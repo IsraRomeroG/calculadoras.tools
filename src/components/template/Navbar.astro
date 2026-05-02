@@ -1,0 +1,67 @@
+---
+import { MENU } from '@lib/constants/menu';
+
+const currentPath = Astro.url.pathname;
+
+function isActiveRoute(currentPath: string, slug: string): boolean {
+  // caso especial para "/"
+  if (slug === '/') {
+    return currentPath === '/';
+  }
+
+  return currentPath.startsWith(slug);
+}
+---
+
+<header class="bg-gray-900 border-b border-gray-700">
+  <div class="relative flex justify-between items-center max-w-5xl mx-auto px-6 py-3 text-white">
+
+    <!-- Logo -->
+    <div class="font-semibold text-lg">
+      <a href="/">
+        calculadoras<span class="text-orange-700">.tools</span>
+      </a>
+    </div>
+
+    <!-- Botón hamburguesa -->
+    <button id="menuBtn" class="md:hidden focus:outline-none">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6"
+           fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M4 6h16M4 12h16M4 18h16"/>
+      </svg>
+    </button>
+
+    <!-- Menú -->
+    <nav id="menu"
+         class="hidden absolute top-full left-0 w-full bg-gray-900 md:static md:block md:w-auto">
+      <ul class="flex flex-col md:flex-row">
+
+        {MENU.map((menuItem) => (
+          <li>
+            <a href={menuItem.slug}
+              class:list={[
+                'block px-4 py-2',
+                isActiveRoute(currentPath, menuItem.slug)
+                  ? 'bg-red-700' : 'hover:bg-gray-700',
+              ]}
+            >
+              {menuItem.name}
+            </a>
+          </li>
+        ))}
+
+      </ul>
+    </nav>
+
+  </div>
+</header>
+
+<script>
+  const menuBtn = document.getElementById('menuBtn');
+  const menu = document.getElementById('menu');
+
+  menuBtn.addEventListener('click', () => {
+    menu.classList.toggle('hidden');
+  });
+</script>
