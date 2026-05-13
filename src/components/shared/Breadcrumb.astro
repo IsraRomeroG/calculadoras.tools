@@ -1,0 +1,120 @@
+---
+type BreadcrumbItemType = "crumb" | "overflow";
+
+export interface BreadcrumbItem {
+  label: string;
+  href?: string;
+  ariaLabel?: string;
+  current?: boolean;
+  optional?: boolean;
+  truncate?: boolean;
+  type?: BreadcrumbItemType;
+}
+
+interface Props {
+  items: BreadcrumbItem[];
+  ariaLabel?: string;
+  showHomeIcon?: boolean;
+  collapseOnMobile?: boolean;
+  class?: string;
+}
+
+const {
+  items,
+  ariaLabel = "Breadcrumb",
+  showHomeIcon = true,
+  collapseOnMobile = false,
+  class: className = "",
+} = Astro.props;
+
+const lastItemIndex = items.length - 1;
+const isCurrent = (item: BreadcrumbItem, index: number) =>
+  item.current || index === lastItemIndex;
+
+const crumbClasses =
+  "inline-flex min-h-9 items-center gap-2 rounded-lg border border-transparent px-2.5 py-1.5 text-gray-300 transition-colors hover:border-gray-600/70 hover:bg-gray-700/60 hover:text-white focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-orange-600/35 focus-visible:ring-offset-2 focus-visible:ring-offset-gray-900 md:min-h-9";
+
+const currentClasses =
+  "inline-flex min-h-9 max-w-[min(52vw,22.5rem)] items-center gap-2 truncate rounded-lg border border-transparent px-2.5 py-1.5 font-semibold text-white md:min-h-9";
+
+const itemClasses = (item: BreadcrumbItem) =>
+  item.optional && collapseOnMobile ? "hidden items-center sm:inline-flex" : "inline-flex min-w-0 items-center";
+---
+
+<nav
+  aria-label={ariaLabel}
+  class:list={[
+    "w-full text-sm font-medium text-gray-500",
+    collapseOnMobile && "text-[13px] sm:text-sm",
+    className,
+  ]}
+>
+  <ol class="flex flex-wrap items-center">
+    {
+      items.map((item, index) => (
+        <>
+          {index > 0 && (
+            <li
+              class:list={[
+                "inline-flex items-center",
+                item.optional && collapseOnMobile && "hidden sm:inline-flex",
+              ]}
+              aria-hidden="true"
+            >
+              <svg
+                class="mx-px h-4.5 w-4.5 shrink-0 text-gray-500"
+                viewBox="0 0 20 20"
+                fill="none"
+              >
+                <path
+                  d="m7.5 4.5 5 5.5-5 5.5"
+                  stroke="currentColor"
+                  stroke-width="1.6"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+              </svg>
+            </li>
+          )}
+
+          <li class={itemClasses(item)}>
+            {item.type === "overflow" ? (
+              <button
+                class={`${crumbClasses} w-9 justify-center font-mono tracking-wider`}
+                type="button"
+                aria-label={item.ariaLabel ?? "Mostrar niveles intermedios"}
+              >
+                ...
+              </button>
+            ) : isCurrent(item, index) ? (
+              <span
+                class:list={[currentClasses, item.truncate && "max-w-[52vw] sm:max-w-[22.5rem]"]}
+                aria-current="page"
+              >
+                {item.label}
+              </span>
+            ) : item.href ? (
+              <a href={item.href} class={crumbClasses} aria-label={item.ariaLabel}>
+                {showHomeIcon && index === 0 && (
+                  <svg class="h-4 w-4 shrink-0" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                    <path
+                      d="M3 10.8 12 3l9 7.8v9.7a.5.5 0 0 1-.5.5h-5.2v-6.4H8.7V21H3.5a.5.5 0 0 1-.5-.5v-9.7Z"
+                      stroke="currentColor"
+                      stroke-width="1.7"
+                      stroke-linejoin="round"
+                    />
+                  </svg>
+                )}
+                <span class:list={[item.truncate && "truncate"]}>{item.label}</span>
+              </a>
+            ) : (
+              <span class:list={[currentClasses, item.truncate && "max-w-[52vw] sm:max-w-[22.5rem]"]}>
+                {item.label}
+              </span>
+            )}
+          </li>
+        </>
+      ))
+    }
+  </ol>
+</nav>
