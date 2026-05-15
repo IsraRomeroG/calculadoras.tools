@@ -1,0 +1,105 @@
+---
+import BaseLayout from "@layouts/BaseLayout.astro";
+import Breadcrumb from "@components/shared/Breadcrumb.astro";
+
+const sections = [
+  {
+    title: "Información que recopilamos",
+    content:
+      "Puedes navegar por calculadoras.tools sin crear una cuenta. Las calculadoras procesan los datos que introduces para mostrar resultados en pantalla. Si usas el formulario de contacto, recopilamos los datos que envíes, como nombre, correo y mensaje.",
+  },
+  {
+    title: "Uso de la información",
+    content:
+      "Usamos la información del formulario únicamente para responder tu mensaje, dar seguimiento a sugerencias, corregir errores o mejorar el sitio.",
+  },
+  {
+    title: "Formulario de contacto",
+    content:
+      "El formulario de contacto se procesa mediante un servicio externo que recibe el envío y lo reenvía al equipo de calculadoras.tools. No publicamos direcciones de correo de contacto en el sitio para reducir spam automatizado.",
+  },
+  {
+    title: "Cookies y analítica",
+    content:
+      "Actualmente no usamos cuentas de usuario ni cookies propias para iniciar sesión. Si en el futuro incorporamos analítica, publicidad o herramientas similares, actualizaremos esta política para explicar qué datos se recopilan y con qué finalidad.",
+  },
+  {
+    title: "Servicios de terceros",
+    content:
+      "El sitio puede depender de proveedores técnicos para alojamiento, entrega del sitio y procesamiento del formulario. Estos servicios pueden tratar datos técnicos necesarios para operar correctamente, como dirección IP, fecha, hora y datos enviados en formularios.",
+  },
+  {
+    title: "Conservación",
+    content:
+      "Conservamos los mensajes de contacto solo durante el tiempo razonablemente necesario para responderlos, resolver incidencias o mantener un historial operativo básico.",
+  },
+  {
+    title: "Tus derechos",
+    content:
+      "Puedes solicitar la revisión, corrección o eliminación de los datos que nos hayas enviado mediante el formulario de contacto.",
+  },
+  {
+    title: "Cambios a esta política",
+    content:
+      "Podemos actualizar esta página cuando cambien las funciones del sitio, los proveedores utilizados o las obligaciones aplicables. La versión vigente estará siempre disponible en esta página.",
+  },
+];
+---
+
+<BaseLayout title="Privacidad">
+  <main class="bg-gray-900 text-gray-100">
+    <section class="border-b border-gray-700">
+      <div class="mx-auto max-w-5xl px-6 py-10">
+        <Breadcrumb
+          class="mb-8"
+          items={[
+            { label: "Inicio", href: "/", ariaLabel: "Inicio" },
+            { label: "Privacidad" },
+          ]}
+        />
+
+        <div class="max-w-3xl">
+          <h1 class="text-4xl font-bold tracking-tight md:text-6xl">
+            Privacidad
+          </h1>
+
+          <p class="mt-6 text-lg leading-relaxed text-gray-400">
+            Esta política explica qué información puede recopilar
+            calculadoras.tools y cómo la usamos para mantener el sitio
+            funcionando de forma clara y responsable.
+          </p>
+
+          <p class="mt-4 text-sm text-gray-500">
+            Última actualización: 14 de mayo de 2026
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section class="mx-auto max-w-5xl px-6 py-14">
+      <div class="grid gap-8">
+        <section class="rounded-lg border border-gray-700 bg-gray-950 p-6">
+          <h2 class="text-lg font-semibold">Resumen</h2>
+          <ul class="mt-4 space-y-3 text-sm text-gray-400">
+            <li>No necesitas una cuenta para usar las calculadoras.</li>
+            <li>
+              Los mensajes del usuario se envían por medio de formularios.
+            </li>
+          </ul>
+        </section>
+        <div class="space-y-6">
+          {
+            sections.map((section) => (
+              <section class="rounded-lg border border-gray-700 bg-gray-950 p-6">
+                <h2 class="text-xl font-semibold">{section.title}</h2>
+                <p class="mt-3 leading-relaxed text-gray-400">
+                  {section.content}
+                </p>
+              </section>
+            ))
+          }
+        </div>
+      </div>
+    </section>
+  </main>
+</BaseLayout>
