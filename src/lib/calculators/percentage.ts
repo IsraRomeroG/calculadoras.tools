@@ -186,7 +186,11 @@ function normalizeSingleSeparator(value: string, separator: "," | "."): string {
   if (parts.length === 2) {
     const [integerPart, fractionalOrGroup] = parts;
 
-    if (fractionalOrGroup.length === 3 && integerPart.length <= 3) {
+    if (
+      separator === "," &&
+      fractionalOrGroup.length === 3 &&
+      integerPart.length <= 3
+    ) {
       return `${integerPart}${fractionalOrGroup}`;
     }
 
