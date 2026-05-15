@@ -1,0 +1,177 @@
+---
+import { render } from "astro:content";
+import BaseLayout from "@layouts/BaseLayout.astro";
+import Breadcrumb from "@components/shared/Breadcrumb.astro";
+import {
+  formatBlogDate,
+  getBlogPostUrl,
+  getCategoryUrl,
+  getPublishedBlogPosts,
+  type BlogPost,
+} from "@lib/blog";
+
+export async function getStaticPaths() {
+  const posts = await getPublishedBlogPosts();
+
+  return posts.map((post) => ({
+    params: { slug: post.id },
+    props: { post },
+  }));
+}
+
+interface Props {
+  post: BlogPost;
+}
+
+const { post } = Astro.props;
+const { Content } = await render(post);
+const title = post.data.seoTitle ?? post.data.title;
+const description = post.data.description;
+const canonical = getBlogPostUrl(post);
+const publishedDate = post.data.pubDate.toISOString();
+const modifiedDate = (post.data.updatedDate ?? post.data.pubDate).toISOString();
+const articleJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "Article",
+  headline: post.data.title,
+  description,
+  datePublished: publishedDate,
+  dateModified: modifiedDate,
+  author: {
+    "@type": "Organization",
+    name: "Calculadoras.Tools",
+  },
+  publisher: {
+    "@type": "Organization",
+    name: "Calculadoras.Tools",
+  },
+  mainEntityOfPage: {
+    "@type": "WebPage",
+    "@id": canonical,
+  },
+};
+---
+
+<BaseLayout title={title} description={description} canonical={canonical}>
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={JSON.stringify(articleJsonLd)} />
+  </Fragment>
+
+  <main class="bg-gray-900 text-gray-100">
+    <article>
+      <header class="border-b border-gray-700">
+        <div class="mx-auto max-w-4xl px-4 py-8 sm:px-6 md:py-10">
+          <Breadcrumb
+            class="mb-6"
+            collapseOnMobile
+            items={[
+              { label: "Inicio", href: "/", ariaLabel: "Inicio" },
+              { label: "Blog", href: "/blog", optional: true },
+              {
+                label: post.data.title,
+                truncate: true,
+              },
+            ]}
+          />
+
+          <a
+            href={getCategoryUrl(post.data.category)}
+            class="text-sm font-semibold uppercase tracking-wide text-amber-400 transition hover:text-amber-300"
+          >
+            {post.data.category}
+          </a>
+
+          <h1 class="mt-3 text-4xl font-bold leading-tight md:text-5xl">
+            {post.data.title}
+          </h1>
+
+          <p class="mt-4 text-base leading-relaxed text-gray-400 md:text-lg">
+            {post.data.description}
+          </p>
+
+          <div class="mt-6 flex flex-wrap items-center gap-x-3 gap-y-2 text-sm text-gray-500">
+            <time datetime={publishedDate}>
+              {formatBlogDate(post.data.pubDate)}
+            </time>
+            {
+              post.data.readTime && (
+                <>
+                  <span aria-hidden="true">·</span>
+                  <span>{post.data.readTime}</span>
+                </>
+              )
+            }
+          </div>
+        </div>
+      </header>
+
+      <div class="mx-auto grid max-w-4xl gap-8 px-4 py-8 sm:px-6 md:py-10 lg:grid-cols-[minmax(0,1fr)_15rem]">
+        <div
+          class="blog-content max-w-none text-base leading-7 text-gray-300"
+        >
+          <Content />
+        </div>
+
+        <aside class="space-y-5 text-sm lg:sticky lg:top-8 lg:self-start">
+          {
+            post.data.tags.length > 0 && (
+              <section>
+                <h2 class="text-sm font-semibold text-white">Temas</h2>
+                <div class="mt-3 flex flex-wrap gap-2">
+                  {post.data.tags.map((tag) => (
+                    <span class="rounded-full border border-gray-700 px-3 py-1 text-gray-400">
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+              </section>
+            )
+          }
+
+          {
+            post.data.relatedCalculator && (
+              <section class="border-t border-gray-800 pt-5">
+                <h2 class="text-sm font-semibold text-white">Calculadora</h2>
+                <a
+                  href={post.data.relatedCalculator.href}
+                  class="mt-3 inline-flex min-h-11 items-center rounded-lg border border-gray-700 px-4 py-2 font-semibold text-amber-400 transition hover:border-amber-400 hover:text-amber-300"
+                >
+                  {post.data.relatedCalculator.label}
+                </a>
+              </section>
+            )
+          }
+        </aside>
+      </div>
+    </article>
+  </main>
+</BaseLayout>
+
+<style>
+  .blog-content :global(h2) {
+    margin-top: 2.5rem;
+    margin-bottom: 0.75rem;
+    color: rgb(243 244 246);
+    font-size: 1.5rem;
+    font-weight: 700;
+    line-height: 1.25;
+  }
+
+  .blog-content :global(p) {
+    margin-top: 1rem;
+  }
+
+  .blog-content :global(pre) {
+    margin-top: 1.25rem;
+    overflow-x: auto;
+    border-radius: 0.5rem;
+    border: 1px solid rgb(55 65 81);
+    background: rgb(3 7 18);
+    padding: 1rem;
+    color: rgb(229 231 235);
+  }
+
+  .blog-content :global(code) {
+    font-size: 0.95em;
+  }
+</style>
