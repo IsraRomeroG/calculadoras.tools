@@ -12,6 +12,8 @@ const faqs = [
     question: "¿Cómo se calcula el porcentaje de un número?",
     answer:
       "Multiplica el número base por el porcentaje dividido entre 100. Por ejemplo, el 20% de 350 se calcula como 350 × 0.20 = 70.",
+    relatedHref: "/blog/como-calcular-porcentajes",
+    relatedLabel: "Ver la guía para calcular porcentajes",
   },
   {
     question: "¿Cómo saber qué porcentaje representa una cantidad?",
@@ -22,11 +24,15 @@ const faqs = [
     question: "¿Cómo calcular el porcentaje de aumento entre dos valores?",
     answer:
       "Resta el valor original al valor nuevo, divide entre el valor original y multiplica por 100. Si el resultado es negativo, se trata de una disminución.",
+    relatedHref: "/blog/aumento-porcentual",
+    relatedLabel: "Entender el aumento porcentual",
   },
   {
     question: "¿Cómo calcular un descuento?",
     answer:
       "Multiplica el precio base por el porcentaje de descuento dividido entre 100. Después resta ese descuento al precio base.",
+    relatedHref: "/blog/porcentaje-de-descuento",
+    relatedLabel: "Ver cómo calcular descuentos",
   },
   {
     question: "¿Qué fórmula se usa para sacar el porcentaje?",
@@ -52,6 +58,14 @@ const examples = [
   {
     title: "Descuentos",
     text: "Calcula cuánto pagas después de aplicar una promoción.",
+    href: "/blog/porcentaje-de-descuento",
+    cta: "Aprender a calcular descuentos",
+  },
+  {
+    title: "Aumentos",
+    text: "Compara un valor inicial y final para saber cuánto creció.",
+    href: "/blog/aumento-porcentual",
+    cta: "Entender el aumento porcentual",
   },
   {
     title: "IVA",
@@ -60,6 +74,29 @@ const examples = [
   {
     title: "Calificaciones",
     text: "Encuentra qué porcentaje representa un resultado parcial.",
+    href: "/blog/como-calcular-porcentajes",
+    cta: "Ver ejemplos de porcentajes",
+  },
+];
+
+const relatedGuides = [
+  {
+    href: "/blog/como-calcular-porcentajes",
+    title: "Cómo calcular porcentajes sin complicarte",
+    description:
+      "Repasa la fórmula base para calcular porcentajes, partes de un total y variaciones.",
+  },
+  {
+    href: "/blog/porcentaje-de-descuento",
+    title: "Cómo calcular un descuento",
+    description:
+      "Aprende a pasar de porcentaje de descuento a ahorro real y precio final.",
+  },
+  {
+    href: "/blog/aumento-porcentual",
+    title: "Qué es el aumento porcentual",
+    description:
+      "Compara dos valores y entiende cuánto cambió una cantidad respecto a su punto de partida.",
   },
 ];
 
@@ -647,7 +684,7 @@ const commonPercentages = [
     </section>
 
     <section class="mx-auto max-w-5xl px-4 py-8 sm:px-6">
-      <div class="grid gap-6 md:grid-cols-3">
+      <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
         {
           examples.map((example) => (
             <article class="rounded-lg border border-gray-700 bg-gray-950 p-5">
@@ -655,7 +692,46 @@ const commonPercentages = [
               <p class="mt-3 text-sm leading-relaxed text-gray-400">
                 {example.text}
               </p>
+              {example.href && example.cta && (
+                <a
+                  href={example.href}
+                  class="mt-4 inline-flex text-sm font-semibold text-amber-400 transition hover:text-amber-300 hover:underline"
+                >
+                  {example.cta}
+                </a>
+              )}
             </article>
+          ))
+        }
+      </div>
+    </section>
+
+    <section class="mx-auto max-w-5xl px-4 py-8 sm:px-6">
+      <div class="mb-5">
+        <h2 class="text-2xl font-semibold">Guías relacionadas</h2>
+        <p class="mt-2 text-sm text-gray-400">
+          Profundiza en los casos más comunes antes o después de usar la
+          calculadora.
+        </p>
+      </div>
+
+      <div class="grid gap-5 md:grid-cols-3">
+        {
+          relatedGuides.map((guide) => (
+            <a
+              href={guide.href}
+              class="group rounded-lg border border-gray-700 bg-gray-950 p-5 transition hover:border-amber-400"
+            >
+              <h3 class="text-lg font-semibold group-hover:text-white">
+                {guide.title}
+              </h3>
+              <p class="mt-3 text-sm leading-relaxed text-gray-400">
+                {guide.description}
+              </p>
+              <span class="mt-4 inline-block text-sm font-semibold text-amber-400 group-hover:underline">
+                Leer guía
+              </span>
+            </a>
           ))
         }
       </div>
@@ -713,6 +789,14 @@ const commonPercentages = [
               <p class="mt-3 text-sm leading-relaxed text-gray-400">
                 {faq.answer}
               </p>
+              {faq.relatedHref && faq.relatedLabel && (
+                <a
+                  href={faq.relatedHref}
+                  class="mt-3 inline-flex text-sm font-semibold text-amber-400 transition hover:text-amber-300 hover:underline"
+                >
+                  {faq.relatedLabel}
+                </a>
+              )}
             </details>
           ))
         }
