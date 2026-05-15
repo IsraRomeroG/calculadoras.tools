@@ -53,6 +53,7 @@ import Breadcrumb from "@components/shared/Breadcrumb.astro";
         </div>
 
         <form
+          id="contact-form"
           class="rounded-lg border border-gray-700 bg-gray-950 p-6"
           action="https://api.web3forms.com/submit"
           method="POST"
@@ -109,6 +110,16 @@ import Breadcrumb from "@components/shared/Breadcrumb.astro";
                 required></textarea>
             </label>
 
+            <div class="overflow-x-auto">
+              <div
+                class="h-captcha"
+                data-captcha="true"
+                data-lang="es"
+                data-theme="dark"
+              >
+              </div>
+            </div>
+
             <button
               class="rounded-lg bg-amber-400 px-5 py-3 text-sm font-semibold text-gray-900 transition hover:bg-gray-700 hover:text-white"
               type="submit"
@@ -120,4 +131,20 @@ import Breadcrumb from "@components/shared/Breadcrumb.astro";
       </div>
     </section>
   </main>
+
+  <script src="https://web3forms.com/client/script.js" async defer></script>
+  <script>
+    const form = document.getElementById("contact-form");
+
+    form?.addEventListener("submit", (event) => {
+      const hCaptchaResponse = form.querySelector<HTMLTextAreaElement>(
+        'textarea[name="h-captcha-response"]'
+      );
+
+      if (!hCaptchaResponse?.value) {
+        event.preventDefault();
+        alert("Por favor completa el captcha antes de enviar el mensaje.");
+      }
+    });
+  </script>
 </BaseLayout>
