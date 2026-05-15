@@ -10,6 +10,9 @@ interface Props {
 }
 
 const { title = "calculadoras.tools", description, canonical } = Astro.props;
+const canonicalUrl = canonical
+  ? new URL(canonical, Astro.site ?? Astro.url).toString()
+  : undefined;
 ---
 
 <html lang="es-MX">
@@ -23,7 +26,7 @@ const { title = "calculadoras.tools", description, canonical } = Astro.props;
       {title === "calculadoras.tools" ? title : `${title} | Calculadoras.Tools`}
     </title>
     {description && <meta name="description" content={description} />}
-    {canonical && <link rel="canonical" href={canonical} />}
+    {canonicalUrl && <link rel="canonical" href={canonicalUrl} />}
     <slot name="head" />
   </head>
   <body class="antialiased">
