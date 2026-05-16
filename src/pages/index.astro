@@ -1,12 +1,17 @@
 ---
 import BaseLayout from "@layouts/BaseLayout.astro";
 import Card from "@components/shared/Card.astro";
-import Breadcrumb from "@components/shared/Breadcrumb.astro";
+import {
+  getCalculatorCategories,
+  getPublishedCalculators,
+} from "@lib/calculator-directory";
 
 import "@styles/global.css";
 
 const description =
   "Calculadoras online simples para resolver porcentajes y otros cálculos cotidianos de forma rápida, clara y gratuita.";
+const calculators = getPublishedCalculators();
+const categories = getCalculatorCategories(calculators);
 ---
 
 <BaseLayout title="Inicio" description={description}>
@@ -42,22 +47,30 @@ const description =
           </p>
         </div>
 
-        <!-- GRID (HOME) -->
-        <div class="grid gap-6 sm:grid-cols-2 md:grid-cols-3">
-          <!-- CARD -->
-          <Card
-            href="/matematicas/calculadora-de-porcentajes"
-            title="Calculadora de porcentajes"
-            description="Calcula porcentajes y aumentos/disminuciones en valores."
-            cta="Usar →"
-          />
+        {
+          categories.length > 0 && (
+            <div class="mb-8 flex flex-wrap gap-3">
+              {categories.map((category) => (
+                <span class="inline-flex items-center gap-2 rounded-full border border-gray-700 px-4 py-2 text-sm text-gray-300">
+                  <span>{category.label}</span>
+                  <span class="text-xs text-gray-500">{category.count}</span>
+                </span>
+              ))}
+            </div>
+          )
+        }
 
-          <Card
-            href="/legal-impuestos/calculadora-de-iva"
-            title="Calculadora de IVA"
-            description="Agrega o desglosa IVA con tasa editable y presets por país."
-            cta="Usar →"
-          />
+        <div class="grid gap-6 sm:grid-cols-2 md:grid-cols-3">
+          {
+            calculators.map((calculator) => (
+              <Card
+                href={calculator.href}
+                title={calculator.title}
+                description={calculator.description}
+                cta="Usar →"
+              />
+            ))
+          }
         </div>
       </div>
     </section>
