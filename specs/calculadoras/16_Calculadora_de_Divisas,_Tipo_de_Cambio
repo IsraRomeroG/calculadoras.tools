@@ -1,0 +1,476 @@
+# Especificación — Calculadora de Divisas / Tipo de Cambio
+
+## Descripción general
+Herramienta para convertir entre monedas del mundo usando tipos
+de cambio actualizados en tiempo real o con la última tasa
+disponible. Es una de las calculadoras más competidas del sitio
+en términos de SEO — Google y XE.com dominan la búsqueda directa
+— pero hay un espacio claro para ganar en búsquedas específicas
+regionales, pares de divisas latinoamericanas y contextos de viaje
+o negocio donde se necesita más que un número.
+
+El diferencial no es la conversión básica (eso lo hace Google
+en el propio SERP) sino el contexto: historial de tipos de cambio,
+comparador de comisiones, calculadora de pérdida por cambio y
+orientación específica para viajeros y freelancers.
+
+---
+
+## Conceptos base
+
+### Tipo de cambio
+El tipo de cambio es el precio de una moneda expresado
+en términos de otra. Existen dos tipos:
+
+**Tipo de cambio directo:**
+Unidades de moneda local por una unidad de moneda extranjera.
+Ejemplo: 1 USD = 17.50 MXN
+
+**Tipo de cambio inverso:**
+Unidades de moneda extranjera por una unidad de moneda local.
+Ejemplo: 1 MXN = 0.0571 USD
+
+### Diferencia entre tipo de cambio interbancario y comercial
+- **Interbancario (mid-market):** el tipo de cambio "real",
+  el que usan los bancos entre sí. Es el que muestran
+  Google, XE y esta calculadora como referencia.
+- **Tipo de venta (banco / casa de cambio):** el que paga
+  el consumidor al comprar divisas. Incluye spread o comisión.
+- **Tipo de compra:** el que recibe el consumidor al vender.
+- La diferencia entre compra y venta es el margen del intermediario.
+
+### Fuente de datos
+- API pública de tipos de cambio con actualización cada hora.
+- Opciones: Open Exchange Rates, Fixer.io, ExchangeRate-API,
+  o Frankfurter (libre y sin clave para EUR base).
+- Mostrar siempre la hora de la última actualización.
+- Si la API falla: usar la última tasa en caché con aviso visible.
+
+---
+
+## Divisas prioritarias para el sitio
+
+### Tier 1 — Alta prioridad (pares más buscados en español)
+
+| Par | Búsqueda estimada |
+|-----|------------------|
+| USD / MXN | Muy alta |
+| EUR / MXN | Alta |
+| USD / COP | Alta |
+| USD / ARS | Alta |
+| USD / CLP | Alta |
+| USD / PEN | Alta |
+| USD / EUR | Muy alta |
+| GBP / EUR | Alta |
+| USD / BRL | Alta |
+| USD / GTQ | Media |
+
+### Tier 2 — Cobertura completa
+Soporte para las ~170 monedas reconocidas por ISO 4217,
+incluyendo:
+- Todas las monedas latinoamericanas
+- Monedas principales de Europa, Asia y Oceanía
+- Monedas del Golfo Pérsico (AED, SAR, QAR)
+- Criptomonedas principales como referencia (BTC, ETH, USDT)
+
+---
+
+## Casos de uso (modos de cálculo)
+
+### Modo 1 — Conversión rápida
+> Ejemplo: ¿Cuántos pesos mexicanos son 500 dólares?
+
+**Inputs:**
+- Cantidad → ej. 500
+- Moneda de origen → ej. USD
+- Moneda de destino → ej. MXN
+
+**Output principal:**
+
+500 USD = 8,750.00 MXN
+1 USD = 17.50 MXN · 1 MXN = 0.0571 USD
+Actualizado: hoy 14:32 hora de Ciudad de México
+
+**Output secundario:**
+- Tipo de cambio inverso: **1 MXN = $0.0571 USD**
+- Fuente: Open Exchange Rates (interbancario / mid-market)
+- Nota: "El tipo de cambio real que obtendrás en un banco
+  o casa de cambio puede diferir. Ver simulador de comisiones."
+
+---
+
+### Modo 2 — Conversión múltiple (una a varias)
+> Ejemplo: Tengo 1,000 USD. ¿Cuánto es en MXN, EUR, COP y CLP?
+
+**Inputs:**
+- Cantidad → ej. 1,000
+- Moneda de origen → ej. USD
+- Monedas de destino → selector múltiple (hasta 8)
+
+**Output — tabla:**
+
+| Moneda | País | Resultado | Tasa |
+|--------|------|-----------|------|
+| 🇲🇽 MXN | México | $17,500.00 | 17.50 |
+| 🇪🇺 EUR | Eurozona | €920.00 | 0.92 |
+| 🇨🇴 COP | Colombia | $4,120,000 | 4,120 |
+| 🇨🇱 CLP | Chile | $940,000 | 940 |
+| 🇵🇪 PEN | Perú | S/3,750 | 3.75 |
+| 🇦🇷 ARS | Argentina | $897,000 | 897 |
+| 🇧🇷 BRL | Brasil | R$5,050 | 5.05 |
+| 🇬🇧 GBP | Reino Unido | £790.00 | 0.79 |
+
+- Banderas de cada país para identificación visual rápida.
+- Ordenar por tasa o por nombre (toggle).
+
+---
+
+### Modo 3 — Simulador de comisiones
+> ¿Cuánto pierdo realmente al cambiar divisas en el banco
+> vs una casa de cambio vs una tarjeta de crédito?
+
+**Inputs:**
+- Cantidad → ej. 1,000 USD
+- Moneda de origen → USD
+- Moneda de destino → MXN
+- Tipo de cambio interbancario (referencia) → 17.50 (auto)
+
+**Definir escenarios de cambio:**
+- Escenario A: banco local → tasa que ofrece → ej. 16.80
+- Escenario B: casa de cambio → tasa → ej. 17.10
+- Escenario C: tarjeta de crédito → tasa + comisión → ej. 17.35 − 3%
+- Escenario D: transferencia internacional (Wise, etc.) → ej. 17.45 − 0.5%
+
+**Output — tabla comparativa:**
+
+| Método | Tasa | Recibes | Pérdida vs interbancario | % perdido |
+|--------|------|---------|--------------------------|-----------|
+| Referencia (ideal) | 17.50 | $17,500 | — | — |
+| 🏦 Banco local | 16.80 | $16,800 | −$700 | −4.0% |
+| 🏪 Casa de cambio | 17.10 | $17,100 | −$400 | −2.3% |
+| 💳 Tarjeta crédito | 16.83 | $16,830 | −$670 | −3.8% |
+| 🌐 Wise / Remesa | 17.37 | $17,370 | −$130 | −0.7% |
+
+- Destacar visualmente el mejor método.
+- Nota: "Estos valores son ejemplos. Consulta las tasas
+  actuales de cada institución antes de cambiar."
+
+---
+
+### Modo 4 — Historial de tipo de cambio
+> ¿Cómo ha variado el USD/MXN en el último año?
+
+**Inputs:**
+- Par de divisas → ej. USD/MXN
+- Período → 7 días / 30 días / 90 días / 1 año / 5 años
+
+**Output:**
+- Gráfica de línea con el historial del tipo de cambio
+- Tabla de datos: fecha, apertura, cierre, máximo, mínimo
+- Estadísticas del período:
+  - Mínimo: **16.80** (fecha)
+  - Máximo: **18.20** (fecha)
+  - Promedio: **17.35**
+  - Variación: **+2.4%** en el período
+
+> Fuente de datos históricos: API con datos diarios
+> (Frankfurter, ExchangeRate-API o similar).
+
+---
+
+### Modo 5 — Calculadora para viajeros
+> Contexto específico para viajes: ¿cuánto dinero llevar,
+> qué me conviene usar, cuánto cuesta todo en mi moneda?
+
+**Inputs:**
+- País de origen + moneda local → ej. México / MXN
+- País de destino → ej. España / EUR
+- Presupuesto de viaje → ej. $30,000 MXN
+- Duración → ej. 10 días
+
+**Output:**
+- Presupuesto en EUR: **€1,560.00**
+- Presupuesto diario: **€156 / día**
+- Tipo de cambio usado: 1 EUR = 19.23 MXN
+- Costo de vida estimado en destino (referencia):
+  - Comida: €30–50/día
+  - Transporte: €10–20/día
+  - Alojamiento (hostal): €25–50/noche
+  - Tu presupuesto diario de €156 es: ✅ Suficiente (nivel medio)
+
+**Conversor rápido para el viaje:**
+
+[ 50  ] EUR = [ 961.50 ] MXN
+
+Campo de conversión rápida bidireccional para usar
+durante el viaje al ver precios.
+
+---
+
+### Modo 6 — Calculadora para freelancers
+> Contexto específico para freelancers que cobran
+> en USD/EUR y viven en LATAM.
+
+**Inputs:**
+- Tarifa por hora → ej. $35 USD/hora
+- Horas trabajadas al mes → ej. 80 horas
+- Moneda local → MXN
+- Retención fiscal estimada → ej. 10%
+
+**Output:**
+- Ingreso bruto en USD: **$2,800 USD**
+- Equivalente en MXN: **$49,000 MXN**
+- Retención fiscal: **$4,900 MXN**
+- Ingreso neto estimado: **$44,100 MXN**
+- Tipo de cambio usado: 17.50 MXN/USD
+- Actualizado: hace 23 minutos
+
+**Simulador de impacto del tipo de cambio:**
+¿Qué pasa con mi ingreso si el dólar sube / baja?
+
+| Escenario | USD/MXN | Ingreso neto MXN |
+|-----------|---------|-----------------|
+| Dólar baja 10% | 15.75 | $39,690 |
+| Tipo actual | 17.50 | $44,100 |
+| Dólar sube 10% | 19.25 | $48,510 |
+
+---
+
+## Inputs detallados
+
+| Campo | Tipo | Rango válido | Valor por defecto |
+|-------|------|-------------|-------------------|
+| Cantidad | Numérico | > 0 | 1 |
+| Moneda origen | Selector con búsqueda | ~170 monedas | USD |
+| Moneda destino | Selector con búsqueda | ~170 monedas | MXN |
+| Monedas adicionales (Modo 2) | Selector múltiple | Hasta 8 | — |
+| Período historial | Selector | 7d / 30d / 90d / 1a / 5a | 30 días |
+| Tasa manual (override) | Numérico (avanzado) | > 0 | API auto |
+| Comisión personalizada | Numérico | 0% – 20% | — |
+| Presupuesto viaje (Modo 5) | Numérico | > 0 | — |
+| Duración viaje (Modo 5) | Numérico | 1 – 365 días | — |
+| Horas freelance (Modo 6) | Numérico | 1 – 744 horas | — |
+| Retención fiscal (Modo 6) | Numérico | 0% – 50% | — |
+
+---
+
+## Feature — Selector de moneda con búsqueda
+El selector de moneda debe ser altamente usable:
+
+- Campo de búsqueda por nombre o código ISO
+  (ej. "peso" o "MXN" → muestra todas las monedas
+  con "peso" en el nombre)
+- Monedas favoritas / recientes al tope de la lista
+- Bandera del país junto a cada moneda
+- Código ISO 4217 visible (USD, EUR, MXN, etc.)
+- Ordenadas: favoritas → recientes → alfabético
+- Búsqueda tolerante a errores (fuzzy search)
+
+---
+
+## Feature — Tasas de cambio populares en tarjetas
+Mostrar en la página principal (sin necesidad de input)
+las tasas actualizadas de los pares más buscados:
+
+USD/MXN  17.50  ▲ +0.12  (+0.69%)
+EUR/MXN  19.23  ▼ −0.08  (−0.41%)
+USD/COP  4,120  ▲ +15    (+0.37%)
+USD/ARS  897    ▲ +2.1   (+0.23%)
+EUR/USD  0.921  ▼ −0.003 (−0.33%)
+
+Actualización automática cada 60 minutos.
+Flecha verde ▲ si sube / roja ▼ si baja vs ayer.
+
+---
+
+## Feature — Aviso de tipo de cambio
+El usuario puede configurar una alerta visual:
+"Avísame cuando USD/MXN supere 18.00"
+
+Al cargar la página, comparar con la tasa actual
+y mostrar banner si se ha alcanzado el umbral.
+(Sin push notifications — solo al visitar la página.)
+
+Guardado en localStorage del navegador.
+
+---
+
+## Feature — Conversor offline / última tasa conocida
+Si la API de tasas no está disponible:
+- Usar la última tasa guardada en caché (localStorage)
+- Mostrar banner visible:
+  ⚠️ "Usando tipo de cambio del [fecha/hora].
+  No se pudo conectar al servicio de tasas en tiempo real."
+- La calculadora sigue funcionando con datos en caché.
+
+---
+
+## Validaciones de inputs
+
+| Regla | Detalle |
+|-------|---------|
+| Cantidad > 0 | Error: "La cantidad debe ser mayor que cero" |
+| Moneda origen ≠ destino | Advertencia: "Seleccionaste la misma moneda de origen y destino" |
+| Cantidad muy grande | Advertencia si supera 1,000,000,000 (mil millones) |
+| API no disponible | Modo offline con última tasa en caché |
+| Tasa manual = 0 | Error: "El tipo de cambio no puede ser cero" |
+| Cantidad no numérica | Limpiar y resaltar el campo |
+| Monedas no disponibles | Mostrar mensaje: "Esta moneda no está disponible actualmente" |
+
+---
+
+## Formato de outputs
+
+| Tipo de resultado | Formato |
+|-------------------|---------|
+| Montos grandes | Separador de miles → 17,500.00 |
+| Montos pequeños | Hasta 6 decimales → 0.000571 |
+| Tipo de cambio | 4 decimales → 17.5024 |
+| Variación histórica | Con signo y % → +2.4% |
+| Símbolo de moneda | Antes del número → $17,500 / €920 / S/3,750 |
+| Timestamp actualización | Hora local → "Actualizado hoy a las 14:32" |
+| Pérdida en comisiones | En rojo con signo → −$700 MXN (−4.0%) |
+
+---
+
+## Features adicionales
+
+### Cálculo en tiempo real
+- La conversión se actualiza automáticamente con cada tecla.
+- La tasa se refresca automáticamente cada 60 minutos.
+
+### Intercambiar monedas (swap)
+- Botón ⇄ para intercambiar origen y destino.
+- El monto se reconvierte automáticamente.
+
+### Copiar resultado
+- Botón de clipboard junto al resultado principal.
+- Copia: "500 USD = 8,750.00 MXN (tasa: 17.50)"
+
+### Historial de conversiones de la sesión
+- Últimas 10 conversiones con hora, par y resultado.
+- Útil para viajeros que hacen múltiples consultas.
+
+### Favoritos
+- El usuario puede marcar hasta 5 pares como favoritos.
+- Aparecen primero en el selector y en las tarjetas
+  de tasas populares.
+- Guardado en localStorage.
+
+### Modo sin conexión
+- Service Worker que cachea la última tasa conocida.
+- Funciona offline con aviso claro de la fecha de los datos.
+
+---
+
+## SEO y contenido de la página
+
+### Meta información
+- Title: "Calculadora de Divisas y Tipo de Cambio — Conversor de Moneda"
+- Description: "Convierte entre más de 170 monedas con tipo de cambio
+  actualizado. USD a MXN, EUR a COP, y mucho más. Con historial,
+  comparador de comisiones y modo viajero. Gratis."
+
+### URLs sugeridas
+- /conversor-divisas (principal)
+- /tipo-de-cambio-dolar-peso
+- /tipo-de-cambio-hoy
+- /calculadora-dolar-a-pesos-mexicanos
+- /tipo-de-cambio-euro-peso
+
+### Páginas de pares específicos (long-tail SEO)
+Generar páginas estáticas o dinámicas para los pares
+más buscados en español:
+
+- /dolar-a-peso-mexicano → "1 USD = 17.50 MXN hoy"
+- /euro-a-peso-mexicano → "1 EUR = 19.23 MXN hoy"
+- /dolar-a-peso-colombiano → "1 USD = 4,120 COP hoy"
+- /dolar-a-peso-chileno → "1 USD = 940 CLP hoy"
+- /dolar-a-sol-peruano → "1 USD = 3.75 PEN hoy"
+- /dolar-a-peso-argentino → "1 USD = 897 ARS hoy"
+- /dolar-a-euro → "1 USD = 0.921 EUR hoy"
+- /libra-a-euro → "1 GBP = 1.172 EUR hoy"
+
+> Estas páginas se generan dinámicamente con la tasa del día.
+> Son la mayor fuente de tráfico long-tail de la calculadora.
+
+### Preguntas frecuentes (FAQ — para rich snippets)
+- ¿Cuánto es 1 dólar en pesos mexicanos hoy?
+- ¿Cuál es el tipo de cambio del euro hoy?
+- ¿Dónde conviene más cambiar dólares?
+- ¿Qué es el tipo de cambio interbancario?
+- ¿Cuánto cobra el banco por cambiar divisas?
+- ¿Conviene más usar tarjeta o efectivo en el extranjero?
+- ¿Cómo afecta el tipo de cambio a los freelancers?
+
+### Contenido de apoyo
+- Tabla de tipos de cambio de las 20 monedas principales
+  vs USD (actualizada diariamente).
+- Artículo: "¿Dónde conviene más cambiar dólares en México?"
+- Guía: "Tipo de cambio para freelancers: cómo proteger
+  tus ingresos en dólares."
+- Explicación: "¿Qué es el spread y por qué el banco
+  no te da el tipo de cambio de Google?"
+
+---
+
+## Especificaciones técnicas
+
+| Parámetro | Detalle |
+|-----------|---------|
+| Plataforma | Web responsive (mobile-first) |
+| API de tasas | ExchangeRate-API / Open Exchange Rates / Frankfurter |
+| Frecuencia actualización | Cada 60 minutos (cron o al cargar la página) |
+| Caché | localStorage + Service Worker para modo offline |
+| Gráfica historial | Chart.js (línea con zoom) |
+| Selector moneda | Componente custom con fuzzy search |
+| Banderas | Emoji de banderas (Unicode) o sprite CSS |
+| Modo offline | Service Worker con última tasa en caché |
+| Exportar | CSV de historial / tabla Modo 2 |
+| Accesibilidad | Labels, ARIA live para actualizaciones de tasa |
+| URL principal | /conversor-divisas |
+| Idioma | Español; formato numérico según locale |
+| Precisión | 4 decimales en tasas; 2 decimales en montos |
+
+---
+
+## Diferencias clave vs otras calculadoras de conversión del sitio
+
+| Aspecto | Divisas | Temperatura | Peso (kg/lb) | Distancia (km/mi) |
+|---------|---------|-------------|-------------|-------------------|
+| Datos en tiempo real | ✅ Sí (API) | ❌ No necesita | ❌ No necesita | ❌ No necesita |
+| Requiere internet | ✅ Para tasa actual | ❌ No | ❌ No | ❌ No |
+| Modo offline | ✅ Con caché | ✅ Siempre | ✅ Siempre | ✅ Siempre |
+| Historial de datos | ✅ Sí (gráfica) | ❌ No aplica | ❌ No aplica | ❌ No aplica |
+| Contextos específicos | ✅ Viaje / freelance | ✅ Clima / cocina | 🔶 Salud | 🔶 Deporte |
+| Long-tail por par | ✅ Alto potencial | ✅ Por valor | 🔶 Medio | 🔶 Medio |
+| Comisiones / spread | ✅ Sí | ❌ No aplica | ❌ No aplica | ❌ No aplica |
+| Monedas soportadas | ~170 | N/A | N/A | N/A |
+
+---
+
+## Casos extremos a contemplar
+
+- API caída → modo offline con caché; aviso prominente;
+  calculadora sigue funcionando con última tasa conocida
+- Moneda con hiperinflación (ARS, VES) → manejar números
+  muy grandes sin desbordamiento; formato con separadores
+- Tipo de cambio = 0 (error de API) → ignorar y usar caché;
+  no mostrar resultado de 0
+- Misma moneda origen y destino → resultado = cantidad ingresada;
+  advertencia amable "Seleccionaste la misma moneda"
+- Cantidad con muchos decimales (ej. 0.00001 BTC) →
+  manejar con 8 decimales de precisión
+- Criptomonedas → volatilidad alta; mostrar timestamp
+  con minutos exactos y advertencia de volatilidad
+- País con múltiples tipos de cambio (ej. Argentina con
+  tipo oficial vs blue) → mostrar solo tipo oficial con
+  nota: "Argentina tiene múltiples tipos de cambio.
+  Este es el tipo de cambio oficial."
+- Cambio de moneda origen/destino al hacer swap con
+  cantidad ya ingresada → reconvertir automáticamente
+  usando el resultado anterior como nuevo input
+- Monedas descontinuadas (ej. peseta española, marco alemán)
+  → no incluir o incluir con nota histórica clara
+- Conexión lenta → mostrar skeleton loader durante
+  la carga de tasas; no bloquear la UI

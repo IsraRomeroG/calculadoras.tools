@@ -1,0 +1,484 @@
+# Especificación — Calculadora de Temperatura (°C / °F / K)
+
+## Descripción general
+Herramienta para convertir temperaturas entre las tres escalas
+principales: Celsius, Fahrenheit y Kelvin. Es una de las
+calculadoras más buscadas del sitio por su utilidad universal
+y transversal: la usan viajeros que llegan a un país con otra
+escala, cocineros que siguen recetas extranjeras, estudiantes
+de ciencias, meteorólogos aficionados y profesionales de la salud.
+
+Aparentemente simple, una buena calculadora de temperatura
+va mucho más allá de la conversión numérica: ofrece contexto
+visual (¿qué tan caliente es eso en la vida real?), soporte
+para múltiples escalas científicas, y casos de uso específicos
+por contexto (cocina, clima, salud, ciencia) que multiplican
+el alcance SEO de una sola herramienta.
+
+---
+
+## Conceptos base
+
+### Las tres escalas principales
+
+| Escala | Símbolo | Punto de congelación del agua | Punto de ebullición | Cero absoluto |
+|--------|---------|------------------------------|--------------------|--------------:|
+| Celsius | °C | 0°C | 100°C | −273.15°C |
+| Fahrenheit | °F | 32°F | 212°F | −459.67°F |
+| Kelvin | K | 273.15 K | 373.15 K | 0 K |
+
+### Escalas adicionales (avanzado)
+
+| Escala | Símbolo | Uso |
+|--------|---------|-----|
+| Rankine | °R | Ingeniería termodinámica (EE.UU.) |
+| Réaumur | °Ré | Histórica, uso residual en Europa |
+| Delisle | °De | Histórica, uso científico |
+| Newton | °N | Histórica, rareza científica |
+| Rømer | °Rø | Histórica, rareza científica |
+
+### Fórmulas de conversión
+
+**Celsius a Fahrenheit:**
+°F = (°C × 9/5) + 32
+
+**Fahrenheit a Celsius:**
+°C = (°F − 32) × 5/9
+
+**Celsius a Kelvin:**
+K = °C + 273.15
+
+**Kelvin a Celsius:**
+°C = K − 273.15
+
+**Fahrenheit a Kelvin:**
+K = (°F + 459.67) × 5/9
+
+**Kelvin a Fahrenheit:**
+°F = (K × 9/5) − 459.67
+
+**Celsius a Rankine:**
+°R = (°C + 273.15) × 9/5
+
+**Celsius a Réaumur:**
+°Ré = °C × 4/5
+
+---
+
+## Casos de uso (modos de cálculo)
+
+### Modo 1 — Conversión rápida (todas las escalas)
+> El usuario ingresa un valor en cualquier escala
+> y obtiene instantáneamente la conversión a todas las demás.
+
+**Input:**
+- Valor numérico en cualquier escala → ej. 37
+- Escala de origen → selector o campo activo → ej. °C
+
+**Output — tabla completa:**
+
+| Escala | Valor | Contexto |
+|--------|-------|---------|
+| **Celsius** | **37.0 °C** | ← Valor ingresado |
+| Fahrenheit | 98.6 °F | |
+| Kelvin | 310.15 K | |
+| Rankine | 558.27 °R | |
+| Réaumur | 29.6 °Ré | |
+
+**Indicador contextual:**
+- 🌡️ "37°C es la temperatura corporal normal humana"
+
+---
+
+### Modo 2 — Conversión bidireccional rápida
+> Interfaz simplificada con dos campos sincronizados.
+> Al escribir en uno, el otro se actualiza solo.
+
+**Diseño:**
+
+[ 37.0  ] °C   ⇄   [ 98.6  ] °F
+
+- Tres pares de conversión disponibles como tabs:
+  - °C ↔ °F (el más buscado)
+  - °C ↔ K
+  - °F ↔ K
+
+- Al escribir en cualquier campo, el otro se actualiza
+  en tiempo real sin botón de convertir.
+
+---
+
+### Modo 3 — Por contexto de uso
+> Selector de contexto que ajusta la presentación
+> y añade información relevante para ese uso específico.
+
+**Contextos disponibles:**
+
+#### 🌤️ Clima y meteorología
+Tabla de referencia para interpretar temperaturas del tiempo:
+
+| Temperatura | Sensación | Qué ponerse |
+|-------------|-----------|-------------|
+| < 0°C / < 32°F | Helado 🥶 | Abrigo de invierno, guantes, bufanda |
+| 0–10°C / 32–50°F | Muy frío | Abrigo y capas |
+| 10–15°C / 50–59°F | Fresco | Chaqueta o jersey |
+| 15–20°C / 59–68°F | Templado | Capa ligera |
+| 20–25°C / 68–77°F | Agradable 😊 | Ropa de primavera |
+| 25–30°C / 77–86°F | Caluroso | Ropa ligera |
+| 30–35°C / 86–95°F | Muy caluroso | Ropa de verano, hidratarse |
+| > 35°C / > 95°F | Extremo 🥵 | Evitar exposición prolongada |
+
+#### 🍳 Cocina y horno
+Tabla de temperaturas de cocción comunes:
+
+| Temperatura | Uso culinario |
+|-------------|--------------|
+| 120°C / 250°F | Horno muy suave — merengues, secado |
+| 150°C / 300°F | Horno suave — bizcochos delicados |
+| 175°C / 350°F | Horno moderado — pasteles, galletas |
+| 190°C / 375°F | Horno medio-alto — pan, pollo |
+| 200°C / 400°F | Horno alto — verduras asadas, pizza |
+| 220°C / 425°F | Horno muy alto — carne sellada |
+| 230°C / 450°F | Horno máximo — pan artesanal |
+| 56°C / 133°F | Carne de res: punto medio |
+| 74°C / 165°F | Pollo: temperatura segura interna |
+| 63°C / 145°F | Cerdo: temperatura segura interna |
+| 100°C / 212°F | Punto de ebullición del agua |
+
+#### 🌡️ Salud y fiebre
+Tabla de interpretación de temperatura corporal:
+
+| Temperatura | Interpretación |
+|-------------|---------------|
+| < 35°C / < 95°F | Hipotermia — buscar atención médica |
+| 35–36.4°C / 95–97.5°F | Por debajo de lo normal |
+| 36.5–37.5°C / 97.7–99.5°F | Normal ✅ |
+| 37.6–38°C / 99.7–100.4°F | Temperatura elevada |
+| 38.1–39°C / 100.6–102.2°F | Fiebre moderada 🟠 |
+| 39.1–40°C / 102.4–104°F | Fiebre alta 🔴 |
+| > 40°C / > 104°F | Fiebre muy alta — atención médica urgente |
+
+Nota: "La temperatura normal varía según la persona,
+la hora del día y el método de medición."
+
+#### 🔬 Ciencia y laboratorio
+Referencias para usos científicos:
+
+| Temperatura | Referencia científica |
+|-------------|----------------------|
+| −273.15°C / 0 K | Cero absoluto (temperatura mínima teórica) |
+| −196°C / −321°F | Nitrógeno líquido |
+| −78.5°C / −109.3°F | Hielo seco (CO₂ sólido) |
+| 0°C / 32°F | Punto de fusión del hielo |
+| 100°C / 212°F | Punto de ebullición del agua (nivel del mar) |
+| 1,083°C / 1,981°F | Punto de fusión del cobre |
+| 1,538°C / 2,800°F | Punto de fusión del hierro |
+| 5,778 K / 5,505°C | Temperatura superficial del Sol |
+
+#### 🏥 Temperatura corporal por método
+Diferencias según la forma de medir:
+
+| Método | Temperatura normal |
+|--------|-------------------|
+| Oral (boca) | 36.5–37.5°C / 97.7–99.5°F |
+| Axilar (axila) | 36.0–37.0°C / 96.8–98.6°F |
+| Rectal | 36.8–38.0°C / 98.2–100.4°F |
+| Oído (timpánico) | 36.5–37.5°C / 97.7–99.5°F |
+| Frente (infrarrojo) | 36.0–37.4°C / 96.8–99.3°F |
+
+---
+
+### Modo 4 — Conversión de rango de temperaturas
+> El usuario quiere convertir un rango completo,
+> no solo un valor puntual.
+
+**Inputs:**
+- Temperatura mínima → ej. 15°C
+- Temperatura máxima → ej. 28°C
+- Escala de origen → °C
+- Escala de destino → °F
+
+**Output:**
+- Mínima: 15°C = **59°F**
+- Máxima: 28°C = **82.4°F**
+- Rango: **59°F – 82.4°F**
+- Diferencia: 13°C = **23.4°F**
+
+> Útil para pronósticos del tiempo, especificaciones
+> técnicas, condiciones de almacenamiento.
+
+---
+
+### Modo 5 — Tabla de conversión personalizada
+> El usuario define un rango y la calculadora genera
+> una tabla de conversión completa.
+
+**Inputs:**
+- Escala de origen → ej. °C
+- Valor inicial → ej. 0
+- Valor final → ej. 100
+- Paso (incremento) → ej. 5
+
+**Output — tabla generada:**
+
+| °C | °F | K |
+|----|-----|---------|
+| 0 | 32.0 | 273.15 |
+| 5 | 41.0 | 278.15 |
+| 10 | 50.0 | 283.15 |
+| 15 | 59.0 | 288.15 |
+| 20 | 68.0 | 293.15 |
+| ... | ... | ... |
+| 100 | 212.0 | 373.15 |
+
+- Máximo 200 filas por tabla.
+- Exportar tabla como CSV.
+- Imprimir vista limpia (útil para laboratorios y cocinas).
+
+---
+
+## Feature — Termómetro visual animado
+Representación gráfica de la temperatura ingresada
+en un termómetro SVG animado.
+
+**Diseño:**
+- Termómetro vertical con escala dual °C / °F
+- Mercurio (o indicador moderno) que sube/baja
+  animadamente al cambiar el valor
+- Zonas de color:
+  - Azul: temperaturas muy frías (< 0°C)
+  - Verde: temperaturas agradables (15–25°C)
+  - Amarillo: caluroso (25–35°C)
+  - Rojo: muy caluroso o fiebre (> 35°C)
+- Se actualiza en tiempo real con cada tecla
+
+---
+
+## Feature — Fórmula visible
+Mostrar la fórmula usada para la conversión actual:
+
+**Ejemplo (°C → °F):**
+
+Fórmula: °F = (°C × 9/5) + 32
+Sustituyendo: °F = (37 × 9/5) + 32
+°F = (66.6) + 32
+°F = 98.6
+
+Toggle para mostrar / ocultar el paso a paso.
+Útil para estudiantes que necesitan aprender la fórmula.
+
+---
+
+## Feature — Temperatura "sensación térmica"
+Para temperaturas de clima, mostrar la sensación
+térmica real según el índice de calor o factor viento:
+
+**Índice de calor (calor + humedad):**
+- Input adicional: humedad relativa (%)
+- Fórmula: Steadman Heat Index
+- Relevante cuando T > 27°C / 80°F
+
+**Factor de enfriamiento por viento (wind chill):**
+- Input adicional: velocidad del viento (km/h o mph)
+- Fórmula: NWS Wind Chill Formula
+- Relevante cuando T < 10°C / 50°F
+
+**Output adicional:**
+- Temperatura real: 35°C
+- Humedad: 70%
+- Sensación térmica: **42°C** ⚠️
+
+---
+
+## Inputs detallados
+
+| Campo | Tipo | Rango válido | Valor por defecto |
+|-------|------|-------------|-------------------|
+| Valor de temperatura | Numérico | −273.15°C a cualquier valor | — |
+| Escala de origen | Selector / Tab | °C / °F / K / °R / °Ré | °C |
+| Escala de destino | Selector | Igual que origen | °F |
+| Contexto de uso | Selector | Clima / Cocina / Salud / Ciencia | — |
+| Decimales | Selector | 0 / 1 / 2 / 3 | 2 |
+| Humedad (sensación) | Numérico | 0% – 100% | — |
+| Velocidad viento (sensación) | Numérico | 0 – 200 km/h | — |
+| Rango mín / máx (Modo 4) | Numérico doble | Sin límite | — |
+| Valor inicial / final (Modo 5) | Numérico doble | Sin límite | — |
+| Paso de la tabla (Modo 5) | Numérico | 0.1 – 100 | 1 |
+
+---
+
+## Validaciones de inputs
+
+| Regla | Detalle |
+|-------|---------|
+| Temperatura < cero absoluto | Error: "La temperatura no puede ser menor que el cero absoluto (−273.15°C / 0 K)" |
+| Kelvin negativo | Error: "La escala Kelvin no admite valores negativos" |
+| Campo vacío | Mostrar campos de resultado vacíos, sin error |
+| Valor no numérico | Ignorar caracteres no numéricos; limpiar el campo |
+| Rango invertido (Modo 4) | Advertencia si mínima > máxima; intercambiar automáticamente |
+| Tabla > 200 filas (Modo 5) | Limitar y notificar: "Mostrando primeras 200 filas" |
+| Paso = 0 (Modo 5) | Error: "El incremento no puede ser cero" |
+
+---
+
+## Formato de outputs
+
+| Tipo de resultado | Formato |
+|-------------------|---------|
+| Temperatura | Configurable: 0–3 decimales → 98.6°F |
+| Símbolo de escala | Siempre junto al número → 37.0 °C |
+| Valores negativos | Con signo → −40.0°C |
+| Diferencia de rango | Con unidades → 23.4°F de diferencia |
+| Tabla personalizada | Alineada a la derecha, separador de decimales según locale |
+| Cero absoluto | Siempre con máxima precisión → −273.15°C / 0.00 K |
+
+---
+
+## Atajos y conversiones más buscadas
+Mostrar como tarjetas de acceso rápido en la página
+para capturar búsquedas específicas de long-tail:
+
+| Búsqueda frecuente | Resultado |
+|-------------------|-----------|
+| 100°F en Celsius | 37.78°C |
+| 37°C en Fahrenheit | 98.6°F |
+| 180°C en Fahrenheit | 356°F |
+| 350°F en Celsius | 176.67°C |
+| 0°C en Fahrenheit | 32°F |
+| 200°C en Fahrenheit | 392°F |
+| 98.6°F en Celsius | 37°C |
+| 72°F en Celsius | 22.22°C |
+
+> Estas tarjetas actúan como respuestas directas a
+> búsquedas de alta intención y mejoran el CTR en Google.
+
+---
+
+## Features adicionales
+
+### Cálculo en tiempo real
+- La conversión ocurre automáticamente con cada tecla.
+- No hay botón de convertir — la respuesta es inmediata.
+
+### Intercambio de escalas (swap)
+- Botón ⇄ para intercambiar escala de origen y destino.
+- El valor se reconvierte automáticamente.
+
+### Copiar cada resultado
+- Ícono de clipboard junto a cada valor convertido.
+- Al hacer clic: copia "98.6°F" al portapapeles.
+- Confirmación visual: ícono cambia a ✓ por 2 segundos.
+
+### Historial de conversiones
+- Últimas 10 conversiones de la sesión.
+- Formato: "37°C → 98.6°F · 310.15 K"
+- Clic en un registro restaura esos valores.
+
+### Botón de limpiar / reset
+- Limpia todos los campos con un clic.
+
+---
+
+## SEO y contenido de la página
+
+### Meta información
+- Title: "Conversor de Temperatura °C a °F — Celsius, Fahrenheit y Kelvin"
+- Description: "Convierte temperaturas entre Celsius, Fahrenheit y Kelvin
+  al instante. Con tabla de referencia para clima, cocina, fiebre y
+  ciencia. Fórmulas explicadas. Gratis."
+
+### URLs sugeridas
+- /conversor-temperatura (principal)
+- /celsius-a-fahrenheit
+- /fahrenheit-a-celsius
+- /celsius-a-kelvin
+- /convertir-grados
+
+### Páginas de conversión específicas (long-tail SEO)
+Generar páginas estáticas o dinámicas para las conversiones
+más buscadas:
+- /100-fahrenheit-en-celsius → "100°F = 37.78°C (fiebre leve)"
+- /37-celsius-en-fahrenheit → "37°C = 98.6°F (temperatura normal)"
+- /180-celsius-en-fahrenheit → "180°C = 356°F (horno moderado)"
+- /350-fahrenheit-en-celsius → "350°F = 176.67°C"
+
+### Preguntas frecuentes (FAQ — para rich snippets)
+- ¿Cómo se convierte Celsius a Fahrenheit?
+- ¿Cuánto es 37 grados Celsius en Fahrenheit?
+- ¿Qué temperatura es 100°F en Celsius?
+- ¿Cuál es la fórmula para convertir °C a °F?
+- ¿Qué es el cero absoluto en Celsius?
+- ¿A qué temperatura hierve el agua en Fahrenheit?
+- ¿Cuánto es 180°C en el horno en Fahrenheit?
+
+### Contenido de apoyo
+- Tabla de conversión °C a °F de −40 a 120°C en pasos de 5.
+- Explicación de por qué existen diferentes escalas de temperatura.
+- Referencia rápida para cocina: temperaturas de horno
+  más comunes en ambas escalas.
+- Truco mnemotécnico: "−40 es donde Celsius y Fahrenheit
+  se encuentran" (son iguales en −40).
+
+---
+
+## Especificaciones técnicas
+
+| Parámetro | Detalle |
+|-----------|---------|
+| Plataforma | Web responsive (mobile-first) |
+| Sin backend | Todo el cálculo ocurre en el cliente (JS) |
+| Termómetro visual | SVG animado nativo (sin canvas) |
+| Precisión interna | Números de punto flotante de 64 bits (IEEE 754) |
+| Redondeo output | Configurable 0–3 decimales; por defecto 2 |
+| Tabla personalizada | Generada en cliente con límite de 200 filas |
+| Exportar CSV | Blob API en cliente |
+| Índice de calor | Fórmula Steadman implementada en JS |
+| Wind chill | Fórmula NWS implementada en JS |
+| Accesibilidad | Labels, ARIA live para actualizaciones en tiempo real |
+| URL principal | /conversor-temperatura |
+| Idioma | Español; símbolo decimal según locale (punto o coma) |
+
+---
+
+## Diferencias clave vs otras calculadoras de conversión del sitio
+
+| Aspecto | Temperatura | Peso (kg/lb) | Distancia (km/mi) | Divisas |
+|---------|-------------|-------------|-------------------|---------|
+| Fórmula | No lineal (°C/°F) / lineal (K) | Lineal | Lineal | Lineal (tasa variable) |
+| Escalas | 5+ escalas | 2 escalas principales | 2 escalas principales | 150+ monedas |
+| Contexto de uso | Múltiple (clima/cocina/salud) | Salud / envíos | Viajes / deporte | Finanzas / viajes |
+| Tabla personalizada | ✅ Sí | ❌ No prioritario | ❌ No prioritario | ❌ No |
+| Termómetro visual | ✅ Único | ❌ No aplica | ❌ No aplica | ❌ No aplica |
+| Cero absoluto | ✅ Límite físico real | ❌ No aplica | ❌ No aplica | ❌ No aplica |
+| Long-tail por valor | ✅ Alto potencial | 🔶 Medio | 🔶 Medio | ❌ Cambia diario |
+| Actualización datos | ❌ No necesita | ❌ No necesita | ❌ No necesita | ✅ Diaria |
+
+---
+
+## Casos extremos a contemplar
+
+- Temperatura = −273.15°C (cero absoluto) → resultado
+  válido: 0 K / −459.67°F; mostrar nota especial:
+  "Este es el cero absoluto: la temperatura más baja
+  teóricamente posible en el universo"
+- Temperatura < −273.15°C → error claro:
+  "Esta temperatura es inferior al cero absoluto,
+  lo cual no es físicamente posible"
+- Valor = 0 en Kelvin → resultado válido:
+  −273.15°C / −459.67°F
+- Números muy grandes (ej. temperatura del Sol: 5,778 K) →
+  manejar sin desbordamiento; mostrar en notación
+  científica si supera 1,000,000
+- −40° (donde °C = °F) → resultado igual en ambas escalas;
+  mostrar nota curiosa: "¡−40 es el único punto donde
+  Celsius y Fahrenheit coinciden!"
+- Coma decimal europea (36,5) → normalizar a punto (36.5)
+  automáticamente
+- Pegado de texto con símbolo (ej. "37°C") → extraer
+  el número y seleccionar la escala automáticamente
+- Modo oscuro del sistema → termómetro SVG adaptado
+  con colores apropiados para fondo oscuro
+- Input de tres dígitos que podría ser °C o °F
+  (ej. 100) → no asumir escala; respetar la seleccionada
+- Conversión entre escalas históricas (Réaumur, Delisle) →
+  calcular correctamente con precisión de 4 decimales
