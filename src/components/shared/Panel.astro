@@ -1,0 +1,38 @@
+---
+type PanelPadding = "none" | "sm" | "md" | "lg";
+
+interface Props {
+  as?: keyof HTMLElementTagNameMap;
+  padding?: PanelPadding;
+  interactive?: boolean;
+  class?: string;
+  [key: string]: unknown;
+}
+
+const {
+  as: Tag = "div",
+  padding = "md",
+  interactive = false,
+  class: className = "",
+  ...attrs
+} = Astro.props;
+
+const paddingClasses: Record<PanelPadding, string> = {
+  none: "",
+  sm: "p-4 sm:p-5",
+  md: "p-5",
+  lg: "p-6",
+};
+---
+
+<Tag
+  class:list={[
+    "rounded-lg border border-gray-700 bg-gray-950",
+    paddingClasses[padding],
+    interactive && "transition hover:border-amber-400",
+    className,
+  ]}
+  {...attrs}
+>
+  <slot />
+</Tag>

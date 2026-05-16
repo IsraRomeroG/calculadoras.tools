@@ -1,9 +1,11 @@
 ---
 import BaseLayout from "@layouts/BaseLayout.astro";
-import Breadcrumb from "@components/shared/Breadcrumb.astro";
+import BlogPostCard from "@components/blog/BlogPostCard.astro";
+import Container from "@components/layout/Container.astro";
+import PageShell from "@components/layout/PageShell.astro";
+import PageHero from "@components/shared/PageHero.astro";
 import {
   getBlogCategories,
-  getBlogPostUrl,
   getCategorySlug,
   getCategoryUrl,
   getPublishedBlogPosts,
@@ -38,62 +40,27 @@ const canonical = getCategoryUrl(category.label);
 ---
 
 <BaseLayout title={title} description={description} canonical={canonical}>
-  <main class="bg-gray-900 text-gray-100">
-    <section class="border-b border-gray-700">
-      <div class="mx-auto max-w-5xl px-4 py-8 sm:px-6 md:py-10">
-        <Breadcrumb
-          class="mb-6"
-          collapseOnMobile
-          items={[
-            { label: "Inicio", href: "/", ariaLabel: "Inicio" },
-            { label: "Blog", href: "/blog", optional: true },
-            { label: category.label, truncate: true },
-          ]}
-        />
+  <PageShell>
+    <PageHero
+      title={`Artículos de ${category.label.toLowerCase()}`}
+      description={`Guías y ejemplos para resolver cálculos de ${category.label.toLowerCase()} con más contexto.`}
+      kicker={category.label}
+      collapseBreadcrumbOnMobile
+      breadcrumbs={[
+        { label: "Inicio", href: "/", ariaLabel: "Inicio" },
+        { label: "Blog", href: "/blog", optional: true },
+        { label: category.label, truncate: true },
+      ]}
+    />
 
-        <div class="max-w-3xl">
-          <p class="text-sm font-semibold uppercase tracking-wide text-amber-400">
-            {category.label}
-          </p>
-          <h1 class="mt-3 text-4xl font-bold leading-tight md:text-5xl">
-            Artículos de {category.label.toLowerCase()}
-          </h1>
-          <p class="mt-4 text-base leading-relaxed text-gray-400 md:text-lg">
-            Guías y ejemplos para resolver cálculos de {category.label.toLowerCase()}
-            con más contexto.
-          </p>
-        </div>
-      </div>
-    </section>
-
-    <section class="mx-auto max-w-5xl px-4 py-8 sm:px-6 md:py-10">
+    <Container as="section" class="py-8 md:py-10">
       <div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
         {
           posts.map((post) => (
-            <a
-              href={getBlogPostUrl(post)}
-              class="group rounded-lg border border-gray-700 p-5 transition hover:border-amber-400"
-            >
-              <p class="text-sm text-amber-400">
-                {post.data.category}
-                {post.data.readTime && ` · ${post.data.readTime}`}
-              </p>
-
-              <h2 class="mt-3 text-lg font-semibold group-hover:text-white">
-                {post.data.title}
-              </h2>
-
-              <p class="mt-2 text-sm leading-relaxed text-gray-400">
-                {post.data.description}
-              </p>
-
-              <span class="mt-4 inline-block text-sm text-amber-400 group-hover:underline">
-                Leer artículo
-              </span>
-            </a>
+            <BlogPostCard post={post} headingLevel="h2" cta="Leer artículo" />
           ))
         }
       </div>
-    </section>
-  </main>
+    </Container>
+  </PageShell>
 </BaseLayout>

@@ -1,38 +1,31 @@
 ---
 import BaseLayout from "@layouts/BaseLayout.astro";
-import Breadcrumb from "@components/shared/Breadcrumb.astro";
+import Container from "@components/layout/Container.astro";
+import PageShell from "@components/layout/PageShell.astro";
+import Button from "@components/shared/Button.astro";
+import PageHero from "@components/shared/PageHero.astro";
+import Panel from "@components/shared/Panel.astro";
 
 const description =
   "Envía sugerencias, reporta errores o propone nuevas calculadoras para calculadoras.tools mediante el formulario de contacto.";
 ---
 
 <BaseLayout title="Contacto" description={description}>
-  <main class="bg-gray-900 text-gray-100">
-    <section class="border-b border-gray-700">
-      <div class="mx-auto max-w-5xl px-6 py-10">
-        <Breadcrumb
-          class="mb-8"
-          items={[
-            { label: "Inicio", href: "/", ariaLabel: "Inicio" },
-            { label: "Contacto" },
-          ]}
-        />
+  <PageShell>
+    <PageHero
+      title="Contacto"
+      description="Si tienes una sugerencia, encontraste un error o quieres proponer una nueva calculadora, escríbenos. Leemos cada mensaje con atención."
+      breadcrumbs={[
+        { label: "Inicio", href: "/", ariaLabel: "Inicio" },
+        { label: "Contacto" },
+      ]}
+      containerClass="px-6 py-10"
+      breadcrumbClass="mb-8"
+      titleClass="text-4xl font-bold tracking-tight md:text-6xl"
+      descriptionClass="mt-6 text-lg leading-relaxed text-gray-400"
+    />
 
-        <div class="max-w-3xl">
-          <h1 class="text-4xl font-bold tracking-tight md:text-6xl">
-            Contacto
-          </h1>
-
-          <p class="mt-6 text-lg leading-relaxed text-gray-400">
-            Si tienes una sugerencia, encontraste un error o quieres proponer
-            una nueva calculadora, escr&iacute;benos. Leemos cada mensaje con
-            atenci&oacute;n.
-          </p>
-        </div>
-      </div>
-    </section>
-
-    <section class="mx-auto max-w-5xl px-6 py-14">
+    <Container as="section" class="px-6 py-14">
       <div class="grid gap-8 md:grid-cols-[0.9fr_1.1fr]">
         <div class="space-y-6">
           <div class="py-4">
@@ -42,7 +35,7 @@ const description =
             </p>
           </div>
 
-          <div class="rounded-lg border border-gray-700 bg-gray-950 p-5">
+          <Panel>
             <h2 class="text-lg font-semibold">Para responder mejor</h2>
             <ul class="mt-4 space-y-3 text-sm text-gray-400">
               <li>Incluye la calculadora o p&aacute;gina relacionada.</li>
@@ -52,12 +45,13 @@ const description =
                 c&aacute;lculo.
               </li>
             </ul>
-          </div>
+          </Panel>
         </div>
 
-        <form
+        <Panel
+          as="form"
           id="contact-form"
-          class="rounded-lg border border-gray-700 bg-gray-950 p-6"
+          padding="lg"
           action="https://api.web3forms.com/submit"
           method="POST"
         >
@@ -123,17 +117,14 @@ const description =
               </div>
             </div>
 
-            <button
-              class="rounded-lg bg-amber-400 px-5 py-3 text-sm font-semibold text-gray-900 transition hover:bg-gray-700 hover:text-white"
-              type="submit"
-            >
+            <Button type="submit" class="text-gray-900 hover:bg-gray-700 hover:text-white">
               Enviar mensaje
-            </button>
+            </Button>
           </div>
-        </form>
+        </Panel>
       </div>
-    </section>
-  </main>
+    </Container>
+  </PageShell>
 
   <script src="https://web3forms.com/client/script.js" async defer></script>
   <script>

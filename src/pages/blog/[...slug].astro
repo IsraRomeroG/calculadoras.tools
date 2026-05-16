@@ -1,7 +1,9 @@
 ---
 import { render } from "astro:content";
 import BaseLayout from "@layouts/BaseLayout.astro";
-import Breadcrumb from "@components/shared/Breadcrumb.astro";
+import Container from "@components/layout/Container.astro";
+import PageShell from "@components/layout/PageShell.astro";
+import PageHero from "@components/shared/PageHero.astro";
 import {
   formatBlogDate,
   getBlogPostSlug,
@@ -61,55 +63,44 @@ const articleJsonLd = {
     <script type="application/ld+json" set:html={JSON.stringify(articleJsonLd)} />
   </Fragment>
 
-  <main class="bg-gray-900 text-gray-100">
+  <PageShell>
     <article>
-      <header class="border-b border-gray-700">
-        <div class="mx-auto max-w-4xl px-4 py-8 sm:px-6 md:py-10">
-          <Breadcrumb
-            class="mb-6"
-            collapseOnMobile
-            items={[
-              { label: "Inicio", href: "/", ariaLabel: "Inicio" },
-              { label: "Blog", href: "/blog", optional: true },
-              {
-                label: post.data.title,
-                truncate: true,
-              },
-            ]}
-          />
-
-          <a
-            href={getCategoryUrl(post.data.category)}
-            class="text-sm font-semibold uppercase tracking-wide text-amber-400 transition hover:text-amber-300"
-          >
-            {post.data.category}
-          </a>
-
-          <h1 class="mt-3 text-4xl font-bold leading-tight md:text-5xl">
-            {post.data.title}
-          </h1>
-
-          <p class="mt-4 text-base leading-relaxed text-gray-400 md:text-lg">
-            {post.data.description}
-          </p>
-
-          <div class="mt-6 flex flex-wrap items-center gap-x-3 gap-y-2 text-sm text-gray-500">
-            <time datetime={publishedDate}>
-              {formatBlogDate(post.data.pubDate)}
-            </time>
-            {
-              post.data.readTime && (
-                <>
-                  <span aria-hidden="true">·</span>
-                  <span>{post.data.readTime}</span>
-                </>
-              )
-            }
-          </div>
+      <PageHero
+        as="header"
+        size="4xl"
+        title={post.data.title}
+        description={post.data.description}
+        kicker={post.data.category}
+        kickerHref={getCategoryUrl(post.data.category)}
+        collapseBreadcrumbOnMobile
+        breadcrumbs={[
+          { label: "Inicio", href: "/", ariaLabel: "Inicio" },
+          { label: "Blog", href: "/blog", optional: true },
+          {
+            label: post.data.title,
+            truncate: true,
+          },
+        ]}
+      >
+        <div class="mt-6 flex flex-wrap items-center gap-x-3 gap-y-2 text-sm text-gray-500">
+          <time datetime={publishedDate}>
+            {formatBlogDate(post.data.pubDate)}
+          </time>
+          {
+            post.data.readTime && (
+              <>
+                <span aria-hidden="true">·</span>
+                <span>{post.data.readTime}</span>
+              </>
+            )
+          }
         </div>
-      </header>
+      </PageHero>
 
-      <div class="mx-auto grid max-w-4xl gap-8 px-4 py-8 sm:px-6 md:py-10 lg:grid-cols-[minmax(0,1fr)_15rem]">
+      <Container
+        size="4xl"
+        class="grid gap-8 py-8 md:py-10 lg:grid-cols-[minmax(0,1fr)_15rem]"
+      >
         <div
           class="blog-content max-w-none text-base leading-7 text-gray-300"
         >
@@ -146,9 +137,9 @@ const articleJsonLd = {
             )
           }
         </aside>
-      </div>
+      </Container>
     </article>
-  </main>
+  </PageShell>
 </BaseLayout>
 
 <style>

@@ -1,6 +1,8 @@
 ---
 import BaseLayout from "@layouts/BaseLayout.astro";
 import Card from "@components/shared/Card.astro";
+import Container from "@components/layout/Container.astro";
+import PageShell from "@components/layout/PageShell.astro";
 import {
   getCalculatorCategories,
   getPublishedCalculators,
@@ -15,10 +17,10 @@ const categories = getCalculatorCategories(calculators);
 ---
 
 <BaseLayout title="Inicio" description={description}>
-  <main class="bg-gray-900 text-gray-100">
+  <PageShell>
     <!-- Hero -->
     <section class="border-b border-gray-700">
-      <div class="mx-auto max-w-5xl px-6 pb-20 pt-15">
+      <Container class="px-6 pb-20 pt-15">
         <div class="max-w-3xl">
           <!-- Title -->
           <h1
@@ -33,12 +35,12 @@ const categories = getCalculatorCategories(calculators);
             Calculadoras prácticas para resolver los problemas del día a día.
           </p>
         </div>
-      </div>
+      </Container>
     </section>
 
     <!-- CONTENIDO DINÁMICO -->
     <section id="calculadoras">
-      <div class="max-w-5xl mx-auto px-6 py-12">
+      <Container class="px-6 py-12">
         <!-- Título de sección -->
         <div class="mb-8">
           <h2 class="text-2xl font-semibold">Calculadoras disponibles</h2>
@@ -72,7 +74,7 @@ const categories = getCalculatorCategories(calculators);
             ))
           }
         </div>
-      </div>
+      </Container>
     </section>
-  </main>
+  </PageShell>
 </BaseLayout>

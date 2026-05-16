@@ -1,7 +1,12 @@
 ---
 import BaseLayout from "@layouts/BaseLayout.astro";
-import Breadcrumb from "@components/shared/Breadcrumb.astro";
+import Container from "@components/layout/Container.astro";
+import PageShell from "@components/layout/PageShell.astro";
+import FaqSection from "@components/shared/FaqSection.astro";
+import PageHero from "@components/shared/PageHero.astro";
+import SectionIntro from "@components/shared/SectionIntro.astro";
 import { VAT_COUNTRY_PRESETS, formatRate } from "@lib/calculators/vat";
+import { buildFaqJsonLd } from "@lib/seo";
 
 const title = "Calculadora de IVA Online — Agrega o Desglosa el IVA al Instante";
 const description =
@@ -43,18 +48,7 @@ const faqs = [
   },
 ];
 
-const faqJsonLd = {
-  "@context": "https://schema.org",
-  "@type": "FAQPage",
-  mainEntity: faqs.map((faq) => ({
-    "@type": "Question",
-    name: faq.question,
-    acceptedAnswer: {
-      "@type": "Answer",
-      text: faq.answer,
-    },
-  })),
-};
+const faqJsonLd = buildFaqJsonLd(faqs);
 
 const examples = [
   {
@@ -77,39 +71,25 @@ const examples = [
     <script type="application/ld+json" set:html={JSON.stringify(faqJsonLd)} />
   </Fragment>
 
-  <main class="bg-gray-900 text-gray-100">
-    <section class="border-b border-gray-700">
-      <div class="mx-auto max-w-5xl px-4 py-6 sm:px-6 md:py-8">
-        <Breadcrumb
-          class="mb-6"
-          collapseOnMobile
-          items={[
-            { label: "Inicio", href: "/", ariaLabel: "Inicio" },
-            {
-              label: "Legal e impuestos",
-              href: "/#calculadoras",
-              optional: true,
-            },
-            { label: "Calculadora de IVA", truncate: true },
-          ]}
-        />
+  <PageShell>
+    <PageHero
+      title="Calculadora de IVA"
+      description="Agrega IVA a un precio base o desglosa el impuesto incluido en un total con resultados claros al instante."
+      kicker="Impuestos"
+      collapseBreadcrumbOnMobile
+      containerClass="py-6 md:py-8"
+      breadcrumbs={[
+        { label: "Inicio", href: "/", ariaLabel: "Inicio" },
+        {
+          label: "Legal e impuestos",
+          href: "/#calculadoras",
+          optional: true,
+        },
+        { label: "Calculadora de IVA", truncate: true },
+      ]}
+    />
 
-        <div class="max-w-3xl">
-          <p class="text-sm font-semibold uppercase tracking-wide text-amber-400">
-            Impuestos
-          </p>
-          <h1 class="mt-3 text-4xl font-bold leading-tight md:text-5xl">
-            Calculadora de IVA
-          </h1>
-          <p class="mt-4 text-base leading-relaxed text-gray-400 md:text-lg">
-            Agrega IVA a un precio base o desglosa el impuesto incluido en un
-            total con resultados claros al instante.
-          </p>
-        </div>
-      </div>
-    </section>
-
-    <section class="mx-auto max-w-5xl px-4 py-6 sm:px-6 md:py-8">
+    <Container as="section" class="py-6 md:py-8">
       <div class="grid gap-6 lg:grid-cols-[minmax(0,1fr)_20rem]">
         <section
           id="vat-calculator"
@@ -431,17 +411,13 @@ const examples = [
           <ol class="mt-4 space-y-3" data-history-list></ol>
         </aside>
       </div>
-    </section>
+    </Container>
 
-    <section class="mx-auto max-w-5xl px-4 py-8 sm:px-6">
-      <div class="mb-6 max-w-3xl">
-        <h2 class="text-2xl font-semibold">Usos frecuentes</h2>
-        <p class="mt-2 text-sm leading-relaxed text-gray-400">
-          La calculadora está pensada para revisar precios, preparar
-          cotizaciones simples y entender cuánto impuesto hay dentro de un
-          total.
-        </p>
-      </div>
+    <Container as="section" class="py-8">
+      <SectionIntro
+        title="Usos frecuentes"
+        description="La calculadora está pensada para revisar precios, preparar cotizaciones simples y entender cuánto impuesto hay dentro de un total."
+      />
 
       <div class="grid gap-5 sm:grid-cols-3">
         {
@@ -457,17 +433,13 @@ const examples = [
           ))
         }
       </div>
-    </section>
+    </Container>
 
-    <section class="mx-auto max-w-5xl px-4 py-8 sm:px-6">
-      <div class="mb-6 max-w-3xl">
-        <h2 class="text-2xl font-semibold">Tasas de referencia por país</h2>
-        <p class="mt-2 text-sm leading-relaxed text-gray-400">
-          Estos presets son orientativos y se pueden editar dentro de la
-          calculadora. Revisa la fuente oficial antes de usarlos en documentos
-          fiscales.
-        </p>
-      </div>
+    <Container as="section" class="py-8">
+      <SectionIntro
+        title="Tasas de referencia por país"
+        description="Estos presets son orientativos y se pueden editar dentro de la calculadora. Revisa la fuente oficial antes de usarlos en documentos fiscales."
+      />
 
       <div class="overflow-x-auto rounded-lg border border-gray-700">
         <table class="min-w-full divide-y divide-gray-800 bg-gray-950 text-sm">
@@ -501,28 +473,10 @@ const examples = [
           </tbody>
         </table>
       </div>
-    </section>
+    </Container>
 
-    <section class="mx-auto max-w-5xl px-4 py-8 pb-12 sm:px-6">
-      <h2 class="text-2xl font-semibold">Preguntas frecuentes</h2>
-      <div
-        class="mt-6 divide-y divide-gray-800 rounded-lg border border-gray-700 bg-gray-950"
-      >
-        {
-          faqs.map((faq) => (
-            <details class="group p-5">
-              <summary class="cursor-pointer list-none text-base font-semibold text-white">
-                <span>{faq.question}</span>
-              </summary>
-              <p class="mt-3 text-sm leading-relaxed text-gray-400">
-                {faq.answer}
-              </p>
-            </details>
-          ))
-        }
-      </div>
-    </section>
-  </main>
+    <FaqSection faqs={faqs} />
+  </PageShell>
 </BaseLayout>
 
 <script>

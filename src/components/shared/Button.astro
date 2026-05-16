@@ -1,0 +1,57 @@
+---
+type ButtonVariant = "primary" | "secondary" | "danger" | "link";
+type ButtonSize = "sm" | "md" | "lg";
+
+interface Props {
+  href?: string;
+  type?: "button" | "submit" | "reset";
+  variant?: ButtonVariant;
+  size?: ButtonSize;
+  block?: boolean;
+  class?: string;
+  [key: string]: unknown;
+}
+
+const {
+  href,
+  type = "button",
+  variant = "primary",
+  size = "md",
+  block = false,
+  class: className = "",
+  ...attrs
+} = Astro.props;
+
+const Tag = href ? "a" : "button";
+
+const variantClasses: Record<ButtonVariant, string> = {
+  primary:
+    "bg-amber-400 text-gray-950 hover:bg-amber-300 focus-visible:ring-amber-400/40",
+  secondary:
+    "border border-gray-700 text-gray-200 hover:border-amber-400 hover:text-white focus-visible:ring-amber-400/40",
+  danger:
+    "border border-gray-700 text-gray-300 hover:border-red-300 hover:text-white focus-visible:ring-red-400/30",
+  link: "text-amber-400 hover:text-amber-300 hover:underline focus-visible:ring-amber-400/30",
+};
+
+const sizeClasses: Record<ButtonSize, string> = {
+  sm: "min-h-9 px-3 py-1.5 text-xs",
+  md: "min-h-11 px-4 py-2 text-sm",
+  lg: "min-h-12 px-5 py-3 text-sm",
+};
+---
+
+<Tag
+  href={href}
+  type={href ? undefined : type}
+  class:list={[
+    "inline-flex items-center justify-center rounded-lg font-semibold transition focus-visible:outline-none focus-visible:ring-3",
+    sizeClasses[size],
+    variantClasses[variant],
+    block && "w-full",
+    className,
+  ]}
+  {...attrs}
+>
+  <slot />
+</Tag>

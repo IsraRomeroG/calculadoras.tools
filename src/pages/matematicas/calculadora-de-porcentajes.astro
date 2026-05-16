@@ -1,6 +1,11 @@
 ---
 import BaseLayout from "@layouts/BaseLayout.astro";
-import Breadcrumb from "@components/shared/Breadcrumb.astro";
+import Container from "@components/layout/Container.astro";
+import PageShell from "@components/layout/PageShell.astro";
+import FaqSection from "@components/shared/FaqSection.astro";
+import PageHero from "@components/shared/PageHero.astro";
+import SectionIntro from "@components/shared/SectionIntro.astro";
+import { buildFaqJsonLd } from "@lib/seo";
 
 const title = "Calculadora de Porcentajes Online — Rápida y Gratis";
 const description =
@@ -41,18 +46,7 @@ const faqs = [
   },
 ];
 
-const faqJsonLd = {
-  "@context": "https://schema.org",
-  "@type": "FAQPage",
-  mainEntity: faqs.map((faq) => ({
-    "@type": "Question",
-    name: faq.question,
-    acceptedAnswer: {
-      "@type": "Answer",
-      text: faq.answer,
-    },
-  })),
-};
+const faqJsonLd = buildFaqJsonLd(faqs);
 
 const examples = [
   {
@@ -113,37 +107,21 @@ const commonPercentages = [
     <script type="application/ld+json" set:html={JSON.stringify(faqJsonLd)} />
   </Fragment>
 
-  <main class="bg-gray-900 text-gray-100">
-    <section class="border-b border-gray-700">
-      <div class="mx-auto max-w-5xl px-4 py-6 sm:px-6 md:py-8">
-        <Breadcrumb
-          class="mb-6"
-          collapseOnMobile
-          items={[
-            { label: "Inicio", href: "/", ariaLabel: "Inicio" },
-            { label: "Matemáticas", href: "/#calculadoras", optional: true },
-            { label: "Calculadora de porcentajes", truncate: true },
-          ]}
-        />
+  <PageShell>
+    <PageHero
+      title="Calculadora de porcentajes"
+      description="Calcula porcentajes, descuentos, aumentos y cambios entre valores con resultados claros al instante."
+      kicker="Matemáticas"
+      collapseBreadcrumbOnMobile
+      containerClass="py-6 md:py-8"
+      breadcrumbs={[
+        { label: "Inicio", href: "/", ariaLabel: "Inicio" },
+        { label: "Matemáticas", href: "/#calculadoras", optional: true },
+        { label: "Calculadora de porcentajes", truncate: true },
+      ]}
+    />
 
-        <div class="max-w-3xl">
-          <p
-            class="text-sm font-semibold uppercase tracking-wide text-amber-400"
-          >
-            Matemáticas
-          </p>
-          <h1 class="mt-3 text-4xl font-bold leading-tight md:text-5xl">
-            Calculadora de porcentajes
-          </h1>
-          <p class="mt-4 text-base leading-relaxed text-gray-400 md:text-lg">
-            Calcula porcentajes, descuentos, aumentos y cambios entre valores
-            con resultados claros al instante.
-          </p>
-        </div>
-      </div>
-    </section>
-
-    <section class="mx-auto max-w-5xl px-4 py-6 sm:px-6 md:py-8">
+    <Container as="section" class="py-6 md:py-8">
       <div class="grid gap-6 lg:grid-cols-[minmax(0,1fr)_20rem]">
         <section
           id="percentage-calculator"
@@ -681,9 +659,9 @@ const commonPercentages = [
           <ol class="mt-4 space-y-3" data-history-list></ol>
         </aside>
       </div>
-    </section>
+    </Container>
 
-    <section class="mx-auto max-w-5xl px-4 py-8 sm:px-6">
+    <Container as="section" class="py-8">
       <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
         {
           examples.map((example) => (
@@ -704,16 +682,14 @@ const commonPercentages = [
           ))
         }
       </div>
-    </section>
+    </Container>
 
-    <section class="mx-auto max-w-5xl px-4 py-8 sm:px-6">
-      <div class="mb-5">
-        <h2 class="text-2xl font-semibold">Guías relacionadas</h2>
-        <p class="mt-2 text-sm text-gray-400">
-          Profundiza en los casos más comunes antes o después de usar la
-          calculadora.
-        </p>
-      </div>
+    <Container as="section" class="py-8">
+      <SectionIntro
+        title="Guías relacionadas"
+        description="Profundiza en los casos más comunes antes o después de usar la calculadora."
+        class="mb-5"
+      />
 
       <div class="grid gap-5 md:grid-cols-3">
         {
@@ -735,15 +711,14 @@ const commonPercentages = [
           ))
         }
       </div>
-    </section>
+    </Container>
 
-    <section class="mx-auto max-w-5xl px-4 py-8 sm:px-6">
-      <div class="mb-5">
-        <h2 class="text-2xl font-semibold">Porcentajes comunes</h2>
-        <p class="mt-2 text-sm text-gray-400">
-          Referencias rápidas para cantidades habituales.
-        </p>
-      </div>
+    <Container as="section" class="py-8">
+      <SectionIntro
+        title="Porcentajes comunes"
+        description="Referencias rápidas para cantidades habituales."
+        class="mb-5"
+      />
 
       <div class="overflow-x-auto rounded-lg border border-gray-700">
         <table
@@ -773,36 +748,10 @@ const commonPercentages = [
           </tbody>
         </table>
       </div>
-    </section>
+    </Container>
 
-    <section class="mx-auto max-w-5xl px-4 py-8 pb-12 sm:px-6">
-      <h2 class="text-2xl font-semibold">Preguntas frecuentes</h2>
-      <div
-        class="mt-6 divide-y divide-gray-800 rounded-lg border border-gray-700 bg-gray-950"
-      >
-        {
-          faqs.map((faq) => (
-            <details class="group p-5">
-              <summary class="cursor-pointer list-none text-base font-semibold text-white">
-                <span>{faq.question}</span>
-              </summary>
-              <p class="mt-3 text-sm leading-relaxed text-gray-400">
-                {faq.answer}
-              </p>
-              {faq.relatedHref && faq.relatedLabel && (
-                <a
-                  href={faq.relatedHref}
-                  class="mt-3 inline-flex text-sm font-semibold text-amber-400 transition hover:text-amber-300 hover:underline"
-                >
-                  {faq.relatedLabel}
-                </a>
-              )}
-            </details>
-          ))
-        }
-      </div>
-    </section>
-  </main>
+    <FaqSection faqs={faqs} />
+  </PageShell>
 </BaseLayout>
 
 <script>

@@ -1,6 +1,9 @@
 ---
 import BaseLayout from "@layouts/BaseLayout.astro";
-import Breadcrumb from "@components/shared/Breadcrumb.astro";
+import Container from "@components/layout/Container.astro";
+import PageShell from "@components/layout/PageShell.astro";
+import PageHero from "@components/shared/PageHero.astro";
+import Panel from "@components/shared/Panel.astro";
 
 const description =
   "Consulta cómo calculadoras.tools maneja la información enviada por formularios y los datos necesarios para operar el sitio.";
@@ -50,38 +53,27 @@ const sections = [
 ---
 
 <BaseLayout title="Privacidad" description={description}>
-  <main class="bg-gray-900 text-gray-100">
-    <section class="border-b border-gray-700">
-      <div class="mx-auto max-w-5xl px-6 py-10">
-        <Breadcrumb
-          class="mb-8"
-          items={[
-            { label: "Inicio", href: "/", ariaLabel: "Inicio" },
-            { label: "Privacidad" },
-          ]}
-        />
+  <PageShell>
+    <PageHero
+      title="Privacidad"
+      description="Esta política explica qué información puede recopilar calculadoras.tools y cómo la usamos para mantener el sitio funcionando de forma clara y responsable."
+      breadcrumbs={[
+        { label: "Inicio", href: "/", ariaLabel: "Inicio" },
+        { label: "Privacidad" },
+      ]}
+      containerClass="px-6 py-10"
+      breadcrumbClass="mb-8"
+      titleClass="text-4xl font-bold tracking-tight md:text-6xl"
+      descriptionClass="mt-6 text-lg leading-relaxed text-gray-400"
+    >
+      <p class="mt-4 text-sm text-gray-500">
+        Última actualización: 14 de mayo de 2026
+      </p>
+    </PageHero>
 
-        <div class="max-w-3xl">
-          <h1 class="text-4xl font-bold tracking-tight md:text-6xl">
-            Privacidad
-          </h1>
-
-          <p class="mt-6 text-lg leading-relaxed text-gray-400">
-            Esta política explica qué información puede recopilar
-            calculadoras.tools y cómo la usamos para mantener el sitio
-            funcionando de forma clara y responsable.
-          </p>
-
-          <p class="mt-4 text-sm text-gray-500">
-            Última actualización: 14 de mayo de 2026
-          </p>
-        </div>
-      </div>
-    </section>
-
-    <section class="mx-auto max-w-5xl px-6 py-14">
+    <Container as="section" class="px-6 py-14">
       <div class="grid gap-8">
-        <section class="rounded-lg border border-gray-700 bg-gray-950 p-6">
+        <Panel as="section" padding="lg">
           <h2 class="text-lg font-semibold">Resumen</h2>
           <ul class="mt-4 space-y-3 text-sm text-gray-400">
             <li>No necesitas una cuenta para usar las calculadoras.</li>
@@ -89,20 +81,20 @@ const sections = [
               Los mensajes del usuario se envían por medio de formularios.
             </li>
           </ul>
-        </section>
+        </Panel>
         <div class="space-y-6">
           {
             sections.map((section) => (
-              <section class="rounded-lg border border-gray-700 bg-gray-950 p-6">
+              <Panel as="section" padding="lg">
                 <h2 class="text-xl font-semibold">{section.title}</h2>
                 <p class="mt-3 leading-relaxed text-gray-400">
                   {section.content}
                 </p>
-              </section>
+              </Panel>
             ))
           }
         </div>
       </div>
-    </section>
-  </main>
+    </Container>
+  </PageShell>
 </BaseLayout>

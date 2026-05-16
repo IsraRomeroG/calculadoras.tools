@@ -1,0 +1,24 @@
+---
+type ContainerSize = "4xl" | "5xl";
+
+interface Props {
+  as?: keyof HTMLElementTagNameMap;
+  size?: ContainerSize;
+  class?: string;
+}
+
+const {
+  as: Tag = "div",
+  size = "5xl",
+  class: className = "",
+} = Astro.props;
+
+const sizeClasses: Record<ContainerSize, string> = {
+  "4xl": "max-w-4xl",
+  "5xl": "max-w-5xl",
+};
+---
+
+<Tag class:list={["mx-auto px-4 sm:px-6", sizeClasses[size], className]}>
+  <slot />
+</Tag>

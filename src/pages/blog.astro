@@ -1,6 +1,10 @@
 ---
 import BaseLayout from "@layouts/BaseLayout.astro";
-import Breadcrumb from "@components/shared/Breadcrumb.astro";
+import BlogPostCard from "@components/blog/BlogPostCard.astro";
+import Container from "@components/layout/Container.astro";
+import PageShell from "@components/layout/PageShell.astro";
+import Button from "@components/shared/Button.astro";
+import PageHero from "@components/shared/PageHero.astro";
 import {
   formatBlogDate,
   getBlogCategories,
@@ -21,31 +25,17 @@ const categories = getBlogCategories(posts);
 ---
 
 <BaseLayout title={title} description={description} canonical={canonical}>
-  <main class="bg-gray-900 text-gray-100">
-    <section class="border-b border-gray-700">
-      <div class="mx-auto max-w-5xl px-4 py-8 sm:px-6 md:py-10">
-        <Breadcrumb
-          class="mb-6"
-          items={[
-            { label: "Inicio", href: "/", ariaLabel: "Inicio" },
-            { label: "Blog" },
-          ]}
-        />
-
-        <div class="max-w-3xl">
-          <p class="text-sm font-semibold uppercase tracking-wide text-amber-400">
-            Blog
-          </p>
-          <h1 class="mt-3 text-4xl font-bold leading-tight md:text-5xl">
-            Guías simples para entender tus cálculos diarios
-          </h1>
-
-          <p class="mt-4 text-base leading-relaxed text-gray-400 md:text-lg">
-            Explicaciones claras, fórmulas prácticas y ejemplos para usar mejor
-            las calculadoras de calculadoras.tools.
-          </p>
-        </div>
-
+  <PageShell>
+    <PageHero
+      title="Guías simples para entender tus cálculos diarios"
+      description="Explicaciones claras, fórmulas prácticas y ejemplos para usar mejor las calculadoras de calculadoras.tools."
+      kicker="Blog"
+      breadcrumbs={[
+        { label: "Inicio", href: "/", ariaLabel: "Inicio" },
+        { label: "Blog" },
+      ]}
+    >
+      <Fragment slot="after">
         {
           categories.length > 0 && (
             <div class="mt-8 flex flex-wrap gap-3">
@@ -61,12 +51,12 @@ const categories = getBlogCategories(posts);
             </div>
           )
         }
-      </div>
-    </section>
+      </Fragment>
+    </PageHero>
 
     {
       featuredPost && (
-        <section class="mx-auto max-w-5xl px-4 py-8 sm:px-6 md:py-10">
+        <Container as="section" class="py-8 md:py-10">
           <article class="grid gap-6 rounded-lg border border-gray-700 bg-gray-950 p-6 md:grid-cols-[minmax(0,1fr)_16rem] md:p-8">
             <div>
               <p class="text-sm font-semibold text-amber-400">
@@ -87,12 +77,12 @@ const categories = getBlogCategories(posts);
                 {featuredPost.data.description}
               </p>
 
-              <a
+              <Button
                 href={getBlogPostUrl(featuredPost)}
-                class="mt-6 inline-flex min-h-11 items-center rounded-lg bg-amber-400 px-5 py-3 text-sm font-semibold text-gray-950 transition hover:bg-amber-300 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/40"
+                class="mt-6"
               >
                 Leer guía destacada
-              </a>
+              </Button>
             </div>
 
             <dl class="grid content-start gap-4 border-t border-gray-800 pt-5 text-sm md:border-l md:border-t-0 md:pl-6 md:pt-0">
@@ -118,11 +108,11 @@ const categories = getBlogCategories(posts);
               </div>
             </dl>
           </article>
-        </section>
+        </Container>
       )
     }
 
-    <section class="mx-auto max-w-5xl px-4 pb-12 sm:px-6">
+    <Container as="section" class="pb-12">
       <div class="mb-6">
         <h2 class="text-2xl font-semibold">Últimos artículos</h2>
         <p class="mt-2 text-sm text-gray-400">
@@ -133,30 +123,10 @@ const categories = getBlogCategories(posts);
       <div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
         {
           latestPosts.map((post) => (
-            <a
-              href={getBlogPostUrl(post)}
-              class="group rounded-lg border border-gray-700 p-5 transition hover:border-amber-400"
-            >
-              <p class="text-sm text-amber-400">
-                {post.data.category}
-                {post.data.readTime && ` · ${post.data.readTime}`}
-              </p>
-
-              <h3 class="mt-3 text-lg font-semibold group-hover:text-white">
-                {post.data.title}
-              </h3>
-
-              <p class="mt-2 text-sm leading-relaxed text-gray-400">
-                {post.data.description}
-              </p>
-
-              <span class="mt-4 inline-block text-sm text-amber-400 group-hover:underline">
-                Leer artículo
-              </span>
-            </a>
+            <BlogPostCard post={post} cta="Leer artículo" />
           ))
         }
       </div>
-    </section>
-  </main>
+    </Container>
+  </PageShell>
 </BaseLayout>
