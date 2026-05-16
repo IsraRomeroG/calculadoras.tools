@@ -8,6 +8,10 @@ tags:
   - proporciones
   - matemáticas
 readTime: "4 min"
+featured: true
+relatedCalculator:
+  label: "Calculadora de porcentajes"
+  href: "/matematicas/calculadora-de-porcentajes"
 ---
 
 ## Para qué sirve

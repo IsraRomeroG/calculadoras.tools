@@ -13,8 +13,11 @@ const dateFormatter = new Intl.DateTimeFormat("es-MX", {
   timeZone: "UTC",
 });
 
+export const getBlogPostSlug = (post: Pick<BlogPost, "id">) =>
+  post.id.split("/").at(-1) ?? post.id;
+
 export const getBlogPostUrl = (post: Pick<BlogPost, "id">) =>
-  `/blog/${post.id}`;
+  `/blog/${getBlogPostSlug(post)}`;
 
 export const getCategorySlug = (category: string) =>
   category
