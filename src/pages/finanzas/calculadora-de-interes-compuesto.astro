@@ -25,7 +25,8 @@ const faqs = [
       "La fórmula base es capital inicial por uno más la tasa periódica elevado al número de períodos. Cuando hay aportaciones, la calculadora suma cada aportación y la hace crecer desde el momento en que ocurre.",
   },
   {
-    question: "¿Cuál es la diferencia entre interés simple e interés compuesto?",
+    question:
+      "¿Cuál es la diferencia entre interés simple e interés compuesto?",
     answer:
       "En el interés simple solo genera rendimiento el capital original. En el interés compuesto, los intereses se reinvierten y también generan nuevos intereses.",
   },
@@ -400,19 +401,29 @@ const explainers = [
               </p>
 
               <div class="mt-5 rounded-lg border border-gray-800 p-4">
-                <p class="text-xs font-semibold uppercase tracking-wide text-gray-500">
+                <p
+                  class="text-xs font-semibold uppercase tracking-wide text-gray-500"
+                >
                   Regla del 72
                 </p>
-                <p class="mt-2 text-sm leading-relaxed text-gray-300" data-rule-72>
+                <p
+                  class="mt-2 text-sm leading-relaxed text-gray-300"
+                  data-rule-72
+                >
                   Ingresa una tasa para estimar cuándo se duplica el dinero.
                 </p>
               </div>
 
               <div class="mt-4 rounded-lg border border-gray-800 p-4">
-                <p class="text-xs font-semibold uppercase tracking-wide text-gray-500">
+                <p
+                  class="text-xs font-semibold uppercase tracking-wide text-gray-500"
+                >
                   Lectura rápida
                 </p>
-                <p class="mt-2 text-sm leading-relaxed text-gray-300" data-explanation>
+                <p
+                  class="mt-2 text-sm leading-relaxed text-gray-300"
+                  data-explanation
+                >
                   El cálculo aparecerá aquí.
                 </p>
               </div>
@@ -499,7 +510,10 @@ const explainers = [
               <th class="px-4 py-3 font-semibold" scope="col">Hito</th>
             </tr>
           </thead>
-          <tbody class="divide-y divide-gray-800 text-gray-300" data-growth-body>
+          <tbody
+            class="divide-y divide-gray-800 text-gray-300"
+            data-growth-body
+          >
           </tbody>
         </table>
       </div>
@@ -618,6 +632,7 @@ const explainers = [
     formatMultiplier,
     formatNumber,
     formatPercent,
+    COMPOUNDING_FREQUENCIES as CLIENT_COMPOUNDING_FREQUENCIES,
     parseDurationInput,
     parseMoneyInput,
     parseRateInput,
@@ -697,9 +712,7 @@ const explainers = [
       inputs.inflationRate?.value.trim();
     const contribution = inputs.contributionAmount?.value.trim();
 
-    return Boolean(
-      requiredHasValue || (contribution && contribution !== "0"),
-    );
+    return Boolean(requiredHasValue || (contribution && contribution !== "0"));
   }
 
   function updateCalculator() {
@@ -750,7 +763,11 @@ const explainers = [
       errors.annualRate = "rate_high";
     }
 
-    if (inflationRate.ok && inflationRate.value !== undefined && inflationRate.value > 30) {
+    if (
+      inflationRate.ok &&
+      inflationRate.value !== undefined &&
+      inflationRate.value > 30
+    ) {
       errors.inflationRate = "inflation_high";
     }
 
@@ -1126,7 +1143,9 @@ const explainers = [
 
   function showErrors(errors) {
     Object.entries(errors).forEach(([field, error]) => {
-      const errorElement = document.querySelector(`[data-error-for="${field}"]`);
+      const errorElement = document.querySelector(
+        `[data-error-for="${field}"]`,
+      );
 
       if (!errorElement) {
         return;
@@ -1171,22 +1190,47 @@ const explainers = [
     updateCalculator();
   }
 
+  function formatContributionInput(input) {
+    if (input.contributionAmount <= 0) {
+      return "Sin aportaci\u00f3n peri\u00f3dica";
+    }
+
+    const frequency =
+      input.contributionFrequency === "monthly" ? "mensual" : "anual";
+    const timing =
+      input.contributionTiming === "beginning"
+        ? "al inicio del per\u00edodo"
+        : "al final del per\u00edodo";
+
+    return `${formatCurrency(input.contributionAmount)} ${frequency}, ${timing}`;
+  }
+
+  function formatCompoundingFrequency(input) {
+    return (
+      CLIENT_COMPOUNDING_FREQUENCIES.find(
+        (frequency) => frequency.value === input.compoundingFrequency,
+      )?.label ?? input.compoundingFrequency
+    );
+  }
+
   function buildCopyText(input, result) {
     const lines = [
-      "Calculadora de interés compuesto",
+      "Calculadora de interés compuesto - calculadoras.tools",
       `Capital inicial: ${formatCurrency(input.principal)}`,
       `Tasa anual: ${formatPercent(input.annualRate)}`,
       `Plazo: ${formatDurationLabel(input.durationMonths)}`,
-      `Monto final: ${formatCurrency(result.futureValue)}`,
+      `Frecuencia de capitalizaci\u00f3n: ${formatCompoundingFrequency(input)}`,
+      `Aportaci\u00f3n peri\u00f3dica: ${formatContributionInput(input)}`,
+      `Aportaciones peri\u00f3dicas totales: ${formatCurrency(result.totalContributions)}`,
       `Total aportado: ${formatCurrency(result.totalInvested)}`,
-      `Aportaciones periódicas: ${formatCurrency(result.totalContributions)}`,
-      `Intereses generados: ${formatCurrency(result.interestEarned)}`,
       `Rentabilidad sobre aportado: ${formatPercent(result.returnOnInvested)}`,
+      `Intereses generados: ${formatCurrency(result.interestEarned)}`,
+      `Monto final: ${formatCurrency(result.futureValue)}`,
     ];
 
     if (result.inflation) {
       lines.push(
-        `Valor real aproximado: ${formatCurrency(result.inflation.realValue)}`,
+        `Valor real aproximado con inflación: ${formatCurrency(result.inflation.realValue)}`,
       );
     }
 
