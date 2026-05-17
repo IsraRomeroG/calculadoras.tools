@@ -17,4 +17,13 @@ export const CALCULATORS: CalculatorDirectoryItem[] = [
     category: "Legal e impuestos",
     order: 20,
   },
+  {
+    id: "calculadora-de-interes-compuesto",
+    title: "Calculadora de interés compuesto",
+    description:
+      "Simula inversiones con aportaciones, inflación y crecimiento año a año.",
+    href: "/finanzas/calculadora-de-interes-compuesto",
+    category: "Finanzas",
+    order: 30,
+  },
 ];

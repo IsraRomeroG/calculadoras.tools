@@ -1,0 +1,1305 @@
+---
+import BaseLayout from "@layouts/BaseLayout.astro";
+import Container from "@components/layout/Container.astro";
+import PageShell from "@components/layout/PageShell.astro";
+import FaqSection from "@components/shared/FaqSection.astro";
+import PageHero from "@components/shared/PageHero.astro";
+import SectionIntro from "@components/shared/SectionIntro.astro";
+import { COMPOUNDING_FREQUENCIES } from "@lib/calculators/compoundInterest";
+import { buildFaqJsonLd } from "@lib/seo";
+
+const title = "Calculadora de Interés Compuesto — Simula tu Inversión";
+const description =
+  "Calcula cuánto puede crecer tu dinero con interés compuesto. Simula aportaciones, inflación y crecimiento año a año. Gratis y sin registro.";
+const canonical = "/finanzas/calculadora-de-interes-compuesto";
+
+const faqs = [
+  {
+    question: "¿Qué es el interés compuesto?",
+    answer:
+      "Es el crecimiento que ocurre cuando los intereses generados se reinvierten y también empiezan a generar intereses. Por eso el crecimiento puede acelerarse con el tiempo.",
+  },
+  {
+    question: "¿Cómo se calcula el interés compuesto?",
+    answer:
+      "La fórmula base es capital inicial por uno más la tasa periódica elevado al número de períodos. Cuando hay aportaciones, la calculadora suma cada aportación y la hace crecer desde el momento en que ocurre.",
+  },
+  {
+    question: "¿Cuál es la diferencia entre interés simple e interés compuesto?",
+    answer:
+      "En el interés simple solo genera rendimiento el capital original. En el interés compuesto, los intereses se reinvierten y también generan nuevos intereses.",
+  },
+  {
+    question: "¿Qué es la regla del 72?",
+    answer:
+      "Es una aproximación rápida para estimar cada cuántos años se duplica una inversión. Divide 72 entre la tasa anual. Por ejemplo, al 8% anual, la duplicación aproximada ocurre cada 9 años.",
+  },
+  {
+    question: "¿Qué frecuencia de capitalización conviene más?",
+    answer:
+      "A igualdad de tasa y plazo, una mayor frecuencia suele producir un monto final ligeramente mayor. La diferencia puede ser pequeña, pero se vuelve más visible con plazos largos.",
+  },
+  {
+    question: "¿Cómo afectan las aportaciones periódicas?",
+    answer:
+      "Las aportaciones aumentan el capital que trabaja. Mientras antes se realicen, más tiempo tienen para generar rendimientos.",
+  },
+  {
+    question: "¿Cómo afecta la inflación a mis ahorros?",
+    answer:
+      "La inflación reduce el poder adquisitivo futuro. Por eso la calculadora puede mostrar un valor real aproximado, expresado en dinero de hoy.",
+  },
+  {
+    question: "¿La calculadora considera impuestos o comisiones?",
+    answer:
+      "No. Los resultados son estimaciones educativas y no incluyen impuestos, comisiones, cambios de tasa ni fluctuaciones de mercado.",
+  },
+];
+
+const faqJsonLd = buildFaqJsonLd(faqs);
+
+const explainers = [
+  {
+    title: "Capital aportado",
+    text: "Es la suma del capital inicial y todas las aportaciones realizadas durante el plazo.",
+  },
+  {
+    title: "Intereses generados",
+    text: "Es la parte del monto final que proviene del rendimiento compuesto.",
+  },
+  {
+    title: "Valor real",
+    text: "Muestra cuánto valdría el monto futuro en poder adquisitivo aproximado de hoy.",
+  },
+];
+---
+
+<BaseLayout title={title} description={description} canonical={canonical}>
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={JSON.stringify(faqJsonLd)} />
+  </Fragment>
+
+  <PageShell>
+    <PageHero
+      title="Calculadora de interés compuesto"
+      description="Proyecta el crecimiento de una inversión con aportaciones periódicas, inflación opcional y tabla año a año."
+      kicker="Finanzas"
+      collapseBreadcrumbOnMobile
+      containerClass="py-6 md:py-8"
+      breadcrumbs={[
+        { label: "Inicio", href: "/", ariaLabel: "Inicio" },
+        { label: "Finanzas", href: "/#calculadoras", optional: true },
+        { label: "Calculadora de interés compuesto", truncate: true },
+      ]}
+    />
+
+    <Container as="section" class="py-6 md:py-8">
+      <div class="grid gap-6 lg:grid-cols-[minmax(0,1fr)_20rem]">
+        <section
+          id="compound-interest-calculator"
+          class="overflow-hidden rounded-lg border border-gray-700 bg-gray-950 shadow-xl shadow-gray-950/30"
+          aria-labelledby="calculator-heading"
+        >
+          <div
+            class="grid gap-0 lg:grid-cols-[minmax(0,1fr)_minmax(18rem,0.86fr)]"
+          >
+            <div class="p-4 sm:p-6">
+              <div class="mb-5">
+                <p
+                  class="text-sm font-semibold uppercase tracking-wide text-amber-400"
+                >
+                  Simulación principal
+                </p>
+                <h2 id="calculator-heading" class="mt-2 text-2xl font-semibold">
+                  ¿Cuánto crecerá mi dinero?
+                </h2>
+                <p class="mt-2 text-sm leading-relaxed text-gray-400">
+                  Captura el capital, la tasa y el plazo. Las aportaciones y la
+                  inflación son opcionales.
+                </p>
+              </div>
+
+              <div class="grid gap-4 sm:grid-cols-2">
+                <div>
+                  <label
+                    for="compound-principal"
+                    class="block text-sm font-medium text-gray-200"
+                  >
+                    Capital inicial
+                  </label>
+                  <input
+                    id="compound-principal"
+                    class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-900 px-4 text-base text-white outline-none transition placeholder:text-gray-600 focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15"
+                    type="text"
+                    inputmode="decimal"
+                    autocomplete="off"
+                    placeholder="10000"
+                    aria-describedby="compound-principal-error"
+                    data-input="principal"
+                  />
+                  <p
+                    id="compound-principal-error"
+                    class="mt-2 hidden text-sm text-red-300"
+                    data-error-for="principal"
+                  >
+                  </p>
+                </div>
+
+                <div>
+                  <label
+                    for="compound-rate"
+                    class="block text-sm font-medium text-gray-200"
+                  >
+                    Tasa anual
+                  </label>
+                  <div
+                    class="mt-2 flex rounded-lg border border-gray-700 bg-gray-900 focus-within:border-amber-400 focus-within:ring-3 focus-within:ring-amber-400/15"
+                  >
+                    <input
+                      id="compound-rate"
+                      class="min-h-12 w-full bg-transparent px-4 text-base text-white outline-none"
+                      type="text"
+                      inputmode="decimal"
+                      autocomplete="off"
+                      placeholder="8"
+                      aria-describedby="compound-rate-error"
+                      data-input="annualRate"
+                    />
+                    <span class="flex items-center px-4 text-gray-500">%</span>
+                  </div>
+                  <p
+                    id="compound-rate-error"
+                    class="mt-2 hidden text-sm text-red-300"
+                    data-error-for="annualRate"
+                  >
+                  </p>
+                </div>
+
+                <div>
+                  <label
+                    for="compound-duration"
+                    class="block text-sm font-medium text-gray-200"
+                  >
+                    Plazo
+                  </label>
+                  <input
+                    id="compound-duration"
+                    class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-900 px-4 text-base text-white outline-none transition placeholder:text-gray-600 focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15"
+                    type="text"
+                    inputmode="decimal"
+                    autocomplete="off"
+                    placeholder="20"
+                    aria-describedby="compound-duration-error"
+                    data-input="duration"
+                  />
+                  <p
+                    id="compound-duration-error"
+                    class="mt-2 hidden text-sm text-red-300"
+                    data-error-for="duration"
+                  >
+                  </p>
+                </div>
+
+                <div>
+                  <label
+                    for="compound-duration-unit"
+                    class="block text-sm font-medium text-gray-200"
+                  >
+                    Unidad de plazo
+                  </label>
+                  <select
+                    id="compound-duration-unit"
+                    class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-900 px-4 text-base text-white outline-none transition focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15"
+                    data-select="durationUnit"
+                  >
+                    <option value="years">Años</option>
+                    <option value="months">Meses</option>
+                  </select>
+                </div>
+
+                <div class="sm:col-span-2">
+                  <label
+                    for="compound-frequency"
+                    class="block text-sm font-medium text-gray-200"
+                  >
+                    Frecuencia de capitalización
+                  </label>
+                  <select
+                    id="compound-frequency"
+                    class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-900 px-4 text-base text-white outline-none transition focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15"
+                    data-select="compoundingFrequency"
+                  >
+                    {
+                      COMPOUNDING_FREQUENCIES.map((frequency) => (
+                        <option
+                          value={frequency.value}
+                          selected={frequency.value === "monthly"}
+                        >
+                          {frequency.label}
+                        </option>
+                      ))
+                    }
+                  </select>
+                </div>
+
+                <div>
+                  <label
+                    for="compound-contribution"
+                    class="block text-sm font-medium text-gray-200"
+                  >
+                    Aportación periódica
+                  </label>
+                  <input
+                    id="compound-contribution"
+                    class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-900 px-4 text-base text-white outline-none transition placeholder:text-gray-600 focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15"
+                    type="text"
+                    inputmode="decimal"
+                    autocomplete="off"
+                    value="0"
+                    aria-describedby="compound-contribution-error"
+                    data-input="contributionAmount"
+                  />
+                  <p
+                    id="compound-contribution-error"
+                    class="mt-2 hidden text-sm text-red-300"
+                    data-error-for="contributionAmount"
+                  >
+                  </p>
+                </div>
+
+                <div>
+                  <label
+                    for="compound-contribution-frequency"
+                    class="block text-sm font-medium text-gray-200"
+                  >
+                    Frecuencia de aportación
+                  </label>
+                  <select
+                    id="compound-contribution-frequency"
+                    class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-900 px-4 text-base text-white outline-none transition focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15"
+                    data-select="contributionFrequency"
+                  >
+                    <option value="monthly">Mensual</option>
+                    <option value="annual">Anual</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label
+                    for="compound-contribution-timing"
+                    class="block text-sm font-medium text-gray-200"
+                  >
+                    Momento de aportación
+                  </label>
+                  <select
+                    id="compound-contribution-timing"
+                    class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-900 px-4 text-base text-white outline-none transition focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15"
+                    data-select="contributionTiming"
+                  >
+                    <option value="end">Al final del período</option>
+                    <option value="beginning">Al inicio del período</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label
+                    for="compound-inflation"
+                    class="block text-sm font-medium text-gray-200"
+                  >
+                    Inflación anual opcional
+                  </label>
+                  <div
+                    class="mt-2 flex rounded-lg border border-gray-700 bg-gray-900 focus-within:border-amber-400 focus-within:ring-3 focus-within:ring-amber-400/15"
+                  >
+                    <input
+                      id="compound-inflation"
+                      class="min-h-12 w-full bg-transparent px-4 text-base text-white outline-none"
+                      type="text"
+                      inputmode="decimal"
+                      autocomplete="off"
+                      placeholder="4"
+                      aria-describedby="compound-inflation-error"
+                      data-input="inflationRate"
+                    />
+                    <span class="flex items-center px-4 text-gray-500">%</span>
+                  </div>
+                  <p
+                    id="compound-inflation-error"
+                    class="mt-2 hidden text-sm text-red-300"
+                    data-error-for="inflationRate"
+                  >
+                  </p>
+                </div>
+              </div>
+
+              <div
+                class="mt-6 flex flex-col gap-3 border-t border-gray-800 pt-5 sm:flex-row sm:flex-wrap"
+              >
+                <button
+                  class="inline-flex min-h-11 items-center justify-center rounded-lg border border-gray-700 px-4 py-2 text-sm font-semibold text-gray-200 transition hover:border-amber-400 hover:text-white focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/40"
+                  type="button"
+                  data-fill-example
+                >
+                  Usar ejemplo
+                </button>
+                <button
+                  class="inline-flex min-h-11 items-center justify-center rounded-lg border border-gray-700 px-4 py-2 text-sm font-semibold text-gray-200 transition hover:border-amber-400 hover:text-white focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/40"
+                  type="button"
+                  data-clear-active
+                >
+                  Limpiar
+                </button>
+                <button
+                  class="hidden min-h-11 items-center justify-center rounded-lg bg-amber-400 px-4 py-2 text-sm font-semibold text-gray-950 transition hover:bg-amber-300 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/40"
+                  type="button"
+                  data-copy-result
+                >
+                  <span data-copy-label>Copiar resultado</span>
+                </button>
+                <button
+                  class="hidden min-h-11 items-center justify-center rounded-lg border border-gray-700 px-4 py-2 text-sm font-semibold text-gray-200 transition hover:border-amber-400 hover:text-white focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/40"
+                  type="button"
+                  data-export-csv
+                >
+                  Exportar CSV
+                </button>
+                <p class="sr-only" aria-live="polite" data-copy-status></p>
+              </div>
+            </div>
+
+            <aside
+              class="border-t border-gray-800 bg-gray-900/70 p-4 sm:p-6 lg:border-l lg:border-t-0"
+              aria-live="polite"
+              data-result-region
+            >
+              <p
+                class="text-sm font-semibold uppercase tracking-wide text-amber-400"
+                data-result-kicker
+              >
+                Resultado
+              </p>
+              <p
+                class="mt-3 break-words text-3xl font-bold leading-tight text-white"
+                data-main-result
+              >
+                Ingresa los valores
+              </p>
+
+              <div class="mt-5 grid gap-3" data-summary-grid>
+                <div
+                  class="rounded-lg border border-gray-800 bg-gray-950/70 p-4 text-sm text-gray-400"
+                >
+                  El resumen aparecerá aquí.
+                </div>
+              </div>
+
+              <p
+                class="mt-4 hidden rounded-lg border border-amber-400/40 bg-amber-400/10 p-3 text-sm leading-relaxed text-amber-200"
+                data-warning
+              >
+              </p>
+
+              <div class="mt-5 rounded-lg border border-gray-800 p-4">
+                <p class="text-xs font-semibold uppercase tracking-wide text-gray-500">
+                  Regla del 72
+                </p>
+                <p class="mt-2 text-sm leading-relaxed text-gray-300" data-rule-72>
+                  Ingresa una tasa para estimar cuándo se duplica el dinero.
+                </p>
+              </div>
+
+              <div class="mt-4 rounded-lg border border-gray-800 p-4">
+                <p class="text-xs font-semibold uppercase tracking-wide text-gray-500">
+                  Lectura rápida
+                </p>
+                <p class="mt-2 text-sm leading-relaxed text-gray-300" data-explanation>
+                  El cálculo aparecerá aquí.
+                </p>
+              </div>
+
+              <p class="mt-4 text-xs leading-relaxed text-gray-500">
+                Estimación educativa. No contempla impuestos, comisiones,
+                cambios de tasa ni variaciones de mercado.
+              </p>
+            </aside>
+          </div>
+        </section>
+
+        <aside
+          class="rounded-lg border border-gray-700 bg-gray-950 p-4 sm:p-5"
+          aria-labelledby="quick-reference-heading"
+        >
+          <h2 id="quick-reference-heading" class="text-lg font-semibold">
+            Referencias rápidas
+          </h2>
+          <div class="mt-4 space-y-4">
+            <div class="rounded-lg border border-gray-800 p-4">
+              <p class="text-sm font-semibold text-white">Regla del 72</p>
+              <p class="mt-2 text-sm leading-relaxed text-gray-400">
+                Divide 72 entre la tasa anual para estimar la duplicación.
+              </p>
+            </div>
+            <div class="rounded-lg border border-gray-800 p-4">
+              <p class="text-sm font-semibold text-white">Aportar antes</p>
+              <p class="mt-2 text-sm leading-relaxed text-gray-400">
+                Las aportaciones al inicio del período tienen más tiempo para
+                generar rendimientos.
+              </p>
+            </div>
+            <div class="rounded-lg border border-gray-800 p-4">
+              <p class="text-sm font-semibold text-white">Inflación</p>
+              <p class="mt-2 text-sm leading-relaxed text-gray-400">
+                El valor real aproxima el poder adquisitivo del monto futuro.
+              </p>
+            </div>
+          </div>
+        </aside>
+      </div>
+    </Container>
+
+    <Container as="section" class="py-8">
+      <SectionIntro
+        title="Crecimiento año a año"
+        description="La tabla separa aportaciones acumuladas e intereses para ver cuándo el rendimiento empieza a pesar más."
+        class="mb-5"
+      />
+
+      <p
+        class="rounded-lg border border-gray-700 bg-gray-950 p-4 text-sm text-gray-400"
+        data-growth-empty
+      >
+        La tabla aparecerá cuando completes el cálculo.
+      </p>
+
+      <div
+        class="hidden overflow-x-auto rounded-lg border border-gray-700"
+        data-growth-table
+      >
+        <table
+          class="min-w-[48rem] w-full divide-y divide-gray-800 bg-gray-950 text-left text-sm"
+        >
+          <caption class="sr-only">
+            Tabla de crecimiento anual del interés compuesto
+          </caption>
+          <thead class="bg-gray-900 text-gray-300">
+            <tr>
+              <th class="px-4 py-3 font-semibold" scope="col">Año</th>
+              <th class="px-4 py-3 text-right font-semibold" scope="col">
+                Aportaciones del año
+              </th>
+              <th class="px-4 py-3 text-right font-semibold" scope="col">
+                Total aportado
+              </th>
+              <th class="px-4 py-3 text-right font-semibold" scope="col">
+                Intereses acumulados
+              </th>
+              <th class="px-4 py-3 text-right font-semibold" scope="col">
+                Total acumulado
+              </th>
+              <th class="px-4 py-3 font-semibold" scope="col">Hito</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-gray-800 text-gray-300" data-growth-body>
+          </tbody>
+        </table>
+      </div>
+    </Container>
+
+    <Container as="section" class="py-8">
+      <SectionIntro
+        title="Comparador de capitalización"
+        description="Compara la misma tasa y plazo con distintas frecuencias. Esta tabla ignora aportaciones periódicas para aislar el efecto de la capitalización."
+        class="mb-5"
+      />
+
+      <p
+        class="rounded-lg border border-gray-700 bg-gray-950 p-4 text-sm text-gray-400"
+        data-comparison-empty
+      >
+        El comparador aparecerá cuando completes capital, tasa y plazo.
+      </p>
+
+      <div
+        class="hidden overflow-x-auto rounded-lg border border-gray-700"
+        data-comparison-table
+      >
+        <table
+          class="min-w-[46rem] w-full divide-y divide-gray-800 bg-gray-950 text-left text-sm"
+        >
+          <caption class="sr-only">
+            Comparación de frecuencias de capitalización
+          </caption>
+          <thead class="bg-gray-900 text-gray-300">
+            <tr>
+              <th class="px-4 py-3 font-semibold" scope="col">Frecuencia</th>
+              <th class="px-4 py-3 text-right font-semibold" scope="col">
+                Veces/año
+              </th>
+              <th class="px-4 py-3 text-right font-semibold" scope="col">
+                Monto final
+              </th>
+              <th class="px-4 py-3 text-right font-semibold" scope="col">
+                Intereses
+              </th>
+              <th class="px-4 py-3 text-right font-semibold" scope="col">
+                Diferencia vs anual
+              </th>
+              <th class="px-4 py-3 font-semibold" scope="col">Nota</th>
+            </tr>
+          </thead>
+          <tbody
+            class="divide-y divide-gray-800 text-gray-300"
+            data-comparison-body
+          >
+          </tbody>
+        </table>
+      </div>
+    </Container>
+
+    <Container as="section" class="py-8">
+      <SectionIntro
+        title="Cómo leer el resultado"
+        description="El resumen distingue entre lo que aportas y lo que se genera por rendimiento para evitar confundir ahorro con rentabilidad."
+      />
+
+      <div class="grid gap-5 sm:grid-cols-3">
+        {
+          explainers.map((item) => (
+            <article class="rounded-lg border border-gray-700 p-5">
+              <h3 class="text-base font-semibold text-white">{item.title}</h3>
+              <p class="mt-2 text-sm leading-relaxed text-gray-400">
+                {item.text}
+              </p>
+            </article>
+          ))
+        }
+      </div>
+    </Container>
+
+    <Container as="section" class="py-8">
+      <SectionIntro
+        title="Interés compuesto vs interés simple"
+        description="En el interés simple, solo genera rendimiento el capital original. En el interés compuesto, los intereses se reinvierten y también generan nuevos intereses."
+      />
+
+      <div class="rounded-lg border border-gray-700 bg-gray-950 p-5">
+        <p class="text-sm leading-relaxed text-gray-300">
+          Por eso el plazo importa tanto: al principio el crecimiento puede
+          parecer lento, pero con los años aumenta la parte del resultado que
+          proviene de intereses acumulados.
+        </p>
+      </div>
+    </Container>
+
+    <Container as="section" class="py-8">
+      <div class="rounded-lg border border-gray-700 bg-gray-950 p-5">
+        <h2 class="text-lg font-semibold text-white">Aviso legal</h2>
+        <p class="mt-3 text-sm leading-relaxed text-gray-400">
+          Esta calculadora es una herramienta educativa. Los resultados son
+          estimaciones y asumen una tasa constante. No contemplan impuestos,
+          comisiones, cambios de tasa, inflación variable ni fluctuaciones de
+          mercado. Consulta a un asesor financiero certificado antes de tomar
+          decisiones de inversión.
+        </p>
+      </div>
+    </Container>
+
+    <FaqSection faqs={faqs} />
+  </PageShell>
+</BaseLayout>
+
+<script>
+  import {
+    calculateCompoundInterest,
+    calculateRuleOf72,
+    buildAnnualGrowthRows,
+    compareCompoundingFrequencies,
+    formatCurrency,
+    formatMultiplier,
+    formatNumber,
+    formatPercent,
+    parseDurationInput,
+    parseMoneyInput,
+    parseRateInput,
+    roundCurrency,
+  } from "@lib/calculators/compoundInterest";
+
+  const ERROR_MESSAGES = {
+    required: "Este campo es obligatorio.",
+    invalid: "Ingresa un número válido.",
+    negative: "Ingresa un número igual o mayor a cero.",
+    too_many_decimals: "Usa máximo 2 decimales.",
+    too_many_rate_decimals: "Usa máximo 4 decimales.",
+    duration_integer: "Ingresa meses completos.",
+    duration_low: "El plazo mínimo es 1 mes.",
+    duration_high: "El plazo máximo es 100 años.",
+    rate_high: "La tasa no puede superar 100%.",
+    inflation_high: "La inflación no puede superar 30%.",
+    no_investment: "Ingresa capital inicial o aportaciones.",
+  };
+
+  const inputSelectors = {
+    principal: '[data-input="principal"]',
+    annualRate: '[data-input="annualRate"]',
+    duration: '[data-input="duration"]',
+    contributionAmount: '[data-input="contributionAmount"]',
+    inflationRate: '[data-input="inflationRate"]',
+  };
+
+  const selectSelectors = {
+    durationUnit: '[data-select="durationUnit"]',
+    compoundingFrequency: '[data-select="compoundingFrequency"]',
+    contributionFrequency: '[data-select="contributionFrequency"]',
+    contributionTiming: '[data-select="contributionTiming"]',
+  };
+
+  const inputs = Object.fromEntries(
+    Object.entries(inputSelectors).map(([key, selector]) => [
+      key,
+      document.querySelector(selector),
+    ]),
+  );
+  const selects = Object.fromEntries(
+    Object.entries(selectSelectors).map(([key, selector]) => [
+      key,
+      document.querySelector(selector),
+    ]),
+  );
+
+  const resultKicker = document.querySelector("[data-result-kicker]");
+  const mainResult = document.querySelector("[data-main-result]");
+  const summaryGrid = document.querySelector("[data-summary-grid]");
+  const warningElement = document.querySelector("[data-warning]");
+  const rule72Element = document.querySelector("[data-rule-72]");
+  const explanation = document.querySelector("[data-explanation]");
+  const copyButton = document.querySelector("[data-copy-result]");
+  const copyLabel = document.querySelector("[data-copy-label]");
+  const copyStatus = document.querySelector("[data-copy-status]");
+  const exportButton = document.querySelector("[data-export-csv]");
+  const clearButton = document.querySelector("[data-clear-active]");
+  const exampleButton = document.querySelector("[data-fill-example]");
+  const growthEmpty = document.querySelector("[data-growth-empty]");
+  const growthTable = document.querySelector("[data-growth-table]");
+  const growthBody = document.querySelector("[data-growth-body]");
+  const comparisonEmpty = document.querySelector("[data-comparison-empty]");
+  const comparisonTable = document.querySelector("[data-comparison-table]");
+  const comparisonBody = document.querySelector("[data-comparison-body]");
+
+  let currentCopyText = "";
+  let currentCsvRows = [];
+  let copiedTimeout = 0;
+
+  function hasStarted() {
+    const requiredHasValue =
+      inputs.principal?.value.trim() ||
+      inputs.annualRate?.value.trim() ||
+      inputs.duration?.value.trim() ||
+      inputs.inflationRate?.value.trim();
+    const contribution = inputs.contributionAmount?.value.trim();
+
+    return Boolean(
+      requiredHasValue || (contribution && contribution !== "0"),
+    );
+  }
+
+  function updateCalculator() {
+    clearErrors();
+
+    if (!hasStarted()) {
+      setInitialState();
+      return;
+    }
+
+    const parsed = parseFormValues();
+
+    if (!parsed.ok) {
+      showErrors(parsed.errors);
+      setInvalidState();
+      return;
+    }
+
+    const result = calculateCompoundInterest(parsed.input);
+    const rows = buildAnnualGrowthRows(parsed.input);
+    const comparison = compareCompoundingFrequencies(parsed.input);
+    const warnings = buildWarnings(parsed.input);
+
+    renderResult(parsed.input, result, warnings);
+    renderGrowthRows(rows);
+    renderComparisonRows(comparison);
+    setActionsVisible(true);
+
+    currentCsvRows = rows;
+    currentCopyText = buildCopyText(parsed.input, result);
+  }
+
+  function parseFormValues() {
+    const errors = {};
+    const principal = parseRequiredMoney("principal");
+    const annualRate = parseRequiredRate("annualRate");
+    const duration = parseRequiredDuration();
+    const contributionAmount = parseOptionalMoney("contributionAmount", 0);
+    const inflationRate = parseOptionalRate("inflationRate");
+
+    collectError(errors, "principal", principal);
+    collectError(errors, "annualRate", annualRate);
+    collectError(errors, "duration", duration);
+    collectError(errors, "contributionAmount", contributionAmount);
+    collectError(errors, "inflationRate", inflationRate);
+
+    if (annualRate.ok && annualRate.value > 100) {
+      errors.annualRate = "rate_high";
+    }
+
+    if (inflationRate.ok && inflationRate.value !== undefined && inflationRate.value > 30) {
+      errors.inflationRate = "inflation_high";
+    }
+
+    if (Object.keys(errors).length > 0) {
+      return { ok: false, errors };
+    }
+
+    const input = {
+      principal: principal.value,
+      annualRate: annualRate.value,
+      durationMonths: duration.value,
+      compoundingFrequency: selects.compoundingFrequency?.value ?? "monthly",
+      contributionAmount: contributionAmount.value,
+      contributionFrequency: selects.contributionFrequency?.value ?? "monthly",
+      contributionTiming: selects.contributionTiming?.value ?? "end",
+      inflationRate: inflationRate.value,
+    };
+    const contributionCount =
+      input.contributionFrequency === "monthly"
+        ? input.durationMonths
+        : input.contributionTiming === "beginning"
+          ? Math.ceil(input.durationMonths / 12)
+          : Math.floor(input.durationMonths / 12);
+
+    if (input.principal + input.contributionAmount * contributionCount <= 0) {
+      return {
+        ok: false,
+        errors: {
+          principal: "no_investment",
+          contributionAmount: "no_investment",
+        },
+      };
+    }
+
+    return { ok: true, input };
+  }
+
+  function parseRequiredMoney(field) {
+    const input = inputs[field];
+    const parsed = parseMoneyInput(input?.value ?? "");
+
+    return parsed;
+  }
+
+  function parseRequiredRate(field) {
+    const input = inputs[field];
+    const parsed = parseRateInput(input?.value ?? "");
+
+    return normalizeParseError(parsed, true);
+  }
+
+  function parseRequiredDuration() {
+    const input = inputs.duration;
+    const parsed = parseDurationInput(input?.value ?? "");
+
+    if (!parsed.ok) {
+      return parsed;
+    }
+
+    const durationUnit = selects.durationUnit?.value ?? "years";
+    const durationMonths =
+      durationUnit === "years" ? Math.round(parsed.value * 12) : parsed.value;
+
+    if (durationUnit === "months" && !Number.isInteger(durationMonths)) {
+      return { ok: false, error: "duration_integer" };
+    }
+
+    if (durationMonths < 1) {
+      return { ok: false, error: "duration_low" };
+    }
+
+    if (durationMonths > 1200) {
+      return { ok: false, error: "duration_high" };
+    }
+
+    return { ok: true, value: Math.round(durationMonths) };
+  }
+
+  function parseOptionalMoney(field, fallback) {
+    const input = inputs[field];
+
+    if (!input || input.value.trim() === "") {
+      return { ok: true, value: fallback };
+    }
+
+    return parseMoneyInput(input.value);
+  }
+
+  function parseOptionalRate(field) {
+    const input = inputs[field];
+
+    if (!input || input.value.trim() === "") {
+      return { ok: true, value: undefined };
+    }
+
+    return normalizeParseError(parseRateInput(input.value), true);
+  }
+
+  function normalizeParseError(parsed, isRate = false) {
+    if (parsed.ok) {
+      return parsed;
+    }
+
+    if (isRate && parsed.error === "too_many_decimals") {
+      return {
+        ...parsed,
+        error: "too_many_rate_decimals",
+      };
+    }
+
+    return parsed;
+  }
+
+  function collectError(errors, field, parsed) {
+    if (!parsed.ok) {
+      errors[field] = parsed.error;
+    }
+  }
+
+  function buildWarnings(input) {
+    const warnings = [];
+
+    if (input.annualRate > 50) {
+      warnings.push("La tasa ingresada es inusualmente alta.");
+    }
+
+    if (typeof input.inflationRate === "number" && input.inflationRate > 20) {
+      warnings.push("La inflación ingresada es inusualmente alta.");
+    }
+
+    if (
+      typeof input.inflationRate === "number" &&
+      input.inflationRate > input.annualRate
+    ) {
+      warnings.push(
+        "Tu dinero crecería en términos nominales, pero perdería poder adquisitivo en términos reales.",
+      );
+    }
+
+    return warnings;
+  }
+
+  function renderResult(input, result, warnings) {
+    if (
+      !resultKicker ||
+      !mainResult ||
+      !summaryGrid ||
+      !warningElement ||
+      !rule72Element ||
+      !explanation
+    ) {
+      return;
+    }
+
+    const rule72 = calculateRuleOf72(input.annualRate);
+    const contributionText =
+      input.contributionAmount > 0
+        ? ` y aportas ${formatCurrency(input.contributionAmount)} de forma ${
+            input.contributionFrequency === "monthly" ? "mensual" : "anual"
+          }`
+        : " sin aportaciones periódicas";
+
+    resultKicker.textContent = "Monto final estimado";
+    mainResult.textContent = formatCurrency(result.futureValue);
+    summaryGrid.innerHTML = [
+      {
+        label: "Total aportado",
+        value: formatCurrency(result.totalInvested),
+      },
+      {
+        label: "Aportaciones periódicas",
+        value: formatCurrency(result.totalContributions),
+      },
+      {
+        label: "Intereses generados",
+        value: formatCurrency(result.interestEarned),
+      },
+      {
+        label: "Multiplicador",
+        value: formatMultiplier(result.investedMultiplier),
+      },
+      {
+        label: "Rentabilidad sobre aportado",
+        value: formatPercent(result.returnOnInvested),
+      },
+      ...(result.inflation
+        ? [
+            {
+              label: "Valor real aproximado",
+              value: formatCurrency(result.inflation.realValue),
+            },
+          ]
+        : []),
+    ]
+      .map(
+        (item) => `
+          <div class="rounded-lg border border-gray-800 bg-gray-950/70 p-4">
+            <span class="block text-xs font-semibold uppercase tracking-wide text-gray-500">${escapeHtml(item.label)}</span>
+            <span class="mt-2 block break-words text-lg font-semibold text-white">${escapeHtml(item.value)}</span>
+          </div>
+        `,
+      )
+      .join("");
+
+    warningElement.textContent = warnings.join(" ");
+    warningElement.classList.toggle("hidden", warnings.length === 0);
+
+    rule72Element.textContent =
+      rule72 === null
+        ? "Con una tasa de 0%, el dinero no se duplica por intereses."
+        : `A esta tasa, tu dinero se duplica aproximadamente cada ${formatNumber(rule72)} años.`;
+
+    explanation.textContent = `Si inviertes ${formatCurrency(
+      input.principal,
+    )}${contributionText} durante ${formatDurationLabel(
+      input.durationMonths,
+    )}, podrías llegar a ${formatCurrency(
+      result.futureValue,
+    )}. De ese total, ${formatCurrency(
+      result.interestEarned,
+    )} serían intereses generados.`;
+  }
+
+  function renderGrowthRows(rows) {
+    if (!growthEmpty || !growthTable || !growthBody) {
+      return;
+    }
+
+    growthEmpty.classList.add("hidden");
+    growthTable.classList.remove("hidden");
+    growthBody.innerHTML = rows
+      .map(
+        (row) => `
+          <tr class="transition-colors hover:bg-gray-900/60">
+            <th class="px-4 py-3 font-semibold text-white" scope="row">${row.year}</th>
+            <td class="px-4 py-3 text-right">${escapeHtml(formatCurrency(row.annualContributions))}</td>
+            <td class="px-4 py-3 text-right">${escapeHtml(formatCurrency(row.totalInvested))}</td>
+            <td class="px-4 py-3 text-right">${escapeHtml(formatCurrency(row.interestEarned))}</td>
+            <td class="px-4 py-3 text-right font-semibold text-white">${escapeHtml(formatCurrency(row.totalValue))}</td>
+            <td class="px-4 py-3">${
+              row.milestone
+                ? `<span class="inline-flex rounded-full border border-amber-400/40 px-2 py-1 text-xs font-semibold text-amber-300">${escapeHtml(row.milestone)}</span>`
+                : ""
+            }</td>
+          </tr>
+        `,
+      )
+      .join("");
+  }
+
+  function renderComparisonRows(rows) {
+    if (!comparisonEmpty || !comparisonTable || !comparisonBody) {
+      return;
+    }
+
+    comparisonEmpty.classList.add("hidden");
+    comparisonTable.classList.remove("hidden");
+    comparisonBody.innerHTML = rows
+      .map(
+        (row) => `
+          <tr class="${row.isBest ? "bg-amber-400/5" : ""} transition-colors hover:bg-gray-900/60">
+            <th class="px-4 py-3 font-semibold text-white" scope="row">${escapeHtml(row.label)}</th>
+            <td class="px-4 py-3 text-right">${escapeHtml(row.periodsLabel)}</td>
+            <td class="px-4 py-3 text-right font-semibold text-white">${escapeHtml(formatCurrency(row.futureValue))}</td>
+            <td class="px-4 py-3 text-right">${escapeHtml(formatCurrency(row.interestEarned))}</td>
+            <td class="px-4 py-3 text-right">${
+              Math.abs(row.differenceVsAnnual) < 0.005
+                ? "—"
+                : escapeHtml(`+${formatCurrency(row.differenceVsAnnual)}`)
+            }</td>
+            <td class="px-4 py-3">${
+              row.isBest
+                ? `<span class="inline-flex rounded-full border border-emerald-400/40 px-2 py-1 text-xs font-semibold text-emerald-300">Mayor rendimiento</span>`
+                : ""
+            }</td>
+          </tr>
+        `,
+      )
+      .join("");
+  }
+
+  function setInitialState() {
+    if (
+      !resultKicker ||
+      !mainResult ||
+      !summaryGrid ||
+      !warningElement ||
+      !rule72Element ||
+      !explanation ||
+      !growthEmpty ||
+      !growthTable ||
+      !growthBody ||
+      !comparisonEmpty ||
+      !comparisonTable ||
+      !comparisonBody
+    ) {
+      return;
+    }
+
+    resultKicker.textContent = "Resultado";
+    mainResult.textContent = "Ingresa los valores";
+    summaryGrid.innerHTML = `
+      <div class="rounded-lg border border-gray-800 bg-gray-950/70 p-4 text-sm text-gray-400">
+        El resumen aparecerá aquí.
+      </div>
+    `;
+    warningElement.textContent = "";
+    warningElement.classList.add("hidden");
+    rule72Element.textContent =
+      "Ingresa una tasa para estimar cuándo se duplica el dinero.";
+    explanation.textContent = "El cálculo aparecerá aquí.";
+    growthEmpty.classList.remove("hidden");
+    growthTable.classList.add("hidden");
+    growthBody.innerHTML = "";
+    comparisonEmpty.classList.remove("hidden");
+    comparisonTable.classList.add("hidden");
+    comparisonBody.innerHTML = "";
+    setActionsVisible(false);
+    currentCopyText = "";
+    currentCsvRows = [];
+  }
+
+  function setInvalidState() {
+    if (
+      !resultKicker ||
+      !mainResult ||
+      !summaryGrid ||
+      !warningElement ||
+      !rule72Element ||
+      !explanation ||
+      !growthEmpty ||
+      !growthTable ||
+      !growthBody ||
+      !comparisonEmpty ||
+      !comparisonTable ||
+      !comparisonBody
+    ) {
+      return;
+    }
+
+    resultKicker.textContent = "Revisa los campos";
+    mainResult.textContent = "No se puede calcular todavía";
+    summaryGrid.innerHTML = "";
+    warningElement.textContent = "";
+    warningElement.classList.add("hidden");
+    rule72Element.textContent =
+      "Corrige los valores marcados para estimar la duplicación.";
+    explanation.textContent = "Corrige los valores marcados para continuar.";
+    growthEmpty.classList.remove("hidden");
+    growthTable.classList.add("hidden");
+    growthBody.innerHTML = "";
+    comparisonEmpty.classList.remove("hidden");
+    comparisonTable.classList.add("hidden");
+    comparisonBody.innerHTML = "";
+    setActionsVisible(false);
+    currentCopyText = "";
+    currentCsvRows = [];
+  }
+
+  function setActionsVisible(isVisible) {
+    copyButton?.classList.toggle("hidden", !isVisible);
+    copyButton?.classList.toggle("inline-flex", isVisible);
+    exportButton?.classList.toggle("hidden", !isVisible);
+    exportButton?.classList.toggle("inline-flex", isVisible);
+  }
+
+  function clearErrors() {
+    document.querySelectorAll("[data-error-for]").forEach((errorElement) => {
+      errorElement.textContent = "";
+      errorElement.classList.add("hidden");
+    });
+  }
+
+  function showErrors(errors) {
+    Object.entries(errors).forEach(([field, error]) => {
+      const errorElement = document.querySelector(`[data-error-for="${field}"]`);
+
+      if (!errorElement) {
+        return;
+      }
+
+      errorElement.textContent =
+        ERROR_MESSAGES[error] ?? ERROR_MESSAGES.invalid;
+      errorElement.classList.remove("hidden");
+    });
+  }
+
+  function clearCalculator() {
+    inputs.principal.value = "";
+    inputs.annualRate.value = "";
+    inputs.duration.value = "";
+    inputs.contributionAmount.value = "0";
+    inputs.inflationRate.value = "";
+    selects.durationUnit.value = "years";
+    selects.compoundingFrequency.value = "monthly";
+    selects.contributionFrequency.value = "monthly";
+    selects.contributionTiming.value = "end";
+    Object.values(inputs).forEach((input) => {
+      delete input.dataset.touched;
+    });
+    clearErrors();
+    setInitialState();
+  }
+
+  function fillExample() {
+    inputs.principal.value = "10000";
+    inputs.annualRate.value = "8";
+    inputs.duration.value = "20";
+    inputs.contributionAmount.value = "500";
+    inputs.inflationRate.value = "4";
+    selects.durationUnit.value = "years";
+    selects.compoundingFrequency.value = "monthly";
+    selects.contributionFrequency.value = "monthly";
+    selects.contributionTiming.value = "end";
+    Object.values(inputs).forEach((input) => {
+      input.dataset.touched = "true";
+    });
+    updateCalculator();
+  }
+
+  function buildCopyText(input, result) {
+    const lines = [
+      "Calculadora de interés compuesto",
+      `Capital inicial: ${formatCurrency(input.principal)}`,
+      `Tasa anual: ${formatPercent(input.annualRate)}`,
+      `Plazo: ${formatDurationLabel(input.durationMonths)}`,
+      `Monto final: ${formatCurrency(result.futureValue)}`,
+      `Total aportado: ${formatCurrency(result.totalInvested)}`,
+      `Aportaciones periódicas: ${formatCurrency(result.totalContributions)}`,
+      `Intereses generados: ${formatCurrency(result.interestEarned)}`,
+      `Rentabilidad sobre aportado: ${formatPercent(result.returnOnInvested)}`,
+    ];
+
+    if (result.inflation) {
+      lines.push(
+        `Valor real aproximado: ${formatCurrency(result.inflation.realValue)}`,
+      );
+    }
+
+    return lines.join("\n");
+  }
+
+  function exportCsv() {
+    if (currentCsvRows.length === 0) {
+      return;
+    }
+
+    const rows = [
+      "anio,aportaciones_anio,total_aportado,intereses_acumulados,total_acumulado",
+      ...currentCsvRows.map((row) =>
+        [
+          row.year,
+          roundCurrency(row.annualContributions),
+          roundCurrency(row.totalInvested),
+          roundCurrency(row.interestEarned),
+          roundCurrency(row.totalValue),
+        ].join(","),
+      ),
+    ];
+    const blob = new Blob([rows.join("\n")], {
+      type: "text/csv;charset=utf-8",
+    });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "interes-compuesto.csv";
+    document.body.append(link);
+    link.click();
+    link.remove();
+    URL.revokeObjectURL(url);
+  }
+
+  async function copyResult() {
+    if (!currentCopyText || !copyLabel || !copyStatus) {
+      return;
+    }
+
+    try {
+      if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(currentCopyText);
+      } else {
+        const textArea = document.createElement("textarea");
+        textArea.value = currentCopyText;
+        textArea.setAttribute("readonly", "");
+        textArea.style.position = "fixed";
+        textArea.style.opacity = "0";
+        document.body.append(textArea);
+        textArea.select();
+        document.execCommand("copy");
+        textArea.remove();
+      }
+
+      window.clearTimeout(copiedTimeout);
+      copyLabel.textContent = "Copiado";
+      copyStatus.textContent = "Resultado copiado.";
+      copiedTimeout = window.setTimeout(() => {
+        copyLabel.textContent = "Copiar resultado";
+        copyStatus.textContent = "";
+      }, 2000);
+    } catch {
+      copyStatus.textContent = "No se pudo copiar el resultado.";
+    }
+  }
+
+  function formatDurationLabel(durationMonths) {
+    const years = Math.floor(durationMonths / 12);
+    const months = durationMonths % 12;
+    const parts = [];
+
+    if (years > 0) {
+      parts.push(`${years} ${years === 1 ? "año" : "años"}`);
+    }
+
+    if (months > 0 || parts.length === 0) {
+      parts.push(`${months} ${months === 1 ? "mes" : "meses"}`);
+    }
+
+    return parts.join(" y ");
+  }
+
+  function escapeHtml(value) {
+    return String(value)
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;")
+      .replaceAll("'", "&#039;");
+  }
+
+  Object.values(inputs).forEach((input) => {
+    input?.addEventListener("input", () => {
+      input.dataset.touched = "true";
+      updateCalculator();
+    });
+
+    input?.addEventListener("blur", () => {
+      input.dataset.touched = "true";
+      updateCalculator();
+    });
+  });
+
+  Object.values(selects).forEach((select) => {
+    select?.addEventListener("change", updateCalculator);
+  });
+
+  clearButton?.addEventListener("click", clearCalculator);
+  exampleButton?.addEventListener("click", fillExample);
+  copyButton?.addEventListener("click", copyResult);
+  exportButton?.addEventListener("click", exportCsv);
+
+  setInitialState();
+</script>
