@@ -1,43 +1,91 @@
-# Astro Starter Kit: Minimal
+# calculadoras.tools
 
-```sh
-npm create astro@latest -- --template minimal
-```
+Sitio web de calculadoras online simples, claras y gratuitas. El proyecto esta construido con Astro y combina herramientas interactivas con contenido editorial para explicar calculos cotidianos de matematicas, finanzas e impuestos.
 
-> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
+## Stack
 
-## 🚀 Project Structure
+- Astro 6
+- Tailwind CSS 4
+- Vitest para pruebas unitarias
+- `@astrojs/sitemap` para sitemap de produccion
+- Colecciones de contenido de Astro para el blog
 
-Inside of your Astro project, you'll see the following folders and files:
+## Requisitos
+
+- Node.js `>=22.12.0`
+- npm
+
+## Comandos
+
+Todos los comandos se ejecutan desde la raiz del proyecto.
+
+| Comando | Accion |
+| --- | --- |
+| `npm install` | Instala dependencias |
+| `npm run dev` | Inicia el servidor local de Astro |
+| `npm run build` | Genera el sitio estatico en `dist/` |
+| `npm run preview` | Previsualiza el build localmente |
+| `npm run test` | Ejecuta Vitest en modo watch |
+| `npm run test:unit:run` | Ejecuta las pruebas unitarias una vez |
+| `npm run coverage` | Ejecuta pruebas con reporte de cobertura |
+| `npm run astro -- --help` | Muestra ayuda de la CLI de Astro |
+
+## Estructura principal
 
 ```text
 /
-├── public/
-├── src/
-│   └── pages/
-│       └── index.astro
-└── package.json
+|-- public/                  # Archivos publicos estaticos
+|-- specs/                   # Especificaciones y notas de producto
+|-- src/
+|   |-- components/          # Componentes de layout, blog y UI compartida
+|   |-- content/blog/        # Articulos Markdown organizados por categoria
+|   |-- layouts/             # Layout base del sitio
+|   |-- lib/                 # Logica reutilizable, SEO y calculadoras
+|   |-- pages/               # Rutas publicas del sitio
+|   |-- styles/              # Estilos globales
+|   `-- svg/                 # Assets SVG del proyecto
+|-- astro.config.mjs
+|-- package.json
+`-- vitest.config.ts
 ```
 
-Astro looks for `.astro` or `.md` files in the `src/pages/` directory. Each page is exposed as a route based on its file name.
+## Calculadoras disponibles
 
-There's nothing special about `src/components/`, but that's where we like to put any Astro/React/Vue/Svelte/Preact components.
+Las calculadoras publicadas se registran en `src/lib/constants/calculators.ts` y se muestran automaticamente en la pagina de inicio.
 
-Any static assets, like images, can be placed in the `public/` directory.
+- `/matematicas/calculadora-de-porcentajes`
+- `/legal-impuestos/calculadora-de-iva`
+- `/finanzas/calculadora-de-interes-compuesto`
 
-## 🧞 Commands
+La logica reutilizable vive en `src/lib/calculators/` junto con sus pruebas unitarias. Cuando agregues una calculadora nueva, crea o actualiza:
 
-All commands are run from the root of the project, from a terminal:
+- La pagina en `src/pages/<categoria>/<slug>.astro`
+- La logica de calculo en `src/lib/calculators/`
+- Las pruebas correspondientes en `src/lib/calculators/*.test.ts`
+- La entrada del directorio en `src/lib/constants/calculators.ts`
 
-| Command                   | Action                                           |
-| :------------------------ | :----------------------------------------------- |
-| `npm install`             | Installs dependencies                            |
-| `npm run dev`             | Starts local dev server at `localhost:4321`      |
-| `npm run build`           | Build your production site to `./dist/`          |
-| `npm run preview`         | Preview your build locally, before deploying     |
-| `npm run astro ...`       | Run CLI commands like `astro add`, `astro check` |
-| `npm run astro -- --help` | Get help using the Astro CLI                     |
+## Blog y contenido
 
-## 👀 Want to learn more?
+Los articulos estan en `src/content/blog/` y usan la coleccion definida en `src/content.config.ts`. Cada articulo debe incluir metadatos como `title`, `description`, `pubDate`, `category`, `tags` y, cuando aplique, `relatedCalculator`.
 
-Feel free to check [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
+Las rutas del blog se generan desde:
+
+- `src/pages/blog.astro`
+- `src/pages/blog/[...slug].astro`
+- `src/pages/blog/categoria/[category].astro`
+
+## SEO
+
+El sitio usa `https://calculadoras.tools` como dominio canonico en `astro.config.mjs`, genera sitemap con `@astrojs/sitemap` y expone `robots.txt` desde `src/pages/robots.txt.ts`.
+
+Para calculadoras con preguntas frecuentes, la utilidad `buildFaqJsonLd` en `src/lib/seo.ts` ayuda a generar marcado JSON-LD de FAQ.
+
+## Alias de imports
+
+El proyecto define alias en `tsconfig.json`:
+
+- `@/*`
+- `@components/*`
+- `@layouts/*`
+- `@lib/*`
+- `@styles/*`
