@@ -2,7 +2,7 @@
 title: "Qué porcentaje es una cantidad de otra"
 seoTitle: "Qué porcentaje es X de Y: fórmula y ejemplos"
 description: "Aprende cómo calcular qué porcentaje representa una cantidad de otra con fórmula, ejemplos y errores comunes."
-pubDate: 2026-05-18
+pubDate: 2026-05-25
 category: "Matemáticas"
 tags:
   - porcentajes

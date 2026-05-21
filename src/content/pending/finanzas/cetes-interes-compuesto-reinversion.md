@@ -1,7 +1,7 @@
 ---
 title: "CETES e interes compuesto: que pasa si reinviertes"
 description: "Entiende como funciona la reinversion en CETES, que datos necesitas para estimar ganancias y que limites tiene el calculo."
-pubDate: 2026-05-26
+pubDate: 2026-05-23
 category: "Finanzas"
 tags:
   - cetes
@@ -130,4 +130,3 @@ No necesariamente. La tasa puede cambiar en cada subasta y en cada nueva compra.
 **La calculadora incluye ISR?**
 
 No. La calculadora de interes compuesto sirve como aproximacion con una tasa constante. Para una estimacion mas cercana a tu caso, revisa la retencion o impuesto aplicable y descuenta ese efecto del rendimiento esperado.
-

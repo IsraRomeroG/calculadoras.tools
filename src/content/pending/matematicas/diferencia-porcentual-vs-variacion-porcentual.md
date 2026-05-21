@@ -2,7 +2,7 @@
 title: "Diferencia porcentual vs variación porcentual"
 seoTitle: "Diferencia porcentual y variación porcentual: diferencias"
 description: "Entiende cuándo usar diferencia porcentual y cuándo usar variación porcentual con fórmulas, ejemplos y casos comunes."
-pubDate: 2026-05-19
+pubDate: 2026-05-25
 category: "Matemáticas"
 tags:
   - diferencia porcentual

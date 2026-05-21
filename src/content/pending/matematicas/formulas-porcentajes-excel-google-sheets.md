@@ -2,7 +2,7 @@
 title: "Fórmulas de porcentajes en Excel y Google Sheets"
 seoTitle: "Porcentajes en Excel y Google Sheets: fórmulas útiles"
 description: "Aprende fórmulas para calcular porcentajes, descuentos, aumentos y variaciones en Excel y Google Sheets."
-pubDate: 2026-05-19
+pubDate: 2026-05-26
 category: "Matemáticas"
 tags:
   - excel
