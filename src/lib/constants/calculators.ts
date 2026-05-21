@@ -10,6 +10,14 @@ export const CALCULATORS: CalculatorDirectoryItem[] = [
     order: 10,
   },
   {
+    id: "calculadora-de-regla-de-tres",
+    title: "Calculadora de regla de tres",
+    description: "Resuelve proporciones directas e inversas paso a paso.",
+    href: "/matematicas/calculadora-de-regla-de-tres",
+    category: "Matemáticas",
+    order: 15,
+  },
+  {
     id: "calculadora-de-iva",
     title: "Calculadora de IVA",
     description: "Agrega o desglosa IVA con tasa editable y presets por país.",
