@@ -1,0 +1,880 @@
+---
+import BaseLayout from "@layouts/BaseLayout.astro";
+import Container from "@components/layout/Container.astro";
+import PageShell from "@components/layout/PageShell.astro";
+import FaqSection from "@components/shared/FaqSection.astro";
+import PageHero from "@components/shared/PageHero.astro";
+import SectionIntro from "@components/shared/SectionIntro.astro";
+import { buildFaqJsonLd } from "@lib/seo";
+
+const title = "Calculadora de Regla de Tres Online - Directa e Inversa";
+const description =
+  "Resuelve reglas de tres directas e inversas al instante. Calcula proporciones con explicación paso a paso, verificación y resultado como fracción.";
+const canonical = "/matematicas/calculadora-de-regla-de-tres";
+
+const faqs = [
+  {
+    question: "¿Qué es la regla de tres?",
+    answer:
+      "La regla de tres es un método para encontrar un cuarto valor cuando ya conoces tres valores relacionados por una proporción.",
+    relatedHref: "/blog/regla-de-tres",
+    relatedLabel: "Ver guía de regla de tres",
+  },
+  {
+    question: "¿Cuál es la fórmula de la regla de tres directa?",
+    answer:
+      "Si A corresponde a B y C corresponde a X, la fórmula directa es X = (B × C) / A.",
+  },
+  {
+    question: "¿Cuál es la fórmula de la regla de tres inversa?",
+    answer:
+      "Si A corresponde a B y C corresponde a X, la fórmula inversa es X = (A × B) / C.",
+  },
+  {
+    question: "¿Cómo sé si una proporción es directa o inversa?",
+    answer:
+      "Es directa cuando ambas magnitudes suben o bajan juntas. Es inversa cuando una aumenta y la otra disminuye, como trabajadores y días para terminar una tarea.",
+  },
+  {
+    question: "¿Puedo usar decimales o valores negativos?",
+    answer:
+      "Sí. La calculadora acepta decimales con punto o coma. Los valores negativos se permiten, pero se muestra una advertencia para que revises si tienen sentido en tu contexto.",
+  },
+];
+
+const faqJsonLd = buildFaqJsonLd(faqs);
+
+const examples = [
+  {
+    title: "Precios y cantidades",
+    body: "Si 3 kg cuestan $150, entonces 7 kg cuestan $350.",
+    type: "Directa",
+  },
+  {
+    title: "Trabajadores y tiempo",
+    body: "Si 4 obreros tardan 12 días, entonces 6 obreros tardan 8 días.",
+    type: "Inversa",
+  },
+  {
+    title: "Recetas",
+    body: "Si 2 tazas alcanzan para 5 porciones, 8 porciones necesitan 3.2 tazas.",
+    type: "Directa",
+  },
+];
+---
+
+<BaseLayout title={title} description={description} canonical={canonical}>
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={JSON.stringify(faqJsonLd)} />
+  </Fragment>
+
+  <PageShell>
+    <PageHero
+      title="Calculadora de regla de tres"
+      description="Encuentra el valor desconocido en proporciones directas e inversas con resultado, comprobación y procedimiento paso a paso."
+      kicker="Matemáticas"
+      collapseBreadcrumbOnMobile
+      containerClass="py-6 md:py-8"
+      breadcrumbs={[
+        { label: "Inicio", href: "/", ariaLabel: "Inicio" },
+        { label: "Matemáticas", href: "/#calculadoras", optional: true },
+        { label: "Calculadora de regla de tres", truncate: true },
+      ]}
+    />
+
+    <Container as="section" class="py-6 md:py-8">
+      <div
+        id="rule-of-three-calculator"
+        class="overflow-hidden rounded-lg border border-gray-700 bg-gray-950 shadow-xl shadow-gray-950/30"
+      >
+        <div class="border-b border-gray-800 p-4 sm:p-5">
+          <div
+            class="inline-flex rounded-lg border border-gray-700 bg-gray-900 p-1"
+            role="group"
+            aria-label="Tipo de proporción"
+          >
+            <button
+              class="min-h-11 rounded-md px-4 py-2 text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/40"
+              type="button"
+              data-type-button="direct"
+              aria-pressed="true"
+            >
+              Directa
+            </button>
+            <button
+              class="min-h-11 rounded-md px-4 py-2 text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/40"
+              type="button"
+              data-type-button="inverse"
+              aria-pressed="false"
+            >
+              Inversa
+            </button>
+          </div>
+        </div>
+
+        <div class="grid gap-0 lg:grid-cols-[minmax(0,1fr)_minmax(20rem,0.72fr)]">
+          <section class="p-4 sm:p-6" aria-labelledby="calculator-heading">
+            <h2 id="calculator-heading" class="text-xl font-semibold">
+              Plantea la proporción
+            </h2>
+            <p class="mt-2 text-sm leading-relaxed text-gray-400">
+              Captura tres valores conocidos. La calculadora encuentra el cuarto
+              valor y muestra cómo llegó al resultado.
+            </p>
+
+            <div class="mt-6 grid gap-4 sm:grid-cols-2">
+              <div>
+                <label
+                  for="first-unit"
+                  class="block text-sm font-medium text-gray-200"
+                >
+                  Unidad de la primera magnitud
+                </label>
+                <input
+                  id="first-unit"
+                  class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-900 px-4 text-base text-white outline-none transition placeholder:text-gray-600 focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15"
+                  type="text"
+                  maxlength="20"
+                  autocomplete="off"
+                  placeholder="kg, obreros, litros"
+                  data-unit="first"
+                />
+              </div>
+
+              <div>
+                <label
+                  for="second-unit"
+                  class="block text-sm font-medium text-gray-200"
+                >
+                  Unidad del resultado
+                </label>
+                <input
+                  id="second-unit"
+                  class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-900 px-4 text-base text-white outline-none transition placeholder:text-gray-600 focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15"
+                  type="text"
+                  maxlength="20"
+                  autocomplete="off"
+                  placeholder="$, días, metros"
+                  data-unit="second"
+                />
+              </div>
+            </div>
+
+            <div class="mt-6 rounded-lg border border-gray-800 bg-gray-900/70 p-3 sm:p-4">
+              <div class="grid grid-cols-[minmax(0,1fr)_minmax(0,1fr)] gap-3 text-xs font-semibold uppercase text-gray-400">
+                <span>Magnitud 1</span>
+                <span>Magnitud 2</span>
+              </div>
+
+              <div class="mt-3 grid grid-cols-[minmax(0,1fr)_minmax(0,1fr)] gap-3">
+                <div>
+                  <label for="value-a" class="sr-only">Valor A</label>
+                  <input
+                    id="value-a"
+                    class="min-h-12 w-full rounded-lg border border-gray-700 bg-gray-950 px-4 text-base text-white outline-none transition placeholder:text-gray-600 focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15"
+                    type="text"
+                    inputmode="decimal"
+                    autocomplete="off"
+                    placeholder="A"
+                    aria-describedby="value-a-error"
+                    data-value-input="a"
+                  />
+                  <p
+                    id="value-a-error"
+                    class="mt-2 hidden text-sm text-red-300"
+                    data-error-for="a"
+                  >
+                  </p>
+                </div>
+
+                <div>
+                  <label for="value-b" class="sr-only">Valor B</label>
+                  <input
+                    id="value-b"
+                    class="min-h-12 w-full rounded-lg border border-gray-700 bg-gray-950 px-4 text-base text-white outline-none transition placeholder:text-gray-600 focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15"
+                    type="text"
+                    inputmode="decimal"
+                    autocomplete="off"
+                    placeholder="B"
+                    aria-describedby="value-b-error"
+                    data-value-input="b"
+                  />
+                  <p
+                    id="value-b-error"
+                    class="mt-2 hidden text-sm text-red-300"
+                    data-error-for="b"
+                  >
+                  </p>
+                </div>
+
+                <div>
+                  <label for="value-c" class="sr-only">Valor C</label>
+                  <input
+                    id="value-c"
+                    class="min-h-12 w-full rounded-lg border border-gray-700 bg-gray-950 px-4 text-base text-white outline-none transition placeholder:text-gray-600 focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15"
+                    type="text"
+                    inputmode="decimal"
+                    autocomplete="off"
+                    placeholder="C"
+                    aria-describedby="value-c-error"
+                    data-value-input="c"
+                  />
+                  <p
+                    id="value-c-error"
+                    class="mt-2 hidden text-sm text-red-300"
+                    data-error-for="c"
+                  >
+                  </p>
+                </div>
+
+                <div
+                  class="flex min-h-12 items-center rounded-lg border border-amber-400/40 bg-amber-400/10 px-4 text-base font-semibold text-amber-100"
+                  aria-label="Valor X calculado"
+                  data-x-preview
+                >
+                  X
+                </div>
+              </div>
+            </div>
+
+            <p
+              class="mt-4 rounded-lg border border-gray-800 bg-gray-900 px-4 py-3 text-sm leading-relaxed text-gray-300"
+              data-sentence
+            >
+              Si A equivale a B, entonces C equivale a X.
+            </p>
+
+            <div class="mt-5 grid gap-4 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-end">
+              <div>
+                <label
+                  for="result-decimals"
+                  class="block text-sm font-medium text-gray-200"
+                >
+                  Decimales del resultado
+                </label>
+                <select
+                  id="result-decimals"
+                  class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-900 px-4 text-base text-white outline-none transition focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15"
+                  data-decimals
+                >
+                  <option value="0">0 decimales</option>
+                  <option value="1">1 decimal</option>
+                  <option value="2" selected>2 decimales</option>
+                  <option value="3">3 decimales</option>
+                  <option value="4">4 decimales</option>
+                </select>
+              </div>
+
+              <div class="flex flex-wrap gap-3">
+                <button
+                  class="inline-flex min-h-11 items-center justify-center rounded-lg border border-gray-700 px-4 py-2 text-sm font-semibold text-gray-200 transition hover:border-amber-400 hover:text-white focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/40"
+                  type="button"
+                  data-swap-values
+                >
+                  Invertir A/C
+                </button>
+                <button
+                  class="inline-flex min-h-11 items-center justify-center rounded-lg border border-gray-700 px-4 py-2 text-sm font-semibold text-gray-200 transition hover:border-amber-400 hover:text-white focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/40"
+                  type="button"
+                  data-clear-calculator
+                >
+                  Limpiar
+                </button>
+              </div>
+            </div>
+          </section>
+
+          <aside class="border-t border-gray-800 bg-gray-900/60 p-4 sm:p-6 lg:border-l lg:border-t-0">
+            <div
+              class="rounded-lg border border-gray-700 bg-gray-950 p-5"
+              aria-live="polite"
+              data-result-region
+            >
+              <p class="text-sm font-semibold uppercase text-amber-400">
+                Resultado
+              </p>
+              <p
+                class="mt-3 break-words text-3xl font-semibold text-white"
+                data-main-result
+              >
+                Ingresa los valores
+              </p>
+              <p class="mt-2 text-sm leading-relaxed text-gray-400" data-result-note>
+                El resultado aparecerá cuando A, B y C sean válidos.
+              </p>
+              <p
+                class="mt-3 hidden rounded-lg border border-orange-400/30 bg-orange-400/10 px-3 py-2 text-sm text-orange-200"
+                data-warning
+              >
+              </p>
+              <p
+                class="mt-3 hidden rounded-lg border border-gray-700 bg-gray-900 px-3 py-2 text-sm text-gray-300"
+                data-fraction
+              >
+              </p>
+
+              <div class="mt-5 flex flex-wrap gap-3">
+                <button
+                  class="hidden min-h-11 items-center justify-center rounded-lg bg-amber-400 px-4 py-2 text-sm font-semibold text-gray-950 transition hover:bg-amber-300 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/40"
+                  type="button"
+                  data-copy-result
+                >
+                  <span data-copy-label>Copiar resultado</span>
+                </button>
+                <button
+                  class="hidden min-h-11 items-center justify-center rounded-lg border border-gray-700 px-4 py-2 text-sm font-semibold text-gray-200 transition hover:border-amber-400 hover:text-white focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/40"
+                  type="button"
+                  data-verify-result
+                >
+                  Verificar
+                </button>
+              </div>
+              <p class="mt-3 min-h-5 text-sm text-emerald-300" data-copy-status>
+              </p>
+            </div>
+
+            <div class="mt-5 rounded-lg border border-gray-700 bg-gray-950 p-5">
+              <h3 class="text-base font-semibold text-white">Fórmula</h3>
+              <p class="mt-3 break-words text-sm text-gray-300" data-formula>
+                La fórmula aparecerá aquí.
+              </p>
+              <p class="mt-2 break-words text-sm text-gray-400" data-substitution>
+              </p>
+            </div>
+
+            <div
+              class="mt-5 hidden rounded-lg border border-emerald-400/30 bg-emerald-400/10 p-5"
+              data-verification-panel
+            >
+              <h3 class="text-base font-semibold text-emerald-100">
+                Comprobación
+              </h3>
+              <ol class="mt-3 space-y-2 text-sm leading-relaxed text-emerald-50" data-verification-list>
+              </ol>
+            </div>
+          </aside>
+        </div>
+      </div>
+    </Container>
+
+    <Container as="section" class="py-6 md:py-8">
+      <SectionIntro
+        title="Procedimiento paso a paso"
+        description="El cálculo se actualiza en tiempo real y conserva el desarrollo para que puedas revisar el planteamiento."
+      />
+
+      <div class="rounded-lg border border-gray-700 bg-gray-950 p-5">
+        <ol
+          class="space-y-3 text-sm leading-relaxed text-gray-300"
+          data-steps-list
+        >
+          <li>Completa los valores para ver el procedimiento.</li>
+        </ol>
+      </div>
+    </Container>
+
+    <Container as="section" class="py-6 md:py-8">
+      <SectionIntro
+        title="Ejemplos frecuentes"
+        description="Estas situaciones muestran cuándo suele aplicarse una proporción directa o inversa."
+      />
+
+      <div class="grid gap-4 md:grid-cols-3">
+        {
+          examples.map((example) => (
+            <article class="rounded-lg border border-gray-700 bg-gray-950 p-5">
+              <p class="text-xs font-semibold uppercase text-amber-400">
+                {example.type}
+              </p>
+              <h3 class="mt-2 text-lg font-semibold text-white">
+                {example.title}
+              </h3>
+              <p class="mt-3 text-sm leading-relaxed text-gray-400">
+                {example.body}
+              </p>
+            </article>
+          ))
+        }
+      </div>
+    </Container>
+
+    <Container as="section" class="py-6 md:py-8">
+      <div class="grid gap-6 md:grid-cols-2">
+        <div>
+          <h2 class="text-2xl font-semibold">Regla de tres directa</h2>
+          <p class="mt-3 text-sm leading-relaxed text-gray-400">
+            Se usa cuando ambas magnitudes cambian en el mismo sentido. Si una
+            aumenta, la otra también aumenta; si una disminuye, la otra también
+            disminuye.
+          </p>
+          <p class="mt-4 rounded-lg border border-gray-800 bg-gray-950 p-4 text-sm text-gray-300">
+            Fórmula: <strong class="text-white">X = (B × C) / A</strong>
+          </p>
+        </div>
+
+        <div>
+          <h2 class="text-2xl font-semibold">Regla de tres inversa</h2>
+          <p class="mt-3 text-sm leading-relaxed text-gray-400">
+            Se usa cuando una magnitud aumenta y la otra disminuye. Es común en
+            problemas de trabajadores, tiempo, velocidad o rendimiento.
+          </p>
+          <p class="mt-4 rounded-lg border border-gray-800 bg-gray-950 p-4 text-sm text-gray-300">
+            Fórmula: <strong class="text-white">X = (A × B) / C</strong>
+          </p>
+        </div>
+      </div>
+    </Container>
+
+    <Container as="section" class="py-6 md:py-8">
+      <div class="rounded-lg border border-gray-700 bg-gray-950 p-5">
+        <h2 class="text-xl font-semibold">Aviso educativo</h2>
+        <p class="mt-3 text-sm leading-relaxed text-gray-400">
+          Esta calculadora es una herramienta educativa. El resultado depende de
+          que los valores capturados realmente formen una proporción directa o
+          inversa. Si tienes dudas, revisa el paso a paso y la verificación antes
+          de usar el resultado.
+        </p>
+      </div>
+    </Container>
+
+    <FaqSection faqs={faqs} />
+  </PageShell>
+</BaseLayout>
+
+<script>
+  import {
+    calculateRuleOfThree,
+    formatFlexibleNumber,
+    formatRuleResult,
+    parseRuleOfThreeInput,
+  } from "@lib/calculators/ruleOfThree";
+
+  const ERROR_MESSAGES = {
+    required: "Este campo es obligatorio.",
+    invalid: "Ingresa un número válido.",
+    zero_a: "El valor A no puede ser cero.",
+    zero_c_inverse: "El valor C no puede ser cero en una proporción inversa.",
+  };
+
+  const typeButtons = Array.from(
+    document.querySelectorAll("[data-type-button]"),
+  );
+  const valueInputs = Array.from(
+    document.querySelectorAll("[data-value-input]"),
+  );
+  const firstUnitInput = document.querySelector('[data-unit="first"]');
+  const secondUnitInput = document.querySelector('[data-unit="second"]');
+  const decimalsSelect = document.querySelector("[data-decimals]");
+  const sentence = document.querySelector("[data-sentence]");
+  const xPreview = document.querySelector("[data-x-preview]");
+  const mainResult = document.querySelector("[data-main-result]");
+  const resultNote = document.querySelector("[data-result-note]");
+  const warning = document.querySelector("[data-warning]");
+  const fraction = document.querySelector("[data-fraction]");
+  const formula = document.querySelector("[data-formula]");
+  const substitution = document.querySelector("[data-substitution]");
+  const stepsList = document.querySelector("[data-steps-list]");
+  const verificationButton = document.querySelector("[data-verify-result]");
+  const verificationPanel = document.querySelector("[data-verification-panel]");
+  const verificationList = document.querySelector("[data-verification-list]");
+  const copyButton = document.querySelector("[data-copy-result]");
+  const copyLabel = document.querySelector("[data-copy-label]");
+  const copyStatus = document.querySelector("[data-copy-status]");
+  const clearButton = document.querySelector("[data-clear-calculator]");
+  const swapButton = document.querySelector("[data-swap-values]");
+
+  let activeType = "direct";
+  let currentResult = null;
+  let currentCopyText = "";
+  let copiedTimeout = 0;
+
+  function getInput(name) {
+    return document.querySelector(`[data-value-input="${name}"]`);
+  }
+
+  function getUnits() {
+    return {
+      first: firstUnitInput?.value.trim() ?? "",
+      second: secondUnitInput?.value.trim() ?? "",
+    };
+  }
+
+  function getDecimals() {
+    return Number(decimalsSelect?.value ?? "2");
+  }
+
+  function setActiveType(type) {
+    activeType = type;
+
+    typeButtons.forEach((button) => {
+      const isActive = button.dataset.typeButton === type;
+      button.setAttribute("aria-pressed", String(isActive));
+      button.classList.toggle("bg-amber-400", isActive);
+      button.classList.toggle("text-gray-950", isActive);
+      button.classList.toggle("text-gray-300", !isActive);
+      button.classList.toggle("hover:bg-gray-800", !isActive);
+    });
+
+    updateCalculator();
+  }
+
+  function parseValues() {
+    const values = {};
+    const errors = {};
+
+    valueInputs.forEach((input) => {
+      const field = input.dataset.valueInput;
+      const parsed = parseRuleOfThreeInput(input.value);
+
+      if (parsed.ok) {
+        values[field] = parsed.value;
+      } else {
+        errors[field] = parsed.error;
+      }
+    });
+
+    if (values.a === 0) {
+      errors.a = "zero_a";
+    }
+
+    if (activeType === "inverse" && values.c === 0) {
+      errors.c = "zero_c_inverse";
+    }
+
+    return { values, errors };
+  }
+
+  function hasAnyValue() {
+    return valueInputs.some((input) => input.value.trim() !== "");
+  }
+
+  function clearErrors() {
+    document.querySelectorAll("[data-error-for]").forEach((errorElement) => {
+      errorElement.textContent = "";
+      errorElement.classList.add("hidden");
+    });
+  }
+
+  function showErrors(errors) {
+    clearErrors();
+
+    Object.entries(errors).forEach(([field, error]) => {
+      const errorElement = document.querySelector(
+        `[data-error-for="${field}"]`,
+      );
+
+      if (!errorElement) {
+        return;
+      }
+
+      const input = getInput(field);
+      const shouldShow =
+        input?.dataset.touched === "true" ||
+        error === "zero_a" ||
+        error === "zero_c_inverse";
+
+      if (!shouldShow) {
+        return;
+      }
+
+      errorElement.textContent = ERROR_MESSAGES[error] ?? ERROR_MESSAGES.invalid;
+      errorElement.classList.remove("hidden");
+    });
+  }
+
+  function setActionVisibility(isVisible) {
+    [copyButton, verificationButton].forEach((button) => {
+      button?.classList.toggle("hidden", !isVisible);
+      button?.classList.toggle("inline-flex", isVisible);
+    });
+  }
+
+  function setInitialState(message = "El resultado aparecerá cuando A, B y C sean válidos.") {
+    currentResult = null;
+    currentCopyText = "";
+    mainResult.textContent = "Ingresa los valores";
+    mainResult.classList.remove("text-red-300", "text-emerald-300");
+    mainResult.classList.add("text-white");
+    resultNote.textContent = message;
+    warning.classList.add("hidden");
+    warning.textContent = "";
+    fraction.classList.add("hidden");
+    fraction.textContent = "";
+    formula.textContent = "La fórmula aparecerá aquí.";
+    substitution.textContent = "";
+    xPreview.textContent = "X";
+    stepsList.innerHTML = "<li>Completa los valores para ver el procedimiento.</li>";
+    verificationPanel.classList.add("hidden");
+    verificationList.innerHTML = "";
+    setActionVisibility(false);
+  }
+
+  function setInvalidState() {
+    currentResult = null;
+    currentCopyText = "";
+    mainResult.textContent = "Revisa los campos";
+    mainResult.classList.remove("text-white", "text-emerald-300");
+    mainResult.classList.add("text-red-300");
+    resultNote.textContent = "Corrige el valor marcado para continuar.";
+    warning.classList.add("hidden");
+    warning.textContent = "";
+    fraction.classList.add("hidden");
+    fraction.textContent = "";
+    formula.textContent = "La fórmula aparecerá aquí.";
+    substitution.textContent = "";
+    xPreview.textContent = "X";
+    stepsList.innerHTML = "<li>Corrige los campos marcados para ver el procedimiento.</li>";
+    verificationPanel.classList.add("hidden");
+    verificationList.innerHTML = "";
+    setActionVisibility(false);
+  }
+
+  function updateSentence(values = {}) {
+    const { first, second } = getUnits();
+    const a = values.a ?? "A";
+    const b = values.b ?? "B";
+    const c = values.c ?? "C";
+    const formattedA = typeof a === "number" ? formatFlexibleNumber(a) : a;
+    const formattedB = typeof b === "number" ? formatFlexibleNumber(b) : b;
+    const formattedC = typeof c === "number" ? formatFlexibleNumber(c) : c;
+    const firstUnit = first ? ` ${first}` : "";
+    const secondUnit = second ? ` ${second}` : "";
+
+    sentence.textContent = `Si ${formattedA}${firstUnit} equivalen a ${formattedB}${secondUnit}, entonces ${formattedC}${firstUnit} equivalen a X${secondUnit}.`;
+  }
+
+  function renderValidResult(values) {
+    const { first, second } = getUnits();
+    const decimals = getDecimals();
+    const result = calculateRuleOfThree({
+      type: activeType,
+      a: values.a,
+      b: values.b,
+      c: values.c,
+      decimals,
+      firstUnit: first,
+      secondUnit: second,
+    });
+    const formattedX = formatRuleResult(result.x, {
+      decimals,
+      unit: second,
+    });
+
+    currentResult = result;
+    mainResult.textContent = `X = ${formattedX}`;
+    mainResult.classList.remove("text-red-300");
+    mainResult.classList.add("text-white");
+    resultNote.textContent =
+      activeType === "direct"
+        ? "Proporción directa: ambas magnitudes cambian en el mismo sentido."
+        : "Proporción inversa: una magnitud aumenta mientras la otra disminuye.";
+    xPreview.textContent = formattedX;
+    formula.textContent = result.formula;
+    substitution.textContent = result.substitution;
+    warning.classList.toggle("hidden", result.x >= 0);
+    warning.textContent =
+      result.x < 0
+        ? "El resultado es negativo; revisa si tiene sentido en este contexto."
+        : "";
+    fraction.classList.toggle("hidden", !result.fraction);
+    fraction.textContent = result.fraction
+      ? `Fracción exacta: ${result.fraction}`
+      : "";
+    stepsList.innerHTML = result.steps
+      .map((step) => `<li>${escapeHtml(step)}</li>`)
+      .join("");
+    verificationPanel.classList.add("hidden");
+    verificationList.innerHTML = "";
+    setActionVisibility(true);
+    updateSentence(values);
+    currentCopyText = buildCopyText(values, result, formattedX);
+  }
+
+  function updateCalculator() {
+    const { values, errors } = parseValues();
+    updateSentence(values);
+
+    if (!hasAnyValue()) {
+      clearErrors();
+      setInitialState();
+      return;
+    }
+
+    const hasOnlyRequiredErrors =
+      Object.keys(errors).length > 0 &&
+      Object.values(errors).every((error) => error === "required");
+
+    if (hasOnlyRequiredErrors) {
+      showErrors(errors);
+      setInitialState("Completa los tres valores para calcular X.");
+      return;
+    }
+
+    if (Object.keys(errors).length > 0) {
+      showErrors(errors);
+      setInvalidState();
+      return;
+    }
+
+    clearErrors();
+    renderValidResult(values);
+  }
+
+  function verifyResult() {
+    if (!currentResult) {
+      return;
+    }
+
+    verificationList.innerHTML = currentResult.verification
+      .map((step) => `<li>${escapeHtml(step)}</li>`)
+      .join("");
+    verificationPanel.classList.remove("hidden");
+  }
+
+  function buildCopyText(values, result, formattedX) {
+    const { first, second } = getUnits();
+    const typeLabel = activeType === "direct" ? "Directa" : "Inversa";
+
+    return [
+      "Calculadora de regla de tres - calculadoras.tools",
+      `Tipo: ${typeLabel}`,
+      `A = ${formatValue(values.a, first)}`,
+      `B = ${formatValue(values.b, second)}`,
+      `C = ${formatValue(values.c, first)}`,
+      `Resultado: X = ${formattedX}`,
+      `Fórmula: ${result.formula}`,
+      `Sustitución: ${result.substitution}`,
+      "",
+      "Paso a paso:",
+      ...result.steps,
+    ].join("\n");
+  }
+
+  function formatValue(value, unit) {
+    const number = formatFlexibleNumber(value);
+
+    if (!unit) {
+      return number;
+    }
+
+    if (["$", "€", "£", "¥"].includes(unit)) {
+      const sign = value < 0 ? "-" : "";
+
+      return `${sign}${unit}${formatFlexibleNumber(Math.abs(value))}`;
+    }
+
+    if (unit === "%") {
+      return `${number}%`;
+    }
+
+    return `${number} ${unit}`;
+  }
+
+  async function copyResult() {
+    if (!currentCopyText) {
+      return;
+    }
+
+    try {
+      if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(currentCopyText);
+      } else {
+        const textArea = document.createElement("textarea");
+        textArea.value = currentCopyText;
+        textArea.setAttribute("readonly", "");
+        textArea.style.position = "fixed";
+        textArea.style.opacity = "0";
+        document.body.append(textArea);
+        textArea.select();
+        document.execCommand("copy");
+        textArea.remove();
+      }
+
+      window.clearTimeout(copiedTimeout);
+      copyLabel.textContent = "Copiado";
+      copyStatus.textContent = "Resultado copiado.";
+      copiedTimeout = window.setTimeout(() => {
+        copyLabel.textContent = "Copiar resultado";
+        copyStatus.textContent = "";
+      }, 2000);
+    } catch {
+      copyStatus.textContent = "No se pudo copiar el resultado.";
+    }
+  }
+
+  function clearCalculator() {
+    activeType = "direct";
+    valueInputs.forEach((input) => {
+      input.value = "";
+      delete input.dataset.touched;
+    });
+    if (firstUnitInput) {
+      firstUnitInput.value = "";
+    }
+    if (secondUnitInput) {
+      secondUnitInput.value = "";
+    }
+    if (decimalsSelect) {
+      decimalsSelect.value = "2";
+    }
+    setActiveType("direct");
+    clearErrors();
+    updateSentence();
+    setInitialState();
+  }
+
+  function swapValues() {
+    const a = getInput("a");
+    const c = getInput("c");
+
+    if (!a || !c) {
+      return;
+    }
+
+    const previousA = a.value;
+    a.value = c.value;
+    c.value = previousA;
+    a.dataset.touched = "true";
+    c.dataset.touched = "true";
+    updateCalculator();
+  }
+
+  function escapeHtml(value) {
+    return String(value)
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;")
+      .replaceAll("'", "&#039;");
+  }
+
+  typeButtons.forEach((button) => {
+    button.addEventListener("click", () => {
+      setActiveType(button.dataset.typeButton);
+    });
+  });
+
+  valueInputs.forEach((input) => {
+    input.addEventListener("input", () => {
+      input.dataset.touched = "true";
+      updateCalculator();
+    });
+
+    input.addEventListener("blur", () => {
+      input.dataset.touched = "true";
+      updateCalculator();
+    });
+  });
+
+  [firstUnitInput, secondUnitInput, decimalsSelect].forEach((control) => {
+    control?.addEventListener("input", updateCalculator);
+    control?.addEventListener("change", updateCalculator);
+  });
+
+  verificationButton?.addEventListener("click", verifyResult);
+  copyButton?.addEventListener("click", copyResult);
+  clearButton?.addEventListener("click", clearCalculator);
+  swapButton?.addEventListener("click", swapValues);
+
+  setActiveType(activeType);
+</script>
