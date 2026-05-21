@@ -17,19 +17,38 @@ relatedCalculator:
 
 ## Qué es el interés compuesto
 
-El interés compuesto es el crecimiento que ocurre cuando los intereses generados se reinvierten y también empiezan a producir nuevos intereses. Por eso suele explicarse como "interés sobre interés": el dinero no crece solo sobre el capital inicial, sino sobre un monto que se va acumulando.
+El interés compuesto fué descrito por Albert Einstein como la octava maravilla del mundo. Y es que cuando uno lo entiende te das cuenta de lo potente que puede llegar a ser si se aplica para nuestro beneficio y lo perjudicial que puede ser si se aplica en el sentido opuesto.
 
-En una inversión o ahorro, el capital inicial es el dinero con el que empiezas. Los intereses son los rendimientos que se generan durante cada periodo. La reinversión ocurre cuando esos intereses se suman al capital, en lugar de retirarlos.
+El interés compuesto es el crecimiento o incremento que ocurre cuando los intereses generados por una inversión se reinvierten, de modo que los intereses empiezan a producir intereses. Por eso suele explicarse como “interés sobre interés”: el dinero no crece solo sobre el capital inicial, sino sobre un monto que se va acumulando.
 
-La idea básica puede resumirse así:
+En una inversión o ahorro, el capital inicial es el dinero con el que empiezas. Los intereses son los rendimientos/ganancias que se generan durante un periodo específico. La reinversión ocurre cuando esos rendimientos/ganancias se suman al capital inicial, en lugar de retirarlos.
+
+## Las matemáticas de interés compuesto
+
+La idea básica puede resumirse con la siguiente fórmula:
 
 ```txt
 monto final = capital inicial x (1 + tasa) ^ periodos
 ```
 
+Por ejemplo:
+
+```txt
+capital inicial: 100
+tasa: 10% -> 0.1
+periodos: 3
+
+monto final = 100 x (1 + 0.1) ^ 3
+monto final = 100 x (1.1) ^ 3
+monto final = 100 x 1.331
+monto final = 133.1
+```
+
+El monto final sería 100 multiplicado por 1.1 a la tercera potencia.
+
 Esa fórmula es una simplificación para un caso sin aportaciones adicionales, sin comisiones y con una tasa constante. En la práctica, el resultado puede cambiar si haces aportaciones, si la tasa cambia o si existen impuestos y costos.
 
-## Ejemplo simple de interés compuesto
+## Ejemplo similar con dinero
 
 Supón que inviertes $1,000 a una tasa anual de 10% durante 3 años, y que cada año reinviertes los intereses.
 
@@ -42,6 +61,8 @@ Año 1: $1,000 x 1.10 = $1,100
 Año 2: $1,100 x 1.10 = $1,210
 Año 3: $1,210 x 1.10 = $1,331
 ```
+
+¿Ves cómo con cada periodo (Año) la ganancia aumenta?
 
 | Año | Capital al inicio del año | Interés del año | Total al cierre |
 | --: | ------------------------: | --------------: | --------------: |
