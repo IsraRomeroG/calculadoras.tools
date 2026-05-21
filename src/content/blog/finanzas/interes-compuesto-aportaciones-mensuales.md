@@ -1,7 +1,7 @@
 ---
 title: "Interés compuesto con aportaciones mensuales"
 description: "Aprende cómo crece una inversión cuando agregas aportaciones mensuales y cómo calcular el monto final."
-pubDate: 2026-05-22
+pubDate: 2026-05-19
 category: "Finanzas"
 tags:
   - interés compuesto
@@ -32,13 +32,13 @@ Supón que empiezas con `$10,000`, aportas `$500` al final de cada mes, obtienes
 
 Con esos datos, la [calculadora de interés compuesto](/finanzas/calculadora-de-interes-compuesto) estima:
 
-| Concepto | Monto |
-|---|---:|
-| Capital inicial | $10,000.00 |
+| Concepto                          |       Monto |
+| --------------------------------- | ----------: |
+| Capital inicial                   |  $10,000.00 |
 | Aportaciones mensuales acumuladas | $120,000.00 |
-| Total aportado | $130,000.00 |
-| Intereses generados | $213,778.24 |
-| Monto final estimado | $343,778.24 |
+| Total aportado                    | $130,000.00 |
+| Intereses generados               | $213,778.24 |
+| Monto final estimado              | $343,778.24 |
 
 La lectura importante es esta: de los `$343,778.24` finales, tú aportaste `$130,000.00` y el resto, `$213,778.24`, viene del rendimiento compuesto.
 
@@ -73,11 +73,11 @@ Esta fórmula funciona bien para un caso ordenado: misma frecuencia, aportacione
 En el ejemplo de `$10,000` iniciales, `$500` mensuales, `8%` anual y `20 años`, el crecimiento se ve así en algunos puntos clave:
 
 | Año | Total aportado | Intereses acumulados | Monto estimado |
-|---:|---:|---:|---:|
-| 1 | $16,000.00 | $1,054.96 | $17,054.96 |
-| 5 | $40,000.00 | $11,636.89 | $51,636.89 |
-| 10 | $70,000.00 | $43,669.42 | $113,669.42 |
-| 20 | $130,000.00 | $213,778.24 | $343,778.24 |
+| --: | -------------: | -------------------: | -------------: |
+|   1 |     $16,000.00 |            $1,054.96 |     $17,054.96 |
+|   5 |     $40,000.00 |           $11,636.89 |     $51,636.89 |
+|  10 |     $70,000.00 |           $43,669.42 |    $113,669.42 |
+|  20 |    $130,000.00 |          $213,778.24 |    $343,778.24 |
 
 Al principio, el total aportado pesa más que los intereses. Con el paso del tiempo, los intereses acumulados empiezan a representar una parte cada vez mayor del monto final.
 

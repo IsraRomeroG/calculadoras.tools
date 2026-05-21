@@ -1,7 +1,7 @@
 ---
 title: "Tasa nominal vs tasa efectiva: cuál es la diferencia"
 description: "Entiende la diferencia entre tasa nominal y tasa efectiva, y por qué la capitalización cambia el rendimiento real."
-pubDate: 2026-05-22
+pubDate: 2026-05-18
 category: "Finanzas"
 tags:
   - tasa nominal
@@ -69,10 +69,10 @@ También conviene tener cuidado con las siglas. TEA, TAE, CAT u otros nombres pu
 Con la misma tasa nominal anual de 12%, la tasa efectiva cambia según la frecuencia de capitalización.
 
 | Capitalización | Veces al año | Tasa efectiva aproximada |
-|---|---:|---:|
-| Anual | 1 | 12.00% |
-| Mensual | 12 | 12.68% |
-| Diaria | 365 | 12.75% |
+| -------------- | -----------: | -----------------------: |
+| Anual          |            1 |                   12.00% |
+| Mensual        |           12 |                   12.68% |
+| Diaria         |          365 |                   12.75% |
 
 La diferencia entre mensual y diaria puede parecer pequeña en un solo año, pero puede acumularse en plazos largos. Esa es una de las razones por las que el interés compuesto se vuelve más visible con el tiempo.
 

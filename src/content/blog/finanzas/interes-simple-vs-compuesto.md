@@ -1,7 +1,7 @@
 ---
 title: "Interés simple vs interés compuesto"
 description: "Conoce la diferencia entre interés simple e interés compuesto con fórmulas, tabla comparativa y ejemplos."
-pubDate: 2026-05-22
+pubDate: 2026-05-16
 category: "Finanzas"
 tags:
   - interes simple
@@ -99,14 +99,14 @@ El capital, la tasa y el plazo son los mismos. Lo que cambia es la forma de capi
 
 ## Tabla comparativa
 
-| Punto | Interés simple | Interés compuesto |
-|---|---|---|
-| Base del cálculo | Capital inicial | Capital más intereses acumulados |
-| Crecimiento | Lineal | Acelerado con el tiempo |
-| Fórmula base | `I = P x r x t` | `VF = P x (1 + r/n)^(n x t)` |
-| Sensible a reinversión | No | Sí |
-| Efecto del plazo | Suma el mismo interés cada período | Cada período puede aumentar el interés siguiente |
-| Uso común | Ejercicios escolares, algunos préstamos o rendimientos fijos | Ahorro, inversión, reinversión y deudas revolventes |
+| Punto                  | Interés simple                                               | Interés compuesto                                   |
+| ---------------------- | ------------------------------------------------------------ | --------------------------------------------------- |
+| Base del cálculo       | Capital inicial                                              | Capital más intereses acumulados                    |
+| Crecimiento            | Lineal                                                       | Acelerado con el tiempo                             |
+| Fórmula base           | `I = P x r x t`                                              | `VF = P x (1 + r/n)^(n x t)`                        |
+| Sensible a reinversión | No                                                           | Sí                                                  |
+| Efecto del plazo       | Suma el mismo interés cada período                           | Cada período puede aumentar el interés siguiente    |
+| Uso común              | Ejercicios escolares, algunos préstamos o rendimientos fijos | Ahorro, inversión, reinversión y deudas revolventes |
 
 ## Cuándo usar cada uno
 

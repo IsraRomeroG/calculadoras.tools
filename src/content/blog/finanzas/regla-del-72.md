@@ -1,7 +1,7 @@
 ---
 title: "Regla del 72: cuánto tarda en duplicarse tu dinero"
 description: "Aprende a usar la regla del 72 para estimar en cuántos años se duplica una inversión con interés compuesto."
-pubDate: 2026-05-22
+pubDate: 2026-05-16
 category: "Finanzas"
 tags:
   - regla del 72
@@ -37,12 +37,12 @@ Esto no significa que el rendimiento esté garantizado. La regla solo sirve como
 La forma más útil de entenderla es comparar varias tasas con el mismo criterio.
 
 | Tasa anual | Duplicación aproximada |
-|---:|---:|
-| 3% | 24 años |
-| 6% | 12 años |
-| 8% | 9 años |
-| 9% | 8 años |
-| 12% | 6 años |
+| ---------: | ---------------------: |
+|         3% |                24 años |
+|         6% |                12 años |
+|         8% |                 9 años |
+|         9% |                 8 años |
+|        12% |                 6 años |
 
 La lectura es directa: a mayor tasa, menos tiempo se necesita para duplicar el capital. Por ejemplo, con 6% anual el dinero tardaría cerca de 12 años en duplicarse; con 12% anual, cerca de 6 años.
 

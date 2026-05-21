@@ -1,7 +1,7 @@
 ---
 title: "Errores comunes al usar una calculadora de interes compuesto"
 description: "Evita errores frecuentes al simular interes compuesto: tasa, plazo, inflacion, aportaciones, impuestos y redondeos."
-pubDate: 2026-05-22
+pubDate: 2026-05-20
 category: "Finanzas"
 tags:
   - interes compuesto

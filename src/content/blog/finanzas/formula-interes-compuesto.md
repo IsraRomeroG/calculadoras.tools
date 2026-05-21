@@ -1,7 +1,7 @@
 ---
 title: "Fórmula del interés compuesto paso a paso"
 description: "Conoce la fórmula del interés compuesto, qué significa cada variable y cómo aplicarla con ejemplos claros."
-pubDate: 2026-05-22
+pubDate: 2026-05-17
 category: "Finanzas"
 tags:
   - interés compuesto
@@ -24,13 +24,13 @@ VF = P x (1 + r / n) ^ (n x t)
 
 Donde:
 
-| Variable | Significado |
-|---|---|
-| `VF` | Valor futuro o monto final. |
-| `P` | Capital inicial. |
-| `r` | Tasa anual en decimal. |
-| `n` | Número de capitalizaciones por año. |
-| `t` | Plazo en años. |
+| Variable | Significado                         |
+| -------- | ----------------------------------- |
+| `VF`     | Valor futuro o monto final.         |
+| `P`      | Capital inicial.                    |
+| `r`      | Tasa anual en decimal.              |
+| `n`      | Número de capitalizaciones por año. |
+| `t`      | Plazo en años.                      |
 
 La parte clave es `(1 + r / n) ^ (n x t)`: ahí se acumula el crecimiento de cada período. Si la capitalización es mensual, por ejemplo, la tasa anual se divide entre 12 y el número de períodos también se multiplica por 12.
 
@@ -91,9 +91,9 @@ VF = 14898.46
 El monto final sería aproximadamente $14,898.46. La diferencia frente a la capitalización anual es de $205.18:
 
 | Capitalización | Monto final |
-|---|---:|
-| Anual | $14,693.28 |
-| Mensual | $14,898.46 |
+| -------------- | ----------: |
+| Anual          |  $14,693.28 |
+| Mensual        |  $14,898.46 |
 
 La capitalización mensual genera un poco más porque los intereses se incorporan al capital con mayor frecuencia. Eso no convierte el resultado en una garantía de inversión: la fórmula solo modela un escenario con tasa constante.
 
@@ -107,11 +107,11 @@ VF = P x (1 + i) ^ m + A x (((1 + i) ^ m - 1) / i)
 
 Donde:
 
-| Variable | Significado |
-|---|---|
-| `i` | Tasa por período, calculada como `r / n`. |
-| `m` | Número total de períodos, calculado como `n x t`. |
-| `A` | Aportación periódica. |
+| Variable | Significado                                       |
+| -------- | ------------------------------------------------- |
+| `i`      | Tasa por período, calculada como `r / n`.         |
+| `m`      | Número total de períodos, calculado como `n x t`. |
+| `A`      | Aportación periódica.                             |
 
 Si la aportación ocurre al inicio de cada período, el segundo bloque se multiplica por `(1 + i)`:
 
