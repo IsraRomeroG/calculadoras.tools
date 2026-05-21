@@ -21,6 +21,8 @@ Para saber cuánto dinero te descuentan, multiplica el precio original por el po
 precio original x descuento / 100
 ```
 
+Si quieres repasar la lógica general de esta operación, consulta [cómo calcular porcentajes](/blog/como-calcular-porcentajes).
+
 Si un producto cuesta $1,200 y tiene 25% de descuento:
 
 ```txt

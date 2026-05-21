@@ -58,6 +58,8 @@ precio sin iva = 238000 / 1.19 = 200000
 iva = 238000 - 200000 = 38000
 ```
 
+Para repasar la lógica general, puedes leer [cómo sumar IVA a un precio](/blog/como-sumar-iva-a-un-precio) y [cómo desglosar IVA incluido](/blog/como-desglosar-iva).
+
 ## Tarifa de 5%, exentos y excluidos
 
 Colombia también contempla bienes y servicios con tratamiento diferente, como tarifa de 5%, exentos o excluidos. No conviene elegir una tarifa solo por categoría general o por costumbre: la clasificación depende de la norma aplicable.
@@ -76,6 +78,8 @@ Para una estimación matemática, la calculadora te permite editar la tasa. Para
 ## Calculadora de IVA para Colombia
 
 Usa la [calculadora de IVA](/legal-impuestos/calculadora-de-iva), selecciona Colombia y elige la tasa de 19% o edítala manualmente si necesitas otro caso.
+
+Para comparar Colombia con otros países, revisa la [tabla de tasas de IVA por país](/blog/tasas-de-iva-por-pais).
 
 ## Fuente oficial
 

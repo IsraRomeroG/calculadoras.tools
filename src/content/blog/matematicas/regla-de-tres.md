@@ -20,6 +20,8 @@ La regla de tres sirve para encontrar un valor desconocido cuando tienes dos can
 
 Por ejemplo: si 3 productos cuestan $180, ¿cuánto cuestan 5 productos?
 
+También puede ayudarte a entender porcentajes, porque muchos cálculos se reducen a una proporción. Para esa base, revisa [cómo calcular porcentajes](/blog/como-calcular-porcentajes).
+
 ## Plantea la proporción
 
 Primero acomoda los datos que sí conoces:

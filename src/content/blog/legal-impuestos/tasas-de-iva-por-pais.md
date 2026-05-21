@@ -24,12 +24,12 @@ Para cálculos rápidos, puedes usar la [calculadora de IVA](/legal-impuestos/ca
 
 | País | Impuesto | Tasa general orientativa | Tasas o notas frecuentes |
 |---|---|---:|---|
-| México | IVA | 16% | Estímulo fronterizo 8% en casos específicos; tasa 0% para ciertas operaciones. |
-| España | IVA | 21% | Tipos reducidos 10%, 4% y 0% para operaciones determinadas. |
+| [México](/blog/iva-mexico) | IVA | 16% | Estímulo fronterizo 8% en casos específicos; tasa 0% para ciertas operaciones. |
+| [España](/blog/iva-espana) | IVA | 21% | Tipos reducidos 10%, 4% y 0% para operaciones determinadas. |
 | Argentina | IVA | 21% | Existen alícuotas de 10.5% y 27% para casos específicos. |
-| Colombia | IVA | 19% | Algunos bienes o servicios pueden tener 5%, exención o exclusión. |
+| [Colombia](/blog/iva-colombia) | IVA | 19% | Algunos bienes o servicios pueden tener 5%, exención o exclusión. |
 | Chile | IVA | 19% | Tasa general para ventas y servicios gravados. |
-| Perú | IGV | 18% | IGV aplicado a operaciones gravadas; revisar exoneraciones e inafectaciones. |
+| [Perú](/blog/igv-peru) | IGV | 18% | IGV aplicado a operaciones gravadas; revisar exoneraciones e inafectaciones. |
 | Ecuador | IVA | Revisar SRI | La tarifa ha tenido cambios recientes; confirma la vigencia en el SRI. |
 | Guatemala | IVA | 12% | Tasa general del IVA. |
 | Costa Rica | IVA | 13% | Existen tarifas reducidas para categorías específicas. |

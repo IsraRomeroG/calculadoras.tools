@@ -39,6 +39,8 @@ Un aumento de $50 puede ser pequeño o grande según el valor original. Subir de
 
 Por eso los porcentajes sirven para comparar cambios entre cantidades de distinto tamaño.
 
+Si necesitas repasar la base antes de comparar cambios, puedes empezar por [cómo calcular porcentajes](/blog/como-calcular-porcentajes).
+
 ## Si el resultado es negativo
 
 Cuando el valor nuevo es menor que el valor original, la misma fórmula devuelve un número negativo. En ese caso estás calculando una disminución porcentual.

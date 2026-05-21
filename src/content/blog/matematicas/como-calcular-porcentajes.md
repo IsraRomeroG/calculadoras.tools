@@ -40,6 +40,8 @@ Si quieres saber qué porcentaje es una cantidad respecto a otra, divide la part
 
 Esto significa que 45 representa el 22.5% de 200.
 
+Esta operación también se puede plantear con [regla de tres](/blog/regla-de-tres), porque estás comparando una parte contra un total equivalente a 100%.
+
 ## Aumentos y disminuciones
 
 Para calcular una variación porcentual entre dos valores, resta el valor original al valor nuevo, divide entre el valor original y multiplica por 100.
@@ -55,6 +57,8 @@ Si pasas de 80 a 100:
 ```
 
 El resultado indica un aumento del 25%.
+
+Si quieres ver ese caso con más detalle, revisa la guía de [aumento porcentual](/blog/aumento-porcentual). Para compras y rebajas, también puedes consultar [cómo calcular un descuento](/blog/porcentaje-de-descuento).
 
 ## Errores comunes
 

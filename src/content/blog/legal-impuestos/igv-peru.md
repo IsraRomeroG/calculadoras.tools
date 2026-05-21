@@ -56,6 +56,8 @@ precio sin igv = 1180 / 1.18 = 1000
 igv = 1180 - 1000 = 180
 ```
 
+La operación es la misma que se usa para otros impuestos tipo IVA. Puedes verla con más detalle en las guías de [cómo sumar IVA a un precio](/blog/como-sumar-iva-a-un-precio) y [cómo desglosar IVA incluido](/blog/como-desglosar-iva).
+
 ## Tabla rápida con 18%
 
 | Precio sin IGV | IGV 18% | Total |
@@ -74,6 +76,8 @@ Para cálculos cotidianos puedes usar 18%, pero para documentos tributarios conv
 ## Calculadora de IGV
 
 Puedes usar la [calculadora de IVA](/legal-impuestos/calculadora-de-iva) como calculadora de IGV: selecciona Perú, usa la tasa de 18% y elige si quieres agregar el impuesto o desglosarlo desde un total.
+
+Para comparar Perú con otros países, revisa la [tabla de tasas de IVA por país](/blog/tasas-de-iva-por-pais).
 
 ## Fuente oficial
 

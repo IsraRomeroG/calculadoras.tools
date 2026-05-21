@@ -38,6 +38,8 @@ precio con iva = 500 + 80 = 580
 
 El IVA es $80 y el total con IVA es $580.
 
+Si este es tu caso principal, puedes revisar la guía específica de [cómo sumar IVA a un precio sin impuesto](/blog/como-sumar-iva-a-un-precio).
+
 ## Fórmula para desglosar IVA incluido
 
 Cuando el precio ya incluye IVA, no basta con restar el porcentaje directamente. Primero debes encontrar la base dividiendo el total entre `1 + tasa`.
@@ -56,6 +58,8 @@ iva = 580 - 500 = 80
 
 El precio base es $500 y el IVA incluido es $80.
 
+Si partes de un precio final, también puedes ver la explicación completa de [cómo desglosar el IVA de un precio total](/blog/como-desglosar-iva).
+
 ## Ejemplos rápidos
 
 | Precio sin IVA | Tasa | IVA | Total |
@@ -73,6 +77,8 @@ El error más frecuente es intentar quitar el IVA restando la tasa al total. Si 
 
 Otro error común es usar una tasa general cuando aplica una tasa reducida, tasa 0% o una regla especial. Por eso conviene verificar la tasa antes de emitir facturas, cotizaciones formales o declaraciones.
 
+Para evitar confusiones de base, revisa la diferencia entre [IVA incluido y precio sin IVA](/blog/iva-incluido-vs-sin-iva). También puede ayudarte la guía de [errores comunes al calcular IVA](/blog/errores-comunes-al-calcular-iva).
+
 ## Usa la calculadora para evitar redondeos manuales
 
 Si solo quieres hacer una estimación rápida, puedes usar las fórmulas anteriores. Si necesitas comparar países, cambiar tasas o copiar un desglose completo, usa la [calculadora de IVA](/legal-impuestos/calculadora-de-iva).
@@ -82,3 +88,5 @@ La herramienta permite agregar IVA, desglosarlo desde un total y editar la tasa 
 ## Fuentes para revisar tasas
 
 Antes de usar una tasa para fines fiscales, consulta la fuente oficial de tu país. Por ejemplo, el SAT de México publica la tasa general en la [Ley del IVA, artículo 1](https://wwwmat.sat.gob.mx/articulo/19848/articulo-1), la Agencia Tributaria de España mantiene una página de [tipos impositivos de IVA](https://sede.agenciatributaria.gob.es/Sede/iva/calculo-iva-repercutido-clientes/tipos-impositivos-iva.html), y la DIAN de Colombia publica criterios sobre la [tarifa general del IVA](https://normograma.dian.gov.co/dian/compilacion/docs/oficio_dian_8857_2025.htm).
+
+Para una vista rápida de varios países, consulta la [tabla de tasas de IVA por país](/blog/tasas-de-iva-por-pais).

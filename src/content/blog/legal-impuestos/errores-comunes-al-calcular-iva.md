@@ -57,6 +57,8 @@ Ejemplos comunes:
 
 Pero esos datos no sustituyen la revisión del caso concreto.
 
+Puedes revisar las guías específicas de [IVA en México](/blog/iva-mexico), [IVA en España](/blog/iva-espana), [IVA en Colombia](/blog/iva-colombia) e [IGV en Perú](/blog/igv-peru), o comparar más países en la [tabla de tasas de IVA](/blog/tasas-de-iva-por-pais).
+
 ## Error 4: tratar tasa 0%, exento y excluido como lo mismo
 
 Matemáticamente, una tasa de 0% produce impuesto cero. Pero fiscalmente no siempre equivale a estar exento, excluido o no sujeto.

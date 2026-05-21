@@ -73,6 +73,8 @@ precio sin iva = 1210 / 1.21 = 1000
 iva = 1210 - 1000 = 210
 ```
 
+Si quieres ver las fórmulas generales paso a paso, revisa [cómo sumar IVA a un precio](/blog/como-sumar-iva-a-un-precio) y [cómo desglosar IVA incluido](/blog/como-desglosar-iva).
+
 ## Tabla rápida con 21%
 
 | Precio sin IVA | IVA 21% | Total |
@@ -85,6 +87,8 @@ iva = 1210 - 1000 = 210
 ## Calculadora de IVA para España
 
 Puedes usar la [calculadora de IVA](/legal-impuestos/calculadora-de-iva), elegir España y cambiar entre 21%, 10%, 4% o una tasa manual. El resultado muestra precio sin IVA, impuesto y precio final.
+
+Para comparar España con otros países, consulta la [tabla de tasas de IVA por país](/blog/tasas-de-iva-por-pais).
 
 ## Fuente oficial
 

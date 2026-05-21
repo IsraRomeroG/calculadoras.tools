@@ -41,6 +41,8 @@ Con IVA de 16%:
 
 El monto a pagar sería $580.
 
+Para ese caso, puedes ver la guía específica de [cómo sumar IVA a un precio sin impuesto](/blog/como-sumar-iva-a-un-precio).
+
 ## Qué significa "IVA incluido"
 
 Cuando una etiqueta dice `$580 IVA incluido`, significa que el total ya contiene el impuesto. Para conocer la base, debes dividir entre `1 + tasa`.
