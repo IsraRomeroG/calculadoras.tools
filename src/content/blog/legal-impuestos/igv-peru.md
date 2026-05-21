@@ -18,7 +18,9 @@ relatedCalculator:
 
 En Perú, el impuesto equivalente al IVA se conoce como IGV: Impuesto General a las Ventas. SUNAT explica que se cobra en la compra final de bienes o servicios gravados.
 
-La tasa aplicable es 18% sobre la operación gravada. En la práctica, ese porcentaje suele usarse para sumar el impuesto a un precio base o desglosarlo desde un total.
+La tasa aplicable total es 18% sobre la operación gravada. Para 2026, SUNAT muestra esa tasa como una composición de 15.5% de IGV y 2.5% de Impuesto de Promoción Municipal (IPM), manteniendo el 18% como tasa aplicable total para el cálculo.
+
+En la práctica, ese 18% suele usarse para sumar el impuesto a un precio base o desglosarlo desde un total.
 
 ## Cómo calcular IGV sobre un precio sin impuesto
 

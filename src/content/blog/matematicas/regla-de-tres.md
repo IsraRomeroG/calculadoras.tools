@@ -10,8 +10,8 @@ tags:
 readTime: "4 min"
 featured: true
 relatedCalculator:
-  label: "Calculadora de porcentajes"
-  href: "/matematicas/calculadora-de-porcentajes"
+  label: "Calculadora de regla de tres"
+  href: "/matematicas/calculadora-de-regla-de-tres"
 ---
 
 ## Para qué sirve
