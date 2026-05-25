@@ -1,339 +1,837 @@
-# Especificación — Calculadora de IMC (Índice de Masa Corporal)
+# Especificación v2 — Calculadora de IMC (Índice de Masa Corporal)
 
 ## Descripción general
-Herramienta para calcular el Índice de Masa Corporal a partir del
-peso y la altura de una persona. Es una de las calculadoras de salud
-con mayor volumen de búsqueda del sitio y tiene un perfil de usuario
-muy amplio: personas que quieren conocer su estado de peso, pacientes
-en seguimiento médico, deportistas, y profesionales de la salud.
 
-La calculadora va más allá del número: contextualiza el resultado
-con la categoría de la OMS, explica sus limitaciones, y conecta
-de forma natural con otras calculadoras de salud del sitio
-(TDEE, macros, déficit calórico).
+Herramienta para calcular el Índice de Masa Corporal (IMC) a partir del peso y
+la altura de una persona. La página debe entregar un resultado rápido, claro y
+responsable: mostrar el número, su categoría de referencia, el rango de peso
+asociado a la altura y las limitaciones del indicador.
+
+El IMC es una herramienta de cribado poblacional, no un diagnóstico médico. La
+experiencia debe evitar lenguaje prescriptivo o estigmatizante y presentar los
+resultados como orientación general. La calculadora debe estar optimizada para
+uso móvil desde el primer viewport y construirse con Astro + Tailwind CSS, sin
+backend ni llamadas de red.
+
+---
+
+## Objetivo de producto
+
+- Calcular el IMC de adultos de forma inmediata y comprensible.
+- Mostrar categoría adulta de referencia y rango de peso saludable asociado a
+  la altura.
+- Permitir usar sistema métrico e imperial sin reescribir los datos.
+- Explicar limitaciones del IMC de forma visible y responsable.
+- Conectar de forma contextual con calculadoras relacionadas del sitio, como
+  TDEE, macros y déficit calórico.
+- Generar una página estática optimizada para SEO en Astro.
+
+---
+
+## Alcance recomendado
+
+### MVP
+
+La primera versión debe enfocarse en el flujo principal para adultos:
+
+- Cálculo de IMC para adultos.
+- Toggle de unidades: métrico (`kg/cm`) e imperial (`lb/ft/in`).
+- Conversión automática de valores al cambiar de sistema.
+- Inputs: peso, altura, edad opcional, sexo opcional y embarazo opcional.
+- Resultado principal: IMC, categoría, explicación breve y gauge o barra visual.
+- Rango de peso saludable para la altura capturada.
+- Diferencia respecto al rango saludable, expresada en lenguaje neutral.
+- Avisos para valores inusuales, embarazo, adultos mayores y resultados fuera
+  del rango normal.
+- Botón de copiar resultado.
+- Botón de limpiar.
+- Contenido SEO, FAQ visible y JSON-LD de `FAQPage`.
+- Bloque visible de limitaciones del IMC.
+
+### Fase 2
+
+- Modo pediátrico para personas de `2 a 19` años usando percentiles por edad y
+  sexo.
+- Clasificación pediátrica con percentiles y subcategoría de obesidad severa.
+- Modo de IMC objetivo.
+- Índice cintura-altura (ICA) como métrica complementaria opcional.
+- Tabla de peso saludable por estatura.
+- Historial de los últimos cálculos válidos en `sessionStorage`, no
+  `localStorage`, y solo si el usuario lo activa explícitamente.
+
+### Fase 3
+
+- Seguimiento histórico con fechas, gráfica y exportación CSV.
+- Persistencia opcional en `localStorage` con aviso claro de privacidad.
+- Comparación de fórmulas de peso ideal como contenido educativo secundario.
+- Vista de impresión.
+- Contenido adicional por población o país cuando existan criterios editoriales
+  definidos.
+
+> No implementar tablas pediátricas embebidas, Chart.js, historial persistente
+> ni CSV en el MVP. Son features valiosas, pero aumentan el alcance, el peso de
+> la página y el riesgo de tratar datos sensibles de salud sin suficiente
+> contexto.
+
+---
+
+## Ruta y archivos sugeridos
+
+| Elemento | Valor |
+|----------|-------|
+| URL pública recomendada | `/salud/calculadora-de-imc` |
+| Alias opcional | `/calculadora-imc` |
+| Archivo Astro recomendado | `src/pages/salud/calculadora-de-imc.astro` |
+| Lógica de cálculo | `src/lib/calculators/bmi.ts` |
+| Pruebas unitarias | `src/lib/calculators/bmi.test.ts` |
+| Locale base | `es-MX` |
+| Layout | `BaseLayout.astro` |
+| Contenedores UI | `PageHero`, `Container`, `SectionIntro`, `FaqSection` |
+| Estilos | Tailwind CSS |
+
+> Si se usa el alias corto, definir si será redirección o ruta canónica. La
+> página debe exponer un único `canonical`.
+
+---
+
+## Comportamiento mobile-first
+
+- La calculadora interactiva debe aparecer como experiencia principal en el
+  primer viewport. No crear una landing page antes de la herramienta.
+- En móvil, usar una sola columna: selector de unidades, inputs, resultado,
+  acciones y contenido contextual.
+- En pantallas medianas o grandes, usar dos columnas: formulario a la izquierda
+  y resultado a la derecha.
+- Los controles táctiles deben tener altura mínima aproximada de `44px`.
+- El gauge o barra visual debe tener dimensiones estables con `aspect-ratio` o
+  alto fijo para evitar saltos de layout.
+- No depender únicamente del color para comunicar categoría o advertencias.
+  Acompañar color con texto y, si aplica, icono accesible.
+- Evitar tarjetas dentro de tarjetas. Usar cards solo para resultados concretos
+  o bloques repetidos.
+- Los resultados largos deben permitir salto de línea sin romper el layout.
+- En móvil, las acciones deben ser botones de ancho completo o wrap natural.
+- El contenido educativo y FAQ deben quedar debajo de la calculadora.
 
 ---
 
 ## Conceptos base
 
 ### Fórmula del IMC
-IMC = peso (kg) / altura (m)²
 
-### Clasificación de la OMS
+```text
+IMC = peso_kg / (altura_m ^ 2)
+```
 
-| IMC | Categoría | Indicador visual |
-|-----|-----------|-----------------|
-| < 16.0 | Delgadez severa | 🔴 Rojo intenso |
-| 16.0 – 16.9 | Delgadez moderada | 🔴 Rojo |
-| 17.0 – 18.4 | Delgadez leve | 🟠 Naranja |
-| 18.5 – 24.9 | Peso normal | 🟢 Verde |
-| 25.0 – 29.9 | Sobrepeso | 🟡 Amarillo |
-| 30.0 – 34.9 | Obesidad grado I | 🟠 Naranja |
-| 35.0 – 39.9 | Obesidad grado II | 🔴 Rojo |
-| ≥ 40.0 | Obesidad grado III (mórbida) | 🔴 Rojo intenso |
+### Fórmula imperial
 
----
+```text
+IMC = (peso_lb * 703) / (altura_in ^ 2)
+```
 
-## Casos de uso (modos de cálculo)
+### Conversión de unidades
 
-### Modo 1 — Cálculo estándar de IMC
-> Ejemplo: Peso 75 kg y mido 1.72 m. ¿Cuál es mi IMC?
-
-**Inputs:**
-- Peso → ej. 75 kg
-- Altura → ej. 1.72 m
-- Sistema de unidades → Métrico (kg/cm) / Imperial (lb/ft-in)
-- Sexo → Hombre / Mujer / Prefiero no decir
-- Edad → ej. 32 años
-
-**Fórmula (sistema métrico):**
-IMC = 75 / (1.72)² = 75 / 2.9584 = **25.35**
-
-**Fórmula (sistema imperial):**
-IMC = (peso_lb × 703) / altura_in²
-
-**Output principal:**
-- IMC: **25.35**
-- Categoría: **Sobrepeso** 🟡
-- Indicador visual: barra o gauge con aguja que señala
-  la categoría del usuario dentro del espectro completo
-
-**Output secundario:**
-- Rango de peso saludable para tu altura:
-  "Para 1.72 m, el peso saludable está entre **54.7 kg y 73.7 kg**"
-- Peso a perder / ganar para entrar en rango normal:
-  "Te encuentras **1.35 kg** por encima del límite superior saludable"
+```text
+kg = lb * 0.45359237
+lb = kg / 0.45359237
+cm = in * 2.54
+in = cm / 2.54
+altura_m = cm / 100
+```
 
 ---
 
-### Modo 2 — IMC por edad (ajuste pediátrico)
-> El IMC estándar no aplica a menores de 18 años.
-> Para niños y adolescentes se usa el percentil de IMC.
+## Clasificación adulta
 
-**Inputs:**
-- Peso → ej. 35 kg
-- Altura → ej. 1.40 m
-- Edad → ej. 11 años
-- Sexo → Niño / Niña
+La tabla principal debe mostrarse como referencia general para adultos. Si el
+proyecto decide usar fuente CDC, tratar adultos como `20+`. Si decide usar OMS
+para adultos, puede aplicarse desde `18+`; en ese caso documentar la decisión
+editorial para no mezclar criterios sin explicación.
 
-**Cálculo:**
-IMC bruto = peso / altura²
-Luego se compara contra tablas de percentiles de la OMS / CDC
-según edad y sexo.
+Recomendación para el MVP: usar criterio adulto desde `20+` y enviar edades de
+`2 a 19` a una nota de modo pediátrico no disponible todavía.
 
-**Output:**
-- IMC bruto: **17.86**
-- Percentil: **72**
-- Categoría pediátrica:
+| IMC | Categoría | Severidad visual |
+|-----|-----------|------------------|
+| `< 16.0` | Delgadez severa | Alerta alta |
+| `16.0 - 16.9` | Delgadez moderada | Alerta |
+| `17.0 - 18.4` | Delgadez leve | Precaución |
+| `18.5 - 24.9` | Rango saludable | Normal |
+| `25.0 - 29.9` | Sobrepeso | Precaución |
+| `30.0 - 34.9` | Obesidad clase 1 | Alerta |
+| `35.0 - 39.9` | Obesidad clase 2 | Alerta alta |
+| `>= 40.0` | Obesidad clase 3 | Alerta alta |
 
-| Percentil | Categoría pediátrica |
-|-----------|---------------------|
-| < 5 | Bajo peso |
-| 5 – 84 | Peso saludable |
-| 85 – 94 | Sobrepeso |
-| ≥ 95 | Obesidad |
-
-- Nota prominente: "Para una evaluación precisa del crecimiento
-  de tu hijo consulta con su pediatra."
+> Evitar el término "mórbida" en la UI. Usar "obesidad clase 3" u "obesidad
+> severa" según el contexto.
 
 ---
 
-### Modo 3 — IMC objetivo
-> Ejemplo: Quiero tener un IMC de 22. ¿Cuánto debo pesar?
+## Flujo principal MVP — Cálculo de IMC adulto
 
-**Inputs:**
-- Altura → ej. 1.72 m
-- IMC objetivo → ej. 22 (o selector de categoría)
+Modo por defecto al cargar la página.
 
-**Fórmula:**
-peso_objetivo = IMC_objetivo × altura²
+**Ejemplo:** Peso `75 kg` y mido `172 cm`. ¿Cuál es mi IMC?
 
-**Output:**
-- Peso para IMC 22: **65.0 kg**
-- Tu peso actual (si fue ingresado): 75 kg
-- Diferencia: **−10 kg**
-- Enlace sugerido: "Calcula cuánto tiempo tardarías →
-  Calculadora de déficit calórico"
-
----
-
-### Modo 4 — Seguimiento histórico
-> El usuario registra su IMC a lo largo del tiempo
-> y ve su progreso en una gráfica.
-
-**Inputs:**
-- Fecha + peso (el usuario agrega entradas manualmente)
-- Altura fija (se mantiene del primer registro)
-
-**Output:**
-- Gráfica de línea: IMC a lo largo del tiempo
-- Tabla de registros con fecha, peso, IMC y categoría
-- Cambio desde el primer registro:
-  "Has bajado **2.3 puntos de IMC** en 3 meses 🎉"
-- Opción de exportar historial como CSV
-
-> Los datos se guardan en localStorage del navegador.
-> No requiere cuenta ni backend.
-
----
-
-## Inputs detallados
+### Inputs del MVP
 
 | Campo | Tipo | Rango válido | Valor por defecto |
-|-------|------|-------------|-------------------|
-| Peso (kg) | Numérico | 10 – 500 kg | — |
-| Peso (lb) | Numérico | 22 – 1,100 lb | — |
-| Altura (cm) | Numérico | 50 – 250 cm | — |
-| Altura (ft + in) | Numérico doble | 1'8" – 8'2" | — |
-| Edad | Numérico | 2 – 120 años | — |
-| Sexo | Selector | Hombre / Mujer / No indicar | No indicar |
-| Sistema de unidades | Toggle | Métrico / Imperial | Métrico |
+|-------|------|--------------|-------------------|
+| Sistema de unidades | Control segmentado | Métrico / Imperial | Métrico |
+| Peso kg | Texto numérico | `10 - 500 kg` | Vacío |
+| Peso lb | Texto numérico | `22 - 1100 lb` | Vacío |
+| Altura cm | Texto numérico | `50 - 250 cm` | Vacío |
+| Altura ft | Texto numérico | `1 - 8 ft` | Vacío |
+| Altura in | Texto numérico | `0 - 11.99 in` | Vacío |
+| Edad | Texto numérico opcional | `2 - 120 años` | Vacío |
+| Sexo | Selector opcional | Hombre / Mujer / No indicar | No indicar |
+| Embarazo | Checkbox opcional | Sí / No | No |
+
+### Reglas del formulario
+
+- Peso y altura son obligatorios para calcular.
+- Edad y sexo son opcionales en el MVP adulto; sirven para mostrar notas y para
+  futura derivación al modo pediátrico.
+- Si la edad es `2 - 19`, no aplicar clasificación adulta como resultado final.
+  Mostrar IMC bruto y una nota indicando que el percentil pediátrico requiere
+  edad y sexo con tablas específicas.
+- Si la edad es menor a `2`, no calcular clasificación; mostrar recomendación
+  de consultar con pediatría.
+- Si embarazo está activo, calcular solo si el usuario ya ingresó datos, pero
+  mostrar una nota prominente: el IMC no es un indicador adecuado durante el
+  embarazo.
+- El sistema imperial debe capturar pies y pulgadas como campos separados.
+- Al cambiar unidades, convertir valores existentes y conservar el significado
+  del cálculo.
+- El cálculo se actualiza en tiempo real cuando hay valores válidos.
+
+### Output principal
+
+Para `75 kg` y `172 cm`:
+
+| Resultado | Valor esperado |
+|-----------|----------------|
+| IMC | `25.35` |
+| Categoría | `Sobrepeso` |
+| Rango saludable estimado | `54.7 - 73.7 kg` |
+| Diferencia respecto al rango | `1.3 kg por encima del rango saludable de referencia` |
+
+Texto breve sugerido:
+
+```text
+Tu IMC es 25.35. Este valor se encuentra en la categoría de sobrepeso para adultos. El IMC es una referencia inicial y debe interpretarse junto con otros factores de salud.
+```
+
+### Rango de peso saludable
+
+Usar los límites adultos `18.5` y `24.9`:
+
+```text
+peso_min = 18.5 * altura_m ^ 2
+peso_max = 24.9 * altura_m ^ 2
+```
+
+Para sistema imperial, calcular internamente en kg y convertir el resultado a
+lb para mostrarlo.
+
+### Diferencia respecto al rango
+
+```text
+si peso < peso_min:
+  diferencia = peso_min - peso
+  texto = "{diferencia} por debajo del rango saludable de referencia"
+
+si peso > peso_max:
+  diferencia = peso - peso_max
+  texto = "{diferencia} por encima del rango saludable de referencia"
+
+si peso está dentro del rango:
+  texto = "Dentro del rango saludable de referencia para tu altura"
+```
+
+Evitar frases como "debes perder" o "debes ganar". El resultado no debe sonar
+como una instrucción médica.
 
 ---
 
-## Limitaciones del IMC (mostrar siempre)
-El IMC es una herramienta de cribado, no un diagnóstico.
-Mostrar siempre un bloque informativo con sus limitaciones:
+## Modo fase 2 — IMC pediátrico
 
-- **No distingue masa muscular de grasa:** un atleta musculoso
-  puede tener IMC de "sobrepeso" sin exceso de grasa.
-- **No considera distribución de la grasa:** la grasa abdominal
-  es más riesgosa que la periférica y el IMC no la mide.
-- **Varía por etnia:** los puntos de corte óptimos pueden diferir
-  entre poblaciones asiáticas, africanas y europeas.
-- **No aplica a embarazadas, niños ni ancianos** sin ajustes.
-- **No reemplaza la evaluación médica** profesional.
+El IMC pediátrico no se interpreta con puntos de corte fijos. Para personas de
+`2 a 19` años se usa IMC por edad y sexo, expresado como percentil.
 
----
+### Inputs
 
-## Métricas complementarias (mostrar como referencia)
+- Peso.
+- Altura.
+- Edad exacta o edad en años y meses.
+- Sexo: niño / niña.
 
-### Índice Cintura-Altura (ICA)
-Indicador adicional de riesgo cardiovascular.
+### Cálculo
 
-Fórmula: ICA = cintura (cm) / altura (cm)
+```text
+IMC bruto = peso_kg / (altura_m ^ 2)
+percentil = lookupPercentile(imc, edad_meses, sexo)
+```
 
-| ICA | Riesgo |
-|-----|--------|
-| < 0.40 | Bajo peso |
-| 0.40 – 0.49 | Saludable |
-| 0.50 – 0.59 | Sobrepeso |
-| ≥ 0.60 | Obesidad |
+### Clasificación pediátrica CDC
 
-Input adicional opcional: medida de cintura (cm o in)
+| Percentil | Categoría pediátrica |
+|-----------|----------------------|
+| `< 5` | Bajo peso |
+| `>= 5 y < 85` | Peso saludable |
+| `>= 85 y < 95` | Sobrepeso |
+| `>= 95` | Obesidad |
+| `>= 120% del percentil 95` o `IMC >= 35` | Obesidad severa |
 
-### Peso ideal según distintas fórmulas
-Mostrar como referencia comparativa, no como verdad absoluta:
+### Nota prominente
 
-| Fórmula | Peso ideal (hombre, 1.72 m) | Peso ideal (mujer, 1.72 m) |
-|---------|----------------------------|---------------------------|
-| Devine | 72.7 kg | 65.2 kg |
-| Robinson | 70.4 kg | 64.4 kg |
-| Miller | 70.1 kg | 65.5 kg |
-| Hamwi | 74.4 kg | 65.8 kg |
-| Promedio | **71.9 kg** | **65.2 kg** |
+```text
+En niñas, niños y adolescentes el IMC debe interpretarse con percentiles por edad y sexo. Para una evaluación precisa del crecimiento, consulta con su pediatra.
+```
 
-Nota: "Estas fórmulas son orientativas y tienen limitaciones similares al IMC."
+> La implementación pediátrica requiere tablas oficiales y pruebas específicas.
+> No estimar percentiles con fórmulas improvisadas.
 
 ---
 
-## Validaciones de inputs
+## Modo fase 2 — IMC objetivo
 
-| Regla | Detalle |
-|-------|---------|
-| Peso entre 10 y 500 kg | Fuera de rango mostrar error claro |
-| Altura entre 50 y 250 cm | Fuera de rango mostrar error claro |
-| Edad entre 2 y 120 años | Menores de 2: redirigir a pediatra |
-| Campos vacíos | Bloquear cálculo y resaltar campo faltante |
-| IMC < 10 o > 80 | Mostrar advertencia de valores inusuales |
+**Ejemplo:** Quiero tener un IMC de `22`. ¿Qué peso correspondería a mi altura?
+
+### Inputs
+
+- Altura.
+- IMC objetivo o selector de categoría.
+- Peso actual opcional.
+
+### Fórmula
+
+```text
+peso_objetivo = imc_objetivo * altura_m ^ 2
+```
+
+### Output
+
+Para `172 cm` e IMC objetivo `22`:
+
+| Resultado | Valor esperado |
+|-----------|----------------|
+| Peso asociado a IMC 22 | `65.1 kg` |
+| Diferencia si peso actual es 75 kg | `-9.9 kg` |
+
+Texto sugerido:
+
+```text
+Para tu altura, un IMC de 22 corresponde aproximadamente a 65.1 kg. Tómalo como referencia matemática, no como meta médica.
+```
+
+---
+
+## Métrica complementaria fase 2 — Índice cintura-altura
+
+El Índice Cintura-Altura (ICA) puede mostrarse como referencia adicional de
+riesgo cardiovascular, siempre como métrica complementaria y opcional.
+
+### Input adicional
+
+- Cintura en cm o pulgadas.
+
+### Fórmula
+
+```text
+ICA = cintura_cm / altura_cm
+```
+
+### Clasificación orientativa
+
+| ICA | Interpretación |
+|-----|----------------|
+| `< 0.40` | Bajo |
+| `0.40 - 0.49` | Saludable |
+| `0.50 - 0.59` | Elevado |
+| `>= 0.60` | Alto |
+
+---
+
+## Limitaciones del IMC
+
+Mostrar siempre un bloque informativo visible debajo del resultado o cerca del
+contenido educativo.
+
+- **No distingue masa muscular de grasa:** una persona con mucha masa muscular
+  puede tener un IMC alto sin tener exceso de grasa corporal.
+- **No mide distribución de grasa:** la grasa abdominal puede implicar riesgos
+  distintos que el IMC no refleja.
+- **Puede variar por población:** algunos grupos pueden presentar riesgos de
+  salud en puntos de corte diferentes.
+- **No reemplaza evaluación médica:** debe interpretarse junto con edad,
+  antecedentes, composición corporal, cintura, laboratorio y otros datos.
+- **No es adecuado durante embarazo:** requiere otros criterios clínicos.
+- **En adultos mayores puede ser menos preciso:** pérdida de músculo y cambios
+  corporales pueden alterar su interpretación.
+
+Texto corto sugerido:
+
+```text
+El IMC es una herramienta de cribado, no un diagnóstico. Si tu resultado te preocupa o tienes síntomas, consulta con un profesional de la salud.
+```
+
+---
+
+## Avisos de salud
+
+### Resultado fuera del rango saludable
+
+```text
+Este resultado es orientativo. Para una evaluación completa considera consultar con un profesional de la salud.
+```
+
+### IMC menor a 16 o mayor/igual a 40
+
+```text
+Tu resultado está en un rango que puede requerir evaluación médica. Si tienes síntomas o cambios recientes de peso, busca orientación profesional.
+```
+
+### Edad mayor o igual a 65
+
+```text
+En adultos mayores el IMC puede no reflejar bien la composición corporal. Interprétalo junto con otros indicadores de salud.
+```
+
+### Embarazo
+
+```text
+Durante el embarazo el IMC actual no es un indicador adecuado para evaluar el peso. Consulta con tu profesional de salud.
+```
+
+### Edad de 2 a 19 años en MVP
+
+```text
+Para niñas, niños y adolescentes se usa percentil de IMC por edad y sexo. Esta versión muestra el IMC bruto, pero no clasifica el resultado pediátrico.
+```
+
+---
+
+## Gauge o barra visual
+
+### Requisitos
+
+- Puede implementarse como SVG propio o barra horizontal segmentada.
+- No usar librería externa en el MVP.
+- Debe ser legible en móvil.
+- Debe incluir etiquetas textuales o leyenda; no depender solo del color.
+- Debe tener estado inicial neutral.
+- Debe respetar `prefers-reduced-motion`.
+- Si se anima, usar transiciones suaves y no bloquear el cálculo.
+
+### Recomendación MVP
+
+Preferir una barra segmentada sobre un velocímetro complejo. Es más liviana,
+más fácil de hacer accesible y ocupa menos altura en móvil.
+
+Rango visual sugerido:
+
+```text
+10 - 45 IMC visible
+```
+
+Si el IMC está fuera del rango visual, fijar el indicador al extremo y mostrar
+texto de valor exacto.
+
+---
+
+## Parsing y validación de inputs
+
+### Tipo de input
+
+Usar `input type="text"` con:
+
+```html
+inputmode="decimal"
+autocomplete="off"
+```
+
+Esto permite aceptar valores pegados con símbolos o formatos regionales.
+
+### Normalización de valores
+
+Aceptar y normalizar:
+
+| Entrada | Valor interno |
+|---------|---------------|
+| `75` | `75` |
+| `75.5` | `75.5` |
+| `75,5` | `75.5` |
+| `75 kg` | `75` |
+| `165 lb` | `165` |
+| `1.72` como altura métrica | `172 cm` si el campo acepta metros |
+| `172 cm` | `172` |
+| `5'8"` | Fase futura; en MVP usar ft/in separados |
+
+### Reglas
+
+| Regla | Comportamiento esperado |
+|-------|-------------------------|
+| Peso vacío | No calcular; mostrar estado neutral o error si el campo fue tocado. |
+| Altura vacía | No calcular; mostrar estado neutral o error si el campo fue tocado. |
+| Peso `< 10 kg` o `> 500 kg` | Bloquear cálculo y mostrar error específico. |
+| Peso `< 22 lb` o `> 1100 lb` | Bloquear cálculo y mostrar error específico. |
+| Altura `< 50 cm` o `> 250 cm` | Bloquear cálculo y mostrar error específico. |
+| Pies `< 1` o `> 8` | Bloquear cálculo. |
+| Pulgadas `< 0` o `>= 12` | Bloquear cálculo. |
+| Edad `< 2` | No clasificar; sugerir consulta pediátrica. |
+| Edad `2 - 19` | Mostrar nota pediátrica; no aplicar categoría adulta en MVP. |
+| Edad `> 120` | Bloquear cálculo y mostrar error. |
+| IMC `< 10` o `> 80` | Permitir si inputs son válidos, pero mostrar advertencia de valor inusual. |
+| Caracteres ambiguos | Error: `Ingresa un número válido.` |
+| Valores negativos | Error específico; no calcular. |
+
+---
+
+## Estados de la calculadora
+
+| Estado | Comportamiento |
+|--------|----------------|
+| Inicial | Mostrar campos vacíos, resultado neutral y sin errores. |
+| Incompleto | No mostrar resultado final; indicar qué falta si el usuario ya interactuó. |
+| Válido adulto | Mostrar IMC, categoría, rango saludable, diferencia y acciones. |
+| Edad pediátrica MVP | Mostrar IMC bruto y nota; no clasificar como adulto. |
+| Inválido | Mostrar errores por campo y ocultar acciones de resultado. |
+| Valor inusual | Mostrar resultado y advertencia informativa. |
+| Embarazo | Mostrar nota prominente junto al resultado. |
+| Copiado | Confirmación visual durante 2 segundos y anuncio accesible. |
+| Limpio | Restaurar estado inicial sin recargar la página. |
 
 ---
 
 ## Formato de outputs
 
+Usar `Intl.NumberFormat` con locale `es-MX`.
+
 | Tipo de resultado | Formato |
 |-------------------|---------|
-| IMC | 2 decimales → 25.35 |
-| Peso saludable | Rango en kg o lb según sistema → 54.7 – 73.7 kg |
-| Diferencia de peso | Con signo y unidad → −10.3 kg / +5.2 lb |
-| Percentil pediátrico | Número entero → percentil 72 |
-| Categoría | Texto + color + emoji de semáforo |
+| IMC | 2 decimales: `25.35` |
+| Peso saludable métrico | 1 decimal: `54.7 - 73.7 kg` |
+| Peso saludable imperial | 1 decimal: `120.7 - 162.4 lb` |
+| Diferencia de peso | 1 decimal con unidad: `1.3 kg` |
+| Altura métrica | Entero o 1 decimal: `172 cm` |
+| Altura imperial | `5 ft 8 in` |
+| Percentil pediátrico fase 2 | Entero: `percentil 72` |
+| Categoría | Texto + color + etiqueta accesible |
+
+### Redondeo
+
+- Usar precisión completa para cálculos internos.
+- Redondear solo al mostrar.
+- El rango saludable debe calcularse con límites `18.5` y `24.9`, no con la
+  categoría redondeada del resultado.
 
 ---
 
-## Features adicionales
+## Acciones del MVP
 
-### Gauge / velocímetro visual
-- Indicador semicircular tipo velocímetro con zonas de color.
-- Aguja que apunta al IMC calculado.
-- Más impactante visualmente que una simple barra.
-- Se anima suavemente al mostrar el resultado.
+### Copiar resultado
 
-### Toggle métrico / imperial
-- Cambio instantáneo entre kg/cm y lb/ft-in.
-- Convierte los valores ya ingresados automáticamente.
-- Sin necesidad de volver a escribir.
+Debe copiar texto plano.
 
-### Cálculo en tiempo real
-- El resultado se actualiza automáticamente con cada tecla.
+Ejemplo:
 
-### Botón de copiar resultado
-- Copia: "IMC: 25.35 — Sobrepeso (OMS)"
+```text
+Calculadora de IMC - calculadoras.tools
+Peso: 75 kg
+Altura: 172 cm
+IMC: 25.35
+Categoría: Sobrepeso
+Rango saludable de referencia: 54.7 - 73.7 kg
+```
 
-### Botón de limpiar / reset
-- Limpia todos los campos con un clic.
+Si `navigator.clipboard` no está disponible, usar fallback con `textarea` o
+mostrar mensaje accesible de error.
 
-### Calculadoras relacionadas (enlaces contextuales)
-Mostrar al pie del resultado, según la categoría obtenida:
+### Limpiar
 
-- Si IMC < 18.5 → "Calcula tus calorías para ganar peso → TDEE"
-- Si IMC 18.5–24.9 → "Mantén tu peso con tu plan de macros → Macros"
-- Si IMC > 24.9 → "Calcula tu déficit calórico para perder peso"
-- Siempre → "Calcula tus calorías diarias → TDEE"
+- Restablece valores por defecto.
+- Limpia errores, advertencias y resultado.
+- No recarga la página.
+- Mantiene sistema métrico como default.
 
-### Aviso de salud
-- Texto visible para IMC fuera del rango normal:
-  "Este resultado es solo orientativo. Consulta con un
-  profesional de la salud para una evaluación completa."
-- Para IMC < 16 o > 40: aviso más prominente con énfasis
-  en buscar atención médica.
+### Usar ejemplo
+
+Opcional. Rellena:
+
+```text
+peso = 75 kg
+altura = 172 cm
+edad = 32
+sexo = No indicar
+```
+
+---
+
+## Calculadoras relacionadas
+
+Mostrar enlaces contextuales debajo del resultado y/o al final de la página.
+No presentar estos enlaces como tratamiento médico.
+
+| Condición | Enlace sugerido |
+|-----------|-----------------|
+| IMC `< 18.5` | Calcula tus calorías diarias con TDEE |
+| IMC `18.5 - 24.9` | Planifica tus macros |
+| IMC `>= 25` | Calcula un déficit calórico orientativo |
+| Siempre | Calculadora de TDEE |
+
+Texto de seguridad:
+
+```text
+Estas herramientas son educativas y no reemplazan una evaluación profesional.
+```
 
 ---
 
 ## SEO y contenido de la página
 
 ### Meta información
-- Title: "Calculadora de IMC Online — Índice de Masa Corporal"
-- Description: "Calcula tu IMC al instante con la fórmula de la OMS.
-  Conoce tu categoría de peso, tu rango saludable y qué significa
-  tu resultado. Gratis y sin registro."
 
-### URLs sugeridas
-- /calculadora-imc (principal)
-- /calculadora-indice-masa-corporal
-- /imc-normal-por-edad
-- /peso-ideal-calculadora
+| Campo | Valor |
+|-------|-------|
+| Title | `Calculadora de IMC Online — Índice de Masa Corporal` |
+| Description | `Calcula tu IMC al instante con peso y altura. Conoce tu categoría de referencia, tu rango saludable estimado y las limitaciones del Índice de Masa Corporal.` |
+| Canonical | `/salud/calculadora-de-imc` |
 
-### Preguntas frecuentes (FAQ — para rich snippets)
+### Estructura sugerida
+
+- `h1`: Calculadora de IMC
+- Intro breve orientada a uso.
+- Calculadora interactiva.
+- Qué significa tu resultado.
+- Tabla de clasificación adulta.
+- Limitaciones del IMC.
+- Ejemplo de cálculo.
+- Rango de peso saludable por altura.
+- FAQ.
+- Fuentes.
+
+### FAQ sugeridas
+
 - ¿Cómo se calcula el IMC?
-- ¿Cuál es el IMC normal para un adulto?
-- ¿Qué IMC es considerado sobrepeso?
-- ¿El IMC es diferente para hombres y mujeres?
-- ¿Cuál es el IMC normal para niños?
-- ¿Qué limitaciones tiene el IMC como medida de salud?
-- ¿Cuánto debo pesar según mi estatura?
+- ¿Cuál es el IMC normal en adultos?
+- ¿Qué IMC se considera sobrepeso?
+- ¿El IMC cambia entre hombres y mujeres?
+- ¿Por qué el IMC no siempre refleja la grasa corporal?
+- ¿El IMC sirve para niños y adolescentes?
+- ¿El IMC sirve durante el embarazo?
+- ¿Cuánto debería pesar según mi estatura?
 
-### Contenido de apoyo
-- Tabla de IMC normal por edad y sexo.
-- Explicación de por qué el IMC no lo dice todo
-  (ejemplo del atleta musculoso).
-- Tabla de peso saludable por estatura (precomputada
-  de 1.50 m a 1.95 m en pasos de 5 cm).
+### Schema.org
 
----
-
-## Especificaciones técnicas
-
-| Parámetro | Detalle |
-|-----------|---------|
-| Plataforma | Web responsive (mobile-first) |
-| Sin backend | Todo el cálculo ocurre en el cliente (JS) |
-| Gauge visual | SVG animado o Canvas (sin librería externa) |
-| Percentiles pediátricos | Tablas OMS/CDC embebidas en JSON en cliente |
-| Historial | localStorage del navegador (sin cuenta) |
-| Gráfica de seguimiento | Chart.js (línea simple) |
-| Exportar CSV | Blob API en cliente |
-| Accesibilidad | Labels en todos los inputs, soporte teclado |
-| URL principal | /calculadora-imc |
-| Idioma | Español (locale configurable) |
-| Precisión numérica | 2 decimales en IMC; 1 decimal en pesos |
+Agregar JSON-LD para `FAQPage` si las preguntas y respuestas están visibles en
+la página.
 
 ---
 
-## Diferencias clave vs otras calculadoras de salud del sitio
+## Implementación en Astro + Tailwind
 
-| Aspecto | IMC | TDEE | Macros | Déficit calórico |
-|---------|-----|------|--------|-----------------|
-| Input principal | Peso + altura | Peso + altura + actividad | Objetivo + calorías | IMC / peso actual |
-| Output principal | Índice numérico | Calorías diarias | Gramos por macronutriente | Calorías a reducir |
-| Objetivo del usuario | Saber su estado | Mantener peso | Planificar dieta | Perder peso |
-| Vinculación natural | → TDEE, déficit | → Macros, déficit | → Déficit | → Macros |
+### Estructura recomendada
+
+```text
+src/pages/salud/calculadora-de-imc.astro
+src/lib/calculators/bmi.ts
+src/lib/calculators/bmi.test.ts
+```
+
+### Criterios técnicos
+
+- La página debe ser estática y compatible con Astro SSG.
+- La UI se construye con Astro + Tailwind.
+- La lógica interactiva puede vivir en un `<script>` de la página o importarse
+  desde un módulo cliente.
+- La lógica matemática debe separarse en funciones puras.
+- No introducir React, Vue, Svelte ni librerías adicionales para esta
+  calculadora.
+- No usar backend.
+- No hacer llamadas de red.
+- No añadir Chart.js en el MVP.
+- Mantener consistencia visual con las páginas existentes (`BaseLayout`,
+  `PageHero`, `Container`, fondo oscuro y acentos sobrios).
+
+### Funciones puras sugeridas
+
+```ts
+type BmiCategory =
+  | "severe-thinness"
+  | "moderate-thinness"
+  | "mild-thinness"
+  | "healthy"
+  | "overweight"
+  | "obesity-class-1"
+  | "obesity-class-2"
+  | "obesity-class-3";
+
+interface AdultBmiResult {
+  bmi: number;
+  category: BmiCategory;
+  healthyWeightMinKg: number;
+  healthyWeightMaxKg: number;
+  differenceFromRangeKg: number;
+  rangeStatus: "below" | "within" | "above";
+}
+
+calculateBmi(weightKg, heightCm)
+classifyAdultBmi(bmi)
+calculateHealthyWeightRange(heightCm)
+calculateAdultBmiResult({ weightKg, heightCm })
+convertKgToLb(kg)
+convertLbToKg(lb)
+convertCmToIn(cm)
+convertInToCm(inches)
+convertMetricToImperial({ weightKg, heightCm })
+convertImperialToMetric({ weightLb, feet, inches })
+parseHealthInput(value)
+formatBmi(value)
+formatWeight(value, unit)
+formatHeight(value, unit)
+buildBmiCopyText(result)
+```
+
+### Categorías adultas sugeridas en código
+
+```ts
+const ADULT_BMI_CATEGORIES = [
+  { min: 0, max: 16, key: "severe-thinness", label: "Delgadez severa" },
+  { min: 16, max: 17, key: "moderate-thinness", label: "Delgadez moderada" },
+  { min: 17, max: 18.5, key: "mild-thinness", label: "Delgadez leve" },
+  { min: 18.5, max: 25, key: "healthy", label: "Rango saludable" },
+  { min: 25, max: 30, key: "overweight", label: "Sobrepeso" },
+  { min: 30, max: 35, key: "obesity-class-1", label: "Obesidad clase 1" },
+  { min: 35, max: 40, key: "obesity-class-2", label: "Obesidad clase 2" },
+  { min: 40, max: Infinity, key: "obesity-class-3", label: "Obesidad clase 3" },
+];
+```
+
+Usar comparaciones tipo `bmi >= min && bmi < max`, excepto el último rango.
 
 ---
 
-## Casos extremos a contemplar
+## Accesibilidad
 
-- Altura = 0 → error claro antes del cálculo
-- Peso muy bajo (ej. 15 kg adulto) → calcular y mostrar
-  advertencia de salud prominente
-- IMC > 60 → calcular con normalidad, sin bloquear,
-  pero con aviso de consultar médico
-- Edad = 2 años → redirigir a modo pediátrico automáticamente
-- Edad > 65 → nota: "En adultos mayores el IMC puede
-  subestimar el riesgo; consulta con tu médico"
-- Sistema imperial: pies + pulgadas → manejar el input
-  como dos campos separados (ft e in), no uno solo
-- Cambio de sistema métrico a imperial con datos ya ingresados →
-  convertir automáticamente sin perder los valores
-- Embarazo → nota visible: "El IMC no es un indicador
-  adecuado durante el embarazo"
+- Todos los inputs deben tener `label` visible.
+- Los errores deben asociarse con `aria-describedby`.
+- El resultado principal debe estar en una región con `aria-live="polite"`.
+- Los controles segmentados deben comunicar estado activo con texto, color y
+  atributos ARIA.
+- Los botones de icono deben incluir `aria-label`.
+- El foco visible debe ser claro con Tailwind.
+- No depender únicamente del color para comunicar categoría, advertencia o
+  error.
+- El gauge o barra debe tener alternativa textual.
+- La navegación debe funcionar con teclado.
+- Las acciones de copiar y limpiar deben informar éxito o error sin depender de
+  `alert()`.
+- Respetar `prefers-reduced-motion` para animaciones del indicador.
+
+---
+
+## Privacidad
+
+- El MVP no debe guardar datos de salud en `localStorage`.
+- Si se implementa historial en fase futura, preferir `sessionStorage` para
+  últimos cálculos no sensibles y sin persistencia prolongada.
+- Si se usa `localStorage`, debe ser opt-in y mostrar texto claro: los datos se
+  guardan solo en el navegador del usuario.
+- No enviar peso, altura, edad, sexo ni resultados a APIs externas.
+- No registrar valores personales en analytics.
+
+---
+
+## Casos extremos
+
+| Caso | Comportamiento esperado |
+|------|-------------------------|
+| Altura `0` | Error claro antes del cálculo. |
+| Peso muy bajo con edad adulta | Bloquear si fuera de rango; si está en rango, calcular y advertir. |
+| IMC `< 10` | Mostrar resultado y advertencia de valor inusual. |
+| IMC `> 80` | Mostrar resultado y advertencia de valor inusual. |
+| Edad `< 2` | No clasificar; recomendar consulta pediátrica. |
+| Edad `2 - 19` | Mostrar IMC bruto y nota pediátrica en MVP. |
+| Edad `>= 65` | Mostrar nota de interpretación en adultos mayores. |
+| Embarazo activo | Mostrar nota prominente. |
+| Sistema imperial con `ft = 5`, `in = 12` | Error; pulgadas deben ser menores que 12. |
+| Cambio de métrico a imperial | Convertir sin perder el valor equivalente. |
+| Resultado largo | Debe hacer wrap sin romper layout. |
+
+---
+
+## Criterios de aceptación
+
+| Caso | Inputs | Resultado esperado |
+|------|--------|--------------------|
+| IMC adulto básico | `75 kg`, `172 cm` | IMC `25.35`, categoría `Sobrepeso`. |
+| Rango saludable | `172 cm` | `54.7 - 73.7 kg`. |
+| Diferencia sobre rango | `75 kg`, `172 cm` | Aproximadamente `1.3 kg` sobre el rango. |
+| Rango saludable | `65 kg`, `172 cm` | Categoría `Rango saludable`; dentro del rango. |
+| Delgadez | `50 kg`, `172 cm` | IMC `16.90`, categoría `Delgadez moderada`. |
+| Obesidad clase 1 | `90 kg`, `172 cm` | IMC `30.42`, categoría `Obesidad clase 1`. |
+| Imperial | `165 lb`, `5 ft`, `8 in` | IMC aproximado `25.09`. |
+| Edad pediátrica MVP | Edad `11`, peso y altura válidos | Mostrar IMC bruto y nota; no clasificar como adulto. |
+| Embarazo | Checkbox activo | Mostrar nota de embarazo junto al resultado. |
+| Edad adulta mayor | Edad `70` | Mostrar nota de adultos mayores. |
+| Altura inválida | `0 cm` | Bloquear cálculo y mostrar error. |
+| Peso inválido | `-75 kg` | Bloquear cálculo y mostrar error. |
+| Copiar resultado | Resultado válido | Copia texto plano con IMC, categoría y rango. |
+| Limpiar | Después de calcular | Campos y resultado vuelven a estado inicial. |
+| Mobile | viewport `390px` | Formulario y resultado no se superponen ni desbordan. |
+
+---
+
+## Pruebas recomendadas
+
+### Unitarias
+
+Si se añade Vitest:
+
+- Fórmula de IMC métrica.
+- Fórmula de IMC imperial.
+- Conversión kg/lb.
+- Conversión cm/in.
+- Clasificación adulta en cada frontera: `16`, `17`, `18.5`, `25`, `30`, `35`,
+  `40`.
+- Rango saludable por altura.
+- Diferencia debajo, dentro y encima del rango.
+- Parsing de formatos comunes.
+- Manejo de valores inválidos.
+- Formato de IMC, peso y altura.
+
+### E2E con Playwright
+
+- Escribir valores y ver resultado en tiempo real.
+- Cambiar unidades y verificar conversión.
+- Activar embarazo y verificar nota.
+- Ingresar edad pediátrica y verificar que no se use clasificación adulta.
+- Copiar resultado.
+- Limpiar formulario.
+- Validar mensajes de error.
+- Validar navegación con teclado.
+- Revisar layout en móvil y desktop.
+
+---
+
+## Fuentes de referencia
+
+- CDC — Adult BMI Categories:
+  https://www.cdc.gov/bmi/adult-calculator/bmi-categories.html
+- CDC — Using BMI-for-Age Growth Charts:
+  https://www.cdc.gov/growth-chart-training/hcp/using-bmi/summary.html
+- WHO — Obesity:
+  https://www.who.int/health-topics/obesity/
+- WHO Expert Consultation — Appropriate body-mass index for Asian populations:
+  https://pubmed.ncbi.nlm.nih.gov/14726171/
+
+---
+
+## Aviso de salud sugerido
+
+Texto visible cerca de los resultados:
+
+```text
+Los resultados son estimaciones orientativas basadas en el Índice de Masa Corporal. El IMC no mide directamente la grasa corporal ni reemplaza una evaluación médica. Consulta con un profesional de la salud si tienes dudas, síntomas, embarazo, cambios recientes de peso o condiciones médicas previas.
+```
