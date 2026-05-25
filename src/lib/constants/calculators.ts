@@ -34,4 +34,13 @@ export const CALCULATORS: CalculatorDirectoryItem[] = [
     category: "Finanzas",
     order: 30,
   },
+  {
+    id: "calculadora-de-prestamo",
+    title: "Calculadora de préstamo",
+    description:
+      "Calcula cuota mensual, intereses, costo total y tabla de amortización.",
+    href: "/finanzas/calculadora-de-prestamo",
+    category: "Finanzas",
+    order: 35,
+  },
 ];
