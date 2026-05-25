@@ -52,11 +52,16 @@
 - Litros a galones
 - Tallas de ropa
 
-### 🏠 Bienes raíces
+### 🏠 Inmuebles
+- **Calculadora de crédito hipotecario** 🔥
+- **Calculadora de enganche** 🔥
+- **Calculadora de renta vs compra** 🔥
 - **Precio por m²** 🔥
+- Calculadora de metros cuadrados
+- Calculadora de gastos de escrituración
+- Calculadora de plusvalía
 - Calculadora de renta
 - Cap rate / rentabilidad
-- Enganche y mensualidad
 
 ### 🎓 Educación y calificaciones
 - **Promedio escolar (GPA)** 🔥

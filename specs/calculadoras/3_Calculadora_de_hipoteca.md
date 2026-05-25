@@ -68,9 +68,11 @@ La primera versión debe enfocarse en el flujo principal:
 
 | Elemento | Valor |
 |----------|-------|
-| URL pública recomendada | `/finanzas/calculadora-de-hipoteca` |
-| Archivo Astro recomendado | `src/pages/finanzas/calculadora-de-hipoteca.astro` |
+| URL pública recomendada | `/inmuebles/calculadora-de-hipoteca` |
+| Archivo Astro recomendado | `src/pages/inmuebles/calculadora-de-hipoteca.astro` |
 | Lógica de cálculo | `src/lib/calculators/mortgage.ts` |
+| Categoría de navegación | `Inmuebles` |
+| Breadcrumb sugerido | `Inicio > Inmuebles > Calculadora de hipoteca` |
 | Locale base | `es-MX` |
 | Moneda base | `MXN`, símbolo `$` |
 | Layout | `BaseLayout.astro` |
@@ -541,7 +543,7 @@ Esta tasa es orientativa. Consulta con tu banco para obtener una tasa personaliz
 |-------|-------|
 | Title | `Calculadora de Hipoteca Online — Cuota Mensual y Amortización` |
 | Description | `Calcula tu cuota hipotecaria al instante. Conoce cuánto pagarás al mes, el total de intereses y la tabla de amortización. Gratis y sin registro.` |
-| Canonical | URL final de la calculadora |
+| Canonical | `/inmuebles/calculadora-de-hipoteca` |
 
 ### Estructura sugerida
 
@@ -575,7 +577,7 @@ página.
 ### Estructura recomendada
 
 ```text
-src/pages/finanzas/calculadora-de-hipoteca.astro
+src/pages/inmuebles/calculadora-de-hipoteca.astro
 src/lib/calculators/mortgage.ts
 src/lib/calculators/mortgage.test.ts
 ```
