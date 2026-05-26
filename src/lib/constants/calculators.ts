@@ -43,4 +43,13 @@ export const CALCULATORS: CalculatorDirectoryItem[] = [
     category: "Finanzas",
     order: 35,
   },
+  {
+    id: "calculadora-de-imc",
+    title: "Calculadora de IMC",
+    description:
+      "Calcula tu Índice de Masa Corporal y revisa tu rango saludable estimado.",
+    href: "/salud/calculadora-de-imc",
+    category: "Salud",
+    order: 40,
+  },
 ];

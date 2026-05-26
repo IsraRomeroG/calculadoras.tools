@@ -1,0 +1,1422 @@
+---
+import BaseLayout from "@layouts/BaseLayout.astro";
+import Container from "@components/layout/Container.astro";
+import PageShell from "@components/layout/PageShell.astro";
+import FaqSection from "@components/shared/FaqSection.astro";
+import PageHero from "@components/shared/PageHero.astro";
+import SectionIntro from "@components/shared/SectionIntro.astro";
+import { ADULT_BMI_CATEGORIES } from "@lib/calculators/bmi";
+import { buildFaqJsonLd } from "@lib/seo";
+
+const title = "Calculadora de IMC Online — Índice de Masa Corporal";
+const description =
+  "Calcula tu IMC al instante con peso y altura. Conoce tu categoría de referencia, tu rango saludable estimado y las limitaciones del Índice de Masa Corporal.";
+const canonical = "/salud/calculadora-de-imc";
+
+const faqs = [
+  {
+    question: "¿Cómo se calcula el IMC?",
+    answer:
+      "El IMC se calcula dividiendo el peso en kilogramos entre la altura en metros al cuadrado: peso / altura².",
+  },
+  {
+    question: "¿Cuál es el IMC normal en adultos?",
+    answer:
+      "En adultos, el rango saludable de referencia suele ubicarse entre 18.5 y 24.9. Es una guía general, no un diagnóstico.",
+  },
+  {
+    question: "¿Qué IMC se considera sobrepeso?",
+    answer:
+      "Un IMC de 25.0 a 29.9 se clasifica como sobrepeso en adultos. A partir de 30.0 se clasifica dentro de rangos de obesidad.",
+  },
+  {
+    question: "¿El IMC cambia entre hombres y mujeres?",
+    answer:
+      "La fórmula adulta es la misma. Aun así, la interpretación puede variar según composición corporal, edad, distribución de grasa y otros factores de salud.",
+  },
+  {
+    question: "¿Por qué el IMC no siempre refleja la grasa corporal?",
+    answer:
+      "Porque no distingue masa muscular, grasa, hueso ni distribución de grasa. Una persona musculosa puede tener un IMC alto sin que eso signifique necesariamente exceso de grasa.",
+  },
+  {
+    question: "¿El IMC sirve para niños y adolescentes?",
+    answer:
+      "En niñas, niños y adolescentes se usa percentil de IMC por edad y sexo. Esta versión muestra una nota pediátrica y no clasifica esos resultados como adultos.",
+  },
+  {
+    question: "¿El IMC sirve durante el embarazo?",
+    answer:
+      "El IMC actual durante el embarazo no es un indicador adecuado para evaluar el peso. Conviene interpretarlo con seguimiento profesional.",
+  },
+  {
+    question: "¿Cuánto debería pesar según mi estatura?",
+    answer:
+      "La calculadora estima el rango de peso asociado al IMC adulto de 18.5 a 24.9 para tu altura. Tómalo como referencia matemática, no como meta médica.",
+  },
+];
+
+const faqJsonLd = buildFaqJsonLd(faqs);
+
+const limitationCards = [
+  {
+    title: "No distingue músculo y grasa",
+    text: "Una persona con mucha masa muscular puede tener un IMC alto sin que el número describa por sí solo su salud.",
+  },
+  {
+    title: "No mide distribución de grasa",
+    text: "La grasa abdominal puede tener implicaciones distintas que el IMC no captura.",
+  },
+  {
+    title: "No reemplaza evaluación médica",
+    text: "Debe interpretarse junto con edad, antecedentes, composición corporal, cintura y otros datos clínicos.",
+  },
+  {
+    title: "Tiene poblaciones especiales",
+    text: "Embarazo, infancia, adolescencia y adultos mayores requieren criterios adicionales.",
+  },
+];
+
+const scaleSegments = [
+  { label: "Bajo", class: "bg-sky-400" },
+  { label: "Saludable", class: "bg-emerald-400" },
+  { label: "Sobrepeso", class: "bg-amber-400" },
+  { label: "Obesidad", class: "bg-red-400" },
+];
+---
+
+<BaseLayout title={title} description={description} canonical={canonical}>
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={JSON.stringify(faqJsonLd)} />
+  </Fragment>
+
+  <PageShell>
+    <PageHero
+      title="Calculadora de IMC"
+      description="Calcula tu Índice de Masa Corporal con peso y altura, revisa la categoría adulta de referencia y entiende las limitaciones del resultado."
+      kicker="Salud"
+      collapseBreadcrumbOnMobile
+      containerClass="py-5 md:py-7"
+      breadcrumbs={[
+        { label: "Inicio", href: "/", ariaLabel: "Inicio" },
+        { label: "Salud", href: "/#calculadoras", optional: true },
+        { label: "Calculadora de IMC", truncate: true },
+      ]}
+    />
+
+    <Container as="section" class="py-6 md:py-8">
+      <section
+        id="bmi-calculator"
+        class="overflow-hidden rounded-lg border border-gray-700 bg-gray-950 shadow-xl shadow-gray-950/30"
+        aria-labelledby="calculator-heading"
+      >
+        <div
+          class="grid gap-0 lg:grid-cols-[minmax(0,1fr)_minmax(18rem,0.74fr)]"
+        >
+          <div class="p-4 sm:p-6">
+            <div class="mb-5">
+              <p
+                class="text-sm font-semibold uppercase tracking-wide text-amber-400"
+              >
+                Cálculo principal
+              </p>
+              <h2 id="calculator-heading" class="mt-2 text-2xl font-semibold">
+                Calcula tu IMC
+              </h2>
+              <p class="mt-2 text-sm leading-relaxed text-gray-400">
+                Ingresa peso y altura. Edad, sexo y embarazo son opcionales y
+                solo ajustan las notas de interpretación.
+              </p>
+            </div>
+
+            <div class="mb-5">
+              <span class="block text-sm font-medium text-gray-200">
+                Sistema de unidades
+              </span>
+              <div
+                class="mt-2 flex rounded-lg border border-gray-700 bg-gray-900 p-1"
+                role="group"
+                aria-label="Sistema de unidades"
+              >
+                <button
+                  class="min-h-11 flex-1 rounded-md px-4 py-2 text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/40"
+                  type="button"
+                  aria-pressed="true"
+                  data-unit-option="metric"
+                >
+                  Métrico
+                </button>
+                <button
+                  class="min-h-11 flex-1 rounded-md px-4 py-2 text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/40"
+                  type="button"
+                  aria-pressed="false"
+                  data-unit-option="imperial"
+                >
+                  Imperial
+                </button>
+              </div>
+            </div>
+
+            <div class="grid gap-4 sm:grid-cols-2" data-unit-panel="metric">
+              <div>
+                <label
+                  for="bmi-weight-kg"
+                  class="block text-sm font-medium text-gray-200"
+                >
+                  Peso
+                </label>
+                <div
+                  class="mt-2 flex rounded-lg border border-gray-700 bg-gray-900 focus-within:border-amber-400 focus-within:ring-3 focus-within:ring-amber-400/15"
+                >
+                  <input
+                    id="bmi-weight-kg"
+                    class="min-h-12 w-full bg-transparent px-4 text-base text-white outline-none"
+                    type="text"
+                    inputmode="decimal"
+                    autocomplete="off"
+                    placeholder="75"
+                    aria-describedby="bmi-weight-kg-error"
+                    data-input="weightKg"
+                  />
+                  <span class="flex items-center px-4 text-gray-500">kg</span>
+                </div>
+                <p
+                  id="bmi-weight-kg-error"
+                  class="mt-2 hidden text-sm text-red-300"
+                  data-error-for="weightKg"
+                >
+                </p>
+              </div>
+
+              <div>
+                <label
+                  for="bmi-height-cm"
+                  class="block text-sm font-medium text-gray-200"
+                >
+                  Altura
+                </label>
+                <div
+                  class="mt-2 flex rounded-lg border border-gray-700 bg-gray-900 focus-within:border-amber-400 focus-within:ring-3 focus-within:ring-amber-400/15"
+                >
+                  <input
+                    id="bmi-height-cm"
+                    class="min-h-12 w-full bg-transparent px-4 text-base text-white outline-none"
+                    type="text"
+                    inputmode="decimal"
+                    autocomplete="off"
+                    placeholder="172"
+                    aria-describedby="bmi-height-cm-error"
+                    data-input="heightCm"
+                  />
+                  <span class="flex items-center px-4 text-gray-500">cm</span>
+                </div>
+                <p
+                  id="bmi-height-cm-error"
+                  class="mt-2 hidden text-sm text-red-300"
+                  data-error-for="heightCm"
+                >
+                </p>
+              </div>
+            </div>
+
+            <div
+              class="hidden grid-cols-2 gap-4 sm:grid-cols-[1fr_0.7fr_0.7fr]"
+              data-unit-panel="imperial"
+            >
+              <div class="col-span-2 sm:col-span-1">
+                <label
+                  for="bmi-weight-lb"
+                  class="block text-sm font-medium text-gray-200"
+                >
+                  Peso
+                </label>
+                <div
+                  class="mt-2 flex rounded-lg border border-gray-700 bg-gray-900 focus-within:border-amber-400 focus-within:ring-3 focus-within:ring-amber-400/15"
+                >
+                  <input
+                    id="bmi-weight-lb"
+                    class="min-h-12 w-full bg-transparent px-4 text-base text-white outline-none"
+                    type="text"
+                    inputmode="decimal"
+                    autocomplete="off"
+                    placeholder="165"
+                    aria-describedby="bmi-weight-lb-error"
+                    data-input="weightLb"
+                  />
+                  <span class="flex items-center px-4 text-gray-500">lb</span>
+                </div>
+                <p
+                  id="bmi-weight-lb-error"
+                  class="mt-2 hidden text-sm text-red-300"
+                  data-error-for="weightLb"
+                >
+                </p>
+              </div>
+
+              <div>
+                <label
+                  for="bmi-height-ft"
+                  class="block text-sm font-medium text-gray-200"
+                >
+                  Pies
+                </label>
+                <input
+                  id="bmi-height-ft"
+                  class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-900 px-4 text-base text-white outline-none transition placeholder:text-gray-600 focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15"
+                  type="text"
+                  inputmode="decimal"
+                  autocomplete="off"
+                  placeholder="5"
+                  aria-describedby="bmi-height-ft-error"
+                  data-input="feet"
+                />
+                <p
+                  id="bmi-height-ft-error"
+                  class="mt-2 hidden text-sm text-red-300"
+                  data-error-for="feet"
+                >
+                </p>
+              </div>
+
+              <div>
+                <label
+                  for="bmi-height-in"
+                  class="block text-sm font-medium text-gray-200"
+                >
+                  Pulgadas
+                </label>
+                <input
+                  id="bmi-height-in"
+                  class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-900 px-4 text-base text-white outline-none transition placeholder:text-gray-600 focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15"
+                  type="text"
+                  inputmode="decimal"
+                  autocomplete="off"
+                  placeholder="8"
+                  aria-describedby="bmi-height-in-error"
+                  data-input="inches"
+                />
+                <p
+                  id="bmi-height-in-error"
+                  class="mt-2 hidden text-sm text-red-300"
+                  data-error-for="inches"
+                >
+                </p>
+              </div>
+            </div>
+
+            <div class="mt-5 grid gap-4 sm:grid-cols-2">
+              <div>
+                <label
+                  for="bmi-age"
+                  class="block text-sm font-medium text-gray-200"
+                >
+                  Edad opcional
+                </label>
+                <div
+                  class="mt-2 flex rounded-lg border border-gray-700 bg-gray-900 focus-within:border-amber-400 focus-within:ring-3 focus-within:ring-amber-400/15"
+                >
+                  <input
+                    id="bmi-age"
+                    class="min-h-12 w-full bg-transparent px-4 text-base text-white outline-none"
+                    type="text"
+                    inputmode="numeric"
+                    autocomplete="off"
+                    placeholder="32"
+                    aria-describedby="bmi-age-error"
+                    data-input="age"
+                  />
+                  <span class="flex items-center px-4 text-gray-500">años</span>
+                </div>
+                <p
+                  id="bmi-age-error"
+                  class="mt-2 hidden text-sm text-red-300"
+                  data-error-for="age"
+                >
+                </p>
+              </div>
+
+              <div>
+                <label
+                  for="bmi-sex"
+                  class="block text-sm font-medium text-gray-200"
+                >
+                  Sexo opcional
+                </label>
+                <select
+                  id="bmi-sex"
+                  class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-900 px-4 text-base text-white outline-none transition focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15"
+                  data-input="sex"
+                >
+                  <option value="not-specified">No indicar</option>
+                  <option value="male">Hombre</option>
+                  <option value="female">Mujer</option>
+                </select>
+              </div>
+            </div>
+
+            <label
+              class="mt-5 flex gap-3 rounded-lg border border-gray-800 bg-gray-900/70 p-4 text-sm leading-relaxed text-gray-300"
+            >
+              <input
+                class="mt-1 size-4 rounded border-gray-600 bg-gray-950 text-amber-400 focus:ring-amber-400"
+                type="checkbox"
+                data-input="pregnancy"
+              />
+              <span>
+                Estoy embarazada o quiero ver la advertencia correspondiente.
+              </span>
+            </label>
+
+            <div
+              class="mt-6 flex flex-col gap-3 border-t border-gray-800 pt-5 sm:flex-row sm:flex-wrap"
+            >
+              <button
+                class="inline-flex min-h-11 items-center justify-center rounded-lg border border-gray-700 px-4 py-2 text-sm font-semibold text-gray-200 transition hover:border-amber-400 hover:text-white focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/40"
+                type="button"
+                data-fill-example
+              >
+                Usar ejemplo
+              </button>
+              <button
+                class="inline-flex min-h-11 items-center justify-center rounded-lg border border-gray-700 px-4 py-2 text-sm font-semibold text-gray-200 transition hover:border-amber-400 hover:text-white focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/40"
+                type="button"
+                data-clear-calculator
+              >
+                Limpiar
+              </button>
+              <button
+                class="hidden min-h-11 items-center justify-center rounded-lg bg-amber-400 px-4 py-2 text-sm font-semibold text-gray-950 transition hover:bg-amber-300 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/40"
+                type="button"
+                data-copy-result
+              >
+                <span data-copy-label>Copiar resultado</span>
+              </button>
+              <p class="sr-only" aria-live="polite" data-copy-status></p>
+            </div>
+          </div>
+
+          <aside
+            class="border-t border-gray-800 bg-gray-900/70 p-4 sm:p-6 lg:border-l lg:border-t-0"
+            aria-live="polite"
+            data-result-region
+          >
+            <p
+              class="text-sm font-semibold uppercase tracking-wide text-amber-400"
+              data-result-kicker
+            >
+              Resultado
+            </p>
+            <p
+              class="mt-3 break-words text-4xl font-bold leading-tight text-white"
+              data-main-result
+            >
+              Ingresa los valores
+            </p>
+            <p
+              class="mt-3 inline-flex rounded-full border border-gray-700 px-3 py-1 text-sm font-semibold text-gray-300"
+              data-category-label
+            >
+              Sin cálculo todavía
+            </p>
+
+            <div class="mt-5 grid gap-3">
+              <div class="rounded-lg border border-gray-800 bg-gray-950/70 p-4">
+                <span
+                  class="block text-xs font-semibold uppercase tracking-wide text-gray-500"
+                >
+                  Rango saludable de referencia
+                </span>
+                <span
+                  class="mt-2 block break-words text-lg font-semibold text-white"
+                  data-healthy-range
+                >
+                  Se mostrará aquí
+                </span>
+              </div>
+              <div class="rounded-lg border border-gray-800 bg-gray-950/70 p-4">
+                <span
+                  class="block text-xs font-semibold uppercase tracking-wide text-gray-500"
+                >
+                  Diferencia respecto al rango
+                </span>
+                <span
+                  class="mt-2 block break-words text-lg font-semibold text-white"
+                  data-range-difference
+                >
+                  Se mostrará aquí
+                </span>
+              </div>
+            </div>
+
+            <div class="mt-5 rounded-lg border border-gray-800 p-4">
+              <div
+                class="flex items-center justify-between gap-3 text-xs font-semibold uppercase tracking-wide text-gray-500"
+              >
+                <span>Escala visual</span>
+                <span data-scale-value>IMC 10 - 45</span>
+              </div>
+              <div
+                class="relative mt-4 h-3 overflow-visible rounded-full bg-gray-800"
+                aria-hidden="true"
+              >
+                <div class="flex h-3 overflow-hidden rounded-full">
+                  {
+                    scaleSegments.map((segment) => (
+                      <span
+                        class={`h-full flex-1 ${segment.class}`}
+                        title={segment.label}
+                      />
+                    ))
+                  }
+                </div>
+                <span
+                  class="absolute top-1/2 h-7 w-1 -translate-x-1/2 -translate-y-1/2 rounded-full bg-white shadow-lg shadow-gray-950 transition-[left] duration-300 motion-reduce:transition-none"
+                  style="left: 0%"
+                  data-scale-marker
+                >
+                </span>
+              </div>
+              <p class="mt-3 text-xs leading-relaxed text-gray-500" data-scale-label>
+                La posición aparecerá cuando completes el cálculo.
+              </p>
+            </div>
+
+            <div
+              class="mt-5 hidden rounded-lg border border-amber-400/40 bg-amber-400/10 p-4"
+              data-warning-panel
+            >
+              <p class="text-sm font-semibold text-amber-200">
+                Notas de interpretación
+              </p>
+              <ul
+                class="mt-2 space-y-2 text-sm leading-relaxed text-amber-100"
+                data-warning-list
+              >
+              </ul>
+            </div>
+
+            <p
+              class="mt-5 rounded-lg border border-gray-800 p-4 text-sm leading-relaxed text-gray-300"
+              data-explanation
+            >
+              El cálculo aparecerá aquí. El IMC es una referencia inicial y no
+              reemplaza una evaluación médica.
+            </p>
+
+            <div
+              class="mt-5 hidden rounded-lg border border-emerald-400/30 bg-emerald-400/10 p-4"
+              data-related-panel
+            >
+              <p class="text-sm font-semibold text-emerald-200">
+                Siguiente cálculo útil
+              </p>
+              <p
+                class="mt-2 text-sm leading-relaxed text-emerald-100"
+                data-related-text
+              >
+              </p>
+              <a
+                class="mt-3 inline-flex text-sm font-semibold text-emerald-200 transition hover:text-emerald-100 hover:underline"
+                href="/#calculadoras"
+              >
+                Ver calculadoras disponibles
+              </a>
+            </div>
+          </aside>
+        </div>
+      </section>
+    </Container>
+
+    <Container as="section" class="py-8">
+      <SectionIntro
+        title="Qué significa tu resultado"
+        description="El IMC compara peso y altura para ubicar un resultado en rangos de referencia adultos. Es útil como punto de partida, pero no describe por sí solo composición corporal, hábitos, síntomas ni antecedentes médicos."
+      />
+
+      <div class="grid gap-4 md:grid-cols-3">
+        <div class="rounded-lg border border-gray-700 bg-gray-950 p-4">
+          <h3 class="font-semibold text-white">Número</h3>
+          <p class="mt-2 text-sm leading-relaxed text-gray-400">
+            Se calcula con la fórmula peso dividido entre altura al cuadrado.
+          </p>
+        </div>
+        <div class="rounded-lg border border-gray-700 bg-gray-950 p-4">
+          <h3 class="font-semibold text-white">Categoría</h3>
+          <p class="mt-2 text-sm leading-relaxed text-gray-400">
+            La categoría adulta usa puntos de corte de referencia, no un
+            diagnóstico individual.
+          </p>
+        </div>
+        <div class="rounded-lg border border-gray-700 bg-gray-950 p-4">
+          <h3 class="font-semibold text-white">Rango de peso</h3>
+          <p class="mt-2 text-sm leading-relaxed text-gray-400">
+            Se estima con los límites de IMC 18.5 y 24.9 para la altura
+            capturada.
+          </p>
+        </div>
+      </div>
+    </Container>
+
+    <Container as="section" class="py-8">
+      <SectionIntro
+        title="Clasificación adulta de IMC"
+        description="Estos rangos se muestran como referencia general para adultos. En personas de 2 a 19 años se usan percentiles por edad y sexo."
+      />
+
+      <div class="overflow-x-auto rounded-lg border border-gray-700">
+        <table
+          class="min-w-[42rem] w-full divide-y divide-gray-800 bg-gray-950 text-left text-sm"
+        >
+          <caption class="sr-only">
+            Tabla de clasificación adulta del Índice de Masa Corporal
+          </caption>
+          <thead class="bg-gray-900 text-gray-300">
+            <tr>
+              <th class="px-4 py-3 font-semibold" scope="col">IMC</th>
+              <th class="px-4 py-3 font-semibold" scope="col">Categoría</th>
+              <th class="px-4 py-3 font-semibold" scope="col">
+                Interpretación visual
+              </th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-gray-800 text-gray-300">
+            {
+              ADULT_BMI_CATEGORIES.map((category) => (
+                <tr>
+                  <th class="px-4 py-3 font-semibold text-white" scope="row">
+                    {category.rangeLabel}
+                  </th>
+                  <td class="px-4 py-3">{category.label}</td>
+                  <td class="px-4 py-3">
+                    {category.severity === "normal"
+                      ? "Normal"
+                      : category.severity === "caution"
+                        ? "Precaución"
+                        : category.severity === "alert"
+                          ? "Alerta"
+                          : "Alerta alta"}
+                  </td>
+                </tr>
+              ))
+            }
+          </tbody>
+        </table>
+      </div>
+    </Container>
+
+    <Container as="section" class="py-8">
+      <SectionIntro
+        title="Limitaciones del IMC"
+        description="El resultado debe leerse como una herramienta de cribado, no como una conclusión médica."
+      />
+
+      <div class="grid gap-4 md:grid-cols-2">
+        {
+          limitationCards.map((card) => (
+            <article class="rounded-lg border border-gray-700 bg-gray-950 p-4">
+              <h3 class="font-semibold text-white">{card.title}</h3>
+              <p class="mt-2 text-sm leading-relaxed text-gray-400">
+                {card.text}
+              </p>
+            </article>
+          ))
+        }
+      </div>
+
+      <p
+        class="mt-5 rounded-lg border border-amber-400/30 bg-amber-400/10 p-4 text-sm leading-relaxed text-amber-100"
+      >
+        Los resultados son estimaciones orientativas basadas en el Índice de
+        Masa Corporal. El IMC no mide directamente la grasa corporal ni
+        reemplaza una evaluación médica. Consulta con un profesional de la
+        salud si tienes dudas, síntomas, embarazo, cambios recientes de peso o
+        condiciones médicas previas.
+      </p>
+    </Container>
+
+    <Container as="section" class="py-8">
+      <SectionIntro
+        title="Ejemplo de cálculo"
+        description="Para una persona adulta con 75 kg y 172 cm, el IMC se calcula así:"
+      />
+
+      <div class="rounded-lg border border-gray-700 bg-gray-950 p-4">
+        <pre
+          class="overflow-x-auto text-sm leading-relaxed text-gray-300"
+        ><code>altura_m = 172 / 100 = 1.72
+IMC = 75 / (1.72 ^ 2)
+IMC = 75 / 2.9584
+IMC = 25.35</code></pre>
+      </div>
+    </Container>
+
+    <Container as="section" class="py-8">
+      <SectionIntro
+        title="Fuentes de referencia"
+        description="La implementación separa cálculo y contenido para que los rangos puedan revisarse si cambian los criterios editoriales."
+      />
+
+      <ul class="space-y-3 text-sm leading-relaxed text-gray-400">
+        <li>
+          <a
+            class="font-semibold text-amber-400 transition hover:text-amber-300 hover:underline"
+            href="https://www.cdc.gov/bmi/adult-calculator/bmi-categories.html"
+            rel="noreferrer"
+            target="_blank"
+          >
+            CDC: Adult BMI Categories
+          </a>
+        </li>
+        <li>
+          <a
+            class="font-semibold text-amber-400 transition hover:text-amber-300 hover:underline"
+            href="https://www.cdc.gov/growth-chart-training/hcp/using-bmi/summary.html"
+            rel="noreferrer"
+            target="_blank"
+          >
+            CDC: Using BMI-for-Age Growth Charts
+          </a>
+        </li>
+        <li>
+          <a
+            class="font-semibold text-amber-400 transition hover:text-amber-300 hover:underline"
+            href="https://www.who.int/health-topics/obesity/"
+            rel="noreferrer"
+            target="_blank"
+          >
+            WHO: Obesity
+          </a>
+        </li>
+      </ul>
+    </Container>
+
+    <FaqSection faqs={faqs} />
+  </PageShell>
+</BaseLayout>
+
+<script>
+  import {
+    buildBmiCopyText,
+    calculateAdultBmiResult,
+    calculateBmi,
+    convertCmToIn,
+    convertImperialToMetric,
+    convertKgToLb,
+    convertMetricToImperial,
+    formatBmi,
+    formatHeight,
+    formatWeight,
+    parseHealthInput,
+    roundTo,
+  } from "@lib/calculators/bmi";
+
+  const BMI_SCALE_MIN = 10;
+  const BMI_SCALE_MAX = 45;
+
+  const ERROR_MESSAGES = {
+    required: "Este campo es obligatorio.",
+    invalid: "Ingresa un número válido.",
+    negative: "Ingresa un valor igual o mayor a cero.",
+    too_many_decimals: "Usa menos decimales.",
+    weight_kg_range: "Ingresa un peso entre 10 y 500 kg.",
+    weight_lb_range: "Ingresa un peso entre 22 y 1,100 lb.",
+    height_cm_range: "Ingresa una altura entre 50 y 250 cm.",
+    feet_range: "Ingresa pies entre 1 y 8.",
+    inches_range: "Ingresa pulgadas entre 0 y menos de 12.",
+    age_integer: "Ingresa años completos.",
+    age_high: "Ingresa una edad de 120 años o menos.",
+  };
+
+  const CATEGORY_TONES = {
+    "severe-thinness": [
+      "border-red-300/60",
+      "bg-red-400/10",
+      "text-red-100",
+    ],
+    "moderate-thinness": [
+      "border-red-300/50",
+      "bg-red-400/10",
+      "text-red-100",
+    ],
+    "mild-thinness": [
+      "border-amber-300/60",
+      "bg-amber-400/10",
+      "text-amber-100",
+    ],
+    healthy: [
+      "border-emerald-300/60",
+      "bg-emerald-400/10",
+      "text-emerald-100",
+    ],
+    overweight: [
+      "border-amber-300/60",
+      "bg-amber-400/10",
+      "text-amber-100",
+    ],
+    "obesity-class-1": [
+      "border-orange-300/60",
+      "bg-orange-400/10",
+      "text-orange-100",
+    ],
+    "obesity-class-2": [
+      "border-red-300/60",
+      "bg-red-400/10",
+      "text-red-100",
+    ],
+    "obesity-class-3": [
+      "border-red-300/60",
+      "bg-red-400/10",
+      "text-red-100",
+    ],
+    neutral: ["border-gray-700", "bg-transparent", "text-gray-300"],
+  };
+
+  const RELATED_TEXT = {
+    below:
+      "Este resultado suele complementarse con una estimación de calorías diarias para planear cambios de peso de forma informada.",
+    within:
+      "Puedes complementar este dato con herramientas de calorías o macros cuando quieras planificar hábitos alimentarios.",
+    above:
+      "Una calculadora de déficit calórico puede ayudarte a explorar escenarios educativos de energía cuando esté disponible.",
+  };
+
+  const unitButtons = Array.from(document.querySelectorAll("[data-unit-option]"));
+  const unitPanels = Array.from(document.querySelectorAll("[data-unit-panel]"));
+  const inputs = {
+    weightKg: document.querySelector('[data-input="weightKg"]'),
+    heightCm: document.querySelector('[data-input="heightCm"]'),
+    weightLb: document.querySelector('[data-input="weightLb"]'),
+    feet: document.querySelector('[data-input="feet"]'),
+    inches: document.querySelector('[data-input="inches"]'),
+    age: document.querySelector('[data-input="age"]'),
+    sex: document.querySelector('[data-input="sex"]'),
+    pregnancy: document.querySelector('[data-input="pregnancy"]'),
+  };
+  const resultKicker = document.querySelector("[data-result-kicker]");
+  const mainResult = document.querySelector("[data-main-result]");
+  const categoryLabel = document.querySelector("[data-category-label]");
+  const healthyRange = document.querySelector("[data-healthy-range]");
+  const rangeDifference = document.querySelector("[data-range-difference]");
+  const scaleValue = document.querySelector("[data-scale-value]");
+  const scaleMarker = document.querySelector("[data-scale-marker]");
+  const scaleLabel = document.querySelector("[data-scale-label]");
+  const warningPanel = document.querySelector("[data-warning-panel]");
+  const warningList = document.querySelector("[data-warning-list]");
+  const explanation = document.querySelector("[data-explanation]");
+  const relatedPanel = document.querySelector("[data-related-panel]");
+  const relatedText = document.querySelector("[data-related-text]");
+  const copyButton = document.querySelector("[data-copy-result]");
+  const copyLabel = document.querySelector("[data-copy-label]");
+  const copyStatus = document.querySelector("[data-copy-status]");
+  const clearButton = document.querySelector("[data-clear-calculator]");
+  const exampleButton = document.querySelector("[data-fill-example]");
+
+  let currentUnit = "metric";
+  let currentCopyText = "";
+  let copiedTimeout = 0;
+
+  function hasStarted() {
+    const visibleFields =
+      currentUnit === "metric"
+        ? [inputs.weightKg, inputs.heightCm]
+        : [inputs.weightLb, inputs.feet, inputs.inches];
+
+    return (
+      visibleFields.some((input) => input?.value.trim() !== "") ||
+      inputs.age?.value.trim() !== "" ||
+      Boolean(inputs.pregnancy?.checked)
+    );
+  }
+
+  function updateUnitButtons() {
+    unitButtons.forEach((button) => {
+      const isActive = button.dataset.unitOption === currentUnit;
+      button.setAttribute("aria-pressed", String(isActive));
+      button.classList.toggle("bg-amber-400", isActive);
+      button.classList.toggle("text-gray-950", isActive);
+      button.classList.toggle("text-gray-300", !isActive);
+      button.classList.toggle("hover:bg-gray-800", !isActive);
+    });
+
+    unitPanels.forEach((panel) => {
+      const isActive = panel.dataset.unitPanel === currentUnit;
+      panel.classList.toggle("hidden", !isActive);
+      panel.classList.toggle("grid", isActive);
+    });
+  }
+
+  function parseFormValues() {
+    const errors = {};
+    const age = parseAge();
+    const metric =
+      currentUnit === "metric" ? parseMetricValues(errors) : parseImperialValues(errors);
+
+    if (!age.ok) {
+      errors.age = age.error;
+    } else if (age.value !== null && age.value > 120) {
+      errors.age = "age_high";
+    }
+
+    if (Object.keys(errors).length > 0 || !metric.ok) {
+      return { ok: false, errors };
+    }
+
+    return {
+      ok: true,
+      input: {
+        ...metric.value,
+        age: age.value,
+        sex: inputs.sex?.value ?? "not-specified",
+        pregnancy: Boolean(inputs.pregnancy?.checked),
+      },
+    };
+  }
+
+  function parseMetricValues(errors) {
+    const weight = parseHealthInput(inputs.weightKg?.value ?? "");
+    const height = parseHealthInput(inputs.heightCm?.value ?? "", {
+      convertMetersToCentimeters: true,
+    });
+
+    collectParseError(errors, "weightKg", weight);
+    collectParseError(errors, "heightCm", height);
+
+    if (weight.ok && (weight.value < 10 || weight.value > 500)) {
+      errors.weightKg = "weight_kg_range";
+    }
+
+    if (height.ok && (height.value < 50 || height.value > 250)) {
+      errors.heightCm = "height_cm_range";
+    }
+
+    if (errors.weightKg || errors.heightCm) {
+      return { ok: false };
+    }
+
+    return {
+      ok: true,
+      value: {
+        weightKg: weight.value,
+        heightCm: height.value,
+      },
+    };
+  }
+
+  function parseImperialValues(errors) {
+    const weight = parseHealthInput(inputs.weightLb?.value ?? "");
+    const feet = parseHealthInput(inputs.feet?.value ?? "", { maxDecimals: 0 });
+    const inches = parseHealthInput(inputs.inches?.value ?? "");
+
+    collectParseError(errors, "weightLb", weight);
+    collectParseError(errors, "feet", feet);
+    collectParseError(errors, "inches", inches);
+
+    if (weight.ok && (weight.value < 22 || weight.value > 1100)) {
+      errors.weightLb = "weight_lb_range";
+    }
+
+    if (feet.ok && (feet.value < 1 || feet.value > 8)) {
+      errors.feet = "feet_range";
+    }
+
+    if (feet.ok && !Number.isInteger(feet.value)) {
+      errors.feet = "age_integer";
+    }
+
+    if (inches.ok && (inches.value < 0 || inches.value >= 12)) {
+      errors.inches = "inches_range";
+    }
+
+    if (errors.weightLb || errors.feet || errors.inches) {
+      return { ok: false };
+    }
+
+    const metric = convertImperialToMetric({
+      weightLb: weight.value,
+      feet: feet.value,
+      inches: inches.value,
+    });
+
+    return {
+      ok: true,
+      value: {
+        ...metric,
+        weightLb: weight.value,
+        feet: feet.value,
+        inches: inches.value,
+      },
+    };
+  }
+
+  function parseAge() {
+    const rawValue = inputs.age?.value.trim() ?? "";
+
+    if (!rawValue) {
+      return { ok: true, value: null };
+    }
+
+    const parsed = parseHealthInput(rawValue, { maxDecimals: 0 });
+
+    if (!parsed.ok) {
+      return {
+        ok: false,
+        error: parsed.error === "too_many_decimals" ? "age_integer" : parsed.error,
+      };
+    }
+
+    if (!Number.isInteger(parsed.value)) {
+      return { ok: false, error: "age_integer" };
+    }
+
+    return { ok: true, value: parsed.value };
+  }
+
+  function collectParseError(errors, field, parsed) {
+    if (!parsed.ok) {
+      errors[field] = parsed.error;
+    }
+  }
+
+  function updateCalculator() {
+    clearErrors();
+
+    if (!hasStarted()) {
+      setInitialState();
+      return;
+    }
+
+    const parsed = parseFormValues();
+
+    if (!parsed.ok) {
+      showErrors(parsed.errors);
+      setInvalidState();
+      return;
+    }
+
+    renderValidResult(parsed.input);
+  }
+
+  function renderValidResult(input) {
+    const bmi = calculateBmi(input.weightKg, input.heightCm);
+    const isUnderTwo = input.age !== null && input.age < 2;
+    const isPediatric = input.age !== null && input.age >= 2 && input.age < 20;
+
+    if (isUnderTwo || isPediatric) {
+      renderNonAdultResult(input, bmi, isUnderTwo);
+      return;
+    }
+
+    const result = calculateAdultBmiResult(input);
+    const display = buildDisplayValues(input, result);
+    const warnings = buildAdultWarnings(input, result);
+
+    resultKicker.textContent = "IMC";
+    mainResult.textContent = formatBmi(result.bmi);
+    setCategoryLabel(result.category.label, result.category.key);
+    healthyRange.textContent = display.healthyRange;
+    rangeDifference.textContent = display.rangeDifference;
+    explanation.textContent = `Tu IMC es ${formatBmi(result.bmi)}. Este valor se encuentra en la categoría "${result.category.label}" para adultos. El IMC es una referencia inicial y debe interpretarse junto con otros factores de salud.`;
+    updateScale(result.bmi, `${formatBmi(result.bmi)} · ${result.category.label}`);
+    renderWarnings(warnings);
+    renderRelated(result.rangeStatus);
+    setCopyVisible(true);
+    currentCopyText = buildBmiCopyText({
+      weight: display.weight,
+      height: display.height,
+      bmi: result.bmi,
+      category: result.category.label,
+      healthyRange: display.healthyRange,
+    });
+  }
+
+  function renderNonAdultResult(input, bmi, isUnderTwo) {
+    const display = buildDisplayValues(input, null);
+    const warnings = [
+      isUnderTwo
+        ? "Para menores de 2 años no se debe interpretar el IMC con esta herramienta. Consulta con pediatría."
+        : "Para niñas, niños y adolescentes se usa percentil de IMC por edad y sexo. Esta versión muestra el IMC bruto, pero no clasifica el resultado pediátrico.",
+    ];
+
+    if (input.pregnancy) {
+      warnings.push(
+        "Durante el embarazo el IMC actual no es un indicador adecuado para evaluar el peso.",
+      );
+    }
+
+    resultKicker.textContent = "IMC bruto";
+    mainResult.textContent = formatBmi(bmi);
+    setCategoryLabel("Sin clasificación adulta", "neutral");
+    healthyRange.textContent = "No aplica en esta versión";
+    rangeDifference.textContent =
+      "La interpretación pediátrica requiere percentiles por edad y sexo.";
+    explanation.textContent =
+      "El número mostrado es el IMC bruto. En menores de 20 años debe interpretarse con tablas pediátricas específicas.";
+    updateScale(bmi, `${formatBmi(bmi)} · IMC bruto`);
+    renderWarnings(warnings);
+    renderRelated(null);
+    setCopyVisible(true);
+    currentCopyText = buildBmiCopyText({
+      weight: display.weight,
+      height: display.height,
+      bmi,
+      category: "Sin clasificación adulta",
+      healthyRange: "No aplica en esta versión",
+    });
+  }
+
+  function buildDisplayValues(input, result) {
+    const usesMetric = currentUnit === "metric";
+    const weight = usesMetric
+      ? formatWeight(input.weightKg, "kg")
+      : formatWeight(input.weightLb, "lb");
+    const height = usesMetric
+      ? formatHeight(input.heightCm, "cm")
+      : formatHeight(convertCmToIn(input.heightCm), "imperial");
+
+    if (!result) {
+      return {
+        weight,
+        height,
+        healthyRange: "No aplica en esta versión",
+        rangeDifference: "No aplica en esta versión",
+      };
+    }
+
+    const minWeight = usesMetric
+      ? result.healthyWeightMinKg
+      : convertKgToLb(result.healthyWeightMinKg);
+    const maxWeight = usesMetric
+      ? result.healthyWeightMaxKg
+      : convertKgToLb(result.healthyWeightMaxKg);
+    const unit = usesMetric ? "kg" : "lb";
+    const healthyRangeText = `${formatWeight(minWeight, unit)} - ${formatWeight(maxWeight, unit)}`;
+    let rangeDifferenceText =
+      "Dentro del rango saludable de referencia para tu altura.";
+
+    if (result.rangeStatus !== "within") {
+      const difference = usesMetric
+        ? result.differenceFromRangeKg
+        : convertKgToLb(result.differenceFromRangeKg);
+      const direction =
+        result.rangeStatus === "above" ? "por encima" : "por debajo";
+      rangeDifferenceText = `${formatWeight(difference, unit)} ${direction} del rango saludable de referencia.`;
+    }
+
+    return {
+      weight,
+      height,
+      healthyRange: healthyRangeText,
+      rangeDifference: rangeDifferenceText,
+    };
+  }
+
+  function buildAdultWarnings(input, result) {
+    const warnings = [];
+
+    if (result.bmi < 10 || result.bmi > 80) {
+      warnings.push(
+        "El resultado es inusual. Revisa los valores capturados antes de interpretarlo.",
+      );
+    }
+
+    if (result.rangeStatus !== "within") {
+      warnings.push(
+        "Este resultado es orientativo. Para una evaluación completa considera consultar con un profesional de la salud.",
+      );
+    }
+
+    if (result.bmi < 16 || result.bmi >= 40) {
+      warnings.push(
+        "Tu resultado está en un rango que puede requerir evaluación médica. Si tienes síntomas o cambios recientes de peso, busca orientación profesional.",
+      );
+    }
+
+    if (input.age !== null && input.age >= 65) {
+      warnings.push(
+        "En adultos mayores el IMC puede no reflejar bien la composición corporal. Interprétalo junto con otros indicadores de salud.",
+      );
+    }
+
+    if (input.pregnancy) {
+      warnings.push(
+        "Durante el embarazo el IMC actual no es un indicador adecuado para evaluar el peso. Consulta con tu profesional de salud.",
+      );
+    }
+
+    return warnings;
+  }
+
+  function updateScale(bmi, label) {
+    const clampedBmi = Math.min(Math.max(bmi, BMI_SCALE_MIN), BMI_SCALE_MAX);
+    const position =
+      ((clampedBmi - BMI_SCALE_MIN) / (BMI_SCALE_MAX - BMI_SCALE_MIN)) * 100;
+
+    scaleMarker.style.left = `${position}%`;
+    scaleValue.textContent = label;
+    scaleLabel.textContent = `Escala visual de referencia: ${label}.`;
+  }
+
+  function renderWarnings(warnings) {
+    warningList.innerHTML = "";
+
+    warnings.forEach((warning) => {
+      const item = document.createElement("li");
+      item.textContent = warning;
+      warningList.append(item);
+    });
+
+    warningPanel.classList.toggle("hidden", warnings.length === 0);
+  }
+
+  function renderRelated(rangeStatus) {
+    if (!rangeStatus) {
+      relatedPanel.classList.add("hidden");
+      relatedText.textContent = "";
+      return;
+    }
+
+    relatedText.textContent = RELATED_TEXT[rangeStatus];
+    relatedPanel.classList.remove("hidden");
+  }
+
+  function setCategoryLabel(text, categoryKey) {
+    Object.values(CATEGORY_TONES)
+      .flat()
+      .forEach((className) => categoryLabel.classList.remove(className));
+
+    categoryLabel.textContent = text;
+    categoryLabel.classList.add(...CATEGORY_TONES[categoryKey]);
+  }
+
+  function setInitialState() {
+    resultKicker.textContent = "Resultado";
+    mainResult.textContent = "Ingresa los valores";
+    setCategoryLabel("Sin cálculo todavía", "neutral");
+    healthyRange.textContent = "Se mostrará aquí";
+    rangeDifference.textContent = "Se mostrará aquí";
+    scaleMarker.style.left = "0%";
+    scaleValue.textContent = "IMC 10 - 45";
+    scaleLabel.textContent = "La posición aparecerá cuando completes el cálculo.";
+    warningList.innerHTML = "";
+    warningPanel.classList.add("hidden");
+    explanation.textContent =
+      "El cálculo aparecerá aquí. El IMC es una referencia inicial y no reemplaza una evaluación médica.";
+    relatedPanel.classList.add("hidden");
+    relatedText.textContent = "";
+    setCopyVisible(false);
+    currentCopyText = "";
+  }
+
+  function setInvalidState() {
+    resultKicker.textContent = "Revisa los campos";
+    mainResult.textContent = "No se puede calcular todavía";
+    setCategoryLabel("Campos pendientes", "neutral");
+    healthyRange.textContent = "Corrige los valores marcados";
+    rangeDifference.textContent = "Corrige los valores marcados";
+    scaleValue.textContent = "Sin cálculo";
+    scaleLabel.textContent = "Corrige los campos para ver la escala.";
+    warningList.innerHTML = "";
+    warningPanel.classList.add("hidden");
+    explanation.textContent = "Corrige los valores marcados para continuar.";
+    relatedPanel.classList.add("hidden");
+    relatedText.textContent = "";
+    setCopyVisible(false);
+    currentCopyText = "";
+  }
+
+  function clearErrors() {
+    document.querySelectorAll("[data-error-for]").forEach((errorElement) => {
+      errorElement.textContent = "";
+      errorElement.classList.add("hidden");
+    });
+  }
+
+  function showErrors(errors) {
+    Object.entries(errors).forEach(([field, error]) => {
+      const errorElement = document.querySelector(
+        `[data-error-for="${field}"]`,
+      );
+
+      if (!errorElement) {
+        return;
+      }
+
+      errorElement.textContent =
+        ERROR_MESSAGES[error] ?? ERROR_MESSAGES.invalid;
+      errorElement.classList.remove("hidden");
+    });
+  }
+
+  function setCopyVisible(isVisible) {
+    copyButton.classList.toggle("hidden", !isVisible);
+    copyButton.classList.toggle("inline-flex", isVisible);
+  }
+
+  function switchUnit(nextUnit) {
+    if (nextUnit === currentUnit) {
+      return;
+    }
+
+    if (currentUnit === "metric") {
+      convertMetricInputsToImperial();
+    } else {
+      convertImperialInputsToMetric();
+    }
+
+    currentUnit = nextUnit;
+    updateUnitButtons();
+    clearErrors();
+    updateCalculator();
+  }
+
+  function convertMetricInputsToImperial() {
+    const parsedWeight = parseHealthInput(inputs.weightKg?.value ?? "");
+    const parsedHeight = parseHealthInput(inputs.heightCm?.value ?? "", {
+      convertMetersToCentimeters: true,
+    });
+
+    if (parsedWeight.ok) {
+      inputs.weightLb.value = String(roundTo(convertKgToLb(parsedWeight.value), 1));
+    }
+
+    if (parsedHeight.ok) {
+      const imperial = convertMetricToImperial({
+        weightKg: parsedWeight.ok ? parsedWeight.value : 1,
+        heightCm: parsedHeight.value,
+      });
+
+      inputs.feet.value = String(imperial.feet);
+      inputs.inches.value = String(roundTo(imperial.inches, 1));
+    }
+  }
+
+  function convertImperialInputsToMetric() {
+    const parsedWeight = parseHealthInput(inputs.weightLb?.value ?? "");
+    const parsedFeet = parseHealthInput(inputs.feet?.value ?? "", {
+      maxDecimals: 0,
+    });
+    const parsedInches = parseHealthInput(inputs.inches?.value ?? "");
+
+    if (parsedWeight.ok) {
+      inputs.weightKg.value = String(
+        roundTo(convertImperialToMetric({
+          weightLb: parsedWeight.value,
+          feet: 1,
+          inches: 0,
+        }).weightKg, 1),
+      );
+    }
+
+    if (parsedFeet.ok && parsedInches.ok) {
+      const metric = convertImperialToMetric({
+        weightLb: parsedWeight.ok ? parsedWeight.value : 1,
+        feet: parsedFeet.value,
+        inches: parsedInches.value,
+      });
+
+      inputs.heightCm.value = String(roundTo(metric.heightCm, 1));
+    }
+  }
+
+  function fillExample() {
+    currentUnit = "metric";
+    updateUnitButtons();
+    inputs.weightKg.value = "75";
+    inputs.heightCm.value = "172";
+    inputs.weightLb.value = "";
+    inputs.feet.value = "";
+    inputs.inches.value = "";
+    inputs.age.value = "32";
+    inputs.sex.value = "not-specified";
+    inputs.pregnancy.checked = false;
+    markInputsTouched();
+    updateCalculator();
+  }
+
+  function clearCalculator() {
+    currentUnit = "metric";
+    updateUnitButtons();
+    Object.values(inputs).forEach((input) => {
+      if (!input) {
+        return;
+      }
+
+      if (input.type === "checkbox") {
+        input.checked = false;
+      } else if (input.tagName === "SELECT") {
+        input.value = "not-specified";
+      } else {
+        input.value = "";
+      }
+
+      delete input.dataset.touched;
+    });
+    clearErrors();
+    setInitialState();
+  }
+
+  function markInputsTouched() {
+    Object.values(inputs).forEach((input) => {
+      if (input) {
+        input.dataset.touched = "true";
+      }
+    });
+  }
+
+  async function copyResult() {
+    if (!currentCopyText || !copyLabel || !copyStatus) {
+      return;
+    }
+
+    try {
+      if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(currentCopyText);
+      } else {
+        const textArea = document.createElement("textarea");
+        textArea.value = currentCopyText;
+        textArea.setAttribute("readonly", "");
+        textArea.style.position = "fixed";
+        textArea.style.opacity = "0";
+        document.body.append(textArea);
+        textArea.select();
+        document.execCommand("copy");
+        textArea.remove();
+      }
+
+      window.clearTimeout(copiedTimeout);
+      copyLabel.textContent = "Copiado";
+      copyStatus.textContent = "Resultado copiado.";
+      copiedTimeout = window.setTimeout(() => {
+        copyLabel.textContent = "Copiar resultado";
+        copyStatus.textContent = "";
+      }, 2000);
+    } catch {
+      copyStatus.textContent = "No se pudo copiar el resultado.";
+    }
+  }
+
+  unitButtons.forEach((button) => {
+    button.addEventListener("click", () => {
+      switchUnit(button.dataset.unitOption);
+    });
+  });
+
+  Object.values(inputs).forEach((input) => {
+    input?.addEventListener("input", () => {
+      input.dataset.touched = "true";
+      updateCalculator();
+    });
+
+    input?.addEventListener("change", () => {
+      input.dataset.touched = "true";
+      updateCalculator();
+    });
+  });
+
+  clearButton?.addEventListener("click", clearCalculator);
+  exampleButton?.addEventListener("click", fillExample);
+  copyButton?.addEventListener("click", copyResult);
+
+  updateUnitButtons();
+  setInitialState();
+</script>
