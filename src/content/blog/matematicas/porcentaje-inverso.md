@@ -2,7 +2,7 @@
 title: "Porcentaje inverso: cómo encontrar el valor original"
 seoTitle: "Porcentaje inverso: calcular el precio original"
 description: "Aprende cómo calcular el valor original antes de un descuento, aumento o impuesto usando porcentaje inverso."
-pubDate: 2026-05-25
+pubDate: 2026-05-26
 category: "Matemáticas"
 tags:
   - porcentaje inverso
@@ -89,12 +89,12 @@ El valor original era $1,000. Si el caso es IVA incluido, el procedimiento es el
 
 ## Ejemplos comunes
 
-| Caso | Multiplicador | Cálculo inverso | Valor original |
-|---|---:|---:|---:|
-| Final $800 con 20% de descuento | 0.80 | 800 / 0.80 | $1,000 |
-| Final $450 con 10% de descuento | 0.90 | 450 / 0.90 | $500 |
-| Final $1,160 con 16% de aumento | 1.16 | 1,160 / 1.16 | $1,000 |
-| Final $1,500 después de aumentar 25% | 1.25 | 1,500 / 1.25 | $1,200 |
+| Caso                                 | Multiplicador | Cálculo inverso | Valor original |
+| ------------------------------------ | ------------: | --------------: | -------------: |
+| Final $800 con 20% de descuento      |          0.80 |      800 / 0.80 |         $1,000 |
+| Final $450 con 10% de descuento      |          0.90 |      450 / 0.90 |           $500 |
+| Final $1,160 con 16% de aumento      |          1.16 |    1,160 / 1.16 |         $1,000 |
+| Final $1,500 después de aumentar 25% |          1.25 |    1,500 / 1.25 |         $1,200 |
 
 La misma lógica aplica para promociones, impuestos, comisiones, márgenes de ajuste o cualquier cambio porcentual calculado sobre una base inicial.
 

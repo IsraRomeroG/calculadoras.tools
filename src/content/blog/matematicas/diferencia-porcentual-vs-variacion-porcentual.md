@@ -2,7 +2,7 @@
 title: "Diferencia porcentual vs variación porcentual"
 seoTitle: "Diferencia porcentual y variación porcentual: diferencias"
 description: "Entiende cuándo usar diferencia porcentual y cuándo usar variación porcentual con fórmulas, ejemplos y casos comunes."
-pubDate: 2026-05-25
+pubDate: 2026-05-26
 category: "Matemáticas"
 tags:
   - diferencia porcentual
@@ -77,11 +77,11 @@ Los dos resultados son correctos, pero significan cosas distintas. El `20%` dice
 
 Estos ejemplos muestran por qué la variación depende del orden, mientras que la diferencia porcentual se mantiene igual si comparas los mismos dos valores.
 
-| Comparación | Variación porcentual | Diferencia porcentual | Lectura |
-|---|---:|---:|---|
-| De 100 a 120 | 20% | 18.18% | Aumento respecto a 100 |
-| De 120 a 100 | -16.67% | 18.18% | Disminución respecto a 120 |
-| De 80 a 100 | 25% | 22.22% | Aumento respecto a 80 |
+| Comparación  | Variación porcentual | Diferencia porcentual | Lectura                    |
+| ------------ | -------------------: | --------------------: | -------------------------- |
+| De 100 a 120 |                  20% |                18.18% | Aumento respecto a 100     |
+| De 120 a 100 |              -16.67% |                18.18% | Disminución respecto a 120 |
+| De 80 a 100  |                  25% |                22.22% | Aumento respecto a 80      |
 
 Observa el primer y segundo caso. Los valores son los mismos, 100 y 120, pero al invertir el orden cambia la variación: de 100 a 120 es `20%`, mientras que de 120 a 100 es `-16.67%`.
 

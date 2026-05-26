@@ -2,7 +2,7 @@
 title: "Cómo restar un porcentaje a una cantidad"
 seoTitle: "Cómo restar un porcentaje: fórmula y ejemplos"
 description: "Aprende cómo quitar un porcentaje de una cantidad para calcular descuentos, rebajas y reducciones sin errores."
-pubDate: 2026-05-25
+pubDate: 2026-05-24
 category: "Matemáticas"
 tags:
   - porcentajes
@@ -67,14 +67,14 @@ Con el método directo, sería:
 
 Cuando restas un porcentaje, puedes convertirlo en un multiplicador. Para restar 10%, multiplicas por `0.90`; para restar 20%, multiplicas por `0.80`; para restar 50%, multiplicas por `0.50`.
 
-| Porcentaje a restar | Multiplicador | Ejemplo con 1,000 |
-|---:|---:|---:|
-| 5% | 0.95 | 1,000 x 0.95 = 950 |
-| 10% | 0.90 | 1,000 x 0.90 = 900 |
-| 15% | 0.85 | 1,000 x 0.85 = 850 |
-| 20% | 0.80 | 1,000 x 0.80 = 800 |
-| 25% | 0.75 | 1,000 x 0.75 = 750 |
-| 50% | 0.50 | 1,000 x 0.50 = 500 |
+| Porcentaje a restar | Multiplicador |  Ejemplo con 1,000 |
+| ------------------: | ------------: | -----------------: |
+|                  5% |          0.95 | 1,000 x 0.95 = 950 |
+|                 10% |          0.90 | 1,000 x 0.90 = 900 |
+|                 15% |          0.85 | 1,000 x 0.85 = 850 |
+|                 20% |          0.80 | 1,000 x 0.80 = 800 |
+|                 25% |          0.75 | 1,000 x 0.75 = 750 |
+|                 50% |          0.50 | 1,000 x 0.50 = 500 |
 
 La lógica siempre es la misma: el multiplicador representa la parte que queda después de quitar el porcentaje. Si restas 25%, queda el 75% de la cantidad original.
 
@@ -82,12 +82,12 @@ La lógica siempre es la misma: el multiplicador representa la parte que queda d
 
 Estos ejemplos muestran el resultado final después de quitar el porcentaje:
 
-| Operación | Cálculo directo | Resultado |
-|---|---:|---:|
-| 1,000 - 20% | 1,000 x 0.80 | 800 |
-| 750 - 15% | 750 x 0.85 | 637.50 |
-| 500 - 8% | 500 x 0.92 | 460 |
-| 2,400 - 25% | 2,400 x 0.75 | 1,800 |
+| Operación   | Cálculo directo | Resultado |
+| ----------- | --------------: | --------: |
+| 1,000 - 20% |    1,000 x 0.80 |       800 |
+| 750 - 15%   |      750 x 0.85 |    637.50 |
+| 500 - 8%    |      500 x 0.92 |       460 |
+| 2,400 - 25% |    2,400 x 0.75 |     1,800 |
 
 Si el caso es una compra, también puedes ver la guía específica de [cómo calcular un descuento](/blog/porcentaje-de-descuento).
 

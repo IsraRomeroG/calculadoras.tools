@@ -2,7 +2,7 @@
 title: "Descuentos sucesivos: por qué 20% + 10% no es 30%"
 seoTitle: "Descuentos sucesivos: fórmula para calcular rebajas acumuladas"
 description: "Aprende cómo calcular descuentos sucesivos y por qué dos rebajas se aplican una después de otra, no sumando porcentajes."
-pubDate: 2026-05-25
+pubDate: 2026-05-26
 category: "Finanzas"
 tags:
   - descuentos
@@ -102,12 +102,12 @@ Ese 28% es el descuento único que produciría el mismo precio final. Es decir, 
 
 Estas combinaciones muestran por que conviene mirar el precio final y no solo sumar los porcentajes del anuncio.
 
-| Precio inicial | Descuentos sucesivos | Cálculo | Precio final | Descuento efectivo |
-|---:|---:|---:|---:|---:|
-| $500 | 10% + 10% | 500 x 0.90 x 0.90 | $405 | 19% |
-| $1,000 | 20% + 10% | 1,000 x 0.80 x 0.90 | $720 | 28% |
-| $2,000 | 30% + 20% | 2,000 x 0.70 x 0.80 | $1,120 | 44% |
-| $800 | 50% + 10% | 800 x 0.50 x 0.90 | $360 | 55% |
+| Precio inicial | Descuentos sucesivos |             Cálculo | Precio final | Descuento efectivo |
+| -------------: | -------------------: | ------------------: | -----------: | -----------------: |
+|           $500 |            10% + 10% |   500 x 0.90 x 0.90 |         $405 |                19% |
+|         $1,000 |            20% + 10% | 1,000 x 0.80 x 0.90 |         $720 |                28% |
+|         $2,000 |            30% + 20% | 2,000 x 0.70 x 0.80 |       $1,120 |                44% |
+|           $800 |            50% + 10% |   800 x 0.50 x 0.90 |         $360 |                55% |
 
 Observa que en todos los casos el descuento efectivo es menor que la suma simple, excepto cuando alguno de los descuentos es 0%. En compras reales, esa diferencia puede ser importante si comparas promociones parecidas.
 
