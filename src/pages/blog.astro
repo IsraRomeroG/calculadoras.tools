@@ -4,13 +4,18 @@ import BlogPostCard from "@components/blog/BlogPostCard.astro";
 import Container from "@components/layout/Container.astro";
 import PageShell from "@components/layout/PageShell.astro";
 import Button from "@components/shared/Button.astro";
+import Pagination from "@components/shared/Pagination.astro";
 import PageHero from "@components/shared/PageHero.astro";
 import {
   formatBlogDate,
+  getBlogIndexPageUrl,
+  getBlogListingPosts,
   getBlogCategories,
+  getFeaturedBlogPost,
   getBlogPostUrl,
   getCategoryUrl,
   getPublishedBlogPosts,
+  paginateItems,
 } from "@lib/blog";
 
 const title = "Blog";
@@ -19,12 +24,21 @@ const description =
 const canonical = "/blog";
 
 const posts = await getPublishedBlogPosts();
-const featuredPost = posts.find((post) => post.data.featured) ?? posts[0];
-const latestPosts = posts.filter((post) => post.id !== featuredPost?.id);
+const featuredPost = getFeaturedBlogPost(posts);
+const latestPosts = getBlogListingPosts(posts, featuredPost);
+const latestPostsPage = paginateItems(latestPosts, 1);
 const categories = getBlogCategories(posts);
 ---
 
 <BaseLayout title={title} description={description} canonical={canonical}>
+  <Fragment slot="head">
+    {
+      latestPostsPage.nextPage && (
+        <link rel="next" href={getBlogIndexPageUrl(latestPostsPage.nextPage)} />
+      )
+    }
+  </Fragment>
+
   <PageShell>
     <PageHero
       title="Guías simples para entender tus cálculos diarios"
@@ -122,11 +136,18 @@ const categories = getBlogCategories(posts);
 
       <div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
         {
-          latestPosts.map((post) => (
+          latestPostsPage.items.map((post) => (
             <BlogPostCard post={post} cta="Leer artículo" />
           ))
         }
       </div>
+
+      <Pagination
+        currentPage={latestPostsPage.currentPage}
+        totalPages={latestPostsPage.totalPages}
+        getPageUrl={getBlogIndexPageUrl}
+        class="mt-8"
+      />
     </Container>
   </PageShell>
 </BaseLayout>

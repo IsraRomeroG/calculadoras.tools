@@ -3,43 +3,63 @@ import BaseLayout from "@layouts/BaseLayout.astro";
 import BlogPostCard from "@components/blog/BlogPostCard.astro";
 import Container from "@components/layout/Container.astro";
 import PageShell from "@components/layout/PageShell.astro";
+import Pagination from "@components/shared/Pagination.astro";
 import PageHero from "@components/shared/PageHero.astro";
 import {
+  getBlogPostsByCategorySlug,
   getBlogCategories,
-  getCategorySlug,
+  getCategoryPageUrl,
   getCategoryUrl,
   getPublishedBlogPosts,
+  paginateItems,
   type BlogCategory,
   type BlogPost,
+  type PaginatedItems,
 } from "@lib/blog";
 
 export async function getStaticPaths() {
   const posts = await getPublishedBlogPosts();
   const categories = getBlogCategories(posts);
 
-  return categories.map((category) => ({
-    params: { category: category.slug },
-    props: {
-      category,
-      posts: posts.filter(
-        (post) => getCategorySlug(post.data.category) === category.slug,
-      ),
-    },
-  }));
+  return categories.map((category) => {
+    const categoryPosts = getBlogPostsByCategorySlug(posts, category.slug);
+    const pagination = paginateItems(categoryPosts, 1);
+
+    return {
+      params: { category: category.slug },
+      props: {
+        category,
+        posts: pagination.items,
+        pagination,
+      },
+    };
+  });
 }
 
 interface Props {
   category: BlogCategory;
   posts: BlogPost[];
+  pagination: PaginatedItems<BlogPost>;
 }
 
-const { category, posts } = Astro.props;
+const { category, posts, pagination } = Astro.props;
 const title = `Blog de ${category.label}`;
 const description = `Artículos de ${category.label.toLowerCase()} con explicaciones claras, fórmulas prácticas y ejemplos.`;
 const canonical = getCategoryUrl(category.label);
 ---
 
 <BaseLayout title={title} description={description} canonical={canonical}>
+  <Fragment slot="head">
+    {
+      pagination.nextPage && (
+        <link
+          rel="next"
+          href={getCategoryPageUrl(category.label, pagination.nextPage)}
+        />
+      )
+    }
+  </Fragment>
+
   <PageShell>
     <PageHero
       title={`Artículos de ${category.label.toLowerCase()}`}
@@ -61,6 +81,13 @@ const canonical = getCategoryUrl(category.label);
           ))
         }
       </div>
+
+      <Pagination
+        currentPage={pagination.currentPage}
+        totalPages={pagination.totalPages}
+        getPageUrl={(page) => getCategoryPageUrl(category.label, page)}
+        class="mt-8"
+      />
     </Container>
   </PageShell>
 </BaseLayout>

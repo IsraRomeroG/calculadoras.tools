@@ -1,0 +1,104 @@
+---
+interface Props {
+  currentPage: number;
+  totalPages: number;
+  getPageUrl: (page: number) => string;
+  class?: string;
+}
+
+const { currentPage, totalPages, getPageUrl, class: className = "" } =
+  Astro.props;
+
+const maxVisiblePages = 5;
+const rangeSize = Math.min(maxVisiblePages, totalPages);
+let startPage = Math.max(1, currentPage - Math.floor(rangeSize / 2));
+let endPage = startPage + rangeSize - 1;
+
+if (endPage > totalPages) {
+  endPage = totalPages;
+  startPage = Math.max(1, endPage - rangeSize + 1);
+}
+
+const pageNumbers = Array.from(
+  { length: endPage - startPage + 1 },
+  (_, index) => startPage + index,
+);
+
+const previousPage = currentPage > 1 ? currentPage - 1 : null;
+const nextPage = currentPage < totalPages ? currentPage + 1 : null;
+const pageLinkClass =
+  "inline-flex min-h-10 min-w-10 items-center justify-center rounded-lg border px-3 text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/30";
+---
+
+{
+  totalPages > 1 && (
+    <nav
+      aria-label="Paginacion"
+      class:list={["flex justify-center", className]}
+    >
+      <ul class="flex flex-wrap items-center justify-center gap-2">
+        <li>
+          {previousPage ? (
+            <a
+              href={getPageUrl(previousPage)}
+              class={`${pageLinkClass} border-gray-700 text-gray-300 hover:border-amber-400 hover:text-white`}
+            >
+              Anterior
+            </a>
+          ) : (
+            <span
+              aria-disabled="true"
+              class={`${pageLinkClass} cursor-not-allowed border-gray-800 text-gray-600`}
+            >
+              Anterior
+            </span>
+          )}
+        </li>
+
+        {pageNumbers.map((pageNumber) => {
+          const isCurrent = pageNumber === currentPage;
+
+          return (
+            <li>
+              <a
+                href={getPageUrl(pageNumber)}
+                aria-current={isCurrent ? "page" : undefined}
+                aria-label={
+                  isCurrent
+                    ? `Pagina ${pageNumber}, pagina actual`
+                    : `Pagina ${pageNumber}`
+                }
+                class:list={[
+                  pageLinkClass,
+                  isCurrent
+                    ? "border-amber-400 bg-amber-400 text-gray-950"
+                    : "border-gray-700 text-gray-300 hover:border-amber-400 hover:text-white",
+                ]}
+              >
+                {pageNumber}
+              </a>
+            </li>
+          );
+        })}
+
+        <li>
+          {nextPage ? (
+            <a
+              href={getPageUrl(nextPage)}
+              class={`${pageLinkClass} border-gray-700 text-gray-300 hover:border-amber-400 hover:text-white`}
+            >
+              Siguiente
+            </a>
+          ) : (
+            <span
+              aria-disabled="true"
+              class={`${pageLinkClass} cursor-not-allowed border-gray-800 text-gray-600`}
+            >
+              Siguiente
+            </span>
+          )}
+        </li>
+      </ul>
+    </nav>
+  )
+}
