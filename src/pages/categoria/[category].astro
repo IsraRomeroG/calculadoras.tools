@@ -1,0 +1,83 @@
+---
+import BaseLayout from "@layouts/BaseLayout.astro";
+import Card from "@components/shared/Card.astro";
+import Container from "@components/layout/Container.astro";
+import PageShell from "@components/layout/PageShell.astro";
+import PageHero from "@components/shared/PageHero.astro";
+import {
+  getCalculatorCategories,
+  getCalculatorCategoryDescription,
+  getCalculatorCategorySlug,
+  getCalculatorCategoryUrl,
+  getPublishedCalculators,
+  type CalculatorCategory,
+  type CalculatorDirectoryItem,
+} from "@lib/calculator-directory";
+
+export function getStaticPaths() {
+  const calculators = getPublishedCalculators();
+  const categories = getCalculatorCategories(calculators);
+
+  return categories.map((category) => ({
+    params: { category: category.slug },
+    props: {
+      category,
+      calculators: calculators.filter(
+        (calculator) =>
+          getCalculatorCategorySlug(calculator.category) === category.slug,
+      ),
+    },
+  }));
+}
+
+interface Props {
+  category: CalculatorCategory;
+  calculators: CalculatorDirectoryItem[];
+}
+
+const { category, calculators } = Astro.props;
+const categoryName = category.label.toLowerCase();
+const title = `Calculadoras de ${categoryName}`;
+const description = getCalculatorCategoryDescription(category.label);
+const canonical = getCalculatorCategoryUrl(category.label);
+---
+
+<BaseLayout title={title} description={description} canonical={canonical}>
+  <PageShell>
+    <PageHero
+      title={title}
+      description={description}
+      kicker={category.label}
+      breadcrumbs={[
+        { label: "Inicio", href: "/", ariaLabel: "Inicio" },
+        { label: category.label, truncate: true },
+      ]}
+    />
+
+    <Container as="section" class="py-8 md:py-10">
+      {
+        calculators.length > 0 ? (
+          <div class="grid gap-6 sm:grid-cols-2 md:grid-cols-3">
+            {calculators.map((calculator) => (
+              <Card
+                href={calculator.href}
+                title={calculator.title}
+                description={calculator.description}
+                cta="Usar →"
+              />
+            ))}
+          </div>
+        ) : (
+          <div class="rounded-lg border border-gray-700 p-6">
+            <h2 class="text-xl font-semibold">
+              No hay calculadoras publicadas
+            </h2>
+            <p class="mt-2 text-sm text-gray-400">
+              Esta categoría todavía no tiene herramientas disponibles.
+            </p>
+          </div>
+        )
+      }
+    </Container>
+  </PageShell>
+</BaseLayout>
