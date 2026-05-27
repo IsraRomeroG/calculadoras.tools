@@ -31,6 +31,8 @@ construirse con Astro + Tailwind CSS, sin backend ni llamadas de red.
   alcance adulto y datos poco realistas.
 - Conectar de forma contextual con IMC, macros, déficit calórico y grasa
   corporal.
+- Evitar transferir datos personales de salud entre calculadoras sin una acción
+  explícita del usuario.
 - Generar una página estática optimizada para SEO en Astro.
 
 ---
@@ -67,17 +69,18 @@ La primera versión debe enfocarse en el flujo principal para adultos:
 
 ### Fase 3
 
-- Calculadora inversa: calorías para acercarse a un peso objetivo en un plazo.
+- Enlace contextual hacia la calculadora de déficit calórico para la pregunta
+  inversa: calorías para acercarse a un peso objetivo en un plazo.
 - Distribución de macros sugerida como anticipo de la calculadora de macros.
 - Gráfica de composición del gasto energético.
 - Equivalencias calóricas educativas.
 - Vista de impresión.
 - Exportación de resultado como texto o CSV.
 
-> No implementar Chart.js, calculadora inversa, historial, comparador de
-> fórmulas ni macros sugeridos en el MVP. Son funciones útiles, pero aumentan el
-> alcance, el peso de la página y el riesgo de comunicar una precisión que la
-> estimación no tiene.
+> No implementar Chart.js, cálculo inverso dentro de TDEE, historial,
+> comparador de fórmulas ni macros sugeridos en el MVP. Son funciones útiles,
+> pero aumentan el alcance, el peso de la página y el riesgo de comunicar una
+> precisión que la estimación no tiene.
 
 ---
 
@@ -86,9 +89,10 @@ La primera versión debe enfocarse en el flujo principal para adultos:
 | Elemento | Valor |
 |----------|-------|
 | URL pública recomendada | `/salud/calculadora-de-calorias-diarias` |
-| Alias opcional | `/calculadora-calorias-diarias` |
-| Alias opcional | `/calculadora-tdee` |
-| Alias opcional | `/calculadora-metabolismo-basal` |
+| Alias recomendado por enlaces existentes | `/salud/calculadora-tdee` |
+| Alias opcional corto | `/calculadora-calorias-diarias` |
+| Alias opcional corto | `/calculadora-tdee` |
+| Alias opcional corto | `/calculadora-metabolismo-basal` |
 | Archivo Astro recomendado | `src/pages/salud/calculadora-de-calorias-diarias.astro` |
 | Lógica de cálculo | `src/lib/calculators/tdee.ts` |
 | Pruebas unitarias | `src/lib/calculators/tdee.test.ts` |
@@ -97,8 +101,12 @@ La primera versión debe enfocarse en el flujo principal para adultos:
 | Contenedores UI | `PageHero`, `Container`, `SectionIntro`, `FaqSection` |
 | Estilos | Tailwind CSS |
 
-> Si se usan alias cortos, definir si serán redirecciones o rutas canónicas.
-> La página debe exponer un único `canonical`.
+> La URL canónica debe ser `/salud/calculadora-de-calorias-diarias`. El alias
+> `/salud/calculadora-tdee` debe existir porque ya hay contenido del sitio que
+> apunta a esa ruta; implementarlo como redirección 301 o como ruta alias que
+> exponga el mismo canonical. Los alias cortos, si se crean, también deben
+> redirigir o exponer el canonical principal. La página debe exponer un único
+> `canonical`.
 
 ---
 
@@ -223,6 +231,26 @@ Texto de ayuda:
 Si dudas entre dos niveles, elige el menor y ajusta después con tu evolución real.
 ```
 
+### Ayuda para elegir actividad
+
+El selector de actividad debe reducir el error más común: elegir un nivel alto
+solo por entrenar algunos días, aunque el resto del día sea sedentario.
+
+En la UI, cada opción debe combinar dos señales:
+
+- Movimiento diario: trabajo sentado, trabajo de pie, caminatas, traslados,
+  tareas domésticas o trabajo físico.
+- Ejercicio estructurado: frecuencia, intensidad y duración semanal.
+
+Texto breve sugerido cerca del selector:
+
+```text
+Piensa en todo tu día, no solo en tu entrenamiento. Si entrenas 3 días pero pasas casi todo el día sentado, quizá "ligeramente activo" sea más realista que "moderadamente activo".
+```
+
+No convertir esta ayuda en un cuestionario largo en el MVP. Debe funcionar como
+microcopy o ayuda expandible dentro del selector.
+
 ### Guía expandida para la UI
 
 **Sedentario (`1.2`)**
@@ -331,9 +359,9 @@ Usar el TDEE calculado como base. Redondear solo al mostrar.
 | Perder peso moderado | `-15%` | `1,818 kcal` | `~0.29 kg/semana` |
 | Perder peso suave | `-10%` | `1,925 kcal` | `~0.19 kg/semana` |
 | Mantener peso | `0%` | `2,139 kcal` | `Estable` |
-| Ganar músculo suave | `+5%` | `2,246 kcal` | `~0.10 kg/semana` |
-| Ganar músculo moderado | `+10%` | `2,353 kcal` | `~0.19 kg/semana` |
-| Ganar peso alto | `+15%` | `2,460 kcal` | `~0.29 kg/semana` |
+| Superávit suave | `+5%` | `2,246 kcal` | `~0.10 kg/semana` |
+| Superávit moderado | `+10%` | `2,353 kcal` | `~0.19 kg/semana` |
+| Superávit alto | `+15%` | `2,460 kcal` | `~0.29 kg/semana` |
 
 Notas importantes:
 
@@ -344,6 +372,9 @@ Notas importantes:
   `0.45 kg/semana`, aunque la evolución real cambia con el tiempo.
 - Mostrar advertencia si el déficit supera `1,000 kcal/día`.
 - Mostrar advertencia si el objetivo baja de mínimos orientativos de seguridad.
+- No prometer ganancia muscular solo por usar superávit calórico. Para objetivos
+  de músculo, explicar que también influyen entrenamiento, proteína, descanso y
+  progresión.
 
 ---
 
@@ -402,6 +433,7 @@ Aceptar y normalizar:
 | Sexo vacío | No calcular; pedir selección si el campo fue tocado. |
 | Edad vacía | No calcular; pedir edad si el campo fue tocado. |
 | Edad `< 18` | No calcular TDEE adulto; mostrar nota de consulta profesional. |
+| Edad `>= 65` | Calcular si el resto es válido, pero mostrar nota de menor precisión en adultos mayores. |
 | Edad `> 100` | Bloquear cálculo y mostrar error claro. |
 | Peso `< 30 kg` o `> 300 kg` | Bloquear cálculo y mostrar error claro. |
 | Peso `< 66 lb` o `> 660 lb` | Bloquear cálculo y mostrar error claro. |
@@ -411,8 +443,8 @@ Aceptar y normalizar:
 | Campos vacíos | No mostrar resultado final; indicar qué falta si el usuario ya interactuó. |
 | Caracteres ambiguos | Error: `Ingresa un número válido.` |
 | Valores negativos | Error específico; no calcular. |
-| TDEE `< 1,000 kcal` | Bloquear resultado final y pedir revisar datos. |
-| Calorías objetivo `< 800 kcal` | Bloquear objetivo y mostrar advertencia de salud. |
+| TDEE `< 1,000 kcal` | Mostrar TMB y TDEE solo si los inputs son válidos, añadir advertencia de revisar datos; no bloquear automáticamente. |
+| Calorías objetivo `< 1,000 kcal` | Bloquear objetivo y mostrar advertencia de salud. |
 | Calorías objetivo `< 1,200` en mujeres | Mostrar advertencia prominente. |
 | Calorías objetivo `< 1,500` en hombres | Mostrar advertencia prominente. |
 | Déficit `> 1,000 kcal/día` | Mostrar advertencia prominente. |
@@ -449,6 +481,18 @@ El objetivo calculado queda en un rango muy bajo. Evita dietas muy bajas en calo
 Este déficit es alto y puede ser difícil de sostener. Considera un ajuste más gradual o consulta con un profesional.
 ```
 
+### TDEE inusualmente bajo
+
+```text
+El gasto diario estimado quedó inusualmente bajo. Revisa edad, peso, altura y actividad antes de usar este número como referencia.
+```
+
+### Adultos mayores
+
+```text
+En adultos mayores, las fórmulas pueden ser menos precisas por cambios en masa muscular, salud, medicamentos y actividad diaria. Toma el resultado como una referencia inicial.
+```
+
 ### Actividad extrema
 
 ```text
@@ -466,6 +510,7 @@ Con entrenamientos o trabajos muy demandantes, la estimación puede quedarse cor
 | Válido adulto | Mostrar TMB, TDEE, objetivo, tabla de ajustes y acciones. |
 | Inválido | Mostrar errores por campo y ocultar acciones de resultado. |
 | Valor inusual | Mostrar resultado solo si los inputs son válidos y añadir advertencia. |
+| Adulto mayor | Mostrar resultado si los datos son válidos y añadir nota de menor precisión. |
 | Objetivo riesgoso | Mantener TDEE visible, pero advertir o bloquear objetivo según severidad. |
 | Copiado | Confirmación visual durante 2 segundos y anuncio accesible. |
 | Limpio | Restaurar estado inicial sin recargar la página. |
@@ -529,7 +574,7 @@ mostrar mensaje accesible de error.
 
 ### Usar ejemplo
 
-Opcional. Rellena:
+Debe estar disponible en el MVP. Rellena:
 
 ```text
 sexo = Mujer
@@ -616,10 +661,16 @@ Slider interactivo de déficit/superávit calórico.
 
 ---
 
-## Modo fase 3 — Calculadora inversa
+## Fuera del MVP — Cálculo inverso por peso objetivo
 
 Pregunta: ¿qué calorías aproximadas necesitaría para acercarme a cierto peso en
 cierto plazo?
+
+Este flujo no debe implementarse dentro de la calculadora de TDEE. Pertenece a
+la calculadora de déficit calórico, porque responde a un plan de cambio de peso
+y requiere más contexto de plazo, peso objetivo y ritmo. En TDEE, mostrar como
+enlace contextual solo cuando el usuario elija un objetivo de pérdida o
+superávit.
 
 ### Inputs
 
@@ -722,7 +773,7 @@ No presentarlos como tratamiento médico.
 | Siempre | Calculadora de IMC |
 | Siempre | Calculadora de macros |
 | Objetivo: perder peso | Calculadora de déficit calórico |
-| Objetivo: ganar músculo | Calculadora de macros |
+| Objetivo: superávit / ganar peso | Calculadora de macros |
 | Actividad de fuerza | Calculadora de 1RM |
 | `% grasa` desconocido | Calculadora de grasa corporal |
 
@@ -741,14 +792,14 @@ Estas herramientas son educativas y no reemplazan una evaluación profesional.
 | Campo | Valor |
 |-------|-------|
 | Title | `Calculadora de Calorías Diarias (TDEE) — TMB y Gasto Diario` |
-| Description | `Calcula tus calorías diarias estimadas según tu metabolismo, actividad física y objetivo. Obtén TMB, TDEE y rangos orientativos para mantener, perder o ganar peso.` |
+| Description | `Calcula tus calorías diarias estimadas según tu metabolismo, actividad física y objetivo. Obtén TMB, TDEE y rangos orientativos para mantener peso, crear déficit o usar superávit.` |
 | Canonical | `/salud/calculadora-de-calorias-diarias` |
 
 Evitar claims como "calorías exactas" o "plan perfecto".
 
 ### Estructura sugerida
 
-- `h1`: Calculadora de calorías diarias
+- `h1`: Calculadora de calorías diarias (TDEE)
 - Intro breve orientada a uso.
 - Calculadora interactiva.
 - Qué significan TMB y TDEE.
@@ -765,7 +816,7 @@ Evitar claims como "calorías exactas" o "plan perfecto".
 - ¿Qué es la TMB?
 - ¿Cuántas calorías necesito para mantener mi peso?
 - ¿Cuántas calorías necesito para perder peso?
-- ¿Cuántas calorías necesito para ganar músculo?
+- ¿Cuántas calorías necesito para subir de peso o apoyar ganancia muscular?
 - ¿Qué nivel de actividad debo elegir?
 - ¿Por qué mi peso no cambia aunque coma según mi TDEE?
 - ¿Cada cuánto debo recalcular mis calorías?
@@ -785,6 +836,7 @@ la página.
 
 ```text
 src/pages/salud/calculadora-de-calorias-diarias.astro
+src/pages/salud/calculadora-tdee.astro (redirección o alias con canonical principal)
 src/lib/calculators/tdee.ts
 src/lib/calculators/tdee.test.ts
 ```
@@ -921,6 +973,12 @@ const KCAL_PER_KG = 7700;
 - Si se usa `localStorage` en una fase futura, debe ser opt-in y mostrar texto
   claro: los datos se guardan solo en el navegador del usuario.
 - La acción de copiar debe requerir interacción explícita del usuario.
+- No pasar edad, peso, altura, sexo usado por fórmula, objetivo ni resultados
+  por query params hacia macros o déficit calórico sin una acción explícita del
+  usuario.
+- Si se añade un flujo "continuar en macros" o "continuar en déficit", debe
+  explicar que los datos se usan solo en el navegador y no se registran en
+  analytics.
 
 ---
 
@@ -929,12 +987,13 @@ const KCAL_PER_KG = 7700;
 | Caso | Comportamiento esperado |
 |------|-------------------------|
 | Edad `< 18` | No calcular TDEE adulto; mostrar nota de salud. |
+| Edad `>= 65` | Calcular si los datos son válidos y mostrar nota de menor precisión. |
 | Edad `> 100` | Bloquear cálculo. |
 | Altura `0` | Error claro antes del cálculo. |
 | Peso negativo | Error claro antes del cálculo. |
 | Sistema imperial con `in = 12` | Error; pulgadas deben ser menores que 12. |
-| TDEE `< 1,000 kcal` | Bloquear y pedir revisar datos. |
-| Calorías objetivo `< 800 kcal` | Bloquear objetivo. |
+| TDEE `< 1,000 kcal` | Mostrar resultado solo con datos válidos y advertir que revise los datos. |
+| Calorías objetivo `< 1,000 kcal` | Bloquear objetivo. |
 | Calorías objetivo bajo mínimos orientativos | Mostrar advertencia prominente. |
 | Déficit `> 1,000 kcal/día` | Mostrar advertencia prominente. |
 | Actividad extrema + bajo peso | Mostrar advertencia de revisar datos y consultar profesional. |
@@ -951,14 +1010,16 @@ const KCAL_PER_KG = 7700;
 | TDEE mujer ejemplo | Mujer, `28`, `65 kg`, `165 cm`, moderada | TMB `1,380`, TDEE `2,139`. |
 | Mantener peso | Mismos inputs, objetivo mantener | Calorías objetivo `2,139`. |
 | Pérdida moderada | Mismos inputs, objetivo `-15%` | Calorías objetivo aprox. `1,818`. |
-| Ganancia moderada | Mismos inputs, objetivo `+10%` | Calorías objetivo aprox. `2,353`. |
+| Superávit moderado | Mismos inputs, objetivo `+10%` | Calorías objetivo aprox. `2,353`; no prometer ganancia muscular automática. |
 | TDEE hombre básico | Hombre, `30`, `80 kg`, `180 cm`, sedentario | TMB `1,780`, TDEE `2,136`. |
 | Conversión imperial | `143.3 lb`, `5 ft`, `5 in` | Resultado cercano al ejemplo métrico. |
 | Edad menor | Edad `16`, datos completos | No calcular TDEE adulto; mostrar nota. |
+| Adulto mayor | Edad `70`, datos completos válidos | Calcular y mostrar nota de menor precisión. |
 | Peso inválido | `-65 kg` | Bloquear cálculo y mostrar error. |
 | Altura inválida | `0 cm` | Bloquear cálculo y mostrar error. |
 | Pulgadas inválidas | `5 ft`, `12 in` | Bloquear cálculo y mostrar error. |
-| Calorías muy bajas | Objetivo bajo umbral | Advertencia prominente o bloqueo según regla. |
+| TDEE inusualmente bajo | Datos válidos con TDEE `< 1,000` | Mostrar TMB/TDEE con advertencia de revisar datos, sin bloquear automáticamente. |
+| Calorías muy bajas | Objetivo `< 1,000 kcal` | Bloquear objetivo y mantener visible el TDEE válido. |
 | Copiar resultado | Resultado válido | Copia texto plano con TMB, TDEE y objetivo. |
 | Limpiar | Después de calcular | Campos y resultado vuelven a estado inicial. |
 | Mobile | viewport `390px` | Formulario, resultado y tabla no se superponen ni desbordan. |
@@ -983,6 +1044,8 @@ Si se añade Vitest:
 - Conversión imperial con ft/in.
 - Parsing de coma decimal y unidades pegadas.
 - Validaciones de edad, peso, altura y pulgadas.
+- Advertencia de adulto mayor.
+- Advertencia de TDEE inusualmente bajo sin bloqueo automático.
 - Validaciones de calorías objetivo.
 - Formato de calorías, peso y altura.
 - Texto de copia.
@@ -994,6 +1057,7 @@ Si se añade Vitest:
 - Cambiar nivel de actividad y verificar TDEE.
 - Cambiar objetivo y verificar fila destacada.
 - Ingresar edad menor de 18 y verificar bloqueo adulto.
+- Ingresar edad de 65 o más y verificar nota de menor precisión.
 - Ver advertencia por calorías muy bajas.
 - Copiar resultado.
 - Limpiar formulario.
