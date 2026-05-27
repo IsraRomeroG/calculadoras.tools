@@ -19,6 +19,8 @@ export interface CalculatorCategory {
 const calculatorCategoryDescriptions: Record<string, string> = {
   finanzas:
     "Calculadoras para estimar préstamos, intereses y escenarios de inversión antes de comprometer tu dinero.",
+  inmuebles:
+    "Herramientas para estimar pagos, financiamiento y escenarios relacionados con vivienda e inmuebles.",
   "legal-e-impuestos":
     "Herramientas para agregar o desglosar impuestos, revisar montos con IVA y preparar cifras útiles para facturas o presupuestos.",
   matematicas:

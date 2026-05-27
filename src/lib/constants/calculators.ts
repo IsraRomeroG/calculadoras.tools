@@ -44,6 +44,15 @@ export const CALCULATORS: CalculatorDirectoryItem[] = [
     order: 35,
   },
   {
+    id: "calculadora-de-hipoteca",
+    title: "Calculadora de hipoteca",
+    description:
+      "Estima cuota mensual, intereses y tabla de amortización de una hipoteca.",
+    href: "/inmuebles/calculadora-de-hipoteca",
+    category: "Inmuebles",
+    order: 37,
+  },
+  {
     id: "calculadora-de-imc",
     title: "Calculadora de IMC",
     description:
