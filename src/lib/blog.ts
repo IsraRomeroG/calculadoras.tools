@@ -1,4 +1,5 @@
 import { getCollection, type CollectionEntry } from "astro:content";
+import { isBlogPostPublishable } from "./blog-publication";
 
 export type BlogPost = CollectionEntry<"blog">;
 
@@ -57,8 +58,10 @@ export const sortBlogPosts = (posts: BlogPost[]) =>
     (a, b) => b.data.pubDate.getTime() - a.data.pubDate.getTime(),
   );
 
-export const getPublishedBlogPosts = async () => {
-  const posts = await getCollection("blog", ({ data }) => !data.draft);
+export const getPublishedBlogPosts = async (now = new Date()) => {
+  const posts = await getCollection("blog", ({ data }) =>
+    isBlogPostPublishable(data, now),
+  );
 
   return sortBlogPosts(posts);
 };
