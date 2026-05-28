@@ -19,6 +19,31 @@ al bienestar a largo plazo.
 
 ---
 
+## Plan de implementación por fases
+
+La calculadora debe desarrollarse en cuatro fases incrementales. Cada
+fase debe quedar publicable, con lógica testeada y sin depender de
+features de fases posteriores para funcionar.
+
+| Fase | Nombre | Objetivo | Entregables principales |
+|------|--------|----------|-------------------------|
+| Fase 1 | MVP sólido | Validar que la calculadora "piense bien" y entregue un plan seguro | Lógica pura, tests unitarios, Modo 1, TDEE calculado/manual, validaciones críticas, comparador básico, resultado con rango y avisos |
+| Fase 2 | Modos avanzados | Permitir simulaciones por calorías, plazo e hitos | Modo 2, Modo 3, TDEE proyectado por tramos, hitos del camino, copiar plan, reset |
+| Fase 3 | Visualización y experiencia | Mejorar comprensión, accesibilidad y exploración | Gráfica de progreso, tabla accesible, slider de escenarios, estados responsive y accesibilidad refinada |
+| Fase 4 | Ejercicio, historial y compartir | Completar funcionalidades periféricas sin comprometer privacidad | Modo 5, prevención de doble conteo de ejercicio, historial local, compartir WhatsApp, contenido SEO/FAQ final |
+
+### Criterios de avance
+
+- No iniciar una fase nueva si la lógica de cálculo de la fase anterior
+  no tiene pruebas unitarias.
+- Las validaciones de seguridad de Fase 1 aplican a todas las fases.
+- Las features de Fase 3 y Fase 4 no deben modificar reglas numéricas
+  centrales sin actualizar tests.
+- El contenido SEO puede redactarse desde Fase 1, pero se considera
+  completo en Fase 4.
+
+---
+
 ## Conceptos base
 
 ### El déficit calórico
@@ -41,7 +66,9 @@ La calculadora debe mostrar el resultado como una estimación inicial
 con rango, no como promesa exacta.
 
 - Modelo MVP: `kg_a_perder * 7,700 / déficit_diario`.
-- Modelo recomendado: recalcular TDEE proyectado por tramos de peso
+- Fase 1: usar el modelo MVP y mostrar un rango prudente para evitar
+  falsa precisión.
+- Fase 2: recalcular TDEE proyectado por tramos de peso
   para reflejar que el gasto diario baja durante la pérdida.
 - Mostrar una fecha estimada en rango: "noviembre - diciembre 2026".
 - Mantener visible la frase: "Ajusta después de 2 a 3 semanas según
@@ -74,7 +101,7 @@ mayor.
 
 ## Casos de uso (modos de cálculo)
 
-### Modo 1 — Dame un plan para llegar a mi peso objetivo
+### Modo 1 — Dame un plan para llegar a mi peso objetivo (Fase 1)
 > El usuario fija el peso objetivo y la calculadora
 > sugiere el déficit y el plazo.
 
@@ -93,7 +120,7 @@ Déficit elegido = 500 kcal/día (moderado)
 Calorías diarias objetivo = 2,450 − 500 = 1,950 kcal
 Total a perder = 12 kg → 12 × 7,700 = 92,400 kcal
 Semanas base = 92,400 / (500 × 7) = 26.4 semanas
-Semanas ajustadas por TDEE proyectado = ~27 - 29 semanas
+Semanas ajustadas por TDEE proyectado = ~27 - 29 semanas (Fase 2)
 
 **Output principal:**
 - Tu TDEE: **2,450 kcal/día**
@@ -107,6 +134,9 @@ Semanas ajustadas por TDEE proyectado = ~27 - 29 semanas
 
 **Output secundario — hitos del camino:**
 
+Los hitos completos pertenecen a Fase 2. En Fase 1 puede mostrarse solo
+el tiempo estimado y la fecha/rango de llegada.
+
 | Hito | Pérdida | Fecha estimada |
 |------|---------|----------------|
 | Primeros 3 kg | −3 kg (77 kg) | Julio 2026 |
@@ -115,7 +145,8 @@ Semanas ajustadas por TDEE proyectado = ~27 - 29 semanas
 
 **Output secundario — alternativas:**
 
-Mostrar tres rutas comparables, con la opción recomendada destacada:
+En Fase 1 mostrar un comparador básico con tres rutas. En Fase 2, usar
+el cálculo ajustado por tramos y añadir fechas/rangos por ruta.
 
 | Ruta | Calorías/día | Ritmo | Duración estimada |
 |------|--------------|-------|-------------------|
@@ -128,7 +159,7 @@ aparecer como recomendación principal.
 
 ---
 
-### Modo 2 — Tengo X calorías al día, ¿cuándo llego a mi meta?
+### Modo 2 — Tengo X calorías al día, ¿cuándo llego a mi meta? (Fase 2)
 > El usuario ya sabe cuántas calorías quiere consumir
 > y quiere saber cuándo llegará a su objetivo.
 
@@ -157,7 +188,7 @@ Semanas = 92,400 / 4,550 = 20.3 semanas
 
 ---
 
-### Modo 3 — Quiero llegar a mi meta en X semanas
+### Modo 3 — Quiero llegar a mi meta en X semanas (Fase 2)
 > El usuario fija el plazo y la calculadora determina
 > el déficit y las calorías necesarias.
 
@@ -190,7 +221,7 @@ Calorías objetivo = 2,450 − 825 = 1,625 kcal/día
 
 ---
 
-### Modo 4 — Comparador de ritmos
+### Modo 4 — Comparador de ritmos (Fase 1 básico, Fase 2 completo)
 > Muestra simultáneamente cómo cambia el resultado
 > según el ritmo de pérdida elegido.
 
@@ -218,7 +249,7 @@ Calorías objetivo = 2,450 − 825 = 1,625 kcal/día
 
 ---
 
-### Modo 5 — Con ejercicio incluido
+### Modo 5 — Con ejercicio incluido (Fase 4)
 > El usuario combina déficit calórico con ejercicio
 > para alcanzar su meta más rápido o con menos restricción alimentaria.
 
@@ -277,6 +308,10 @@ Pérdida semanal estimada = 5,180 / 7,700 = **0.67 kg/semana**
 
 ## Inputs detallados
 
+La UI puede mostrar solo los inputs de la fase implementada. Las
+validaciones críticas de edad, peso objetivo, IMC objetivo y calorías
+mínimas deben existir desde Fase 1.
+
 | Campo | Tipo | Rango válido | Valor por defecto |
 |-------|------|-------------|-------------------|
 | Peso actual | Numérico | 30 – 300 kg | — |
@@ -296,6 +331,15 @@ Pérdida semanal estimada = 5,180 / 7,700 = **0.67 kg/semana**
 | Ejercicio intensidad | Selector | Suave / moderada / vigorosa | Moderada |
 | Sistema de unidades | Toggle | Métrico / Imperial | Métrico |
 
+**Alcance por fase:**
+
+- Fase 1: peso actual, peso objetivo, altura, edad, sexo, actividad,
+  ritmo de pérdida, TDEE manual opcional y sistema métrico.
+- Fase 2: calorías diarias, plazo en semanas, copiar plan y reset.
+- Fase 3: inputs interactivos de escenario para gráfica/slider.
+- Fase 4: ejercicio tipo, frecuencia, duración, intensidad, base de TDEE,
+  historial y compartir.
+
 Notas:
 
 - Calcular IMC actual e IMC objetivo de forma interna para detectar
@@ -306,7 +350,7 @@ Notas:
 
 ---
 
-## Feature — Recalcular TDEE en el camino
+## Feature — Recalcular TDEE en el camino (Fase 2)
 A medida que el usuario pierde peso, su TDEE disminuye.
 La calculadora muestra cuándo será necesario recalibrar:
 
@@ -331,7 +375,7 @@ La calculadora muestra cuándo será necesario recalibrar:
 
 ---
 
-## Feature — Gráfica de progreso proyectado
+## Feature — Gráfica de progreso proyectado (Fase 3)
 Línea de tiempo visual que muestra el peso proyectado semana a semana.
 
 **Series:**
@@ -358,7 +402,7 @@ Línea de tiempo visual que muestra el peso proyectado semana a semana.
 
 ---
 
-## Feature — Racha y motivación
+## Feature — Racha y motivación (Fase 1 básico, Fase 3 refinado)
 Elementos de motivación sin caer en lenguaje dañino:
 
 - "En 4 semanas podrías sentir más energía al subir escaleras"
@@ -372,7 +416,7 @@ Elementos de motivación sin caer en lenguaje dañino:
 
 ---
 
-## Feature — Plan semanal simplificado
+## Feature — Plan semanal simplificado (Fase 1)
 Resumen accionable para empezar hoy:
 
 **Tu plan esta semana:**
@@ -471,36 +515,40 @@ la salud mental. Aplicar siempre estas pautas de tono:
 
 ## Features adicionales
 
-### Cálculo en tiempo real
+### Cálculo en tiempo real (Fase 1)
 - Todos los outputs y la gráfica se actualizan
   automáticamente con cada cambio de input.
+- En Fase 1 aplica a resultados numéricos y comparador básico.
+- En Fase 3 aplica también a gráfica y slider.
 
-### Toggle métrico / imperial
+### Toggle métrico / imperial (Fase 1 métrico, Fase 2 imperial)
 - Cambio instantáneo entre kg/cm y lb/ft-in.
 - Convierte los valores ya ingresados automáticamente.
+- Fase 1 puede limitarse a métrico si acelera el MVP, pero la lógica
+  interna debe quedar preparada para imperial.
 
-### Botón de copiar plan
+### Botón de copiar plan (Fase 2)
 - Copia el resumen del plan en texto plano:
   "Meta: 68 kg | Calorías: 1,950/día |
    Déficit: −500 kcal | Plazo: 26 semanas"
 
-### Botón de limpiar / reset
+### Botón de limpiar / reset (Fase 2)
 - Limpia todos los campos con un clic.
 
-### Compartir por WhatsApp
+### Compartir por WhatsApp (Fase 4)
 - Texto preformateado con el resumen del plan.
 - Útil para compartir con un acompañante o nutricionista.
 - El botón debe ser explícito; no compartir automáticamente.
 - El texto debe omitir datos sensibles no necesarios. Ejemplo:
   "Plan estimado: 1,950 kcal/día, ritmo moderado, revisión en 2-3 semanas."
 
-### Historial de simulaciones
+### Historial de simulaciones (Fase 4)
 - Últimas 5 configuraciones calculadas en la sesión.
 - Guardar solo en estado local del navegador o memoria de sesión.
 - No enviar ni persistir historial en servidor.
 - Incluir botón para borrar historial.
 
-### Aviso de salud
+### Aviso de salud (Fase 1)
 - Visible siempre debajo de los resultados:
   "Esta calculadora proporciona estimaciones orientativas
   basadas en promedios poblacionales. Los resultados reales
@@ -527,6 +575,10 @@ la salud mental. Aplicar siempre estas pautas de tono:
 ---
 
 ## SEO y contenido de la página
+
+El contenido SEO puede iniciarse en Fase 1 con meta title,
+description y contenido mínimo. La versión completa con FAQ, contenido
+de apoyo y enlaces contextuales se considera alcance de Fase 4.
 
 ### Meta información
 - Title: "Calculadora de Déficit Calórico — ¿Cuánto Debo Comer para Bajar de Peso?"
@@ -568,26 +620,32 @@ la salud mental. Aplicar siempre estas pautas de tono:
 
 ## Especificaciones técnicas
 
-| Parámetro | Detalle |
-|-----------|---------|
-| Plataforma | Web responsive (mobile-first) |
-| Sin backend | Todo el cálculo ocurre en el cliente (JS) |
-| Gráfica de progreso | Chart.js (línea ajustada, línea simple opcional y banda de variación) |
-| Tabla accesible | Fallback obligatorio de la gráfica |
-| Fechas | Basadas en Date() del navegador; locale es-MX; mostrar rangos |
-| Toggle métrico/imperial | Conversión automática sin pérdida de datos |
-| Compartir WhatsApp | API WhatsApp Web con texto preformateado y acción explícita |
-| Historial | Solo local/sesión; borrado manual disponible |
-| Accesibilidad | Labels en todos los inputs, soporte teclado |
-| URL principal | /calculadora-deficit-calorico |
-| Idioma | Español (locale configurable) |
-| Precisión | Calorías a entero; peso a 1 decimal; semanas a 1 decimal |
+| Parámetro | Fase | Detalle |
+|-----------|------|---------|
+| Plataforma | 1 | Web responsive (mobile-first) |
+| Sin backend | 1 | Todo el cálculo ocurre en el cliente (JS) |
+| Lógica pura | 1 | `src/lib/calculators/deficit.ts` con unit tests |
+| Página principal | 1 | `/calculadora-deficit-calorico` |
+| Fechas | 1 | Basadas en Date() del navegador; locale es-MX; mostrar rangos |
+| Accesibilidad base | 1 | Labels en todos los inputs, soporte teclado, mensajes de error claros |
+| Toggle métrico/imperial | 2 | Conversión automática sin pérdida de datos |
+| Copiar/reset | 2 | Acciones explícitas para copiar plan y limpiar campos |
+| Gráfica de progreso | 3 | Chart.js (línea ajustada, línea simple opcional y banda de variación) |
+| Tabla accesible | 3 | Fallback obligatorio de la gráfica |
+| Slider de escenarios | 3 | Actualiza resultados y gráfica sin salto de layout |
+| Compartir WhatsApp | 4 | API WhatsApp Web con texto preformateado y acción explícita |
+| Historial | 4 | Solo local/sesión; borrado manual disponible |
+| SEO completo | 4 | FAQ, contenido de apoyo y enlaces contextuales finales |
+| Idioma | 1 | Español (locale configurable) |
+| Precisión | 1 | Calorías a entero; peso a 1 decimal; semanas a 1 decimal |
 
 ---
 
 ## Lógica técnica sugerida
 
 Separar la lógica de cálculo de la UI para poder probarla con unit tests.
+La Fase 1 debe crear los tipos y funciones base aunque algunas
+propiedades se completen en fases posteriores.
 
 ```ts
 interface DeficitInput {
@@ -623,30 +681,42 @@ Funciones esperadas:
 
 - `calculateDeficitPlan(input)`
 - `calculateSimpleTimeline(weightLossKg, dailyDeficit)`
-- `calculateAdjustedTimeline(input, tdeeStepKg = 5)`
+- `calculateAdjustedTimeline(input, tdeeStepKg = 5)` (Fase 2)
 - `classifyDeficitRisk({ weeklyLossPercent, dailyDeficit, targetCalories, bmr })`
 - `validateDeficitInput(input)`
-- `calculateExerciseCalories({ weightKg, exerciseType, durationMinutes, frequency, intensity })`
-- `buildProgressSeries(result)`
-- `buildDeficitCopyText(input, result)`
+- `calculateExerciseCalories({ weightKg, exerciseType, durationMinutes, frequency, intensity })` (Fase 4)
+- `buildProgressSeries(result)` (Fase 3)
+- `buildDeficitCopyText(input, result)` (Fase 2)
+
+### Alcance técnico por fase
+
+| Fase | Archivos esperados | Pruebas esperadas |
+|------|--------------------|-------------------|
+| Fase 1 | `deficit.ts`, `deficit.test.ts`, página base Astro | Cálculo Modo 1, clasificación de riesgo, validaciones críticas |
+| Fase 2 | Extensión de `deficit.ts`, helpers de copiar/reset | Modo 2, Modo 3, TDEE por tramos, hitos |
+| Fase 3 | Componentes de gráfica y tabla accesible | Series de progreso, fallback accesible, slider |
+| Fase 4 | Helpers de ejercicio, historial y compartir | Ejercicio sin doble conteo, privacidad de historial, texto compartido |
 
 ### Casos de prueba mínimos
 
-| Caso | Input | Resultado esperado |
-|------|-------|--------------------|
-| Plan moderado válido | 80 kg → 68 kg, TDEE 2,450, déficit 500 | 1,950 kcal/día, ~0.45 kg/semana, rango de fecha |
-| Peso objetivo igual | 80 kg → 80 kg | No calcular déficit; sugerir mantenimiento |
-| Peso objetivo mayor | 80 kg → 85 kg | No calcular déficit; sugerir superávit/TDEE |
-| Menor de edad | Edad 16 | No calcular plan adulto |
-| IMC objetivo bajo | Objetivo con IMC < 18.5 | Bloquear plan de pérdida |
-| Calorías bajo mínimo | 1,100 kcal mujer o 1,400 kcal hombre | Advertencia prominente |
-| Calorías < 800 | 750 kcal | Bloquear |
-| Calorías >= TDEE | 2,600 kcal con TDEE 2,450 | Indicar que no hay déficit |
-| Pérdida > 1%/semana | Plazo muy corto | Marcar agresivo o supervisión |
-| Pérdida > 1.5%/semana | Plazo extremo | Bloquear |
-| Ejercicio duplicado | Actividad alta + mismo ejercicio explícito | Mostrar advertencia de doble conteo |
-| Cambio de unidades | kg/cm ↔ lb/ft-in | Mantener valores equivalentes sin perder datos |
-| Copiar plan | Resultado válido | Texto plano sin datos sensibles innecesarios |
+| Fase | Caso | Input | Resultado esperado |
+|------|------|-------|--------------------|
+| 1 | Plan moderado válido | 80 kg → 68 kg, TDEE 2,450, déficit 500 | 1,950 kcal/día, ~0.45 kg/semana, rango de fecha |
+| 1 | Peso objetivo igual | 80 kg → 80 kg | No calcular déficit; sugerir mantenimiento |
+| 1 | Peso objetivo mayor | 80 kg → 85 kg | No calcular déficit; sugerir superávit/TDEE |
+| 1 | Menor de edad | Edad 16 | No calcular plan adulto |
+| 1 | IMC objetivo bajo | Objetivo con IMC < 18.5 | Bloquear plan de pérdida |
+| 1 | Calorías bajo mínimo | 1,100 kcal mujer o 1,400 kcal hombre | Advertencia prominente |
+| 1 | Calorías < 800 | 750 kcal | Bloquear |
+| 1 | Pérdida > 1%/semana | Plazo muy corto o ritmo límite | Marcar agresivo o supervisión |
+| 1 | Pérdida > 1.5%/semana | Plazo extremo | Bloquear |
+| 2 | Calorías >= TDEE | 2,600 kcal con TDEE 2,450 | Indicar que no hay déficit |
+| 2 | TDEE por tramos | Pérdida > 5 kg | Duración ajustada mayor o igual a duración simple |
+| 2 | Copiar plan | Resultado válido | Texto plano sin datos sensibles innecesarios |
+| 2 | Cambio de unidades | kg/cm ↔ lb/ft-in | Mantener valores equivalentes sin perder datos |
+| 3 | Gráfica | Resultado válido | Serie de progreso y tabla accesible coherentes |
+| 4 | Ejercicio duplicado | Actividad alta + mismo ejercicio explícito | Mostrar advertencia de doble conteo |
+| 4 | Historial local | Varias simulaciones | Guardar últimas 5 en sesión/local y permitir borrado |
 
 ---
 
