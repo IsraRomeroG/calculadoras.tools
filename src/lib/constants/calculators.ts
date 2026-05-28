@@ -70,4 +70,13 @@ export const CALCULATORS: CalculatorDirectoryItem[] = [
     category: "Salud",
     order: 45,
   },
+  {
+    id: "calculadora-de-macros",
+    title: "Calculadora de macros",
+    description:
+      "Calcula gramos diarios de proteína, carbohidratos y grasas según calorías, peso y objetivo.",
+    href: "/salud/calculadora-de-macros",
+    category: "Salud",
+    order: 50,
+  },
 ];
