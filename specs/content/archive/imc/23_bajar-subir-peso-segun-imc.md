@@ -52,7 +52,7 @@ calorias sin dar planes personalizados.
 - `/salud/calculadora-de-imc`
 - `/blog/calorias-diarias-e-imc`
 - `/blog/como-interpretar-resultado-imc`
-- Futuro: `/salud/calculadora-tdee`
+- Futuro: `/salud/calculadora-de-calorias-diarias-tdee`
 
 ## FAQ sugeridas
 

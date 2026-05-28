@@ -50,7 +50,7 @@ energetico diario.
 
 - `/salud/calculadora-de-imc`
 - `/blog/bajar-subir-peso-segun-imc`
-- Futuro: `/salud/calculadora-tdee`
+- Futuro: `/salud/calculadora-de-calorias-diarias-tdee`
 - Futuro: `/salud/calculadora-de-deficit-calorico`
 
 ## FAQ sugeridas

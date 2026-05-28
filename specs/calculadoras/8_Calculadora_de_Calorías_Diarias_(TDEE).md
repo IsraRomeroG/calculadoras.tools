@@ -88,12 +88,10 @@ La primera versión debe enfocarse en el flujo principal para adultos:
 
 | Elemento | Valor |
 |----------|-------|
-| URL pública recomendada | `/salud/calculadora-de-calorias-diarias` |
-| Alias recomendado por enlaces existentes | `/salud/calculadora-tdee` |
+| URL pública recomendada | `/salud/calculadora-de-calorias-diarias-tdee` |
 | Alias opcional corto | `/calculadora-calorias-diarias` |
-| Alias opcional corto | `/calculadora-tdee` |
 | Alias opcional corto | `/calculadora-metabolismo-basal` |
-| Archivo Astro recomendado | `src/pages/salud/calculadora-de-calorias-diarias.astro` |
+| Archivo Astro recomendado | `src/pages/salud/calculadora-de-calorias-diarias-tdee.astro` |
 | Lógica de cálculo | `src/lib/calculators/tdee.ts` |
 | Pruebas unitarias | `src/lib/calculators/tdee.test.ts` |
 | Locale base | `es-MX` |
@@ -101,12 +99,9 @@ La primera versión debe enfocarse en el flujo principal para adultos:
 | Contenedores UI | `PageHero`, `Container`, `SectionIntro`, `FaqSection` |
 | Estilos | Tailwind CSS |
 
-> La URL canónica debe ser `/salud/calculadora-de-calorias-diarias`. El alias
-> `/salud/calculadora-tdee` debe existir porque ya hay contenido del sitio que
-> apunta a esa ruta; implementarlo como redirección 301 o como ruta alias que
-> exponga el mismo canonical. Los alias cortos, si se crean, también deben
-> redirigir o exponer el canonical principal. La página debe exponer un único
-> `canonical`.
+> La URL canónica debe ser `/salud/calculadora-de-calorias-diarias-tdee`. Los
+> alias cortos, si se crean, deben redirigir o exponer el canonical principal.
+> La página debe exponer un único `canonical`.
 
 ---
 
@@ -793,7 +788,7 @@ Estas herramientas son educativas y no reemplazan una evaluación profesional.
 |-------|-------|
 | Title | `Calculadora de Calorías Diarias (TDEE) — TMB y Gasto Diario` |
 | Description | `Calcula tus calorías diarias estimadas según tu metabolismo, actividad física y objetivo. Obtén TMB, TDEE y rangos orientativos para mantener peso, crear déficit o usar superávit.` |
-| Canonical | `/salud/calculadora-de-calorias-diarias` |
+| Canonical | `/salud/calculadora-de-calorias-diarias-tdee` |
 
 Evitar claims como "calorías exactas" o "plan perfecto".
 
@@ -835,8 +830,7 @@ la página.
 ### Estructura recomendada
 
 ```text
-src/pages/salud/calculadora-de-calorias-diarias.astro
-src/pages/salud/calculadora-tdee.astro (redirección o alias con canonical principal)
+src/pages/salud/calculadora-de-calorias-diarias-tdee.astro
 src/lib/calculators/tdee.ts
 src/lib/calculators/tdee.test.ts
 ```
