@@ -5,7 +5,9 @@ import Container from "@components/layout/Container.astro";
 import PageShell from "@components/layout/PageShell.astro";
 import PageHero from "@components/shared/PageHero.astro";
 import {
+  assertNoBlogRouteConflicts,
   formatBlogDate,
+  getBlogPostCategorySlug,
   getBlogPostSlug,
   getBlogPostUrl,
   getCategoryUrl,
@@ -15,9 +17,13 @@ import {
 
 export async function getStaticPaths() {
   const posts = await getPublishedBlogPosts();
+  assertNoBlogRouteConflicts(posts);
 
   return posts.map((post) => ({
-    params: { slug: getBlogPostSlug(post) },
+    params: {
+      category: getBlogPostCategorySlug(post),
+      slug: getBlogPostSlug(post),
+    },
     props: { post },
   }));
 }
@@ -76,6 +82,11 @@ const articleJsonLd = {
         breadcrumbs={[
           { label: "Inicio", href: "/", ariaLabel: "Inicio" },
           { label: "Blog", href: "/blog", optional: true },
+          {
+            label: post.data.category,
+            href: getCategoryUrl(post.data.category),
+            optional: true,
+          },
           {
             label: post.data.title,
             truncate: true,

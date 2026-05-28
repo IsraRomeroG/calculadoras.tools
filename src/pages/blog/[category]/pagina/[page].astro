@@ -3,9 +3,10 @@ import BaseLayout from "@layouts/BaseLayout.astro";
 import BlogPostCard from "@components/blog/BlogPostCard.astro";
 import Container from "@components/layout/Container.astro";
 import PageShell from "@components/layout/PageShell.astro";
-import Pagination from "@components/shared/Pagination.astro";
 import PageHero from "@components/shared/PageHero.astro";
+import Pagination from "@components/shared/Pagination.astro";
 import {
+  assertNoBlogRouteConflicts,
   getBlogPostsByCategorySlug,
   getBlogCategories,
   getCategoryPageUrl,
@@ -19,20 +20,32 @@ import {
 
 export async function getStaticPaths() {
   const posts = await getPublishedBlogPosts();
+  assertNoBlogRouteConflicts(posts);
   const categories = getBlogCategories(posts);
 
-  return categories.map((category) => {
+  return categories.flatMap((category) => {
     const categoryPosts = getBlogPostsByCategorySlug(posts, category.slug);
-    const pagination = paginateItems(categoryPosts, 1);
+    const firstPage = paginateItems(categoryPosts, 1);
 
-    return {
-      params: { category: category.slug },
-      props: {
-        category,
-        posts: pagination.items,
-        pagination,
+    return Array.from(
+      { length: Math.max(0, firstPage.totalPages - 1) },
+      (_, index) => {
+        const currentPage = index + 2;
+        const pagination = paginateItems(categoryPosts, currentPage);
+
+        return {
+          params: {
+            category: category.slug,
+            page: String(currentPage),
+          },
+          props: {
+            category,
+            posts: pagination.items,
+            pagination,
+          },
+        };
       },
-    };
+    );
   });
 }
 
@@ -43,13 +56,21 @@ interface Props {
 }
 
 const { category, posts, pagination } = Astro.props;
-const title = `Blog de ${category.label}`;
-const description = `Artículos de ${category.label.toLowerCase()} con explicaciones claras, fórmulas prácticas y ejemplos.`;
-const canonical = getCategoryUrl(category.label);
+const title = `Blog de ${category.label} - página ${pagination.currentPage}`;
+const description = `Más artículos de ${category.label.toLowerCase()} con explicaciones claras, fórmulas prácticas y ejemplos.`;
+const canonical = getCategoryPageUrl(category.label, pagination.currentPage);
 ---
 
 <BaseLayout title={title} description={description} canonical={canonical}>
   <Fragment slot="head">
+    {
+      pagination.previousPage && (
+        <link
+          rel="prev"
+          href={getCategoryPageUrl(category.label, pagination.previousPage)}
+        />
+      )
+    }
     {
       pagination.nextPage && (
         <link
@@ -62,18 +83,30 @@ const canonical = getCategoryUrl(category.label);
 
   <PageShell>
     <PageHero
-      title={`Artículos de ${category.label.toLowerCase()}`}
-      description={`Guías y ejemplos para resolver cálculos de ${category.label.toLowerCase()} con más contexto.`}
+      title={`Artículos de ${category.label.toLowerCase()} - página ${pagination.currentPage}`}
+      description={`Más guías y ejemplos para resolver cálculos de ${category.label.toLowerCase()} con contexto práctico.`}
       kicker={category.label}
       collapseBreadcrumbOnMobile
       breadcrumbs={[
         { label: "Inicio", href: "/", ariaLabel: "Inicio" },
         { label: "Blog", href: "/blog", optional: true },
-        { label: category.label, truncate: true },
+        {
+          label: category.label,
+          href: getCategoryUrl(category.label),
+          optional: true,
+        },
+        { label: `Página ${pagination.currentPage}` },
       ]}
     />
 
     <Container as="section" class="py-8 md:py-10">
+      <div class="mb-6">
+        <h2 class="text-2xl font-semibold">Artículos</h2>
+        <p class="mt-2 text-sm text-gray-400">
+          Página {pagination.currentPage} de {pagination.totalPages}.
+        </p>
+      </div>
+
       <div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
         {
           posts.map((post) => (

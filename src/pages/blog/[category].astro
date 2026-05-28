@@ -3,9 +3,10 @@ import BaseLayout from "@layouts/BaseLayout.astro";
 import BlogPostCard from "@components/blog/BlogPostCard.astro";
 import Container from "@components/layout/Container.astro";
 import PageShell from "@components/layout/PageShell.astro";
-import PageHero from "@components/shared/PageHero.astro";
 import Pagination from "@components/shared/Pagination.astro";
+import PageHero from "@components/shared/PageHero.astro";
 import {
+  assertNoBlogRouteConflicts,
   getBlogPostsByCategorySlug,
   getBlogCategories,
   getCategoryPageUrl,
@@ -19,31 +20,21 @@ import {
 
 export async function getStaticPaths() {
   const posts = await getPublishedBlogPosts();
+  assertNoBlogRouteConflicts(posts);
   const categories = getBlogCategories(posts);
 
-  return categories.flatMap((category) => {
+  return categories.map((category) => {
     const categoryPosts = getBlogPostsByCategorySlug(posts, category.slug);
-    const firstPage = paginateItems(categoryPosts, 1);
+    const pagination = paginateItems(categoryPosts, 1);
 
-    return Array.from(
-      { length: Math.max(0, firstPage.totalPages - 1) },
-      (_, index) => {
-        const currentPage = index + 2;
-        const pagination = paginateItems(categoryPosts, currentPage);
-
-        return {
-          params: {
-            category: category.slug,
-            page: String(currentPage),
-          },
-          props: {
-            category,
-            posts: pagination.items,
-            pagination,
-          },
-        };
+    return {
+      params: { category: category.slug },
+      props: {
+        category,
+        posts: pagination.items,
+        pagination,
       },
-    );
+    };
   });
 }
 
@@ -54,21 +45,13 @@ interface Props {
 }
 
 const { category, posts, pagination } = Astro.props;
-const title = `Blog de ${category.label} - pagina ${pagination.currentPage}`;
-const description = `Mas articulos de ${category.label.toLowerCase()} con explicaciones claras, formulas practicas y ejemplos.`;
-const canonical = getCategoryPageUrl(category.label, pagination.currentPage);
+const title = `Blog de ${category.label}`;
+const description = `Artículos de ${category.label.toLowerCase()} con explicaciones claras, fórmulas prácticas y ejemplos.`;
+const canonical = getCategoryUrl(category.label);
 ---
 
 <BaseLayout title={title} description={description} canonical={canonical}>
   <Fragment slot="head">
-    {
-      pagination.previousPage && (
-        <link
-          rel="prev"
-          href={getCategoryPageUrl(category.label, pagination.previousPage)}
-        />
-      )
-    }
     {
       pagination.nextPage && (
         <link
@@ -81,34 +64,22 @@ const canonical = getCategoryPageUrl(category.label, pagination.currentPage);
 
   <PageShell>
     <PageHero
-      title={`Articulos de ${category.label.toLowerCase()} - pagina ${pagination.currentPage}`}
-      description={`Mas guias y ejemplos para resolver calculos de ${category.label.toLowerCase()} con contexto practico.`}
+      title={`Artículos de ${category.label.toLowerCase()}`}
+      description={`Guías y ejemplos para resolver cálculos de ${category.label.toLowerCase()} con más contexto.`}
       kicker={category.label}
       collapseBreadcrumbOnMobile
       breadcrumbs={[
         { label: "Inicio", href: "/", ariaLabel: "Inicio" },
         { label: "Blog", href: "/blog", optional: true },
-        {
-          label: category.label,
-          href: getCategoryUrl(category.label),
-          optional: true,
-        },
-        { label: `Pagina ${pagination.currentPage}` },
+        { label: category.label, truncate: true },
       ]}
     />
 
     <Container as="section" class="py-8 md:py-10">
-      <div class="mb-6">
-        <h2 class="text-2xl font-semibold">Articulos</h2>
-        <p class="mt-2 text-sm text-gray-400">
-          Pagina {pagination.currentPage} de {pagination.totalPages}.
-        </p>
-      </div>
-
       <div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
         {
           posts.map((post) => (
-            <BlogPostCard post={post} headingLevel="h2" cta="Leer articulo" />
+            <BlogPostCard post={post} headingLevel="h2" cta="Leer artículo" />
           ))
         }
       </div>

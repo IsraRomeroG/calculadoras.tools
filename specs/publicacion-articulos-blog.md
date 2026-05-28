@@ -69,17 +69,21 @@ El flujo esta en `src/lib/blog.ts`:
 - `getPublishedBlogPosts()` obtiene los articulos de `src/content/blog` que no son borrador y cuya `pubDate` no es futura.
 - `getBlogCategories(posts)` agrupa por `post.data.category`.
 - `getCategorySlug(category)` convierte el nombre a slug.
-- `getCategoryUrl(category)` genera `/blog/categoria/<slug>`.
+- `getCategoryUrl(category)` genera `/blog/<slug>`.
+- `getBlogPostUrl(post)` genera
+  `/blog/<slug-categoria>/<slug-del-articulo>`.
 
 Las paginas dinamicas del blog usan esa informacion para generar:
 
 - `/blog`
 - `/blog/pagina/<page>`
-- `/blog/<slug-del-articulo>`
-- `/blog/categoria/<slug-categoria>`
-- `/blog/categoria/<slug-categoria>/pagina/<page>`
+- `/blog/<slug-categoria>`
+- `/blog/<slug-categoria>/pagina/<page>`
+- `/blog/<slug-categoria>/<slug-del-articulo>`
 
-Por eso, para una categoria nueva de blog, el cambio minimo es publicar al menos un articulo con `category: "Nueva categoria"` dentro de `src/content/blog/<slug-categoria>/`.
+Por eso, para una categoria nueva de blog, el cambio minimo es publicar al
+menos un articulo con `category: "Nueva categoria"` dentro de
+`src/content/blog/<slug-categoria>/`.
 
 ## Crear una categoria nueva de articulos
 
@@ -92,15 +96,15 @@ Pasos:
 3. Crea la carpeta organizativa con el slug normalizado: `src/content/blog/salud`.
 4. Mueve el articulo a esa carpeta.
 5. Corre `npm.cmd run build`.
-6. Verifica que el build genere la pagina de categoria esperada, por ejemplo `/blog/categoria/salud`.
+6. Verifica que el build genere la pagina de categoria esperada, por ejemplo `/blog/salud`, y la pagina del articulo bajo esa categoria, por ejemplo `/blog/salud/que-es-el-imc-y-como-se-calcula`.
 
 El slug se calcula automaticamente: minusculas, sin acentos y con guiones. Ejemplos:
 
 | Categoria | URL de categoria |
 |---|---|
-| `Salud` | `/blog/categoria/salud` |
-| `Legal e impuestos` | `/blog/categoria/legal-e-impuestos` |
-| `Matematicas financieras` | `/blog/categoria/matematicas-financieras` |
+| `Salud` | `/blog/salud` |
+| `Legal e impuestos` | `/blog/legal-e-impuestos` |
+| `Matematicas financieras` | `/blog/matematicas-financieras` |
 
 ## Cuando si hay cambios de codigo
 
@@ -132,7 +136,7 @@ la ruta debe existir en `src/pages`. El blog no valida automaticamente que ese e
 
 ### Si se requiere copy SEO personalizado por categoria
 
-Actualmente las paginas de categoria del blog construyen titulo y descripcion de forma generica en `src/pages/blog/categoria/[category].astro` y en su paginacion.
+Actualmente las paginas de categoria del blog construyen titulo y descripcion de forma generica en `src/pages/blog/[category].astro` y en su paginacion.
 
 Si una categoria nueva necesita texto SEO personalizado, habria que introducir una fuente de metadatos para categorias del blog y usarla en esas paginas. Ese patron no existe todavia.
 

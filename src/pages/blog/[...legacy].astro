@@ -1,0 +1,50 @@
+---
+import {
+  assertNoBlogRouteConflicts,
+  getBlogCategories,
+  getBlogPostSlug,
+  getBlogPostUrl,
+  getBlogPostsByCategorySlug,
+  getCategoryPageUrl,
+  getCategoryUrl,
+  getPublishedBlogPosts,
+  paginateItems,
+} from "@lib/blog";
+
+export async function getStaticPaths() {
+  const posts = await getPublishedBlogPosts();
+  assertNoBlogRouteConflicts(posts);
+  const categories = getBlogCategories(posts);
+  const legacyPaths = posts.map((post) => ({
+    params: { legacy: getBlogPostSlug(post) },
+    props: { target: getBlogPostUrl(post) },
+  }));
+
+  categories.forEach((category) => {
+    legacyPaths.push({
+      params: { legacy: `categoria/${category.slug}` },
+      props: { target: getCategoryUrl(category.label) },
+    });
+
+    const categoryPosts = getBlogPostsByCategorySlug(posts, category.slug);
+    const firstPage = paginateItems(categoryPosts, 1);
+
+    for (let page = 2; page <= firstPage.totalPages; page += 1) {
+      legacyPaths.push({
+        params: { legacy: `categoria/${category.slug}/pagina/${page}` },
+        props: { target: getCategoryPageUrl(category.label, page) },
+      });
+    }
+  });
+
+  return legacyPaths;
+}
+
+interface Props {
+  target: string;
+}
+
+const { target } = Astro.props;
+
+return Astro.redirect(target, 301);
+---
