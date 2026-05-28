@@ -3,7 +3,7 @@ title: "Obesidad clase 1, 2 y 3 según IMC"
 seoTitle: "Obesidad según IMC: clases 1, 2 y 3 explicadas"
 description: "Conoce los rangos de obesidad según el IMC adulto, sus clases y las limitaciones de esta clasificación."
 pubDate: 2026-06-03
-category: "Salud"
+categorySlug: "salud"
 tags:
   - obesidad
   - imc

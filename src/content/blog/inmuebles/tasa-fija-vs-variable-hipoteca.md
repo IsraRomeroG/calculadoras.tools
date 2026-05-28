@@ -3,7 +3,7 @@ title: "Tasa fija vs variable en una hipoteca"
 seoTitle: "Tasa fija o variable en hipoteca: diferencias, riesgos y ejemplos"
 description: "Conoce la diferencia entre una hipoteca de tasa fija y una de tasa variable, y por qué los escenarios variables requieren supuestos adicionales."
 pubDate: 2026-06-09
-category: "Inmuebles"
+categorySlug: "inmuebles"
 tags:
   - tasa fija
   - tasa variable

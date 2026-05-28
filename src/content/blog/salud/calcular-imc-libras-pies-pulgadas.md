@@ -3,7 +3,7 @@ title: "Cómo calcular el IMC en libras, pies y pulgadas"
 seoTitle: "IMC en libras, pies y pulgadas: fórmula imperial"
 description: "Aprende la fórmula imperial del IMC usando libras, pies y pulgadas, con un ejemplo paso a paso."
 pubDate: 2026-06-13
-category: "Salud"
+categorySlug: "salud"
 tags:
   - imc
   - libras

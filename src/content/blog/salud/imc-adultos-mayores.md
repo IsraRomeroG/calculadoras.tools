@@ -3,7 +3,7 @@ title: "IMC en adultos mayores: cómo interpretarlo con cuidado"
 seoTitle: "IMC en adultos mayores: límites, masa muscular y salud"
 description: "Aprende por qué el IMC puede ser menos preciso en adultos mayores y qué factores conviene considerar."
 pubDate: 2026-06-09
-category: "Salud"
+categorySlug: "salud"
 tags:
   - imc
   - adultos mayores

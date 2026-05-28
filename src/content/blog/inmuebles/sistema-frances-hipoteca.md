@@ -3,7 +3,7 @@ title: "Sistema francés en una hipoteca: explicación fácil"
 seoTitle: "Sistema francés hipotecario: cuota fija, intereses y capital"
 description: "Entiende cómo funciona el sistema francés de amortización en una hipoteca, por qué la cuota es fija y cómo cambia la mezcla de capital e intereses."
 pubDate: 2026-06-10
-category: "Inmuebles"
+categorySlug: "inmuebles"
 tags:
   - sistema francés
   - amortización

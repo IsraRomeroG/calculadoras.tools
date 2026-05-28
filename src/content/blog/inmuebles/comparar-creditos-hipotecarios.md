@@ -3,7 +3,7 @@ title: "Cómo comparar créditos hipotecarios"
 seoTitle: "Cómo comparar hipotecas: tasa, CAT, plazo, seguros y costo total"
 description: "Aprende a comparar créditos hipotecarios revisando tasa, CAT, plazo, mensualidad, seguros, comisiones y condiciones de pago anticipado."
 pubDate: 2026-06-08
-category: "Inmuebles"
+categorySlug: "inmuebles"
 tags:
   - comparar hipotecas
   - cat

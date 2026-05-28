@@ -3,7 +3,7 @@ title: "Tabla de IMC para adultos"
 seoTitle: "Tabla de IMC: rangos y categorías para adultos"
 description: "Consulta la tabla de IMC para adultos: bajo peso, rango saludable, sobrepeso y obesidad según el índice de masa corporal."
 pubDate: 2026-05-28
-category: "Salud"
+categorySlug: "salud"
 tags:
   - imc
   - tabla imc

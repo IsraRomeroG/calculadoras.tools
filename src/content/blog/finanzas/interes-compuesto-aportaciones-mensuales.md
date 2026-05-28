@@ -2,7 +2,7 @@
 title: "Interés compuesto con aportaciones mensuales"
 description: "Aprende cómo crece una inversión cuando agregas aportaciones mensuales y cómo calcular el monto final."
 pubDate: 2026-05-19
-category: "Finanzas"
+categorySlug: "finanzas"
 tags:
   - interés compuesto
   - aportaciones mensuales

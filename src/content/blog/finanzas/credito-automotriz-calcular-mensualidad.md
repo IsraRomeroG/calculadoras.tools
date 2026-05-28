@@ -3,7 +3,7 @@ title: "Crédito automotriz: cómo calcular mensualidad e intereses"
 seoTitle: "Crédito automotriz: calcula mensualidad, intereses, enganche y plazo"
 description: "Aprende a estimar la mensualidad de un crédito automotriz considerando monto financiado, tasa, plazo, enganche, comisiones y seguro."
 pubDate: 2026-06-12
-category: "Finanzas"
+categorySlug: "finanzas"
 tags:
   - crédito automotriz
   - préstamo auto

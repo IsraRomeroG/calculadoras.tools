@@ -2,7 +2,7 @@
 title: "Tasa nominal vs tasa efectiva: cuál es la diferencia"
 description: "Entiende la diferencia entre tasa nominal y tasa efectiva, y por qué la capitalización cambia el rendimiento real."
 pubDate: 2026-05-18
-category: "Finanzas"
+categorySlug: "finanzas"
 tags:
   - tasa nominal
   - tasa efectiva

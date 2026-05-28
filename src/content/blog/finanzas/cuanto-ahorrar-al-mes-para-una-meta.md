@@ -2,7 +2,7 @@
 title: "Cuanto ahorrar al mes para llegar a una meta"
 description: "Aprende a estimar cuanto necesitas ahorrar cada mes para alcanzar una meta usando plazo, tasa e interes compuesto."
 pubDate: 2026-05-21
-category: "Finanzas"
+categorySlug: "finanzas"
 tags:
   - ahorro
   - metas financieras

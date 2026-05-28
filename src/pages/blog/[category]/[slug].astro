@@ -7,6 +7,7 @@ import PageHero from "@components/shared/PageHero.astro";
 import {
   assertNoBlogRouteConflicts,
   formatBlogDate,
+  getBlogPostCategory,
   getBlogPostCategorySlug,
   getBlogPostSlug,
   getBlogPostUrl,
@@ -33,6 +34,7 @@ interface Props {
 }
 
 const { post } = Astro.props;
+const category = getBlogPostCategory(post);
 const { Content } = await render(post);
 const title = post.data.seoTitle ?? post.data.title;
 const description = post.data.description;
@@ -76,15 +78,15 @@ const articleJsonLd = {
         size="4xl"
         title={post.data.title}
         description={post.data.description}
-        kicker={post.data.category}
-        kickerHref={getCategoryUrl(post.data.category)}
+        kicker={category.label}
+        kickerHref={getCategoryUrl(category.slug)}
         collapseBreadcrumbOnMobile
         breadcrumbs={[
           { label: "Inicio", href: "/", ariaLabel: "Inicio" },
           { label: "Blog", href: "/blog", optional: true },
           {
-            label: post.data.category,
-            href: getCategoryUrl(post.data.category),
+            label: category.label,
+            href: getCategoryUrl(category.slug),
             optional: true,
           },
           {

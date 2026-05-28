@@ -2,7 +2,7 @@
 title: "Qué es el interés compuesto y cómo funciona"
 description: "Aprende qué es el interés compuesto, por qué crece con el tiempo y cómo calcularlo con ejemplos sencillos."
 pubDate: 2026-05-17
-category: "Finanzas"
+categorySlug: "finanzas"
 tags:
   - interés compuesto
   - inversiones

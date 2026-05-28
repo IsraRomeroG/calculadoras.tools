@@ -3,7 +3,7 @@ title: "Sobrepeso según IMC: qué significa un IMC de 25 a 29.9"
 seoTitle: "Sobrepeso según IMC: rango 25 a 29.9 y cómo interpretarlo"
 description: "Conoce qué significa estar en el rango de sobrepeso según el IMC y qué limitaciones tiene esta clasificación."
 pubDate: 2026-06-02
-category: "Salud"
+categorySlug: "salud"
 tags:
   - sobrepeso
   - imc

@@ -1,11 +1,17 @@
 import { getCollection, type CollectionEntry } from "astro:content";
 import { isBlogPostPublishable } from "./blog-publication";
+import {
+  getCategory,
+  getCategoryByLabel,
+  getCategoryLegacySlugs,
+  type CategorySlug,
+} from "./constants/categories";
 
 export type BlogPost = CollectionEntry<"blog">;
 
 export interface BlogCategory {
   label: string;
-  slug: string;
+  slug: CategorySlug;
   count: number;
 }
 
@@ -29,30 +35,35 @@ const dateFormatter = new Intl.DateTimeFormat("es-MX", {
 export const getBlogPostSlug = (post: Pick<BlogPost, "id">) =>
   post.id.split("/").at(-1) ?? post.id;
 
-export const getCategorySlug = (category: string) =>
-  category
-    .toLowerCase()
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-+|-+$/g, "");
+export const getCategorySlug = (category: string) => {
+  const metadata = getCategoryByLabel(category);
+
+  if (!metadata) {
+    throw new Error(`Unknown category label "${category}".`);
+  }
+
+  return metadata.slug;
+};
 
 export const getBlogPostCategorySlug = (post: Pick<BlogPost, "data">) =>
-  getCategorySlug(post.data.category);
+  post.data.categorySlug;
+
+export const getBlogPostCategory = (post: Pick<BlogPost, "data">) =>
+  getCategory(getBlogPostCategorySlug(post));
 
 export const getBlogPostUrl = (post: Pick<BlogPost, "id" | "data">) =>
   `/blog/${getBlogPostCategorySlug(post)}/${getBlogPostSlug(post)}`;
 
-export const getCategoryUrl = (category: string) =>
-  `/blog/${getCategorySlug(category)}`;
+export const getCategoryUrl = (categorySlug: CategorySlug) =>
+  `/blog/${categorySlug}`;
 
 export const getBlogIndexPageUrl = (page: number) =>
   page <= 1 ? "/blog" : `/blog/pagina/${page}`;
 
-export const getCategoryPageUrl = (category: string, page: number) =>
+export const getCategoryPageUrl = (categorySlug: CategorySlug, page: number) =>
   page <= 1
-    ? getCategoryUrl(category)
-    : `${getCategoryUrl(category)}/pagina/${page}`;
+    ? getCategoryUrl(categorySlug)
+    : `${getCategoryUrl(categorySlug)}/pagina/${page}`;
 
 export const formatBlogDate = (date: Date) => dateFormatter.format(date);
 
@@ -83,11 +94,10 @@ export const getBlogListingPosts = (
     : posts;
 
 export const getBlogCategories = (posts: BlogPost[]) => {
-  const categories = new Map<string, BlogCategory>();
+  const categories = new Map<CategorySlug, BlogCategory>();
 
   posts.forEach((post) => {
-    const label = post.data.category;
-    const slug = getCategorySlug(label);
+    const slug = getBlogPostCategorySlug(post);
     const category = categories.get(slug);
 
     if (category) {
@@ -95,7 +105,9 @@ export const getBlogCategories = (posts: BlogPost[]) => {
       return;
     }
 
-    categories.set(slug, { label, slug, count: 1 });
+    const metadata = getCategory(slug);
+
+    categories.set(slug, { label: metadata.label, slug, count: 1 });
   });
 
   return [...categories.values()].sort((a, b) =>
@@ -105,9 +117,9 @@ export const getBlogCategories = (posts: BlogPost[]) => {
 
 export const getBlogPostsByCategorySlug = (
   posts: BlogPost[],
-  categorySlug: string,
+  categorySlug: CategorySlug,
 ) =>
-  posts.filter((post) => getCategorySlug(post.data.category) === categorySlug);
+  posts.filter((post) => getBlogPostCategorySlug(post) === categorySlug);
 
 export interface BlogRouteConflict {
   route: string;
@@ -121,17 +133,17 @@ export const getBlogRouteConflicts = (
   posts: Pick<BlogPost, "id" | "data">[],
 ): BlogRouteConflict[] => {
   const conflicts: BlogRouteConflict[] = [];
-  const categoryLabels = new Map<string, string>();
+  const categoryLabels = new Map<CategorySlug, string>();
   const articleRoutes = new Set<string>();
   const legacyArticleSlugs = new Set<string>();
-  const articleSlugsByCategory = new Map<string, Set<string>>();
+  const articleSlugsByCategory = new Map<CategorySlug, Set<string>>();
 
   posts.forEach((post) => {
     const categorySlug = getBlogPostCategorySlug(post);
     const articleSlug = getBlogPostSlug(post);
     const articleRoute = getBlogPostUrl(post);
 
-    categoryLabels.set(categorySlug, post.data.category);
+    categoryLabels.set(categorySlug, getCategory(categorySlug).label);
 
     if (reservedBlogArticleSlugs.has(articleSlug)) {
       conflicts.push({
@@ -164,18 +176,27 @@ export const getBlogRouteConflicts = (
     legacyArticleSlugs.add(articleSlug);
   });
 
-  categoryLabels.forEach((label, categorySlug) => {
-    if (reservedBlogCategorySlugs.has(categorySlug)) {
+  const categoryRouteSlugs = new Map<string, CategorySlug>();
+
+  categoryLabels.forEach((_, categorySlug) => {
+    categoryRouteSlugs.set(categorySlug, categorySlug);
+    getCategoryLegacySlugs(categorySlug).forEach((legacySlug) => {
+      categoryRouteSlugs.set(legacySlug, categorySlug);
+    });
+  });
+
+  categoryRouteSlugs.forEach((targetCategorySlug, routeSlug) => {
+    if (reservedBlogCategorySlugs.has(routeSlug)) {
       conflicts.push({
-        route: getCategoryUrl(label),
-        message: `Blog category route "/blog/${categorySlug}" is reserved.`,
+        route: `/blog/${routeSlug}`,
+        message: `Blog category route "/blog/${routeSlug}" is reserved.`,
       });
     }
 
-    if (legacyArticleSlugs.has(categorySlug)) {
+    if (legacyArticleSlugs.has(routeSlug)) {
       conflicts.push({
-        route: getCategoryUrl(label),
-        message: `Legacy blog article redirect "/blog/${categorySlug}" conflicts with category route "/blog/${categorySlug}".`,
+        route: `/blog/${routeSlug}`,
+        message: `Legacy blog article redirect "/blog/${routeSlug}" conflicts with category route "${getCategoryUrl(targetCategorySlug)}".`,
       });
     }
   });

@@ -3,7 +3,7 @@ title: "Porcentaje inverso: cómo encontrar el valor original"
 seoTitle: "Porcentaje inverso: calcular el precio original"
 description: "Aprende cómo calcular el valor original antes de un descuento, aumento o impuesto usando porcentaje inverso."
 pubDate: 2026-05-26
-category: "Matemáticas"
+categorySlug: "matematicas"
 tags:
   - porcentaje inverso
   - descuentos

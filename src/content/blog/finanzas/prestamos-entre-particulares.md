@@ -3,7 +3,7 @@ title: "Préstamos entre particulares: cómo calcular pagos e intereses"
 seoTitle: "Préstamo entre particulares: intereses, pagos y tabla de amortización"
 description: "Aprende a estimar pagos e intereses en un préstamo entre particulares y qué datos conviene dejar claros por escrito."
 pubDate: 2026-06-14
-category: "Finanzas"
+categorySlug: "finanzas"
 tags:
   - préstamo entre particulares
   - intereses

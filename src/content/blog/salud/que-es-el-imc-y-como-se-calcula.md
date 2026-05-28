@@ -3,7 +3,7 @@ title: "Qué es el IMC y cómo se calcula"
 seoTitle: "Qué es el IMC: fórmula, ejemplo y cómo interpretar el resultado"
 description: "Aprende qué es el Índice de Masa Corporal, cómo se calcula con peso y altura, y qué significa el resultado en adultos."
 pubDate: 2026-05-27
-category: "Salud"
+categorySlug: "salud"
 tags:
   - imc
   - salud

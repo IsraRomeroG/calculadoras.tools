@@ -3,7 +3,7 @@ title: "IMC en niños y adolescentes: por qué se usan percentiles"
 seoTitle: "IMC infantil y adolescente: percentiles por edad y sexo"
 description: "Aprende por qué el IMC en niños y adolescentes se interpreta con percentiles por edad y sexo, no con rangos adultos."
 pubDate: 2026-06-06
-category: "Salud"
+categorySlug: "salud"
 tags:
   - imc infantil
   - percentiles

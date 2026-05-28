@@ -10,6 +10,7 @@ import {
   getPublishedBlogPosts,
   paginateItems,
 } from "@lib/blog";
+import { getCategoryLegacySlugs } from "@lib/constants/categories";
 
 export async function getStaticPaths() {
   const posts = await getPublishedBlogPosts();
@@ -21,20 +22,47 @@ export async function getStaticPaths() {
   }));
 
   categories.forEach((category) => {
-    legacyPaths.push({
-      params: { legacy: `categoria/${category.slug}` },
-      props: { target: getCategoryUrl(category.label) },
-    });
-
     const categoryPosts = getBlogPostsByCategorySlug(posts, category.slug);
     const firstPage = paginateItems(categoryPosts, 1);
+    const categoryLegacySlugs = [
+      category.slug,
+      ...getCategoryLegacySlugs(category.slug),
+    ];
 
-    for (let page = 2; page <= firstPage.totalPages; page += 1) {
+    categoryLegacySlugs.forEach((sourceSlug) => {
       legacyPaths.push({
-        params: { legacy: `categoria/${category.slug}/pagina/${page}` },
-        props: { target: getCategoryPageUrl(category.label, page) },
+        params: { legacy: `categoria/${sourceSlug}` },
+        props: { target: getCategoryUrl(category.slug) },
       });
-    }
+
+      if (sourceSlug !== category.slug) {
+        legacyPaths.push({
+          params: { legacy: sourceSlug },
+          props: { target: getCategoryUrl(category.slug) },
+        });
+
+        categoryPosts.forEach((post) => {
+          legacyPaths.push({
+            params: { legacy: `${sourceSlug}/${getBlogPostSlug(post)}` },
+            props: { target: getBlogPostUrl(post) },
+          });
+        });
+      }
+
+      for (let page = 2; page <= firstPage.totalPages; page += 1) {
+        legacyPaths.push({
+          params: { legacy: `categoria/${sourceSlug}/pagina/${page}` },
+          props: { target: getCategoryPageUrl(category.slug, page) },
+        });
+
+        if (sourceSlug !== category.slug) {
+          legacyPaths.push({
+            params: { legacy: `${sourceSlug}/pagina/${page}` },
+            props: { target: getCategoryPageUrl(category.slug, page) },
+          });
+        }
+      }
+    });
   });
 
   return legacyPaths;

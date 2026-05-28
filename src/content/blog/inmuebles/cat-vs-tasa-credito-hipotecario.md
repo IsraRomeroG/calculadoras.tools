@@ -3,7 +3,7 @@ title: "CAT vs tasa en un crédito hipotecario"
 seoTitle: "CAT vs tasa hipotecaria: diferencias y cómo comparar créditos"
 description: "Entiende la diferencia entre tasa de interés y CAT en un crédito hipotecario, y por qué no conviene comparar solo la mensualidad."
 pubDate: 2026-06-01
-category: "Inmuebles"
+categorySlug: "inmuebles"
 tags:
   - cat
   - tasa hipotecaria

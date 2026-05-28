@@ -3,7 +3,7 @@ title: "Hipoteca de $3,000,000: cuánto pago al mes"
 seoTitle: "Hipoteca de 3 millones: mensualidad, intereses y plazo"
 description: "Simula cuánto podrías pagar al mes por una hipoteca de $3,000,000 con distintos plazos, tasas y pagos extra."
 pubDate: 2026-06-17
-category: "Inmuebles"
+categorySlug: "inmuebles"
 tags:
   - hipoteca 3000000
   - cuota mensual

@@ -3,7 +3,7 @@ title: "Préstamo de $50,000: cuánto pago al mes"
 seoTitle: "Préstamo de 50000: mensualidad, intereses y costo total"
 description: "Simula cuánto podrías pagar al mes por un préstamo de $50,000 según la tasa, el plazo, la comisión y los seguros."
 pubDate: 2026-05-31
-category: "Finanzas"
+categorySlug: "finanzas"
 tags:
   - préstamo 50000
   - cuota mensual

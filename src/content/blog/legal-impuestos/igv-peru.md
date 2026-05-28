@@ -2,7 +2,7 @@
 title: "IGV en Perú: cómo calcular el 18%"
 description: "Aprende cómo calcular y desglosar el IGV en Perú con ejemplos simples usando la tasa aplicable del 18%."
 pubDate: 2026-05-09
-category: "Legal e impuestos"
+categorySlug: "legal-impuestos"
 tags:
   - igv peru
   - sunat

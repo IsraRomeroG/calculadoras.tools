@@ -3,7 +3,7 @@ title: "Tabla de peso saludable de 1.50 m a 1.95 m"
 seoTitle: "Tabla de peso saludable por estatura de 1.50 m a 1.95 m"
 description: "Consulta rangos de peso saludable por estatura, calculados con IMC adulto de 18.5 a 24.9."
 pubDate: 2026-06-28
-category: "Salud"
+categorySlug: "salud"
 tags:
   - peso saludable
   - tabla de peso

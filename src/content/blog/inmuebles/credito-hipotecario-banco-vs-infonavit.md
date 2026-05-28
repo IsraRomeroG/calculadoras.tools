@@ -3,7 +3,7 @@ title: "Crédito hipotecario bancario vs Infonavit"
 seoTitle: "Banco vs Infonavit: diferencias al financiar una vivienda"
 description: "Conoce diferencias generales entre un crédito hipotecario bancario e Infonavit, y qué datos comparar antes de decidir."
 pubDate: 2026-06-13
-category: "Inmuebles"
+categorySlug: "inmuebles"
 tags:
   - infonavit
   - crédito hipotecario

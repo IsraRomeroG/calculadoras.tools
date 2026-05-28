@@ -58,7 +58,7 @@ interface Props {
 const { category, posts, pagination } = Astro.props;
 const title = `Blog de ${category.label} - página ${pagination.currentPage}`;
 const description = `Más artículos de ${category.label.toLowerCase()} con explicaciones claras, fórmulas prácticas y ejemplos.`;
-const canonical = getCategoryPageUrl(category.label, pagination.currentPage);
+const canonical = getCategoryPageUrl(category.slug, pagination.currentPage);
 ---
 
 <BaseLayout title={title} description={description} canonical={canonical}>
@@ -67,7 +67,7 @@ const canonical = getCategoryPageUrl(category.label, pagination.currentPage);
       pagination.previousPage && (
         <link
           rel="prev"
-          href={getCategoryPageUrl(category.label, pagination.previousPage)}
+          href={getCategoryPageUrl(category.slug, pagination.previousPage)}
         />
       )
     }
@@ -75,7 +75,7 @@ const canonical = getCategoryPageUrl(category.label, pagination.currentPage);
       pagination.nextPage && (
         <link
           rel="next"
-          href={getCategoryPageUrl(category.label, pagination.nextPage)}
+          href={getCategoryPageUrl(category.slug, pagination.nextPage)}
         />
       )
     }
@@ -92,7 +92,7 @@ const canonical = getCategoryPageUrl(category.label, pagination.currentPage);
         { label: "Blog", href: "/blog", optional: true },
         {
           label: category.label,
-          href: getCategoryUrl(category.label),
+          href: getCategoryUrl(category.slug),
           optional: true,
         },
         { label: `Página ${pagination.currentPage}` },
@@ -118,7 +118,7 @@ const canonical = getCategoryPageUrl(category.label, pagination.currentPage);
       <Pagination
         currentPage={pagination.currentPage}
         totalPages={pagination.totalPages}
-        getPageUrl={(page) => getCategoryPageUrl(category.label, page)}
+        getPageUrl={(page) => getCategoryPageUrl(category.slug, page)}
         class="mt-8"
       />
     </Container>

@@ -12,6 +12,7 @@ import {
   getBlogListingPosts,
   getBlogCategories,
   getFeaturedBlogPost,
+  getBlogPostCategory,
   getBlogPostUrl,
   getCategoryUrl,
   getPublishedBlogPosts,
@@ -25,6 +26,9 @@ const canonical = "/blog";
 
 const posts = await getPublishedBlogPosts();
 const featuredPost = getFeaturedBlogPost(posts);
+const featuredPostCategory = featuredPost
+  ? getBlogPostCategory(featuredPost)
+  : undefined;
 const latestPosts = getBlogListingPosts(posts, featuredPost);
 const latestPostsPage = paginateItems(latestPosts, 1);
 const categories = getBlogCategories(posts);
@@ -55,7 +59,7 @@ const categories = getBlogCategories(posts);
             <div class="mt-8 flex flex-wrap gap-3">
               {categories.map((category) => (
                 <a
-                  href={getCategoryUrl(category.label)}
+                  href={getCategoryUrl(category.slug)}
                   class="inline-flex items-center gap-2 rounded-full border border-gray-700 px-4 py-2 text-sm text-gray-300 transition hover:border-amber-400 hover:text-white"
                 >
                   <span>{category.label}</span>
@@ -74,7 +78,7 @@ const categories = getBlogCategories(posts);
           <article class="grid gap-6 rounded-lg border border-gray-700 bg-gray-950 p-6 md:grid-cols-[minmax(0,1fr)_16rem] md:p-8">
             <div>
               <p class="text-sm font-semibold text-amber-400">
-                {featuredPost.data.category}
+                {featuredPostCategory?.label}
                 {featuredPost.data.readTime && ` · ${featuredPost.data.readTime}`}
               </p>
 
@@ -113,10 +117,10 @@ const categories = getBlogCategories(posts);
                 <dt class="text-gray-500">Categoría</dt>
                 <dd class="mt-1">
                   <a
-                    href={getCategoryUrl(featuredPost.data.category)}
+                    href={getCategoryUrl(featuredPost.data.categorySlug)}
                     class="font-medium text-gray-200 transition hover:text-amber-300"
                   >
-                    {featuredPost.data.category}
+                    {featuredPostCategory?.label}
                   </a>
                 </dd>
               </div>

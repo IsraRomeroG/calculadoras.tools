@@ -3,7 +3,7 @@ title: "Qué incluye la cuota hipotecaria"
 seoTitle: "Qué incluye una cuota hipotecaria: capital, intereses y otros costos"
 description: "Entiende qué puede incluir una cuota hipotecaria, qué calcula nuestra herramienta y qué costos debes revisar por separado."
 pubDate: 2026-06-06
-category: "Inmuebles"
+categorySlug: "inmuebles"
 tags:
   - cuota hipotecaria
   - capital e intereses

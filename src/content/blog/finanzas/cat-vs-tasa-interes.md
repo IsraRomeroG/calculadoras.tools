@@ -3,7 +3,7 @@ title: "CAT vs tasa de interés: cuál debes comparar"
 seoTitle: "CAT vs tasa de interés: diferencias, ejemplo y costo real"
 description: "Entiende la diferencia entre CAT y tasa de interés, qué costos incluye cada uno y por qué el CAT ayuda a comparar préstamos."
 pubDate: 2026-05-29
-category: "Finanzas"
+categorySlug: "finanzas"
 tags:
   - cat
   - tasa de interés

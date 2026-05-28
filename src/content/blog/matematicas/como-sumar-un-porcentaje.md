@@ -3,7 +3,7 @@ title: "Cómo sumar un porcentaje a una cantidad"
 seoTitle: "Cómo sumar un porcentaje: fórmula y ejemplos"
 description: "Aprende cómo agregar un porcentaje a una cantidad con fórmula directa, ejemplos de precios, recargos e incrementos."
 pubDate: 2026-05-24
-category: "Matemáticas"
+categorySlug: "matematicas"
 tags:
   - porcentajes
   - aumentos

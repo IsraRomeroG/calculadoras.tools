@@ -1,5 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { CALCULATOR_CATEGORIES } from "./constants/calculator-categories";
+import {
+  CATEGORIES,
+  CATEGORY_SLUGS,
+  getCategoryByLabel,
+  getCategoryBySlugOrLegacySlug,
+} from "./constants/categories";
 import { CALCULATORS } from "./constants/calculators";
 import {
   getCalculatorCategories,
@@ -50,16 +55,52 @@ describe("calculator category directory", () => {
       "robots.txt",
     ]);
 
-    Object.entries(CALCULATOR_CATEGORIES).forEach(([slug, metadata]) => {
+    Object.entries(CATEGORIES).forEach(([slug, metadata]) => {
       expect(metadata.slug).toBe(slug);
       expect(reservedSlugs.has(slug)).toBe(false);
     });
 
     CALCULATORS.forEach((calculator) => {
-      expect(CALCULATOR_CATEGORIES[calculator.categorySlug]).toBeDefined();
+      expect(CATEGORIES[calculator.categorySlug]).toBeDefined();
+      expect(CATEGORIES[calculator.categorySlug].description).toBeTruthy();
       expect(calculator.href.startsWith(`/${calculator.categorySlug}/`)).toBe(
         true,
       );
     });
+  });
+
+  it("keeps shared category labels and legacy slugs coherent", () => {
+    const labels = new Set<string>();
+    const routeSlugs = new Set<string>();
+    const reservedBlogSlugs = new Set(["categoria", "pagina"]);
+
+    CATEGORY_SLUGS.forEach((slug) => {
+      const category = CATEGORIES[slug];
+
+      expect(category.slug).toBe(slug);
+      expect(labels.has(category.label)).toBe(false);
+      labels.add(category.label);
+
+      expect(routeSlugs.has(category.slug)).toBe(false);
+      expect(reservedBlogSlugs.has(category.slug)).toBe(false);
+      routeSlugs.add(category.slug);
+
+      category.legacySlugs?.forEach((legacySlug) => {
+        expect(routeSlugs.has(legacySlug)).toBe(false);
+        expect(reservedBlogSlugs.has(legacySlug)).toBe(false);
+        routeSlugs.add(legacySlug);
+      });
+    });
+
+    expect(getCategoryByLabel("Legal e impuestos")?.slug).toBe(
+      "legal-impuestos",
+    );
+    expect(getCategoryByLabel("Fecha y tiempo")?.slug).toBe("fecha-tiempo");
+    expect(getCategoryBySlugOrLegacySlug("legal-e-impuestos")?.slug).toBe(
+      "legal-impuestos",
+    );
+    expect(getCategoryBySlugOrLegacySlug("fecha-y-tiempo")?.slug).toBe(
+      "fecha-tiempo",
+    );
   });
 });

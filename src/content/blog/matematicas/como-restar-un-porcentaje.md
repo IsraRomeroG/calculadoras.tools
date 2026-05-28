@@ -3,7 +3,7 @@ title: "Cómo restar un porcentaje a una cantidad"
 seoTitle: "Cómo restar un porcentaje: fórmula y ejemplos"
 description: "Aprende cómo quitar un porcentaje de una cantidad para calcular descuentos, rebajas y reducciones sin errores."
 pubDate: 2026-05-24
-category: "Matemáticas"
+categorySlug: "matematicas"
 tags:
   - porcentajes
   - descuentos

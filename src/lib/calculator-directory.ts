@@ -1,8 +1,7 @@
 import { CALCULATORS } from "@lib/constants/calculators";
-import {
-  CALCULATOR_CATEGORIES,
-  type CalculatorCategorySlug,
-} from "@lib/constants/calculator-categories";
+import { getCategory, type CategorySlug } from "@lib/constants/categories";
+
+export type CalculatorCategorySlug = CategorySlug;
 
 export interface CalculatorDirectoryItem {
   id: string;
@@ -22,7 +21,7 @@ export interface CalculatorCategory {
 }
 
 export const getCalculatorCategory = (slug: CalculatorCategorySlug) =>
-  CALCULATOR_CATEGORIES[slug];
+  getCategory(slug);
 
 export const getCalculatorCategoryUrl = (slug: CalculatorCategorySlug) =>
   `/${slug}`;

@@ -3,7 +3,7 @@ title: "Qué significa tener un IMC menor a 16"
 seoTitle: "IMC menor a 16: delgadez severa y qué considerar"
 description: "Conoce qué significa un IMC menor a 16 en adultos y por qué puede requerir evaluación profesional."
 pubDate: 2026-06-15
-category: "Salud"
+categorySlug: "salud"
 tags:
   - imc bajo
   - bajo peso

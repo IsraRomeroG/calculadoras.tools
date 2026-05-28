@@ -3,7 +3,7 @@ title: "Sistema francés de amortización: explicación fácil"
 seoTitle: "Sistema francés de amortización: cuota fija, intereses y capital"
 description: "Entiende cómo funciona el sistema francés de amortización, por qué la cuota es fija y cómo cambia la mezcla de capital e intereses."
 pubDate: 2026-06-09
-category: "Finanzas"
+categorySlug: "finanzas"
 tags:
   - sistema francés
   - amortización

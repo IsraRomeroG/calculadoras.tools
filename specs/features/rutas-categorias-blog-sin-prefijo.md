@@ -1,5 +1,11 @@
 # Spec: rutas del blog por categoria sin prefijo
 
+> Nota posterior: la migracion
+> `specs/features/homologacion-slugs-categorias-blog-calculadoras.md`
+> reemplaza los ejemplos de `legal-e-impuestos` como slug canonico del blog.
+> Despues de esa homologacion, el slug canonico compartido es
+> `legal-impuestos`.
+
 ## Contexto
 
 El blog tiene actualmente estas familias de rutas publicas:
@@ -457,4 +463,3 @@ Despues del cambio debe documentar:
 - los articulos individuales viven bajo
   `/blog/<slug-categoria>/<slug-del-articulo>`.
 - una categoria nueva debe verificarse en `/blog/<slug>`.
-

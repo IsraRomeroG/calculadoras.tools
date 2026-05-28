@@ -96,7 +96,21 @@ const getLegacyBlogArticleSlugsForSitemap = () =>
       .map((filePath) => basename(filePath, extname(filePath))),
   );
 
+const getPublishedBlogCategorySlugsForSitemap = () =>
+  new Set(
+    getMarkdownFiles(BLOG_CONTENT_DIR)
+      .map((filePath) => {
+        const content = readFileSync(filePath, 'utf8');
+
+        return isPublishableBlogContent(content)
+          ? getFrontmatterValue(content, 'categorySlug')
+          : null;
+      })
+      .filter((categorySlug) => categorySlug),
+  );
+
 const legacyBlogArticleSlugs = getLegacyBlogArticleSlugsForSitemap();
+const publishedBlogCategorySlugs = getPublishedBlogCategorySlugsForSitemap();
 
 const shouldIncludeInSitemap = (page) => {
   const path = new URL(page).pathname.replace(/\/$/, '');
@@ -105,11 +119,24 @@ const shouldIncludeInSitemap = (page) => {
     return false;
   }
 
-  const blogSingleSegment = /^\/blog\/([^/]+)$/.exec(path);
+  const blogSegments = path.split('/').filter(Boolean);
 
-  return (
-    !blogSingleSegment || !legacyBlogArticleSlugs.has(blogSingleSegment[1])
-  );
+  if (blogSegments[0] !== 'blog' || blogSegments.length === 1) {
+    return true;
+  }
+
+  if (blogSegments[1] === 'pagina') {
+    return true;
+  }
+
+  if (
+    blogSegments.length === 2 &&
+    legacyBlogArticleSlugs.has(blogSegments[1])
+  ) {
+    return false;
+  }
+
+  return publishedBlogCategorySlugs.has(blogSegments[1]);
 };
 
 // https://astro.build/config

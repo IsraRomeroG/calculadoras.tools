@@ -3,7 +3,7 @@ title: "Tabla de amortización de un préstamo: qué es y cómo leerla"
 seoTitle: "Tabla de amortización: capital, intereses, saldo y pagos"
 description: "Conoce qué muestra una tabla de amortización, cómo se divide cada pago entre capital e intereses y cómo usarla para comparar un crédito."
 pubDate: 2026-05-28
-category: "Finanzas"
+categorySlug: "finanzas"
 tags:
   - amortización
   - préstamo

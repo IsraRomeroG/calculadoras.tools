@@ -3,7 +3,7 @@ title: "Préstamo de nómina vs préstamo personal: diferencias"
 seoTitle: "Préstamo de nómina vs personal: tasa, CAT, pagos y riesgos"
 description: "Conoce las diferencias entre un préstamo de nómina y un préstamo personal, y qué revisar antes de comparar ofertas."
 pubDate: 2026-06-07
-category: "Finanzas"
+categorySlug: "finanzas"
 tags:
   - préstamo de nómina
   - préstamo personal

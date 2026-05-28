@@ -2,7 +2,7 @@
 title: "Cómo calcular porcentajes sin complicarte"
 description: "Guía rápida para entender porcentajes, aumentos, descuentos y variaciones con ejemplos claros."
 pubDate: 2026-05-10
-category: "Matemáticas"
+categorySlug: "matematicas"
 tags:
   - porcentajes
   - matemáticas

@@ -3,7 +3,7 @@ title: "Cuánto debería pesar según mi estatura"
 seoTitle: "Cuánto debería pesar según mi estatura: rango saludable"
 description: "Aprende a estimar un rango de peso saludable según tu estatura usando el IMC adulto como referencia."
 pubDate: 2026-06-01
-category: "Salud"
+categorySlug: "salud"
 tags:
   - peso
   - estatura

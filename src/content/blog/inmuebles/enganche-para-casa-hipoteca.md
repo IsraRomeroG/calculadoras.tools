@@ -3,7 +3,7 @@ title: "Enganche para casa: cómo afecta tu hipoteca"
 seoTitle: "Enganche para casa: porcentaje, monto y efecto en la mensualidad"
 description: "Entiende cómo el enganche reduce el monto de una hipoteca, cambia la mensualidad y puede disminuir los intereses totales."
 pubDate: 2026-05-29
-category: "Inmuebles"
+categorySlug: "inmuebles"
 tags:
   - enganche
   - hipoteca

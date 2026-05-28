@@ -3,7 +3,7 @@ title: "Préstamo de $100,000: cuánto pago al mes"
 seoTitle: "Préstamo de 100000: mensualidad, intereses y costo total"
 description: "Revisa escenarios para estimar cuánto pagarías por un préstamo de $100,000 según tasa, plazo, comisiones y seguros."
 pubDate: 2026-06-01
-category: "Finanzas"
+categorySlug: "finanzas"
 tags:
   - préstamo 100000
   - cuota mensual

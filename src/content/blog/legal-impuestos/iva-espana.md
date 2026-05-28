@@ -2,7 +2,7 @@
 title: "IVA en España: tipos general, reducido y superreducido"
 description: "Conoce los tipos de IVA en España, cómo calcular el 21%, cuándo aparecen el 10%, el 4% y el 0%, y cómo desglosar precios."
 pubDate: 2026-05-11
-category: "Legal e impuestos"
+categorySlug: "legal-impuestos"
 tags:
   - iva españa
   - agencia tributaria

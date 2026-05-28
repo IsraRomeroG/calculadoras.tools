@@ -3,7 +3,7 @@ title: "Hipoteca de $1,000,000: cuánto pago al mes"
 seoTitle: "Hipoteca de 1 millón: mensualidad, intereses y plazo"
 description: "Simula cuánto podrías pagar al mes por una hipoteca de $1,000,000 con distintos plazos y tasas."
 pubDate: 2026-06-15
-category: "Inmuebles"
+categorySlug: "inmuebles"
 tags:
   - hipoteca 1000000
   - cuota mensual

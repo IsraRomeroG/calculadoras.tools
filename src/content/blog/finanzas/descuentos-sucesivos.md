@@ -3,7 +3,7 @@ title: "Descuentos sucesivos: por qué 20% + 10% no es 30%"
 seoTitle: "Descuentos sucesivos: fórmula para calcular rebajas acumuladas"
 description: "Aprende cómo calcular descuentos sucesivos y por qué dos rebajas se aplican una después de otra, no sumando porcentajes."
 pubDate: 2026-05-26
-category: "Finanzas"
+categorySlug: "finanzas"
 tags:
   - descuentos
   - compras

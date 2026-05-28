@@ -3,7 +3,7 @@ title: "Cómo calcular calificaciones con porcentajes"
 seoTitle: "Calificaciones con porcentajes: nota final y ponderaciones"
 description: "Aprende cómo calcular una calificación con porcentajes, aciertos, ponderaciones y nota final con ejemplos claros."
 pubDate: 2026-05-27
-category: "Matemáticas"
+categorySlug: "matematicas"
 tags:
   - calificaciones
   - porcentajes

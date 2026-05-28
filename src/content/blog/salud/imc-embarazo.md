@@ -3,7 +3,7 @@ title: "IMC y embarazo: por qué no se interpreta igual"
 seoTitle: "IMC en embarazo: límites y cómo interpretarlo con cuidado"
 description: "Conoce por qué el IMC actual durante el embarazo no se interpreta igual y qué precauciones considerar."
 pubDate: 2026-06-07
-category: "Salud"
+categorySlug: "salud"
 tags:
   - embarazo
   - imc

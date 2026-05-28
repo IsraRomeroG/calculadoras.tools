@@ -2,7 +2,7 @@
 title: "Cómo calcular el IVA paso a paso"
 description: "Aprende a sumar y desglosar IVA con fórmulas simples, ejemplos claros y una calculadora online."
 pubDate: 2026-05-16
-category: "Legal e impuestos"
+categorySlug: "legal-impuestos"
 tags:
   - iva
   - impuestos

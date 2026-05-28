@@ -3,7 +3,7 @@ title: "Cuánto debo pesar si mido 1.65 m"
 seoTitle: "Cuánto debo pesar si mido 1.65 m: rango saludable"
 description: "Conoce el rango de peso saludable de referencia para una estatura de 1.65 m según el IMC adulto."
 pubDate: 2026-06-23
-category: "Salud"
+categorySlug: "salud"
 tags:
   - peso saludable
   - estatura

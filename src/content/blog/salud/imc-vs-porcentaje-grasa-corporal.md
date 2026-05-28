@@ -3,7 +3,7 @@ title: "IMC vs porcentaje de grasa corporal"
 seoTitle: "IMC vs porcentaje de grasa corporal: diferencias y cuándo usar cada uno"
 description: "Compara el IMC con el porcentaje de grasa corporal y entiende qué puede medir cada indicador."
 pubDate: 2026-06-10
-category: "Salud"
+categorySlug: "salud"
 tags:
   - imc
   - grasa corporal

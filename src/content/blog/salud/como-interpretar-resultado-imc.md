@@ -3,7 +3,7 @@ title: "Cómo interpretar tu resultado de IMC"
 seoTitle: "Cómo interpretar el IMC: categoría, rango y limitaciones"
 description: "Aprende a leer tu resultado de IMC, qué significa cada categoría y qué limitaciones debes considerar."
 pubDate: 2026-05-30
-category: "Salud"
+categorySlug: "salud"
 tags:
   - imc
   - interpretacion
