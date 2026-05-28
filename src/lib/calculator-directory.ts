@@ -1,65 +1,55 @@
 import { CALCULATORS } from "@lib/constants/calculators";
+import {
+  CALCULATOR_CATEGORIES,
+  type CalculatorCategorySlug,
+} from "@lib/constants/calculator-categories";
 
 export interface CalculatorDirectoryItem {
   id: string;
   title: string;
   description: string;
   href: string;
-  category: string;
+  categorySlug: CalculatorCategorySlug;
   order: number;
   draft?: boolean;
 }
 
 export interface CalculatorCategory {
+  slug: CalculatorCategorySlug;
   label: string;
-  slug: string;
+  description: string;
   count: number;
 }
 
-const calculatorCategoryDescriptions: Record<string, string> = {
-  finanzas:
-    "Calculadoras para estimar préstamos, intereses y escenarios de inversión antes de comprometer tu dinero.",
-  inmuebles:
-    "Herramientas para estimar pagos, financiamiento y escenarios relacionados con vivienda e inmuebles.",
-  "legal-e-impuestos":
-    "Herramientas para agregar o desglosar impuestos, revisar montos con IVA y preparar cifras útiles para facturas o presupuestos.",
-  matematicas:
-    "Calculadoras para porcentajes, proporciones y reglas de tres, con resultados directos para tareas, compras y trabajo.",
-  salud:
-    "Calculadoras de referencia para revisar indicadores personales y entender mejor tus resultados de bienestar.",
-  "fecha-y-tiempo":
-    "Herramientas para calcular edades, intervalos, cumpleaños y fechas importantes con claridad.",
-};
+export const getCalculatorCategory = (slug: CalculatorCategorySlug) =>
+  CALCULATOR_CATEGORIES[slug];
 
-export const getCalculatorCategorySlug = (category: string) =>
-  category
-    .toLowerCase()
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-+|-+$/g, "");
+export const getCalculatorCategoryUrl = (slug: CalculatorCategorySlug) =>
+  `/categoria/${slug}`;
 
-export const getCalculatorCategoryUrl = (category: string) =>
-  `/categoria/${getCalculatorCategorySlug(category)}`;
-
-export const getCalculatorCategoryDescription = (category: string) =>
-  calculatorCategoryDescriptions[getCalculatorCategorySlug(category)] ??
-  "Calculadoras seleccionadas para resolver operaciones frecuentes con resultados claros y fáciles de revisar.";
+export const getCalculatorCategoryDescription = (slug: CalculatorCategorySlug) =>
+  getCalculatorCategory(slug).description;
 
 export const sortCalculators = (items: CalculatorDirectoryItem[]) =>
-  [...items].sort((a, b) => a.order - b.order || a.title.localeCompare(b.title));
+  [...items].sort(
+    (a, b) => a.order - b.order || a.title.localeCompare(b.title),
+  );
 
 export const getPublishedCalculators = () =>
   sortCalculators(CALCULATORS.filter((calculator) => !calculator.draft));
 
+export const getCalculatorsByCategorySlug = (
+  items: CalculatorDirectoryItem[],
+  categorySlug: CalculatorCategorySlug,
+) => items.filter((item) => item.categorySlug === categorySlug);
+
 export const getCalculatorCategories = (
   items: CalculatorDirectoryItem[],
 ): CalculatorCategory[] => {
-  const categories = new Map<string, CalculatorCategory>();
+  const categories = new Map<CalculatorCategorySlug, CalculatorCategory>();
 
   items.forEach((item) => {
-    const label = item.category;
-    const slug = getCalculatorCategorySlug(label);
+    const slug = item.categorySlug;
     const category = categories.get(slug);
 
     if (category) {
@@ -67,7 +57,14 @@ export const getCalculatorCategories = (
       return;
     }
 
-    categories.set(slug, { label, slug, count: 1 });
+    const metadata = getCalculatorCategory(slug);
+
+    categories.set(slug, {
+      slug,
+      label: metadata.label,
+      description: metadata.description,
+      count: 1,
+    });
   });
 
   return [...categories.values()].sort((a, b) =>

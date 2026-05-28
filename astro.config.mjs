@@ -22,6 +22,8 @@ export default defineConfig({
 
   redirects: {
     '/calculadora-deficit-calorico': '/salud/calculadora-deficit-calorico',
-    '/calculadora-de-edad': '/fecha-tiempo/calculadora-de-edad'
+    '/calculadora-de-edad': '/fecha-tiempo/calculadora-de-edad',
+    '/categoria/legal-e-impuestos': '/categoria/legal-impuestos',
+    '/categoria/fecha-y-tiempo': '/categoria/fecha-tiempo'
   }
 });

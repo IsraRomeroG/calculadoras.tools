@@ -6,7 +6,7 @@ export const CALCULATORS: CalculatorDirectoryItem[] = [
     title: "Calculadora de porcentajes",
     description: "Calcula porcentajes y aumentos/disminuciones en valores.",
     href: "/matematicas/calculadora-de-porcentajes",
-    category: "Matemáticas",
+    categorySlug: "matematicas",
     order: 10,
   },
   {
@@ -14,7 +14,7 @@ export const CALCULATORS: CalculatorDirectoryItem[] = [
     title: "Calculadora de regla de tres",
     description: "Resuelve proporciones directas e inversas paso a paso.",
     href: "/matematicas/calculadora-de-regla-de-tres",
-    category: "Matemáticas",
+    categorySlug: "matematicas",
     order: 15,
   },
   {
@@ -22,7 +22,7 @@ export const CALCULATORS: CalculatorDirectoryItem[] = [
     title: "Calculadora de IVA",
     description: "Agrega o desglosa IVA con tasa editable y presets por país.",
     href: "/legal-impuestos/calculadora-de-iva",
-    category: "Legal e impuestos",
+    categorySlug: "legal-impuestos",
     order: 20,
   },
   {
@@ -31,7 +31,7 @@ export const CALCULATORS: CalculatorDirectoryItem[] = [
     description:
       "Simula inversiones con aportaciones, inflación y crecimiento año a año.",
     href: "/finanzas/calculadora-de-interes-compuesto",
-    category: "Finanzas",
+    categorySlug: "finanzas",
     order: 30,
   },
   {
@@ -40,7 +40,7 @@ export const CALCULATORS: CalculatorDirectoryItem[] = [
     description:
       "Calcula cuota mensual, intereses, costo total y tabla de amortización.",
     href: "/finanzas/calculadora-de-prestamo",
-    category: "Finanzas",
+    categorySlug: "finanzas",
     order: 35,
   },
   {
@@ -49,7 +49,7 @@ export const CALCULATORS: CalculatorDirectoryItem[] = [
     description:
       "Estima cuota mensual, intereses y tabla de amortización de una hipoteca.",
     href: "/inmuebles/calculadora-de-hipoteca",
-    category: "Inmuebles",
+    categorySlug: "inmuebles",
     order: 37,
   },
   {
@@ -58,7 +58,7 @@ export const CALCULATORS: CalculatorDirectoryItem[] = [
     description:
       "Calcula tu Índice de Masa Corporal y revisa tu rango saludable estimado.",
     href: "/salud/calculadora-de-imc",
-    category: "Salud",
+    categorySlug: "salud",
     order: 40,
   },
   {
@@ -67,7 +67,7 @@ export const CALCULATORS: CalculatorDirectoryItem[] = [
     description:
       "Estima tu TMB, gasto diario total y calorías orientativas por objetivo.",
     href: "/salud/calculadora-de-calorias-diarias-tdee",
-    category: "Salud",
+    categorySlug: "salud",
     order: 45,
   },
   {
@@ -76,7 +76,7 @@ export const CALCULATORS: CalculatorDirectoryItem[] = [
     description:
       "Calcula gramos diarios de proteína, carbohidratos y grasas según calorías, peso y objetivo.",
     href: "/salud/calculadora-de-macros",
-    category: "Salud",
+    categorySlug: "salud",
     order: 50,
   },
   {
@@ -85,7 +85,7 @@ export const CALCULATORS: CalculatorDirectoryItem[] = [
     description:
       "Estima calorias diarias, deficit, ritmo semanal y plazo para bajar de peso.",
     href: "/salud/calculadora-deficit-calorico",
-    category: "Salud",
+    categorySlug: "salud",
     order: 55,
   },
   {
@@ -94,7 +94,7 @@ export const CALCULATORS: CalculatorDirectoryItem[] = [
     description:
       "Calcula edad exacta, días vividos y próximo cumpleaños con fecha de referencia editable.",
     href: "/fecha-tiempo/calculadora-de-edad",
-    category: "Fecha y tiempo",
+    categorySlug: "fecha-tiempo",
     order: 60,
   },
 ];

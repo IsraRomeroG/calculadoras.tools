@@ -5,9 +5,8 @@ import Container from "@components/layout/Container.astro";
 import PageShell from "@components/layout/PageShell.astro";
 import PageHero from "@components/shared/PageHero.astro";
 import {
+  getCalculatorsByCategorySlug,
   getCalculatorCategories,
-  getCalculatorCategoryDescription,
-  getCalculatorCategorySlug,
   getCalculatorCategoryUrl,
   getPublishedCalculators,
   type CalculatorCategory,
@@ -22,10 +21,7 @@ export function getStaticPaths() {
     params: { category: category.slug },
     props: {
       category,
-      calculators: calculators.filter(
-        (calculator) =>
-          getCalculatorCategorySlug(calculator.category) === category.slug,
-      ),
+      calculators: getCalculatorsByCategorySlug(calculators, category.slug),
     },
   }));
 }
@@ -38,8 +34,8 @@ interface Props {
 const { category, calculators } = Astro.props;
 const categoryName = category.label.toLowerCase();
 const title = `Calculadoras de ${categoryName}`;
-const description = getCalculatorCategoryDescription(category.label);
-const canonical = getCalculatorCategoryUrl(category.label);
+const description = category.description;
+const canonical = getCalculatorCategoryUrl(category.slug);
 ---
 
 <BaseLayout title={title} description={description} canonical={canonical}>
