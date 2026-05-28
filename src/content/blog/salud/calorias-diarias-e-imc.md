@@ -92,7 +92,7 @@ Ambas herramientas son útiles si se interpretan como referencias, no como instr
 
 ## Calculadoras relacionadas
 
-Empieza con la [calculadora de IMC](/salud/calculadora-de-imc). Después puedes usar la [calculadora de calorías diarias (TDEE)](/salud/calculadora-de-calorias-diarias) para complementar el análisis energético.
+Empieza con la [calculadora de IMC](/salud/calculadora-de-imc). Después puedes usar la [calculadora de calorías diarias (TDEE)](/salud/calculadora-de-calorias-diarias-tdee) para complementar el análisis energético.
 
 ## Preguntas frecuentes
 
