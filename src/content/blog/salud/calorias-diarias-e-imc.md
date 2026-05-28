@@ -92,7 +92,7 @@ Ambas herramientas son útiles si se interpretan como referencias, no como instr
 
 ## Calculadoras relacionadas
 
-Empieza con la [calculadora de IMC](/salud/calculadora-de-imc). Cuando estén disponibles, la [calculadora TDEE](/salud/calculadora-tdee) y la calculadora de déficit calórico podrán complementar el análisis energético.
+Empieza con la [calculadora de IMC](/salud/calculadora-de-imc). Después puedes usar la [calculadora de calorías diarias (TDEE)](/salud/calculadora-de-calorias-diarias) para complementar el análisis energético.
 
 ## Preguntas frecuentes
 
@@ -106,11 +106,10 @@ Normalmente no necesita usar el IMC directamente. Suele usar peso, estatura, eda
 
 ### Qué calculadora debo usar primero?
 
-Si quieres ubicar tu peso respecto a tu estatura, empieza por IMC. Si quieres estimar energía diaria, usa una calculadora TDEE cuando esté disponible.
+Si quieres ubicar tu peso respecto a tu estatura, empieza por IMC. Si quieres estimar energía diaria, usa la calculadora de calorías diarias (TDEE).
 
 ## Fuentes consultadas
 
 - [CDC: BMI Frequently Asked Questions](https://www.cdc.gov/bmi/faq/index.html)
 - [CDC: Adult BMI Categories](https://www.cdc.gov/bmi/adult-calculator/bmi-categories.html)
 - [NIDDK: Eating & Physical Activity to Lose or Maintain Weight](https://www.niddk.nih.gov/health-information/weight-management/adult-overweight-obesity/eating-physical-activity)
-

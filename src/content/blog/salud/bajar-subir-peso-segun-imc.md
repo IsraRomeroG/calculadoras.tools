@@ -82,7 +82,7 @@ El IMC no calcula cuántas calorías necesitas. Solo relaciona peso y estatura.
 
 Para estimar energía diaria se usan herramientas como TDEE, que considera variables como edad, sexo, peso, estatura y actividad física. Por eso, después de calcular el IMC, puede tener sentido revisar la relación entre [calorías diarias e IMC](/blog/calorias-diarias-e-imc).
 
-Cuando esté disponible, la [calculadora TDEE](/salud/calculadora-tdee) podrá ayudarte a estimar gasto energético diario. Más adelante también puede complementarse con herramientas de déficit o superávit calórico, siempre con enfoque orientativo.
+La [calculadora de calorías diarias (TDEE)](/salud/calculadora-de-calorias-diarias) puede ayudarte a estimar gasto energético diario. Más adelante también puede complementarse con herramientas de déficit o superávit calórico, siempre con enfoque orientativo.
 
 ## Cuándo consultar a un profesional
 
@@ -121,4 +121,3 @@ Si hay síntomas, cambios rápidos de peso, enfermedades, embarazo, IMC muy bajo
 - [CDC: Adult BMI Categories](https://www.cdc.gov/bmi/adult-calculator/bmi-categories.html)
 - [NIDDK: Eating & Physical Activity to Lose or Maintain Weight](https://www.niddk.nih.gov/health-information/weight-management/adult-overweight-obesity/eating-physical-activity)
 - [MedlinePlus: Body Weight](https://medlineplus.gov/bodyweight.html)
-

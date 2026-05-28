@@ -61,4 +61,13 @@ export const CALCULATORS: CalculatorDirectoryItem[] = [
     category: "Salud",
     order: 40,
   },
+  {
+    id: "calculadora-de-calorias-diarias",
+    title: "Calculadora de calorías diarias (TDEE)",
+    description:
+      "Estima tu TMB, gasto diario total y calorías orientativas por objetivo.",
+    href: "/salud/calculadora-de-calorias-diarias",
+    category: "Salud",
+    order: 45,
+  },
 ];

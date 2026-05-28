@@ -1,0 +1,1422 @@
+---
+import BaseLayout from "@layouts/BaseLayout.astro";
+import Container from "@components/layout/Container.astro";
+import PageShell from "@components/layout/PageShell.astro";
+import FaqSection from "@components/shared/FaqSection.astro";
+import PageHero from "@components/shared/PageHero.astro";
+import SectionIntro from "@components/shared/SectionIntro.astro";
+import { ACTIVITY_OPTIONS, GOAL_OPTIONS } from "@lib/calculators/tdee";
+import { buildFaqJsonLd } from "@lib/seo";
+
+const title = "Calculadora de Calorías Diarias (TDEE) — TMB y Gasto Diario";
+const description =
+  "Calcula tus calorías diarias estimadas según tu metabolismo, actividad física y objetivo. Obtén TMB, TDEE y rangos orientativos para mantener peso, crear déficit o usar superávit.";
+const canonical = "/salud/calculadora-de-calorias-diarias";
+
+const faqs = [
+  {
+    question: "¿Qué es el TDEE y cómo se calcula?",
+    answer:
+      "El TDEE es el gasto energético total diario. Se estima multiplicando la tasa metabólica basal por un factor de actividad.",
+  },
+  {
+    question: "¿Qué es la TMB?",
+    answer:
+      "La TMB o tasa metabólica basal estima las calorías que el cuerpo usa en reposo para funciones vitales como respiración, circulación y temperatura.",
+  },
+  {
+    question: "¿Cuántas calorías necesito para mantener mi peso?",
+    answer:
+      "La estimación de mantenimiento es tu TDEE. Úsala como punto de partida y ajústala después de 2 a 3 semanas según tu evolución real.",
+  },
+  {
+    question: "¿Cuántas calorías necesito para perder peso?",
+    answer:
+      "La calculadora muestra déficits orientativos de 10%, 15% y 20% sobre tu TDEE. No son promesas de cambio real y pueden requerir supervisión profesional.",
+  },
+  {
+    question:
+      "¿Cuántas calorías necesito para subir de peso o apoyar ganancia muscular?",
+    answer:
+      "La calculadora muestra superávits orientativos de 5%, 10% y 15%. Un superávit no garantiza músculo: también influyen entrenamiento, proteína, descanso y progresión.",
+  },
+  {
+    question: "¿Qué nivel de actividad debo elegir?",
+    answer:
+      "Piensa en todo tu día, no solo en tus entrenamientos. Si dudas entre dos niveles, elige el menor y ajusta con tu evolución real.",
+  },
+  {
+    question: "¿Por qué mi peso no cambia aunque coma según mi TDEE?",
+    answer:
+      "Porque el TDEE es una estimación. Puede variar por movimiento diario, sueño, estrés, medicamentos, ciclo menstrual, masa muscular, precisión de datos y adaptación metabólica.",
+  },
+  {
+    question: "¿Cada cuánto debo recalcular mis calorías?",
+    answer:
+      "Recalcula cuando cambies varios kilos de peso, cambie tu rutina de actividad o después de observar tu evolución durante 2 a 3 semanas.",
+  },
+  {
+    question: "¿Qué fórmula es más precisa para calcular el metabolismo?",
+    answer:
+      "En esta versión se usa Mifflin-St Jeor por defecto porque es una fórmula común para adultos. En versiones avanzadas puede compararse con Harris-Benedict o Katch-McArdle.",
+  },
+  {
+    question: "¿Esta calculadora sirve para adolescentes?",
+    answer:
+      "No. Está pensada para adultos. En niñas, niños y adolescentes las necesidades energéticas dependen del crecimiento y deben evaluarse con un profesional de salud.",
+  },
+];
+
+const faqJsonLd = buildFaqJsonLd(faqs);
+
+const summaryCards = [
+  {
+    title: "TMB",
+    text: "Metabolismo basal estimado con Mifflin-St Jeor.",
+  },
+  {
+    title: "TDEE",
+    text: "TMB ajustada por tu actividad diaria aproximada.",
+  },
+  {
+    title: "Objetivo",
+    text: "Rangos orientativos para déficit, mantenimiento o superávit.",
+  },
+];
+
+const sources = [
+  {
+    label: "Mifflin-St Jeor: resting energy expenditure",
+    href: "https://pubmed.ncbi.nlm.nih.gov/2305711/",
+  },
+  {
+    label: "National Academies: Dietary Reference Intakes for Energy",
+    href: "https://nap.nationalacademies.org/read/26818/chapter/2",
+  },
+  {
+    label: "NCBI Bookshelf: Factors Affecting Energy Expenditure",
+    href: "https://www.ncbi.nlm.nih.gov/books/NBK591031/",
+  },
+  {
+    label: "NIDDK: Body Weight Planner",
+    href: "https://www.niddk.nih.gov/bwp",
+  },
+  {
+    label: "CDC: Steps for Losing Weight",
+    href: "https://www.cdc.gov/healthy-weight-growth/losing-weight/index.html",
+  },
+];
+---
+
+<BaseLayout title={title} description={description} canonical={canonical}>
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={JSON.stringify(faqJsonLd)} />
+  </Fragment>
+
+  <PageShell>
+    <PageHero
+      title="Calculadora de calorías diarias (TDEE)"
+      description="Estima tu TMB, tu gasto total diario y rangos orientativos para mantener peso, crear déficit o usar superávit."
+      kicker="Salud"
+      collapseBreadcrumbOnMobile
+      containerClass="py-5 md:py-7"
+      breadcrumbs={[
+        { label: "Inicio", href: "/", ariaLabel: "Inicio" },
+        { label: "Salud", href: "/#calculadoras", optional: true },
+        { label: "Calculadora TDEE", truncate: true },
+      ]}
+    />
+
+    <Container as="section" class="py-6 md:py-8">
+      <section
+        id="tdee-calculator"
+        class="overflow-hidden rounded-lg border border-gray-700 bg-gray-950 shadow-xl shadow-gray-950/30"
+        aria-labelledby="calculator-heading"
+      >
+        <div class="grid gap-0 xl:grid-cols-[minmax(0,1fr)_minmax(21rem,0.78fr)]">
+          <div class="p-4 sm:p-6">
+            <div class="mb-5">
+              <p class="text-sm font-semibold uppercase tracking-wide text-amber-400">
+                Cálculo principal
+              </p>
+              <h2 id="calculator-heading" class="mt-2 text-2xl font-semibold">
+                Calcula tu gasto diario estimado
+              </h2>
+              <p class="mt-2 text-sm leading-relaxed text-gray-400">
+                La fórmula usa sexo, edad, peso, altura y actividad. El
+                resultado es educativo y debe ajustarse con tu evolución real.
+              </p>
+            </div>
+
+            <div class="mb-5">
+              <span class="block text-sm font-medium text-gray-200">
+                Sistema de unidades
+              </span>
+              <div
+                class="mt-2 flex rounded-lg border border-gray-700 bg-gray-900 p-1"
+                role="group"
+                aria-label="Sistema de unidades"
+              >
+                <button
+                  class="min-h-11 flex-1 rounded-md px-4 py-2 text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/40"
+                  type="button"
+                  aria-pressed="true"
+                  data-unit-option="metric"
+                >
+                  Métrico
+                </button>
+                <button
+                  class="min-h-11 flex-1 rounded-md px-4 py-2 text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/40"
+                  type="button"
+                  aria-pressed="false"
+                  data-unit-option="imperial"
+                >
+                  Imperial
+                </button>
+              </div>
+            </div>
+
+            <div class="grid gap-4 sm:grid-cols-2">
+              <div>
+                <label
+                  for="tdee-sex"
+                  class="block text-sm font-medium text-gray-200"
+                >
+                  Sexo usado por la fórmula
+                </label>
+                <select
+                  id="tdee-sex"
+                  class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-900 px-4 text-base text-white outline-none transition focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15"
+                  aria-describedby="tdee-sex-error"
+                  data-input="sex"
+                >
+                  <option value="">Selecciona</option>
+                  <option value="female">Mujer</option>
+                  <option value="male">Hombre</option>
+                </select>
+                <p class="mt-2 text-xs leading-relaxed text-gray-500">
+                  La ecuación requiere esta variable; no se usa para inferir
+                  identidad de género.
+                </p>
+                <p
+                  id="tdee-sex-error"
+                  class="mt-2 hidden text-sm text-red-300"
+                  data-error-for="sex"
+                >
+                </p>
+              </div>
+
+              <div>
+                <label
+                  for="tdee-age"
+                  class="block text-sm font-medium text-gray-200"
+                >
+                  Edad
+                </label>
+                <div
+                  class="mt-2 flex rounded-lg border border-gray-700 bg-gray-900 focus-within:border-amber-400 focus-within:ring-3 focus-within:ring-amber-400/15"
+                >
+                  <input
+                    id="tdee-age"
+                    class="min-h-12 w-full bg-transparent px-4 text-base text-white outline-none"
+                    type="text"
+                    inputmode="numeric"
+                    autocomplete="off"
+                    placeholder="28"
+                    aria-describedby="tdee-age-error"
+                    data-input="age"
+                  />
+                  <span class="flex items-center px-4 text-gray-500">años</span>
+                </div>
+                <p
+                  id="tdee-age-error"
+                  class="mt-2 hidden text-sm text-red-300"
+                  data-error-for="age"
+                >
+                </p>
+              </div>
+            </div>
+
+            <div class="mt-5 grid gap-4 sm:grid-cols-2" data-unit-panel="metric">
+              <div>
+                <label
+                  for="tdee-weight-kg"
+                  class="block text-sm font-medium text-gray-200"
+                >
+                  Peso
+                </label>
+                <div
+                  class="mt-2 flex rounded-lg border border-gray-700 bg-gray-900 focus-within:border-amber-400 focus-within:ring-3 focus-within:ring-amber-400/15"
+                >
+                  <input
+                    id="tdee-weight-kg"
+                    class="min-h-12 w-full bg-transparent px-4 text-base text-white outline-none"
+                    type="text"
+                    inputmode="decimal"
+                    autocomplete="off"
+                    placeholder="65"
+                    aria-describedby="tdee-weight-kg-error"
+                    data-input="weightKg"
+                  />
+                  <span class="flex items-center px-4 text-gray-500">kg</span>
+                </div>
+                <p
+                  id="tdee-weight-kg-error"
+                  class="mt-2 hidden text-sm text-red-300"
+                  data-error-for="weightKg"
+                >
+                </p>
+              </div>
+
+              <div>
+                <label
+                  for="tdee-height-cm"
+                  class="block text-sm font-medium text-gray-200"
+                >
+                  Altura
+                </label>
+                <div
+                  class="mt-2 flex rounded-lg border border-gray-700 bg-gray-900 focus-within:border-amber-400 focus-within:ring-3 focus-within:ring-amber-400/15"
+                >
+                  <input
+                    id="tdee-height-cm"
+                    class="min-h-12 w-full bg-transparent px-4 text-base text-white outline-none"
+                    type="text"
+                    inputmode="decimal"
+                    autocomplete="off"
+                    placeholder="165"
+                    aria-describedby="tdee-height-cm-error"
+                    data-input="heightCm"
+                  />
+                  <span class="flex items-center px-4 text-gray-500">cm</span>
+                </div>
+                <p
+                  id="tdee-height-cm-error"
+                  class="mt-2 hidden text-sm text-red-300"
+                  data-error-for="heightCm"
+                >
+                </p>
+              </div>
+            </div>
+
+            <div
+              class="mt-5 hidden grid-cols-2 gap-4 sm:grid-cols-[1fr_0.7fr_0.7fr]"
+              data-unit-panel="imperial"
+            >
+              <div class="col-span-2 sm:col-span-1">
+                <label
+                  for="tdee-weight-lb"
+                  class="block text-sm font-medium text-gray-200"
+                >
+                  Peso
+                </label>
+                <div
+                  class="mt-2 flex rounded-lg border border-gray-700 bg-gray-900 focus-within:border-amber-400 focus-within:ring-3 focus-within:ring-amber-400/15"
+                >
+                  <input
+                    id="tdee-weight-lb"
+                    class="min-h-12 w-full bg-transparent px-4 text-base text-white outline-none"
+                    type="text"
+                    inputmode="decimal"
+                    autocomplete="off"
+                    placeholder="143"
+                    aria-describedby="tdee-weight-lb-error"
+                    data-input="weightLb"
+                  />
+                  <span class="flex items-center px-4 text-gray-500">lb</span>
+                </div>
+                <p
+                  id="tdee-weight-lb-error"
+                  class="mt-2 hidden text-sm text-red-300"
+                  data-error-for="weightLb"
+                >
+                </p>
+              </div>
+
+              <div>
+                <label
+                  for="tdee-height-ft"
+                  class="block text-sm font-medium text-gray-200"
+                >
+                  Pies
+                </label>
+                <input
+                  id="tdee-height-ft"
+                  class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-900 px-4 text-base text-white outline-none transition placeholder:text-gray-600 focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15"
+                  type="text"
+                  inputmode="numeric"
+                  autocomplete="off"
+                  placeholder="5"
+                  aria-describedby="tdee-height-ft-error"
+                  data-input="feet"
+                />
+                <p
+                  id="tdee-height-ft-error"
+                  class="mt-2 hidden text-sm text-red-300"
+                  data-error-for="feet"
+                >
+                </p>
+              </div>
+
+              <div>
+                <label
+                  for="tdee-height-in"
+                  class="block text-sm font-medium text-gray-200"
+                >
+                  Pulgadas
+                </label>
+                <input
+                  id="tdee-height-in"
+                  class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-900 px-4 text-base text-white outline-none transition placeholder:text-gray-600 focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15"
+                  type="text"
+                  inputmode="decimal"
+                  autocomplete="off"
+                  placeholder="5"
+                  aria-describedby="tdee-height-in-error"
+                  data-input="inches"
+                />
+                <p
+                  id="tdee-height-in-error"
+                  class="mt-2 hidden text-sm text-red-300"
+                  data-error-for="inches"
+                >
+                </p>
+              </div>
+            </div>
+
+            <fieldset class="mt-6">
+              <legend class="text-sm font-medium text-gray-200">
+                Nivel de actividad
+              </legend>
+              <p class="mt-2 text-sm leading-relaxed text-gray-400">
+                Piensa en todo tu día, no solo en tu entrenamiento. Si dudas
+                entre dos niveles, elige el menor y ajusta después.
+              </p>
+              <div class="mt-3 grid gap-3">
+                {
+                  ACTIVITY_OPTIONS.map((activity) => (
+                    <label
+                      class="flex min-h-16 cursor-pointer gap-3 rounded-lg border border-gray-800 bg-gray-900/70 p-3 transition hover:border-amber-400/60"
+                      data-activity-card={activity.key}
+                    >
+                      <input
+                        class="mt-1 size-4 shrink-0 border-gray-600 bg-gray-950 text-amber-400 focus:ring-amber-400"
+                        type="radio"
+                        name="activityLevel"
+                        value={activity.key}
+                        data-input="activityLevel"
+                      />
+                      <span class="min-w-0">
+                        <span class="block text-sm font-semibold text-white">
+                          {activity.label}
+                          <span class="text-gray-500">
+                            {" "}
+                            · factor {activity.factor}
+                          </span>
+                        </span>
+                        <span class="mt-1 block text-xs leading-relaxed text-gray-400">
+                          {activity.description}. {activity.detail}
+                        </span>
+                      </span>
+                    </label>
+                  ))
+                }
+              </div>
+              <p
+                id="tdee-activity-error"
+                class="mt-2 hidden text-sm text-red-300"
+                data-error-for="activityLevel"
+              >
+              </p>
+            </fieldset>
+
+            <div class="mt-5">
+              <label
+                for="tdee-goal"
+                class="block text-sm font-medium text-gray-200"
+              >
+                Objetivo
+              </label>
+              <select
+                id="tdee-goal"
+                class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-900 px-4 text-base text-white outline-none transition focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15"
+                data-input="goal"
+              >
+                {
+                  GOAL_OPTIONS.map((goal) => (
+                    <option value={goal.key} selected={goal.key === "maintain"}>
+                      {goal.label}
+                    </option>
+                  ))
+                }
+              </select>
+            </div>
+
+            <div
+              class="mt-6 flex flex-col gap-3 border-t border-gray-800 pt-5 sm:flex-row sm:flex-wrap"
+            >
+              <button
+                class="inline-flex min-h-11 items-center justify-center rounded-lg border border-gray-700 px-4 py-2 text-sm font-semibold text-gray-200 transition hover:border-amber-400 hover:text-white focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/40"
+                type="button"
+                data-fill-example
+              >
+                Usar ejemplo
+              </button>
+              <button
+                class="inline-flex min-h-11 items-center justify-center rounded-lg border border-gray-700 px-4 py-2 text-sm font-semibold text-gray-200 transition hover:border-amber-400 hover:text-white focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/40"
+                type="button"
+                data-clear-calculator
+              >
+                Limpiar
+              </button>
+              <button
+                class="hidden min-h-11 items-center justify-center rounded-lg bg-amber-400 px-4 py-2 text-sm font-semibold text-gray-950 transition hover:bg-amber-300 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/40"
+                type="button"
+                data-copy-result
+              >
+                <span data-copy-label>Copiar resultado</span>
+              </button>
+              <p class="sr-only" aria-live="polite" data-copy-status></p>
+            </div>
+          </div>
+
+          <aside
+            class="border-t border-gray-800 bg-gray-900/70 p-4 sm:p-6 xl:border-l xl:border-t-0"
+            aria-live="polite"
+            data-result-region
+          >
+            <p
+              class="text-sm font-semibold uppercase tracking-wide text-amber-400"
+              data-result-kicker
+            >
+              Resultado
+            </p>
+            <p
+              class="mt-3 min-h-14 break-words text-4xl font-bold leading-tight text-white"
+              data-main-result
+            >
+              Completa los datos
+            </p>
+            <p
+              class="mt-3 inline-flex rounded-full border border-gray-700 px-3 py-1 text-sm font-semibold text-gray-300"
+              data-goal-label
+            >
+              Sin cálculo todavía
+            </p>
+
+            <div class="mt-5 grid gap-3 sm:grid-cols-3 xl:grid-cols-1">
+              <div class="rounded-lg border border-gray-800 bg-gray-950/70 p-4">
+                <span class="block text-xs font-semibold uppercase tracking-wide text-gray-500">
+                  TMB estimada
+                </span>
+                <span
+                  class="mt-2 block break-words text-lg font-semibold text-white"
+                  data-bmr-result
+                >
+                  Se mostrará aquí
+                </span>
+              </div>
+              <div class="rounded-lg border border-gray-800 bg-gray-950/70 p-4">
+                <span class="block text-xs font-semibold uppercase tracking-wide text-gray-500">
+                  Calorías objetivo
+                </span>
+                <span
+                  class="mt-2 block break-words text-lg font-semibold text-white"
+                  data-goal-calories
+                >
+                  Se mostrará aquí
+                </span>
+              </div>
+              <div class="rounded-lg border border-gray-800 bg-gray-950/70 p-4">
+                <span class="block text-xs font-semibold uppercase tracking-wide text-gray-500">
+                  Ajuste diario
+                </span>
+                <span
+                  class="mt-2 block break-words text-lg font-semibold text-white"
+                  data-goal-adjustment
+                >
+                  Se mostrará aquí
+                </span>
+              </div>
+            </div>
+
+            <p
+              class="mt-5 text-sm leading-relaxed text-gray-300"
+              data-explanation
+            >
+              El resultado aparecerá aquí. Tu TDEE es una estimación inicial y
+              no reemplaza una evaluación profesional.
+            </p>
+
+            <div
+              class="mt-5 hidden rounded-lg border border-amber-400/40 bg-amber-400/10 p-4"
+              data-warning-panel
+            >
+              <p class="text-sm font-semibold text-amber-200">
+                Notas importantes
+              </p>
+              <ul
+                class="mt-2 list-disc space-y-2 pl-5 text-sm leading-relaxed text-amber-50/90"
+                data-warning-list
+              >
+              </ul>
+            </div>
+
+            <div class="mt-5 rounded-lg border border-gray-800 bg-gray-950/50 p-4">
+              <div class="flex flex-wrap items-center justify-between gap-3">
+                <h3 class="text-sm font-semibold text-white">
+                  Rangos por objetivo
+                </h3>
+                <span class="text-xs font-semibold uppercase tracking-wide text-gray-500">
+                  Base TDEE
+                </span>
+              </div>
+              <div class="mt-3 grid gap-2" data-goal-rows>
+                {
+                  GOAL_OPTIONS.map((goal) => (
+                    <div
+                      class="grid gap-2 rounded-lg border border-gray-800 bg-gray-900/70 p-3 text-sm sm:grid-cols-[minmax(0,1fr)_auto] xl:grid-cols-1 2xl:grid-cols-[minmax(0,1fr)_auto]"
+                      data-goal-row={goal.key}
+                    >
+                      <div class="min-w-0">
+                        <p class="font-semibold text-gray-100">{goal.label}</p>
+                        <p
+                          class="mt-1 text-xs text-gray-500"
+                          data-goal-row-detail={goal.key}
+                        >
+                          Se calculará al completar los datos.
+                        </p>
+                      </div>
+                      <div class="text-left sm:text-right xl:text-left 2xl:text-right">
+                        <p
+                          class="font-semibold text-white"
+                          data-goal-row-calories={goal.key}
+                        >
+                          -
+                        </p>
+                        <p
+                          class="mt-1 text-xs text-gray-500"
+                          data-goal-row-weekly={goal.key}
+                        >
+                          -
+                        </p>
+                      </div>
+                    </div>
+                  ))
+                }
+              </div>
+            </div>
+
+            <div
+              class="mt-5 hidden rounded-lg border border-gray-800 p-4"
+              data-related-panel
+            >
+              <p class="text-sm font-semibold text-white">
+                Siguiente paso útil
+              </p>
+              <p
+                class="mt-2 text-sm leading-relaxed text-gray-400"
+                data-related-text
+              >
+              </p>
+              <div class="mt-3 flex flex-wrap gap-2 text-sm">
+                <a
+                  class="font-semibold text-amber-400 transition hover:text-amber-300 hover:underline"
+                  href="/salud/calculadora-de-imc"
+                >
+                  Calculadora de IMC
+                </a>
+                <span class="text-gray-600">·</span>
+                <span class="text-gray-500">Macros y déficit: próximamente</span>
+              </div>
+            </div>
+          </aside>
+        </div>
+      </section>
+    </Container>
+
+    <Container as="section" class="py-8 md:py-10">
+      <div class="grid gap-4 md:grid-cols-3">
+        {
+          summaryCards.map((card) => (
+            <article class="rounded-lg border border-gray-800 bg-gray-950/70 p-5">
+              <h2 class="text-lg font-semibold text-white">{card.title}</h2>
+              <p class="mt-2 text-sm leading-relaxed text-gray-400">
+                {card.text}
+              </p>
+            </article>
+          ))
+        }
+      </div>
+    </Container>
+
+    <Container as="section" class="py-8 md:py-10">
+      <SectionIntro
+        title="Cómo usar tu resultado"
+        description="El TDEE no mide tu gasto exacto; lo estima. Úsalo como punto de partida durante 2 a 3 semanas y ajusta según cambios reales de peso, energía, apetito, entrenamiento y contexto de salud."
+      />
+      <div class="mt-6 grid gap-5 lg:grid-cols-2">
+        <div class="rounded-lg border border-gray-800 bg-gray-950/70 p-5">
+          <h3 class="text-lg font-semibold text-white">
+            Elegir actividad suele ser lo más difícil
+          </h3>
+          <p class="mt-3 text-sm leading-relaxed text-gray-400">
+            Dos personas con el mismo entrenamiento pueden tener gastos
+            distintos por movimiento diario, trabajo, sueño, estrés, masa
+            muscular, medicamentos y otros factores. Si dudas entre dos niveles,
+            empieza con el menor.
+          </p>
+        </div>
+        <div class="rounded-lg border border-gray-800 bg-gray-950/70 p-5">
+          <h3 class="text-lg font-semibold text-white">
+            Superávit no significa músculo automático
+          </h3>
+          <p class="mt-3 text-sm leading-relaxed text-gray-400">
+            Un superávit puede apoyar la ganancia de peso, pero la ganancia de
+            músculo depende también de entrenamiento de fuerza, proteína,
+            descanso y progresión. Toma el número como referencia, no como
+            garantía.
+          </p>
+        </div>
+      </div>
+    </Container>
+
+    <Container as="section" class="py-8 md:py-10">
+      <SectionIntro
+        title="Factores usados por la calculadora"
+        description="El factor de actividad multiplica tu TMB. Por eso pequeños cambios en este campo pueden mover bastante el resultado final."
+      />
+      <div class="mt-6 overflow-hidden rounded-lg border border-gray-800">
+        <div class="divide-y divide-gray-800">
+          {
+            ACTIVITY_OPTIONS.map((activity) => (
+              <div class="grid gap-2 bg-gray-950/70 p-4 text-sm md:grid-cols-[minmax(0,1fr)_8rem]">
+                <div>
+                  <p class="font-semibold text-white">{activity.label}</p>
+                  <p class="mt-1 leading-relaxed text-gray-400">
+                    {activity.description}. {activity.detail}
+                  </p>
+                </div>
+                <p class="font-semibold text-amber-300 md:text-right">
+                  {activity.factor}
+                </p>
+              </div>
+            ))
+          }
+        </div>
+      </div>
+    </Container>
+
+    <Container as="section" class="py-8 md:py-10">
+      <SectionIntro
+        title="Limitaciones y aviso"
+        description="Los resultados son estimaciones educativas basadas en fórmulas poblacionales. Tu gasto real puede variar por actividad diaria, composición corporal, sueño, estrés, medicamentos, condiciones médicas y adaptación metabólica."
+      />
+      <div
+        class="mt-6 rounded-lg border border-amber-400/30 bg-amber-400/10 p-5 text-sm leading-relaxed text-amber-50/90"
+      >
+        Consulta con un profesional de la salud si tienes dudas, síntomas,
+        embarazo, lactancia, antecedentes de trastornos de la conducta
+        alimentaria, cambios recientes de peso o una condición médica.
+      </div>
+    </Container>
+
+    <Container as="section" class="py-8 md:py-10">
+      <SectionIntro
+        title="Referencias usadas"
+        description="La fórmula principal y los avisos se apoyan en fuentes públicas de referencia. La calculadora sigue siendo una herramienta educativa."
+      />
+      <ul class="mt-6 space-y-3 text-sm leading-relaxed text-gray-400">
+        {
+          sources.map((source) => (
+            <li>
+              <a
+                class="font-semibold text-amber-400 transition hover:text-amber-300 hover:underline"
+                href={source.href}
+                rel="noreferrer"
+                target="_blank"
+              >
+                {source.label}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </Container>
+
+    <FaqSection faqs={faqs} />
+  </PageShell>
+</BaseLayout>
+
+<script>
+  import {
+    buildGoalRows,
+    buildTdeeCopyText,
+    calculateTdeeResult,
+    convertImperialToMetric,
+    convertKgToLb,
+    convertMetricToImperial,
+    formatCalories,
+    formatSignedCalories,
+    formatWeeklyEquivalentKg,
+    getGoalOption,
+    parseHealthInput,
+    roundTo,
+    validateGoalCalories,
+  } from "@lib/calculators/tdee";
+
+  const ERROR_MESSAGES = {
+    required: "Este campo es obligatorio.",
+    invalid: "Ingresa un número válido.",
+    negative: "Ingresa un valor igual o mayor a cero.",
+    too_many_decimals: "Usa menos decimales.",
+    sex_required: "Selecciona el sexo usado por la fórmula.",
+    activity_required: "Selecciona un nivel de actividad.",
+    age_integer: "Ingresa años completos.",
+    age_under_18:
+      "Esta calculadora está pensada para adultos. Consulta con un profesional de salud.",
+    age_over_100: "Ingresa una edad de 100 años o menos.",
+    weight_kg_range: "Ingresa un peso entre 30 y 300 kg.",
+    weight_lb_range: "Ingresa un peso entre 66 y 660 lb.",
+    height_cm_range: "Ingresa una altura entre 100 y 250 cm.",
+    feet_range: "Ingresa pies entre 3 y 8.",
+    inches_range: "Ingresa pulgadas entre 0 y menos de 12.",
+  };
+
+  const WARNING_MESSAGES = {
+    older_adult:
+      "En adultos mayores, las fórmulas pueden ser menos precisas por cambios en masa muscular, salud, medicamentos y actividad diaria.",
+    low_tdee:
+      "El gasto diario estimado quedó inusualmente bajo. Revisa edad, peso, altura y actividad antes de usar este número como referencia.",
+    goal_too_low:
+      "El objetivo calculado queda por debajo de 1,000 kcal/día. Se bloquea ese objetivo por seguridad.",
+    low_goal_female:
+      "El objetivo queda por debajo de 1,200 kcal/día. Evita dietas muy bajas en calorías sin supervisión profesional.",
+    low_goal_male:
+      "El objetivo queda por debajo de 1,500 kcal/día. Evita dietas muy bajas en calorías sin supervisión profesional.",
+    high_deficit:
+      "Este déficit supera 1,000 kcal/día y puede ser difícil de sostener. Considera un ajuste más gradual.",
+    extreme_activity:
+      "Con actividad extrema y bajo peso, revisa los datos y considera orientación profesional.",
+    superplus_note:
+      "Un superávit calórico no garantiza ganancia muscular; también influyen entrenamiento, proteína, descanso y progresión.",
+  };
+
+  const GOAL_ROW_ACTIVE_CLASSES = [
+    "border-amber-400/70",
+    "bg-amber-400/10",
+  ];
+  const GOAL_ROW_BASE_CLASSES = ["border-gray-800", "bg-gray-900/70"];
+  const ACTIVITY_ACTIVE_CLASSES = [
+    "border-amber-400/70",
+    "bg-amber-400/10",
+  ];
+  const ACTIVITY_BASE_CLASSES = ["border-gray-800", "bg-gray-900/70"];
+
+  const unitButtons = Array.from(document.querySelectorAll("[data-unit-option]"));
+  const unitPanels = Array.from(document.querySelectorAll("[data-unit-panel]"));
+  const activityCards = Array.from(
+    document.querySelectorAll("[data-activity-card]"),
+  );
+  const inputs = {
+    sex: document.querySelector('[data-input="sex"]'),
+    age: document.querySelector('[data-input="age"]'),
+    weightKg: document.querySelector('[data-input="weightKg"]'),
+    heightCm: document.querySelector('[data-input="heightCm"]'),
+    weightLb: document.querySelector('[data-input="weightLb"]'),
+    feet: document.querySelector('[data-input="feet"]'),
+    inches: document.querySelector('[data-input="inches"]'),
+    activityLevel: Array.from(
+      document.querySelectorAll('[data-input="activityLevel"]'),
+    ),
+    goal: document.querySelector('[data-input="goal"]'),
+  };
+  const resultKicker = document.querySelector("[data-result-kicker]");
+  const mainResult = document.querySelector("[data-main-result]");
+  const goalLabel = document.querySelector("[data-goal-label]");
+  const bmrResult = document.querySelector("[data-bmr-result]");
+  const goalCalories = document.querySelector("[data-goal-calories]");
+  const goalAdjustment = document.querySelector("[data-goal-adjustment]");
+  const explanation = document.querySelector("[data-explanation]");
+  const warningPanel = document.querySelector("[data-warning-panel]");
+  const warningList = document.querySelector("[data-warning-list]");
+  const relatedPanel = document.querySelector("[data-related-panel]");
+  const relatedText = document.querySelector("[data-related-text]");
+  const copyButton = document.querySelector("[data-copy-result]");
+  const copyLabel = document.querySelector("[data-copy-label]");
+  const copyStatus = document.querySelector("[data-copy-status]");
+  const clearButton = document.querySelector("[data-clear-calculator]");
+  const exampleButton = document.querySelector("[data-fill-example]");
+
+  let currentUnit = "metric";
+  let currentCopyText = "";
+  let copiedTimeout = 0;
+
+  function hasStarted() {
+    const visibleFields =
+      currentUnit === "metric"
+        ? [inputs.weightKg, inputs.heightCm]
+        : [inputs.weightLb, inputs.feet, inputs.inches];
+
+    return (
+      visibleFields.some((input) => input?.value.trim() !== "") ||
+      inputs.age?.value.trim() !== "" ||
+      inputs.sex?.value !== "" ||
+      inputs.activityLevel.some((input) => input.checked)
+    );
+  }
+
+  function updateUnitButtons() {
+    unitButtons.forEach((button) => {
+      const isActive = button.dataset.unitOption === currentUnit;
+      button.setAttribute("aria-pressed", String(isActive));
+      button.classList.toggle("bg-amber-400", isActive);
+      button.classList.toggle("text-gray-950", isActive);
+      button.classList.toggle("text-gray-300", !isActive);
+      button.classList.toggle("hover:bg-gray-800", !isActive);
+    });
+
+    unitPanels.forEach((panel) => {
+      const isActive = panel.dataset.unitPanel === currentUnit;
+      panel.classList.toggle("hidden", !isActive);
+      panel.classList.toggle("grid", isActive);
+    });
+  }
+
+  function updateActivityCards() {
+    const activityLevel = getSelectedActivityLevel();
+
+    activityCards.forEach((card) => {
+      const isActive = card.dataset.activityCard === activityLevel;
+      ACTIVITY_BASE_CLASSES.forEach((className) => {
+        card.classList.toggle(className, !isActive);
+      });
+      ACTIVITY_ACTIVE_CLASSES.forEach((className) => {
+        card.classList.toggle(className, isActive);
+      });
+    });
+  }
+
+  function parseFormValues() {
+    const errors = {};
+    const sex = inputs.sex?.value;
+    const age = parseAge();
+    const activityLevel = getSelectedActivityLevel();
+    const goal = inputs.goal?.value || "maintain";
+    const metric =
+      currentUnit === "metric" ? parseMetricValues(errors) : parseImperialValues(errors);
+
+    if (!sex) {
+      errors.sex = "sex_required";
+    }
+
+    if (!age.ok) {
+      errors.age = age.error;
+    } else if (age.value < 18) {
+      errors.age = "age_under_18";
+    } else if (age.value > 100) {
+      errors.age = "age_over_100";
+    }
+
+    if (!activityLevel) {
+      errors.activityLevel = "activity_required";
+    }
+
+    if (Object.keys(errors).length > 0 || !metric.ok) {
+      return { ok: false, errors };
+    }
+
+    return {
+      ok: true,
+      input: {
+        ...metric.value,
+        sex,
+        age: age.value,
+        activityLevel,
+        goal,
+      },
+    };
+  }
+
+  function parseMetricValues(errors) {
+    const weight = parseHealthInput(inputs.weightKg?.value ?? "");
+    const height = parseHealthInput(inputs.heightCm?.value ?? "", {
+      convertMetersToCentimeters: true,
+    });
+
+    collectParseError(errors, "weightKg", weight);
+    collectParseError(errors, "heightCm", height);
+
+    if (weight.ok && (weight.value < 30 || weight.value > 300)) {
+      errors.weightKg = "weight_kg_range";
+    }
+
+    if (height.ok && (height.value < 100 || height.value > 250)) {
+      errors.heightCm = "height_cm_range";
+    }
+
+    if (errors.weightKg || errors.heightCm) {
+      return { ok: false };
+    }
+
+    return {
+      ok: true,
+      value: {
+        weightKg: weight.value,
+        heightCm: height.value,
+      },
+    };
+  }
+
+  function parseImperialValues(errors) {
+    const weight = parseHealthInput(inputs.weightLb?.value ?? "");
+    const feet = parseHealthInput(inputs.feet?.value ?? "", { maxDecimals: 0 });
+    const inches = parseHealthInput(inputs.inches?.value ?? "");
+
+    collectParseError(errors, "weightLb", weight);
+    collectParseError(errors, "feet", feet);
+    collectParseError(errors, "inches", inches);
+
+    if (weight.ok && (weight.value < 66 || weight.value > 660)) {
+      errors.weightLb = "weight_lb_range";
+    }
+
+    if (feet.ok && (!Number.isInteger(feet.value) || feet.value < 3 || feet.value > 8)) {
+      errors.feet = "feet_range";
+    }
+
+    if (inches.ok && (inches.value < 0 || inches.value >= 12)) {
+      errors.inches = "inches_range";
+    }
+
+    if (errors.weightLb || errors.feet || errors.inches) {
+      return { ok: false };
+    }
+
+    const metric = convertImperialToMetric({
+      weightLb: weight.value,
+      feet: feet.value,
+      inches: inches.value,
+    });
+
+    return {
+      ok: true,
+      value: {
+        ...metric,
+        weightLb: weight.value,
+        feet: feet.value,
+        inches: inches.value,
+      },
+    };
+  }
+
+  function parseAge() {
+    const rawValue = inputs.age?.value.trim() ?? "";
+
+    if (!rawValue) {
+      return { ok: false, error: "required" };
+    }
+
+    const parsed = parseHealthInput(rawValue, { maxDecimals: 0 });
+
+    if (!parsed.ok) {
+      return {
+        ok: false,
+        error: parsed.error === "too_many_decimals" ? "age_integer" : parsed.error,
+      };
+    }
+
+    if (!Number.isInteger(parsed.value)) {
+      return { ok: false, error: "age_integer" };
+    }
+
+    return { ok: true, value: parsed.value };
+  }
+
+  function collectParseError(errors, field, parsed) {
+    if (!parsed.ok) {
+      errors[field] = parsed.error;
+    }
+  }
+
+  function getSelectedActivityLevel() {
+    return inputs.activityLevel.find((input) => input.checked)?.value ?? "";
+  }
+
+  function updateCalculator() {
+    clearErrors();
+    updateActivityCards();
+
+    if (!hasStarted()) {
+      setInitialState();
+      return;
+    }
+
+    const parsed = parseFormValues();
+
+    if (!parsed.ok) {
+      showErrors(parsed.errors);
+      setInvalidState();
+      return;
+    }
+
+    renderValidResult(parsed.input);
+  }
+
+  function renderValidResult(input) {
+    const result = calculateTdeeResult(input);
+    const goal = getGoalOption(input.goal);
+    const goalValidation = validateGoalCalories({
+      sex: input.sex,
+      goalCalories: result.goalCalories,
+      tdee: result.tdee,
+      goalAdjustmentCalories: result.goalAdjustmentCalories,
+      goal: input.goal,
+    });
+
+    resultKicker.textContent = "TDEE estimado";
+    mainResult.textContent = formatCalories(result.tdee);
+    goalLabel.textContent = goal.label;
+    goalLabel.className =
+      "mt-3 inline-flex rounded-full border border-amber-400/60 bg-amber-400/10 px-3 py-1 text-sm font-semibold text-amber-100";
+    bmrResult.textContent = formatCalories(result.bmr);
+    goalCalories.textContent = goalValidation.isBlocked
+      ? "Objetivo bloqueado"
+      : formatCalories(result.goalCalories);
+    goalAdjustment.textContent = formatSignedCalories(result.goalAdjustmentCalories);
+    explanation.textContent = goalValidation.isBlocked
+      ? `Tu TDEE estimado es ${formatCalories(result.tdee)}. El objetivo seleccionado baja de 1,000 kcal/día, por eso se mantiene visible el TDEE pero se bloquea ese objetivo.`
+      : `Tu gasto total diario estimado es ${formatCalories(result.tdee)}. Úsalo como punto de partida y ajusta según tu evolución durante las próximas 2 a 3 semanas.`;
+
+    updateGoalRows(result.tdee, input.goal, input.sex);
+    renderWarnings(result.warnings);
+    renderRelated(input.goal);
+    setCopyVisible(true);
+    currentCopyText = buildTdeeCopyText(input, result);
+  }
+
+  function updateGoalRows(tdee, selectedGoal, sex) {
+    buildGoalRows(tdee).forEach((row) => {
+      const rowElement = document.querySelector(`[data-goal-row="${row.goal}"]`);
+      const detail = document.querySelector(`[data-goal-row-detail="${row.goal}"]`);
+      const calories = document.querySelector(`[data-goal-row-calories="${row.goal}"]`);
+      const weekly = document.querySelector(`[data-goal-row-weekly="${row.goal}"]`);
+      const validation = validateGoalCalories({
+        sex,
+        goalCalories: row.calories,
+        tdee,
+        goalAdjustmentCalories: row.adjustmentCalories,
+        goal: row.goal,
+      });
+      const isSelected = row.goal === selectedGoal;
+
+      if (rowElement) {
+        GOAL_ROW_BASE_CLASSES.forEach((className) => {
+          rowElement.classList.toggle(className, !isSelected);
+        });
+        GOAL_ROW_ACTIVE_CLASSES.forEach((className) => {
+          rowElement.classList.toggle(className, isSelected);
+        });
+      }
+
+      if (detail) {
+        detail.textContent = `${formatPercent(row.adjustmentPercent)} · ${formatSignedCalories(row.adjustmentCalories)}`;
+      }
+
+      if (calories) {
+        calories.textContent = validation.isBlocked
+          ? "Bloqueado"
+          : formatCalories(row.calories);
+      }
+
+      if (weekly) {
+        weekly.textContent = formatWeeklyEquivalentKg(row.weeklyEnergyEquivalentKg);
+      }
+    });
+  }
+
+  function formatPercent(value) {
+    if (value === 0) {
+      return "0%";
+    }
+
+    return `${value > 0 ? "+" : ""}${Math.round(value * 100)}%`;
+  }
+
+  function renderWarnings(warnings) {
+    warningList.innerHTML = "";
+
+    warnings.forEach((warning) => {
+      const message = WARNING_MESSAGES[warning];
+
+      if (!message) {
+        return;
+      }
+
+      const item = document.createElement("li");
+      item.textContent = message;
+      warningList.append(item);
+    });
+
+    warningPanel.classList.toggle("hidden", warningList.children.length === 0);
+  }
+
+  function renderRelated(goal) {
+    let text =
+      "Puedes complementar este resultado con la calculadora de IMC para revisar otra referencia de salud.";
+
+    if (goal.startsWith("lose")) {
+      text =
+        "Para planear un plazo o un peso objetivo, usa una calculadora de déficit calórico cuando esté disponible.";
+    } else if (goal.startsWith("gain")) {
+      text =
+        "Para convertir estas calorías en gramos de proteína, carbohidratos y grasas, la siguiente herramienta natural será macros.";
+    }
+
+    relatedText.textContent = text;
+    relatedPanel.classList.remove("hidden");
+  }
+
+  function setInitialState() {
+    resultKicker.textContent = "Resultado";
+    mainResult.textContent = "Completa los datos";
+    goalLabel.textContent = "Sin cálculo todavía";
+    goalLabel.className =
+      "mt-3 inline-flex rounded-full border border-gray-700 px-3 py-1 text-sm font-semibold text-gray-300";
+    bmrResult.textContent = "Se mostrará aquí";
+    goalCalories.textContent = "Se mostrará aquí";
+    goalAdjustment.textContent = "Se mostrará aquí";
+    explanation.textContent =
+      "El resultado aparecerá aquí. Tu TDEE es una estimación inicial y no reemplaza una evaluación profesional.";
+    warningList.innerHTML = "";
+    warningPanel.classList.add("hidden");
+    relatedPanel.classList.add("hidden");
+    relatedText.textContent = "";
+    resetGoalRows();
+    setCopyVisible(false);
+    currentCopyText = "";
+  }
+
+  function setInvalidState() {
+    resultKicker.textContent = "Revisa los campos";
+    mainResult.textContent = "No se puede calcular todavía";
+    goalLabel.textContent = "Campos pendientes";
+    goalLabel.className =
+      "mt-3 inline-flex rounded-full border border-gray-700 px-3 py-1 text-sm font-semibold text-gray-300";
+    bmrResult.textContent = "Corrige los valores";
+    goalCalories.textContent = "Corrige los valores";
+    goalAdjustment.textContent = "Corrige los valores";
+    explanation.textContent = "Corrige los valores marcados para continuar.";
+    warningList.innerHTML = "";
+    warningPanel.classList.add("hidden");
+    relatedPanel.classList.add("hidden");
+    relatedText.textContent = "";
+    resetGoalRows();
+    setCopyVisible(false);
+    currentCopyText = "";
+  }
+
+  function resetGoalRows() {
+    document.querySelectorAll("[data-goal-row]").forEach((row) => {
+      GOAL_ROW_ACTIVE_CLASSES.forEach((className) => row.classList.remove(className));
+      GOAL_ROW_BASE_CLASSES.forEach((className) => row.classList.add(className));
+    });
+    document.querySelectorAll("[data-goal-row-detail]").forEach((detail) => {
+      detail.textContent = "Se calculará al completar los datos.";
+    });
+    document.querySelectorAll("[data-goal-row-calories]").forEach((calories) => {
+      calories.textContent = "-";
+    });
+    document.querySelectorAll("[data-goal-row-weekly]").forEach((weekly) => {
+      weekly.textContent = "-";
+    });
+  }
+
+  function clearErrors() {
+    document.querySelectorAll("[data-error-for]").forEach((errorElement) => {
+      errorElement.textContent = "";
+      errorElement.classList.add("hidden");
+    });
+  }
+
+  function showErrors(errors) {
+    Object.entries(errors).forEach(([field, error]) => {
+      const errorElement = document.querySelector(`[data-error-for="${field}"]`);
+
+      if (!errorElement) {
+        return;
+      }
+
+      errorElement.textContent = ERROR_MESSAGES[error] ?? ERROR_MESSAGES.invalid;
+      errorElement.classList.remove("hidden");
+    });
+  }
+
+  function setCopyVisible(isVisible) {
+    copyButton.classList.toggle("hidden", !isVisible);
+    copyButton.classList.toggle("inline-flex", isVisible);
+  }
+
+  function switchUnit(nextUnit) {
+    if (nextUnit === currentUnit) {
+      return;
+    }
+
+    if (currentUnit === "metric") {
+      convertMetricInputsToImperial();
+    } else {
+      convertImperialInputsToMetric();
+    }
+
+    currentUnit = nextUnit;
+    updateUnitButtons();
+    clearErrors();
+    updateCalculator();
+  }
+
+  function convertMetricInputsToImperial() {
+    const parsedWeight = parseHealthInput(inputs.weightKg?.value ?? "");
+    const parsedHeight = parseHealthInput(inputs.heightCm?.value ?? "", {
+      convertMetersToCentimeters: true,
+    });
+
+    if (parsedWeight.ok) {
+      inputs.weightLb.value = String(roundTo(convertKgToLb(parsedWeight.value), 1));
+    }
+
+    if (parsedHeight.ok) {
+      const imperial = convertMetricToImperial({
+        weightKg: parsedWeight.ok ? parsedWeight.value : 1,
+        heightCm: parsedHeight.value,
+      });
+
+      inputs.feet.value = String(imperial.feet);
+      inputs.inches.value = String(roundTo(imperial.inches, 1));
+    }
+  }
+
+  function convertImperialInputsToMetric() {
+    const parsedWeight = parseHealthInput(inputs.weightLb?.value ?? "");
+    const parsedFeet = parseHealthInput(inputs.feet?.value ?? "", {
+      maxDecimals: 0,
+    });
+    const parsedInches = parseHealthInput(inputs.inches?.value ?? "");
+
+    if (parsedWeight.ok) {
+      inputs.weightKg.value = String(
+        roundTo(convertImperialToMetric({
+          weightLb: parsedWeight.value,
+          feet: 1,
+          inches: 0,
+        }).weightKg, 1),
+      );
+    }
+
+    if (parsedFeet.ok && parsedInches.ok) {
+      const metric = convertImperialToMetric({
+        weightLb: parsedWeight.ok ? parsedWeight.value : 1,
+        feet: parsedFeet.value,
+        inches: parsedInches.value,
+      });
+
+      inputs.heightCm.value = String(roundTo(metric.heightCm, 1));
+    }
+  }
+
+  function fillExample() {
+    currentUnit = "metric";
+    updateUnitButtons();
+    inputs.sex.value = "female";
+    inputs.age.value = "28";
+    inputs.weightKg.value = "65";
+    inputs.heightCm.value = "165";
+    inputs.weightLb.value = "";
+    inputs.feet.value = "";
+    inputs.inches.value = "";
+    inputs.activityLevel.forEach((input) => {
+      input.checked = input.value === "moderate";
+    });
+    inputs.goal.value = "maintain";
+    updateCalculator();
+  }
+
+  function clearCalculator() {
+    currentUnit = "metric";
+    updateUnitButtons();
+    inputs.sex.value = "";
+    inputs.age.value = "";
+    inputs.weightKg.value = "";
+    inputs.heightCm.value = "";
+    inputs.weightLb.value = "";
+    inputs.feet.value = "";
+    inputs.inches.value = "";
+    inputs.activityLevel.forEach((input) => {
+      input.checked = false;
+    });
+    inputs.goal.value = "maintain";
+    clearErrors();
+    updateActivityCards();
+    setInitialState();
+  }
+
+  async function copyResult() {
+    if (!currentCopyText || !copyLabel || !copyStatus) {
+      return;
+    }
+
+    try {
+      if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(currentCopyText);
+      } else {
+        const textArea = document.createElement("textarea");
+        textArea.value = currentCopyText;
+        textArea.setAttribute("readonly", "");
+        textArea.style.position = "fixed";
+        textArea.style.opacity = "0";
+        document.body.append(textArea);
+        textArea.select();
+        document.execCommand("copy");
+        textArea.remove();
+      }
+
+      window.clearTimeout(copiedTimeout);
+      copyLabel.textContent = "Copiado";
+      copyStatus.textContent = "Resultado copiado.";
+      copiedTimeout = window.setTimeout(() => {
+        copyLabel.textContent = "Copiar resultado";
+        copyStatus.textContent = "";
+      }, 2000);
+    } catch {
+      copyStatus.textContent = "No se pudo copiar el resultado.";
+    }
+  }
+
+  unitButtons.forEach((button) => {
+    button.addEventListener("click", () => {
+      switchUnit(button.dataset.unitOption);
+    });
+  });
+
+  [
+    inputs.sex,
+    inputs.age,
+    inputs.weightKg,
+    inputs.heightCm,
+    inputs.weightLb,
+    inputs.feet,
+    inputs.inches,
+    inputs.goal,
+    ...inputs.activityLevel,
+  ].forEach((input) => {
+    input?.addEventListener("input", updateCalculator);
+    input?.addEventListener("change", updateCalculator);
+  });
+
+  clearButton?.addEventListener("click", clearCalculator);
+  exampleButton?.addEventListener("click", fillExample);
+  copyButton?.addEventListener("click", copyResult);
+
+  updateUnitButtons();
+  updateActivityCards();
+  setInitialState();
+</script>
