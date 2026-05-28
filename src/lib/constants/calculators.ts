@@ -84,7 +84,7 @@ export const CALCULATORS: CalculatorDirectoryItem[] = [
     title: "Calculadora de deficit calorico",
     description:
       "Estima calorias diarias, deficit, ritmo semanal y plazo para bajar de peso.",
-    href: "/calculadora-deficit-calorico",
+    href: "/salud/calculadora-deficit-calorico",
     category: "Salud",
     order: 55,
   },
@@ -93,7 +93,7 @@ export const CALCULATORS: CalculatorDirectoryItem[] = [
     title: "Calculadora de edad",
     description:
       "Calcula edad exacta, días vividos y próximo cumpleaños con fecha de referencia editable.",
-    href: "/calculadora-de-edad",
+    href: "/fecha-tiempo/calculadora-de-edad",
     category: "Fecha y tiempo",
     order: 60,
   },

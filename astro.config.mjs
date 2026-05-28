@@ -18,5 +18,10 @@ export default defineConfig({
     plugins: [tailwindcss()]
   },
 
-  integrations: [sitemap()]
+  integrations: [sitemap()],
+
+  redirects: {
+    '/calculadora-deficit-calorico': '/salud/calculadora-deficit-calorico',
+    '/calculadora-de-edad': '/fecha-tiempo/calculadora-de-edad'
+  }
 });
