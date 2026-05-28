@@ -25,7 +25,7 @@ export const getCalculatorCategory = (slug: CalculatorCategorySlug) =>
   CALCULATOR_CATEGORIES[slug];
 
 export const getCalculatorCategoryUrl = (slug: CalculatorCategorySlug) =>
-  `/categoria/${slug}`;
+  `/${slug}`;
 
 export const getCalculatorCategoryDescription = (slug: CalculatorCategorySlug) =>
   getCalculatorCategory(slug).description;

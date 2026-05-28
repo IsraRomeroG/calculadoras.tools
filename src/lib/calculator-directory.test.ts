@@ -10,11 +10,9 @@ import {
 describe("calculator category directory", () => {
   it("uses explicit canonical slugs for category URLs", () => {
     expect(getCalculatorCategoryUrl("legal-impuestos")).toBe(
-      "/categoria/legal-impuestos",
+      "/legal-impuestos",
     );
-    expect(getCalculatorCategoryUrl("fecha-tiempo")).toBe(
-      "/categoria/fecha-tiempo",
-    );
+    expect(getCalculatorCategoryUrl("fecha-tiempo")).toBe("/fecha-tiempo");
   });
 
   it("keeps display labels separate from canonical slugs", () => {
@@ -41,8 +39,20 @@ describe("calculator category directory", () => {
   });
 
   it("declares coherent category metadata and calculator routes", () => {
+    const reservedSlugs = new Set([
+      "404",
+      "blog",
+      "calculadora-de-edad",
+      "calculadora-deficit-calorico",
+      "categoria",
+      "contacto",
+      "privacidad",
+      "robots.txt",
+    ]);
+
     Object.entries(CALCULATOR_CATEGORIES).forEach(([slug, metadata]) => {
       expect(metadata.slug).toBe(slug);
+      expect(reservedSlugs.has(slug)).toBe(false);
     });
 
     CALCULATORS.forEach((calculator) => {

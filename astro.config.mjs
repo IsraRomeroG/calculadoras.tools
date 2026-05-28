@@ -23,7 +23,13 @@ export default defineConfig({
   redirects: {
     '/calculadora-deficit-calorico': '/salud/calculadora-deficit-calorico',
     '/calculadora-de-edad': '/fecha-tiempo/calculadora-de-edad',
-    '/categoria/legal-e-impuestos': '/categoria/legal-impuestos',
-    '/categoria/fecha-y-tiempo': '/categoria/fecha-tiempo'
+    '/categoria/fecha-tiempo': '/fecha-tiempo',
+    '/categoria/finanzas': '/finanzas',
+    '/categoria/inmuebles': '/inmuebles',
+    '/categoria/legal-impuestos': '/legal-impuestos',
+    '/categoria/matematicas': '/matematicas',
+    '/categoria/salud': '/salud',
+    '/categoria/legal-e-impuestos': '/legal-impuestos',
+    '/categoria/fecha-y-tiempo': '/fecha-tiempo'
   }
 });
