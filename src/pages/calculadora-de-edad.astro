@@ -1,0 +1,880 @@
+---
+import BaseLayout from "@layouts/BaseLayout.astro";
+import Container from "@components/layout/Container.astro";
+import PageShell from "@components/layout/PageShell.astro";
+import FaqSection from "@components/shared/FaqSection.astro";
+import PageHero from "@components/shared/PageHero.astro";
+import SectionIntro from "@components/shared/SectionIntro.astro";
+import { buildFaqJsonLd } from "@lib/seo";
+
+const title = "Calculadora de Edad - Años, Meses, Días y Próximo Cumpleaños";
+const description =
+  "Calcula tu edad exacta en años, meses y días. Descubre cuántos días has vivido, cuánto falta para tu próximo cumpleaños y qué edad tendrás en una fecha específica.";
+const canonical = "/calculadora-de-edad";
+
+const faqs = [
+  {
+    question: "¿Cómo se calcula la edad exacta?",
+    answer:
+      "Se calcula con calendario: primero se cuentan años completos, luego meses completos y finalmente los días restantes entre la fecha de nacimiento y la fecha de referencia.",
+  },
+  {
+    question: "¿Cuántos días he vivido?",
+    answer:
+      "Los días vividos se calculan como la diferencia entre la fecha de nacimiento y la fecha de referencia. No se cuenta de forma inclusiva: del 1 al 2 de enero hay 1 día.",
+  },
+  {
+    question: "¿Qué pasa si nací el 29 de febrero?",
+    answer:
+      "En años no bisiestos puedes elegir si usar 28 de febrero o 1 de marzo para el próximo cumpleaños. La calculadora usa 28 de febrero por defecto.",
+  },
+  {
+    question: "¿Las horas, minutos y segundos son exactos?",
+    answer:
+      "Son aproximados porque esta versión solo pide fecha, no hora de nacimiento. Se calculan desde el inicio del día de nacimiento hasta el inicio del día de referencia.",
+  },
+  {
+    question: "¿Puedo calcular qué edad tendré en una fecha futura?",
+    answer:
+      "Sí. Cambia la fecha de referencia por una fecha futura y la calculadora mostrará la edad que tendrás ese día.",
+  },
+  {
+    question: "¿Sirve para trámites oficiales?",
+    answer:
+      "Sirve como ayuda de cálculo, pero cada escuela, institución o trámite puede tener reglas propias. Confirma siempre el criterio oficial correspondiente.",
+  },
+];
+
+const faqJsonLd = buildFaqJsonLd(faqs);
+
+const monthOptions = [
+  { value: "1", label: "Enero" },
+  { value: "2", label: "Febrero" },
+  { value: "3", label: "Marzo" },
+  { value: "4", label: "Abril" },
+  { value: "5", label: "Mayo" },
+  { value: "6", label: "Junio" },
+  { value: "7", label: "Julio" },
+  { value: "8", label: "Agosto" },
+  { value: "9", label: "Septiembre" },
+  { value: "10", label: "Octubre" },
+  { value: "11", label: "Noviembre" },
+  { value: "12", label: "Diciembre" },
+];
+
+const unitRows = [
+  ["Años completos", "completeYears"],
+  ["Meses completos", "completeMonths"],
+  ["Semanas completas", "completeWeeks"],
+  ["Días vividos", "days"],
+  ["Horas aprox.", "approximateHours"],
+  ["Minutos aprox.", "approximateMinutes"],
+  ["Segundos aprox.", "approximateSeconds"],
+];
+---
+
+<BaseLayout title={title} description={description} canonical={canonical}>
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={JSON.stringify(faqJsonLd)} />
+  </Fragment>
+
+  <PageShell>
+    <PageHero
+      title="Calculadora de edad"
+      description="Calcula años, meses y días exactos, días vividos y cuánto falta para el próximo cumpleaños usando una fecha de referencia editable."
+      kicker="Fecha y tiempo"
+      collapseBreadcrumbOnMobile
+      containerClass="py-5 md:py-7"
+      breadcrumbs={[
+        { label: "Inicio", href: "/", ariaLabel: "Inicio" },
+        { label: "Fecha y tiempo", href: "/#calculadoras", optional: true },
+        { label: "Calculadora de edad", truncate: true },
+      ]}
+    />
+
+    <Container as="section" class="py-6 md:py-8">
+      <section
+        id="age-calculator"
+        class="overflow-hidden rounded-lg border border-gray-700 bg-gray-950 shadow-xl shadow-gray-950/30"
+        aria-labelledby="calculator-heading"
+      >
+        <div
+          class="grid gap-0 lg:grid-cols-[minmax(0,1fr)_minmax(19rem,0.78fr)]"
+        >
+          <div class="p-4 sm:p-6">
+            <div>
+              <p
+                class="text-sm font-semibold uppercase tracking-wide text-amber-400"
+              >
+                Cálculo principal
+              </p>
+              <h2 id="calculator-heading" class="mt-2 text-2xl font-semibold">
+                ¿Cuántos años tengo?
+              </h2>
+              <p class="mt-2 text-sm leading-relaxed text-gray-400">
+                Ingresa fecha de nacimiento. La fecha de referencia usa hoy por
+                defecto, pero puedes cambiarla para calcular una edad pasada o
+                futura.
+              </p>
+            </div>
+
+            <fieldset class="mt-6">
+              <legend class="text-sm font-semibold text-gray-200">
+                Fecha de nacimiento
+              </legend>
+              <div class="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-[0.65fr_1fr_0.8fr]">
+                <div>
+                  <label for="birth-day" class="block text-sm text-gray-300">
+                    Día
+                  </label>
+                  <input
+                    id="birth-day"
+                    class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-900 px-4 text-base text-white outline-none transition placeholder:text-gray-600 focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15"
+                    type="text"
+                    inputmode="numeric"
+                    maxlength="2"
+                    autocomplete="bday-day"
+                    placeholder="15"
+                    data-birth-day
+                  />
+                </div>
+
+                <div>
+                  <label for="birth-month" class="block text-sm text-gray-300">
+                    Mes
+                  </label>
+                  <select
+                    id="birth-month"
+                    class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-900 px-4 text-base text-white outline-none transition focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15"
+                    autocomplete="bday-month"
+                    data-birth-month
+                  >
+                    <option value="">Mes</option>
+                    {
+                      monthOptions.map((month) => (
+                        <option value={month.value}>{month.label}</option>
+                      ))
+                    }
+                  </select>
+                </div>
+
+                <div class="col-span-2 sm:col-span-1">
+                  <label for="birth-year" class="block text-sm text-gray-300">
+                    Año
+                  </label>
+                  <input
+                    id="birth-year"
+                    class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-900 px-4 text-base text-white outline-none transition placeholder:text-gray-600 focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15"
+                    type="text"
+                    inputmode="numeric"
+                    maxlength="4"
+                    autocomplete="bday-year"
+                    placeholder="1990"
+                    data-birth-year
+                  />
+                </div>
+              </div>
+              <p
+                id="birth-error"
+                class="mt-2 hidden text-sm text-red-300"
+                data-birth-error
+              >
+              </p>
+            </fieldset>
+
+            <fieldset class="mt-6 rounded-lg border border-gray-800 bg-gray-900/60 p-4">
+              <div class="flex flex-wrap items-center justify-between gap-3">
+                <legend class="text-sm font-semibold text-gray-200">
+                  Fecha de referencia
+                </legend>
+                <button
+                  class="inline-flex min-h-10 items-center justify-center rounded-lg border border-gray-700 px-3 py-2 text-sm font-semibold text-gray-200 transition hover:border-amber-400 hover:text-white focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/40"
+                  type="button"
+                  data-use-today
+                >
+                  Usar hoy
+                </button>
+              </div>
+
+              <div class="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-[0.65fr_1fr_0.8fr]">
+                <div>
+                  <label for="reference-day" class="block text-sm text-gray-300">
+                    Día
+                  </label>
+                  <input
+                    id="reference-day"
+                    class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-950 px-4 text-base text-white outline-none transition placeholder:text-gray-600 focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15"
+                    type="text"
+                    inputmode="numeric"
+                    maxlength="2"
+                    data-reference-day
+                  />
+                </div>
+
+                <div>
+                  <label
+                    for="reference-month"
+                    class="block text-sm text-gray-300"
+                  >
+                    Mes
+                  </label>
+                  <select
+                    id="reference-month"
+                    class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-950 px-4 text-base text-white outline-none transition focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15"
+                    data-reference-month
+                  >
+                    {
+                      monthOptions.map((month) => (
+                        <option value={month.value}>{month.label}</option>
+                      ))
+                    }
+                  </select>
+                </div>
+
+                <div class="col-span-2 sm:col-span-1">
+                  <label
+                    for="reference-year"
+                    class="block text-sm text-gray-300"
+                  >
+                    Año
+                  </label>
+                  <input
+                    id="reference-year"
+                    class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-950 px-4 text-base text-white outline-none transition placeholder:text-gray-600 focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15"
+                    type="text"
+                    inputmode="numeric"
+                    maxlength="4"
+                    data-reference-year
+                  />
+                </div>
+              </div>
+              <p
+                id="reference-error"
+                class="mt-2 hidden text-sm text-red-300"
+                data-reference-error
+              >
+              </p>
+            </fieldset>
+
+            <div class="mt-5">
+              <label
+                for="leap-day-rule"
+                class="block text-sm font-medium text-gray-200"
+              >
+                Regla para nacidos el 29 de febrero
+              </label>
+              <select
+                id="leap-day-rule"
+                class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-900 px-4 text-base text-white outline-none transition focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15"
+                data-leap-rule
+              >
+                <option value="feb-28">Usar 28 de febrero en años no bisiestos</option>
+                <option value="mar-01">Usar 1 de marzo en años no bisiestos</option>
+              </select>
+              <p class="mt-2 text-sm leading-relaxed text-gray-500">
+                Solo afecta fechas de nacimiento del 29 de febrero.
+              </p>
+            </div>
+
+            <div
+              class="mt-6 flex flex-col gap-3 border-t border-gray-800 pt-5 sm:flex-row sm:flex-wrap"
+            >
+              <button
+                class="inline-flex min-h-11 items-center justify-center rounded-lg border border-gray-700 px-4 py-2 text-sm font-semibold text-gray-200 transition hover:border-amber-400 hover:text-white focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/40"
+                type="button"
+                data-fill-example
+              >
+                Usar ejemplo
+              </button>
+              <button
+                class="inline-flex min-h-11 items-center justify-center rounded-lg border border-gray-700 px-4 py-2 text-sm font-semibold text-gray-200 transition hover:border-amber-400 hover:text-white focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/40"
+                type="button"
+                data-clear-calculator
+              >
+                Limpiar
+              </button>
+              <button
+                class="hidden min-h-11 items-center justify-center rounded-lg bg-amber-400 px-4 py-2 text-sm font-semibold text-gray-950 transition hover:bg-amber-300 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/40"
+                type="button"
+                data-copy-result
+              >
+                <span data-copy-label>Copiar resultado</span>
+              </button>
+              <p class="sr-only" aria-live="polite" data-copy-status></p>
+            </div>
+          </div>
+
+          <aside
+            class="border-t border-gray-800 bg-gray-900/70 p-4 sm:p-6 lg:border-l lg:border-t-0"
+            aria-live="polite"
+            data-result-region
+          >
+            <p
+              class="text-sm font-semibold uppercase tracking-wide text-amber-400"
+              data-result-kicker
+            >
+              Resultado
+            </p>
+            <p
+              class="mt-3 break-words text-3xl font-bold leading-tight text-white md:text-4xl"
+              data-main-result
+            >
+              Ingresa tu fecha
+            </p>
+            <p class="mt-3 text-sm leading-relaxed text-gray-400" data-result-note>
+              Completa día, mes y año de nacimiento para ver tu edad.
+            </p>
+
+            <div
+              class="mt-5 hidden rounded-lg border border-amber-400/40 bg-amber-400/10 p-4"
+              data-warning-panel
+            >
+              <p class="text-sm font-semibold text-amber-200">
+                Revisa este detalle
+              </p>
+              <ul
+                class="mt-2 space-y-2 text-sm leading-relaxed text-amber-100"
+                data-warning-list
+              >
+              </ul>
+            </div>
+
+            <div class="mt-5 grid gap-3">
+              <div class="rounded-lg border border-gray-800 bg-gray-950/70 p-4">
+                <span
+                  class="block text-xs font-semibold uppercase tracking-wide text-gray-500"
+                >
+                  Fecha interpretada
+                </span>
+                <span
+                  class="mt-2 block break-words text-lg font-semibold text-white"
+                  data-birth-date-display
+                >
+                  Se mostrará aquí
+                </span>
+              </div>
+
+              <div class="rounded-lg border border-gray-800 bg-gray-950/70 p-4">
+                <span
+                  class="block text-xs font-semibold uppercase tracking-wide text-gray-500"
+                >
+                  Próximo cumpleaños
+                </span>
+                <span
+                  class="mt-2 block break-words text-lg font-semibold text-white"
+                  data-next-birthday
+                >
+                  Se mostrará aquí
+                </span>
+                <span
+                  class="mt-2 block text-sm leading-relaxed text-gray-400"
+                  data-next-birthday-note
+                >
+                </span>
+              </div>
+            </div>
+          </aside>
+        </div>
+      </section>
+    </Container>
+
+    <Container as="section" class="py-6 md:py-8">
+      <SectionIntro
+        title="Edad en otras unidades"
+        description="Las horas, minutos y segundos se muestran como aproximación porque esta versión usa fechas sin hora."
+      />
+
+      <div
+        class="overflow-hidden rounded-lg border border-gray-700 bg-gray-950"
+        data-units-panel
+      >
+        <div class="grid gap-px bg-gray-800 sm:grid-cols-2 lg:grid-cols-4">
+          {
+            unitRows.map(([label, key]) => (
+              <div class="bg-gray-950 p-4">
+                <span class="block text-xs font-semibold uppercase tracking-wide text-gray-500">
+                  {label}
+                </span>
+                <span
+                  class="mt-2 block break-words text-lg font-semibold text-white"
+                  data-unit-output={key}
+                >
+                  -
+                </span>
+              </div>
+            ))
+          }
+        </div>
+      </div>
+    </Container>
+
+    <Container as="section" class="py-6 md:py-8">
+      <div class="grid gap-6 md:grid-cols-2">
+        <div>
+          <h2 class="text-2xl font-semibold">Cómo se calcula</h2>
+          <p class="mt-3 text-sm leading-relaxed text-gray-400">
+            La edad no es solo restar años. La calculadora cuenta años completos,
+            después meses completos y al final los días restantes según la
+            longitud real de cada mes.
+          </p>
+          <p class="mt-4 rounded-lg border border-gray-800 bg-gray-950 p-4 text-sm leading-relaxed text-gray-300">
+            Del 1 de enero al 2 de enero hay 1 día vivido. No se usa conteo
+            inclusivo.
+          </p>
+        </div>
+
+        <div>
+          <h2 class="text-2xl font-semibold">29 de febrero</h2>
+          <p class="mt-3 text-sm leading-relaxed text-gray-400">
+            Si naciste el 29 de febrero, en años no bisiestos puedes usar el 28
+            de febrero o el 1 de marzo como referencia de cumpleaños. La
+            calculadora permite elegir la regla para que el resultado sea
+            explícito.
+          </p>
+          <p class="mt-4 rounded-lg border border-gray-800 bg-gray-950 p-4 text-sm leading-relaxed text-gray-300">
+            Para trámites, escuelas o requisitos oficiales, confirma siempre la
+            regla exacta con la institución correspondiente.
+          </p>
+        </div>
+      </div>
+    </Container>
+
+    <Container as="section" class="py-6 md:py-8">
+      <div class="rounded-lg border border-gray-700 bg-gray-950 p-5">
+        <h2 class="text-xl font-semibold">Aviso</h2>
+        <p class="mt-3 text-sm leading-relaxed text-gray-400">
+          Esta calculadora usa fechas de calendario para ayudarte a estimar edad,
+          días vividos y próximos cumpleaños. Para trámites, requisitos
+          escolares, médicos o legales, confirma siempre la regla exacta con la
+          institución correspondiente.
+        </p>
+      </div>
+    </Container>
+
+    <FaqSection faqs={faqs} />
+  </PageShell>
+</BaseLayout>
+
+<script>
+  import {
+    DEFAULT_LEAP_DAY_RULE,
+    MIN_PERSON_YEAR,
+    buildAgeCopyText,
+    calculateAgeResult,
+    comparePlainDates,
+    formatAgeDifference,
+    formatCompactDuration,
+    formatNumber,
+    formatPlainDate,
+    parseDateParts,
+    todayInLocalTimeZone,
+  } from "@lib/calculators/age";
+
+  const ERROR_MESSAGES = {
+    required: "Completa día, mes y año.",
+    invalid: "Ingresa una fecha válida.",
+    year_four_digits: "Ingresa el año con 4 dígitos.",
+    date_invalid: "Esa fecha no existe en el calendario.",
+    year_range: "La fecha está fuera del rango permitido.",
+    future_birth: "La fecha de nacimiento no puede ser futura.",
+    reference_before_birth: "La fecha de referencia es anterior al nacimiento.",
+  };
+
+  const birthInputs = {
+    day: document.querySelector("[data-birth-day]"),
+    month: document.querySelector("[data-birth-month]"),
+    year: document.querySelector("[data-birth-year]"),
+  };
+  const referenceInputs = {
+    day: document.querySelector("[data-reference-day]"),
+    month: document.querySelector("[data-reference-month]"),
+    year: document.querySelector("[data-reference-year]"),
+  };
+  const allDateInputs = [
+    birthInputs.day,
+    birthInputs.month,
+    birthInputs.year,
+    referenceInputs.day,
+    referenceInputs.month,
+    referenceInputs.year,
+  ];
+
+  const leapRuleSelect = document.querySelector("[data-leap-rule]");
+  const birthError = document.querySelector("[data-birth-error]");
+  const referenceError = document.querySelector("[data-reference-error]");
+  const resultKicker = document.querySelector("[data-result-kicker]");
+  const mainResult = document.querySelector("[data-main-result]");
+  const resultNote = document.querySelector("[data-result-note]");
+  const birthDateDisplay = document.querySelector("[data-birth-date-display]");
+  const nextBirthday = document.querySelector("[data-next-birthday]");
+  const nextBirthdayNote = document.querySelector("[data-next-birthday-note]");
+  const warningPanel = document.querySelector("[data-warning-panel]");
+  const warningList = document.querySelector("[data-warning-list]");
+  const copyButton = document.querySelector("[data-copy-result]");
+  const copyLabel = document.querySelector("[data-copy-label]");
+  const copyStatus = document.querySelector("[data-copy-status]");
+  const clearButton = document.querySelector("[data-clear-calculator]");
+  const exampleButton = document.querySelector("[data-fill-example]");
+  const todayButton = document.querySelector("[data-use-today]");
+  const unitOutputs = {
+    completeYears: document.querySelector('[data-unit-output="completeYears"]'),
+    completeMonths: document.querySelector('[data-unit-output="completeMonths"]'),
+    completeWeeks: document.querySelector('[data-unit-output="completeWeeks"]'),
+    days: document.querySelector('[data-unit-output="days"]'),
+    approximateHours: document.querySelector(
+      '[data-unit-output="approximateHours"]',
+    ),
+    approximateMinutes: document.querySelector(
+      '[data-unit-output="approximateMinutes"]',
+    ),
+    approximateSeconds: document.querySelector(
+      '[data-unit-output="approximateSeconds"]',
+    ),
+  };
+
+  let referenceUsesToday = true;
+  let currentCopyText = "";
+  let copiedTimeout = 0;
+
+  function hasBirthStarted() {
+    return Object.values(birthInputs).some((input) => input?.value.trim() !== "");
+  }
+
+  function getToday() {
+    return todayInLocalTimeZone();
+  }
+
+  function setDateInputs(inputs, date) {
+    inputs.day.value = String(date.day);
+    inputs.month.value = String(date.month);
+    inputs.year.value = String(date.year);
+  }
+
+  function parseDateFromInputs(inputs, options = {}) {
+    return parseDateParts({
+      day: inputs.day?.value ?? "",
+      month: inputs.month?.value ?? "",
+      year: inputs.year?.value ?? "",
+      minYear: options.minYear,
+      maxYear: options.maxYear,
+    });
+  }
+
+  function getLeapRule() {
+    return leapRuleSelect?.value || DEFAULT_LEAP_DAY_RULE;
+  }
+
+  function setInitialState() {
+    currentCopyText = "";
+    resultKicker.textContent = "Resultado";
+    mainResult.textContent = "Ingresa tu fecha";
+    resultNote.textContent =
+      "Completa día, mes y año de nacimiento para ver tu edad.";
+    birthDateDisplay.textContent = "Se mostrará aquí";
+    nextBirthday.textContent = "Se mostrará aquí";
+    nextBirthdayNote.textContent = "";
+    renderWarnings([]);
+    resetUnitOutputs();
+    setCopyVisible(false);
+  }
+
+  function setInvalidState(message) {
+    currentCopyText = "";
+    resultKicker.textContent = "Revisa los campos";
+    mainResult.textContent = "No se puede calcular todavía";
+    resultNote.textContent = message;
+    birthDateDisplay.textContent = "Corrige los datos marcados";
+    nextBirthday.textContent = "Se mostrará cuando la fecha sea válida";
+    nextBirthdayNote.textContent = "";
+    renderWarnings([]);
+    resetUnitOutputs();
+    setCopyVisible(false);
+  }
+
+  function updateCalculator() {
+    clearErrors();
+
+    if (!hasBirthStarted()) {
+      setInitialState();
+      return;
+    }
+
+    const today = getToday();
+    const birth = parseDateFromInputs(birthInputs, {
+      minYear: MIN_PERSON_YEAR,
+      maxYear: today.year,
+    });
+    const reference = parseDateFromInputs(referenceInputs, {
+      minYear: MIN_PERSON_YEAR,
+      maxYear: 9999,
+    });
+
+    if (!birth.ok) {
+      showError(birthError, birth.error);
+      setInvalidState("Corrige la fecha de nacimiento para continuar.");
+      return;
+    }
+
+    if (comparePlainDates(birth.value, today) > 0) {
+      showError(birthError, "future_birth");
+      setInvalidState("La fecha de nacimiento no puede estar en el futuro.");
+      return;
+    }
+
+    if (!reference.ok) {
+      showError(referenceError, reference.error);
+      setInvalidState("Corrige la fecha de referencia para continuar.");
+      return;
+    }
+
+    if (comparePlainDates(birth.value, reference.value) > 0) {
+      showError(referenceError, "reference_before_birth");
+      setInvalidState("La fecha de referencia debe ser posterior al nacimiento.");
+      return;
+    }
+
+    renderResult({
+      birthDate: birth.value,
+      referenceDate: reference.value,
+      today,
+    });
+  }
+
+  function renderResult({ birthDate, referenceDate, today }) {
+    const leapDayRule = getLeapRule();
+    const result = calculateAgeResult({
+      birthDate,
+      referenceDate,
+      today,
+      leapDayRule,
+    });
+    const tense = getResultTense(referenceDate, today);
+    const referenceLabel =
+      comparePlainDates(referenceDate, today) === 0
+        ? "al día de hoy"
+        : `en ${formatPlainDate(referenceDate)}`;
+
+    resultKicker.textContent = "Edad exacta";
+    mainResult.textContent = `${tense} ${formatAgeDifference(result.age)}.`;
+    resultNote.textContent = `Resultado calculado ${referenceLabel}.`;
+    birthDateDisplay.textContent = formatPlainDate(birthDate);
+    nextBirthday.textContent = formatPlainDate(result.nextAnniversary.date);
+    nextBirthdayNote.textContent = buildNextBirthdayNote(result);
+    renderWarnings(result.warnings);
+    renderAlternativeUnits(result.alternativeUnits);
+    setCopyVisible(true);
+    currentCopyText = buildAgeCopyText({
+      birthDate,
+      referenceDate,
+      result,
+    });
+  }
+
+  function getResultTense(referenceDate, today) {
+    const comparison = comparePlainDates(referenceDate, today);
+
+    if (comparison > 0) {
+      return "Tendrás";
+    }
+
+    if (comparison < 0) {
+      return "Tenías";
+    }
+
+    return "Tienes";
+  }
+
+  function buildNextBirthdayNote(result) {
+    const { nextAnniversary } = result;
+    const daysText =
+      nextAnniversary.daysUntil === 0
+        ? "Hoy es el cumpleaños."
+        : `Faltan ${formatNumber(nextAnniversary.daysUntil)} días (${formatCompactDuration(
+            nextAnniversary.calendarUntil,
+          )}).`;
+
+    return `${daysText} Cae en ${nextAnniversary.weekday} y cumplirá ${formatNumber(
+      nextAnniversary.turningYears ?? 0,
+    )} años.`;
+  }
+
+  function renderAlternativeUnits(units) {
+    unitOutputs.completeYears.textContent = `${formatNumber(
+      units.completeYears,
+    )} ${units.completeYears === 1 ? "año" : "años"}`;
+    unitOutputs.completeMonths.textContent = `${formatNumber(
+      units.completeMonths,
+    )} ${units.completeMonths === 1 ? "mes" : "meses"}`;
+    unitOutputs.completeWeeks.textContent = `${formatNumber(
+      units.completeWeeks,
+    )} ${units.completeWeeks === 1 ? "semana" : "semanas"}`;
+    unitOutputs.days.textContent = `${formatNumber(units.days)} ${
+      units.days === 1 ? "día" : "días"
+    }`;
+    unitOutputs.approximateHours.textContent = `${formatNumber(
+      units.approximateHours,
+    )} h aprox.`;
+    unitOutputs.approximateMinutes.textContent = `${formatNumber(
+      units.approximateMinutes,
+    )} min aprox.`;
+    unitOutputs.approximateSeconds.textContent = `${formatNumber(
+      units.approximateSeconds,
+    )} s aprox.`;
+  }
+
+  function resetUnitOutputs() {
+    Object.values(unitOutputs).forEach((element) => {
+      element.textContent = "-";
+    });
+  }
+
+  function renderWarnings(warnings) {
+    warningList.innerHTML = "";
+
+    warnings.forEach((warning) => {
+      const item = document.createElement("li");
+      item.textContent = warning;
+      warningList.append(item);
+    });
+
+    warningPanel.classList.toggle("hidden", warnings.length === 0);
+  }
+
+  function clearErrors() {
+    [birthError, referenceError].forEach((element) => {
+      element.textContent = "";
+      element.classList.add("hidden");
+    });
+  }
+
+  function showError(element, error) {
+    element.textContent = ERROR_MESSAGES[error] ?? ERROR_MESSAGES.invalid;
+    element.classList.remove("hidden");
+  }
+
+  function setCopyVisible(isVisible) {
+    copyButton.classList.toggle("hidden", !isVisible);
+    copyButton.classList.toggle("inline-flex", isVisible);
+  }
+
+  function useToday() {
+    referenceUsesToday = true;
+    setDateInputs(referenceInputs, getToday());
+    updateCalculator();
+  }
+
+  function fillExample() {
+    setDateInputs(birthInputs, { year: 1990, month: 3, day: 15 });
+    setDateInputs(referenceInputs, { year: 2026, month: 4, day: 25 });
+    referenceUsesToday = false;
+    leapRuleSelect.value = DEFAULT_LEAP_DAY_RULE;
+    markInputsTouched();
+    updateCalculator();
+  }
+
+  function clearCalculator() {
+    Object.values(birthInputs).forEach((input) => {
+      input.value = "";
+      delete input.dataset.touched;
+    });
+    leapRuleSelect.value = DEFAULT_LEAP_DAY_RULE;
+    useToday();
+    clearErrors();
+    setInitialState();
+  }
+
+  function markInputsTouched() {
+    allDateInputs.forEach((input) => {
+      if (input) {
+        input.dataset.touched = "true";
+      }
+    });
+  }
+
+  async function copyResult() {
+    if (!currentCopyText) {
+      return;
+    }
+
+    try {
+      if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(currentCopyText);
+      } else {
+        const textArea = document.createElement("textarea");
+        textArea.value = currentCopyText;
+        textArea.setAttribute("readonly", "");
+        textArea.style.position = "fixed";
+        textArea.style.opacity = "0";
+        document.body.append(textArea);
+        textArea.select();
+        document.execCommand("copy");
+        textArea.remove();
+      }
+
+      window.clearTimeout(copiedTimeout);
+      copyLabel.textContent = "Copiado";
+      copyStatus.textContent = "Resultado copiado.";
+      copiedTimeout = window.setTimeout(() => {
+        copyLabel.textContent = "Copiar resultado";
+        copyStatus.textContent = "";
+      }, 2000);
+    } catch {
+      copyStatus.textContent = "No se pudo copiar el resultado.";
+    }
+  }
+
+  function scheduleMidnightRefresh() {
+    const now = new Date();
+    const nextMidnight = new Date(now);
+    nextMidnight.setHours(24, 0, 1, 0);
+
+    window.setTimeout(() => {
+      if (referenceUsesToday) {
+        setDateInputs(referenceInputs, getToday());
+      }
+
+      updateCalculator();
+      scheduleMidnightRefresh();
+    }, nextMidnight.getTime() - now.getTime());
+  }
+
+  allDateInputs.forEach((input) => {
+    input?.addEventListener("input", () => {
+      input.dataset.touched = "true";
+
+      if (
+        input === referenceInputs.day ||
+        input === referenceInputs.month ||
+        input === referenceInputs.year
+      ) {
+        referenceUsesToday = false;
+      }
+
+      updateCalculator();
+    });
+
+    input?.addEventListener("change", () => {
+      input.dataset.touched = "true";
+
+      if (
+        input === referenceInputs.day ||
+        input === referenceInputs.month ||
+        input === referenceInputs.year
+      ) {
+        referenceUsesToday = false;
+      }
+
+      updateCalculator();
+    });
+  });
+
+  leapRuleSelect?.addEventListener("change", updateCalculator);
+  todayButton?.addEventListener("click", useToday);
+  exampleButton?.addEventListener("click", fillExample);
+  clearButton?.addEventListener("click", clearCalculator);
+  copyButton?.addEventListener("click", copyResult);
+
+  setDateInputs(referenceInputs, getToday());
+  setInitialState();
+  scheduleMidnightRefresh();
+</script>

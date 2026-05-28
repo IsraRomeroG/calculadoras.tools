@@ -88,4 +88,13 @@ export const CALCULATORS: CalculatorDirectoryItem[] = [
     category: "Salud",
     order: 55,
   },
+  {
+    id: "calculadora-de-edad",
+    title: "Calculadora de edad",
+    description:
+      "Calcula edad exacta, días vividos y próximo cumpleaños con fecha de referencia editable.",
+    href: "/calculadora-de-edad",
+    category: "Fecha y tiempo",
+    order: 60,
+  },
 ];

@@ -27,6 +27,8 @@ const calculatorCategoryDescriptions: Record<string, string> = {
     "Calculadoras para porcentajes, proporciones y reglas de tres, con resultados directos para tareas, compras y trabajo.",
   salud:
     "Calculadoras de referencia para revisar indicadores personales y entender mejor tus resultados de bienestar.",
+  "fecha-y-tiempo":
+    "Herramientas para calcular edades, intervalos, cumpleaños y fechas importantes con claridad.",
 };
 
 export const getCalculatorCategorySlug = (category: string) =>
