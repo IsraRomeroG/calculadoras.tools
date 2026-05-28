@@ -79,4 +79,13 @@ export const CALCULATORS: CalculatorDirectoryItem[] = [
     category: "Salud",
     order: 50,
   },
+  {
+    id: "calculadora-deficit-calorico",
+    title: "Calculadora de deficit calorico",
+    description:
+      "Estima calorias diarias, deficit, ritmo semanal y plazo para bajar de peso.",
+    href: "/calculadora-deficit-calorico",
+    category: "Salud",
+    order: 55,
+  },
 ];

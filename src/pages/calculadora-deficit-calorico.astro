@@ -1,0 +1,986 @@
+---
+import BaseLayout from "@layouts/BaseLayout.astro";
+import Container from "@components/layout/Container.astro";
+import PageShell from "@components/layout/PageShell.astro";
+import PageHero from "@components/shared/PageHero.astro";
+import {
+  ACTIVITY_OPTIONS,
+  PACE_OPTIONS,
+} from "@lib/calculators/deficit";
+
+const title =
+  "Calculadora de Deficit Calorico - Cuanto Comer para Bajar de Peso";
+const description =
+  "Calcula un deficit calorico estimado para bajar de peso con un plan responsable: calorias diarias, ritmo semanal, plazo estimado y validaciones de seguridad.";
+const canonical = "/calculadora-deficit-calorico";
+---
+
+<BaseLayout title={title} description={description} canonical={canonical}>
+  <PageShell>
+    <PageHero
+      title="Calculadora de deficit calorico"
+      description="Estima tus calorias diarias para bajar de peso con un ritmo realista, avisos de seguridad y un rango de fecha orientativo."
+      kicker="Salud"
+      collapseBreadcrumbOnMobile
+      containerClass="py-5 md:py-7"
+      breadcrumbs={[
+        { label: "Inicio", href: "/", ariaLabel: "Inicio" },
+        { label: "Salud", href: "/#calculadoras", optional: true },
+        { label: "Deficit calorico", truncate: true },
+      ]}
+    />
+
+    <Container as="section" class="py-6 md:py-8">
+      <section
+        id="deficit-calculator"
+        class="overflow-hidden rounded-lg border border-gray-700 bg-gray-950 shadow-xl shadow-gray-950/30"
+        aria-labelledby="calculator-heading"
+      >
+        <div class="grid gap-0 xl:grid-cols-[minmax(0,1fr)_minmax(22rem,0.82fr)]">
+          <div class="p-4 sm:p-6">
+            <div class="mb-5">
+              <p class="text-sm font-semibold uppercase tracking-wide text-amber-400">
+                Fase 1 MVP
+              </p>
+              <h2 id="calculator-heading" class="mt-2 text-2xl font-semibold">
+                Plan para llegar a tu peso objetivo
+              </h2>
+              <p class="mt-2 text-sm leading-relaxed text-gray-400">
+                Usa Mifflin-St Jeor para estimar tu TDEE, aplica el ritmo que
+                elijas y muestra un rango prudente. Los resultados son una
+                referencia inicial.
+              </p>
+            </div>
+
+            <div class="grid gap-4 sm:grid-cols-2">
+              <div>
+                <label
+                  for="deficit-sex"
+                  class="block text-sm font-medium text-gray-200"
+                >
+                  Sexo usado por la formula
+                </label>
+                <select
+                  id="deficit-sex"
+                  class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-900 px-4 text-base text-white outline-none transition focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15"
+                  aria-describedby="deficit-sex-error"
+                  data-input="sex"
+                >
+                  <option value="">Selecciona</option>
+                  <option value="female">Mujer</option>
+                  <option value="male">Hombre</option>
+                </select>
+                <p class="mt-2 text-xs leading-relaxed text-gray-500">
+                  La ecuacion requiere esta variable; no se usa para inferir
+                  identidad de genero.
+                </p>
+                <p
+                  id="deficit-sex-error"
+                  class="mt-2 hidden text-sm text-red-300"
+                  data-error-for="sex"
+                >
+                </p>
+              </div>
+
+              <div>
+                <label
+                  for="deficit-age"
+                  class="block text-sm font-medium text-gray-200"
+                >
+                  Edad
+                </label>
+                <div
+                  class="mt-2 flex rounded-lg border border-gray-700 bg-gray-900 focus-within:border-amber-400 focus-within:ring-3 focus-within:ring-amber-400/15"
+                >
+                  <input
+                    id="deficit-age"
+                    class="min-h-12 w-full bg-transparent px-4 text-base text-white outline-none"
+                    type="text"
+                    inputmode="numeric"
+                    autocomplete="off"
+                    placeholder="34"
+                    aria-describedby="deficit-age-error"
+                    data-input="age"
+                  />
+                  <span class="flex items-center px-4 text-gray-500">anos</span>
+                </div>
+                <p
+                  id="deficit-age-error"
+                  class="mt-2 hidden text-sm text-red-300"
+                  data-error-for="age"
+                >
+                </p>
+              </div>
+            </div>
+
+            <div class="mt-5 grid gap-4 sm:grid-cols-3">
+              <div>
+                <label
+                  for="deficit-weight"
+                  class="block text-sm font-medium text-gray-200"
+                >
+                  Peso actual
+                </label>
+                <div
+                  class="mt-2 flex rounded-lg border border-gray-700 bg-gray-900 focus-within:border-amber-400 focus-within:ring-3 focus-within:ring-amber-400/15"
+                >
+                  <input
+                    id="deficit-weight"
+                    class="min-h-12 w-full bg-transparent px-4 text-base text-white outline-none"
+                    type="text"
+                    inputmode="decimal"
+                    autocomplete="off"
+                    placeholder="80"
+                    aria-describedby="deficit-weight-error"
+                    data-input="weightKg"
+                  />
+                  <span class="flex items-center px-4 text-gray-500">kg</span>
+                </div>
+                <p
+                  id="deficit-weight-error"
+                  class="mt-2 hidden text-sm text-red-300"
+                  data-error-for="weightKg"
+                >
+                </p>
+              </div>
+
+              <div>
+                <label
+                  for="deficit-target-weight"
+                  class="block text-sm font-medium text-gray-200"
+                >
+                  Peso objetivo
+                </label>
+                <div
+                  class="mt-2 flex rounded-lg border border-gray-700 bg-gray-900 focus-within:border-amber-400 focus-within:ring-3 focus-within:ring-amber-400/15"
+                >
+                  <input
+                    id="deficit-target-weight"
+                    class="min-h-12 w-full bg-transparent px-4 text-base text-white outline-none"
+                    type="text"
+                    inputmode="decimal"
+                    autocomplete="off"
+                    placeholder="68"
+                    aria-describedby="deficit-target-weight-error"
+                    data-input="targetWeightKg"
+                  />
+                  <span class="flex items-center px-4 text-gray-500">kg</span>
+                </div>
+                <p
+                  id="deficit-target-weight-error"
+                  class="mt-2 hidden text-sm text-red-300"
+                  data-error-for="targetWeightKg"
+                >
+                </p>
+              </div>
+
+              <div>
+                <label
+                  for="deficit-height"
+                  class="block text-sm font-medium text-gray-200"
+                >
+                  Altura
+                </label>
+                <div
+                  class="mt-2 flex rounded-lg border border-gray-700 bg-gray-900 focus-within:border-amber-400 focus-within:ring-3 focus-within:ring-amber-400/15"
+                >
+                  <input
+                    id="deficit-height"
+                    class="min-h-12 w-full bg-transparent px-4 text-base text-white outline-none"
+                    type="text"
+                    inputmode="decimal"
+                    autocomplete="off"
+                    placeholder="172"
+                    aria-describedby="deficit-height-error"
+                    data-input="heightCm"
+                  />
+                  <span class="flex items-center px-4 text-gray-500">cm</span>
+                </div>
+                <p
+                  id="deficit-height-error"
+                  class="mt-2 hidden text-sm text-red-300"
+                  data-error-for="heightCm"
+                >
+                </p>
+              </div>
+            </div>
+
+            <div class="mt-5">
+              <label
+                for="deficit-manual-tdee"
+                class="block text-sm font-medium text-gray-200"
+              >
+                TDEE manual opcional
+              </label>
+              <div
+                class="mt-2 flex rounded-lg border border-gray-700 bg-gray-900 focus-within:border-amber-400 focus-within:ring-3 focus-within:ring-amber-400/15"
+              >
+                <input
+                  id="deficit-manual-tdee"
+                  class="min-h-12 w-full bg-transparent px-4 text-base text-white outline-none"
+                  type="text"
+                  inputmode="numeric"
+                  autocomplete="off"
+                  placeholder="2450"
+                  aria-describedby="deficit-manual-tdee-help deficit-manual-tdee-error"
+                  data-input="manualTdee"
+                />
+                <span class="flex items-center px-4 text-gray-500">kcal</span>
+              </div>
+              <p
+                id="deficit-manual-tdee-help"
+                class="mt-2 text-xs leading-relaxed text-gray-500"
+              >
+                Si lo dejas vacio, se calcula con Mifflin-St Jeor y tu nivel
+                de actividad.
+              </p>
+              <p
+                id="deficit-manual-tdee-error"
+                class="mt-2 hidden text-sm text-red-300"
+                data-error-for="manualTdee"
+              >
+              </p>
+            </div>
+
+            <fieldset class="mt-6">
+              <legend class="text-sm font-medium text-gray-200">
+                Nivel de actividad
+              </legend>
+              <p class="mt-2 text-sm leading-relaxed text-gray-400">
+                Piensa en todo tu dia, no solo en entrenamientos aislados. Si
+                dudas entre dos niveles, elige el menor y ajusta con datos
+                reales.
+              </p>
+              <div class="mt-3 grid gap-3 md:grid-cols-2">
+                {
+                  ACTIVITY_OPTIONS.map((activity) => (
+                    <label
+                      class="flex min-h-16 cursor-pointer gap-3 rounded-lg border border-gray-800 bg-gray-900/70 p-3 transition hover:border-amber-400/60"
+                      data-activity-card={activity.key}
+                    >
+                      <input
+                        class="mt-1 size-4 shrink-0 border-gray-600 bg-gray-950 text-amber-400 focus:ring-amber-400"
+                        type="radio"
+                        name="activityLevel"
+                        value={activity.key}
+                        checked={activity.key === "sedentary"}
+                        data-input="activityLevel"
+                      />
+                      <span class="min-w-0">
+                        <span class="block text-sm font-semibold text-white">
+                          {activity.label}
+                        </span>
+                        <span class="mt-1 block text-xs leading-relaxed text-gray-400">
+                          {activity.description}
+                        </span>
+                      </span>
+                    </label>
+                  ))
+                }
+              </div>
+              <p
+                id="deficit-activity-error"
+                class="mt-2 hidden text-sm text-red-300"
+                data-error-for="activityLevel"
+              >
+              </p>
+            </fieldset>
+
+            <fieldset class="mt-6">
+              <legend class="text-sm font-medium text-gray-200">
+                Ritmo de perdida
+              </legend>
+              <div class="mt-3 grid gap-3 md:grid-cols-2">
+                {
+                  PACE_OPTIONS.map((pace) => (
+                    <label
+                      class="flex min-h-16 cursor-pointer gap-3 rounded-lg border border-gray-800 bg-gray-900/70 p-3 transition hover:border-amber-400/60"
+                      data-pace-card={pace.key}
+                    >
+                      <input
+                        class="mt-1 size-4 shrink-0 border-gray-600 bg-gray-950 text-amber-400 focus:ring-amber-400"
+                        type="radio"
+                        name="pace"
+                        value={pace.key}
+                        checked={pace.key === "moderate"}
+                        data-input="pace"
+                      />
+                      <span class="min-w-0">
+                        <span class="block text-sm font-semibold text-white">
+                          {pace.label}
+                          <span class="text-gray-500">
+                            {" "}
+                            - {pace.dailyDeficit} kcal/dia
+                          </span>
+                        </span>
+                        <span class="mt-1 block text-xs leading-relaxed text-gray-400">
+                          {pace.description}
+                        </span>
+                      </span>
+                    </label>
+                  ))
+                }
+              </div>
+              <p
+                id="deficit-pace-error"
+                class="mt-2 hidden text-sm text-red-300"
+                data-error-for="pace"
+              >
+              </p>
+            </fieldset>
+
+            <div class="mt-6 flex flex-col gap-3 border-t border-gray-800 pt-5 sm:flex-row">
+              <button
+                class="inline-flex min-h-11 items-center justify-center rounded-lg border border-gray-700 px-4 py-2 text-sm font-semibold text-gray-200 transition hover:border-amber-400 hover:text-white focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/40"
+                type="button"
+                data-fill-example
+              >
+                Usar ejemplo
+              </button>
+            </div>
+          </div>
+
+          <aside class="border-t border-gray-800 bg-gray-900/60 p-4 sm:p-6 xl:border-l xl:border-t-0">
+            <p
+              class="text-sm font-semibold uppercase tracking-wide text-amber-400"
+              data-result-kicker
+            >
+              Resultado
+            </p>
+            <div class="mt-3">
+              <p class="text-sm text-gray-400">Calorias objetivo</p>
+              <p
+                class="mt-1 text-3xl font-semibold tracking-tight text-white md:text-4xl"
+                data-main-result
+              >
+                Completa los datos
+              </p>
+              <p
+                class="mt-3 inline-flex rounded-full border border-gray-700 px-3 py-1 text-sm font-semibold text-gray-300"
+                data-risk-label
+              >
+                Sin calculo todavia
+              </p>
+            </div>
+
+            <dl class="mt-6 grid gap-3 sm:grid-cols-2 xl:grid-cols-1">
+              <div class="rounded-lg border border-gray-800 bg-gray-950 p-4">
+                <dt class="text-xs uppercase tracking-wide text-gray-500">
+                  TDEE estimado
+                </dt>
+                <dd class="mt-1 text-lg font-semibold" data-tdee-result>
+                  -
+                </dd>
+              </div>
+              <div class="rounded-lg border border-gray-800 bg-gray-950 p-4">
+                <dt class="text-xs uppercase tracking-wide text-gray-500">
+                  Deficit diario
+                </dt>
+                <dd class="mt-1 text-lg font-semibold" data-deficit-result>
+                  -
+                </dd>
+              </div>
+              <div class="rounded-lg border border-gray-800 bg-gray-950 p-4">
+                <dt class="text-xs uppercase tracking-wide text-gray-500">
+                  Perdida semanal
+                </dt>
+                <dd class="mt-1 text-lg font-semibold" data-weekly-result>
+                  -
+                </dd>
+              </div>
+              <div class="rounded-lg border border-gray-800 bg-gray-950 p-4">
+                <dt class="text-xs uppercase tracking-wide text-gray-500">
+                  Plazo estimado
+                </dt>
+                <dd class="mt-1 text-lg font-semibold" data-weeks-result>
+                  -
+                </dd>
+              </div>
+              <div class="rounded-lg border border-gray-800 bg-gray-950 p-4">
+                <dt class="text-xs uppercase tracking-wide text-gray-500">
+                  Fecha estimada
+                </dt>
+                <dd class="mt-1 text-lg font-semibold" data-date-result>
+                  -
+                </dd>
+              </div>
+              <div class="rounded-lg border border-gray-800 bg-gray-950 p-4">
+                <dt class="text-xs uppercase tracking-wide text-gray-500">
+                  IMC objetivo
+                </dt>
+                <dd class="mt-1 text-lg font-semibold" data-target-bmi-result>
+                  -
+                </dd>
+              </div>
+            </dl>
+
+            <p
+              class="mt-5 text-sm leading-relaxed text-gray-400"
+              data-explanation
+            >
+              El resultado aparecera aqui. Ajusta despues de 2 a 3 semanas
+              segun tu evolucion real.
+            </p>
+
+            <div
+              class="mt-5 hidden rounded-lg border border-amber-300/40 bg-amber-400/10 p-4"
+              data-warning-panel
+            >
+              <p class="text-sm font-semibold text-amber-100">
+                Avisos importantes
+              </p>
+              <ul
+                class="mt-2 list-disc space-y-1 pl-5 text-sm leading-relaxed text-amber-50/85"
+                data-warning-list
+              >
+              </ul>
+            </div>
+
+            <div class="mt-5 rounded-lg border border-gray-800 bg-gray-950 p-4">
+              <p class="text-sm font-semibold text-white">Tu plan esta semana</p>
+              <ul class="mt-3 space-y-2 text-sm leading-relaxed text-gray-400">
+                <li>Come cerca del objetivo calculado, si no esta bloqueado.</li>
+                <li>Manten actividad moderada y sostenible.</li>
+                <li>Pesate una vez por semana, en condiciones parecidas.</li>
+                <li>Recalcula si cambias 4 - 5 kg o tu rutina cambia.</li>
+              </ul>
+            </div>
+          </aside>
+        </div>
+      </section>
+    </Container>
+
+    <Container as="section" class="py-6 md:py-8">
+      <div class="rounded-lg border border-gray-700 bg-gray-950 p-4 sm:p-6">
+        <div class="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <p class="text-sm font-semibold uppercase tracking-wide text-amber-400">
+              Comparador basico
+            </p>
+            <h2 class="mt-2 text-2xl font-semibold">Ritmos posibles</h2>
+          </div>
+          <p class="max-w-xl text-sm leading-relaxed text-gray-400">
+            La opcion moderada se marca como punto de partida. Los ritmos altos
+            pueden requerir seguimiento profesional.
+          </p>
+        </div>
+
+        <div class="mt-5 overflow-x-auto">
+          <table class="w-full min-w-[48rem] text-left text-sm">
+            <thead class="border-b border-gray-800 text-xs uppercase tracking-wide text-gray-500">
+              <tr>
+                <th class="py-3 pr-4 font-semibold">Ritmo</th>
+                <th class="px-4 py-3 font-semibold">Deficit</th>
+                <th class="px-4 py-3 font-semibold">Calorias/dia</th>
+                <th class="px-4 py-3 font-semibold">Perdida/semana</th>
+                <th class="px-4 py-3 font-semibold">% peso/semana</th>
+                <th class="px-4 py-3 font-semibold">Duracion</th>
+                <th class="py-3 pl-4 font-semibold">Riesgo</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-800" data-comparison-body>
+              {
+                PACE_OPTIONS.map((pace) => (
+                  <tr data-comparison-row={pace.key}>
+                    <th class="py-3 pr-4 font-semibold text-white">
+                      {pace.label}
+                      {pace.key === "moderate" && (
+                        <span class="ml-2 rounded-full bg-amber-400/10 px-2 py-1 text-xs text-amber-200">
+                          recomendado
+                        </span>
+                      )}
+                    </th>
+                    <td class="px-4 py-3 text-gray-300" data-row-deficit={pace.key}>
+                      -
+                    </td>
+                    <td class="px-4 py-3 text-gray-300" data-row-calories={pace.key}>
+                      -
+                    </td>
+                    <td class="px-4 py-3 text-gray-300" data-row-weekly={pace.key}>
+                      -
+                    </td>
+                    <td class="px-4 py-3 text-gray-300" data-row-percent={pace.key}>
+                      -
+                    </td>
+                    <td class="px-4 py-3 text-gray-300" data-row-weeks={pace.key}>
+                      -
+                    </td>
+                    <td class="py-3 pl-4 text-gray-300" data-row-risk={pace.key}>
+                      -
+                    </td>
+                  </tr>
+                ))
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </Container>
+
+    <Container as="section" class="py-6 md:py-8">
+      <div class="grid gap-4 md:grid-cols-3">
+        <div class="rounded-lg border border-gray-800 bg-gray-950 p-5">
+          <h2 class="text-lg font-semibold">Estimacion, no promesa</h2>
+          <p class="mt-2 text-sm leading-relaxed text-gray-400">
+            El calculo usa promedios poblacionales y una equivalencia de 7,700
+            kcal por kg. Tu progreso real puede variar.
+          </p>
+        </div>
+        <div class="rounded-lg border border-gray-800 bg-gray-950 p-5">
+          <h2 class="text-lg font-semibold">Adultos</h2>
+          <p class="mt-2 text-sm leading-relaxed text-gray-400">
+            Esta version no calcula planes para menores de edad ni metas que
+            dejen el IMC objetivo por debajo de 18.5.
+          </p>
+        </div>
+        <div class="rounded-lg border border-gray-800 bg-gray-950 p-5">
+          <h2 class="text-lg font-semibold">Salud primero</h2>
+          <p class="mt-2 text-sm leading-relaxed text-gray-400">
+            Consulta con un profesional si tienes embarazo, lactancia,
+            condiciones medicas, sintomas o historial de trastornos de la
+            conducta alimentaria.
+          </p>
+        </div>
+      </div>
+    </Container>
+  </PageShell>
+</BaseLayout>
+
+<script>
+  import {
+    buildDeficitCopyText,
+    calculateDeficitPlan,
+    formatBmi,
+    formatCalories,
+    formatDateRange,
+    formatSignedCalories,
+    formatWeeklyLossKg,
+    formatWeeklyLossPercent,
+    formatWeeksRange,
+    getRiskLabel,
+    parseHealthInput,
+    roundTo,
+    validateDeficitInput,
+  } from "@lib/calculators/deficit";
+
+  const ERROR_MESSAGES = {
+    required: "Este campo es obligatorio.",
+    invalid: "Ingresa un numero valido.",
+    negative: "Ingresa un valor igual o mayor a cero.",
+    too_many_decimals: "Usa menos decimales.",
+    age_integer: "Ingresa anos completos.",
+    age_under_18:
+      "Esta calculadora es para adultos. Para menores de edad, consulta con un profesional de salud.",
+    age_over_100: "Ingresa una edad de 100 anos o menos.",
+    weight_range: "Ingresa un peso actual entre 30 y 300 kg.",
+    target_weight_range: "Ingresa un peso objetivo entre 30 y 299 kg.",
+    height_range: "Ingresa una altura entre 100 y 250 cm.",
+    target_equal:
+      "Tu meta parece ser mantener tu peso. Usa la calculadora de TDEE para mantenimiento.",
+    target_higher:
+      "Esta calculadora es para bajar de peso. Para subir, usa TDEE con superavit.",
+    target_bmi_low:
+      "Ese objetivo podria quedar por debajo de un rango saludable. Revisa tu meta con un profesional.",
+    manual_tdee_range: "Ingresa un TDEE manual entre 800 y 6,000 kcal.",
+  };
+
+  const WARNING_MESSAGES = {
+    older_adult:
+      "En adultos mayores, las formulas pueden ser menos precisas por cambios en masa muscular, salud y actividad diaria.",
+    large_weight_loss:
+      "La meta implica perder mas de 50 kg. Es recomendable hacerlo con seguimiento medico o nutricional.",
+    low_tdee:
+      "El TDEE quedo inusualmente bajo. Revisa edad, peso, altura y actividad antes de usarlo como referencia.",
+    manual_tdee_used:
+      "Se esta usando el TDEE manual en lugar del TDEE calculado.",
+    low_calories_female:
+      "El objetivo baja de 1,200 kcal/dia. No se recomienda como plan por defecto sin orientacion profesional.",
+    low_calories_male:
+      "El objetivo baja de 1,500 kcal/dia. No se recomienda como plan por defecto sin orientacion profesional.",
+    calories_below_bmr:
+      "El objetivo queda por debajo de tu metabolismo basal estimado. Considera un ritmo mas gradual.",
+    high_deficit:
+      "El deficit supera 1,000 kcal/dia. No se recomienda sin supervision profesional.",
+    high_weekly_loss:
+      "El ritmo supera 1% de tu peso por semana. Se considera agresivo.",
+    very_high_weekly_loss:
+      "El ritmo supera el limite del MVP o el objetivo baja demasiado. Se bloquea el plan por seguridad.",
+    target_calories_blocked:
+      "Por seguridad, no se calculan planes por debajo de 800 kcal/dia.",
+  };
+
+  const RISK_CLASSES = {
+    suave: ["border-emerald-300/50", "bg-emerald-400/10", "text-emerald-100"],
+    moderado: ["border-amber-300/50", "bg-amber-400/10", "text-amber-100"],
+    agresivo: ["border-orange-300/50", "bg-orange-400/10", "text-orange-100"],
+    "solo-supervision": ["border-red-300/50", "bg-red-400/10", "text-red-100"],
+    bloqueado: ["border-red-300/60", "bg-red-500/10", "text-red-100"],
+  };
+  const RISK_BASE_CLASSES = [
+    "mt-3",
+    "inline-flex",
+    "rounded-full",
+    "border",
+    "px-3",
+    "py-1",
+    "text-sm",
+    "font-semibold",
+  ];
+  const ACTIVE_CARD_CLASSES = ["border-amber-400/70", "bg-amber-400/10"];
+  const BASE_CARD_CLASSES = ["border-gray-800", "bg-gray-900/70"];
+
+  const inputs = {
+    sex: document.querySelector('[data-input="sex"]'),
+    age: document.querySelector('[data-input="age"]'),
+    weightKg: document.querySelector('[data-input="weightKg"]'),
+    targetWeightKg: document.querySelector('[data-input="targetWeightKg"]'),
+    heightCm: document.querySelector('[data-input="heightCm"]'),
+    manualTdee: document.querySelector('[data-input="manualTdee"]'),
+    activityLevel: Array.from(
+      document.querySelectorAll('[data-input="activityLevel"]'),
+    ),
+    pace: Array.from(document.querySelectorAll('[data-input="pace"]')),
+  };
+  const resultKicker = document.querySelector("[data-result-kicker]");
+  const mainResult = document.querySelector("[data-main-result]");
+  const riskLabel = document.querySelector("[data-risk-label]");
+  const tdeeResult = document.querySelector("[data-tdee-result]");
+  const deficitResult = document.querySelector("[data-deficit-result]");
+  const weeklyResult = document.querySelector("[data-weekly-result]");
+  const weeksResult = document.querySelector("[data-weeks-result]");
+  const dateResult = document.querySelector("[data-date-result]");
+  const targetBmiResult = document.querySelector("[data-target-bmi-result]");
+  const explanation = document.querySelector("[data-explanation]");
+  const warningPanel = document.querySelector("[data-warning-panel]");
+  const warningList = document.querySelector("[data-warning-list]");
+  const exampleButton = document.querySelector("[data-fill-example]");
+  const activityCards = Array.from(
+    document.querySelectorAll("[data-activity-card]"),
+  );
+  const paceCards = Array.from(document.querySelectorAll("[data-pace-card]"));
+
+  let currentCopyText = "";
+
+  function hasStarted() {
+    return [
+      inputs.sex,
+      inputs.age,
+      inputs.weightKg,
+      inputs.targetWeightKg,
+      inputs.heightCm,
+      inputs.manualTdee,
+    ].some((input) => input?.value.trim() !== "");
+  }
+
+  function getSelectedRadioValue(radios) {
+    return radios.find((input) => input.checked)?.value ?? "";
+  }
+
+  function parseFormValues() {
+    const errors = {};
+    const sex = inputs.sex?.value;
+    const age = parseIntegerField(inputs.age?.value ?? "");
+    const weight = parseRequiredNumber(inputs.weightKg?.value ?? "");
+    const targetWeight = parseRequiredNumber(inputs.targetWeightKg?.value ?? "");
+    const height = parseRequiredNumber(inputs.heightCm?.value ?? "", {
+      convertMetersToCentimeters: true,
+    });
+    const manualTdee = parseOptionalNumber(inputs.manualTdee?.value ?? "");
+    const activityLevel = getSelectedRadioValue(inputs.activityLevel);
+    const pace = getSelectedRadioValue(inputs.pace);
+
+    if (!sex) {
+      errors.sex = "required";
+    }
+
+    collectParseError(errors, "age", age);
+    collectParseError(errors, "weightKg", weight);
+    collectParseError(errors, "targetWeightKg", targetWeight);
+    collectParseError(errors, "heightCm", height);
+    collectParseError(errors, "manualTdee", manualTdee);
+
+    if (!activityLevel) {
+      errors.activityLevel = "required";
+    }
+
+    if (!pace) {
+      errors.pace = "required";
+    }
+
+    if (Object.keys(errors).length > 0) {
+      return { ok: false, errors };
+    }
+
+    const input = {
+      sex,
+      age: age.value,
+      weightKg: weight.value,
+      targetWeightKg: targetWeight.value,
+      heightCm: height.value,
+      activityLevel,
+      pace,
+      manualTdee: manualTdee.value,
+    };
+    const validation = validateDeficitInput(input);
+
+    if (!validation.isValid) {
+      return { ok: false, errors: validation.errors };
+    }
+
+    return { ok: true, input };
+  }
+
+  function parseRequiredNumber(value, options = {}) {
+    return parseHealthInput(value, options);
+  }
+
+  function parseOptionalNumber(value) {
+    if (!value.trim()) {
+      return { ok: true, value: undefined };
+    }
+
+    return parseHealthInput(value, { maxDecimals: 0 });
+  }
+
+  function parseIntegerField(value) {
+    const parsed = parseHealthInput(value, { maxDecimals: 0 });
+
+    if (!parsed.ok) {
+      return {
+        ok: false,
+        error: parsed.error === "too_many_decimals" ? "age_integer" : parsed.error,
+      };
+    }
+
+    if (!Number.isInteger(parsed.value)) {
+      return { ok: false, error: "age_integer" };
+    }
+
+    return parsed;
+  }
+
+  function collectParseError(errors, field, parsed) {
+    if (!parsed.ok) {
+      errors[field] = parsed.error;
+    }
+  }
+
+  function updateCalculator() {
+    clearErrors();
+    updateSelectedCards();
+
+    if (!hasStarted()) {
+      setInitialState();
+      return;
+    }
+
+    const parsed = parseFormValues();
+
+    if (!parsed.ok) {
+      showErrors(parsed.errors);
+      setInvalidState();
+      return;
+    }
+
+    renderValidResult(parsed.input);
+  }
+
+  function renderValidResult(input) {
+    const result = calculateDeficitPlan(input);
+    const riskText = getRiskLabel(result.riskLevel);
+
+    resultKicker.textContent = result.isBlocked ? "Plan bloqueado" : "Plan estimado";
+    mainResult.textContent = result.isBlocked
+      ? "No recomendado"
+      : formatCalories(result.targetCalories);
+    setRiskLabel(riskText, result.riskLevel);
+    tdeeResult.textContent = formatCalories(result.tdee);
+    deficitResult.textContent = formatSignedCalories(-result.dailyDeficit);
+    weeklyResult.textContent = `${formatWeeklyLossKg(result.weeklyLossKg)} (${formatWeeklyLossPercent(result.weeklyLossPercent)})`;
+    weeksResult.textContent = formatWeeksRange(result.estimatedWeeksRange);
+    dateResult.textContent = formatDateRange(result.estimatedDateRange);
+    targetBmiResult.textContent = formatBmi(result.targetBmi);
+    explanation.textContent = result.isBlocked
+      ? "Este plan queda fuera de los limites de seguridad del MVP. Prueba un ritmo mas gradual o revisa tu meta."
+      : "Usa este numero como punto de partida y ajusta despues de 2 a 3 semanas segun tu evolucion real.";
+    currentCopyText = buildDeficitCopyText(input, result);
+
+    renderWarnings(result.warnings);
+    renderComparisonRows(result.comparisonRows);
+  }
+
+  function renderWarnings(warnings) {
+    warningList.innerHTML = "";
+
+    warnings.forEach((warning) => {
+      const message = WARNING_MESSAGES[warning];
+
+      if (!message) {
+        return;
+      }
+
+      const item = document.createElement("li");
+      item.textContent = message;
+      warningList.append(item);
+    });
+
+    warningPanel.classList.toggle("hidden", warningList.children.length === 0);
+  }
+
+  function renderComparisonRows(rows) {
+    rows.forEach((row) => {
+      setText(`[data-row-deficit="${row.pace}"]`, formatSignedCalories(-row.dailyDeficit));
+      setText(
+        `[data-row-calories="${row.pace}"]`,
+        row.isBlocked ? "Bloqueado" : formatCalories(row.targetCalories),
+      );
+      setText(`[data-row-weekly="${row.pace}"]`, formatWeeklyLossKg(row.weeklyLossKg));
+      setText(
+        `[data-row-percent="${row.pace}"]`,
+        formatWeeklyLossPercent(row.weeklyLossPercent),
+      );
+      setText(`[data-row-weeks="${row.pace}"]`, formatWeeksRange(row.estimatedWeeksRange));
+      setText(`[data-row-risk="${row.pace}"]`, getRiskLabel(row.riskLevel));
+    });
+  }
+
+  function setText(selector, text) {
+    const element = document.querySelector(selector);
+
+    if (element) {
+      element.textContent = text;
+    }
+  }
+
+  function setRiskLabel(text, riskLevel) {
+    riskLabel.className = "";
+    RISK_BASE_CLASSES.forEach((className) => riskLabel.classList.add(className));
+    (RISK_CLASSES[riskLevel] ?? []).forEach((className) => {
+      riskLabel.classList.add(className);
+    });
+    riskLabel.textContent = text;
+  }
+
+  function setInitialState() {
+    resultKicker.textContent = "Resultado";
+    mainResult.textContent = "Completa los datos";
+    riskLabel.className =
+      "mt-3 inline-flex rounded-full border border-gray-700 px-3 py-1 text-sm font-semibold text-gray-300";
+    riskLabel.textContent = "Sin calculo todavia";
+    tdeeResult.textContent = "-";
+    deficitResult.textContent = "-";
+    weeklyResult.textContent = "-";
+    weeksResult.textContent = "-";
+    dateResult.textContent = "-";
+    targetBmiResult.textContent = "-";
+    explanation.textContent =
+      "El resultado aparecera aqui. Ajusta despues de 2 a 3 semanas segun tu evolucion real.";
+    warningList.innerHTML = "";
+    warningPanel.classList.add("hidden");
+    resetComparisonRows();
+    currentCopyText = "";
+  }
+
+  function setInvalidState() {
+    resultKicker.textContent = "Revisa los campos";
+    mainResult.textContent = "No se puede calcular";
+    riskLabel.className =
+      "mt-3 inline-flex rounded-full border border-gray-700 px-3 py-1 text-sm font-semibold text-gray-300";
+    riskLabel.textContent = "Campos pendientes";
+    tdeeResult.textContent = "Corrige datos";
+    deficitResult.textContent = "Corrige datos";
+    weeklyResult.textContent = "Corrige datos";
+    weeksResult.textContent = "Corrige datos";
+    dateResult.textContent = "Corrige datos";
+    targetBmiResult.textContent = "Corrige datos";
+    explanation.textContent = "Corrige los valores marcados para continuar.";
+    warningList.innerHTML = "";
+    warningPanel.classList.add("hidden");
+    resetComparisonRows();
+    currentCopyText = "";
+  }
+
+  function resetComparisonRows() {
+    document.querySelectorAll("[data-comparison-row]").forEach((row) => {
+      row.querySelectorAll("td").forEach((cell) => {
+        cell.textContent = "-";
+      });
+    });
+  }
+
+  function clearErrors() {
+    document.querySelectorAll("[data-error-for]").forEach((errorElement) => {
+      errorElement.textContent = "";
+      errorElement.classList.add("hidden");
+    });
+  }
+
+  function showErrors(errors) {
+    Object.entries(errors).forEach(([field, error]) => {
+      const errorElement = document.querySelector(`[data-error-for="${field}"]`);
+
+      if (!errorElement) {
+        return;
+      }
+
+      errorElement.textContent = ERROR_MESSAGES[error] ?? ERROR_MESSAGES.invalid;
+      errorElement.classList.remove("hidden");
+    });
+  }
+
+  function updateSelectedCards() {
+    const activityLevel = getSelectedRadioValue(inputs.activityLevel);
+    const pace = getSelectedRadioValue(inputs.pace);
+
+    updateCardGroup(activityCards, "activityCard", activityLevel);
+    updateCardGroup(paceCards, "paceCard", pace);
+  }
+
+  function updateCardGroup(cards, datasetKey, selectedValue) {
+    cards.forEach((card) => {
+      const isActive = card.dataset[datasetKey] === selectedValue;
+
+      BASE_CARD_CLASSES.forEach((className) => {
+        card.classList.toggle(className, !isActive);
+      });
+      ACTIVE_CARD_CLASSES.forEach((className) => {
+        card.classList.toggle(className, isActive);
+      });
+    });
+  }
+
+  function fillExample() {
+    inputs.sex.value = "male";
+    inputs.age.value = "34";
+    inputs.weightKg.value = "80";
+    inputs.targetWeightKg.value = "68";
+    inputs.heightCm.value = "172";
+    inputs.manualTdee.value = "2450";
+    inputs.activityLevel.forEach((input) => {
+      input.checked = input.value === "moderate";
+    });
+    inputs.pace.forEach((input) => {
+      input.checked = input.value === "moderate";
+    });
+    updateCalculator();
+  }
+
+  [
+    inputs.sex,
+    inputs.age,
+    inputs.weightKg,
+    inputs.targetWeightKg,
+    inputs.heightCm,
+    inputs.manualTdee,
+    ...inputs.activityLevel,
+    ...inputs.pace,
+  ].forEach((input) => {
+    input?.addEventListener("input", updateCalculator);
+    input?.addEventListener("change", updateCalculator);
+  });
+
+  exampleButton?.addEventListener("click", fillExample);
+
+  updateSelectedCards();
+  setInitialState();
+</script>
