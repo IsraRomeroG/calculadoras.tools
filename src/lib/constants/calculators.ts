@@ -97,4 +97,13 @@ export const CALCULATORS: CalculatorDirectoryItem[] = [
     categorySlug: "fecha-tiempo",
     order: 60,
   },
+  {
+    id: "diferencia-entre-fechas",
+    title: "Calculadora de diferencia entre fechas",
+    description:
+      "Cuenta días entre fechas, suma o resta tiempo y calcula días hábiles sin fines de semana.",
+    href: "/fecha-tiempo/diferencia-entre-fechas",
+    categorySlug: "fecha-tiempo",
+    order: 62,
+  },
 ];
