@@ -1,0 +1,962 @@
+---
+import BaseLayout from "@layouts/BaseLayout.astro";
+import Container from "@components/layout/Container.astro";
+import PageShell from "@components/layout/PageShell.astro";
+import FaqSection from "@components/shared/FaqSection.astro";
+import PageHero from "@components/shared/PageHero.astro";
+import SectionIntro from "@components/shared/SectionIntro.astro";
+import { buildFaqJsonLd } from "@lib/seo";
+
+const title = "Calculadora de Fecha Probable de Parto - FPP y Semanas de Embarazo";
+const description =
+  "Calcula tu fecha probable de parto por FUM, ovulación, ecografía, FIV o FPP oficial. Revisa semanas de gestación, ventana de parto y confianza del cálculo.";
+const canonical = "/salud/fecha-probable-de-parto";
+
+const faqs = [
+  {
+    question: "¿Cómo se calcula la fecha probable de parto?",
+    answer:
+      "El método más común suma 280 días al primer día de la última menstruación. También puede estimarse con ovulación, ecografía, reproducción asistida o una FPP oficial indicada por tu equipo médico.",
+  },
+  {
+    question: "¿La FUM es el primer o el último día de la menstruación?",
+    answer:
+      "Para este cálculo se usa el primer día de sangrado de la última menstruación. Usar otro día puede mover la fecha probable de parto.",
+  },
+  {
+    question: "¿Qué tan exacta es la fecha probable de parto?",
+    answer:
+      "Es una estimación. Solo una minoría de bebés nace exactamente ese día. La calculadora muestra un nivel de confianza según el dato usado.",
+  },
+  {
+    question: "¿Qué pasa si la ecografía y la FUM dan fechas distintas?",
+    answer:
+      "Pequeñas diferencias son frecuentes. Si las fechas se separan varios días, tu médico o matrona puede indicar cuál usar como FPP oficial.",
+  },
+  {
+    question: "¿Cómo se calcula la FPP en FIV?",
+    answer:
+      "Si conoces la fecha de transferencia embrionaria, se suman 266 días menos la edad del embrión. Por ejemplo, transferencia día 5: fecha de transferencia + 261 días.",
+  },
+  {
+    question: "¿Qué pasa si mi fecha probable de parto ya pasó?",
+    answer:
+      "Puede ocurrir que el bebé no nazca exactamente en la FPP. Mantén contacto con tu equipo médico, especialmente si han pasado varios días.",
+  },
+];
+
+const faqJsonLd = buildFaqJsonLd(faqs);
+
+const methodOptions = [
+  { value: "lmp", label: "FUM" },
+  { value: "ovulation", label: "Ovulación" },
+  { value: "ultrasound", label: "Ecografía" },
+  { value: "ivf", label: "FIV" },
+  { value: "official", label: "FPP oficial" },
+];
+---
+
+<BaseLayout title={title} description={description} canonical={canonical}>
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={JSON.stringify(faqJsonLd)} />
+  </Fragment>
+
+  <PageShell>
+    <PageHero
+      title="Calculadora de fecha probable de parto"
+      description="Estima tu FPP y tus semanas de embarazo por FUM, ecografía, ovulación, reproducción asistida o una fecha indicada por tu profesional de salud."
+      kicker="Salud"
+      collapseBreadcrumbOnMobile
+      containerClass="py-5 md:py-7"
+      breadcrumbs={[
+        { label: "Inicio", href: "/", ariaLabel: "Inicio" },
+        { label: "Salud", href: "/salud", optional: true },
+        { label: "Fecha probable de parto", truncate: true },
+      ]}
+    />
+
+    <Container as="section" class="py-6 md:py-8">
+      <section
+        id="pregnancy-due-date-calculator"
+        class="overflow-hidden rounded-lg border border-gray-700 bg-gray-950 shadow-xl shadow-gray-950/30"
+        aria-labelledby="calculator-heading"
+      >
+        <div class="grid gap-0 xl:grid-cols-[minmax(0,1.02fr)_minmax(20rem,0.82fr)]">
+          <div class="p-4 sm:p-6">
+            <div>
+              <p class="text-sm font-semibold text-amber-400">
+                Cálculo principal
+              </p>
+              <h2 id="calculator-heading" class="mt-2 text-2xl font-semibold">
+                ¿Cuándo podría nacer tu bebé?
+              </h2>
+              <p class="mt-2 text-sm leading-relaxed text-gray-400">
+                Elige el dato que tienes a la mano. Si ya tienes una FPP
+                indicada por tu médico, úsala como referencia principal.
+              </p>
+            </div>
+
+            <div class="mt-5">
+              <label for="due-date-method" class="block text-sm font-semibold text-gray-200">
+                Método de cálculo
+              </label>
+              <select
+                id="due-date-method"
+                class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-900 px-4 text-base text-white outline-none transition focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15"
+                data-method-select
+              >
+                {
+                  methodOptions.map((method) => (
+                    <option value={method.value}>{method.label}</option>
+                  ))
+                }
+              </select>
+            </div>
+
+            <div class="mt-6 space-y-5">
+              <div data-method-panel="lmp">
+                <fieldset class="rounded-lg border border-gray-800 bg-gray-900/60 p-4">
+                  <legend class="text-sm font-semibold text-gray-200">
+                    Última menstruación
+                  </legend>
+                  <div class="mt-3 grid gap-4 sm:grid-cols-2">
+                    <div>
+                      <label for="lmp-date" class="block text-sm text-gray-300">
+                        Primer día de tu última menstruación
+                      </label>
+                      <input
+                        id="lmp-date"
+                        class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-950 px-4 text-base text-white outline-none transition focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15"
+                        type="date"
+                        data-lmp-date
+                      />
+                    </div>
+                    <div>
+                      <label for="cycle-length" class="block text-sm text-gray-300">
+                        Duración del ciclo
+                      </label>
+                      <input
+                        id="cycle-length"
+                        class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-950 px-4 text-base text-white outline-none transition focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15"
+                        type="number"
+                        min="20"
+                        max="45"
+                        step="1"
+                        inputmode="numeric"
+                        value="28"
+                        data-cycle-length
+                      />
+                    </div>
+                    <div class="sm:col-span-2">
+                      <label for="luteal-phase" class="block text-sm text-gray-300">
+                        Fase lútea opcional
+                      </label>
+                      <input
+                        id="luteal-phase"
+                        class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-950 px-4 text-base text-white outline-none transition placeholder:text-gray-600 focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15"
+                        type="number"
+                        min="10"
+                        max="17"
+                        step="1"
+                        inputmode="numeric"
+                        placeholder="14"
+                        data-luteal-phase
+                      />
+                      <p class="mt-2 text-sm leading-relaxed text-gray-500">
+                        Déjala vacía si no la conoces. Usaremos la duración del
+                        ciclo para ajustar la FPP.
+                      </p>
+                    </div>
+                  </div>
+                </fieldset>
+              </div>
+
+              <div class="hidden" data-method-panel="ovulation">
+                <fieldset class="rounded-lg border border-gray-800 bg-gray-900/60 p-4">
+                  <legend class="text-sm font-semibold text-gray-200">
+                    Ovulación o concepción estimada
+                  </legend>
+                  <div class="mt-3 grid gap-4 sm:grid-cols-2">
+                    <div>
+                      <label for="conception-date" class="block text-sm text-gray-300">
+                        Fecha aproximada
+                      </label>
+                      <input
+                        id="conception-date"
+                        class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-950 px-4 text-base text-white outline-none transition focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15"
+                        type="date"
+                        data-conception-date
+                      />
+                    </div>
+                    <div>
+                      <label for="conception-source" class="block text-sm text-gray-300">
+                        Tipo de dato
+                      </label>
+                      <select
+                        id="conception-source"
+                        class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-950 px-4 text-base text-white outline-none transition focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15"
+                        data-conception-source
+                      >
+                        <option value="ovulation">Ovulación</option>
+                        <option value="fertilization">Fecundación</option>
+                        <option value="intercourse">Relación sexual</option>
+                        <option value="insemination">Inseminación</option>
+                      </select>
+                    </div>
+                  </div>
+                </fieldset>
+              </div>
+
+              <div class="hidden" data-method-panel="ultrasound">
+                <fieldset class="rounded-lg border border-gray-800 bg-gray-900/60 p-4">
+                  <legend class="text-sm font-semibold text-gray-200">
+                    Resultado de ecografía
+                  </legend>
+                  <div class="mt-3 grid gap-4 sm:grid-cols-3">
+                    <div class="sm:col-span-3">
+                      <label for="scan-date" class="block text-sm text-gray-300">
+                        Fecha de la ecografía
+                      </label>
+                      <input
+                        id="scan-date"
+                        class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-950 px-4 text-base text-white outline-none transition focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15"
+                        type="date"
+                        data-scan-date
+                      />
+                    </div>
+                    <div class="sm:col-span-2">
+                      <label for="scan-weeks" class="block text-sm text-gray-300">
+                        Semanas en la ecografía
+                      </label>
+                      <input
+                        id="scan-weeks"
+                        class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-950 px-4 text-base text-white outline-none transition focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15"
+                        type="number"
+                        min="4"
+                        max="42"
+                        step="1"
+                        inputmode="numeric"
+                        placeholder="12"
+                        data-scan-weeks
+                      />
+                    </div>
+                    <div>
+                      <label for="scan-days" class="block text-sm text-gray-300">
+                        Días
+                      </label>
+                      <input
+                        id="scan-days"
+                        class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-950 px-4 text-base text-white outline-none transition focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15"
+                        type="number"
+                        min="0"
+                        max="6"
+                        step="1"
+                        inputmode="numeric"
+                        value="0"
+                        data-scan-days
+                      />
+                    </div>
+                  </div>
+                </fieldset>
+              </div>
+
+              <div class="hidden" data-method-panel="ivf">
+                <fieldset class="rounded-lg border border-gray-800 bg-gray-900/60 p-4">
+                  <legend class="text-sm font-semibold text-gray-200">
+                    FIV / reproducción asistida
+                  </legend>
+                  <div class="mt-3 grid gap-4 sm:grid-cols-2">
+                    <div>
+                      <label for="ivf-kind" class="block text-sm text-gray-300">
+                        Tipo de tratamiento
+                      </label>
+                      <select
+                        id="ivf-kind"
+                        class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-950 px-4 text-base text-white outline-none transition focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15"
+                        data-ivf-kind
+                      >
+                        <option value="transfer">Transferencia embrionaria</option>
+                        <option value="fertilization">FIV/ICSI fecundación</option>
+                        <option value="iui">Inseminación intrauterina</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label for="ivf-date" class="block text-sm text-gray-300">
+                        Fecha del procedimiento
+                      </label>
+                      <input
+                        id="ivf-date"
+                        class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-950 px-4 text-base text-white outline-none transition focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15"
+                        type="date"
+                        data-ivf-date
+                      />
+                    </div>
+                    <div class="sm:col-span-2" data-embryo-age-wrapper>
+                      <label for="embryo-age" class="block text-sm text-gray-300">
+                        Edad del embrión al transferir
+                      </label>
+                      <select
+                        id="embryo-age"
+                        class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-950 px-4 text-base text-white outline-none transition focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15"
+                        data-embryo-age
+                      >
+                        <option value="3">Día 3</option>
+                        <option value="5" selected>Día 5</option>
+                        <option value="6">Día 6</option>
+                      </select>
+                    </div>
+                  </div>
+                </fieldset>
+              </div>
+
+              <div class="hidden" data-method-panel="official">
+                <fieldset class="rounded-lg border border-gray-800 bg-gray-900/60 p-4">
+                  <legend class="text-sm font-semibold text-gray-200">
+                    FPP indicada por profesional
+                  </legend>
+                  <label for="official-due-date" class="mt-3 block text-sm text-gray-300">
+                    Fecha probable de parto oficial
+                  </label>
+                  <input
+                    id="official-due-date"
+                    class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-950 px-4 text-base text-white outline-none transition focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15"
+                    type="date"
+                    data-official-date
+                  />
+                </fieldset>
+              </div>
+
+              <p class="hidden text-sm text-red-300" data-form-error></p>
+
+              <div class="flex flex-col gap-3 border-t border-gray-800 pt-5 sm:flex-row sm:flex-wrap">
+                <button
+                  class="inline-flex min-h-11 items-center justify-center rounded-lg border border-gray-700 px-4 py-2 text-sm font-semibold text-gray-200 transition hover:border-amber-400 hover:text-white focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/40"
+                  type="button"
+                  data-fill-example
+                >
+                  Usar ejemplo
+                </button>
+                <button
+                  class="inline-flex min-h-11 items-center justify-center rounded-lg border border-gray-700 px-4 py-2 text-sm font-semibold text-gray-200 transition hover:border-amber-400 hover:text-white focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/40"
+                  type="button"
+                  data-clear-calculator
+                >
+                  Limpiar
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <aside
+            class="border-t border-gray-800 bg-gray-900/70 p-4 sm:p-6 xl:border-l xl:border-t-0"
+            aria-live="polite"
+          >
+            <p class="text-sm font-semibold text-amber-400" data-result-kicker>
+              Resultado
+            </p>
+            <p
+              class="mt-3 break-words text-3xl font-bold leading-tight text-white md:text-4xl"
+              data-main-result
+            >
+              Completa tus datos
+            </p>
+            <p class="mt-3 text-sm leading-relaxed text-gray-400" data-result-note>
+              El resultado aparecerá aquí, junto con semanas de gestación y
+              nivel de confianza.
+            </p>
+
+            <div class="mt-5 h-2 overflow-hidden rounded-full bg-gray-800">
+              <div
+                class="h-full w-0 rounded-full bg-amber-400 transition-all"
+                data-progress-bar
+              >
+              </div>
+            </div>
+            <p class="mt-2 text-xs text-gray-500" data-progress-note>
+              Progreso estimado hasta la semana 40.
+            </p>
+
+            <div class="mt-5 grid gap-3" data-summary-list>
+              <div class="rounded-lg border border-gray-800 bg-gray-950/70 p-4">
+                <span class="block text-xs font-semibold text-gray-500">
+                  Edad gestacional
+                </span>
+                <span class="mt-2 block text-lg font-semibold text-white" data-summary-age>
+                  -
+                </span>
+              </div>
+              <div class="rounded-lg border border-gray-800 bg-gray-950/70 p-4">
+                <span class="block text-xs font-semibold text-gray-500">
+                  Método y confianza
+                </span>
+                <span class="mt-2 block text-lg font-semibold text-white" data-summary-confidence>
+                  -
+                </span>
+                <span class="mt-2 block text-sm leading-relaxed text-gray-400" data-confidence-note>
+                </span>
+              </div>
+              <div class="rounded-lg border border-gray-800 bg-gray-950/70 p-4">
+                <span class="block text-xs font-semibold text-gray-500">
+                  Estado
+                </span>
+                <span class="mt-2 block text-sm leading-relaxed text-gray-300" data-summary-status>
+                  -
+                </span>
+              </div>
+            </div>
+
+            <div
+              class="mt-5 hidden rounded-lg border border-amber-400/40 bg-amber-400/10 p-4"
+              data-warning-panel
+            >
+              <p class="text-sm font-semibold text-amber-200">
+                Revisa este detalle
+              </p>
+              <ul class="mt-2 space-y-2 text-sm leading-relaxed text-amber-100" data-warning-list>
+              </ul>
+            </div>
+
+            <div class="mt-5 rounded-lg border border-gray-700 bg-gray-950 p-4">
+              <p class="text-sm font-semibold text-gray-100">Aviso médico</p>
+              <p class="mt-2 text-sm leading-relaxed text-gray-400">
+                La fecha probable de parto es una estimación. Tu médico o
+                matrona es la mejor fuente de información sobre tu embarazo.
+              </p>
+            </div>
+          </aside>
+        </div>
+      </section>
+    </Container>
+
+    <Container as="section" class="py-6 md:py-8">
+      <SectionIntro
+        title="Ventana de parto y fechas importantes"
+        description="Las fechas siguientes se calculan desde la FPP de referencia. Úsalas como orientación para conversar con tu equipo médico."
+      />
+      <div class="grid gap-6 lg:grid-cols-2">
+        <div class="rounded-lg border border-gray-700 bg-gray-950 p-4 sm:p-5">
+          <h2 class="text-xl font-semibold">Ventana de parto</h2>
+          <div class="mt-4 grid gap-3" data-term-windows>
+            <p class="text-sm text-gray-400">Completa la calculadora para ver los rangos.</p>
+          </div>
+        </div>
+        <div class="rounded-lg border border-gray-700 bg-gray-950 p-4 sm:p-5">
+          <h2 class="text-xl font-semibold">Fechas importantes</h2>
+          <div class="mt-4 grid gap-3" data-milestones>
+            <p class="text-sm text-gray-400">Completa la calculadora para ver las fechas.</p>
+          </div>
+        </div>
+      </div>
+    </Container>
+
+    <Container as="section" class="hidden py-6 md:py-8" data-comparison-section>
+      <SectionIntro
+        title="Comparación de métodos"
+        description="Si ingresaste más de un dato, revisa cuánto se separan las fechas. Las diferencias pequeñas son frecuentes."
+      />
+      <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3" data-comparison-list>
+      </div>
+    </Container>
+
+    <Container as="section" class="py-6 md:py-8">
+      <div class="grid gap-6 md:grid-cols-2">
+        <div>
+          <h2 class="text-2xl font-semibold">Cómo interpretar el resultado</h2>
+          <p class="mt-3 text-sm leading-relaxed text-gray-400">
+            La FPP funciona como una fecha de referencia, no como una cita exacta.
+            Por eso mostramos también una ventana de parto y un nivel de confianza
+            según el método usado.
+          </p>
+        </div>
+        <div>
+          <h2 class="text-2xl font-semibold">Qué dato conviene usar</h2>
+          <p class="mt-3 text-sm leading-relaxed text-gray-400">
+            Si tienes una FPP oficial, úsala primero. Si no, una ecografía
+            temprana o datos de reproducción asistida suelen ser más precisos que
+            una fecha de relación sexual aproximada.
+          </p>
+        </div>
+      </div>
+    </Container>
+
+    <FaqSection faqs={faqs} />
+  </PageShell>
+</BaseLayout>
+
+<script>
+  import {
+    buildMethodComparisons,
+    calculateFromAssistedReproduction,
+    calculateFromLmp,
+    calculateFromOfficialDueDate,
+    calculateFromOvulation,
+    calculateFromUltrasound,
+    formatFullPregnancyDate,
+    formatGestationalAge,
+    formatIsoDate,
+    formatPregnancyDate,
+    formatRelativeDays,
+    parseIsoDate,
+    todayInLocalTimeZone,
+  } from "@lib/calculators/pregnancyDueDate";
+
+  const methodSelect = document.querySelector("[data-method-select]");
+  const methodPanels = document.querySelectorAll("[data-method-panel]");
+  const formError = document.querySelector("[data-form-error]");
+  const resultKicker = document.querySelector("[data-result-kicker]");
+  const mainResult = document.querySelector("[data-main-result]");
+  const resultNote = document.querySelector("[data-result-note]");
+  const progressBar = document.querySelector("[data-progress-bar]");
+  const progressNote = document.querySelector("[data-progress-note]");
+  const summaryAge = document.querySelector("[data-summary-age]");
+  const summaryConfidence = document.querySelector("[data-summary-confidence]");
+  const confidenceNote = document.querySelector("[data-confidence-note]");
+  const summaryStatus = document.querySelector("[data-summary-status]");
+  const warningPanel = document.querySelector("[data-warning-panel]");
+  const warningList = document.querySelector("[data-warning-list]");
+  const termWindows = document.querySelector("[data-term-windows]");
+  const milestones = document.querySelector("[data-milestones]");
+  const comparisonSection = document.querySelector("[data-comparison-section]");
+  const comparisonList = document.querySelector("[data-comparison-list]");
+  const embryoAgeWrapper = document.querySelector("[data-embryo-age-wrapper]");
+
+  const fields = {
+    lmpDate: document.querySelector("[data-lmp-date]"),
+    cycleLength: document.querySelector("[data-cycle-length]"),
+    lutealPhase: document.querySelector("[data-luteal-phase]"),
+    conceptionDate: document.querySelector("[data-conception-date]"),
+    conceptionSource: document.querySelector("[data-conception-source]"),
+    scanDate: document.querySelector("[data-scan-date]"),
+    scanWeeks: document.querySelector("[data-scan-weeks]"),
+    scanDays: document.querySelector("[data-scan-days]"),
+    ivfKind: document.querySelector("[data-ivf-kind]"),
+    ivfDate: document.querySelector("[data-ivf-date]"),
+    embryoAge: document.querySelector("[data-embryo-age]"),
+    officialDate: document.querySelector("[data-official-date]"),
+  };
+
+  const inputElements = [
+    fields.lmpDate,
+    fields.cycleLength,
+    fields.lutealPhase,
+    fields.conceptionDate,
+    fields.conceptionSource,
+    fields.scanDate,
+    fields.scanWeeks,
+    fields.scanDays,
+    fields.ivfKind,
+    fields.ivfDate,
+    fields.embryoAge,
+    fields.officialDate,
+  ];
+
+  const methodOrder = ["official", "ivf", "ultrasound", "lmp", "ovulation"];
+
+  function setMode(method) {
+    methodPanels.forEach((panel) => {
+      panel.classList.toggle("hidden", panel.dataset.methodPanel !== method);
+    });
+    updateEmbryoVisibility();
+    updateCalculator();
+  }
+
+  function updateCalculator() {
+    clearError();
+
+    const activeMethod = methodSelect.value;
+    const activeResult = getResultForMethod(activeMethod, true);
+
+    if (!activeResult.ok) {
+      if (activeResult.reason === "empty") {
+        renderNeutralState();
+        return;
+      }
+
+      renderInvalidState(activeResult.message);
+      return;
+    }
+
+    const completeResults = collectCompleteResults();
+    const primaryResult = activeResult.result;
+    const comparisons = buildMethodComparisons(primaryResult, completeResults);
+    renderResult(primaryResult, comparisons);
+  }
+
+  function collectCompleteResults() {
+    const results = [];
+
+    methodOrder.forEach((method) => {
+      const candidate = getResultForMethod(method, false);
+
+      if (candidate.ok) {
+        results.push(candidate.result);
+      }
+    });
+
+    return results;
+  }
+
+  function getResultForMethod(method, strict) {
+    try {
+      if (method === "lmp") {
+        const lmpDate = readDate(fields.lmpDate, "Ingresa el primer día de tu última menstruación.", strict);
+        if (!lmpDate) return emptyResult();
+        ensureNotFuture(lmpDate, "La FUM no puede ser futura.");
+
+        return okResult(
+          calculateFromLmp({
+            lmpDate,
+            cycleLength: readInteger(fields.cycleLength, 20, 45, "La duración del ciclo debe estar entre 20 y 45 días."),
+            lutealPhase: readOptionalInteger(fields.lutealPhase, 10, 17, "La fase lútea debe estar entre 10 y 17 días."),
+            today: todayInLocalTimeZone(),
+          }),
+        );
+      }
+
+      if (method === "ovulation") {
+        const conceptionDate = readDate(fields.conceptionDate, "Ingresa la fecha aproximada de ovulación o concepción.", strict);
+        if (!conceptionDate) return emptyResult();
+        ensureNotFuture(conceptionDate, "La fecha de ovulación/concepción no puede ser futura.");
+
+        return okResult(
+          calculateFromOvulation({
+            conceptionDate,
+            source: fields.conceptionSource.value,
+            today: todayInLocalTimeZone(),
+          }),
+        );
+      }
+
+      if (method === "ultrasound") {
+        const scanDate = readDate(fields.scanDate, "Ingresa la fecha de la ecografía.", strict);
+        if (!scanDate) return emptyResult();
+        ensureNotFuture(scanDate, "La fecha de ecografía no puede ser futura.");
+
+        return okResult(
+          calculateFromUltrasound({
+            scanDate,
+            weeks: readInteger(fields.scanWeeks, 4, 42, "Las semanas de ecografía deben estar entre 4 y 42."),
+            days: readInteger(fields.scanDays, 0, 6, "Los días de ecografía deben estar entre 0 y 6."),
+            today: todayInLocalTimeZone(),
+          }),
+        );
+      }
+
+      if (method === "ivf") {
+        const date = readDate(fields.ivfDate, "Ingresa la fecha del procedimiento.", strict);
+        if (!date) return emptyResult();
+        ensureNotFuture(date, "La fecha del procedimiento no puede ser futura.");
+
+        return okResult(
+          calculateFromAssistedReproduction({
+            date,
+            kind: fields.ivfKind.value,
+            embryoAgeDays: Number(fields.embryoAge.value),
+            today: todayInLocalTimeZone(),
+          }),
+        );
+      }
+
+      if (method === "official") {
+        const dueDate = readDate(fields.officialDate, "Ingresa la FPP indicada por tu profesional de salud.", strict);
+        if (!dueDate) return emptyResult();
+
+        return okResult(
+          calculateFromOfficialDueDate({
+            dueDate,
+            today: todayInLocalTimeZone(),
+          }),
+        );
+      }
+    } catch (error) {
+      return invalidResult(error instanceof Error ? error.message : "Revisa los datos ingresados.");
+    }
+
+    return emptyResult();
+  }
+
+  function readDate(input, message, strict) {
+    const value = input.value.trim();
+
+    if (!value) {
+      if (strict) {
+        throw new Error(message);
+      }
+
+      return null;
+    }
+
+    const date = parseIsoDate(value);
+
+    if (!date) {
+      throw new Error("Ingresa una fecha válida.");
+    }
+
+    return date;
+  }
+
+  function readInteger(input, min, max, message) {
+    const value = input.value.trim();
+
+    if (!/^\d+$/.test(value)) {
+      throw new Error(message);
+    }
+
+    const number = Number(value);
+
+    if (number < min || number > max) {
+      throw new Error(message);
+    }
+
+    return number;
+  }
+
+  function readOptionalInteger(input, min, max, message) {
+    const value = input.value.trim();
+
+    if (!value) {
+      return undefined;
+    }
+
+    return readInteger(input, min, max, message);
+  }
+
+  function ensureNotFuture(date, message) {
+    const today = todayInLocalTimeZone();
+    const iso = formatIsoDate(date);
+    const todayIso = formatIsoDate(today);
+
+    if (iso > todayIso) {
+      throw new Error(message);
+    }
+  }
+
+  function renderNeutralState() {
+    resultKicker.textContent = "Resultado";
+    mainResult.textContent = "Completa tus datos";
+    resultNote.textContent =
+      "El resultado aparecerá aquí, junto con semanas de gestación y nivel de confianza.";
+    progressBar.style.width = "0%";
+    progressNote.textContent = "Progreso estimado hasta la semana 40.";
+    summaryAge.textContent = "-";
+    summaryConfidence.textContent = "-";
+    confidenceNote.textContent = "";
+    summaryStatus.textContent = "-";
+    renderWarnings([]);
+    renderPlaceholderLists();
+    renderComparisons([]);
+  }
+
+  function renderInvalidState(message) {
+    showError(message);
+    resultKicker.textContent = "Revisa los datos";
+    mainResult.textContent = "No se puede calcular todavía";
+    resultNote.textContent = message;
+    progressBar.style.width = "0%";
+    summaryAge.textContent = "-";
+    summaryConfidence.textContent = "-";
+    confidenceNote.textContent = "";
+    summaryStatus.textContent = "-";
+    renderWarnings([]);
+    renderPlaceholderLists();
+    renderComparisons([]);
+  }
+
+  function renderResult(result, comparisons) {
+    resultKicker.textContent = "Fecha probable de parto";
+    mainResult.textContent = formatFullPregnancyDate(result.dueDate);
+    resultNote.textContent = `${formatRelativeDays(result.daysUntilDueDate)}. ${result.trimester}.`;
+    progressBar.style.width = `${result.progressPercent}%`;
+    progressNote.textContent = `${result.progressPercent}% del embarazo estimado hasta la semana 40.`;
+    summaryAge.textContent = formatGestationalAge(result.gestationalAge);
+    summaryConfidence.textContent = `${result.methodLabel} · confianza ${result.confidence.toLowerCase()}`;
+    confidenceNote.textContent = result.confidenceMessage;
+    summaryStatus.textContent = result.status.message;
+    renderWarnings(buildWarningsWithComparison(result, comparisons));
+    renderDateList(termWindows, result.termWindows);
+    renderDateList(milestones, result.milestones);
+    renderComparisons(comparisons);
+  }
+
+  function buildWarningsWithComparison(result, comparisons) {
+    const warnings = [...result.warnings];
+    const relevantDifferences = comparisons.filter(
+      (comparison) => Math.abs(comparison.differenceDays) > 7,
+    );
+
+    if (relevantDifferences.length > 0) {
+      warnings.push(
+        "Tus datos dan fechas distintas. Tu equipo médico puede indicar cuál usar como FPP oficial.",
+      );
+    }
+
+    return [...new Set(warnings)];
+  }
+
+  function renderDateList(container, rows) {
+    container.innerHTML = "";
+
+    rows.forEach((row) => {
+      const item = document.createElement("div");
+      item.className = "rounded-lg border border-gray-800 bg-gray-900/60 p-4";
+
+      const title = document.createElement("p");
+      title.className = "text-sm font-semibold text-gray-100";
+      title.textContent = row.label;
+
+      const range = document.createElement("p");
+      range.className = "mt-1 text-xs text-amber-300";
+      range.textContent = row.gestationalRange;
+
+      const date = document.createElement("p");
+      date.className = "mt-2 text-sm leading-relaxed text-gray-400";
+      date.textContent = row.endDate
+        ? `${formatPregnancyDate(row.startDate)} al ${formatPregnancyDate(row.endDate)}`
+        : formatPregnancyDate(row.startDate);
+
+      item.append(title, range, date);
+      container.append(item);
+    });
+  }
+
+  function renderPlaceholderLists() {
+    termWindows.innerHTML =
+      '<p class="text-sm text-gray-400">Completa la calculadora para ver los rangos.</p>';
+    milestones.innerHTML =
+      '<p class="text-sm text-gray-400">Completa la calculadora para ver las fechas.</p>';
+  }
+
+  function renderComparisons(comparisons) {
+    comparisonList.innerHTML = "";
+
+    if (comparisons.length <= 1) {
+      comparisonSection.classList.add("hidden");
+      return;
+    }
+
+    comparisonSection.classList.remove("hidden");
+
+    comparisons.forEach((comparison) => {
+      const item = document.createElement("div");
+      item.className = "rounded-lg border border-gray-700 bg-gray-950 p-4";
+
+      const title = document.createElement("p");
+      title.className = "text-sm font-semibold text-gray-100";
+      title.textContent = comparison.methodLabel;
+
+      const date = document.createElement("p");
+      date.className = "mt-2 text-lg font-semibold text-white";
+      date.textContent = formatPregnancyDate(comparison.dueDate);
+
+      const diff = document.createElement("p");
+      diff.className = "mt-2 text-sm text-gray-400";
+      diff.textContent =
+        comparison.differenceDays === 0
+          ? "Fecha principal"
+          : `${comparison.differenceDays > 0 ? "+" : ""}${comparison.differenceDays} días vs. el método activo`;
+
+      const confidence = document.createElement("p");
+      confidence.className = "mt-1 text-xs text-amber-300";
+      confidence.textContent = `Confianza ${comparison.confidence.toLowerCase()}`;
+
+      item.append(title, date, diff, confidence);
+      comparisonList.append(item);
+    });
+  }
+
+  function renderWarnings(warnings) {
+    warningList.innerHTML = "";
+
+    warnings.forEach((warning) => {
+      const item = document.createElement("li");
+      item.textContent = warning;
+      warningList.append(item);
+    });
+
+    warningPanel.classList.toggle("hidden", warnings.length === 0);
+  }
+
+  function showError(message) {
+    formError.textContent = message;
+    formError.classList.remove("hidden");
+  }
+
+  function clearError() {
+    formError.textContent = "";
+    formError.classList.add("hidden");
+  }
+
+  function updateEmbryoVisibility() {
+    embryoAgeWrapper.classList.toggle(
+      "hidden",
+      fields.ivfKind.value !== "transfer",
+    );
+  }
+
+  function fillExample() {
+    const method = methodSelect.value;
+
+    if (method === "lmp") {
+      fields.lmpDate.value = "2025-09-01";
+      fields.cycleLength.value = "28";
+      fields.lutealPhase.value = "";
+    } else if (method === "ovulation") {
+      fields.conceptionDate.value = "2025-09-15";
+      fields.conceptionSource.value = "ovulation";
+    } else if (method === "ultrasound") {
+      fields.scanDate.value = "2025-11-24";
+      fields.scanWeeks.value = "12";
+      fields.scanDays.value = "0";
+    } else if (method === "ivf") {
+      fields.ivfKind.value = "transfer";
+      fields.ivfDate.value = "2025-09-20";
+      fields.embryoAge.value = "5";
+    } else if (method === "official") {
+      fields.officialDate.value = "2026-06-08";
+    }
+
+    updateEmbryoVisibility();
+    updateCalculator();
+  }
+
+  function clearCalculator() {
+    fields.lmpDate.value = "";
+    fields.cycleLength.value = "28";
+    fields.lutealPhase.value = "";
+    fields.conceptionDate.value = "";
+    fields.conceptionSource.value = "ovulation";
+    fields.scanDate.value = "";
+    fields.scanWeeks.value = "";
+    fields.scanDays.value = "0";
+    fields.ivfKind.value = "transfer";
+    fields.ivfDate.value = "";
+    fields.embryoAge.value = "5";
+    fields.officialDate.value = "";
+    updateEmbryoVisibility();
+    renderNeutralState();
+  }
+
+  function okResult(result) {
+    return { ok: true, result };
+  }
+
+  function emptyResult() {
+    return { ok: false, reason: "empty" };
+  }
+
+  function invalidResult(message) {
+    return { ok: false, reason: "invalid", message };
+  }
+
+  inputElements.forEach((input) => {
+    input?.addEventListener("input", updateCalculator);
+    input?.addEventListener("change", updateCalculator);
+  });
+
+  methodSelect?.addEventListener("change", () => setMode(methodSelect.value));
+  fields.ivfKind?.addEventListener("change", updateEmbryoVisibility);
+  document.querySelector("[data-fill-example]")?.addEventListener("click", fillExample);
+  document.querySelector("[data-clear-calculator]")?.addEventListener("click", clearCalculator);
+
+  setMode("lmp");
+</script>

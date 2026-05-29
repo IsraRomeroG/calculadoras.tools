@@ -89,6 +89,15 @@ export const CALCULATORS: CalculatorDirectoryItem[] = [
     order: 55,
   },
   {
+    id: "fecha-probable-de-parto",
+    title: "Calculadora de fecha probable de parto",
+    description:
+      "Calcula FPP, semanas de embarazo, ventana de parto y confianza por FUM, ecografia, FIV o FPP oficial.",
+    href: "/salud/fecha-probable-de-parto",
+    categorySlug: "salud",
+    order: 57,
+  },
+  {
     id: "calculadora-de-edad",
     title: "Calculadora de edad",
     description:
