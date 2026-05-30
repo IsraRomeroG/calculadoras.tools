@@ -98,6 +98,15 @@ export const CALCULATORS: CalculatorDirectoryItem[] = [
     order: 57,
   },
   {
+    id: "calculadora-de-ovulacion",
+    title: "Calculadora de ovulacion",
+    description:
+      "Estima ventana fertil, ovulacion probable, proxima menstruacion y confianza segun tu ciclo.",
+    href: "/salud/calculadora-de-ovulacion",
+    categorySlug: "salud",
+    order: 58,
+  },
+  {
     id: "calculadora-de-edad",
     title: "Calculadora de edad",
     description:

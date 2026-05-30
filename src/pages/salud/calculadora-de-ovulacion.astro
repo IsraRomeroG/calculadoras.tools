@@ -1,0 +1,1308 @@
+---
+import BaseLayout from "@layouts/BaseLayout.astro";
+import Container from "@components/layout/Container.astro";
+import PageShell from "@components/layout/PageShell.astro";
+import FaqSection from "@components/shared/FaqSection.astro";
+import PageHero from "@components/shared/PageHero.astro";
+import SectionIntro from "@components/shared/SectionIntro.astro";
+import { buildFaqJsonLd } from "@lib/seo";
+
+const title = "Calculadora de ovulación - días fértiles y ciclo menstrual";
+const description =
+  "Calcula tu ventana fértil estimada, día probable de ovulación y próxima menstruación. Incluye calendario del ciclo, modo irregular y guía para test de embarazo.";
+const canonical = "/salud/calculadora-de-ovulacion";
+
+const faqs = [
+  {
+    question: "¿Cómo sé cuándo voy a ovular?",
+    answer:
+      "La ovulación suele ocurrir unos 12 a 14 días antes de la siguiente menstruación. Esta calculadora estima esa fecha con tu FUM y duración de ciclo, pero puede variar de un ciclo a otro.",
+  },
+  {
+    question: "¿Cuántos días dura la ventana fértil?",
+    answer:
+      "La ventana fértil principal incluye los cinco días antes de la ovulación estimada y el día de ovulación. El día posterior se muestra solo como margen por incertidumbre.",
+  },
+  {
+    question: "¿La calculadora sirve si tengo ciclos irregulares?",
+    answer:
+      "Sí, pero la estimación será más amplia y de menor confianza. Puedes ingresar ciclos anteriores o tu ciclo más corto y más largo para obtener un rango.",
+  },
+  {
+    question: "¿Sirve como método anticonceptivo?",
+    answer:
+      "No. Esta herramienta no debe usarse para evitar embarazo. Si quieres evitar un embarazo, usa un método anticonceptivo confiable y consulta con un profesional de salud.",
+  },
+  {
+    question: "¿Cuándo es mejor hacer un test de embarazo?",
+    answer:
+      "El momento más fiable suele ser desde el primer día de retraso. Un test temprano puede salir negativo aunque exista embarazo, por lo que conviene repetirlo si la menstruación no llega.",
+  },
+  {
+    question: "¿Cuándo debería consultar si estoy intentando concebir?",
+    answer:
+      "Considera consultar si llevas 12 meses intentando sin embarazo, o 6 meses si tienes 35 años o más. Consulta antes si tienes más de 40 años, ciclos muy irregulares o síntomas importantes.",
+  },
+];
+
+const faqJsonLd = buildFaqJsonLd(faqs);
+---
+
+<BaseLayout title={title} description={description} canonical={canonical}>
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={JSON.stringify(faqJsonLd)} />
+  </Fragment>
+
+  <PageShell>
+    <PageHero
+      title="Calculadora de ovulación"
+      description="Estima tu ventana fértil, día probable de ovulación y próxima menstruación con nivel de confianza y calendario del ciclo."
+      kicker="Salud"
+      collapseBreadcrumbOnMobile
+      containerClass="py-5 md:py-7"
+      breadcrumbs={[
+        { label: "Inicio", href: "/", ariaLabel: "Inicio" },
+        { label: "Salud", href: "/salud", optional: true },
+        { label: "Ovulación", truncate: true },
+      ]}
+    />
+
+    <Container as="section" class="py-6 md:py-8">
+      <section
+        id="ovulation-calculator"
+        class="overflow-hidden rounded-lg border border-gray-700 bg-gray-950 shadow-xl shadow-gray-950/30"
+        aria-labelledby="calculator-heading"
+      >
+        <div class="grid gap-0 xl:grid-cols-[minmax(0,1.05fr)_minmax(20rem,0.82fr)]">
+          <div class="p-4 sm:p-6">
+            <div>
+              <p class="text-sm font-semibold text-emerald-300">
+                Cálculo principal
+              </p>
+              <h2 id="calculator-heading" class="mt-2 text-2xl font-semibold">
+                ¿Cuándo podría ser tu ventana fértil?
+              </h2>
+              <p class="mt-2 text-sm leading-relaxed text-gray-400">
+                Elige el tipo de dato que tienes. El resultado es una estimación,
+                no una garantía ni un método anticonceptivo.
+              </p>
+            </div>
+
+            <div class="mt-5 grid gap-4 sm:grid-cols-3">
+              <div class="sm:col-span-2">
+                <label for="ovulation-mode" class="block text-sm font-semibold text-gray-200">
+                  Modo de cálculo
+                </label>
+                <select
+                  id="ovulation-mode"
+                  class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-900 px-4 text-base text-white outline-none transition focus:border-emerald-300 focus:ring-3 focus:ring-emerald-300/15"
+                  data-mode-select
+                >
+                  <option value="standard">Ciclo regular</option>
+                  <option value="history">Ciclo variable con historial</option>
+                  <option value="range">Ciclo variable por rango</option>
+                  <option value="detected">Ovulación detectada</option>
+                </select>
+              </div>
+
+              <div>
+                <label for="cycle-intent" class="block text-sm font-semibold text-gray-200">
+                  Intención
+                </label>
+                <select
+                  id="cycle-intent"
+                  class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-900 px-4 text-base text-white outline-none transition focus:border-emerald-300 focus:ring-3 focus:ring-emerald-300/15"
+                  data-intent
+                >
+                  <option value="conceive">Concebir</option>
+                  <option value="track">Conocer mi ciclo</option>
+                  <option value="avoid">Evitar embarazo</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="mt-5 grid gap-4 sm:grid-cols-2">
+              <div>
+                <label for="period-length" class="block text-sm font-medium text-gray-200">
+                  Duración de menstruación
+                </label>
+                <div
+                  class="mt-2 flex rounded-lg border border-gray-700 bg-gray-900 focus-within:border-emerald-300 focus-within:ring-3 focus-within:ring-emerald-300/15"
+                >
+                  <input
+                    id="period-length"
+                    class="min-h-12 w-full bg-transparent px-4 text-base text-white outline-none"
+                    type="number"
+                    min="2"
+                    max="10"
+                    step="1"
+                    inputmode="numeric"
+                    value="5"
+                    data-period-length
+                  />
+                  <span class="flex items-center px-4 text-gray-500">días</span>
+                </div>
+              </div>
+
+              <div>
+                <label for="luteal-phase" class="block text-sm font-medium text-gray-200">
+                  Fase lútea opcional
+                </label>
+                <div
+                  class="mt-2 flex rounded-lg border border-gray-700 bg-gray-900 focus-within:border-emerald-300 focus-within:ring-3 focus:ring-emerald-300/15"
+                >
+                  <input
+                    id="luteal-phase"
+                    class="min-h-12 w-full bg-transparent px-4 text-base text-white outline-none placeholder:text-gray-600"
+                    type="number"
+                    min="10"
+                    max="16"
+                    step="1"
+                    inputmode="numeric"
+                    placeholder="14"
+                    data-luteal-phase
+                  />
+                  <span class="flex items-center px-4 text-gray-500">días</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="mt-6 space-y-5">
+              <div data-mode-panel="standard">
+                <fieldset class="rounded-lg border border-gray-800 bg-gray-900/60 p-4">
+                  <legend class="text-sm font-semibold text-gray-200">
+                    Ciclo regular
+                  </legend>
+                  <div class="mt-3 grid gap-4 sm:grid-cols-2">
+                    <div>
+                      <label for="standard-lmp-date" class="block text-sm text-gray-300">
+                        Primer día de tu última menstruación
+                      </label>
+                      <input
+                        id="standard-lmp-date"
+                        class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-950 px-4 text-base text-white outline-none transition focus:border-emerald-300 focus:ring-3 focus:ring-emerald-300/15"
+                        type="date"
+                        data-standard-lmp
+                      />
+                    </div>
+
+                    <div>
+                      <label for="cycle-length-number" class="block text-sm text-gray-300">
+                        Duración del ciclo
+                      </label>
+                      <div
+                        class="mt-2 flex rounded-lg border border-gray-700 bg-gray-950 focus-within:border-emerald-300 focus-within:ring-3 focus-within:ring-emerald-300/15"
+                      >
+                        <input
+                          id="cycle-length-number"
+                          class="min-h-12 w-full bg-transparent px-4 text-base text-white outline-none"
+                          type="number"
+                          min="21"
+                          max="45"
+                          step="1"
+                          inputmode="numeric"
+                          value="28"
+                          data-cycle-length
+                        />
+                        <span class="flex items-center px-4 text-gray-500">días</span>
+                      </div>
+                    </div>
+
+                    <div class="sm:col-span-2">
+                      <label for="cycle-length-range" class="block text-sm text-gray-300">
+                        Ajuste rápido del ciclo
+                      </label>
+                      <input
+                        id="cycle-length-range"
+                        class="mt-3 h-2 w-full accent-emerald-300"
+                        type="range"
+                        min="21"
+                        max="45"
+                        step="1"
+                        value="28"
+                        data-cycle-length-range
+                      />
+                      <div class="mt-2 flex justify-between text-xs text-gray-500">
+                        <span>21 días</span>
+                        <span>28 días</span>
+                        <span>45 días</span>
+                      </div>
+                    </div>
+                  </div>
+                </fieldset>
+              </div>
+
+              <div class="hidden" data-mode-panel="history">
+                <fieldset class="rounded-lg border border-gray-800 bg-gray-900/60 p-4">
+                  <legend class="text-sm font-semibold text-gray-200">
+                    Ciclo variable con historial
+                  </legend>
+                  <div class="mt-3">
+                    <label for="history-lmp-date" class="block text-sm text-gray-300">
+                      Primer día de tu última menstruación
+                    </label>
+                    <input
+                      id="history-lmp-date"
+                      class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-950 px-4 text-base text-white outline-none transition focus:border-emerald-300 focus:ring-3 focus:ring-emerald-300/15"
+                      type="date"
+                      data-history-lmp
+                    />
+                  </div>
+                  <div class="mt-4 grid gap-4 sm:grid-cols-2">
+                    {
+                      [1, 2, 3, 4].map((index) => (
+                        <div>
+                          <label
+                            for={`history-date-${index}`}
+                            class="block text-sm text-gray-300"
+                          >
+                            Menstruación anterior {index}
+                          </label>
+                          <input
+                            id={`history-date-${index}`}
+                            class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-950 px-4 text-base text-white outline-none transition focus:border-emerald-300 focus:ring-3 focus:ring-emerald-300/15"
+                            type="date"
+                            data-history-date
+                          />
+                        </div>
+                      ))
+                    }
+                  </div>
+                  <p class="mt-3 text-sm leading-relaxed text-gray-500">
+                    Ingresa al menos dos fechas anteriores. Con tres o más ciclos
+                    recientes, la confianza puede mejorar.
+                  </p>
+                </fieldset>
+              </div>
+
+              <div class="hidden" data-mode-panel="range">
+                <fieldset class="rounded-lg border border-gray-800 bg-gray-900/60 p-4">
+                  <legend class="text-sm font-semibold text-gray-200">
+                    Ciclo variable por rango
+                  </legend>
+                  <div class="mt-3 grid gap-4 sm:grid-cols-3">
+                    <div class="sm:col-span-3">
+                      <label for="range-lmp-date" class="block text-sm text-gray-300">
+                        Primer día de tu última menstruación
+                      </label>
+                      <input
+                        id="range-lmp-date"
+                        class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-950 px-4 text-base text-white outline-none transition focus:border-emerald-300 focus:ring-3 focus:ring-emerald-300/15"
+                        type="date"
+                        data-range-lmp
+                      />
+                    </div>
+                    <div>
+                      <label for="shortest-cycle" class="block text-sm text-gray-300">
+                        Ciclo más corto
+                      </label>
+                      <div class="mt-2 flex rounded-lg border border-gray-700 bg-gray-950">
+                        <input
+                          id="shortest-cycle"
+                          class="min-h-12 w-full bg-transparent px-4 text-base text-white outline-none"
+                          type="number"
+                          min="21"
+                          max="45"
+                          step="1"
+                          inputmode="numeric"
+                          placeholder="25"
+                          data-shortest-cycle
+                        />
+                        <span class="flex items-center px-4 text-gray-500">días</span>
+                      </div>
+                    </div>
+                    <div>
+                      <label for="longest-cycle" class="block text-sm text-gray-300">
+                        Ciclo más largo
+                      </label>
+                      <div class="mt-2 flex rounded-lg border border-gray-700 bg-gray-950">
+                        <input
+                          id="longest-cycle"
+                          class="min-h-12 w-full bg-transparent px-4 text-base text-white outline-none"
+                          type="number"
+                          min="21"
+                          max="45"
+                          step="1"
+                          inputmode="numeric"
+                          placeholder="32"
+                          data-longest-cycle
+                        />
+                        <span class="flex items-center px-4 text-gray-500">días</span>
+                      </div>
+                    </div>
+                  </div>
+                </fieldset>
+              </div>
+
+              <div class="hidden" data-mode-panel="detected">
+                <fieldset class="rounded-lg border border-gray-800 bg-gray-900/60 p-4">
+                  <legend class="text-sm font-semibold text-gray-200">
+                    Ovulación detectada
+                  </legend>
+                  <div class="mt-3 grid gap-4 sm:grid-cols-2">
+                    <div>
+                      <label for="detected-ovulation-date" class="block text-sm text-gray-300">
+                        Fecha detectada de ovulación
+                      </label>
+                      <input
+                        id="detected-ovulation-date"
+                        class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-950 px-4 text-base text-white outline-none transition focus:border-emerald-300 focus:ring-3 focus:ring-emerald-300/15"
+                        type="date"
+                        data-detected-ovulation
+                      />
+                    </div>
+                    <div>
+                      <label for="ovulation-source" class="block text-sm text-gray-300">
+                        Fuente
+                      </label>
+                      <select
+                        id="ovulation-source"
+                        class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-950 px-4 text-base text-white outline-none transition focus:border-emerald-300 focus:ring-3 focus:ring-emerald-300/15"
+                        data-ovulation-source
+                      >
+                        <option value="lh">Test LH</option>
+                        <option value="bbt">Temperatura basal</option>
+                        <option value="mucus">Moco cervical</option>
+                        <option value="ultrasound">Ecografía</option>
+                        <option value="clinical">Seguimiento clínico</option>
+                        <option value="other">Otra señal</option>
+                      </select>
+                    </div>
+                  </div>
+                </fieldset>
+              </div>
+
+              <p class="hidden text-sm text-red-300" data-form-error></p>
+
+              <div class="flex flex-col gap-3 border-t border-gray-800 pt-5 sm:flex-row sm:flex-wrap">
+                <button
+                  class="inline-flex min-h-11 items-center justify-center rounded-lg border border-gray-700 px-4 py-2 text-sm font-semibold text-gray-200 transition hover:border-emerald-300 hover:text-white focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-emerald-300/40"
+                  type="button"
+                  data-fill-example
+                >
+                  Usar ejemplo
+                </button>
+                <button
+                  class="inline-flex min-h-11 items-center justify-center rounded-lg border border-gray-700 px-4 py-2 text-sm font-semibold text-gray-200 transition hover:border-emerald-300 hover:text-white focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-emerald-300/40"
+                  type="button"
+                  data-clear-calculator
+                >
+                  Limpiar
+                </button>
+                <button
+                  class="inline-flex min-h-11 items-center justify-center rounded-lg border border-gray-700 px-4 py-2 text-sm font-semibold text-gray-200 transition hover:border-emerald-300 hover:text-white focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-emerald-300/40"
+                  type="button"
+                  data-save-cycle
+                >
+                  Guardar en este dispositivo
+                </button>
+                <button
+                  class="inline-flex min-h-11 items-center justify-center rounded-lg border border-gray-700 px-4 py-2 text-sm font-semibold text-gray-200 transition hover:border-red-300 hover:text-white focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-red-300/40"
+                  type="button"
+                  data-delete-cycle
+                >
+                  Borrar datos guardados
+                </button>
+              </div>
+              <p class="text-xs leading-relaxed text-gray-500" data-storage-note>
+                Tus datos se guardan solo en este navegador mediante almacenamiento
+                local. No se crea cuenta y no se envían a un servidor.
+              </p>
+            </div>
+          </div>
+
+          <aside
+            class="border-t border-gray-800 bg-gray-900/70 p-4 sm:p-6 xl:border-l xl:border-t-0"
+            aria-live="polite"
+          >
+            <p class="text-sm font-semibold text-emerald-300" data-result-kicker>
+              Resultado
+            </p>
+            <p
+              class="mt-3 break-words text-3xl font-bold leading-tight text-white md:text-4xl"
+              data-main-result
+            >
+              Completa tus datos
+            </p>
+            <p class="mt-3 text-sm leading-relaxed text-gray-400" data-result-note>
+              El resultado aparecerá aquí con confianza, calendario y próximos
+              pasos.
+            </p>
+
+            <div class="mt-5 grid gap-3">
+              <div class="rounded-lg border border-gray-800 bg-gray-950/70 p-4">
+                <span class="block text-xs font-semibold text-gray-500">
+                  Ovulación estimada
+                </span>
+                <span class="mt-2 block text-lg font-semibold text-white" data-summary-ovulation>
+                  -
+                </span>
+              </div>
+              <div class="rounded-lg border border-gray-800 bg-gray-950/70 p-4">
+                <span class="block text-xs font-semibold text-gray-500">
+                  Próxima menstruación
+                </span>
+                <span class="mt-2 block text-lg font-semibold text-white" data-summary-period>
+                  -
+                </span>
+              </div>
+              <div class="rounded-lg border border-gray-800 bg-gray-950/70 p-4">
+                <span class="block text-xs font-semibold text-gray-500">
+                  Confianza
+                </span>
+                <span class="mt-2 block text-lg font-semibold text-white" data-summary-confidence>
+                  -
+                </span>
+                <span class="mt-2 block text-sm leading-relaxed text-gray-400" data-confidence-note>
+                </span>
+              </div>
+              <div class="rounded-lg border border-gray-800 bg-gray-950/70 p-4">
+                <span class="block text-xs font-semibold text-gray-500">
+                  Hoy
+                </span>
+                <span class="mt-2 block text-sm leading-relaxed text-gray-300" data-today-status>
+                  -
+                </span>
+              </div>
+            </div>
+
+            <div
+              class="mt-5 hidden rounded-lg border border-amber-400/40 bg-amber-400/10 p-4"
+              data-warning-panel
+            >
+              <p class="text-sm font-semibold text-amber-200">
+                Revisa este detalle
+              </p>
+              <ul class="mt-2 space-y-2 text-sm leading-relaxed text-amber-100" data-warning-list>
+              </ul>
+            </div>
+
+            <div class="mt-5 flex flex-col gap-3 sm:flex-row xl:flex-col">
+              <button
+                class="inline-flex min-h-11 items-center justify-center rounded-lg bg-emerald-300 px-4 py-2 text-sm font-semibold text-gray-950 transition hover:bg-emerald-200 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-emerald-300/40"
+                type="button"
+                data-copy-result
+              >
+                Copiar resumen
+              </button>
+              <a
+                class="inline-flex min-h-11 items-center justify-center rounded-lg border border-gray-700 px-4 py-2 text-sm font-semibold text-gray-200 transition hover:border-emerald-300 hover:text-white focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-emerald-300/40"
+                href="/salud/fecha-probable-de-parto"
+              >
+                Ir a fecha probable de parto
+              </a>
+            </div>
+            <p class="mt-2 min-h-5 text-xs text-gray-500" data-action-feedback></p>
+
+            <div class="mt-5 rounded-lg border border-gray-700 bg-gray-950 p-4">
+              <p class="text-sm font-semibold text-gray-100">Aviso de salud</p>
+              <p class="mt-2 text-sm leading-relaxed text-gray-400">
+                Esta calculadora ofrece una estimación basada en promedios. La
+                ovulación puede variar de un ciclo a otro y no debe usarse como
+                método anticonceptivo.
+              </p>
+            </div>
+          </aside>
+        </div>
+      </section>
+    </Container>
+
+    <Container as="section" class="py-6 md:py-8">
+      <SectionIntro
+        title="Calendario del ciclo"
+        description="La leyenda combina color y texto para no depender solo del color. Selecciona un día para ver su detalle."
+      />
+      <div class="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(18rem,0.4fr)]">
+        <div class="rounded-lg border border-gray-700 bg-gray-950 p-4 sm:p-5">
+          <div class="flex flex-wrap gap-3 text-xs text-gray-300" aria-label="Leyenda del calendario">
+            <span class="inline-flex items-center gap-2">
+              <span class="h-3 w-3 rounded-sm bg-rose-300"></span> Menstruación
+            </span>
+            <span class="inline-flex items-center gap-2">
+              <span class="h-3 w-3 rounded-sm bg-emerald-300"></span> Ventana fértil
+            </span>
+            <span class="inline-flex items-center gap-2">
+              <span class="h-3 w-3 rounded-sm bg-amber-300"></span> Ovulación
+            </span>
+            <span class="inline-flex items-center gap-2">
+              <span class="h-3 w-3 rounded-sm border border-dashed border-emerald-200"></span> Margen
+            </span>
+          </div>
+          <div class="mt-5 grid gap-5 xl:grid-cols-2" data-calendar-months>
+            <p class="text-sm text-gray-400">
+              Completa la calculadora para ver el calendario.
+            </p>
+          </div>
+        </div>
+
+        <div class="rounded-lg border border-gray-700 bg-gray-950 p-4 sm:p-5">
+          <h2 class="text-xl font-semibold">Detalle del día</h2>
+          <p class="mt-3 text-sm leading-relaxed text-gray-400" data-day-detail>
+            Selecciona un día del calendario para ver la fase y fertilidad
+            estimada.
+          </p>
+        </div>
+      </div>
+    </Container>
+
+    <Container as="section" class="py-6 md:py-8">
+      <div class="grid gap-6 lg:grid-cols-2">
+        <div class="rounded-lg border border-gray-700 bg-gray-950 p-4 sm:p-5">
+          <h2 class="text-xl font-semibold">Días de la ventana fértil</h2>
+          <div class="mt-4 grid gap-3" data-fertility-rows>
+            <p class="text-sm text-gray-400">Completa la calculadora para ver el desglose.</p>
+          </div>
+        </div>
+
+        <div class="rounded-lg border border-gray-700 bg-gray-950 p-4 sm:p-5">
+          <h2 class="text-xl font-semibold">Cuándo hacer test de embarazo</h2>
+          <div class="mt-4 grid gap-3 text-sm leading-relaxed text-gray-300">
+            <p>
+              Momento más fiable: <strong class="text-white" data-test-reliable>-</strong>
+            </p>
+            <p>
+              Test sensible: <strong class="text-white" data-test-sensitive>-</strong>
+            </p>
+            <p class="text-gray-400" data-test-note>
+              Si haces un test antes del retraso y sale negativo, puede ser
+              demasiado pronto.
+            </p>
+          </div>
+        </div>
+      </div>
+    </Container>
+
+    <Container as="section" class="py-6 md:py-8">
+      <div class="grid gap-6 md:grid-cols-3">
+        <div>
+          <h2 class="text-2xl font-semibold">Cómo leer la confianza</h2>
+          <p class="mt-3 text-sm leading-relaxed text-gray-400">
+            La confianza sube cuando hay varios ciclos recientes y poca variación.
+            Baja cuando el ciclo es largo, muy variable o la fecha es menos segura.
+          </p>
+        </div>
+        <div>
+          <h2 class="text-2xl font-semibold">Señales que pueden ayudar</h2>
+          <p class="mt-3 text-sm leading-relaxed text-gray-400">
+            Test LH, moco cervical y temperatura basal pueden complementar la
+            estimación. Ninguna señal aislada garantiza el momento exacto.
+          </p>
+        </div>
+        <div>
+          <h2 class="text-2xl font-semibold">Cuándo pedir orientación</h2>
+          <p class="mt-3 text-sm leading-relaxed text-gray-400">
+            Si llevas 12 meses intentando concebir, o 6 meses si tienes 35 años
+            o más, considera consultar con un especialista.
+          </p>
+        </div>
+      </div>
+    </Container>
+
+    <FaqSection faqs={faqs} />
+  </PageShell>
+</BaseLayout>
+
+<script>
+  import {
+    addCalendarDays,
+    buildOvulationCopyText,
+    calculateFromCycleHistory,
+    calculateFromCycleRange,
+    calculateFromDetectedOvulation,
+    calculateStandardCycle,
+    comparePlainDates,
+    diffTotalDays,
+    formatFullOvulationDate,
+    formatIsoDate,
+    formatOvulationDate,
+    formatOvulationDateRange,
+    parseIsoDate,
+    todayInLocalTimeZone,
+  } from "@lib/calculators/ovulation";
+
+  const storageKey = "calculadoras.tools.ovulation.v1";
+  const modeSelect = document.querySelector("[data-mode-select]");
+  const modePanels = document.querySelectorAll("[data-mode-panel]");
+  const formError = document.querySelector("[data-form-error]");
+  const resultKicker = document.querySelector("[data-result-kicker]");
+  const mainResult = document.querySelector("[data-main-result]");
+  const resultNote = document.querySelector("[data-result-note]");
+  const summaryOvulation = document.querySelector("[data-summary-ovulation]");
+  const summaryPeriod = document.querySelector("[data-summary-period]");
+  const summaryConfidence = document.querySelector("[data-summary-confidence]");
+  const confidenceNote = document.querySelector("[data-confidence-note]");
+  const todayStatus = document.querySelector("[data-today-status]");
+  const warningPanel = document.querySelector("[data-warning-panel]");
+  const warningList = document.querySelector("[data-warning-list]");
+  const calendarMonths = document.querySelector("[data-calendar-months]");
+  const dayDetail = document.querySelector("[data-day-detail]");
+  const fertilityRows = document.querySelector("[data-fertility-rows]");
+  const testReliable = document.querySelector("[data-test-reliable]");
+  const testSensitive = document.querySelector("[data-test-sensitive]");
+  const testNote = document.querySelector("[data-test-note]");
+  const actionFeedback = document.querySelector("[data-action-feedback]");
+
+  const fields = {
+    intent: document.querySelector("[data-intent]"),
+    periodLength: document.querySelector("[data-period-length]"),
+    lutealPhase: document.querySelector("[data-luteal-phase]"),
+    standardLmp: document.querySelector("[data-standard-lmp]"),
+    cycleLength: document.querySelector("[data-cycle-length]"),
+    cycleLengthRange: document.querySelector("[data-cycle-length-range]"),
+    historyLmp: document.querySelector("[data-history-lmp]"),
+    historyDates: [...document.querySelectorAll("[data-history-date]")],
+    rangeLmp: document.querySelector("[data-range-lmp]"),
+    shortestCycle: document.querySelector("[data-shortest-cycle]"),
+    longestCycle: document.querySelector("[data-longest-cycle]"),
+    detectedOvulation: document.querySelector("[data-detected-ovulation]"),
+    ovulationSource: document.querySelector("[data-ovulation-source]"),
+  };
+
+  const allInputs = [
+    modeSelect,
+    fields.intent,
+    fields.periodLength,
+    fields.lutealPhase,
+    fields.standardLmp,
+    fields.cycleLength,
+    fields.cycleLengthRange,
+    fields.historyLmp,
+    ...fields.historyDates,
+    fields.rangeLmp,
+    fields.shortestCycle,
+    fields.longestCycle,
+    fields.detectedOvulation,
+    fields.ovulationSource,
+  ];
+
+  let lastResult = null;
+
+  function setMode(mode) {
+    modePanels.forEach((panel) => {
+      panel.classList.toggle("hidden", panel.dataset.modePanel !== mode);
+    });
+    updateCalculator();
+  }
+
+  function updateCalculator() {
+    clearError();
+
+    const result = getResultForMode(modeSelect.value, true);
+
+    if (!result.ok) {
+      lastResult = null;
+
+      if (result.reason === "empty") {
+        renderNeutralState();
+        return;
+      }
+
+      renderInvalidState(result.message);
+      return;
+    }
+
+    lastResult = result.result;
+    renderResult(result.result);
+  }
+
+  function getResultForMode(mode, strict) {
+    try {
+      const shared = {
+        periodLength: readInteger(fields.periodLength, 2, 10, "La menstruación debe durar entre 2 y 10 días."),
+        lutealPhase: readOptionalInteger(fields.lutealPhase, 10, 16, "La fase lútea debe estar entre 10 y 16 días."),
+        today: todayInLocalTimeZone(),
+        intent: fields.intent.value,
+      };
+
+      if (mode === "standard") {
+        const lmpDate = readDate(fields.standardLmp, "Ingresa el primer día de tu última menstruación.", strict);
+        if (!lmpDate) return emptyResult();
+
+        return okResult(
+          calculateStandardCycle({
+            lmpDate,
+            cycleLength: readInteger(fields.cycleLength, 21, 45, "La duración del ciclo debe estar entre 21 y 45 días."),
+            ...shared,
+          }),
+        );
+      }
+
+      if (mode === "history") {
+        const lmpDate = readDate(fields.historyLmp, "Ingresa el primer día de tu última menstruación.", strict);
+        if (!lmpDate) return emptyResult();
+        const previousPeriodStartDates = fields.historyDates
+          .map((input) => readDate(input, "", false))
+          .filter(Boolean);
+
+        if (previousPeriodStartDates.length < 2) {
+          if (strict) {
+            throw new Error("Agrega al menos dos fechas anteriores para estimar ciclos variables.");
+          }
+          return emptyResult();
+        }
+
+        return okResult(
+          calculateFromCycleHistory({
+            lmpDate,
+            previousPeriodStartDates,
+            ...shared,
+          }),
+        );
+      }
+
+      if (mode === "range") {
+        const lmpDate = readDate(fields.rangeLmp, "Ingresa el primer día de tu última menstruación.", strict);
+        if (!lmpDate) return emptyResult();
+
+        return okResult(
+          calculateFromCycleRange({
+            lmpDate,
+            shortestCycle: readInteger(fields.shortestCycle, 21, 45, "El ciclo más corto debe estar entre 21 y 45 días."),
+            longestCycle: readInteger(fields.longestCycle, 21, 45, "El ciclo más largo debe estar entre 21 y 45 días."),
+            ...shared,
+          }),
+        );
+      }
+
+      if (mode === "detected") {
+        const ovulationDate = readDate(fields.detectedOvulation, "Ingresa la fecha detectada de ovulación.", strict);
+        if (!ovulationDate) return emptyResult();
+
+        return okResult(
+          calculateFromDetectedOvulation({
+            ovulationDate,
+            source: fields.ovulationSource.value,
+            ...shared,
+          }),
+        );
+      }
+    } catch (error) {
+      return invalidResult(error instanceof Error ? error.message : "Revisa los datos ingresados.");
+    }
+
+    return emptyResult();
+  }
+
+  function readDate(input, message, strict) {
+    const value = input.value.trim();
+
+    if (!value) {
+      if (strict && message) {
+        throw new Error(message);
+      }
+
+      return null;
+    }
+
+    const date = parseIsoDate(value);
+
+    if (!date) {
+      throw new Error("Ingresa una fecha válida.");
+    }
+
+    return date;
+  }
+
+  function readInteger(input, min, max, message) {
+    const value = input.value.trim();
+
+    if (!/^\d+$/.test(value)) {
+      throw new Error(message);
+    }
+
+    const number = Number(value);
+
+    if (number < min || number > max) {
+      throw new Error(message);
+    }
+
+    return number;
+  }
+
+  function readOptionalInteger(input, min, max, message) {
+    const value = input.value.trim();
+
+    if (!value) {
+      return undefined;
+    }
+
+    return readInteger(input, min, max, message);
+  }
+
+  function renderNeutralState() {
+    resultKicker.textContent = "Resultado";
+    mainResult.textContent = "Completa tus datos";
+    resultNote.textContent =
+      "El resultado aparecerá aquí con confianza, calendario y próximos pasos.";
+    summaryOvulation.textContent = "-";
+    summaryPeriod.textContent = "-";
+    summaryConfidence.textContent = "-";
+    confidenceNote.textContent = "";
+    todayStatus.textContent = "-";
+    renderWarnings([]);
+    renderCalendar(null);
+    renderFertilityRows(null);
+    renderPregnancyTest(null);
+  }
+
+  function renderInvalidState(message) {
+    showError(message);
+    resultKicker.textContent = "Revisa los datos";
+    mainResult.textContent = "No se puede calcular todavía";
+    resultNote.textContent = message;
+    summaryOvulation.textContent = "-";
+    summaryPeriod.textContent = "-";
+    summaryConfidence.textContent = "-";
+    confidenceNote.textContent = "";
+    todayStatus.textContent = "-";
+    renderWarnings([]);
+    renderCalendar(null);
+    renderFertilityRows(null);
+    renderPregnancyTest(null);
+  }
+
+  function renderResult(result) {
+    const ovulationRange = formatOvulationDateRange(
+      result.ovulationStart,
+      result.ovulationEnd,
+    );
+    const periodRange = formatOvulationDateRange(
+      result.nextPeriodRange?.start ?? result.nextPeriodDate,
+      result.nextPeriodRange?.end ?? result.nextPeriodDate,
+    );
+
+    resultKicker.textContent = "Ventana fértil estimada";
+    mainResult.textContent = formatOvulationDateRange(
+      result.fertileStart,
+      result.fertileEnd,
+    );
+    resultNote.textContent = `Días de mayor probabilidad relativa: ${formatOvulationDateRange(
+      result.peakStart,
+      result.peakEnd,
+    )}. Margen de observación: ${formatOvulationDate(result.observationEnd)}.`;
+    summaryOvulation.textContent = ovulationRange;
+    summaryPeriod.textContent = periodRange;
+    summaryConfidence.textContent = `${result.modeLabel} · confianza ${result.confidence.toLowerCase()}`;
+    confidenceNote.textContent = result.confidenceMessage;
+    todayStatus.textContent = result.todayStatus.message;
+    renderWarnings(result.warnings);
+    renderCalendar(result);
+    renderFertilityRows(result);
+    renderPregnancyTest(result);
+  }
+
+  function renderWarnings(warnings) {
+    warningList.innerHTML = "";
+
+    warnings.forEach((warning) => {
+      const item = document.createElement("li");
+      item.textContent = warning;
+      warningList.append(item);
+    });
+
+    warningPanel.classList.toggle("hidden", warnings.length === 0);
+  }
+
+  function renderCalendar(result) {
+    calendarMonths.innerHTML = "";
+
+    if (!result) {
+      calendarMonths.innerHTML =
+        '<p class="text-sm text-gray-400">Completa la calculadora para ver el calendario.</p>';
+      dayDetail.textContent =
+        "Selecciona un día del calendario para ver la fase y fertilidad estimada.";
+      return;
+    }
+
+    const firstMonth = startOfMonth(result.lmpDate);
+    const lastMonth = startOfMonth(result.nextPeriodRange?.end ?? result.observationEnd);
+    const months = getMonthsBetween(firstMonth, lastMonth).slice(0, 3);
+
+    months.forEach((month) => {
+      calendarMonths.append(buildMonthElement(month, result));
+    });
+
+    renderDayDetail(result.ovulationStart, result);
+  }
+
+  function buildMonthElement(month, result) {
+    const wrapper = document.createElement("section");
+    wrapper.className = "rounded-lg border border-gray-800 bg-gray-900/60 p-3";
+
+    const title = document.createElement("h3");
+    title.className = "text-sm font-semibold text-gray-100";
+    title.textContent = formatMonthTitle(month);
+
+    const grid = document.createElement("div");
+    grid.className = "mt-3 grid grid-cols-7 gap-1";
+    grid.setAttribute("role", "grid");
+
+    ["L", "M", "X", "J", "V", "S", "D"].forEach((day) => {
+      const item = document.createElement("div");
+      item.className = "flex h-7 items-center justify-center text-xs font-semibold text-gray-500";
+      item.textContent = day;
+      grid.append(item);
+    });
+
+    const leadingBlanks = getMondayWeekdayIndex(month);
+
+    for (let index = 0; index < leadingBlanks; index += 1) {
+      const blank = document.createElement("div");
+      blank.className = "h-9";
+      grid.append(blank);
+    }
+
+    const totalDays = daysInMonth(month.year, month.month);
+
+    for (let day = 1; day <= totalDays; day += 1) {
+      const date = { year: month.year, month: month.month, day };
+      const meta = getDayMeta(date, result);
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = `flex h-9 w-full items-center justify-center rounded-md border text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300 ${meta.className}`;
+      button.textContent = String(day);
+      button.setAttribute(
+        "aria-label",
+        `${formatFullOvulationDate(date)}. ${meta.label}. ${meta.fertility}.`,
+      );
+      button.addEventListener("click", () => renderDayDetail(date, result));
+      grid.append(button);
+    }
+
+    wrapper.append(title, grid);
+    return wrapper;
+  }
+
+  function getDayMeta(date, result) {
+    const today = todayInLocalTimeZone();
+    const isToday = comparePlainDates(date, today) === 0;
+    const todayClass = isToday ? " ring-2 ring-sky-300" : "";
+    const inPeriod = isBetween(date, result.lmpDate, result.periodEndDate);
+    const inFertile = isBetween(date, result.fertileStart, result.fertileEnd);
+    const inOvulation = isBetween(date, result.ovulationStart, result.ovulationEnd);
+    const inMargin = comparePlainDates(date, result.observationEnd) === 0;
+
+    if (inOvulation) {
+      return {
+        label: "Ovulación estimada",
+        fertility: "Fertilidad muy alta",
+        className: `border-amber-300 bg-amber-300 text-gray-950${todayClass}`,
+      };
+    }
+
+    if (inFertile && inPeriod) {
+      return {
+        label: "Menstruación estimada y ventana fértil",
+        fertility: "Fertilidad estimada en aumento",
+        className: `border-emerald-300 bg-emerald-300/80 text-gray-950${todayClass}`,
+      };
+    }
+
+    if (inFertile) {
+      return {
+        label: "Ventana fértil estimada",
+        fertility: "Fertilidad estimada alta",
+        className: `border-emerald-300 bg-emerald-300 text-gray-950${todayClass}`,
+      };
+    }
+
+    if (inMargin) {
+      return {
+        label: "Margen por incertidumbre",
+        fertility: "Fertilidad estimada baja",
+        className: `border-dashed border-emerald-200 bg-emerald-300/10 text-emerald-100${todayClass}`,
+      };
+    }
+
+    if (inPeriod) {
+      return {
+        label: "Menstruación estimada",
+        fertility: "Fertilidad estimada baja",
+        className: `border-rose-300 bg-rose-300/80 text-gray-950${todayClass}`,
+      };
+    }
+
+    return {
+      label: "Fertilidad estimada baja",
+      fertility: "Fertilidad estimada baja",
+      className: `border-gray-800 bg-gray-950 text-gray-300 hover:border-gray-600${todayClass}`,
+    };
+  }
+
+  function renderDayDetail(date, result) {
+    const meta = getDayMeta(date, result);
+    const cycleDay = diffTotalDays(result.lmpDate, date) + 1;
+
+    dayDetail.textContent = `${formatFullOvulationDate(date)}. Día ${cycleDay} del ciclo estimado. ${meta.label}. ${meta.fertility}.`;
+  }
+
+  function renderFertilityRows(result) {
+    fertilityRows.innerHTML = "";
+
+    if (!result) {
+      fertilityRows.innerHTML =
+        '<p class="text-sm text-gray-400">Completa la calculadora para ver el desglose.</p>';
+      return;
+    }
+
+    result.fertilityRows.forEach((row) => {
+      const item = document.createElement("div");
+      item.className = "grid gap-2 rounded-lg border border-gray-800 bg-gray-900/60 p-4 sm:grid-cols-[5rem_1fr]";
+
+      const date = document.createElement("div");
+      date.className = "text-sm font-semibold text-white";
+      date.textContent = formatOvulationDate(row.date);
+
+      const details = document.createElement("div");
+      details.innerHTML = `
+        <p class="text-sm font-semibold text-gray-100">${row.relation} · ${row.level}</p>
+        <p class="mt-1 text-sm leading-relaxed text-gray-400">Día ${row.cycleDay} del ciclo. ${row.description}</p>
+      `;
+
+      item.append(date, details);
+      fertilityRows.append(item);
+    });
+  }
+
+  function renderPregnancyTest(result) {
+    if (!result) {
+      testReliable.textContent = "-";
+      testSensitive.textContent = "-";
+      testNote.textContent =
+        "Si haces un test antes del retraso y sale negativo, puede ser demasiado pronto.";
+      return;
+    }
+
+    const reliableStart = result.nextPeriodRange?.start ?? result.nextPeriodDate;
+    const reliableEnd = result.nextPeriodRange?.end ?? result.nextPeriodDate;
+    const sensitiveStart = addCalendarDays(result.ovulationStart, 10);
+    const sensitiveEnd = addCalendarDays(result.ovulationEnd, 12);
+
+    testReliable.textContent = `desde ${formatOvulationDateRange(reliableStart, reliableEnd)}`;
+    testSensitive.textContent = `${formatOvulationDateRange(sensitiveStart, sensitiveEnd)}`;
+    testNote.textContent =
+      "Un negativo temprano no descarta embarazo. Repite en unos días si la menstruación no llega.";
+  }
+
+  function fillExample() {
+    const mode = modeSelect.value;
+    fields.periodLength.value = "5";
+    fields.lutealPhase.value = "";
+    fields.intent.value = "conceive";
+
+    if (mode === "standard") {
+      fields.standardLmp.value = "2026-04-01";
+      setCycleLength("28");
+    } else if (mode === "history") {
+      fields.historyLmp.value = "2026-04-01";
+      ["2026-01-05", "2026-02-02", "2026-03-03", ""].forEach((value, index) => {
+        fields.historyDates[index].value = value;
+      });
+    } else if (mode === "range") {
+      fields.rangeLmp.value = "2026-04-01";
+      fields.shortestCycle.value = "25";
+      fields.longestCycle.value = "32";
+    } else if (mode === "detected") {
+      fields.detectedOvulation.value = "2026-04-15";
+      fields.ovulationSource.value = "lh";
+    }
+
+    updateCalculator();
+  }
+
+  function clearCalculator() {
+    fields.periodLength.value = "5";
+    fields.lutealPhase.value = "";
+    fields.intent.value = "conceive";
+    fields.standardLmp.value = "";
+    setCycleLength("28");
+    fields.historyLmp.value = "";
+    fields.historyDates.forEach((input) => {
+      input.value = "";
+    });
+    fields.rangeLmp.value = "";
+    fields.shortestCycle.value = "";
+    fields.longestCycle.value = "";
+    fields.detectedOvulation.value = "";
+    fields.ovulationSource.value = "lh";
+    clearFeedback();
+    renderNeutralState();
+  }
+
+  function saveCycle() {
+    const payload = {
+      mode: modeSelect.value,
+      intent: fields.intent.value,
+      periodLength: fields.periodLength.value,
+      lutealPhase: fields.lutealPhase.value,
+      standardLmp: fields.standardLmp.value,
+      cycleLength: fields.cycleLength.value,
+      historyLmp: fields.historyLmp.value,
+      historyDates: fields.historyDates.map((input) => input.value),
+      rangeLmp: fields.rangeLmp.value,
+      shortestCycle: fields.shortestCycle.value,
+      longestCycle: fields.longestCycle.value,
+      detectedOvulation: fields.detectedOvulation.value,
+      ovulationSource: fields.ovulationSource.value,
+    };
+
+    localStorage.setItem(storageKey, JSON.stringify(payload));
+    showFeedback("Datos guardados en este dispositivo.");
+  }
+
+  function loadSavedCycle() {
+    try {
+      const raw = localStorage.getItem(storageKey);
+      if (!raw) return;
+
+      const payload = JSON.parse(raw);
+      modeSelect.value = payload.mode ?? "standard";
+      fields.intent.value = payload.intent ?? "conceive";
+      fields.periodLength.value = payload.periodLength ?? "5";
+      fields.lutealPhase.value = payload.lutealPhase ?? "";
+      fields.standardLmp.value = payload.standardLmp ?? "";
+      setCycleLength(payload.cycleLength ?? "28");
+      fields.historyLmp.value = payload.historyLmp ?? "";
+      fields.historyDates.forEach((input, index) => {
+        input.value = payload.historyDates?.[index] ?? "";
+      });
+      fields.rangeLmp.value = payload.rangeLmp ?? "";
+      fields.shortestCycle.value = payload.shortestCycle ?? "";
+      fields.longestCycle.value = payload.longestCycle ?? "";
+      fields.detectedOvulation.value = payload.detectedOvulation ?? "";
+      fields.ovulationSource.value = payload.ovulationSource ?? "lh";
+      setMode(modeSelect.value);
+      showFeedback("Datos guardados cargados desde este navegador.");
+    } catch {
+      localStorage.removeItem(storageKey);
+    }
+  }
+
+  function deleteSavedCycle() {
+    localStorage.removeItem(storageKey);
+    showFeedback("Datos guardados eliminados.");
+  }
+
+  async function copyResult() {
+    if (!lastResult) {
+      showFeedback("Completa la calculadora antes de copiar.");
+      return;
+    }
+
+    const text = buildOvulationCopyText(lastResult);
+
+    try {
+      await navigator.clipboard.writeText(text);
+      showFeedback("Resumen copiado.");
+    } catch {
+      showFeedback("No se pudo copiar automáticamente.");
+    }
+  }
+
+  function setCycleLength(value) {
+    fields.cycleLength.value = value;
+    fields.cycleLengthRange.value = value;
+  }
+
+  function showError(message) {
+    formError.textContent = message;
+    formError.classList.remove("hidden");
+  }
+
+  function clearError() {
+    formError.textContent = "";
+    formError.classList.add("hidden");
+  }
+
+  function showFeedback(message) {
+    actionFeedback.textContent = message;
+  }
+
+  function clearFeedback() {
+    actionFeedback.textContent = "";
+  }
+
+  function okResult(result) {
+    return { ok: true, result };
+  }
+
+  function emptyResult() {
+    return { ok: false, reason: "empty" };
+  }
+
+  function invalidResult(message) {
+    return { ok: false, reason: "invalid", message };
+  }
+
+  function isBetween(date, start, end) {
+    return comparePlainDates(date, start) >= 0 && comparePlainDates(date, end) <= 0;
+  }
+
+  function startOfMonth(date) {
+    return { year: date.year, month: date.month, day: 1 };
+  }
+
+  function addMonths(date, months) {
+    const totalMonths = date.year * 12 + date.month - 1 + months;
+    return {
+      year: Math.floor(totalMonths / 12),
+      month: positiveModulo(totalMonths, 12) + 1,
+      day: 1,
+    };
+  }
+
+  function getMonthsBetween(start, end) {
+    const months = [];
+    let current = start;
+
+    while (comparePlainDates(current, end) <= 0) {
+      months.push(current);
+      current = addMonths(current, 1);
+    }
+
+    return months;
+  }
+
+  function daysInMonth(year, month) {
+    return new Date(Date.UTC(year, month, 0)).getUTCDate();
+  }
+
+  function getMondayWeekdayIndex(date) {
+    const day = new Date(Date.UTC(date.year, date.month - 1, date.day)).getUTCDay();
+    return (day + 6) % 7;
+  }
+
+  function formatMonthTitle(date) {
+    return new Intl.DateTimeFormat("es-MX", {
+      month: "long",
+      year: "numeric",
+      timeZone: "UTC",
+    }).format(new Date(Date.UTC(date.year, date.month - 1, date.day)));
+  }
+
+  function positiveModulo(value, divisor) {
+    return ((value % divisor) + divisor) % divisor;
+  }
+
+  allInputs.forEach((input) => {
+    input?.addEventListener("input", updateCalculator);
+    input?.addEventListener("change", updateCalculator);
+  });
+
+  fields.cycleLength?.addEventListener("input", () => {
+    fields.cycleLengthRange.value = fields.cycleLength.value;
+  });
+  fields.cycleLengthRange?.addEventListener("input", () => {
+    fields.cycleLength.value = fields.cycleLengthRange.value;
+  });
+  modeSelect?.addEventListener("change", () => setMode(modeSelect.value));
+  document.querySelector("[data-fill-example]")?.addEventListener("click", fillExample);
+  document.querySelector("[data-clear-calculator]")?.addEventListener("click", clearCalculator);
+  document.querySelector("[data-save-cycle]")?.addEventListener("click", saveCycle);
+  document.querySelector("[data-delete-cycle]")?.addEventListener("click", deleteSavedCycle);
+  document.querySelector("[data-copy-result]")?.addEventListener("click", copyResult);
+
+  renderNeutralState();
+  loadSavedCycle();
+  setMode(modeSelect.value);
+</script>
