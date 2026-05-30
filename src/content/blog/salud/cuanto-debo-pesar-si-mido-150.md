@@ -2,7 +2,7 @@
 title: "Cuánto debo pesar si mido 1.50 m"
 seoTitle: "Cuánto debo pesar si mido 1.50 m: rango saludable"
 description: "Conoce el rango de peso saludable de referencia para una estatura de 1.50 m según el IMC adulto."
-pubDate: 2026-06-20
+pubDate: 2027-06-20
 categorySlug: "salud"
 tags:
   - peso saludable
@@ -23,8 +23,8 @@ Este rango no es un diagnóstico ni una meta obligatoria. Es una referencia inic
 Para una estatura de 1.50 m, el rango queda así:
 
 | Estatura | Peso mínimo por IMC 18.5 | Peso máximo por IMC 24.9 |
-|----------|--------------------------|--------------------------|
-| 1.50 m | 41.6 kg | 56.0 kg |
+| -------- | ------------------------ | ------------------------ |
+| 1.50 m   | 41.6 kg                  | 56.0 kg                  |
 
 Si buscas "peso ideal 1.50 mujer" o "peso ideal 1.50", conviene tomar este dato como rango y no como un número único. La composición corporal, la edad, la masa muscular y el contexto de salud pueden cambiar la interpretación.
 
@@ -61,11 +61,11 @@ Puedes ver el enfoque completo en [peso ideal vs peso saludable](/blog/peso-idea
 
 Para 1.50 m:
 
-| Peso | IMC aproximado | Lectura adulta |
-|------|----------------|----------------|
-| 40 kg | 17.8 | Bajo peso |
-| 48 kg | 21.3 | Rango saludable |
-| 57 kg | 25.3 | Sobrepeso |
+| Peso  | IMC aproximado | Lectura adulta  |
+| ----- | -------------- | --------------- |
+| 40 kg | 17.8           | Bajo peso       |
+| 48 kg | 21.3           | Rango saludable |
+| 57 kg | 25.3           | Sobrepeso       |
 
 Estos ejemplos usan categorías adultas. No aplican igual para niños, adolescentes o embarazo.
 
@@ -91,4 +91,3 @@ No. En niños y adolescentes se usan percentiles por edad y sexo, no la tabla ad
 
 - [CDC: Adult BMI Categories](https://www.cdc.gov/bmi/adult-calculator/bmi-categories.html)
 - [CDC: BMI Frequently Asked Questions](https://www.cdc.gov/bmi/faq/index.html)
-

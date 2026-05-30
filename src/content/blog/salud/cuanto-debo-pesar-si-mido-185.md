@@ -2,7 +2,7 @@
 title: "Cuánto debo pesar si mido 1.85 m"
 seoTitle: "Cuánto debo pesar si mido 1.85 m: rango saludable"
 description: "Conoce el rango de peso saludable de referencia para una estatura de 1.85 m según el IMC adulto."
-pubDate: 2026-06-27
+pubDate: 2027-06-27
 categorySlug: "salud"
 tags:
   - peso saludable
@@ -21,8 +21,8 @@ El resultado debe verse como una guía. Una cifra aislada no describe toda tu sa
 ## Rango saludable para 1.85 m
 
 | Estatura | Peso mínimo por IMC 18.5 | Peso máximo por IMC 24.9 |
-|----------|--------------------------|--------------------------|
-| 1.85 m | 63.3 kg | 85.2 kg |
+| -------- | ------------------------ | ------------------------ |
+| 1.85 m   | 63.3 kg                  | 85.2 kg                  |
 
 Este rango incluye distintos pesos posibles que pueden estar dentro de la categoría saludable adulta.
 
@@ -50,11 +50,11 @@ Con 1.85 m:
 
 ## Ejemplos de IMC
 
-| Peso | IMC aproximado | Lectura adulta |
-|------|----------------|----------------|
-| 65 kg | 19.0 | Rango saludable |
-| 80 kg | 23.4 | Rango saludable |
-| 88 kg | 25.7 | Sobrepeso |
+| Peso  | IMC aproximado | Lectura adulta  |
+| ----- | -------------- | --------------- |
+| 65 kg | 19.0           | Rango saludable |
+| 80 kg | 23.4           | Rango saludable |
+| 88 kg | 25.7           | Sobrepeso       |
 
 La lectura adulta se basa en el valor de IMC, no en el peso por sí solo.
 
@@ -86,4 +86,3 @@ Porque personas con la misma estatura pueden tener distintas composiciones corpo
 
 - [CDC: Adult BMI Categories](https://www.cdc.gov/bmi/adult-calculator/bmi-categories.html)
 - [CDC: BMI Frequently Asked Questions](https://www.cdc.gov/bmi/faq/index.html)
-

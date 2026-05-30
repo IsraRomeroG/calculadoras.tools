@@ -2,7 +2,7 @@
 title: "Comisión por apertura: cómo afecta un préstamo"
 seoTitle: "Comisión por apertura en préstamos: ejemplo, CAT y costo total"
 description: "Aprende qué es la comisión por apertura, cómo se calcula y por qué puede aumentar el costo total de un préstamo."
-pubDate: 2026-06-03
+pubDate: 2026-05-30
 categorySlug: "finanzas"
 tags:
   - comisión por apertura

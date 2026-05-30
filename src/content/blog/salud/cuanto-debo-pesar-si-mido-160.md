@@ -2,7 +2,7 @@
 title: "Cuánto debo pesar si mido 1.60 m"
 seoTitle: "Cuánto debo pesar si mido 1.60 m: rango saludable"
 description: "Conoce el rango de peso saludable de referencia para una estatura de 1.60 m según el IMC adulto."
-pubDate: 2026-06-22
+pubDate: 2027-06-22
 categorySlug: "salud"
 tags:
   - peso saludable
@@ -21,8 +21,8 @@ No es un peso ideal exacto. Es una referencia para ubicar tu peso respecto a tu 
 ## Rango saludable para 1.60 m
 
 | Estatura | Peso mínimo por IMC 18.5 | Peso máximo por IMC 24.9 |
-|----------|--------------------------|--------------------------|
-| 1.60 m | 47.4 kg | 63.7 kg |
+| -------- | ------------------------ | ------------------------ |
+| 1.60 m   | 47.4 kg                  | 63.7 kg                  |
 
 Dentro de ese rango, el IMC adulto cae en la categoría de peso saludable. Por debajo o por encima, la interpretación debe hacerse con más contexto.
 
@@ -50,11 +50,11 @@ peso máximo = 24.9 x 2.56 = 63.7 kg
 
 ## Ejemplos de IMC
 
-| Peso | IMC aproximado | Lectura adulta |
-|------|----------------|----------------|
-| 46 kg | 18.0 | Bajo peso |
-| 55 kg | 21.5 | Rango saludable |
-| 64 kg | 25.0 | Sobrepeso |
+| Peso  | IMC aproximado | Lectura adulta  |
+| ----- | -------------- | --------------- |
+| 46 kg | 18.0           | Bajo peso       |
+| 55 kg | 21.5           | Rango saludable |
+| 64 kg | 25.0           | Sobrepeso       |
 
 Estos ejemplos muestran por qué unos pocos kilos pueden cambiar la categoría cuando estás cerca de un límite.
 
@@ -86,4 +86,3 @@ Aplica como referencia adulta general. No sustituye una evaluación individual.
 
 - [CDC: Adult BMI Categories](https://www.cdc.gov/bmi/adult-calculator/bmi-categories.html)
 - [CDC: BMI Frequently Asked Questions](https://www.cdc.gov/bmi/faq/index.html)
-

@@ -2,7 +2,7 @@
 title: "Sistema francés de amortización: explicación fácil"
 seoTitle: "Sistema francés de amortización: cuota fija, intereses y capital"
 description: "Entiende cómo funciona el sistema francés de amortización, por qué la cuota es fija y cómo cambia la mezcla de capital e intereses."
-pubDate: 2026-06-09
+pubDate: 2026-05-31
 categorySlug: "finanzas"
 tags:
   - sistema francés
@@ -58,11 +58,11 @@ Esto se ve mejor en una [tabla de amortización](/blog/tabla-amortizacion-presta
 
 Supongamos un préstamo de `$50,000`, tasa anual de `24%` y plazo de `24 meses`. La cuota mensual estimada es `$2,643.55`.
 
-| Mes | Cuota | Capital | Intereses | Saldo pendiente |
-|---:|---:|---:|---:|---:|
-| 1 | $2,643.55 | $1,643.55 | $1,000.00 | $48,356.45 |
-| 2 | $2,643.55 | $1,676.43 | $967.13 | $46,680.02 |
-| 3 | $2,643.55 | $1,709.95 | $933.60 | $44,970.06 |
+| Mes |     Cuota |   Capital | Intereses | Saldo pendiente |
+| --: | --------: | --------: | --------: | --------------: |
+|   1 | $2,643.55 | $1,643.55 | $1,000.00 |      $48,356.45 |
+|   2 | $2,643.55 | $1,676.43 |   $967.13 |      $46,680.02 |
+|   3 | $2,643.55 | $1,709.95 |   $933.60 |      $44,970.06 |
 
 La cuota es igual, pero el capital sube y el interés baja. Esa es la señal típica del sistema francés.
 

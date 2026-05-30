@@ -2,7 +2,7 @@
 title: "Préstamo de $50,000: cuánto pago al mes"
 seoTitle: "Préstamo de 50000: mensualidad, intereses y costo total"
 description: "Simula cuánto podrías pagar al mes por un préstamo de $50,000 según la tasa, el plazo, la comisión y los seguros."
-pubDate: 2026-05-31
+pubDate: 2026-06-05
 categorySlug: "finanzas"
 tags:
   - préstamo 50000
@@ -34,11 +34,11 @@ Puedes ajustar el monto, la tasa y el plazo en la [calculadora de préstamo](/fi
 
 Estos escenarios usan cuota fija mensual y no incluyen comisión ni seguro:
 
-| Escenario | Tasa anual | Plazo | Mensualidad estimada | Intereses estimados | Total pagado |
-|---|---:|---:|---:|---:|---:|
-| Corto plazo | 18% | 12 meses | $4,584.00 | $5,008.00 | $55,008.00 |
-| Intermedio | 24% | 24 meses | $2,643.55 | $13,445.32 | $63,445.32 |
-| Largo y caro | 36% | 36 meses | $2,290.19 | $32,446.83 | $82,446.83 |
+| Escenario    | Tasa anual |    Plazo | Mensualidad estimada | Intereses estimados | Total pagado |
+| ------------ | ---------: | -------: | -------------------: | ------------------: | -----------: |
+| Corto plazo  |        18% | 12 meses |            $4,584.00 |           $5,008.00 |   $55,008.00 |
+| Intermedio   |        24% | 24 meses |            $2,643.55 |          $13,445.32 |   $63,445.32 |
+| Largo y caro |        36% | 36 meses |            $2,290.19 |          $32,446.83 |   $82,446.83 |
 
 El tercer escenario tiene la mensualidad más baja que el de 12 meses, pero termina pagando mucho más en intereses. Esa es la tensión normal entre plazo y costo total.
 

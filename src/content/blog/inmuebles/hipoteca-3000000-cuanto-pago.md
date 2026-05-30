@@ -2,7 +2,7 @@
 title: "Hipoteca de $3,000,000: cuánto pago al mes"
 seoTitle: "Hipoteca de 3 millones: mensualidad, intereses y plazo"
 description: "Simula cuánto podrías pagar al mes por una hipoteca de $3,000,000 con distintos plazos, tasas y pagos extra."
-pubDate: 2026-06-17
+pubDate: 2027-06-17
 categorySlug: "inmuebles"
 tags:
   - hipoteca 3000000
@@ -30,11 +30,11 @@ El total pagado sería aproximadamente `$6,478,026.88`, con intereses de `$3,478
 
 ## Tabla de escenarios
 
-| Tasa anual | Plazo | Cuota estimada | Total pagado | Intereses |
-|---:|---:|---:|---:|---:|
-| 8% | 15 años | $28,669.56 | $5,160,521.26 | $2,160,521.26 |
-| 9% | 20 años | $26,991.78 | $6,478,026.88 | $3,478,026.88 |
-| 10% | 25 años | $27,261.02 | $8,178,306.71 | $5,178,306.71 |
+| Tasa anual |   Plazo | Cuota estimada |  Total pagado |     Intereses |
+| ---------: | ------: | -------------: | ------------: | ------------: |
+|         8% | 15 años |     $28,669.56 | $5,160,521.26 | $2,160,521.26 |
+|         9% | 20 años |     $26,991.78 | $6,478,026.88 | $3,478,026.88 |
+|        10% | 25 años |     $27,261.02 | $8,178,306.71 | $5,178,306.71 |
 
 La mensualidad no lo cuenta todo. El escenario de 25 años parece cercano en cuota al de 20, pero el total de intereses aumenta mucho.
 

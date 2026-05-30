@@ -2,7 +2,7 @@
 title: "Cuánto debo pesar si mido 1.70 m"
 seoTitle: "Cuánto debo pesar si mido 1.70 m: rango saludable"
 description: "Conoce el rango de peso saludable de referencia para una estatura de 1.70 m según el IMC adulto."
-pubDate: 2026-06-24
+pubDate: 2027-06-24
 categorySlug: "salud"
 tags:
   - peso saludable
@@ -21,8 +21,8 @@ No debe leerse como una meta médica. Es una referencia para interpretar peso y 
 ## Rango saludable para 1.70 m
 
 | Estatura | Peso mínimo por IMC 18.5 | Peso máximo por IMC 24.9 |
-|----------|--------------------------|--------------------------|
-| 1.70 m | 53.5 kg | 72.0 kg |
+| -------- | ------------------------ | ------------------------ |
+| 1.70 m   | 53.5 kg                  | 72.0 kg                  |
 
 Si estás cerca de los límites, es normal que el redondeo cambie una décima del IMC.
 
@@ -41,11 +41,11 @@ peso máximo = 24.9 x 1.70^2 = 72.0 kg
 
 ## Ejemplos de IMC
 
-| Peso | IMC aproximado | Lectura adulta |
-|------|----------------|----------------|
-| 53 kg | 18.3 | Bajo peso |
-| 65 kg | 22.5 | Rango saludable |
-| 73 kg | 25.3 | Sobrepeso |
+| Peso  | IMC aproximado | Lectura adulta  |
+| ----- | -------------- | --------------- |
+| 53 kg | 18.3           | Bajo peso       |
+| 65 kg | 22.5           | Rango saludable |
+| 73 kg | 25.3           | Sobrepeso       |
 
 La categoría se calcula con el valor exacto, no solo con una etiqueta general.
 
@@ -77,4 +77,3 @@ No. Es una referencia de IMC adulto, no una recomendación personalizada.
 
 - [CDC: Adult BMI Categories](https://www.cdc.gov/bmi/adult-calculator/bmi-categories.html)
 - [CDC: BMI Frequently Asked Questions](https://www.cdc.gov/bmi/faq/index.html)
-

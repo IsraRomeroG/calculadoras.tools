@@ -2,7 +2,7 @@
 title: "Cuánto debo pesar si mido 1.75 m"
 seoTitle: "Cuánto debo pesar si mido 1.75 m: rango saludable"
 description: "Conoce el rango de peso saludable de referencia para una estatura de 1.75 m según el IMC adulto."
-pubDate: 2026-06-25
+pubDate: 2027-06-25
 categorySlug: "salud"
 tags:
   - peso saludable
@@ -21,8 +21,8 @@ La palabra clave es "rango": no hay un peso ideal único para todas las personas
 ## Rango saludable para 1.75 m
 
 | Estatura | Peso mínimo por IMC 18.5 | Peso máximo por IMC 24.9 |
-|----------|--------------------------|--------------------------|
-| 1.75 m | 56.7 kg | 76.3 kg |
+| -------- | ------------------------ | ------------------------ |
+| 1.75 m   | 56.7 kg                  | 76.3 kg                  |
 
 Este intervalo es orientativo y debe interpretarse junto con otros datos de salud.
 
@@ -49,11 +49,11 @@ Con 1.75 m:
 
 ## Ejemplos con diferentes pesos
 
-| Peso | IMC aproximado | Lectura adulta |
-|------|----------------|----------------|
-| 56 kg | 18.3 | Bajo peso |
-| 70 kg | 22.9 | Rango saludable |
-| 78 kg | 25.5 | Sobrepeso |
+| Peso  | IMC aproximado | Lectura adulta  |
+| ----- | -------------- | --------------- |
+| 56 kg | 18.3           | Bajo peso       |
+| 70 kg | 22.9           | Rango saludable |
+| 78 kg | 25.5           | Sobrepeso       |
 
 Estos ejemplos ayudan a ubicar el resultado, pero no reemplazan una evaluación individual.
 
@@ -85,4 +85,3 @@ Puede servir como referencia, pero en personas con mucha masa muscular necesita 
 
 - [CDC: Adult BMI Categories](https://www.cdc.gov/bmi/adult-calculator/bmi-categories.html)
 - [CDC: BMI Frequently Asked Questions](https://www.cdc.gov/bmi/faq/index.html)
-

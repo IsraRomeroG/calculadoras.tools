@@ -2,7 +2,7 @@
 title: "Peso saludable según estatura"
 seoTitle: "Peso saludable según estatura: tabla por altura e IMC"
 description: "Consulta el rango de peso saludable de referencia según tu estatura, calculado con IMC adulto de 18.5 a 24.9."
-pubDate: 2026-05-31
+pubDate: 2026-06-10
 categorySlug: "salud"
 tags:
   - peso saludable
@@ -42,17 +42,17 @@ peso máximo = 24.9 x altura_m^2
 ## Tabla de peso saludable por estatura
 
 | Estatura | Rango saludable de referencia |
-|----------|-------------------------------|
-| 1.50 m | 41.6 a 56.0 kg |
-| 1.55 m | 44.4 a 59.8 kg |
-| 1.60 m | 47.4 a 63.7 kg |
-| 1.65 m | 50.4 a 67.8 kg |
-| 1.70 m | 53.5 a 72.0 kg |
-| 1.75 m | 56.7 a 76.3 kg |
-| 1.80 m | 59.9 a 80.7 kg |
-| 1.85 m | 63.3 a 85.2 kg |
-| 1.90 m | 66.8 a 89.9 kg |
-| 1.95 m | 70.4 a 94.7 kg |
+| -------- | ----------------------------- |
+| 1.50 m   | 41.6 a 56.0 kg                |
+| 1.55 m   | 44.4 a 59.8 kg                |
+| 1.60 m   | 47.4 a 63.7 kg                |
+| 1.65 m   | 50.4 a 67.8 kg                |
+| 1.70 m   | 53.5 a 72.0 kg                |
+| 1.75 m   | 56.7 a 76.3 kg                |
+| 1.80 m   | 59.9 a 80.7 kg                |
+| 1.85 m   | 63.3 a 85.2 kg                |
+| 1.90 m   | 66.8 a 89.9 kg                |
+| 1.95 m   | 70.4 a 94.7 kg                |
 
 Estos valores están redondeados a una decimal. Para calcular tu rango con más precisión, usa la [calculadora de IMC](/salud/calculadora-de-imc).
 

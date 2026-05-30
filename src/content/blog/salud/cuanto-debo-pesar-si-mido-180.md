@@ -2,7 +2,7 @@
 title: "Cuánto debo pesar si mido 1.80 m"
 seoTitle: "Cuánto debo pesar si mido 1.80 m: rango saludable"
 description: "Conoce el rango de peso saludable de referencia para una estatura de 1.80 m según el IMC adulto."
-pubDate: 2026-06-26
+pubDate: 2027-06-26
 categorySlug: "salud"
 tags:
   - peso saludable
@@ -21,8 +21,8 @@ Este rango es una guía inicial. No dice por sí solo si tu composición corpora
 ## Rango saludable para 1.80 m
 
 | Estatura | Peso mínimo por IMC 18.5 | Peso máximo por IMC 24.9 |
-|----------|--------------------------|--------------------------|
-| 1.80 m | 59.9 kg | 80.7 kg |
+| -------- | ------------------------ | ------------------------ |
+| 1.80 m   | 59.9 kg                  | 80.7 kg                  |
 
 Si tu peso está muy cerca de 80.7 kg, pequeñas diferencias de medición pueden mover el IMC alrededor del límite de 25.
 
@@ -42,11 +42,11 @@ altura^2 = 1.80 x 1.80 = 3.24
 
 ## Ejemplos de IMC
 
-| Peso | IMC aproximado | Lectura adulta |
-|------|----------------|----------------|
-| 60 kg | 18.5 | Límite inferior saludable |
-| 75 kg | 23.1 | Rango saludable |
-| 85 kg | 26.2 | Sobrepeso |
+| Peso  | IMC aproximado | Lectura adulta            |
+| ----- | -------------- | ------------------------- |
+| 60 kg | 18.5           | Límite inferior saludable |
+| 75 kg | 23.1           | Rango saludable           |
+| 85 kg | 26.2           | Sobrepeso                 |
 
 El resultado exacto puede variar por redondeo de peso y estatura.
 
@@ -80,4 +80,3 @@ Sí. Más masa muscular puede elevar el peso y el IMC sin representar necesariam
 
 - [CDC: Adult BMI Categories](https://www.cdc.gov/bmi/adult-calculator/bmi-categories.html)
 - [CDC: BMI Frequently Asked Questions](https://www.cdc.gov/bmi/faq/index.html)
-

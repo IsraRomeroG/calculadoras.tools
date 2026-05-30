@@ -2,7 +2,7 @@
 title: "CAT vs tasa en un crédito hipotecario"
 seoTitle: "CAT vs tasa hipotecaria: diferencias y cómo comparar créditos"
 description: "Entiende la diferencia entre tasa de interés y CAT en un crédito hipotecario, y por qué no conviene comparar solo la mensualidad."
-pubDate: 2026-06-01
+pubDate: 2026-05-31
 categorySlug: "inmuebles"
 tags:
   - cat
@@ -79,16 +79,16 @@ Por eso debes usarla como base de simulación, no como oferta vinculante.
 
 Para comparar ofertas, reúne los mismos datos de cada institución:
 
-| Dato | Por qué importa |
-|---|---|
-| Monto financiado | Debe ser igual para comparar bien |
-| Tasa anual | Afecta los intereses mensuales |
-| CAT | Resume costos bajo metodología oficial |
-| Plazo | Cambia mensualidad e intereses totales |
-| Seguros | Pueden aumentar el pago mensual |
-| Comisiones | Pueden aumentar el costo inicial o total |
-| Pago anticipado | Define flexibilidad para abonar a capital |
-| Total pagado | Muestra el costo acumulado |
+| Dato             | Por qué importa                           |
+| ---------------- | ----------------------------------------- |
+| Monto financiado | Debe ser igual para comparar bien         |
+| Tasa anual       | Afecta los intereses mensuales            |
+| CAT              | Resume costos bajo metodología oficial    |
+| Plazo            | Cambia mensualidad e intereses totales    |
+| Seguros          | Pueden aumentar el pago mensual           |
+| Comisiones       | Pueden aumentar el costo inicial o total  |
+| Pago anticipado  | Define flexibilidad para abonar a capital |
+| Total pagado     | Muestra el costo acumulado                |
 
 Después usa la [calculadora de hipoteca](/inmuebles/calculadora-de-hipoteca) para simular la parte de capital e intereses y compara ese resultado contra la cotización formal.
 

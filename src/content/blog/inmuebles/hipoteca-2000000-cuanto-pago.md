@@ -2,7 +2,7 @@
 title: "Hipoteca de $2,000,000: cuánto pago al mes"
 seoTitle: "Hipoteca de 2 millones: mensualidad, intereses y amortización"
 description: "Simula cuánto podrías pagar al mes por una hipoteca de $2,000,000 según la tasa, el plazo y los pagos extra."
-pubDate: 2026-06-02
+pubDate: 2027-06-02
 categorySlug: "inmuebles"
 tags:
   - hipoteca 2000000
@@ -34,11 +34,11 @@ Puedes ajustar este escenario en la [calculadora de hipoteca](/inmuebles/calcula
 
 Estos escenarios usan el mismo monto de préstamo: `$2,000,000`.
 
-| Tasa anual | Plazo | Cuota estimada | Total pagado | Intereses |
-|---:|---:|---:|---:|---:|
-| 8% | 15 años | $19,113.04 | $3,440,347.50 | $1,440,347.50 |
-| 9% | 20 años | $17,994.52 | $4,318,684.59 | $2,318,684.59 |
-| 10% | 25 años | $18,174.01 | $5,452,204.47 | $3,452,204.47 |
+| Tasa anual |   Plazo | Cuota estimada |  Total pagado |     Intereses |
+| ---------: | ------: | -------------: | ------------: | ------------: |
+|         8% | 15 años |     $19,113.04 | $3,440,347.50 | $1,440,347.50 |
+|         9% | 20 años |     $17,994.52 | $4,318,684.59 | $2,318,684.59 |
+|        10% | 25 años |     $18,174.01 | $5,452,204.47 | $3,452,204.47 |
 
 La mensualidad más baja no siempre significa menor costo total. El plazo largo puede reducir presión mensual, pero aumenta el tiempo durante el cual se generan intereses.
 
@@ -64,9 +64,9 @@ Si agregas `$2,000` extra al mes al escenario de `9%` a `20 años`, la cuota bas
 
 La estimación quedaría así:
 
-| Escenario | Duración | Intereses |
-|---|---:|---:|
-| Sin pago extra | 240 meses | $2,318,684.59 |
+| Escenario        |  Duración |     Intereses |
+| ---------------- | --------: | ------------: |
+| Sin pago extra   | 240 meses | $2,318,684.59 |
 | Con $2,000 extra | 186 meses | $1,711,832.41 |
 
 El ahorro aproximado sería de `$606,852.18` en intereses y `54` meses. Esto supone que el pago extra se aplica a capital.

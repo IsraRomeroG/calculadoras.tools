@@ -2,7 +2,7 @@
 title: "Hipoteca de $1,000,000: cuánto pago al mes"
 seoTitle: "Hipoteca de 1 millón: mensualidad, intereses y plazo"
 description: "Simula cuánto podrías pagar al mes por una hipoteca de $1,000,000 con distintos plazos y tasas."
-pubDate: 2026-06-15
+pubDate: 2027-06-15
 categorySlug: "inmuebles"
 tags:
   - hipoteca 1000000
@@ -30,11 +30,11 @@ El total pagado sería aproximadamente `$2,159,342.29`, con intereses estimados 
 
 ## Tabla de escenarios
 
-| Tasa anual | Plazo | Cuota estimada | Total pagado | Intereses |
-|---:|---:|---:|---:|---:|
-| 8% | 15 años | $9,556.52 | $1,720,173.75 | $720,173.75 |
-| 9% | 20 años | $8,997.26 | $2,159,342.29 | $1,159,342.29 |
-| 10% | 25 años | $9,087.01 | $2,726,102.24 | $1,726,102.24 |
+| Tasa anual |   Plazo | Cuota estimada |  Total pagado |     Intereses |
+| ---------: | ------: | -------------: | ------------: | ------------: |
+|         8% | 15 años |      $9,556.52 | $1,720,173.75 |   $720,173.75 |
+|         9% | 20 años |      $8,997.26 | $2,159,342.29 | $1,159,342.29 |
+|        10% | 25 años |      $9,087.01 | $2,726,102.24 | $1,726,102.24 |
 
 Observa que el escenario de 25 años tiene una cuota parecida al de 20 años, pero intereses mucho mayores.
 

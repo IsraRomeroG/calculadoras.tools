@@ -1,442 +1,713 @@
 # Especificación — Calculadora de Ovulación
 
-## Descripción general
-Herramienta para identificar los días fértiles y el día de ovulación
-dentro del ciclo menstrual. Es la calculadora previa natural a la
-de fecha probable de parto: la usa una mujer que está buscando
-quedarse embarazada, o que quiere conocer mejor su ciclo para
-planificación familiar natural.
+## Objetivo
+Herramienta para estimar la ventana fértil, la fecha probable de ovulación
+y el momento recomendado para hacer un test de embarazo, con un enfoque
+útil, empático y clínicamente prudente.
 
-Alto volumen de búsqueda constante durante todo el año con picos
-en enero (propósitos de año nuevo) y primavera. El perfil de usuario
-es predominantemente mujeres entre 25 y 38 años, frecuentemente
-acompañadas por su pareja, con una intención clara de concepción
-o de autoconocimiento del ciclo menstrual.
+La calculadora debe ayudar a personas que:
 
-El tono debe ser esperanzador, empático y clínicamente correcto.
-Esta calculadora toca temas de fertilidad que pueden estar
-cargados emocionalmente para muchas usuarias.
+- Buscan concebir y quieren identificar sus días con mayor probabilidad.
+- Quieren conocer mejor su ciclo menstrual.
+- Tienen ciclos variables y necesitan una estimación por rangos.
+
+La calculadora **no debe presentarse como método anticonceptivo**, no
+garantiza embarazo y no diagnostica problemas de fertilidad.
+
+---
+
+## Ruta e integración en el sitio
+
+La calculadora debe vivir en la categoría Salud.
+
+| Elemento | Valor |
+|----------|-------|
+| Archivo Astro | `src/pages/salud/calculadora-de-ovulacion.astro` |
+| URL canónica | `/salud/calculadora-de-ovulacion` |
+| Categoría | `salud` |
+| Registro | `src/lib/constants/calculators.ts` |
+| ID sugerido | `calculadora-de-ovulacion` |
+| Orden sugerido | `58`, después de fecha probable de parto o inmediatamente antes si se quiere ordenar por recorrido de usuaria |
+
+La spec anterior sugería `/calculadora-ovulacion` como URL principal. Esa
+ruta puede usarse en el futuro como redirección SEO, pero la canónica del
+producto debe seguir el patrón actual del repo: `/salud/...`.
+
+---
+
+## Alcance por fases
+
+### MVP recomendado
+
+1. Cálculo estándar por FUM y duración del ciclo.
+2. Modo de ciclo irregular por historial de inicios de menstruación o por
+   rango corto/largo.
+3. Resultado con nivel de confianza: alto, medio o bajo.
+4. Calendario visual del ciclo con leyenda accesible.
+5. Indicador de "dónde estás hoy" dentro del ciclo.
+6. Orientación sobre cuándo hacer test de embarazo.
+7. Guardado local opcional con botón explícito y opción de borrar datos.
+8. Copiar resumen del resultado.
+9. Avisos médicos y de uso responsable siempre visibles.
+
+### Fase 2
+
+1. Proyección de 3 a 6 ciclos.
+2. Registro avanzado de hasta 12 ciclos.
+3. Tendencia de ciclos que se alargan o acortan.
+4. Exportar a calendario.
+5. Compartir por WhatsApp, con texto neutral y privacidad clara.
+6. Guías extendidas sobre test LH, temperatura basal y moco cervical.
+
+---
+
+## Principios de producto
+
+### Qué debe aportar valor
+
+La calculadora no debe limitarse a decir "ovulas tal día". Debe responder:
+
+- Cuál es mi ventana fértil estimada.
+- Qué días tienen mayor probabilidad relativa.
+- Qué tan confiable es esta estimación.
+- Qué significa si mi ciclo es irregular.
+- Qué puedo observar para confirmar mejor la ovulación.
+- Cuándo tiene más sentido hacer un test de embarazo.
+- Cuándo conviene consultar con un profesional.
+
+### Tono
+
+Usar un tono claro, cálido y cuidadoso. Fertilidad puede ser un tema
+emocionalmente cargado para muchas personas.
+
+Usar:
+
+- "ventana fértil estimada"
+- "días con mayor probabilidad"
+- "puede ayudarte a orientar"
+- "si estás intentando concebir"
+- "consulta con tu ginecólogo, matrona o especialista si tienes dudas"
+
+Evitar:
+
+- Prometer embarazo.
+- Decir "día exacto" sin matices.
+- Culpar a la usuaria si no consigue embarazo.
+- Presentar porcentajes como predicciones personales.
+- Dar indicaciones médicas individualizadas.
+- Sugerir que sirve para evitar embarazo sin otro método.
+
+---
+
+## Avisos responsables obligatorios
+
+### Aviso principal
+
+> Esta calculadora ofrece una estimación basada en promedios del ciclo
+> menstrual. La ovulación puede variar de un ciclo a otro, incluso en ciclos
+> regulares. No reemplaza una valoración médica y no debe usarse como método
+> anticonceptivo.
+
+### Si la persona selecciona "evitar embarazo"
+
+Si se incluye un campo de intención y la persona elige "evitar embarazo",
+mostrar un aviso prominente:
+
+> Esta herramienta no es un método anticonceptivo. Si quieres evitar un
+> embarazo, usa un método anticonceptivo confiable y consulta con un
+> profesional de salud para elegir el más adecuado para ti.
+
+No bloquear el cálculo, pero sí evitar cualquier texto que pueda sonar a
+garantía de seguridad anticonceptiva.
+
+### Cuándo consultar
+
+Mostrar una nota contextual, especialmente en ciclos irregulares:
+
+> Si llevas 12 meses intentando concebir sin embarazo, o 6 meses si tienes
+> 35 años o más, considera consultar con un especialista en fertilidad. Si
+> tienes más de 40 años, ciclos muy irregulares, ausencia de menstruación,
+> sangrados inusuales, dolor pélvico importante, endometriosis conocida o
+> pérdidas gestacionales repetidas, conviene consultar antes.
 
 ---
 
 ## Conceptos base
 
-### El ciclo menstrual
-El ciclo menstrual se mide desde el primer día de la menstruación
-hasta el día anterior a la siguiente menstruación.
+### Ciclo menstrual
 
-- Ciclo promedio: **28 días** (rango normal: 21–35 días)
-- La duración puede variar mes a mes incluso en ciclos regulares
+El ciclo menstrual se mide desde el primer día de sangrado menstrual hasta
+el día anterior al inicio de la siguiente menstruación.
 
-### Las fases del ciclo
+En adultos, los ciclos de 21 a 35 días suelen considerarse dentro de un
+rango habitual. La herramienta puede permitir ciclos de 21 a 45 días para
+estimar casos más largos, pero debe mostrar advertencias cuando el ciclo
+esté fuera del rango 21 a 35.
 
-| Fase | Duración | Descripción |
-|------|----------|-------------|
-| Menstruación | Días 1–5 | Sangrado menstrual |
-| Fase folicular | Días 1–13 | Maduración del folículo |
-| Ovulación | Día 14 (en ciclo de 28) | Liberación del óvulo |
-| Fase lútea | Días 15–28 | Preparación del útero |
+### Ovulación
 
-### La ovulación
-- Ocurre aproximadamente **14 días antes** del inicio
-  de la siguiente menstruación (no 14 días después de la FUM).
-- El óvulo es viable durante **12–24 horas** tras la ovulación.
-- Los espermatozoides pueden sobrevivir **3–5 días** en el tracto
-  reproductivo femenino.
+- La ovulación ocurre aproximadamente 12 a 14 días antes del inicio de la
+  siguiente menstruación.
+- La fase lútea suele ser más estable que la fase folicular.
+- El valor por defecto de fase lútea será 14 días.
+- El rango avanzado permitido para fase lútea será 12 a 16 días.
+- Si se permite 10 a 16 días, 10 u 11 deben generar advertencia discreta.
 
-### La ventana fértil
-La combinación de la supervivencia del espermatozoide y la
-viabilidad del óvulo crea una ventana fértil de **5–6 días**:
-- **5 días antes** de la ovulación
-- **El día de la ovulación** (pico de fertilidad)
-- **1 día después** de la ovulación
+### Ventana fértil
 
-### Fase lútea
-- Duración relativamente constante: **12–16 días**
-- Promedio: **14 días**
-- Esto significa que la ovulación varía según la longitud
-  del ciclo, pero la fase lútea es casi siempre la misma
+La ventana fértil principal debe mostrarse como:
 
-### Fórmula de cálculo
-Día de ovulación = FUM + (duración_ciclo − 14 días)
+- Los 5 días antes de la ovulación estimada.
+- El día de la ovulación estimada.
 
-**Ejemplos:**
-- Ciclo 28 días: ovulación día 14 (FUM + 14)
-- Ciclo 30 días: ovulación día 16 (FUM + 16)
-- Ciclo 35 días: ovulación día 21 (FUM + 21)
-- Ciclo 24 días: ovulación día 10 (FUM + 10)
+El día posterior a la ovulación puede mostrarse como **margen de observación
+por incertidumbre del cálculo**, no como pico fértil principal. Esto evita
+convertir un margen útil en una promesa clínica.
+
+### Viabilidad
+
+- Los espermatozoides pueden sobrevivir hasta 5 días en condiciones fértiles.
+- El óvulo suele ser viable unas 12 a 24 horas tras la ovulación.
+- La ovulación real puede moverse por estrés, enfermedad, sueño, cambios de
+  peso, lactancia, medicamentos, anticonceptivos hormonales recientes,
+  síndrome de ovario poliquístico, perimenopausia u otros factores.
 
 ---
 
-## Casos de uso (modos de cálculo)
+## Modelo de cálculo
 
-### Modo 1 — Cálculo estándar de días fértiles
-> La mujer sabe cuándo fue su última menstruación.
-> Quiere saber cuándo será su próxima ovulación.
+### Fechas civiles
 
-**Inputs:**
-- Fecha de inicio de la última menstruación (FUM) → ej. 01/04/2026
-- Duración del ciclo (días) → ej. 28 días
-- Duración de la menstruación (días) → ej. 5 días (opcional)
+Usar fechas civiles, no instantes UTC. Para evitar errores por zona horaria:
 
-**Cálculo:**
-Día de ovulación = 01/04/2026 + (28 − 14) = **15 de abril de 2026**
-Ventana fértil inicio = 15/04/2026 − 5 = **10 de abril de 2026**
-Ventana fértil fin = 15/04/2026 + 1 = **16 de abril de 2026**
-Próxima menstruación estimada = 01/04/2026 + 28 = **29 de abril de 2026**
+- Preferir `Temporal.PlainDate` si el proyecto lo soporta.
+- Si se usa `Date`, construir fechas al mediodía local o usar helpers
+  consistentes tipo `date-fns`.
+- No calcular con strings ambiguos `MM/DD/YYYY`.
+- Mostrar fechas en español, base `es-MX`.
 
-**Output principal:**
-- 🥚 Día de ovulación estimado: **miércoles, 15 de abril de 2026**
-- 💚 Días más fértiles: **10 al 16 de abril de 2026**
-- 📅 Próxima menstruación estimada: **29 de abril de 2026**
+### Cálculo estándar
 
-**Output secundario — desglose de la ventana fértil:**
+Inputs:
 
-| Día | Fecha | Fertilidad | Descripción |
-|-----|-------|-----------|-------------|
-| Día 10 | 10 abr | 🟡 Baja-media | Inicio ventana fértil |
-| Día 11 | 11 abr | 🟡 Media | Fertilidad creciente |
-| Día 12 | 12 abr | 🟠 Alta | Alta probabilidad |
-| Día 13 | 13 abr | 🔴 Muy alta | Pico previo |
-| Día 14 | 14 abr | 🔴 Muy alta | Pico previo |
-| **Día 15** | **15 abr** | **🔴 Máxima** | **Día de ovulación** |
-| Día 16 | 16 abr | 🟡 Decreciente | Último día fértil |
-| Día 17+ | 17 abr+ | ⚪ Muy baja | Fase lútea |
+- Fecha de inicio de la última menstruación (FUM).
+- Duración habitual del ciclo.
+- Duración de la menstruación.
+- Fase lútea opcional avanzada, por defecto 14 días.
 
----
+Fórmulas:
 
-### Modo 2 — Proyección de varios ciclos
-> La mujer quiere planificar con más de un mes de antelación
-> o ha estado intentando concebir durante varios ciclos.
+```text
+proxima_menstruacion = FUM + duracion_ciclo
+ovulacion_estimada = proxima_menstruacion - fase_lutea
+ventana_fertil_inicio = ovulacion_estimada - 5 dias
+ventana_fertil_fin = ovulacion_estimada
+margen_observacion_fin = ovulacion_estimada + 1 dia
+```
 
-**Inputs:**
-- FUM → ej. 01/04/2026
-- Duración del ciclo → ej. 28 días
-- Número de ciclos a proyectar → ej. 3 ciclos (1–6)
+Importante para implementación:
 
-**Output — calendario de 3 ciclos:**
+Si FUM es el día 1 del ciclo, la etiqueta "día del ciclo" se calcula como:
 
-| Ciclo | Menstruación | Ovulación | Ventana fértil |
-|-------|-------------|-----------|----------------|
-| Ciclo 1 | 01–05 abr 2026 | 15 abr | 10–16 abr 2026 |
-| Ciclo 2 | 29 abr–03 may 2026 | 13 may | 08–14 may 2026 |
-| Ciclo 3 | 27–31 may 2026 | 10 jun | 05–11 jun 2026 |
+```text
+dia_del_ciclo = diferencia_en_dias(fecha, FUM) + 1
+```
 
-- Vista de calendario visual con colores:
-  🔴 Menstruación · 🟢 Ventana fértil · ⭐ Ovulación
+Ejemplo: FUM 1 de abril, ciclo de 28 días, fase lútea de 14 días:
+
+- Próxima menstruación estimada: 29 de abril.
+- Ovulación estimada: 15 de abril.
+- Esa fecha cae en el día 15 del ciclo si se cuenta FUM como día 1.
+
+No mezclar "FUM + 14 días" con la etiqueta "día 14" sin revisar este
+desfase. En contenido educativo puede decirse "alrededor de la mitad del
+ciclo", pero el calendario debe ser consistente.
 
 ---
 
-### Modo 3 — Con ciclo irregular
-> La mujer tiene ciclos irregulares y quiere
-> una estimación basada en el rango de su ciclo.
+## Modos de cálculo
 
-**Inputs:**
-- FUM → ej. 01/04/2026
-- Ciclo más corto de los últimos 6 meses → ej. 25 días
-- Ciclo más largo de los últimos 6 meses → ej. 32 días
+### Modo 1 — Cálculo estándar
 
-**Cálculo:**
-Ovulación más temprana = FUM + (ciclo_corto − 14) = FUM + 11 = **12 abr**
-Ovulación más tardía = FUM + (ciclo_largo − 14) = FUM + 18 = **19 abr**
-Ventana fértil ampliada = **7 al 20 de abril**
+Caso:
 
-**Output:**
-- Ventana fértil estimada: **7 al 20 de abril de 2026**
-- Días de máxima probabilidad: **12 al 19 de abril**
-- Nota: "Con ciclos irregulares la ventana fértil es más amplia
-  y menos predecible. Los test de ovulación (LH) pueden
-  ayudarte a confirmar el momento exacto."
+> La persona conoce el primer día de su última menstruación y su ciclo suele
+> tener una duración parecida.
 
----
+Inputs:
 
-### Modo 4 — Calculadora de fase lútea
-> Para mujeres que ya han detectado su ovulación
-> (con test LH o temperatura basal) y quieren saber
-> cuándo esperar su menstruación o hacer un test de embarazo.
+| Campo | Tipo | Rango | Defecto |
+|-------|------|-------|---------|
+| FUM | Date picker | No futura; idealmente última menstruación real | Sin defecto |
+| Duración del ciclo | Slider + número | 21 a 45 días | 28 |
+| Duración menstruación | Número | 2 a 10 días | 5 |
+| Fase lútea avanzada | Número | 12 a 16 días | 14 |
+| Intención | Selector opcional | Concebir / conocer ciclo / evitar embarazo | Concebir |
 
-**Inputs:**
-- Fecha detectada de ovulación → ej. 15/04/2026
-- Duración habitual de la fase lútea → ej. 14 días (rango 12–16)
+Output principal:
 
-**Output:**
-- Próxima menstruación estimada: **29 de abril de 2026**
-- Desde cuándo puede dar positivo un test:
-  **Día 25–27 de abril** (10–12 días post ovulación)
-- Día óptimo para hacer el test de embarazo:
-  **29 de abril de 2026** (primer día de retraso)
-- Si la menstruación no llega el 29 de abril:
-  "Considera hacer un test de embarazo ese día."
+- Ventana fértil estimada: 10 al 15 de abril de 2026.
+- Ovulación estimada: miércoles, 15 de abril de 2026.
+- Días de mayor probabilidad relativa: 13 al 15 de abril de 2026.
+- Margen de observación: 16 de abril de 2026.
+- Próxima menstruación estimada: miércoles, 29 de abril de 2026.
+- Confianza del cálculo: media.
 
----
+Mensaje:
 
-### Modo 5 — Registro y seguimiento de ciclos
-> La mujer registra sus ciclos mes a mes y la calculadora
-> aprende el patrón para hacer predicciones más precisas.
+> Esta estimación asume una fase lútea de 14 días y un ciclo de 28 días.
+> La ovulación real puede variar algunos días.
 
-**Inputs (registro histórico):**
-- Hasta 12 ciclos anteriores con fecha de inicio
-- Duración de cada ciclo (calculada automáticamente)
+Desglose sugerido:
 
-**Procesamiento:**
-- Promedio de ciclos registrados
-- Desviación estándar (variabilidad)
-- Tendencia (ciclos que se alargan o acortan)
+| Relación con ovulación | Fecha | Nivel | Mensaje |
+|------------------------|-------|-------|---------|
+| O - 5 | 10 abr | Baja-media | Inicio de ventana fértil estimada |
+| O - 4 | 11 abr | Media | Fertilidad creciente |
+| O - 3 | 12 abr | Media-alta | Buen momento para intentar concebir |
+| O - 2 | 13 abr | Alta | Uno de los días con mayor probabilidad |
+| O - 1 | 14 abr | Muy alta | Pico previo probable |
+| O | 15 abr | Muy alta | Ovulación estimada |
+| O + 1 | 16 abr | Margen bajo | Margen por incertidumbre, no pico principal |
 
-**Output:**
-- Ciclo promedio: **29.3 días** (basado en 6 ciclos)
-- Variabilidad: **±2 días**
-- Predicción próxima ovulación: **17 de abril** (±2 días)
-- Predicción próxima menstruación: **1 de mayo** (±2 días)
-- Nota: "Con más registros las predicciones mejoran.
-  Agrega al menos 3 ciclos para mayor precisión."
+### Modo 2 — Ciclo irregular por historial
 
-> Datos guardados en localStorage del navegador.
-> Sin cuenta, sin backend.
+Caso:
 
----
+> La persona tiene ciclos variables y puede ingresar fechas de inicio de
+> menstruación anteriores.
 
-## Inputs detallados
+Inputs MVP:
 
-| Campo | Tipo | Rango válido | Valor por defecto |
-|-------|------|-------------|-------------------|
-| Fecha FUM | Date picker | Hasta 45 días atrás | — |
-| Duración del ciclo | Numérico + Slider | 21 – 45 días | 28 días |
-| Duración menstruación | Numérico | 2 – 10 días | 5 días |
-| Ciclo más corto (Modo 3) | Numérico | 21 – 44 días | — |
-| Ciclo más largo (Modo 3) | Numérico | 22 – 45 días | — |
-| Fecha ovulación detectada | Date picker | Últimos 30 días | — |
-| Duración fase lútea | Numérico | 10 – 16 días | 14 días |
-| Ciclos a proyectar | Selector | 1 – 6 | 3 |
-| Formato de fecha | Selector | DD/MM/AAAA / MM/DD/AAAA | Según locale |
+- FUM actual.
+- Fechas de inicio de 3 a 6 menstruaciones anteriores.
+- Duración de menstruación opcional.
 
----
+Procesamiento:
 
-## Feature — Calendario visual del ciclo
-Representación visual del ciclo menstrual completo
-en formato de calendario mensual.
+- Ordenar fechas de inicio.
+- Calcular duración de cada ciclo como diferencia entre inicios consecutivos.
+- Calcular mínimo, máximo, promedio y variabilidad.
+- Si hay menos de 3 ciclos, mostrar confianza baja o pedir más datos.
 
-**Código de colores:**
-- 🔴 Rojo: días de menstruación
-- 🟢 Verde claro: ventana fértil
-- ⭐ Estrella: día de ovulación (máxima fertilidad)
-- ⚪ Gris: días de baja fertilidad (fase lútea)
-- 📅 Borde azul: día de hoy
+Fórmulas:
 
-**Interactividad:**
-- Al hacer clic en cualquier día del calendario,
-  mostrar tooltip con: fase del ciclo, nivel de fertilidad
-  y descripción breve.
-- Navegación entre meses si se proyectan varios ciclos.
+```text
+ciclo_corto = minimo(ciclos_registrados)
+ciclo_largo = maximo(ciclos_registrados)
+ovulacion_temprana = FUM + ciclo_corto - fase_lutea
+ovulacion_tardia = FUM + ciclo_largo - fase_lutea
+ventana_fertil_inicio = ovulacion_temprana - 5 dias
+ventana_fertil_fin = ovulacion_tardia
+margen_observacion_fin = ovulacion_tardia + 1 dia
+```
 
----
+Output:
 
-## Feature — Indicador de dónde estás hoy
-Si la FUM es reciente, mostrar prominentemente
-en qué punto del ciclo está la usuaria hoy:
+- Ventana fértil estimada: 7 al 19 de abril de 2026.
+- Margen de observación: hasta el 20 de abril de 2026.
+- Ovulación estimada entre: 12 y 19 de abril de 2026.
+- Ciclo promedio: 29.3 días.
+- Variabilidad: ±2 días.
+- Confianza del cálculo: baja/media/alta según datos.
 
-📍 Hoy (25 de abril) estás en el día 25 de tu ciclo
-[============================|=======]
-Día 1                 Día 25   Día 28
-FUM          Fase lútea ↑      Próx. regla
-Estado: Fase lútea · Fertilidad muy baja
-Próxima ovulación: en 17 días (12 de mayo)
-Próxima menstruación: en 3 días (29 de abril)
+Mensaje:
 
----
+> Con ciclos variables, la ventana fértil se amplía porque la ovulación es
+> menos predecible. Los test de ovulación (LH), el moco cervical y la
+> temperatura basal pueden ayudarte a confirmar mejor el momento.
 
-## Feature — Síntomas de ovulación (guía informativa)
-Sección educativa que ayuda a la usuaria a confirmar
-la ovulación con señales físicas:
+### Modo 3 — Ciclo irregular por rango corto/largo
 
-| Señal | Descripción | Momento del ciclo |
-|-------|-------------|------------------|
-| Moco cervical | Transparente, elástico (tipo clara de huevo) | 2–3 días antes de ovulación |
-| Dolor de Mittelschmerz | Leve dolor en un lado del abdomen | Día de ovulación |
-| Temperatura basal (BBT) | Sube 0.2–0.5°C después de ovular | Día después de ovulación |
-| Test LH (OPK) | Pico de LH 24–36h antes de ovular | 1–2 días antes |
-| Sensibilidad en senos | Leve sensibilidad | Tras la ovulación |
-| Aumento de libido | Frecuente en días fértiles | Días previos a ovulación |
+Caso:
 
-CTA: "Combinar esta calculadora con test de ovulación
-(OPK) mejora significativamente la precisión."
+> La persona no quiere ingresar fechas, pero conoce el ciclo más corto y el
+> más largo de los últimos meses.
 
----
+Inputs:
 
-## Feature — Probabilidades de concepción por día
-Mostrar la probabilidad estimada de concepción
-para cada día de la ventana fértil según estudios clínicos:
+| Campo | Tipo | Rango |
+|-------|------|-------|
+| FUM | Date picker | No futura |
+| Ciclo más corto | Número | 21 a 44 |
+| Ciclo más largo | Número | 22 a 45 |
 
-| Días antes de ovulación | Probabilidad estimada |
-|------------------------|----------------------|
-| 5 días antes | ~10% |
-| 4 días antes | ~14% |
-| 3 días antes | ~16% |
-| 2 días antes | ~27% |
-| 1 día antes | ~31% |
-| Día de ovulación | ~33% |
-| 1 día después | ~5% |
-| 2+ días después | < 1% |
+Reglas:
 
-Fuente: Wilcox et al. (New England Journal of Medicine, 1995)
-Nota: "Estas probabilidades son por ciclo y para parejas
-sin problemas de fertilidad conocidos."
+- Si ciclo corto y ciclo largo son iguales, tratar como ciclo regular.
+- Si ciclo corto > ciclo largo, mostrar error.
+- Si la diferencia entre corto y largo es mayor a 7 días, confianza baja.
+
+### Modo 4 — Por ovulación detectada
+
+Caso:
+
+> La persona ya detectó ovulación con test LH, temperatura basal, moco
+> cervical o seguimiento clínico.
+
+Inputs:
+
+- Fecha de ovulación detectada.
+- Fuente: test LH, temperatura basal, moco cervical, ecografía, otra.
+- Duración de fase lútea habitual, por defecto 14 días.
+
+Output:
+
+- Próxima menstruación estimada.
+- Cuándo hacer test de embarazo.
+- Cuántos días post ovulación han pasado hoy.
+- Nivel de confianza según fuente:
+  - Ecografía o seguimiento clínico: alta.
+  - Temperatura basal confirmada: media-alta.
+  - Test LH: media, porque anticipa ovulación pero no la confirma por sí solo.
+  - Moco cervical: media/baja según regularidad.
 
 ---
 
-## Feature — Cuándo hacer el test de embarazo
-Orientación sobre el momento óptimo para realizar
-el test, basado en la fecha de ovulación calculada:
+## Nivel de confianza
 
-🧪 ¿Cuándo hacer el test de embarazo?
-Demasiado pronto → resultado poco fiable
-Momento óptimo  → primer día de retraso (29 de abril)
-Con test sensible → desde el 25 de abril (10 días post-ovulación)
-💡 Consejo: Hacer el test con la primera orina de la mañana
-aumenta la concentración de hCG y mejora la precisión.
+Mostrar siempre una etiqueta de confianza junto al resultado.
+
+### Alta
+
+Condiciones sugeridas:
+
+- Hay al menos 3 ciclos registrados.
+- Variabilidad de ciclos menor o igual a 3 días.
+- Ciclos dentro de 21 a 35 días.
+- FUM reciente y coherente con el ciclo declarado.
+
+Mensaje:
+
+> Buena estimación si tus ciclos recientes siguen este patrón. Aun así, la
+> ovulación puede moverse algunos días.
+
+### Media
+
+Condiciones sugeridas:
+
+- La persona solo declaró una duración habitual.
+- No hay historial suficiente.
+- Variabilidad de 4 a 7 días.
+- Ciclo entre 21 y 35 días, pero sin confirmación.
+
+Mensaje:
+
+> Estimación orientativa. Puedes mejorar la precisión registrando varios
+> ciclos o usando test LH y señales físicas.
+
+### Baja
+
+Condiciones sugeridas:
+
+- Ciclo menor a 21 o mayor a 35 días.
+- Diferencia entre ciclo corto y largo mayor a 7 días.
+- FUM muy antigua o incoherente.
+- Menstruaciones ausentes o muy espaciadas.
+- Datos incompletos o contradictorios.
+
+Mensaje:
+
+> Con estos datos la ovulación es menos predecible. Usa este resultado como
+> rango amplio y considera consultar si tus ciclos son muy irregulares o si
+> estás intentando concebir desde hace varios meses.
 
 ---
 
-## Feature — Compartir ventana fértil
-Para parejas que quieren coordinar:
+## Indicador de dónde estás hoy
 
-💚 Mi ventana fértil
-📅 Días más fértiles: 10 al 16 de abril de 2026
-🥚 Día de ovulación: 15 de abril de 2026
-📆 Próxima regla estimada: 29 de abril de 2026
+Si la fecha actual cae dentro del ciclo estimado, mostrar:
+
+```text
+Hoy estás en el día 25 de tu ciclo estimado.
+Fase probable: fase lútea.
+Fertilidad estimada: baja.
+Próxima menstruación estimada: en 3 días.
+```
+
+Si hoy ya pasó la próxima menstruación estimada:
+
+```text
+Tu menstruación estimada era el 29 de abril.
+Si tu ciclo suele ser regular y aún no ha llegado, puede ser buen momento
+para hacer un test de embarazo. Si el test es negativo y la menstruación no
+llega, repite en unos días o consulta con un profesional.
+```
+
+Si la FUM guardada es antigua:
+
+```text
+Los datos guardados parecen pertenecer a un ciclo anterior. Actualiza la
+fecha de tu última menstruación para recalcular.
+```
+
+---
+
+## Calendario visual
+
+Debe representar el ciclo menstrual completo y, si hay modo irregular, el
+rango de fechas estimado.
+
+### Leyenda
+
+No depender solo de color. Cada tipo de día debe tener color, texto y
+atributo accesible.
+
+| Tipo | Visual | Etiqueta accesible |
+|------|--------|--------------------|
+| Menstruación | Rojo suave | Día de menstruación estimada |
+| Ventana fértil principal | Verde | Ventana fértil estimada |
+| Ovulación estimada | Marca destacada | Ovulación estimada |
+| Margen de observación | Verde tenue o punteado | Margen por incertidumbre |
+| Baja fertilidad estimada | Gris | Fertilidad estimada baja |
+| Hoy | Borde o anillo | Hoy |
+
+### Interacción
+
+- Tooltip o panel al seleccionar un día.
+- Soporte teclado para moverse entre días.
+- `aria-label` con fecha, fase y nivel.
+- No usar solo emojis como información.
+- Mantener dimensiones estables para evitar saltos de layout.
+
+---
+
+## Probabilidad de concepción por día
+
+Esta sección puede ser diferencial, pero debe presentarse con mucho cuidado.
+
+Recomendación de UI:
+
+- Usar "probabilidad relativa estimada" o "referencia poblacional".
+- Mostrar barras o niveles, no solo porcentajes exactos.
+- Aclarar que no predice la probabilidad individual de una persona o pareja.
+
+Tabla orientativa basada en Wilcox et al.:
+
+| Relación con ovulación | Referencia aproximada | Nivel UI |
+|------------------------|-----------------------|----------|
+| 5 días antes | ~10% | Baja-media |
+| 4 días antes | ~14% | Media |
+| 3 días antes | ~16% | Media |
+| 2 días antes | ~27% | Alta |
+| 1 día antes | ~31% | Muy alta |
+| Día de ovulación | ~33% | Muy alta |
+| 1 día después | Muy baja / margen | No pico principal |
+| 2+ días después | Cercana a cero | Baja |
+
+Nota obligatoria:
+
+> Estos porcentajes son referencias de estudios poblacionales y no una
+> predicción personal. La probabilidad real depende de edad, salud, semen,
+> frecuencia de relaciones, momento real de ovulación y otros factores.
+
+No sumar los porcentajes. No presentarlos como "probabilidad del ciclo" para
+la usuaria.
+
+---
+
+## Cuándo hacer test de embarazo
+
+Basar la orientación en la ovulación estimada y en la próxima menstruación
+estimada.
+
+Output recomendado:
+
+- Primer día de retraso estimado: 29 de abril de 2026.
+- Momento más fiable para test casero: desde el primer día de retraso.
+- Test sensible: puede detectar antes, alrededor de 10 a 12 días post
+  ovulación, pero un negativo temprano no descarta embarazo.
+- Si no sabes cuándo debía llegar tu menstruación: hacer test al menos 21
+  días después de la relación sexual sin protección.
+
+Mensaje:
+
+> Si haces el test antes del retraso y sale negativo, puede ser demasiado
+> pronto. Repite en unos días si la menstruación no llega.
+
+Sobre primera orina:
+
+> La primera orina de la mañana puede ayudar en pruebas tempranas porque
+> suele estar más concentrada. Después del primer día de retraso, muchos tests
+> pueden usarse a cualquier hora si sigues las instrucciones del fabricante.
+
+---
+
+## Guardado local y privacidad
+
+El guardado debe ser explícito, no automático.
+
+### Datos guardables
+
+- FUM.
+- Duración habitual del ciclo.
+- Duración de menstruación.
+- Fechas históricas de inicio de menstruación si la persona las agrega.
+- Preferencia de modo.
+
+### UI requerida
+
+- Botón: "Guardar en este dispositivo".
+- Botón: "Borrar datos guardados".
+- Texto visible:
+
+> Tus datos se guardan solo en este navegador mediante almacenamiento local.
+> No se crea cuenta y no se envían a un servidor.
+
+### Reglas
+
+- No guardar datos hasta que la usuaria lo pida.
+- Al cargar datos antiguos, detectar si la FUM parece pertenecer a un ciclo
+  pasado y pedir actualización.
+- No incluir datos sensibles en URLs compartidas.
+
+---
+
+## Compartir y copiar
+
+### MVP
+
+Botón "Copiar resumen" con texto plano:
+
+```text
+Mi ventana fértil estimada: 10 al 15 de abril de 2026
+Ovulación estimada: 15 de abril de 2026
+Próxima menstruación estimada: 29 de abril de 2026
 Calculado en calculadoras.tools
+```
 
-Botón "Compartir en WhatsApp" con texto preformateado.
+### Fase 2
 
----
-
-## Validaciones de inputs
-
-| Regla | Detalle |
-|-------|---------|
-| FUM no futura | Error: "La fecha de inicio no puede ser futura" |
-| FUM hace más de 45 días | Advertencia: "Han pasado más de 45 días. ¿Es correcta la fecha?" |
-| Ciclo entre 21 y 45 días | Fuera de rango: error con sugerencia de consultar médico |
-| Ciclo corto < ciclo largo (Modo 3) | Error si el ciclo corto es mayor que el largo |
-| Duración menstruación > ciclo | Error lógico: la menstruación no puede durar más que el ciclo |
-| Fase lútea entre 10 y 16 días | Fuera de rango: advertencia |
-| Campos vacíos | Bloquear cálculo y resaltar campo faltante |
+WhatsApp puede agregarse después, pero el texto debe ser neutral y evitar
+datos excesivos. No compartir historial de ciclos.
 
 ---
 
-## Tono y tratamiento responsable del tema
+## Validaciones
 
-La fertilidad es un tema cargado emocionalmente.
-Muchas usuarias pueden llevar meses o años intentando concebir.
-
-✅ **Usar:**
-- Lenguaje esperanzador y neutral: "días fértiles", "ventana de concepción"
-- Énfasis claro en que es una estimación, no una garantía
-- Recordatorios amables de consultar con ginecólogo o especialista
-- Reconocer implícitamente que el proceso puede ser largo
-- Información clínicamente correcta con fuentes
-
-❌ **Evitar:**
-- Promesas de embarazo o lenguaje que genere expectativas irreales
-- Frases que impliquen que "si no funciona es tu culpa"
-- Lenguaje excesivamente técnico o clínico que genere ansiedad
-- Minimizar la complejidad de la fertilidad humana
-- Dar consejos médicos específicos sobre infertilidad
-
-**Aviso especial para usuarias con ciclos muy irregulares:**
-"Los ciclos muy irregulares pueden dificultar la predicción
-de la ovulación. Si llevas más de 12 meses intentando
-concebir (o 6 meses si tienes más de 35 años), te
-recomendamos consultar con un especialista en fertilidad."
+| Regla | Tipo | Mensaje |
+|-------|------|---------|
+| FUM futura | Error | La fecha de inicio no puede ser futura. |
+| FUM muy antigua | Advertencia | Esta fecha parece pertenecer a un ciclo anterior. Actualiza tu FUM si ya tuviste otra menstruación. |
+| Ciclo menor a 21 | Error o advertencia fuerte | Los ciclos menores a 21 días pueden requerir orientación médica. |
+| Ciclo 21 a 35 | Válido | Sin advertencia. |
+| Ciclo 36 a 45 | Advertencia | Los ciclos largos pueden hacer menos precisa la predicción. |
+| Ciclo mayor a 45 | Error | Ingresa un ciclo entre 21 y 45 días o consulta con un profesional si tus ciclos son más largos. |
+| Menstruación menor a 2 o mayor a 10 | Error | Revisa la duración de la menstruación. |
+| Menstruación mayor a 7 | Advertencia | Sangrados de más de 7 días pueden ameritar consulta si son habituales. |
+| Menstruación mayor que ciclo | Error | La menstruación no puede durar más que el ciclo completo. |
+| Ciclo corto mayor que largo | Error | El ciclo más corto no puede ser mayor que el ciclo más largo. |
+| Variación mayor a 7 días | Advertencia | Con ciclos variables, la ventana fértil es más amplia y menos predecible. |
+| Campos requeridos vacíos | Error | Completa los campos necesarios para calcular. |
+| Intención evitar embarazo | Advertencia fuerte | Esta calculadora no es un método anticonceptivo. |
 
 ---
 
-## Formato de outputs
+## Casos extremos
 
-| Tipo de resultado | Formato |
-|-------------------|---------|
-| Día de ovulación | Formato largo → "miércoles, 15 de abril de 2026" |
-| Ventana fértil | Rango → "10 al 16 de abril de 2026" |
-| Próxima menstruación | Formato largo → "miércoles, 29 de abril de 2026" |
-| Probabilidades | Porcentaje entero → "~31%" |
-| Ciclos proyectados | Tabla con filas por ciclo |
-| Día actual del ciclo | Número entero → "Día 25 de tu ciclo" |
+### Ciclo de 21 días
 
----
+- Próxima menstruación: FUM + 21 días.
+- Ovulación estimada: FUM + 7 días.
+- La ventana fértil puede iniciar muy cerca de la menstruación.
+- Mostrar nota de ciclo corto y baja/mediana confianza si no hay historial.
 
-## Features adicionales
+### Ciclo de 45 días
 
-### Cálculo instantáneo
-- El resultado aparece automáticamente al completar
-  la fecha y la duración del ciclo, sin botón de calcular.
+- Próxima menstruación: FUM + 45 días.
+- Ovulación estimada: FUM + 31 días.
+- Mostrar nota de ciclo largo y menor precisión.
 
-### Slider de duración del ciclo
-- Slider visual de 21 a 45 días.
-- Al moverlo, el calendario y todos los outputs
-  se actualizan en tiempo real.
-- Muestra el día de ovulación cambiando en tiempo real.
+### FUM hace más tiempo que el ciclo declarado
 
-### Botón de copiar resultado
-- Copia el resumen de la ventana fértil en texto plano.
+Si `hoy > proxima_menstruacion_estimada`:
 
-### Guardar mi ciclo
-- Guardar FUM y duración del ciclo en localStorage.
-- Al volver al sitio, recordar los datos y recalcular
-  automáticamente con la fecha actual.
-- Botón: "Guardar mi ciclo en este dispositivo"
+- Indicar que la menstruación estimada ya debió llegar.
+- Sugerir actualizar FUM si ya hubo sangrado.
+- Si no llegó y el ciclo suele ser regular, orientar sobre test de embarazo.
 
-### Aviso médico siempre visible
-- "Esta calculadora es una herramienta de apoyo basada
-  en promedios. Los ciclos menstruales varían naturalmente.
-  Para un seguimiento preciso de tu fertilidad consulta
-  con tu ginecólogo o matrona."
+### Ciclo corto = ciclo largo
 
----
+Tratar como ciclo regular con ese valor exacto.
 
-## Calculadoras relacionadas (enlaces contextuales)
+### Fase lútea corta
 
-| Situación | Enlace sugerido |
-|-----------|----------------|
-| Embarazo confirmado | → Fecha probable de parto |
-| Quiere saber semanas de gestación | → Semanas de gestación |
-| Quiere calcular su IMC | → Calculadora de IMC |
-| Ciclo muy irregular | → Nota de consultar especialista |
-| Quiere calcular TDEE en embarazo | → Calculadora de TDEE |
+Si fase lútea es 10 u 11 días:
+
+- Calcular correctamente.
+- Mostrar nota:
+
+> Si tu fase lútea suele ser menor de 12 días, coméntalo con tu profesional
+> de salud, especialmente si estás intentando concebir.
+
+### Factores que reducen precisión
+
+Mostrar nota si aplica o incluir en contenido educativo:
+
+- Postparto o lactancia.
+- Uso reciente o actual de anticonceptivos hormonales.
+- Síndrome de ovario poliquístico.
+- Perimenopausia.
+- Estrés intenso, cambios de peso o ejercicio extremo.
+- Enfermedad reciente.
+- Ciclos ausentes o muy irregulares.
 
 ---
 
-## SEO y contenido de la página
+## SEO
 
-### Meta información
-- Title: "Calculadora de Ovulación — Días Fértiles y Ciclo Menstrual"
-- Description: "Calcula tu día de ovulación y ventana fértil al instante.
-  Conoce tus días más fértiles del mes con el calendario de ciclo
-  menstrual. Gratis y sin registro."
+### Meta
 
-### URLs sugeridas
-- /calculadora-ovulacion (principal)
-- /dias-fertiles-calculadora
-- /cuando-ovulo
-- /calendario-menstrual
-- /ventana-fertil-calculadora
+Title:
 
-### Preguntas frecuentes (FAQ — para rich snippets)
+> Calculadora de ovulación - días fértiles y ciclo menstrual
+
+Description:
+
+> Calcula tu ventana fértil estimada, día probable de ovulación y próxima
+> menstruación. Incluye calendario del ciclo, modo irregular y guía para test
+> de embarazo.
+
+Canonical:
+
+> `/salud/calculadora-de-ovulacion`
+
+### Keywords principales
+
+- calculadora de ovulación
+- días fértiles
+- ventana fértil
+- calendario menstrual
+- cuándo ovulo
+- calculadora días fértiles
+
+### FAQs
+
 - ¿Cómo sé cuándo voy a ovular?
-- ¿Cuántos días antes de la ovulación puedo quedar embarazada?
-- ¿Qué es la ventana fértil?
-- ¿Cómo afecta la duración del ciclo al día de ovulación?
-- ¿Es posible ovular durante la menstruación?
-- ¿Qué síntomas indican que estoy ovulando?
-- ¿Cuándo es el mejor momento para hacer un test de embarazo?
-- ¿Por qué mi ciclo es irregular?
+- ¿Cuántos días dura la ventana fértil?
+- ¿Puedo quedar embarazada fuera de la ventana fértil?
+- ¿Por qué mi ovulación cambia de fecha?
+- ¿La calculadora sirve si tengo ciclos irregulares?
+- ¿Sirve como método anticonceptivo?
+- ¿Cuándo es mejor hacer un test de embarazo?
+- ¿Qué tan confiables son los test de ovulación LH?
+- ¿Cuándo debería consultar si estoy intentando concebir?
 
-### Contenido de apoyo
-- Explicación de las fases del ciclo menstrual con infografía.
-- Guía: "¿Cómo usar los test de ovulación (OPK)?"
-- Tabla de día de ovulación según duración del ciclo
-  (precalculada para ciclos de 21 a 35 días).
-- Artículo: "Mitos y verdades sobre los días fértiles."
-- Diferencia entre temperatura basal y test de ovulación.
+Agregar FAQ JSON-LD como en las otras páginas del sitio.
+
+---
+
+## Calculadoras relacionadas
+
+| Situación | Enlace |
+|-----------|--------|
+| Embarazo confirmado | `/salud/fecha-probable-de-parto` |
+| Quiere revisar IMC | `/salud/calculadora-de-imc` |
+| Quiere calcular calorías diarias | `/salud/calculadora-de-calorias-diarias-tdee` |
+| Quiere calcular macros | `/salud/calculadora-de-macros` |
+
+El enlace a fecha probable de parto debe aparecer después del bloque de test
+de embarazo y en calculadoras relacionadas.
 
 ---
 
@@ -444,59 +715,73 @@ recomendamos consultar con un especialista en fertilidad."
 
 | Parámetro | Detalle |
 |-----------|---------|
-| Plataforma | Web responsive (mobile-first) |
-| Sin backend | Todo el cálculo ocurre en el cliente (JS) |
-| Manejo de fechas | date-fns o Temporal API |
-| Calendario visual | Generado con JS + CSS Grid nativo |
-| Slider duración ciclo | Input range nativo con actualización en tiempo real |
-| Guardar ciclo | localStorage del navegador |
-| Compartir WhatsApp | API WhatsApp Web |
-| Accesibilidad | Labels, roles ARIA en calendario, soporte teclado |
-| URL principal | /calculadora-ovulacion |
-| Idioma | Español; nombres de días y meses en español |
-| Locale | es-MX base; adaptar según país del usuario |
+| Plataforma | Astro + JS cliente |
+| Backend | No |
+| Persistencia | `localStorage`, solo con consentimiento explícito |
+| Fechas | `Temporal.PlainDate`, `date-fns` o helpers propios de fecha civil |
+| Locale | `es-MX` por defecto |
+| Calendario | CSS Grid nativo |
+| Accesibilidad | Labels, `aria-label`, soporte teclado, leyenda textual |
+| Resultado | Actualización instantánea al completar campos válidos |
+| Copiar | Clipboard API con fallback |
+| Compartir WhatsApp | Fase 2 |
 
 ---
 
-## Diferencias clave vs Calculadora de Fecha Probable de Parto
+## Pruebas recomendadas
 
-| Aspecto | Calculadora de Ovulación | Fecha probable de parto |
-|---------|-------------------------|------------------------|
-| Momento de uso | Antes / durante búsqueda de embarazo | Después de confirmar embarazo |
-| Objetivo principal | Identificar días fértiles | Saber cuándo nace el bebé |
-| Horizonte temporal | Próximos 1–6 ciclos (semanas) | 40 semanas completas |
-| Output central | Ventana fértil + ovulación | FPP + semanas de gestación |
-| Probabilidades | ✅ Por día de la ventana fértil | ❌ No aplica |
-| Calendario visual | ✅ Del ciclo mensual | ❌ De hitos del embarazo |
-| Hitos del bebé | ❌ No aplica | ✅ Semana a semana |
-| Test de embarazo | ✅ Cuándo hacerlo | ❌ No aplica |
-| Tono | Esperanzador / práctico | Celebratorio / informativo |
-| Usuario típico | Mujer buscando concebir | Mujer ya embarazada |
-| Vinculación natural | → FPP (si hay embarazo) | ← Ovulación (antes) |
+### Unitarias
+
+- Ciclo 28, FUM 2026-04-01, fase lútea 14:
+  - próxima menstruación 2026-04-29
+  - ovulación 2026-04-15
+  - ventana fértil 2026-04-10 a 2026-04-15
+- Ciclo 21.
+- Ciclo 45.
+- Año bisiesto.
+- Cambio de mes y cambio de año.
+- Ciclo irregular con historial de 3 a 6 fechas.
+- Ciclo corto igual a ciclo largo.
+- FUM futura.
+- FUM antigua.
+- Cálculo del día del ciclo con conteo inclusivo.
+- Test de embarazo antes, en y después del primer día de retraso.
+- Guardar, cargar y borrar `localStorage`.
+
+### UI
+
+- Mobile y desktop.
+- Calendario sin solapamientos.
+- Textos largos dentro de botones y tarjetas.
+- Navegación por teclado.
+- Contraste suficiente.
+- Resultados no dependen solo de color.
 
 ---
 
-## Casos extremos a contemplar
+## Fuentes base para contenido médico
 
-- Ciclo de 21 días → ovulación en día 7 (FUM + 7);
-  ventana fértil desde día 2, casi solapada con menstruación;
-  mostrar nota explicativa de ciclo corto
-- Ciclo de 45 días → ovulación en día 31; ventana fértil
-  muy tardía; mostrar nota sobre ciclo largo
-- FUM hace más de 35 días con ciclo de 28 → ya debería
-  haber llegado la menstruación; advertencia amable:
-  "Si tu ciclo es regular y aún no ha llegado tu regla,
-  podría ser momento de hacer un test de embarazo."
-- Ciclo corto = ciclo largo en Modo 3 → tratar como
-  ciclo regular con ese valor exacto
-- Proyectar 6 ciclos con ciclo de 45 días → el calendario
-  abarca más de 8 meses; paginar correctamente
-- Fase lútea de 10 días (defecto de fase lútea) → calcular
-  correctamente y añadir nota discreta sobre consultar médico
-- Guardar ciclo en localStorage y volver después de 2 meses →
-  detectar que la FUM guardada es antigua, sugerir actualizar
-  con la FUM más reciente
-- Usuaria ingresa duración menstruación mayor que ventana
-  fértil calculada → advertencia visual pero sin bloquear
-- Cambio de idioma / locale → adaptar nombres de días
-  y meses sin recalcular los valores
+Usar estas fuentes como base editorial y para validar mensajes:
+
+- Office on Women's Health: ovulation calculator y límites de estimación.
+- ASRM: optimización de fertilidad natural y frecuencia durante ventana fértil.
+- CDC: infertilidad, edad y cuándo consultar.
+- NHS: cuándo hacer test de embarazo.
+- FDA: precisión de test de embarazo y primera orina.
+- ACOG: ciclos menstruales, fertilidad y evaluación de infertilidad.
+- Wilcox et al., New England Journal of Medicine, 1995: probabilidades
+  poblacionales según relación con ovulación.
+
+---
+
+## Diferencia clave frente a fecha probable de parto
+
+| Aspecto | Ovulación | Fecha probable de parto |
+|---------|-----------|-------------------------|
+| Momento | Antes o durante búsqueda de embarazo | Después de embarazo confirmado |
+| Objetivo | Estimar ventana fértil | Estimar FPP y semanas de gestación |
+| Resultado central | Ventana fértil + confianza | FPP + progreso del embarazo |
+| Precisión | Variable, depende del ciclo | Mejor si hay ecografía/FPP oficial |
+| Riesgo de uso indebido | Anticoncepción o promesas de concepción | Ansiedad por fecha exacta de parto |
+| Tono | Esperanzador, neutral, práctico | Cálido, informativo, cuidadoso |
+

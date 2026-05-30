@@ -2,7 +2,7 @@
 title: "Cuánto debo pesar si mido 1.55 m"
 seoTitle: "Cuánto debo pesar si mido 1.55 m: rango saludable"
 description: "Conoce el rango de peso saludable de referencia para una estatura de 1.55 m según el IMC adulto."
-pubDate: 2026-06-21
+pubDate: 2027-06-21
 categorySlug: "salud"
 tags:
   - peso saludable
@@ -21,8 +21,8 @@ El dato sirve para orientarte, no para diagnosticar tu salud ni definir un objet
 ## Rango saludable para 1.55 m
 
 | Estatura | Peso mínimo por IMC 18.5 | Peso máximo por IMC 24.9 |
-|----------|--------------------------|--------------------------|
-| 1.55 m | 44.4 kg | 59.8 kg |
+| -------- | ------------------------ | ------------------------ |
+| 1.55 m   | 44.4 kg                  | 59.8 kg                  |
 
 Si tu peso está dentro de ese intervalo, tu IMC caería en el rango saludable adulto. Si está fuera, conviene interpretar el resultado junto con otros factores.
 
@@ -49,11 +49,11 @@ Con 1.55 m:
 
 ## Ejemplos de IMC con pesos cercanos
 
-| Peso | IMC aproximado | Lectura adulta |
-|------|----------------|----------------|
-| 44 kg | 18.3 | Límite bajo |
-| 52 kg | 21.6 | Rango saludable |
-| 60 kg | 25.0 | Límite de sobrepeso |
+| Peso  | IMC aproximado | Lectura adulta      |
+| ----- | -------------- | ------------------- |
+| 44 kg | 18.3           | Límite bajo         |
+| 52 kg | 21.6           | Rango saludable     |
+| 60 kg | 25.0           | Límite de sobrepeso |
 
 Estos valores están redondeados. El resultado exacto puede cambiar por décimas.
 
@@ -87,4 +87,3 @@ La fórmula adulta del IMC no cambia, aunque la interpretación individual puede
 
 - [CDC: Adult BMI Categories](https://www.cdc.gov/bmi/adult-calculator/bmi-categories.html)
 - [CDC: BMI Frequently Asked Questions](https://www.cdc.gov/bmi/faq/index.html)
-

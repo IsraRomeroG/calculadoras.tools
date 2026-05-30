@@ -2,7 +2,7 @@
 title: "Hipoteca de $1,500,000: cuánto pago al mes"
 seoTitle: "Hipoteca de 1.5 millones: mensualidad, intereses y plazo"
 description: "Simula cuánto podrías pagar al mes por una hipoteca de $1,500,000 con distintos plazos y tasas."
-pubDate: 2026-06-16
+pubDate: 2027-06-16
 categorySlug: "inmuebles"
 tags:
   - hipoteca 1500000
@@ -30,11 +30,11 @@ El total pagado sería aproximadamente `$3,239,013.44`, con intereses de `$1,739
 
 ## Tabla de escenarios
 
-| Tasa anual | Plazo | Cuota estimada | Total pagado | Intereses |
-|---:|---:|---:|---:|---:|
-| 8% | 15 años | $14,334.78 | $2,580,260.63 | $1,080,260.63 |
-| 9% | 20 años | $13,495.89 | $3,239,013.44 | $1,739,013.44 |
-| 10% | 25 años | $13,630.51 | $4,089,153.35 | $2,589,153.35 |
+| Tasa anual |   Plazo | Cuota estimada |  Total pagado |     Intereses |
+| ---------: | ------: | -------------: | ------------: | ------------: |
+|         8% | 15 años |     $14,334.78 | $2,580,260.63 | $1,080,260.63 |
+|         9% | 20 años |     $13,495.89 | $3,239,013.44 | $1,739,013.44 |
+|        10% | 25 años |     $13,630.51 | $4,089,153.35 | $2,589,153.35 |
 
 El escenario de 25 años mantiene una cuota parecida al de 20 años, pero suma más intereses por la duración del crédito.
 

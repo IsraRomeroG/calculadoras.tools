@@ -2,7 +2,7 @@
 title: "Cómo interpretar tu resultado de IMC"
 seoTitle: "Cómo interpretar el IMC: categoría, rango y limitaciones"
 description: "Aprende a leer tu resultado de IMC, qué significa cada categoría y qué limitaciones debes considerar."
-pubDate: 2026-05-30
+pubDate: 2026-06-01
 categorySlug: "salud"
 tags:
   - imc
@@ -28,12 +28,12 @@ IMC = peso en kg / altura en m^2
 
 Después se compara con rangos adultos:
 
-| IMC | Categoría adulta |
-|-----|------------------|
-| Menos de 18.5 | Bajo peso |
-| 18.5 a 24.9 | Rango saludable |
-| 25.0 a 29.9 | Sobrepeso |
-| 30.0 o más | Obesidad |
+| IMC           | Categoría adulta |
+| ------------- | ---------------- |
+| Menos de 18.5 | Bajo peso        |
+| 18.5 a 24.9   | Rango saludable  |
+| 25.0 a 29.9   | Sobrepeso        |
+| 30.0 o más    | Obesidad         |
 
 Si tu resultado es 25.35, por ejemplo, cae en sobrepeso. Si es 22.0, cae dentro del rango saludable. Si es 17.8, cae en bajo peso.
 

@@ -2,7 +2,7 @@
 title: "Pagos extra en una hipoteca: cómo ahorrar intereses"
 seoTitle: "Abono a capital en hipoteca: pagos extra, plazo e intereses"
 description: "Conoce cómo los pagos extra pueden reducir capital, acortar el plazo de una hipoteca y ahorrar intereses."
-pubDate: 2026-05-31
+pubDate: 2026-06-05
 categorySlug: "inmuebles"
 tags:
   - pagos extra
@@ -55,10 +55,10 @@ Sin pago extra, el crédito dura `240` meses y el total de intereses estimado es
 
 Si agregas `$2,000` extra al mes:
 
-| Escenario | Meses reales | Intereses estimados |
-|---|---:|---:|
-| Sin pago extra | 240 | $2,318,684.59 |
-| Con $2,000 extra | 186 | $1,711,832.41 |
+| Escenario        | Meses reales | Intereses estimados |
+| ---------------- | -----------: | ------------------: |
+| Sin pago extra   |          240 |       $2,318,684.59 |
+| Con $2,000 extra |          186 |       $1,711,832.41 |
 
 En este ejemplo, el pago extra reduce la duración aproximada a `15 años 6 meses`, ahorra `54` meses y baja intereses en cerca de `$606,852.18`.
 
