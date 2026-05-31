@@ -12,6 +12,7 @@ export const CATEGORY_SLUGS = [
   "matematicas",
   "salud",
   "fecha-tiempo",
+  "conversores",
 ] as const;
 
 export type CategorySlug = (typeof CATEGORY_SLUGS)[number];
@@ -55,6 +56,12 @@ export const CATEGORIES = {
       "Herramientas para calcular edades, intervalos, cumpleaños y fechas importantes con claridad.",
     legacySlugs: ["fecha-y-tiempo"],
   },
+  conversores: {
+    slug: "conversores",
+    label: "Conversores",
+    description:
+      "Conversores rápidos para transformar unidades cotidianas con resultados claros y referencias útiles.",
+  },
 } as const satisfies Record<CategorySlug, CategoryMetadata>;
 
 export const isCategorySlug = (slug: string): slug is CategorySlug =>
@@ -75,4 +82,3 @@ export const getCategoryBySlugOrLegacySlug = (slug: string) =>
 
 export const getCategoryLegacySlugs = (slug: CategorySlug) =>
   CATEGORIES[slug].legacySlugs ?? [];
-

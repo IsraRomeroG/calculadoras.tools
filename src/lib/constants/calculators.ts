@@ -124,4 +124,13 @@ export const CALCULATORS: CalculatorDirectoryItem[] = [
     categorySlug: "fecha-tiempo",
     order: 62,
   },
+  {
+    id: "conversor-de-temperatura",
+    title: "Conversor de temperatura",
+    description:
+      "Convierte temperaturas entre Celsius, Fahrenheit y Kelvin con fórmula y referencias prácticas.",
+    href: "/conversores/conversor-de-temperatura",
+    categorySlug: "conversores",
+    order: 65,
+  },
 ];

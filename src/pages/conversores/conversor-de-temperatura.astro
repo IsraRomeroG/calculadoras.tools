@@ -1,0 +1,824 @@
+---
+import BaseLayout from "@layouts/BaseLayout.astro";
+import Container from "@components/layout/Container.astro";
+import PageShell from "@components/layout/PageShell.astro";
+import FaqSection from "@components/shared/FaqSection.astro";
+import PageHero from "@components/shared/PageHero.astro";
+import SectionIntro from "@components/shared/SectionIntro.astro";
+import {
+  TEMPERATURE_SCALE_METADATA,
+  type TemperatureScale,
+} from "@lib/calculators/temperature";
+import { buildFaqJsonLd } from "@lib/seo";
+
+const title = "Conversor de temperatura °C a °F y Kelvin";
+const description =
+  "Convierte temperaturas entre Celsius, Fahrenheit y Kelvin al instante. Consulta fórmulas, equivalencias y referencias prácticas para clima, cocina y ciencia.";
+const canonical = "/conversores/conversor-de-temperatura";
+
+const faqs = [
+  {
+    question: "¿Cómo convertir Celsius a Fahrenheit?",
+    answer:
+      "Multiplica los grados Celsius por 9/5 y suma 32. Por ejemplo, 20 °C equivalen a 68 °F.",
+  },
+  {
+    question: "¿Cómo convertir Fahrenheit a Celsius?",
+    answer:
+      "Resta 32 a los grados Fahrenheit y multiplica el resultado por 5/9. Por ejemplo, 68 °F equivalen a 20 °C.",
+  },
+  {
+    question: "¿Cuánto es 37 grados Celsius en Fahrenheit?",
+    answer:
+      "37 °C equivalen a 98.6 °F. Es una referencia habitual para temperatura corporal, aunque el valor normal puede variar según la persona y el método de medición.",
+  },
+  {
+    question: "¿Cuánto es 100 °F en Celsius?",
+    answer: "100 °F equivalen aproximadamente a 37.78 °C.",
+  },
+  {
+    question: "¿Cuál es el cero absoluto en Celsius?",
+    answer:
+      "El cero absoluto equivale a -273.15 °C, 0 K o -459.67 °F. Es la temperatura mínima teórica.",
+  },
+  {
+    question: "¿Por qué Kelvin no usa el símbolo de grado?",
+    answer:
+      "Kelvin es la unidad base de temperatura termodinámica del Sistema Internacional. Su símbolo es K, sin el signo de grado.",
+  },
+  {
+    question: "¿A qué temperatura Celsius y Fahrenheit son iguales?",
+    answer: "Las dos escalas coinciden en -40: -40 °C equivalen a -40 °F.",
+  },
+  {
+    question: "¿Cuánto es 180 °C en un horno Fahrenheit?",
+    answer: "180 °C equivalen a 356 °F.",
+  },
+];
+
+const faqJsonLd = buildFaqJsonLd(faqs);
+
+const primaryScales: TemperatureScale[] = ["c", "f", "k"];
+const advancedScales: TemperatureScale[] = ["r", "re"];
+
+const shortcuts = [
+  { label: "100 °F en Celsius", value: "100", from: "f", to: "c", result: "37.78 °C" },
+  { label: "37 °C en Fahrenheit", value: "37", from: "c", to: "f", result: "98.6 °F" },
+  { label: "180 °C en Fahrenheit", value: "180", from: "c", to: "f", result: "356 °F" },
+  { label: "350 °F en Celsius", value: "350", from: "f", to: "c", result: "176.67 °C" },
+  { label: "0 °C en Fahrenheit", value: "0", from: "c", to: "f", result: "32 °F" },
+  { label: "200 °C en Fahrenheit", value: "200", from: "c", to: "f", result: "392 °F" },
+  { label: "98.6 °F en Celsius", value: "98.6", from: "f", to: "c", result: "37 °C" },
+  { label: "72 °F en Celsius", value: "72", from: "f", to: "c", result: "22.22 °C" },
+  { label: "-40 °C en Fahrenheit", value: "-40", from: "c", to: "f", result: "-40 °F" },
+];
+---
+
+<BaseLayout title={title} description={description} canonical={canonical}>
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={JSON.stringify(faqJsonLd)} />
+  </Fragment>
+
+  <PageShell>
+    <PageHero
+      title="Conversor de temperatura"
+      description="Convierte Celsius, Fahrenheit y Kelvin al instante. Consulta la fórmula, copia resultados y revisa referencias prácticas."
+      kicker="Conversores"
+      collapseBreadcrumbOnMobile
+      containerClass="py-6 md:py-8"
+      breadcrumbs={[
+        { label: "Inicio", href: "/", ariaLabel: "Inicio" },
+        { label: "Conversores", href: "/conversores", optional: true },
+        { label: "Temperatura", truncate: true },
+      ]}
+    />
+
+    <Container as="section" class="py-6 md:py-8">
+      <section
+        id="temperature-converter"
+        class="overflow-hidden rounded-lg border border-gray-700 bg-gray-950 shadow-xl shadow-gray-950/30"
+        aria-labelledby="calculator-heading"
+      >
+        <div class="grid gap-0 lg:grid-cols-[minmax(0,1fr)_minmax(19rem,0.78fr)]">
+          <div class="p-4 sm:p-6">
+            <p class="text-sm font-semibold text-amber-300">Conversión rápida</p>
+            <h2 id="calculator-heading" class="mt-2 text-2xl font-semibold">
+              ¿Qué temperatura quieres convertir?
+            </h2>
+            <p class="mt-2 text-sm leading-relaxed text-gray-400">
+              Escribe un valor con punto o coma decimal. También puedes pegar
+              valores como <span class="text-gray-200">37 °C</span>.
+            </p>
+
+            <div class="mt-6">
+              <label for="temperature-value" class="block text-sm font-semibold text-gray-200">
+                Temperatura
+              </label>
+              <div
+                class="mt-2 flex rounded-lg border border-gray-700 bg-gray-900 focus-within:border-amber-400 focus-within:ring-3 focus-within:ring-amber-400/15"
+              >
+                <input
+                  id="temperature-value"
+                  class="min-h-14 w-full bg-transparent px-4 text-xl text-white outline-none placeholder:text-gray-600"
+                  type="text"
+                  inputmode="decimal"
+                  autocomplete="off"
+                  placeholder="Ej. 37 o 98,6 °F"
+                  aria-describedby="temperature-error"
+                  data-temperature-input
+                />
+                <span class="flex items-center px-4 text-sm text-gray-500" data-input-symbol>
+                  °C
+                </span>
+              </div>
+              <p
+                id="temperature-error"
+                class="mt-2 hidden text-sm text-red-300"
+                data-temperature-error
+              >
+              </p>
+            </div>
+
+            <div class="mt-5 grid gap-4 sm:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] sm:items-end">
+              <div>
+                <label for="temperature-origin" class="block text-sm font-medium text-gray-200">
+                  Desde
+                </label>
+                <select
+                  id="temperature-origin"
+                  class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-900 px-4 text-base text-white outline-none transition focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15"
+                  data-origin-select
+                >
+                  {
+                    [...primaryScales, ...advancedScales].map((scale) => (
+                      <option value={scale}>
+                        {TEMPERATURE_SCALE_METADATA[scale].label} ({TEMPERATURE_SCALE_METADATA[scale].symbol})
+                      </option>
+                    ))
+                  }
+                </select>
+              </div>
+
+              <button
+                class="min-h-12 rounded-lg border border-gray-700 bg-gray-900 px-4 text-lg font-semibold text-amber-300 transition hover:border-amber-400 hover:bg-gray-800 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/30"
+                type="button"
+                aria-label="Intercambiar escalas de origen y destino"
+                title="Intercambiar escalas"
+                data-swap-scales
+              >
+                ⇄
+              </button>
+
+              <div>
+                <label for="temperature-destination" class="block text-sm font-medium text-gray-200">
+                  Hacia
+                </label>
+                <select
+                  id="temperature-destination"
+                  class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-900 px-4 text-base text-white outline-none transition focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15"
+                  data-destination-select
+                >
+                  {
+                    [...primaryScales, ...advancedScales].map((scale) => (
+                      <option value={scale} selected={scale === "f"}>
+                        {TEMPERATURE_SCALE_METADATA[scale].label} ({TEMPERATURE_SCALE_METADATA[scale].symbol})
+                      </option>
+                    ))
+                  }
+                </select>
+              </div>
+            </div>
+
+            <div class="mt-5 flex flex-wrap items-end gap-3">
+              <div>
+                <label for="temperature-decimals" class="block text-sm font-medium text-gray-200">
+                  Decimales
+                </label>
+                <select
+                  id="temperature-decimals"
+                  class="mt-2 min-h-11 rounded-lg border border-gray-700 bg-gray-900 px-3 text-sm text-white outline-none transition focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15"
+                  data-decimals-select
+                >
+                  <option value="0">0</option>
+                  <option value="1">1</option>
+                  <option value="2" selected>2</option>
+                  <option value="3">3</option>
+                </select>
+              </div>
+              <button
+                class="min-h-11 rounded-lg border border-gray-700 px-4 py-2 text-sm font-semibold text-gray-200 transition hover:border-gray-500 hover:bg-gray-900 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-gray-400/30"
+                type="button"
+                data-clear-calculator
+              >
+                Limpiar
+              </button>
+            </div>
+          </div>
+
+          <aside class="border-t border-gray-800 bg-gray-900/65 p-4 sm:p-6 lg:border-l lg:border-t-0">
+            <p class="text-xs font-semibold uppercase tracking-wide text-gray-500">
+              Resultado principal
+            </p>
+            <p class="mt-3 min-h-10 text-3xl font-semibold text-amber-100" data-main-result>
+              Ingresa una temperatura
+            </p>
+            <p class="mt-3 min-h-5 text-sm leading-relaxed text-gray-400" data-result-note>
+              Verás la equivalencia destacada y el resto de escalas.
+            </p>
+            <button
+              class="mt-4 hidden min-h-11 rounded-lg bg-amber-400 px-4 py-2 text-sm font-semibold text-gray-950 transition hover:bg-amber-300 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-300/40"
+              type="button"
+              data-copy-main
+            >
+              Copiar resultado
+            </button>
+            <p class="sr-only" aria-live="polite" data-live-status></p>
+            <p class="mt-3 min-h-5 text-sm text-emerald-300" aria-live="polite" data-copy-status></p>
+          </aside>
+        </div>
+
+        <div class="border-t border-gray-800 p-4 sm:p-6">
+          <div class="grid gap-6 lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)]">
+            <div>
+              <h3 class="text-lg font-semibold">Todas las equivalencias</h3>
+              <div class="mt-3 overflow-hidden rounded-lg border border-gray-800">
+                <table class="w-full text-left text-sm">
+                  <thead class="bg-gray-900 text-xs uppercase tracking-wide text-gray-500">
+                    <tr>
+                      <th class="px-4 py-3 font-semibold">Escala</th>
+                      <th class="px-4 py-3 text-right font-semibold">Valor</th>
+                      <th class="px-4 py-3 text-right font-semibold"><span class="sr-only">Acción</span></th>
+                    </tr>
+                  </thead>
+                  <tbody class="divide-y divide-gray-800 bg-gray-950">
+                    {
+                      primaryScales.map((scale) => (
+                        <tr>
+                          <th class="px-4 py-3 font-medium text-gray-300">
+                            {TEMPERATURE_SCALE_METADATA[scale].label}
+                          </th>
+                          <td class="px-4 py-3 text-right font-semibold text-white" data-output={scale}>
+                            -
+                          </td>
+                          <td class="px-4 py-3 text-right">
+                            <button
+                              class="hidden rounded-md px-2 py-1 text-xs font-semibold text-amber-300 transition hover:bg-amber-400/10 hover:text-amber-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400/40"
+                              type="button"
+                              data-copy-scale={scale}
+                            >
+                              Copiar
+                            </button>
+                          </td>
+                        </tr>
+                      ))
+                    }
+                  </tbody>
+                </table>
+              </div>
+
+              <details class="mt-3 rounded-lg border border-gray-800 bg-gray-950">
+                <summary class="cursor-pointer px-4 py-3 text-sm font-semibold text-gray-200">
+                  Escalas avanzadas: Rankine y Réaumur
+                </summary>
+                <div class="border-t border-gray-800">
+                  <table class="w-full text-left text-sm">
+                    <tbody class="divide-y divide-gray-800">
+                      {
+                        advancedScales.map((scale) => (
+                          <tr>
+                            <th class="px-4 py-3 font-medium text-gray-300">
+                              {TEMPERATURE_SCALE_METADATA[scale].label}
+                            </th>
+                            <td class="px-4 py-3 text-right font-semibold text-white" data-output={scale}>
+                              -
+                            </td>
+                            <td class="px-4 py-3 text-right">
+                              <button
+                                class="hidden rounded-md px-2 py-1 text-xs font-semibold text-amber-300 transition hover:bg-amber-400/10 hover:text-amber-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400/40"
+                                type="button"
+                                data-copy-scale={scale}
+                              >
+                                Copiar
+                              </button>
+                            </td>
+                          </tr>
+                        ))
+                      }
+                    </tbody>
+                  </table>
+                </div>
+              </details>
+            </div>
+
+            <div>
+              <h3 class="text-lg font-semibold">Fórmula utilizada</h3>
+              <div class="mt-3 rounded-lg border border-gray-800 bg-gray-900/70 p-4">
+                <p class="text-sm leading-relaxed text-gray-200" data-formula>
+                  La fórmula aparecerá cuando ingreses una temperatura.
+                </p>
+                <details class="mt-3 hidden" data-procedure-panel>
+                  <summary class="cursor-pointer text-sm font-semibold text-amber-300">
+                    Ver procedimiento
+                  </summary>
+                  <ol class="mt-3 space-y-2 text-sm leading-relaxed text-gray-400" data-procedure-list></ol>
+                </details>
+              </div>
+              <p class="mt-3 text-xs leading-relaxed text-gray-500">
+                El cálculo conserva precisión interna completa y redondea solo
+                el valor mostrado.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+    </Container>
+
+    <Container as="section" class="py-6 md:py-8">
+      <SectionIntro
+        title="Conversiones frecuentes"
+        description="Usa un atajo para cargar el conversor con equivalencias habituales de clima, cocina y salud."
+      />
+      <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        {
+          shortcuts.map((shortcut) => (
+            <button
+              class="rounded-lg border border-gray-800 bg-gray-950 p-4 text-left transition hover:border-amber-400/60 hover:bg-gray-900 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/30"
+              type="button"
+              data-shortcut-value={shortcut.value}
+              data-shortcut-from={shortcut.from}
+              data-shortcut-to={shortcut.to}
+            >
+              <span class="block text-sm font-semibold text-white">{shortcut.label}</span>
+              <span class="mt-2 block text-sm text-amber-300">{shortcut.result}</span>
+            </button>
+          ))
+        }
+      </div>
+    </Container>
+
+    <Container as="section" class="py-6 md:py-8">
+      <SectionIntro
+        title="Referencias prácticas"
+        description="Estas tablas sirven como orientación rápida. La conversión numérica no cambia según el contexto."
+      />
+      <div class="grid gap-5 lg:grid-cols-2">
+        <article class="rounded-lg border border-gray-800 bg-gray-950 p-5">
+          <h3 class="text-lg font-semibold">Clima</h3>
+          <p class="mt-2 text-sm leading-relaxed text-gray-400">
+            La sensación real también depende de humedad, viento, sol y actividad.
+          </p>
+          <div class="mt-4 overflow-hidden rounded-lg border border-gray-800">
+            <table class="w-full text-left text-sm">
+              <thead class="bg-gray-900 text-xs uppercase text-gray-500">
+                <tr><th class="px-3 py-2">°C</th><th class="px-3 py-2">°F</th><th class="px-3 py-2">Referencia</th></tr>
+              </thead>
+              <tbody class="divide-y divide-gray-800 text-gray-300">
+                <tr><td class="px-3 py-2">&lt; 0</td><td class="px-3 py-2">&lt; 32</td><td class="px-3 py-2">Bajo cero</td></tr>
+                <tr><td class="px-3 py-2">0 a 10</td><td class="px-3 py-2">32 a 50</td><td class="px-3 py-2">Frío</td></tr>
+                <tr><td class="px-3 py-2">15 a 25</td><td class="px-3 py-2">59 a 77</td><td class="px-3 py-2">Templado</td></tr>
+                <tr><td class="px-3 py-2">≥ 30</td><td class="px-3 py-2">≥ 86</td><td class="px-3 py-2">Caluroso</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </article>
+
+        <article class="rounded-lg border border-gray-800 bg-gray-950 p-5">
+          <h3 class="text-lg font-semibold">Cocina y horno</h3>
+          <p class="mt-2 text-sm leading-relaxed text-gray-400">
+            Referencias habituales de horno; pueden variar según la receta y el equipo.
+          </p>
+          <div class="mt-4 overflow-hidden rounded-lg border border-gray-800">
+            <table class="w-full text-left text-sm">
+              <thead class="bg-gray-900 text-xs uppercase text-gray-500">
+                <tr><th class="px-3 py-2">°C</th><th class="px-3 py-2">°F</th><th class="px-3 py-2">Uso</th></tr>
+              </thead>
+              <tbody class="divide-y divide-gray-800 text-gray-300">
+                <tr><td class="px-3 py-2">120</td><td class="px-3 py-2">250</td><td class="px-3 py-2">Horno bajo</td></tr>
+                <tr><td class="px-3 py-2">175</td><td class="px-3 py-2">350</td><td class="px-3 py-2">Moderado</td></tr>
+                <tr><td class="px-3 py-2">200</td><td class="px-3 py-2">400</td><td class="px-3 py-2">Alto</td></tr>
+                <tr><td class="px-3 py-2">230</td><td class="px-3 py-2">450</td><td class="px-3 py-2">Muy alto</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </article>
+
+        <article class="rounded-lg border border-gray-800 bg-gray-950 p-5">
+          <h3 class="text-lg font-semibold">Seguridad alimentaria</h3>
+          <p class="mt-2 text-sm leading-relaxed text-gray-400">
+            Temperaturas internas mínimas de referencia publicadas por
+            <a class="text-amber-300 hover:underline" href="https://www.fsis.usda.gov/safetempchart" rel="noreferrer">USDA FSIS</a>.
+          </p>
+          <ul class="mt-4 space-y-3 text-sm leading-relaxed text-gray-300">
+            <li><strong class="text-white">Cortes enteros de res y cerdo:</strong> 63 °C / 145 °F, con 3 minutos de reposo.</li>
+            <li><strong class="text-white">Carne molida:</strong> 71 °C / 160 °F.</li>
+            <li><strong class="text-white">Aves:</strong> 74 °C / 165 °F.</li>
+          </ul>
+        </article>
+
+        <article class="rounded-lg border border-gray-800 bg-gray-950 p-5">
+          <h3 class="text-lg font-semibold">Salud</h3>
+          <p class="mt-2 text-sm leading-relaxed text-gray-400">
+            La temperatura corporal normal varía según la persona, edad, hora
+            del día y método de medición. Este conversor no diagnostica fiebre.
+          </p>
+          <p class="mt-4 rounded-lg border border-red-400/25 bg-red-400/10 p-3 text-sm leading-relaxed text-red-100">
+            Una temperatura corporal inferior a 35 °C / 95 °F puede indicar
+            hipotermia y requiere atención médica urgente.
+          </p>
+        </article>
+
+        <article class="rounded-lg border border-gray-800 bg-gray-950 p-5 lg:col-span-2">
+          <h3 class="text-lg font-semibold">Ciencia</h3>
+          <div class="mt-4 grid gap-3 text-sm sm:grid-cols-2 lg:grid-cols-3">
+            <p class="rounded-lg bg-gray-900 p-3 text-gray-300"><strong class="text-white">0 K</strong><br />-273.15 °C, cero absoluto</p>
+            <p class="rounded-lg bg-gray-900 p-3 text-gray-300"><strong class="text-white">77.15 K</strong><br />-196 °C, nitrógeno líquido aproximado</p>
+            <p class="rounded-lg bg-gray-900 p-3 text-gray-300"><strong class="text-white">194.65 K</strong><br />-78.5 °C, hielo seco aproximado</p>
+            <p class="rounded-lg bg-gray-900 p-3 text-gray-300"><strong class="text-white">273.15 K</strong><br />0 °C, fusión del hielo</p>
+            <p class="rounded-lg bg-gray-900 p-3 text-gray-300"><strong class="text-white">373.15 K</strong><br />100 °C, ebullición del agua a presión estándar</p>
+            <p class="rounded-lg bg-gray-900 p-3 text-gray-300"><strong class="text-white">-40 °C</strong><br />-40 °F, ambas escalas coinciden</p>
+          </div>
+        </article>
+      </div>
+    </Container>
+
+    <Container as="section" class="py-6 md:py-8">
+      <SectionIntro
+        title="Fórmulas principales"
+        description="Las conversiones se calculan con precisión completa y se redondean únicamente al mostrarse."
+      />
+      <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <article class="rounded-lg border border-gray-800 bg-gray-950 p-4">
+          <h3 class="font-semibold text-white">Celsius a Fahrenheit</h3>
+          <p class="mt-2 text-sm text-amber-200">°F = (°C × 9 / 5) + 32</p>
+        </article>
+        <article class="rounded-lg border border-gray-800 bg-gray-950 p-4">
+          <h3 class="font-semibold text-white">Fahrenheit a Celsius</h3>
+          <p class="mt-2 text-sm text-amber-200">°C = (°F - 32) × 5 / 9</p>
+        </article>
+        <article class="rounded-lg border border-gray-800 bg-gray-950 p-4">
+          <h3 class="font-semibold text-white">Celsius a Kelvin</h3>
+          <p class="mt-2 text-sm text-amber-200">K = °C + 273.15</p>
+        </article>
+      </div>
+      <p class="mt-5 text-sm leading-relaxed text-gray-400">
+        Kelvin es la unidad base de temperatura termodinámica del Sistema
+        Internacional y se escribe sin símbolo de grado. Consulta la referencia
+        de <a class="text-amber-300 hover:underline" href="https://www.nist.gov/pml/owm/si-units-temperature" rel="noreferrer">NIST</a>.
+      </p>
+    </Container>
+
+    <FaqSection faqs={faqs} />
+  </PageShell>
+</BaseLayout>
+
+<script>
+  import {
+    TEMPERATURE_SCALE_METADATA,
+    TEMPERATURE_SCALES,
+    buildTemperatureExplanation,
+    convertAllTemperatures,
+    convertTemperature,
+    formatTemperature,
+    isTemperatureScale,
+    parseTemperatureInput,
+  } from "@lib/calculators/temperature";
+
+  const input = document.querySelector("[data-temperature-input]");
+  const inputSymbol = document.querySelector("[data-input-symbol]");
+  const originSelect = document.querySelector("[data-origin-select]");
+  const destinationSelect = document.querySelector("[data-destination-select]");
+  const decimalsSelect = document.querySelector("[data-decimals-select]");
+  const errorElement = document.querySelector("[data-temperature-error]");
+  const mainResult = document.querySelector("[data-main-result]");
+  const resultNote = document.querySelector("[data-result-note]");
+  const formula = document.querySelector("[data-formula]");
+  const procedurePanel = document.querySelector("[data-procedure-panel]");
+  const procedureList = document.querySelector("[data-procedure-list]");
+  const copyMainButton = document.querySelector("[data-copy-main]");
+  const copyStatus = document.querySelector("[data-copy-status]");
+  const liveStatus = document.querySelector("[data-live-status]");
+  const clearButton = document.querySelector("[data-clear-calculator]");
+  const swapButton = document.querySelector("[data-swap-scales]");
+  const outputElements = new Map(
+    TEMPERATURE_SCALES.map((scale) => [
+      scale,
+      document.querySelector(`[data-output="${scale}"]`),
+    ]),
+  );
+
+  let currentResults = null;
+  let currentMainCopyText = "";
+  let copyTimer = 0;
+
+  function getScale(select) {
+    return isTemperatureScale(select.value) ? select.value : "c";
+  }
+
+  function getDecimals() {
+    const decimals = Number(decimalsSelect.value);
+
+    return Number.isInteger(decimals) && decimals >= 0 && decimals <= 3
+      ? decimals
+      : 2;
+  }
+
+  function setError(message = "") {
+    errorElement.textContent = message;
+    errorElement.classList.toggle("hidden", !message);
+    input.setAttribute("aria-invalid", message ? "true" : "false");
+  }
+
+  function clearOutputs(note = "Verás la equivalencia destacada y el resto de escalas.") {
+    currentResults = null;
+    currentMainCopyText = "";
+    mainResult.textContent = "Ingresa una temperatura";
+    resultNote.textContent = note;
+    formula.textContent = "La fórmula aparecerá cuando ingreses una temperatura.";
+    procedurePanel.classList.add("hidden");
+    procedureList.replaceChildren();
+    copyMainButton.classList.add("hidden");
+
+    outputElements.forEach((element) => {
+      element.textContent = "-";
+    });
+
+    document.querySelectorAll("[data-copy-scale]").forEach((button) => {
+      button.classList.add("hidden");
+    });
+  }
+
+  function buildContextNote(results) {
+    if (Math.abs(results.k) < 1e-9) {
+      return "Este es el cero absoluto: la temperatura mínima teórica.";
+    }
+
+    if (Math.abs(results.c + 40) < 1e-9) {
+      return "Dato curioso: -40 es el único punto donde Celsius y Fahrenheit coinciden.";
+    }
+
+    return "La conversión usa precisión completa y redondea únicamente la visualización.";
+  }
+
+  function syncUrl(value, origin, destination, decimals) {
+    const url = new URL(window.location.href);
+
+    url.searchParams.set("valor", String(value));
+    url.searchParams.set("origen", origin);
+    url.searchParams.set("destino", destination);
+
+    if (decimals === 2) {
+      url.searchParams.delete("decimales");
+    } else {
+      url.searchParams.set("decimales", String(decimals));
+    }
+
+    window.history.replaceState({}, "", url);
+  }
+
+  function clearUrl() {
+    const url = new URL(window.location.href);
+
+    ["valor", "origen", "destino", "decimales"].forEach((parameter) => {
+      url.searchParams.delete(parameter);
+    });
+
+    window.history.replaceState({}, "", url);
+  }
+
+  function render(options = {}) {
+    const { normalizeDetectedScale = false, updateUrl = true, announce = true } = options;
+    const parsed = parseTemperatureInput(input.value);
+
+    inputSymbol.textContent =
+      TEMPERATURE_SCALE_METADATA[getScale(originSelect)].symbol;
+
+    if (!parsed.ok) {
+      if (parsed.error === "invalid") {
+        setError("No pudimos interpretar la temperatura. Usa un formato como 36,5 °C.");
+        clearOutputs("Revisa el formato para ver las equivalencias.");
+      } else {
+        setError();
+        clearOutputs();
+      }
+
+      if (updateUrl) {
+        clearUrl();
+      }
+
+      return;
+    }
+
+    if (normalizeDetectedScale && parsed.detectedScale) {
+      originSelect.value = parsed.detectedScale;
+      input.value = parsed.normalized;
+      inputSymbol.textContent =
+        TEMPERATURE_SCALE_METADATA[parsed.detectedScale].symbol;
+    }
+
+    const origin = getScale(originSelect);
+    const destination = getScale(destinationSelect);
+    const decimals = getDecimals();
+
+    try {
+      const results = convertAllTemperatures(parsed.value, origin);
+      const explanation = buildTemperatureExplanation(
+        parsed.value,
+        origin,
+        destination,
+        decimals,
+      );
+      const formattedSource = formatTemperature(parsed.value, origin, decimals);
+      const formattedDestination = formatTemperature(
+        results[destination],
+        destination,
+        decimals,
+      );
+
+      setError();
+      currentResults = results;
+      currentMainCopyText = `${formattedSource} = ${formattedDestination}`;
+      mainResult.textContent = currentMainCopyText;
+      resultNote.textContent = buildContextNote(results);
+      formula.textContent = `Fórmula: ${explanation.formula}`;
+      procedurePanel.classList.remove("hidden");
+      procedureList.replaceChildren(
+        ...explanation.steps.map((step) => {
+          const item = document.createElement("li");
+
+          item.textContent = step;
+
+          return item;
+        }),
+      );
+      copyMainButton.classList.remove("hidden");
+
+      TEMPERATURE_SCALES.forEach((scale) => {
+        outputElements.get(scale).textContent = formatTemperature(
+          results[scale],
+          scale,
+          decimals,
+        );
+      });
+
+      document.querySelectorAll("[data-copy-scale]").forEach((button) => {
+        button.classList.remove("hidden");
+      });
+
+      if (updateUrl) {
+        syncUrl(parsed.value, origin, destination, decimals);
+      }
+
+      if (announce) {
+        liveStatus.textContent = `Resultado: ${currentMainCopyText}`;
+      }
+    } catch (error) {
+      setError(
+        error instanceof Error
+          ? error.message
+          : "No pudimos convertir esta temperatura.",
+      );
+      clearOutputs("Corrige el valor para continuar.");
+
+      if (updateUrl) {
+        clearUrl();
+      }
+    }
+  }
+
+  async function copyText(text) {
+    if (!text) {
+      return;
+    }
+
+    try {
+      await navigator.clipboard.writeText(text);
+      copyStatus.textContent = `Copiado: ${text}`;
+    } catch {
+      copyStatus.textContent = "No fue posible copiar automáticamente.";
+    }
+
+    window.clearTimeout(copyTimer);
+    copyTimer = window.setTimeout(() => {
+      copyStatus.textContent = "";
+    }, 2000);
+  }
+
+  function loadUrlParameters() {
+    const parameters = new URLSearchParams(window.location.search);
+    const value = parameters.get("valor");
+    const origin = parameters.get("origen");
+    const destination = parameters.get("destino");
+    const decimals = parameters.get("decimales");
+
+    if (origin && isTemperatureScale(origin)) {
+      originSelect.value = origin;
+    }
+
+    if (destination && isTemperatureScale(destination)) {
+      destinationSelect.value = destination;
+    }
+
+    if (decimals && ["0", "1", "2", "3"].includes(decimals)) {
+      decimalsSelect.value = decimals;
+    }
+
+    if (value && parseTemperatureInput(value).ok) {
+      input.value = value;
+      render({ updateUrl: false });
+    } else {
+      inputSymbol.textContent =
+        TEMPERATURE_SCALE_METADATA[getScale(originSelect)].symbol;
+    }
+  }
+
+  input.addEventListener("input", () => {
+    render({ normalizeDetectedScale: true });
+  });
+
+  originSelect.addEventListener("change", () => {
+    render();
+  });
+
+  destinationSelect.addEventListener("change", () => {
+    render();
+  });
+
+  decimalsSelect.addEventListener("change", () => {
+    render();
+  });
+
+  swapButton.addEventListener("click", () => {
+    const parsed = parseTemperatureInput(input.value);
+    const origin = getScale(originSelect);
+    const destination = getScale(destinationSelect);
+
+    originSelect.value = destination;
+    destinationSelect.value = origin;
+
+    if (parsed.ok) {
+      try {
+        input.value = String(convertTemperature(parsed.value, origin, destination));
+      } catch {
+        // The normal render path presents the validation message.
+      }
+    }
+
+    render();
+  });
+
+  clearButton.addEventListener("click", () => {
+    input.value = "";
+    setError();
+    clearOutputs();
+    clearUrl();
+    input.focus();
+  });
+
+  copyMainButton.addEventListener("click", () => {
+    copyText(currentMainCopyText);
+  });
+
+  document.addEventListener("click", (event) => {
+    const copyButton = event.target.closest("[data-copy-scale]");
+
+    if (copyButton) {
+      const scale = copyButton.dataset.copyScale;
+
+      if (currentResults && isTemperatureScale(scale)) {
+        copyText(formatTemperature(currentResults[scale], scale, getDecimals()));
+      }
+
+      return;
+    }
+
+    const shortcutButton = event.target.closest("[data-shortcut-value]");
+
+    if (!shortcutButton) {
+      return;
+    }
+
+    const { shortcutValue, shortcutFrom, shortcutTo } = shortcutButton.dataset;
+
+    if (
+      typeof shortcutValue !== "string" ||
+      !isTemperatureScale(shortcutFrom) ||
+      !isTemperatureScale(shortcutTo)
+    ) {
+      return;
+    }
+
+    input.value = shortcutValue;
+    originSelect.value = shortcutFrom;
+    destinationSelect.value = shortcutTo;
+    render();
+    input.focus();
+    document.querySelector("#temperature-converter")?.scrollIntoView({
+      behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches
+        ? "auto"
+        : "smooth",
+      block: "start",
+    });
+  });
+
+  loadUrlParameters();
+</script>
