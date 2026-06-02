@@ -1,476 +1,887 @@
-# Especificación — Calculadora de Divisas / Tipo de Cambio
+# Especificación MVP — Conversor de divisas y comparador de tipo de cambio
 
-## Descripción general
-Herramienta para convertir entre monedas del mundo usando tipos
-de cambio actualizados en tiempo real o con la última tasa
-disponible. Es una de las calculadoras más competidas del sitio
-en términos de SEO — Google y XE.com dominan la búsqueda directa
-— pero hay un espacio claro para ganar en búsquedas específicas
-regionales, pares de divisas latinoamericanas y contextos de viaje
-o negocio donde se necesita más que un número.
+## Resumen
 
-El diferencial no es la conversión básica (eso lo hace Google
-en el propio SERP) sino el contexto: historial de tipos de cambio,
-comparador de comisiones, calculadora de pérdida por cambio y
-orientación específica para viajeros y freelancers.
+Herramienta para convertir monedas fiduciarias usando la última tasa de
+referencia disponible y comparar cuánto dinero recibiría realmente el usuario
+con la oferta de un banco, casa de cambio, tarjeta o servicio de transferencia.
 
----
+La conversión básica por sí sola no es el diferencial: Google ya la resuelve en
+el buscador. El valor de esta calculadora está en mostrar con claridad:
 
-## Conceptos base
+- Qué tasa de referencia se utilizó y de qué fecha es.
+- Cuánto se recibe con una oferta comercial concreta.
+- Cuánto se pierde frente a la referencia por spread, comisión y cargo fijo.
+- Qué diferencia existe entre una tasa orientativa y una tasa aplicable a una
+  operación real.
 
-### Tipo de cambio
-El tipo de cambio es el precio de una moneda expresado
-en términos de otra. Existen dos tipos:
-
-**Tipo de cambio directo:**
-Unidades de moneda local por una unidad de moneda extranjera.
-Ejemplo: 1 USD = 17.50 MXN
-
-**Tipo de cambio inverso:**
-Unidades de moneda extranjera por una unidad de moneda local.
-Ejemplo: 1 MXN = 0.0571 USD
-
-### Diferencia entre tipo de cambio interbancario y comercial
-- **Interbancario (mid-market):** el tipo de cambio "real",
-  el que usan los bancos entre sí. Es el que muestran
-  Google, XE y esta calculadora como referencia.
-- **Tipo de venta (banco / casa de cambio):** el que paga
-  el consumidor al comprar divisas. Incluye spread o comisión.
-- **Tipo de compra:** el que recibe el consumidor al vender.
-- La diferencia entre compra y venta es el margen del intermediario.
-
-### Fuente de datos
-- API pública de tipos de cambio con actualización cada hora.
-- Opciones: Open Exchange Rates, Fixer.io, ExchangeRate-API,
-  o Frankfurter (libre y sin clave para EUR base).
-- Mostrar siempre la hora de la última actualización.
-- Si la API falla: usar la última tasa en caché con aviso visible.
+El MVP debe ser útil sin registro, mobile-first y compatible con el sitio Astro
+estático actual.
 
 ---
 
-## Divisas prioritarias para el sitio
+## Decisiones de alcance
 
-### Tier 1 — Alta prioridad (pares más buscados en español)
+### Incluido en el MVP
 
-| Par | Búsqueda estimada |
-|-----|------------------|
+1. Conversión rápida entre monedas fiduciarias disponibles en el proveedor.
+2. Dos intenciones de cálculo: **Tengo** y **Quiero recibir**.
+3. Tipo de cambio directo e inverso.
+4. Comparador de costo real con hasta 3 escenarios manuales.
+5. Tarjetas de pares populares para usuarios de Latinoamérica.
+6. Historial diario sencillo para 30 y 90 días.
+7. Caché de la última tasa conocida en `localStorage`.
+8. Estado visible de fuente, fecha efectiva y momento de consulta.
+9. URL compartible con los parámetros principales.
+10. Contexto especial para USD/MXN con enlace al FIX de Banco de México.
+
+### Fuera del MVP
+
+- Criptomonedas como BTC, ETH y USDT.
+- Calculadora completa para viajeros con datos de costo de vida.
+- Calculadora fiscal para freelancers.
+- Alertas de tipo de cambio.
+- Favoritos y recientes persistentes.
+- Conversión múltiple de una moneda a 8 destinos.
+- Service Worker y soporte offline garantizado de la aplicación completa.
+- Integración automática del FIX de Banco de México.
+- Páginas SEO generadas masivamente para todos los pares.
+- Selector con fuzzy search tolerante a errores.
+- Datos intradía, apertura, cierre, máximo y mínimo (OHLC).
+
+Estas mejoras quedan documentadas en la sección **Fases posteriores**.
+
+---
+
+## Ruta e integración en el sitio
+
+### Archivo principal
+
+```text
+src/pages/conversores/conversor-de-divisas.astro
+```
+
+### URL pública y canonical
+
+```text
+/conversores/conversor-de-divisas
+```
+
+La URL sigue el patrón actual de:
+
+```text
+/conversores/conversor-de-temperatura
+```
+
+### Registro en el directorio
+
+Agregar el conversor a:
+
+```text
+src/lib/constants/calculators.ts
+```
+
+Propuesta:
+
+```ts
+{
+  id: "conversor-de-divisas",
+  title: "Conversor de divisas",
+  description:
+    "Convierte monedas y compara cuánto recibes realmente según la tasa y las comisiones.",
+  href: "/conversores/conversor-de-divisas",
+  categorySlug: "conversores",
+  order: 67,
+}
+```
+
+### Lógica testeable
+
+Crear:
+
+```text
+src/lib/calculators/currency.ts
+src/lib/calculators/currency.test.ts
+```
+
+La página Astro debe concentrarse en presentación y eventos del navegador. Las
+conversiones, comparaciones, validaciones y formatos reutilizables deben vivir
+en el módulo testeable.
+
+---
+
+## Conceptos que debe comunicar la interfaz
+
+### Tasa de referencia
+
+Es una tasa orientativa obtenida de una fuente externa. Sirve para convertir y
+comparar escenarios, pero no garantiza el precio de una operación real.
+
+No utilizar los textos:
+
+- "Tipo de cambio real"
+- "Tasa en tiempo real"
+- "Recibirás exactamente"
+
+Preferir:
+
+- "Última tasa de referencia disponible"
+- "Estimación"
+- "La tasa ofrecida por tu proveedor puede ser distinta"
+
+### Tasa comercial
+
+Es la tasa que un banco, casa de cambio, tarjeta o servicio de transferencia
+ofrece al usuario. Puede incorporar un margen o spread aunque no muestre una
+comisión explícita.
+
+### Fecha efectiva y momento de consulta
+
+La interfaz debe distinguir siempre:
+
+- **Tasa publicada:** fecha efectiva de los datos del proveedor.
+- **Consultada:** momento en que la aplicación obtuvo o leyó los datos.
+
+Ejemplo:
+
+```text
+Tasa de referencia publicada: 30 may 2026
+Consultada: hace 4 minutos
+Fuente: Frankfurter
+```
+
+Esto evita presentar como nueva una tasa que no cambió durante el fin de semana
+o un día inhábil.
+
+---
+
+## Fuente de datos del MVP
+
+### Proveedor principal
+
+Usar **Frankfurter v2**:
+
+```text
+https://api.frankfurter.dev
+```
+
+Documentación:
+
+```text
+https://frankfurter.dev/
+```
+
+Motivos:
+
+- No requiere API key.
+- Puede consultarse desde el navegador.
+- Proporciona tasas de referencia diarias.
+- Ofrece monedas activas e historial diario.
+- Permite lanzar el MVP sin backend adicional.
+
+### Restricciones que deben quedar explícitas
+
+- Los datos son tasas de referencia diarias, no cotizaciones intradía.
+- La cobertura depende de las monedas activas disponibles en el proveedor.
+- No prometer una cifra fija como "más de 170 monedas" en metadatos o copy.
+- No mezclar criptomonedas con monedas ISO 4217.
+- No utilizar la tasa para liquidar pagos, operar divisas o tomar decisiones
+  financieras sensibles sin verificar con la institución correspondiente.
+
+### Estrategia de consulta
+
+Al cargar la página:
+
+1. Leer el último payload válido de `localStorage`.
+2. Si se consultó hace menos de 60 minutos, mostrarlo inmediatamente.
+3. Si no existe o tiene más de 60 minutos, solicitar datos nuevos.
+4. Guardar la respuesta válida con su fecha efectiva y momento de consulta.
+5. Si falla la red, utilizar el último payload válido disponible y mostrar una
+   advertencia prominente.
+
+La ventana de 60 minutos controla cuándo se intenta refrescar la caché. No
+significa que la fuente publique una tasa nueva cada hora.
+
+### Estructura mínima de caché
+
+```ts
+interface CachedCurrencyRates {
+  version: 1;
+  source: "frankfurter";
+  base: string;
+  effectiveDate: string;
+  fetchedAt: string;
+  rates: Record<string, number>;
+}
+```
+
+Clave sugerida:
+
+```text
+calculadoras.tools.currency-rates.v1
+```
+
+### Integraciones futuras con credenciales
+
+Si más adelante se utiliza Open Exchange Rates, Fixer, ExchangeRate-API o la
+API SIE de Banco de México, consumirlas mediante un endpoint propio con caché.
+No exponer API keys o tokens en JavaScript del navegador.
+
+Referencias:
+
+```text
+https://openexchangerates.org/signup
+https://fixer.io/documentation
+https://www.exchangerate-api.com/docs/overview
+https://www.banxico.org.mx/SieAPIRest/swagger/index.html
+```
+
+---
+
+## Catálogo de monedas
+
+### Cobertura
+
+Mostrar monedas fiduciarias activas disponibles en Frankfurter. No incluir
+monedas históricas o descontinuadas en el selector principal.
+
+El catálogo visible debe incluir:
+
+- Código ISO 4217: `USD`, `MXN`, `EUR`.
+- Nombre en español cuando exista traducción local.
+- Símbolo únicamente como apoyo visual.
+
+No depender solo del símbolo: `$` puede representar varias monedas.
+
+### Monedas prioritarias
+
+Ordenar al inicio las monedas más útiles para la audiencia del sitio:
+
+| Código | Moneda |
+|--------|--------|
+| MXN | Peso mexicano |
+| USD | Dólar estadounidense |
+| EUR | Euro |
+| COP | Peso colombiano |
+| ARS | Peso argentino |
+| CLP | Peso chileno |
+| PEN | Sol peruano |
+| BRL | Real brasileño |
+| GTQ | Quetzal guatemalteco |
+| GBP | Libra esterlina |
+| CAD | Dólar canadiense |
+| JPY | Yen japonés |
+
+### Selector del MVP
+
+- Selector con búsqueda por código o nombre.
+- Prioritarias primero; después, orden alfabético.
+- Código siempre visible.
+- Navegable con teclado.
+- Etiqueta accesible.
+
+Las banderas no son requisito del MVP: una moneda no siempre representa a un
+solo país. Pueden agregarse después cuando aporten claridad.
+
+---
+
+## Modo 1 — Conversión rápida
+
+### Objetivo
+
+Responder de forma inmediata cuánto equivale un monto o cuánto dinero de origen
+se necesita para recibir una cantidad concreta.
+
+### Intención A: Tengo
+
+> Tengo 500 USD. ¿Cuántos MXN equivalen según la referencia?
+
+**Inputs:**
+
+- Intención: `Tengo`
+- Cantidad: `500`
+- Moneda de origen: `USD`
+- Moneda de destino: `MXN`
+
+**Cálculo:**
+
+```text
+resultado destino = cantidad origen × tasa referencia
+```
+
+**Output principal:**
+
+```text
+500.00 USD = 8,750.00 MXN
+```
+
+### Intención B: Quiero recibir
+
+> Quiero recibir 10,000 MXN. ¿Cuántos USD necesito según la referencia?
+
+**Inputs:**
+
+- Intención: `Quiero recibir`
+- Cantidad deseada: `10,000`
+- Moneda de origen: `USD`
+- Moneda de destino: `MXN`
+
+**Cálculo:**
+
+```text
+cantidad origen necesaria = cantidad destino deseada ÷ tasa referencia
+```
+
+**Output principal:**
+
+```text
+Necesitas aproximadamente 571.43 USD para recibir 10,000.00 MXN
+```
+
+### Output secundario común
+
+```text
+1 USD = 17.5000 MXN
+1 MXN = 0.057143 USD
+Tasa de referencia publicada: 30 may 2026
+Consultada: hace 4 minutos
+Fuente: Frankfurter
+```
+
+Mostrar además:
+
+- Botón **Intercambiar monedas**.
+- Botón **Copiar resultado**.
+- Enlace **Comparar con una oferta real** que lleve al simulador.
+- Aviso: "Tu banco, tarjeta o casa de cambio puede aplicar una tasa distinta,
+  spread, comisión o cargo fijo."
+
+### Comportamiento al intercambiar monedas
+
+Al hacer swap:
+
+1. Intercambiar moneda de origen y destino.
+2. Utilizar el resultado mostrado como nuevo monto de entrada cuando sea
+   posible.
+3. Recalcular con la nueva tasa.
+
+---
+
+## Modo 2 — Comparador de costo real
+
+### Objetivo
+
+Ayudar al usuario a comparar ofertas concretas y detectar el costo oculto del
+spread aunque una institución anuncie "sin comisión".
+
+### Entrada común
+
+- Intención: `Tengo` o `Quiero recibir`.
+- Cantidad.
+- Moneda de origen.
+- Moneda de destino.
+- Tasa de referencia: automática.
+- Opción avanzada: tasa de referencia manual.
+
+### Escenarios
+
+Permitir hasta 3 escenarios editables. Cada escenario incluye:
+
+| Campo | Tipo | Valor inicial |
+|-------|------|---------------|
+| Nombre | Texto corto | Banco / Casa de cambio / Tarjeta |
+| Tasa ofrecida | Numérico > 0 | Vacío |
+| Comisión porcentual | 0% a 100% | 0% |
+| Cargo fijo | Numérico >= 0 | 0 |
+
+En el MVP, el cargo fijo se captura en la moneda de destino y debe etiquetarse
+de forma explícita.
+
+### Fórmulas para intención Tengo
+
+```text
+referencia ideal = cantidad origen × tasa referencia
+bruto escenario = cantidad origen × tasa ofrecida
+neto escenario = bruto escenario × (1 - comisión / 100) - cargo fijo
+pérdida = referencia ideal - neto escenario
+porcentaje perdido = pérdida ÷ referencia ideal × 100
+```
+
+### Fórmulas para intención Quiero recibir
+
+```text
+origen ideal = cantidad destino deseada ÷ tasa referencia
+origen necesario escenario =
+  (cantidad destino deseada + cargo fijo)
+  ÷ (tasa ofrecida × (1 - comisión / 100))
+costo adicional = origen necesario escenario - origen ideal
+porcentaje adicional = costo adicional ÷ origen ideal × 100
+```
+
+### Output para intención Tengo
+
+Ejemplo: `1,000 USD` a `MXN`, referencia `17.50`.
+
+| Método | Tasa ofrecida | Comisión | Cargo fijo | Recibes neto | Diferencia vs referencia |
+|--------|---------------|----------|------------|--------------|--------------------------|
+| Referencia orientativa | 17.5000 | — | — | 17,500.00 MXN | — |
+| Banco local | 16.8000 | 0% | 0 MXN | 16,800.00 MXN | -700.00 MXN (-4.00%) |
+| Casa de cambio | 17.1000 | 0% | 0 MXN | 17,100.00 MXN | -400.00 MXN (-2.29%) |
+| Tarjeta | 17.3500 | 3% | 0 MXN | 16,829.50 MXN | -670.50 MXN (-3.83%) |
+
+### Output para intención Quiero recibir
+
+Ejemplo: recibir `10,000 MXN`, referencia `17.50`.
+
+| Método | Tasa ofrecida | Comisión | Cargo fijo | Necesitas enviar | Costo adicional |
+|--------|---------------|----------|------------|-----------------|-----------------|
+| Referencia orientativa | 17.5000 | — | — | 571.43 USD | — |
+| Banco local | 16.8000 | 0% | 0 MXN | 595.24 USD | +23.81 USD (+4.17%) |
+| Transferencia | 17.4000 | 0.5% | 50 MXN | 580.49 USD | +9.06 USD (+1.59%) |
+
+### Reglas visuales
+
+- Destacar el escenario más favorable capturado por el usuario.
+- No inventar tasas de instituciones.
+- Mostrar los escenarios vacíos hasta que el usuario capture una oferta.
+- Aclarar que los resultados son estimaciones y deben verificarse antes de una
+  operación.
+
+---
+
+## Tarjetas de pares populares
+
+### Objetivo
+
+Ofrecer contexto útil sin obligar al usuario a completar el formulario.
+
+### Pares iniciales
+
+| Par | Prioridad |
+|-----|-----------|
 | USD / MXN | Muy alta |
 | EUR / MXN | Alta |
 | USD / COP | Alta |
 | USD / ARS | Alta |
 | USD / CLP | Alta |
 | USD / PEN | Alta |
-| USD / EUR | Muy alta |
-| GBP / EUR | Alta |
 | USD / BRL | Alta |
 | USD / GTQ | Media |
+| EUR / USD | Alta |
+| GBP / EUR | Media |
 
-### Tier 2 — Cobertura completa
-Soporte para las ~170 monedas reconocidas por ISO 4217,
-incluyendo:
-- Todas las monedas latinoamericanas
-- Monedas principales de Europa, Asia y Oceanía
-- Monedas del Golfo Pérsico (AED, SAR, QAR)
-- Criptomonedas principales como referencia (BTC, ETH, USDT)
+### Contenido por tarjeta
 
----
+```text
+USD / MXN
+1 USD = 17.5000 MXN
++0.1200 (+0.69%) vs última referencia disponible
+```
 
-## Casos de uso (modos de cálculo)
+No usar "vs ayer": en fines de semana o días inhábiles puede no existir una
+publicación nueva. Comparar contra la referencia diaria anterior disponible.
 
-### Modo 1 — Conversión rápida
-> Ejemplo: ¿Cuántos pesos mexicanos son 500 dólares?
+### Interacción
 
-**Inputs:**
-- Cantidad → ej. 500
-- Moneda de origen → ej. USD
-- Moneda de destino → ej. MXN
+Al seleccionar una tarjeta:
 
-**Output principal:**
-
-500 USD = 8,750.00 MXN
-1 USD = 17.50 MXN · 1 MXN = 0.0571 USD
-Actualizado: hoy 14:32 hora de Ciudad de México
-
-**Output secundario:**
-- Tipo de cambio inverso: **1 MXN = $0.0571 USD**
-- Fuente: Open Exchange Rates (interbancario / mid-market)
-- Nota: "El tipo de cambio real que obtendrás en un banco
-  o casa de cambio puede diferir. Ver simulador de comisiones."
+1. Cargar el par en el conversor.
+2. Mantener o asignar cantidad `1`.
+3. Llevar foco al resultado principal sin recargar la página.
 
 ---
 
-### Modo 2 — Conversión múltiple (una a varias)
-> Ejemplo: Tengo 1,000 USD. ¿Cuánto es en MXN, EUR, COP y CLP?
+## Historial diario
 
-**Inputs:**
-- Cantidad → ej. 1,000
-- Moneda de origen → ej. USD
-- Monedas de destino → selector múltiple (hasta 8)
+### Objetivo
 
-**Output — tabla:**
+Dar contexto suficiente para responder si la referencia reciente está más alta
+o más baja, sin presentar la herramienta como una plataforma de trading.
 
-| Moneda | País | Resultado | Tasa |
-|--------|------|-----------|------|
-| 🇲🇽 MXN | México | $17,500.00 | 17.50 |
-| 🇪🇺 EUR | Eurozona | €920.00 | 0.92 |
-| 🇨🇴 COP | Colombia | $4,120,000 | 4,120 |
-| 🇨🇱 CLP | Chile | $940,000 | 940 |
-| 🇵🇪 PEN | Perú | S/3,750 | 3.75 |
-| 🇦🇷 ARS | Argentina | $897,000 | 897 |
-| 🇧🇷 BRL | Brasil | R$5,050 | 5.05 |
-| 🇬🇧 GBP | Reino Unido | £790.00 | 0.79 |
+### Inputs
 
-- Banderas de cada país para identificación visual rápida.
-- Ordenar por tasa o por nombre (toggle).
+- Par de monedas.
+- Periodo: `30 días` o `90 días`.
 
----
+### Outputs
 
-### Modo 3 — Simulador de comisiones
-> ¿Cuánto pierdo realmente al cambiar divisas en el banco
-> vs una casa de cambio vs una tarjeta de crédito?
+- Gráfica de línea sencilla con una tasa diaria.
+- Tabla accesible con `fecha` y `tasa de referencia`.
+- Estadísticas:
+  - Valor mínimo y fecha.
+  - Valor máximo y fecha.
+  - Promedio.
+  - Variación entre primera y última referencia disponible.
 
-**Inputs:**
-- Cantidad → ej. 1,000 USD
-- Moneda de origen → USD
-- Moneda de destino → MXN
-- Tipo de cambio interbancario (referencia) → 17.50 (auto)
+### Restricciones
 
-**Definir escenarios de cambio:**
-- Escenario A: banco local → tasa que ofrece → ej. 16.80
-- Escenario B: casa de cambio → tasa → ej. 17.10
-- Escenario C: tarjeta de crédito → tasa + comisión → ej. 17.35 − 3%
-- Escenario D: transferencia internacional (Wise, etc.) → ej. 17.45 − 0.5%
-
-**Output — tabla comparativa:**
-
-| Método | Tasa | Recibes | Pérdida vs interbancario | % perdido |
-|--------|------|---------|--------------------------|-----------|
-| Referencia (ideal) | 17.50 | $17,500 | — | — |
-| 🏦 Banco local | 16.80 | $16,800 | −$700 | −4.0% |
-| 🏪 Casa de cambio | 17.10 | $17,100 | −$400 | −2.3% |
-| 💳 Tarjeta crédito | 16.83 | $16,830 | −$670 | −3.8% |
-| 🌐 Wise / Remesa | 17.37 | $17,370 | −$130 | −0.7% |
-
-- Destacar visualmente el mejor método.
-- Nota: "Estos valores son ejemplos. Consulta las tasas
-  actuales de cada institución antes de cambiar."
+- No mostrar apertura, cierre, máximo y mínimo intradía.
+- No interpolar días sin dato.
+- No presentar el historial como recomendación de compra o venta.
+- Puede implementarse con SVG generado en cliente para evitar agregar una
+  dependencia al MVP.
 
 ---
 
-### Modo 4 — Historial de tipo de cambio
-> ¿Cómo ha variado el USD/MXN en el último año?
+## Contexto especial USD/MXN
 
-**Inputs:**
-- Par de divisas → ej. USD/MXN
-- Período → 7 días / 30 días / 90 días / 1 año / 5 años
+Cuando el par seleccionado sea `USD/MXN` o `MXN/USD`, mostrar un bloque breve:
 
-**Output:**
-- Gráfica de línea con el historial del tipo de cambio
-- Tabla de datos: fecha, apertura, cierre, máximo, mínimo
-- Estadísticas del período:
-  - Mínimo: **16.80** (fecha)
-  - Máximo: **18.20** (fecha)
-  - Promedio: **17.35**
-  - Variación: **+2.4%** en el período
+```text
+¿Buscas el FIX de Banco de México?
 
-> Fuente de datos históricos: API con datos diarios
-> (Frankfurter, ExchangeRate-API o similar).
+La referencia de este conversor es orientativa. El FIX de Banco de México se
+determina en días hábiles bancarios con una metodología específica y se usa
+para ciertos fines oficiales. Consulta el valor y la fecha aplicable en Banco
+de México.
+```
 
----
+Enlace oficial:
 
-### Modo 5 — Calculadora para viajeros
-> Contexto específico para viajes: ¿cuánto dinero llevar,
-> qué me conviene usar, cuánto cuesta todo en mi moneda?
+```text
+https://www.banxico.org.mx/tipcamb/tipCamMIAction.do?idioma=es
+```
 
-**Inputs:**
-- País de origen + moneda local → ej. México / MXN
-- País de destino → ej. España / EUR
-- Presupuesto de viaje → ej. $30,000 MXN
-- Duración → ej. 10 días
-
-**Output:**
-- Presupuesto en EUR: **€1,560.00**
-- Presupuesto diario: **€156 / día**
-- Tipo de cambio usado: 1 EUR = 19.23 MXN
-- Costo de vida estimado en destino (referencia):
-  - Comida: €30–50/día
-  - Transporte: €10–20/día
-  - Alojamiento (hostal): €25–50/noche
-  - Tu presupuesto diario de €156 es: ✅ Suficiente (nivel medio)
-
-**Conversor rápido para el viaje:**
-
-[ 50  ] EUR = [ 961.50 ] MXN
-
-Campo de conversión rápida bidireccional para usar
-durante el viaje al ver precios.
+No mezclar visualmente la tasa general del conversor con el FIX. La integración
+automática del dato de Banxico requiere una fase posterior con endpoint propio,
+caché y atribución adecuada.
 
 ---
 
-### Modo 6 — Calculadora para freelancers
-> Contexto específico para freelancers que cobran
-> en USD/EUR y viven en LATAM.
+## Estados de carga, caché y error
 
-**Inputs:**
-- Tarifa por hora → ej. $35 USD/hora
-- Horas trabajadas al mes → ej. 80 horas
-- Moneda local → MXN
-- Retención fiscal estimada → ej. 10%
+### Cargando
 
-**Output:**
-- Ingreso bruto en USD: **$2,800 USD**
-- Equivalente en MXN: **$49,000 MXN**
-- Retención fiscal: **$4,900 MXN**
-- Ingreso neto estimado: **$44,100 MXN**
-- Tipo de cambio usado: 17.50 MXN/USD
-- Actualizado: hace 23 minutos
+- Mostrar skeleton o mensaje corto mientras se consulta la fuente.
+- Mantener utilizable el contenido editorial de la página.
 
-**Simulador de impacto del tipo de cambio:**
-¿Qué pasa con mi ingreso si el dólar sube / baja?
+### Datos vigentes según caché local
 
-| Escenario | USD/MXN | Ingreso neto MXN |
-|-----------|---------|-----------------|
-| Dólar baja 10% | 15.75 | $39,690 |
-| Tipo actual | 17.50 | $44,100 |
-| Dólar sube 10% | 19.25 | $48,510 |
+Mostrar la tasa con fecha efectiva y momento de consulta.
 
----
+### Caché antigua por fallo de red
 
-## Inputs detallados
+Mostrar banner visible:
 
-| Campo | Tipo | Rango válido | Valor por defecto |
-|-------|------|-------------|-------------------|
-| Cantidad | Numérico | > 0 | 1 |
-| Moneda origen | Selector con búsqueda | ~170 monedas | USD |
-| Moneda destino | Selector con búsqueda | ~170 monedas | MXN |
-| Monedas adicionales (Modo 2) | Selector múltiple | Hasta 8 | — |
-| Período historial | Selector | 7d / 30d / 90d / 1a / 5a | 30 días |
-| Tasa manual (override) | Numérico (avanzado) | > 0 | API auto |
-| Comisión personalizada | Numérico | 0% – 20% | — |
-| Presupuesto viaje (Modo 5) | Numérico | > 0 | — |
-| Duración viaje (Modo 5) | Numérico | 1 – 365 días | — |
-| Horas freelance (Modo 6) | Numérico | 1 – 744 horas | — |
-| Retención fiscal (Modo 6) | Numérico | 0% – 50% | — |
+```text
+No pudimos actualizar las tasas. Estás usando la última referencia guardada,
+publicada el [fecha] y consultada el [fecha/hora].
+```
+
+La calculadora puede seguir funcionando, pero el usuario debe entender que el
+dato puede estar desactualizado.
+
+### Sin red y sin caché
+
+Mostrar:
+
+```text
+No pudimos cargar una tasa de referencia. Revisa tu conexión e inténtalo de
+nuevo.
+```
+
+No calcular con una tasa inventada ni con ejemplos hardcodeados.
+
+### Respuesta inválida
+
+Ignorar el payload y conservar la última caché válida si existe. Considerar
+inválida una respuesta cuando:
+
+- Falta la fecha efectiva.
+- Falta la tasa requerida.
+- Una tasa no es numérica, no es finita o es menor o igual a cero.
 
 ---
 
-## Feature — Selector de moneda con búsqueda
-El selector de moneda debe ser altamente usable:
+## Validaciones
 
-- Campo de búsqueda por nombre o código ISO
-  (ej. "peso" o "MXN" → muestra todas las monedas
-  con "peso" en el nombre)
-- Monedas favoritas / recientes al tope de la lista
-- Bandera del país junto a cada moneda
-- Código ISO 4217 visible (USD, EUR, MXN, etc.)
-- Ordenadas: favoritas → recientes → alfabético
-- Búsqueda tolerante a errores (fuzzy search)
-
----
-
-## Feature — Tasas de cambio populares en tarjetas
-Mostrar en la página principal (sin necesidad de input)
-las tasas actualizadas de los pares más buscados:
-
-USD/MXN  17.50  ▲ +0.12  (+0.69%)
-EUR/MXN  19.23  ▼ −0.08  (−0.41%)
-USD/COP  4,120  ▲ +15    (+0.37%)
-USD/ARS  897    ▲ +2.1   (+0.23%)
-EUR/USD  0.921  ▼ −0.003 (−0.33%)
-
-Actualización automática cada 60 minutos.
-Flecha verde ▲ si sube / roja ▼ si baja vs ayer.
-
----
-
-## Feature — Aviso de tipo de cambio
-El usuario puede configurar una alerta visual:
-"Avísame cuando USD/MXN supere 18.00"
-
-Al cargar la página, comparar con la tasa actual
-y mostrar banner si se ha alcanzado el umbral.
-(Sin push notifications — solo al visitar la página.)
-
-Guardado en localStorage del navegador.
-
----
-
-## Feature — Conversor offline / última tasa conocida
-Si la API de tasas no está disponible:
-- Usar la última tasa guardada en caché (localStorage)
-- Mostrar banner visible:
-  ⚠️ "Usando tipo de cambio del [fecha/hora].
-  No se pudo conectar al servicio de tasas en tiempo real."
-- La calculadora sigue funcionando con datos en caché.
-
----
-
-## Validaciones de inputs
-
-| Regla | Detalle |
+| Regla | Mensaje |
 |-------|---------|
-| Cantidad > 0 | Error: "La cantidad debe ser mayor que cero" |
-| Moneda origen ≠ destino | Advertencia: "Seleccionaste la misma moneda de origen y destino" |
-| Cantidad muy grande | Advertencia si supera 1,000,000,000 (mil millones) |
-| API no disponible | Modo offline con última tasa en caché |
-| Tasa manual = 0 | Error: "El tipo de cambio no puede ser cero" |
-| Cantidad no numérica | Limpiar y resaltar el campo |
-| Monedas no disponibles | Mostrar mensaje: "Esta moneda no está disponible actualmente" |
+| Cantidad vacía | "Ingresa una cantidad para convertir." |
+| Cantidad no numérica | "Revisa la cantidad. Usa un número válido." |
+| Cantidad <= 0 | "La cantidad debe ser mayor que cero." |
+| Cantidad > 1,000,000,000 | "El monto es muy alto. Revisa que sea correcto." |
+| Origen = destino | Mostrar equivalencia 1:1 y aviso amable. |
+| Tasa de referencia inválida | No calcular; usar caché válida o mostrar error. |
+| Tasa comercial <= 0 | "La tasa ofrecida debe ser mayor que cero." |
+| Comisión < 0 o > 100 | "La comisión debe estar entre 0% y 100%." |
+| Cargo fijo < 0 | "El cargo fijo no puede ser negativo." |
+| Neto escenario <= 0 | "Con estos cargos no recibirías un monto positivo." |
+
+### Parseo de cantidades
+
+Aceptar entradas habituales:
+
+```text
+1000
+1,000.50
+1000,50
+```
+
+Normalizar internamente antes de calcular. Mantener precisión completa durante
+el cálculo y redondear solo al mostrar resultados.
 
 ---
 
-## Formato de outputs
+## Formato de resultados
 
-| Tipo de resultado | Formato |
-|-------------------|---------|
-| Montos grandes | Separador de miles → 17,500.00 |
-| Montos pequeños | Hasta 6 decimales → 0.000571 |
-| Tipo de cambio | 4 decimales → 17.5024 |
-| Variación histórica | Con signo y % → +2.4% |
-| Símbolo de moneda | Antes del número → $17,500 / €920 / S/3,750 |
-| Timestamp actualización | Hora local → "Actualizado hoy a las 14:32" |
-| Pérdida en comisiones | En rojo con signo → −$700 MXN (−4.0%) |
+### Principios
 
----
+- Mostrar siempre el código ISO junto al monto.
+- Utilizar `Intl.NumberFormat` con locale `es-MX`.
+- No depender únicamente del símbolo monetario.
+- Evitar redondear durante pasos intermedios.
+- Adaptar decimales según magnitud.
 
-## Features adicionales
+### Reglas sugeridas
 
-### Cálculo en tiempo real
-- La conversión se actualiza automáticamente con cada tecla.
-- La tasa se refresca automáticamente cada 60 minutos.
-
-### Intercambiar monedas (swap)
-- Botón ⇄ para intercambiar origen y destino.
-- El monto se reconvierte automáticamente.
-
-### Copiar resultado
-- Botón de clipboard junto al resultado principal.
-- Copia: "500 USD = 8,750.00 MXN (tasa: 17.50)"
-
-### Historial de conversiones de la sesión
-- Últimas 10 conversiones con hora, par y resultado.
-- Útil para viajeros que hacen múltiples consultas.
-
-### Favoritos
-- El usuario puede marcar hasta 5 pares como favoritos.
-- Aparecen primero en el selector y en las tarjetas
-  de tasas populares.
-- Guardado en localStorage.
-
-### Modo sin conexión
-- Service Worker que cachea la última tasa conocida.
-- Funciona offline con aviso claro de la fecha de los datos.
+| Tipo | Formato |
+|------|---------|
+| Montos habituales | `17,500.00 MXN` |
+| Montos pequeños | Hasta 6 decimales |
+| Tasa directa | Hasta 4 decimales |
+| Tasa inversa pequeña | Hasta 6 decimales |
+| Variación | `+0.69%` o `-2.29%` |
+| Pérdida | `-700.00 MXN (-4.00%)` |
+| Fecha efectiva | `Tasa publicada: 30 may 2026` |
+| Consulta reciente | `Consultada: hace 4 minutos` |
 
 ---
 
-## SEO y contenido de la página
+## URL compartible
 
-### Meta información
-- Title: "Calculadora de Divisas y Tipo de Cambio — Conversor de Moneda"
-- Description: "Convierte entre más de 170 monedas con tipo de cambio
-  actualizado. USD a MXN, EUR a COP, y mucho más. Con historial,
-  comparador de comisiones y modo viajero. Gratis."
+Sincronizar parámetros después de una conversión válida:
 
-### URLs sugeridas
-- /conversor-divisas (principal)
-- /tipo-de-cambio-dolar-peso
-- /tipo-de-cambio-hoy
-- /calculadora-dolar-a-pesos-mexicanos
-- /tipo-de-cambio-euro-peso
+```text
+/conversores/conversor-de-divisas?cantidad=500&origen=USD&destino=MXN&modo=tengo
+```
 
-### Páginas de pares específicos (long-tail SEO)
-Generar páginas estáticas o dinámicas para los pares
-más buscados en español:
+Para intención inversa:
 
-- /dolar-a-peso-mexicano → "1 USD = 17.50 MXN hoy"
-- /euro-a-peso-mexicano → "1 EUR = 19.23 MXN hoy"
-- /dolar-a-peso-colombiano → "1 USD = 4,120 COP hoy"
-- /dolar-a-peso-chileno → "1 USD = 940 CLP hoy"
-- /dolar-a-sol-peruano → "1 USD = 3.75 PEN hoy"
-- /dolar-a-peso-argentino → "1 USD = 897 ARS hoy"
-- /dolar-a-euro → "1 USD = 0.921 EUR hoy"
-- /libra-a-euro → "1 GBP = 1.172 EUR hoy"
+```text
+/conversores/conversor-de-divisas?cantidad=10000&origen=USD&destino=MXN&modo=recibir
+```
 
-> Estas páginas se generan dinámicamente con la tasa del día.
-> Son la mayor fuente de tráfico long-tail de la calculadora.
+Reglas:
 
-### Preguntas frecuentes (FAQ — para rich snippets)
-- ¿Cuánto es 1 dólar en pesos mexicanos hoy?
-- ¿Cuál es el tipo de cambio del euro hoy?
-- ¿Dónde conviene más cambiar dólares?
-- ¿Qué es el tipo de cambio interbancario?
-- ¿Cuánto cobra el banco por cambiar divisas?
-- ¿Conviene más usar tarjeta o efectivo en el extranjero?
-- ¿Cómo afecta el tipo de cambio a los freelancers?
+- Mantener canonical en `/conversores/conversor-de-divisas`.
+- Validar parámetros antes de cargarlos.
+- No incluir escenarios comerciales en la URL durante el MVP.
+- El botón copiar debe incluir cantidad, monedas, tasa de referencia y fecha
+  efectiva.
 
-### Contenido de apoyo
-- Tabla de tipos de cambio de las 20 monedas principales
-  vs USD (actualizada diariamente).
-- Artículo: "¿Dónde conviene más cambiar dólares en México?"
-- Guía: "Tipo de cambio para freelancers: cómo proteger
-  tus ingresos en dólares."
-- Explicación: "¿Qué es el spread y por qué el banco
-  no te da el tipo de cambio de Google?"
+Ejemplo:
+
+```text
+500.00 USD = 8,750.00 MXN
+Tasa de referencia: 1 USD = 17.5000 MXN
+Publicada: 30 may 2026
+Fuente: Frankfurter
+```
 
 ---
 
-## Especificaciones técnicas
+## Diseño de la página
 
-| Parámetro | Detalle |
-|-----------|---------|
-| Plataforma | Web responsive (mobile-first) |
-| API de tasas | ExchangeRate-API / Open Exchange Rates / Frankfurter |
-| Frecuencia actualización | Cada 60 minutos (cron o al cargar la página) |
-| Caché | localStorage + Service Worker para modo offline |
-| Gráfica historial | Chart.js (línea con zoom) |
-| Selector moneda | Componente custom con fuzzy search |
-| Banderas | Emoji de banderas (Unicode) o sprite CSS |
-| Modo offline | Service Worker con última tasa en caché |
-| Exportar | CSV de historial / tabla Modo 2 |
-| Accesibilidad | Labels, ARIA live para actualizaciones de tasa |
-| URL principal | /conversor-divisas |
-| Idioma | Español; formato numérico según locale |
-| Precisión | 4 decimales en tasas; 2 decimales en montos |
+### Hero
+
+**Kicker:** Conversores
+
+**H1:** Conversor de divisas
+
+**Descripción:**
+
+```text
+Convierte monedas con la última tasa de referencia disponible y compara cuánto
+recibirías realmente después de la tasa y las comisiones de tu proveedor.
+```
+
+### Orden de secciones
+
+1. Hero y breadcrumbs.
+2. Conversión rápida.
+3. Comparador de costo real.
+4. Pares populares.
+5. Historial diario.
+6. Contexto USD/MXN y FIX de Banxico.
+7. Explicación: referencia, spread y comisión.
+8. Preguntas frecuentes visibles.
+
+### Responsive
+
+- Mobile-first.
+- Resultado principal visible cerca del formulario.
+- Tablas con scroll horizontal cuando sea necesario.
+- Botones con altura mínima táctil equivalente a los conversores existentes.
+
+### Accesibilidad
+
+- `label` asociado a todos los inputs.
+- Estado de carga y resultado con `aria-live="polite"`.
+- Errores asociados mediante `aria-describedby`.
+- Navegación completa por teclado.
+- No comunicar variaciones solo mediante color.
+- Texto visible para valores positivos y negativos.
 
 ---
 
-## Diferencias clave vs otras calculadoras de conversión del sitio
+## SEO
 
-| Aspecto | Divisas | Temperatura | Peso (kg/lb) | Distancia (km/mi) |
-|---------|---------|-------------|-------------|-------------------|
-| Datos en tiempo real | ✅ Sí (API) | ❌ No necesita | ❌ No necesita | ❌ No necesita |
-| Requiere internet | ✅ Para tasa actual | ❌ No | ❌ No | ❌ No |
-| Modo offline | ✅ Con caché | ✅ Siempre | ✅ Siempre | ✅ Siempre |
-| Historial de datos | ✅ Sí (gráfica) | ❌ No aplica | ❌ No aplica | ❌ No aplica |
-| Contextos específicos | ✅ Viaje / freelance | ✅ Clima / cocina | 🔶 Salud | 🔶 Deporte |
-| Long-tail por par | ✅ Alto potencial | ✅ Por valor | 🔶 Medio | 🔶 Medio |
-| Comisiones / spread | ✅ Sí | ❌ No aplica | ❌ No aplica | ❌ No aplica |
-| Monedas soportadas | ~170 | N/A | N/A | N/A |
+### Meta title
+
+```text
+Conversor de Divisas — Compara Tipo de Cambio y Comisiones
+```
+
+### Meta description
+
+```text
+Convierte monedas con la última tasa de referencia disponible y compara cuánto
+recibes realmente según la tasa, el spread y las comisiones de tu proveedor.
+```
+
+### Contenido editorial
+
+Explicar con ejemplos:
+
+- Qué es una tasa de referencia.
+- Por qué el banco no ofrece exactamente la tasa mostrada por un conversor.
+- Qué es el spread.
+- Cómo comparar una oferta "sin comisión".
+- Qué significa el FIX de Banco de México y cuándo consultarlo.
+
+### FAQ visibles
+
+Incluir respuestas claras para:
+
+- ¿Qué tipo de cambio usa este conversor?
+- ¿La tasa mostrada es la que me dará mi banco?
+- ¿Qué es el spread cambiario?
+- ¿Cómo comparo una casa de cambio con una tarjeta?
+- ¿Por qué la tasa puede no cambiar durante el fin de semana?
+- ¿Qué diferencia hay entre esta referencia y el FIX de Banco de México?
+
+No plantear `FAQPage` JSON-LD como mecanismo para obtener rich snippets. Google
+limita los resultados enriquecidos de FAQ principalmente a sitios reconocidos
+de salud o gobierno:
+
+```text
+https://developers.google.com/search/docs/appearance/structured-data/faqpage?hl=es
+```
+
+### Páginas por par
+
+No generar cientos de páginas casi idénticas en el MVP.
+
+En una fase posterior, evaluar páginas manualmente curadas para pocos pares con
+demanda clara:
+
+```text
+/conversores/dolar-a-peso-mexicano
+/conversores/euro-a-peso-mexicano
+/conversores/dolar-a-peso-colombiano
+```
+
+Cada página debe aportar contenido propio: contexto local, ejemplos, fuente,
+fecha, preguntas específicas y enlace al conversor principal. Evitar páginas
+generadas únicamente para capturar búsquedas similares.
+
+Referencia:
+
+```text
+https://developers.google.com/search/docs/essentials/spam-policies
+```
 
 ---
 
-## Casos extremos a contemplar
+## Eventos analíticos sugeridos
 
-- API caída → modo offline con caché; aviso prominente;
-  calculadora sigue funcionando con última tasa conocida
-- Moneda con hiperinflación (ARS, VES) → manejar números
-  muy grandes sin desbordamiento; formato con separadores
-- Tipo de cambio = 0 (error de API) → ignorar y usar caché;
-  no mostrar resultado de 0
-- Misma moneda origen y destino → resultado = cantidad ingresada;
-  advertencia amable "Seleccionaste la misma moneda"
-- Cantidad con muchos decimales (ej. 0.00001 BTC) →
-  manejar con 8 decimales de precisión
-- Criptomonedas → volatilidad alta; mostrar timestamp
-  con minutos exactos y advertencia de volatilidad
-- País con múltiples tipos de cambio (ej. Argentina con
-  tipo oficial vs blue) → mostrar solo tipo oficial con
-  nota: "Argentina tiene múltiples tipos de cambio.
-  Este es el tipo de cambio oficial."
-- Cambio de moneda origen/destino al hacer swap con
-  cantidad ya ingresada → reconvertir automáticamente
-  usando el resultado anterior como nuevo input
-- Monedas descontinuadas (ej. peseta española, marco alemán)
-  → no incluir o incluir con nota histórica clara
-- Conexión lenta → mostrar skeleton loader durante
-  la carga de tasas; no bloquear la UI
+Si el sitio incorpora analítica, medir:
+
+| Evento | Cuándo |
+|--------|--------|
+| `currency_conversion_completed` | Conversión válida |
+| `currency_mode_changed` | Cambio entre Tengo y Quiero recibir |
+| `currency_pair_swapped` | Uso del botón swap |
+| `currency_comparison_started` | Primer escenario comercial capturado |
+| `currency_result_copied` | Copia de resultado |
+| `currency_history_viewed` | Apertura o cambio del historial |
+| `currency_cache_fallback_used` | Uso de caché por fallo de red |
+| `banxico_fix_link_clicked` | Clic al enlace oficial |
+
+No enviar cantidades capturadas ni datos que puedan ser sensibles.
+
+---
+
+## Fases posteriores
+
+### Fase 2 — Contexto y recurrencia
+
+- Conversión múltiple a varios destinos.
+- Favoritos y pares recientes.
+- Alertas visuales guardadas en `localStorage`.
+- Historial de conversiones de la sesión.
+- Exportar tabla e historial como CSV.
+- Selector fuzzy tolerante a errores.
+- Integración automática del FIX de Banxico mediante endpoint propio.
+- Páginas curadas para pares prioritarios.
+
+### Fase 3 — Casos de uso especializados
+
+- Modo viajero con presupuesto diario, sin prometer costo de vida si no existe
+  una fuente mantenible y atribuible.
+- Modo freelancer para convertir ingresos y modelar sensibilidad ante cambios
+  de tasa. Mantener cálculos fiscales como estimaciones claramente separadas.
+- Service Worker para cargar la interfaz sin conexión y reutilizar la última
+  tasa guardada con advertencias visibles.
+
+### Fase 4 — Datos con otra naturaleza
+
+- Criptomonedas en una herramienta separada o sección explícitamente separada.
+- Fuente especializada para activos digitales.
+- Timestamp más frecuente, mayor precisión y advertencia de volatilidad.
+- Identificación clara de ticker y proveedor.
+
+Las criptomonedas no deben describirse como monedas ISO 4217. Referencia:
+
+```text
+https://www.iso.org/news/ref2466.html
+```
+
+---
+
+## Casos extremos
+
+- API caída con caché válida: continuar con aviso visible.
+- API caída sin caché: bloquear cálculo dependiente de tasa.
+- Fin de semana o día inhábil: conservar fecha efectiva del último dato.
+- Monedas con cifras muy grandes: usar separadores y evitar desbordamientos.
+- Misma moneda: resultado 1:1 con aviso informativo.
+- Tasa cero, negativa o no finita: descartar.
+- Cargo fijo mayor al bruto del escenario: explicar que no se recibe un neto
+  positivo.
+- Moneda ya no disponible en el proveedor: mostrar mensaje y pedir otra.
+- Parámetros URL inválidos: ignorarlos sin romper la interfaz.
+- `localStorage` no disponible: continuar sin caché persistente.
+- Red lenta: mostrar carga sin bloquear el resto de la página.
+
+---
+
+## Criterios de aceptación del MVP
+
+1. La página existe en `/conversores/conversor-de-divisas`.
+2. El conversor está registrado en el directorio de calculadoras.
+3. El usuario puede convertir con las intenciones Tengo y Quiero recibir.
+4. El resultado muestra tasa directa, inversa, fuente, fecha efectiva y momento
+   de consulta.
+5. El usuario puede intercambiar monedas y copiar un resumen.
+6. El comparador acepta hasta 3 escenarios con tasa, comisión y cargo fijo.
+7. El comparador destaca el escenario capturado más favorable.
+8. Las tarjetas populares cargan pares prioritarios de Latinoamérica.
+9. El historial muestra una tasa diaria para 30 y 90 días, sin OHLC.
+10. Si falla la API y existe caché válida, se usa con un aviso visible.
+11. Si no existe API ni caché, no se calcula con datos inventados.
+12. USD/MXN muestra contexto y enlace oficial al FIX de Banco de México.
+13. La página funciona en móvil y puede operarse con teclado.
+14. Las funciones de cálculo y validación tienen pruebas unitarias.
+15. El build de Astro termina correctamente.
