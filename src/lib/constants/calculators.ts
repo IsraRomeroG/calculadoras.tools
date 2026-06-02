@@ -133,4 +133,13 @@ export const CALCULATORS: CalculatorDirectoryItem[] = [
     categorySlug: "conversores",
     order: 65,
   },
+  {
+    id: "conversor-de-peso",
+    title: "Conversor de peso",
+    description:
+      "Convierte kilogramos y libras al instante con fórmula y equivalencias útiles.",
+    href: "/conversores/conversor-de-peso",
+    categorySlug: "conversores",
+    order: 70,
+  },
 ];
