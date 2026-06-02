@@ -2,7 +2,7 @@
 title: "Cómo comparar créditos hipotecarios"
 seoTitle: "Cómo comparar hipotecas: tasa, CAT, plazo, seguros y costo total"
 description: "Aprende a comparar créditos hipotecarios revisando tasa, CAT, plazo, mensualidad, seguros, comisiones y condiciones de pago anticipado."
-pubDate: 2026-06-08
+pubDate: 2026-06-02
 categorySlug: "inmuebles"
 tags:
   - comparar hipotecas
@@ -34,17 +34,17 @@ La [calculadora de hipoteca](/inmuebles/calculadora-de-hipoteca) te ayuda a comp
 
 Antes de comparar, prepara una tabla con:
 
-| Dato | Oferta A | Oferta B |
-|---|---:|---:|
-| Monto del crédito |  |  |
-| Tasa anual |  |  |
-| CAT |  |  |
-| Plazo |  |  |
-| Mensualidad base |  |  |
-| Seguros |  |  |
-| Comisiones |  |  |
-| Total pagado |  |  |
-| Pago anticipado |  |  |
+| Dato              | Oferta A | Oferta B |
+| ----------------- | -------: | -------: |
+| Monto del crédito |          |          |
+| Tasa anual        |          |          |
+| CAT               |          |          |
+| Plazo             |          |          |
+| Mensualidad base  |          |          |
+| Seguros           |          |          |
+| Comisiones        |          |          |
+| Total pagado      |          |          |
+| Pago anticipado   |          |          |
 
 Si no tienes un dato, solicítalo. Comparar ofertas incompletas puede sesgar la decisión.
 
@@ -70,13 +70,13 @@ Estos puntos importan mucho si planeas hacer [pagos extra en tu hipoteca](/blog/
 
 Supongamos dos créditos por `$2,000,000`:
 
-| Concepto | Oferta A | Oferta B |
-|---|---:|---:|
-| Tasa anual | 8.5% | 9.0% |
-| Plazo | 15 años | 20 años |
-| Cuota base | $19,694.79 | $17,994.52 |
+| Concepto     |      Oferta A |      Oferta B |
+| ------------ | ------------: | ------------: |
+| Tasa anual   |          8.5% |          9.0% |
+| Plazo        |       15 años |       20 años |
+| Cuota base   |    $19,694.79 |    $17,994.52 |
 | Total pagado | $3,545,062.41 | $4,318,684.59 |
-| Intereses | $1,545,062.41 | $2,318,684.59 |
+| Intereses    | $1,545,062.41 | $2,318,684.59 |
 
 La oferta B tiene menor mensualidad, pero mayor costo total. Eso no significa que sea mala para todos: puede ser más manejable mensualmente. La decisión depende de liquidez, estabilidad y condiciones completas.
 

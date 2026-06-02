@@ -2,7 +2,7 @@
 title: "Sistema francés en una hipoteca: explicación fácil"
 seoTitle: "Sistema francés hipotecario: cuota fija, intereses y capital"
 description: "Entiende cómo funciona el sistema francés de amortización en una hipoteca, por qué la cuota es fija y cómo cambia la mezcla de capital e intereses."
-pubDate: 2026-06-10
+pubDate: 2026-06-02
 categorySlug: "inmuebles"
 tags:
   - sistema francés
@@ -61,11 +61,11 @@ Si la cuota es `$17,994.52`, solo `$2,994.52` reducen capital en ese primer pago
 
 ## Ejemplo con tabla de 3 meses
 
-| Mes | Pago | Capital | Intereses | Saldo |
-|---:|---:|---:|---:|---:|
-| 1 | $17,994.52 | $2,994.52 | $15,000.00 | $1,997,005.48 |
-| 2 | $17,994.52 | $3,016.98 | $14,977.54 | $1,993,988.50 |
-| 3 | $17,994.52 | $3,039.61 | $14,954.91 | $1,990,948.90 |
+| Mes |       Pago |   Capital |  Intereses |         Saldo |
+| --: | ---------: | --------: | ---------: | ------------: |
+|   1 | $17,994.52 | $2,994.52 | $15,000.00 | $1,997,005.48 |
+|   2 | $17,994.52 | $3,016.98 | $14,977.54 | $1,993,988.50 |
+|   3 | $17,994.52 | $3,039.61 | $14,954.91 | $1,990,948.90 |
 
 La cuota es igual, pero el capital aumenta poco a poco.
 

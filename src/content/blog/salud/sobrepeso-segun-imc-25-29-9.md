@@ -2,7 +2,7 @@
 title: "Sobrepeso según IMC: qué significa un IMC de 25 a 29.9"
 seoTitle: "Sobrepeso según IMC: rango 25 a 29.9 y cómo interpretarlo"
 description: "Conoce qué significa estar en el rango de sobrepeso según el IMC y qué limitaciones tiene esta clasificación."
-pubDate: 2026-06-02
+pubDate: 2026-06-20
 categorySlug: "salud"
 tags:
   - sobrepeso
@@ -28,21 +28,21 @@ IMC de 25.0 a 29.9
 
 Por debajo de 25.0, el resultado puede estar dentro del rango saludable si es al menos 18.5. A partir de 30.0, la categoría cambia a obesidad.
 
-| IMC | Categoría adulta |
-|-----|------------------|
-| 18.5 a 24.9 | Rango saludable |
-| 25.0 a 29.9 | Sobrepeso |
+| IMC         | Categoría adulta |
+| ----------- | ---------------- |
+| 18.5 a 24.9 | Rango saludable  |
+| 25.0 a 29.9 | Sobrepeso        |
 | 30.0 a 34.9 | Obesidad clase 1 |
 
 Si quieres saber dónde cae tu resultado, usa la [calculadora de IMC](/salud/calculadora-de-imc).
 
 ## Ejemplos de IMC en este rango
 
-| IMC | Lectura |
-|-----|---------|
-| 25.0 | Inicio de sobrepeso |
-| 26.4 | Sobrepeso |
-| 28.1 | Sobrepeso |
+| IMC  | Lectura                                |
+| ---- | -------------------------------------- |
+| 25.0 | Inicio de sobrepeso                    |
+| 26.4 | Sobrepeso                              |
+| 28.1 | Sobrepeso                              |
 | 29.9 | Límite superior del rango de sobrepeso |
 
 Ejemplo con 75 kg y 1.72 m:
