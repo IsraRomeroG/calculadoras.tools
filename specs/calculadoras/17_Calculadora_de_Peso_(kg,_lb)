@@ -1,0 +1,599 @@
+# Especificación MVP - Conversor de peso (kg y lb)
+
+## Objetivo
+
+Crear un conversor rápido y claro para transformar valores entre kilogramos y
+libras. La herramienta debe responder la consulta principal en segundos y
+mostrar equivalencias útiles sin convertir la primera pantalla en un formulario
+complejo.
+
+Aunque en el uso cotidiano se habla de "peso", las unidades incluidas en esta
+herramienta representan masa. La interfaz puede conservar el término habitual
+"peso" por claridad para el usuario y explicar la diferencia brevemente en el
+contenido editorial.
+
+La primera versión debe priorizar:
+
+- Conversión instantánea entre kilogramos (`kg`) y libras (`lb`).
+- Resultado destacado y tabla compacta con unidades relacionadas.
+- Fórmula visible con procedimiento opcional.
+- Entradas con punto o coma decimal.
+- Atajos para conversiones frecuentes.
+- Accesibilidad, uso móvil y enlaces compartibles.
+
+---
+
+## Ruta e integración con el sitio
+
+### Archivo de página
+
+```text
+src/pages/conversores/conversor-de-peso.astro
+```
+
+### URL pública principal
+
+```text
+/conversores/conversor-de-peso
+```
+
+La URL sigue el patrón existente:
+
+```text
+/conversores/conversor-de-temperatura
+```
+
+### Registro en el directorio
+
+Agregar la calculadora a:
+
+```text
+src/lib/constants/calculators.ts
+```
+
+Entrada sugerida:
+
+```ts
+{
+  id: "conversor-de-peso",
+  title: "Conversor de peso",
+  description:
+    "Convierte kilogramos y libras al instante con fórmula y equivalencias útiles.",
+  href: "/conversores/conversor-de-peso",
+  categorySlug: "conversores",
+  order: 70,
+}
+```
+
+### Lógica testeable
+
+Crear:
+
+```text
+src/lib/calculators/weight.ts
+src/lib/calculators/weight.test.ts
+```
+
+La página Astro debe concentrarse en presentación y eventos del navegador. El
+parseo, las conversiones, las validaciones y el formato reutilizable deben vivir
+en el módulo testeable.
+
+---
+
+## Alcance por fase
+
+### Fase 1 - MVP de lanzamiento
+
+- Conversión principal entre `kg` y `lb`.
+- Unidades secundarias disponibles: gramos (`g`), onzas (`oz`) y stone (`st`).
+- Selector de unidad de origen y unidad de destino.
+- Resultado de destino destacado.
+- Tabla compacta con equivalencias en todas las unidades disponibles.
+- Conversión en tiempo real.
+- Botón para intercambiar origen y destino.
+- Acciones para copiar resultado y limpiar.
+- Fórmula visible y procedimiento desplegable.
+- Atajos de conversiones frecuentes.
+- URL compartible mediante parámetros.
+- Validaciones, accesibilidad y pruebas unitarias.
+
+### Fase 2 - Mejoras de utilidad
+
+- Tabla personalizada para convertir un rango de valores.
+- Exportación CSV e impresión limpia.
+- Historial local de las últimas 10 conversiones.
+- Toneladas métricas (`t`) para usos logísticos.
+- Miligramos (`mg`) para usos generales no clínicos.
+- Selector de decimales visibles.
+
+### Fuera del alcance inicial
+
+- Conversión de volumen a masa, por ejemplo tazas de harina a gramos.
+- Densidades por ingrediente o material.
+- Recomendaciones de peso saludable.
+- Cálculo de IMC.
+- Dosis médicas o veterinarias por peso.
+- Conversión entre kilogramos y kilocalorías.
+- Páginas masivas por cada valor convertido.
+
+Las conversiones culinarias, el IMC y las dosis por peso deben vivir en
+herramientas independientes porque requieren contexto y reglas adicionales.
+
+---
+
+## Conceptos base
+
+### Unidades principales
+
+| Unidad | Símbolo | Equivalencia exacta o de referencia |
+|--------|---------|--------------------------------------|
+| Kilogramo | `kg` | Unidad base de masa del SI |
+| Libra avoirdupois internacional | `lb` | `1 lb = 0.45359237 kg` exactamente |
+
+La libra utilizada debe ser la libra avoirdupois internacional. No mezclarla
+con libra troy ni con usos históricos o regionales de la palabra "libra".
+
+### Unidades secundarias incluidas
+
+| Unidad | Símbolo | Equivalencia |
+|--------|---------|--------------|
+| Gramo | `g` | `1 kg = 1000 g` |
+| Onza avoirdupois | `oz` | `1 lb = 16 oz` |
+| Stone | `st` | `1 st = 14 lb` |
+
+Estas unidades pueden mostrarse en el mismo selector, pero `kg` y `lb` deben
+ocupar la posición más visible. `st` es útil para usuarios del Reino Unido y no
+debe presentarse como unidad habitual para toda la audiencia.
+
+### Diferencia entre masa y peso
+
+Texto editorial sugerido:
+
+```text
+En el lenguaje cotidiano usamos "peso" para hablar de kilogramos y libras.
+Técnicamente, estas unidades miden masa. El peso físico es una fuerza y depende
+de la gravedad.
+```
+
+No es necesario introducir newtons (`N`) en el conversor principal. Una futura
+calculadora de fuerza puede cubrir ese caso.
+
+---
+
+## Representación interna
+
+Toda conversión debe pasar por kilogramos como unidad canónica:
+
+```text
+entrada -> kilogramos con precisión completa -> unidad de salida -> redondeo visual
+```
+
+Factores hacia kilogramos:
+
+```text
+kg -> kg   kg = valor
+lb -> kg   kg = lb × 0.45359237
+g  -> kg   kg = g ÷ 1000
+oz -> kg   kg = oz × 0.028349523125
+st -> kg   kg = st × 6.35029318
+```
+
+Factores desde kilogramos:
+
+```text
+kg -> kg   kg = valor
+kg -> lb   lb = kg ÷ 0.45359237
+kg -> g    g = kg × 1000
+kg -> oz   oz = kg ÷ 0.028349523125
+kg -> st   st = kg ÷ 6.35029318
+```
+
+No redondear durante pasos intermedios.
+
+---
+
+## Conversión principal
+
+### Inputs
+
+| Campo | Tipo | Valor inicial |
+|-------|------|---------------|
+| Peso | Texto con `inputmode="decimal"` | Vacío |
+| Unidad de origen | Selector o botones | `kg` |
+| Unidad de destino | Selector o botones | `lb` |
+
+Se prefiere `type="text"` con `inputmode="decimal"` en vez de `type="number"`
+para controlar correctamente la coma decimal, el pegado de símbolos y estados
+intermedios como `.` o `,`.
+
+### Output principal
+
+El resultado de destino debe ocupar la posición más visible:
+
+```text
+70 kg = 154.32 lb
+```
+
+Debajo se muestra una tabla compacta:
+
+| Unidad | Resultado |
+|--------|-----------|
+| Kilogramos | `70 kg` |
+| Libras | `154.32 lb` |
+| Gramos | `70,000 g` |
+| Onzas | `2,469.18 oz` |
+| Stone | `11.02 st` |
+
+Cada fila debe incluir una acción para copiar el valor con su unidad.
+
+### Conversión en tiempo real
+
+- Actualizar resultados al escribir una entrada válida.
+- No usar un botón obligatorio para convertir.
+- Mantener resultados vacíos si el campo está vacío.
+- No mostrar error mientras el usuario escribe un estado intermedio válido,
+  por ejemplo `.`, `,`, `70,` o `70.`.
+
+### Intercambio de unidades
+
+El botón `⇄` intercambia origen y destino y conserva el significado del valor:
+
+```text
+70 kg -> 154.32 lb
+```
+
+al intercambiar:
+
+```text
+154.32 lb -> 70 kg
+```
+
+Usar la precisión interna del resultado, no el valor ya redondeado para mostrar.
+
+### Copiar y limpiar
+
+- El resultado principal y cada fila incluyen una acción `Copiar`.
+- Al copiar, mostrar confirmación visual durante aproximadamente 2 segundos.
+- Añadir una acción `Limpiar` que deje el campo vacío y restablezca los
+  resultados sin cambiar las unidades elegidas.
+
+---
+
+## Parseo de entradas
+
+### Formatos aceptados
+
+```text
+70
+70.5
+70,5
+70 kg
+154.32lb
+2 000 g
+11 st
+```
+
+### Reglas
+
+- Aceptar punto o coma como separador decimal.
+- Permitir espacios alrededor del valor y la unidad.
+- Aceptar separadores de miles razonables cuando no exista ambigüedad.
+- Si el texto pegado contiene una unidad inequívoca (`kg`, `lb`, `g`, `oz`,
+  `st`), seleccionar automáticamente esa unidad como origen.
+- Interpretar `lbs` como alias de `lb`.
+- No asumir una unidad por el tamaño del número.
+- No eliminar silenciosamente caracteres hasta obtener otro número.
+- Si el contenido no puede interpretarse de forma inequívoca, conservar la
+  entrada y mostrar un mensaje claro.
+
+Ejemplo de error:
+
+```text
+No pudimos interpretar el peso. Usa un formato como 70 kg o 154,3 lb.
+```
+
+### Separadores ambiguos
+
+El parseo debe documentarse y probarse. Reglas sugeridas:
+
+- `1,5` y `1.5` significan uno y medio.
+- `1,000.5` significa mil con cinco décimas.
+- `1.000,5` significa mil con cinco décimas.
+- `1 000` significa mil.
+- Una entrada ambigua como `1,000` puede interpretarse según el locale
+  `es-MX`, pero debe mantenerse consistente en todo el sitio.
+
+---
+
+## Validaciones
+
+| Caso | Comportamiento |
+|------|----------------|
+| Campo vacío | Resultados vacíos, sin error |
+| Estado intermedio al escribir | Esperar más entrada, sin error prematuro |
+| Texto ambiguo o inválido | Conservar valor y mostrar mensaje |
+| Valor negativo | Mostrar error y no convertir |
+| Cero exacto | Convertir normalmente |
+| Número no finito | Mostrar error y no convertir |
+| Número muy grande | Convertir; usar notación científica cuando mejore la legibilidad |
+| Origen igual a destino | Mostrar equivalencia `1:1` sin error |
+
+Mensaje recomendado para valores negativos:
+
+```text
+El peso no puede ser negativo.
+```
+
+No fijar un máximo arbitrario bajo: el conversor puede utilizarse para objetos,
+equipaje, productos o logística, no solo para peso corporal.
+
+---
+
+## Fórmula visible
+
+Mostrar la fórmula correspondiente a la conversión destacada.
+
+Ejemplo para `70 kg -> lb`:
+
+```text
+Fórmula: lb = kg ÷ 0.45359237
+Sustituyendo: lb = 70 ÷ 0.45359237
+Resultado: 154.32 lb
+```
+
+Ejemplo para `154.32 lb -> kg`:
+
+```text
+Fórmula: kg = lb × 0.45359237
+Sustituyendo: kg = 154.32 × 0.45359237
+Resultado: 70 kg aproximadamente
+```
+
+Requisitos:
+
+- Mostrar la fórmula resumida de forma predeterminada.
+- Añadir un desplegable `Ver procedimiento`.
+- Construir el procedimiento desde valores sin redondeo intermedio.
+- Adaptar la explicación a la unidad elegida.
+- No mostrar pasos vacíos si todavía no hay entrada válida.
+- Usar `aproximadamente` cuando el valor mostrado esté redondeado.
+
+---
+
+## Atajos de conversiones frecuentes
+
+Mostrar tarjetas que precarguen el conversor principal:
+
+| Consulta | Resultado aproximado |
+|----------|----------------------|
+| `1 kg` en libras | `2.20 lb` |
+| `5 kg` en libras | `11.02 lb` |
+| `10 kg` en libras | `22.05 lb` |
+| `20 kg` en libras | `44.09 lb` |
+| `50 kg` en libras | `110.23 lb` |
+| `70 kg` en libras | `154.32 lb` |
+| `100 kg` en libras | `220.46 lb` |
+| `100 lb` en kilogramos | `45.36 kg` |
+| `150 lb` en kilogramos | `68.04 kg` |
+| `200 lb` en kilogramos | `90.72 kg` |
+
+Las tarjetas deben apuntar a la misma página con parámetros de URL:
+
+```text
+/conversores/conversor-de-peso?valor=70&origen=kg&destino=lb
+```
+
+---
+
+## Enlaces compartibles
+
+Sincronizar la conversión válida con parámetros de URL:
+
+| Parámetro | Ejemplo | Regla |
+|-----------|---------|-------|
+| `valor` | `70` | Número normalizado con punto decimal |
+| `origen` | `kg` | `kg`, `lb`, `g`, `oz` o `st` |
+| `destino` | `lb` | `kg`, `lb`, `g`, `oz` o `st` |
+
+Requisitos:
+
+- Leer parámetros válidos al cargar la página.
+- Ignorar parámetros desconocidos sin romper la interfaz.
+- No indexar páginas duplicadas por parámetros.
+- Mantener el canonical en `/conversores/conversor-de-peso`.
+
+---
+
+## Diseño de la página
+
+### Hero
+
+**Kicker:** Conversores
+
+**H1:** Conversor de peso
+
+**Descripción:**
+
+```text
+Convierte kilogramos y libras al instante. Consulta equivalencias, revisa la
+fórmula y copia el resultado.
+```
+
+### Orden de secciones
+
+1. Hero y breadcrumbs.
+2. Conversión rápida.
+3. Fórmula y procedimiento.
+4. Atajos frecuentes.
+5. Tabla breve de equivalencias.
+6. Explicación de kilogramos, libras y masa.
+7. Preguntas frecuentes visibles.
+
+### Responsive
+
+- Mobile-first.
+- Resultado principal visible cerca del input.
+- Controles cómodos para uso táctil.
+- Tabla con scroll horizontal únicamente si resulta necesario.
+- Mantener `kg` y `lb` visibles sin desplegables adicionales en la primera
+  pantalla.
+
+---
+
+## SEO y contenido
+
+### Metadata principal
+
+```text
+Title: Conversor de kg a lb y libras a kilogramos
+Description: Convierte kilogramos a libras y libras a kilogramos al instante. Consulta la fórmula, equivalencias frecuentes y resultados en gramos, onzas y stone.
+Canonical: /conversores/conversor-de-peso
+```
+
+### FAQ visible
+
+- ¿Cuántas libras tiene un kilogramo?
+- ¿Cómo convertir kilogramos a libras?
+- ¿Cómo convertir libras a kilogramos?
+- ¿Cuánto son 70 kg en libras?
+- ¿Cuánto son 150 libras en kilogramos?
+- ¿Cuál es la diferencia entre kg y lb?
+- ¿Kilogramos y libras miden masa o peso?
+- ¿Cuántas onzas tiene una libra?
+
+Generar `FAQPage` JSON-LD solo para preguntas y respuestas visibles en la
+página.
+
+### Contenido de apoyo
+
+- Fórmula de `kg` a `lb`.
+- Fórmula de `lb` a `kg`.
+- Tabla breve de conversiones frecuentes.
+- Explicación del kilogramo como unidad del SI.
+- Explicación de la libra avoirdupois internacional.
+- Nota breve sobre masa y peso.
+- Enlaces internos hacia IMC, macros y déficit calórico cuando esas
+  herramientas aporten contexto, sin convertir el conversor en una calculadora
+  de salud.
+
+### Estrategia long-tail
+
+Durante el lanzamiento, usar tarjetas y parámetros de URL sobre la página
+principal. No crear páginas como `/70-kg-a-libras` o `/150-libras-a-kilos`
+hasta comprobar demanda real y definir una plantilla que aporte contenido útil
+suficiente para evitar páginas pobres o duplicadas.
+
+---
+
+## Accesibilidad
+
+- Usar `label` asociado a cada input y selector.
+- Mantener objetivos táctiles cómodos en móvil.
+- Anunciar resultados válidos con `aria-live="polite"`.
+- No anunciar cada tecla si la salida todavía no es válida.
+- Mantener errores próximos al campo y enlazados con `aria-describedby`.
+- Permitir navegación completa con teclado.
+- Añadir texto accesible a botones de copiar, limpiar e intercambiar.
+- No depender únicamente del color para comunicar errores o confirmaciones.
+- Mantener foco visible.
+
+---
+
+## Eventos analíticos sugeridos
+
+Si el sitio incorpora analítica, medir:
+
+| Evento | Cuándo |
+|--------|--------|
+| `weight_conversion_completed` | Conversión válida |
+| `weight_units_swapped` | Uso del botón para intercambiar |
+| `weight_result_copied` | Copia del resultado |
+| `weight_shortcut_selected` | Selección de un atajo |
+
+No enviar el valor capturado. Una cantidad puede representar información
+personal aunque el conversor también tenga usos generales.
+
+---
+
+## Casos extremos obligatorios
+
+| Entrada | Resultado esperado |
+|---------|--------------------|
+| `0 kg` | `0 lb`, válido |
+| `1 kg` | `2.2046226218... lb` internamente |
+| `1 lb` | `0.45359237 kg` exactamente |
+| `16 oz` | `1 lb` |
+| `14 lb` | `1 st` |
+| `70,5 kg` | Parsear como `70.5 kg` |
+| `154.32lb` pegado | Extraer valor y seleccionar `lb` |
+| `-1 kg` | Error |
+| `100` con origen `lb` | Respetar `lb`; no asumir `kg` |
+| `1e9 g` | Convertir y formatear de forma legible |
+| Origen y destino `kg` | Mostrar equivalencia `1:1` |
+
+---
+
+## Pruebas unitarias mínimas
+
+### Conversión
+
+- `1 lb = 0.45359237 kg`.
+- `1 kg = 2.2046226218... lb`.
+- `100 kg = 220.46226218... lb`.
+- `16 oz = 1 lb`.
+- `14 lb = 1 st`.
+- `1000 g = 1 kg`.
+- Round-trip por cada unidad sin pérdida relevante de precisión.
+
+### Validación
+
+- Aceptar cero.
+- Rechazar valores negativos.
+- Mantener vacío sin error.
+- Rechazar texto ambiguo sin modificar silenciosamente la entrada.
+- Rechazar `NaN`, `Infinity` y valores no finitos.
+
+### Parseo
+
+- Aceptar punto decimal.
+- Aceptar coma decimal.
+- Aceptar unidad pegada.
+- Detectar `kg`, `lb`, `lbs`, `g`, `oz` y `st`.
+- No inferir unidad desde un número sin símbolo.
+- Aplicar consistentemente la regla definida para separadores de miles.
+
+### URL
+
+- Leer parámetros válidos.
+- Ignorar parámetros inválidos.
+- Mantener canonical único.
+
+---
+
+## Criterios de aceptación del MVP
+
+1. La página existe en `/conversores/conversor-de-peso`.
+2. El conversor está registrado en el directorio de calculadoras.
+3. El usuario puede convertir entre `kg` y `lb` en tiempo real.
+4. `g`, `oz` y `st` están disponibles como unidades secundarias.
+5. El resultado destacado, la tabla completa y el botón de intercambio son
+   consistentes.
+6. Las entradas con coma decimal y unidades pegadas se interpretan
+   correctamente.
+7. Los valores negativos se rechazan y cero se acepta.
+8. Los errores no modifican silenciosamente el texto ingresado.
+9. La fórmula visible corresponde al par de unidades seleccionado.
+10. Los atajos precargan la misma página mediante parámetros válidos.
+11. La interfaz funciona con teclado y anuncia resultados válidos sin saturar
+    lectores de pantalla.
+12. La lógica central tiene pruebas unitarias.
+13. El build del sitio termina correctamente.
+
+---
+
+## Fuentes de referencia
+
+- BIPM, kilogram - SI base unit of mass:
+  https://www.bipm.org/en/si-base-units/kilogram
+- NIST, Handbook 44 - Appendix C. General Tables of Units of Measurement:
+  https://www.nist.gov/pml/owm/nist-handbook-44-current-edition

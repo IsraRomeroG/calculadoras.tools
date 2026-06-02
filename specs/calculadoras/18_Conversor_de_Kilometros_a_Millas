@@ -1,0 +1,898 @@
+# Especificación MVP — Conversor de kilómetros a millas
+
+## Resumen
+
+Herramienta para convertir distancias entre kilómetros (`km`) y millas
+terrestres (`mi`) de forma inmediata, clara y verificable.
+
+Aunque el nombre prioritario del roadmap es **Kilómetros a millas**, la página
+debe resolver también la conversión inversa **millas a kilómetros**. Ambas
+intenciones corresponden a la misma necesidad y no justifican páginas
+duplicadas durante el MVP.
+
+La calculadora debe ser estática, mobile-first, utilizable sin registro y
+compatible con la arquitectura Astro actual. Todo el cálculo ocurre en el
+navegador: no requiere backend, base de datos ni llamadas de red.
+
+---
+
+## Objetivo de producto
+
+- Convertir kilómetros a millas terrestres y millas terrestres a kilómetros.
+- Mostrar el resultado mientras el usuario escribe una entrada válida.
+- Evitar confundir la milla terrestre con la milla náutica.
+- Ofrecer una fórmula visible y un procedimiento breve.
+- Permitir intercambiar unidades, copiar el resultado y limpiar el formulario.
+- Resolver búsquedas frecuentes con atajos que carguen la misma calculadora.
+- Mantener una única URL canónica para la herramienta.
+- Separar la lógica matemática en funciones puras con pruebas unitarias.
+
+---
+
+## Decisiones de alcance
+
+### Incluido en el MVP
+
+1. Conversión bidireccional entre kilómetros (`km`) y millas terrestres (`mi`).
+2. Input de texto con soporte para punto o coma decimal.
+3. Conversión en tiempo real.
+4. Selector de unidad de origen y destino.
+5. Botón para intercambiar unidades conservando la distancia equivalente.
+6. Selector de decimales visibles: `0`, `1`, `2`, `3`, `4` o `5`.
+7. Resultado destacado, tasa de equivalencia y fórmula aplicada.
+8. Procedimiento desplegable con sustitución de valores.
+9. Botón para copiar resultado.
+10. Botón para limpiar.
+11. Atajos para conversiones frecuentes.
+12. URL compartible mediante query params.
+13. Contenido editorial y preguntas frecuentes visibles.
+14. Accesibilidad por teclado y anuncios moderados para lectores de pantalla.
+15. Pruebas unitarias para conversión, parseo, validación y formato.
+
+### Fuera del MVP
+
+- Conversor general de longitud con centímetros, metros, pulgadas, pies y
+  yardas como selectores permanentes.
+- Conversión de millas náuticas.
+- Mapas, geolocalización o cálculo de rutas entre ciudades.
+- Estimación de tiempo de viaje.
+- Consumo de combustible o costo por kilómetro.
+- Calculadora de ritmo de carrera.
+- Historial persistente.
+- Exportación CSV.
+- Páginas generadas masivamente para cada cantidad.
+
+Estas mejoras pueden evaluarse después del lanzamiento sin recargar la
+experiencia principal.
+
+---
+
+## Ruta e integración en el sitio
+
+### Archivo principal
+
+```text
+src/pages/conversores/kilometros-a-millas.astro
+```
+
+### URL pública y canonical
+
+```text
+/conversores/kilometros-a-millas
+```
+
+La URL es corta, descriptiva y utiliza únicamente caracteres ASCII. La misma
+página debe resolver kilómetros a millas y millas a kilómetros.
+
+### Registro en el directorio
+
+Agregar el conversor a:
+
+```text
+src/lib/constants/calculators.ts
+```
+
+Propuesta:
+
+```ts
+{
+  id: "kilometros-a-millas",
+  title: "Kilómetros a millas",
+  description:
+    "Convierte kilómetros y millas terrestres al instante con fórmula, equivalencias y ejemplos frecuentes.",
+  href: "/conversores/kilometros-a-millas",
+  categorySlug: "conversores",
+  order: 69,
+}
+```
+
+El orden propuesto deja espacio entre los conversores ya documentados:
+
+| Conversor | `order` |
+|-----------|---------|
+| Temperatura | `65` |
+| Divisas | `67` |
+| Kilómetros a millas | `69` |
+
+### Lógica testeable
+
+Crear:
+
+```text
+src/lib/calculators/distance.ts
+src/lib/calculators/distance.test.ts
+```
+
+La página Astro debe concentrarse en presentación, eventos del navegador y
+sincronización de URL. La conversión, el parseo y el formato reutilizable deben
+vivir en el módulo testeable.
+
+---
+
+## Conceptos que debe comunicar la interfaz
+
+### Kilómetro
+
+El kilómetro es una unidad de longitud del sistema métrico:
+
+```text
+1 km = 1,000 m
+```
+
+### Milla terrestre
+
+La milla utilizada por defecto es la **milla terrestre** o **milla
+internacional**, común en distancias por carretera y carrera:
+
+```text
+1 mi = 1.609344 km
+```
+
+La equivalencia es exacta. Por lo tanto:
+
+```text
+1 km = 0.621371192237334 mi
+```
+
+### No confundir con millas náuticas
+
+La milla náutica es una unidad diferente:
+
+```text
+1 nmi = 1.852 km
+```
+
+El MVP no convierte millas náuticas. La interfaz debe incluir una nota breve
+cerca de la explicación:
+
+```text
+Esta calculadora usa millas terrestres (mi). Las millas náuticas (nmi), usadas
+en navegación marítima y aérea, tienen una equivalencia diferente.
+```
+
+No utilizar solamente la palabra “millas” en el contenido explicativo cuando
+pueda existir ambigüedad.
+
+---
+
+## Representación interna
+
+Usar kilómetros como unidad canónica:
+
+```text
+entrada -> kilómetros con precisión completa -> unidad de salida -> redondeo visual
+```
+
+Constantes:
+
+```ts
+const KILOMETERS_PER_MILE = 1.609344;
+const MILES_PER_KILOMETER = 1 / KILOMETERS_PER_MILE;
+```
+
+No hardcodear una versión redondeada como `1.6` o `0.62` para calcular. Esas
+aproximaciones pueden aparecer únicamente como ayudas mentales claramente
+etiquetadas.
+
+---
+
+## Fórmulas
+
+### Kilómetros a millas
+
+```text
+millas = kilómetros ÷ 1.609344
+```
+
+Forma equivalente:
+
+```text
+millas = kilómetros × 0.621371192237334
+```
+
+### Millas a kilómetros
+
+```text
+kilómetros = millas × 1.609344
+```
+
+### Regla de redondeo
+
+- Conservar precisión completa durante el cálculo.
+- Redondear solamente al mostrar.
+- Usar el número de decimales visible elegido por el usuario.
+- Mantener el valor normalizado completo en los query params cuando sea
+  razonable.
+
+---
+
+## Conversión principal
+
+### Inputs
+
+| Campo | Tipo | Valor inicial |
+|-------|------|---------------|
+| Distancia | Texto con `inputmode="decimal"` | Vacío |
+| Unidad de origen | Selector o botones | Kilómetros (`km`) |
+| Unidad de destino | Selector o botones | Millas terrestres (`mi`) |
+| Decimales visibles | Selector: `0` a `5` | `2` |
+
+Se prefiere `type="text"` con `inputmode="decimal"` en vez de `type="number"`
+para controlar correctamente la coma decimal, el pegado de unidades y estados
+intermedios como `12,`.
+
+### Output principal
+
+Ejemplo:
+
+```text
+10 km = 6.21 mi
+```
+
+Mostrar debajo:
+
+```text
+1 km = 0.62137 mi
+1 mi = 1.609344 km
+```
+
+La tasa directa e inversa aporta contexto y permite verificar que la dirección
+seleccionada es la esperada.
+
+### Conversión en tiempo real
+
+- Actualizar el resultado al escribir una entrada válida.
+- No exigir un botón “Convertir”.
+- Mantener el resultado neutral si el input está vacío.
+- No mostrar error mientras el usuario escribe un estado intermedio válido,
+  por ejemplo `-`, `.`, `,` o `12,`.
+- Mostrar un mensaje claro si el contenido deja de ser interpretable.
+
+### Intercambio de unidades
+
+El botón `⇄` debe intercambiar unidad de origen y destino y conservar el
+significado de la distancia.
+
+Ejemplo:
+
+```text
+10 km -> 6.21371192237334 mi
+```
+
+Al intercambiar:
+
+```text
+6.21371192237334 mi -> 10 km
+```
+
+El input puede mostrar una versión suficientemente precisa para evitar deriva
+visible en intercambios repetidos. El resultado conserva precisión interna
+completa y se redondea únicamente en pantalla.
+
+### Copiar y limpiar
+
+- El botón **Copiar resultado** copia texto plano.
+- Tras copiar, mostrar confirmación visual durante aproximadamente 2 segundos.
+- El botón **Limpiar** vacía el input y los resultados sin recargar la página.
+- Limpiar no cambia las unidades ni los decimales seleccionados.
+
+Texto copiado:
+
+```text
+10 km = 6.21 mi
+Equivalencia: 1 mi = 1.609344 km
+```
+
+---
+
+## Parseo de entradas
+
+### Formatos aceptados
+
+```text
+10
+10.5
+10,5
+1,000
+1.000,5
+42.195 km
+26,2 mi
+15 kilómetros
+8 millas
+```
+
+### Reglas
+
+- Aceptar punto o coma como separador decimal.
+- Aceptar separadores de miles habituales.
+- Si aparecen punto y coma, interpretar como separador decimal el último y
+  como agrupador de miles el anterior.
+- Si aparece una sola coma seguida por exactamente tres dígitos, interpretarla
+  como agrupador de miles para mantener consistencia con los parsers actuales
+  del proyecto: `1,000` se normaliza como `1000`.
+- Si aparece un solo punto, interpretarlo como decimal: `42.195` se normaliza
+  como `42.195`.
+- Documentar esta decisión en pruebas: una entrada con una sola coma y tres
+  dígitos posteriores es inherentemente ambigua. Para escribir tres decimales,
+  recomendar punto: `1.609 km`.
+- Permitir espacios alrededor del número y la unidad.
+- Detectar unidades pegadas o escritas completas:
+  - Kilómetros: `km`, `kilómetro`, `kilómetros`, `kilometro`, `kilometros`.
+  - Millas terrestres: `mi`, `milla`, `millas`.
+- Si el texto pegado contiene una unidad inequívoca, seleccionar esa unidad
+  como origen.
+- No eliminar silenciosamente caracteres desconocidos hasta producir otro
+  número.
+- No convertir `nmi`, “milla náutica” o “millas náuticas” como si fueran
+  millas terrestres.
+
+Mensaje recomendado para formato inválido:
+
+```text
+No pudimos interpretar la distancia. Usa un formato como 10,5 km o 6.2 mi.
+```
+
+Mensaje recomendado para millas náuticas:
+
+```text
+Esta calculadora convierte millas terrestres (mi), no millas náuticas (nmi).
+```
+
+---
+
+## Validaciones
+
+| Caso | Comportamiento |
+|------|----------------|
+| Campo vacío | Resultado neutral, sin error |
+| Estado intermedio al escribir | Esperar más entrada, sin error prematuro |
+| Texto ambiguo o inválido | Conservar input y mostrar mensaje |
+| Distancia `0` | Convertir correctamente a `0` |
+| Distancia negativa | No convertir; mostrar error |
+| Resultado no finito | No convertir; mostrar error |
+| Distancia muy grande | Convertir; usar notación científica si mejora legibilidad |
+| Origen igual a destino | Mostrar equivalencia `1:1` y aviso amable |
+| Unidad náutica detectada | Explicar que el MVP usa millas terrestres |
+
+Mensaje para valores negativos:
+
+```text
+La distancia no puede ser negativa.
+```
+
+No establecer un máximo arbitrario bajo: una distancia puede representar una
+ruta, una escala geográfica o una distancia astronómica expresada por el
+usuario. Para valores extremadamente grandes, priorizar formato legible y
+validación de finitud.
+
+---
+
+## Formato de resultados
+
+Usar `Intl.NumberFormat` con locale `es-MX`.
+
+| Tipo | Formato |
+|------|---------|
+| Resultado habitual | `10 km = 6.21 mi` |
+| Resultado con decimales | `42.195 km = 26.219 mi` |
+| Tasa km a mi | `1 km = 0.62137 mi` |
+| Tasa mi a km | `1 mi = 1.609344 km` |
+| Valores pequeños | Hasta `8` decimales si el valor visible sería `0` |
+| Valores grandes | Separadores de miles |
+| Valores extremos | Notación científica si mejora legibilidad |
+
+### Símbolos
+
+- Kilómetros: `km`.
+- Millas terrestres: `mi`.
+- Millas náuticas: `nmi`, solo en la nota explicativa.
+
+Usar símbolos breves junto al resultado. En texto editorial, escribir el
+nombre completo cuando ayude a la claridad.
+
+---
+
+## Fórmula visible
+
+Mostrar la fórmula correspondiente a la dirección elegida.
+
+Ejemplo para `10 km -> mi`:
+
+```text
+Fórmula: millas = kilómetros ÷ 1.609344
+Sustituyendo: millas = 10 ÷ 1.609344
+Resultado: 6.21 mi
+```
+
+Ejemplo para `10 mi -> km`:
+
+```text
+Fórmula: kilómetros = millas × 1.609344
+Sustituyendo: kilómetros = 10 × 1.609344
+Resultado: 16.09 km
+```
+
+Requisitos:
+
+- Mostrar la fórmula resumida cuando exista una entrada válida.
+- Incluir un desplegable **Ver procedimiento**.
+- Construir el procedimiento con valores sin redondeo intermedio.
+- Adaptar etiquetas a la dirección elegida.
+- No renderizar pasos vacíos si todavía no existe un resultado.
+
+---
+
+## Atajos de conversiones frecuentes
+
+Mostrar tarjetas que carguen el conversor principal sin recargar la página.
+
+### Kilómetros a millas
+
+| Consulta | Resultado aproximado |
+|----------|----------------------|
+| `1 km` a millas | `0.62 mi` |
+| `5 km` a millas | `3.11 mi` |
+| `10 km` a millas | `6.21 mi` |
+| `21.0975 km` a millas | `13.11 mi` |
+| `42.195 km` a millas | `26.22 mi` |
+| `50 km` a millas | `31.07 mi` |
+| `100 km` a millas | `62.14 mi` |
+
+### Millas a kilómetros
+
+| Consulta | Resultado aproximado |
+|----------|----------------------|
+| `1 mi` a kilómetros | `1.61 km` |
+| `3.1 mi` a kilómetros | `4.99 km` |
+| `5 mi` a kilómetros | `8.05 km` |
+| `10 mi` a kilómetros | `16.09 km` |
+| `26.2 mi` a kilómetros | `42.16 km` |
+| `50 mi` a kilómetros | `80.47 km` |
+| `100 mi` a kilómetros | `160.93 km` |
+
+Cada tarjeta debe cargar `valor`, `origen` y `destino` en el conversor
+principal, actualizar la URL y llevar foco al resultado sin perder
+accesibilidad.
+
+---
+
+## Referencias prácticas
+
+El contenido de apoyo debe ayudar a interpretar distancias sin convertir la
+página en una calculadora de rutas.
+
+### Tabla breve
+
+| Kilómetros | Millas terrestres aproximadas |
+|------------|-------------------------------|
+| `1 km` | `0.62 mi` |
+| `5 km` | `3.11 mi` |
+| `10 km` | `6.21 mi` |
+| `20 km` | `12.43 mi` |
+| `50 km` | `31.07 mi` |
+| `100 km` | `62.14 mi` |
+| `500 km` | `310.69 mi` |
+| `1,000 km` | `621.37 mi` |
+
+### Ayuda mental
+
+Mostrar como aproximaciones, no como fórmula principal:
+
+```text
+Para estimar rápido: 5 km son aproximadamente 3.1 mi.
+Para estimar rápido: 10 mi son aproximadamente 16 km.
+```
+
+### Carreras
+
+Puede incluirse un bloque compacto:
+
+| Carrera | Distancia aproximada |
+|---------|----------------------|
+| `5 km` | `3.11 mi` |
+| `10 km` | `6.21 mi` |
+| Medio maratón: `21.0975 km` | `13.11 mi` |
+| Maratón: `42.195 km` | `26.22 mi` |
+
+No agregar cálculo de ritmo, tiempos objetivo o planes de entrenamiento al
+MVP. Esos casos corresponden a una calculadora de pace independiente.
+
+---
+
+## URL compartible
+
+Sincronizar parámetros después de una conversión válida:
+
+```text
+/conversores/kilometros-a-millas?valor=10&origen=km&destino=mi
+```
+
+Conversión inversa:
+
+```text
+/conversores/kilometros-a-millas?valor=10&origen=mi&destino=km
+```
+
+Con decimales personalizados:
+
+```text
+/conversores/kilometros-a-millas?valor=42.195&origen=km&destino=mi&decimales=3
+```
+
+### Reglas
+
+| Parámetro | Valores válidos | Default |
+|-----------|-----------------|---------|
+| `valor` | Número normalizado no negativo | Vacío |
+| `origen` | `km`, `mi` | `km` |
+| `destino` | `km`, `mi` | `mi` |
+| `decimales` | `0`, `1`, `2`, `3`, `4`, `5` | `2` |
+
+- Leer params válidos al cargar.
+- Ignorar params inválidos sin romper la interfaz.
+- Mantener canonical en `/conversores/kilometros-a-millas`.
+- No crear páginas indexables duplicadas por query params.
+
+---
+
+## Diseño de página
+
+### Hero
+
+**Kicker:** Conversores
+
+**H1:** Kilómetros a millas
+
+**Descripción:**
+
+```text
+Convierte kilómetros y millas terrestres al instante. Consulta la fórmula,
+copia el resultado y usa equivalencias frecuentes para carretera o carrera.
+```
+
+### Orden de secciones
+
+1. Hero y breadcrumbs.
+2. Conversor principal.
+3. Atajos de conversiones frecuentes.
+4. Tabla breve de equivalencias.
+5. Cómo convertir kilómetros y millas.
+6. Nota sobre millas terrestres y millas náuticas.
+7. Referencias compactas para carreras.
+8. Preguntas frecuentes visibles.
+
+### Responsive
+
+- Mobile-first.
+- Formulario y resultado cerca del primer viewport.
+- Una columna en móvil.
+- Dos columnas en pantallas amplias: formulario a la izquierda y resultado a la
+  derecha.
+- Botones táctiles de altura mínima aproximada de `44px`.
+- Resultados largos con wrap natural.
+- Tablas con scroll horizontal si fuera necesario.
+
+### Componentes existentes
+
+Reutilizar la composición visual de los conversores actuales:
+
+```text
+BaseLayout
+PageShell
+Container
+PageHero
+SectionIntro
+FaqSection
+```
+
+No incorporar React, Vue, Svelte ni librerías adicionales.
+
+---
+
+## Accesibilidad
+
+- Asociar un `label` visible al input y a cada selector.
+- Usar `aria-describedby` para errores.
+- Marcar inputs inválidos con `aria-invalid`.
+- Anunciar resultados válidos con `aria-live="polite"`.
+- No anunciar errores durante estados intermedios de escritura.
+- Incluir `aria-label` descriptivo en el botón de intercambio.
+- Comunicar éxito o fallo al copiar sin usar `alert()`.
+- Permitir navegación completa por teclado.
+- Mantener foco visible.
+- No depender únicamente del color para errores o estados.
+- Respetar `prefers-reduced-motion` al desplazar hacia un atajo cargado.
+
+---
+
+## SEO
+
+### Metadata principal
+
+```text
+Title: Kilómetros a Millas — Conversor de km a mi
+Description: Convierte kilómetros a millas y millas a kilómetros al instante. Consulta la fórmula, equivalencias frecuentes y ejemplos para carretera o carrera.
+Canonical: /conversores/kilometros-a-millas
+```
+
+### H1
+
+```text
+Kilómetros a millas
+```
+
+### Contenido editorial
+
+Explicar brevemente:
+
+- Cuántas millas terrestres tiene un kilómetro.
+- Cuántos kilómetros tiene una milla terrestre.
+- Cómo convertir kilómetros a millas.
+- Cómo convertir millas a kilómetros.
+- Diferencia entre milla terrestre y milla náutica.
+- Aproximaciones útiles para estimar mentalmente.
+
+### FAQ visibles
+
+Incluir respuestas claras para:
+
+- ¿Cuántas millas son 1 kilómetro?
+- ¿Cuántos kilómetros son 1 milla?
+- ¿Cómo convertir kilómetros a millas?
+- ¿Cómo convertir millas a kilómetros?
+- ¿Cuántas millas son 5 kilómetros?
+- ¿Cuántas millas son 10 kilómetros?
+- ¿Cuántos kilómetros son 100 millas?
+- ¿Una milla terrestre es igual a una milla náutica?
+- ¿Cuántas millas tiene un maratón?
+
+Generar `FAQPage` JSON-LD únicamente para preguntas y respuestas visibles en la
+página.
+
+### Estrategia long-tail
+
+Durante el MVP, resolver cantidades populares con tarjetas y query params en
+la página principal.
+
+No crear inicialmente páginas como:
+
+```text
+/conversores/10-kilometros-a-millas
+/conversores/100-kilometros-a-millas
+/conversores/5-millas-a-kilometros
+```
+
+Evaluar páginas curadas únicamente si existe demanda comprobada y cada página
+puede aportar contenido propio suficiente.
+
+---
+
+## Analítica sugerida
+
+Si el sitio incorpora analítica, medir:
+
+| Evento | Cuándo |
+|--------|--------|
+| `distance_conversion_completed` | Conversión válida |
+| `distance_units_swapped` | Uso del botón intercambiar |
+| `distance_result_copied` | Copia de resultado |
+| `distance_shortcut_selected` | Selección de atajo |
+| `distance_nautical_input_rejected` | Intento de convertir `nmi` |
+
+No enviar cantidades capturadas ni query params completos a analytics.
+
+---
+
+## Implementación técnica sugerida
+
+### Tipos
+
+```ts
+type DistanceUnit = "km" | "mi";
+
+interface ParsedDistance {
+  value: number;
+  normalized: string;
+  detectedUnit?: DistanceUnit;
+}
+```
+
+### Constantes
+
+```ts
+const KILOMETERS_PER_MILE = 1.609344;
+
+const DISTANCE_UNIT_METADATA = {
+  km: {
+    label: "Kilómetros",
+    symbol: "km",
+  },
+  mi: {
+    label: "Millas terrestres",
+    symbol: "mi",
+  },
+} as const;
+```
+
+### Funciones puras sugeridas
+
+```ts
+convertDistance(value, origin, destination)
+convertAllDistances(value, origin)
+parseDistanceInput(value)
+validateDistance(value)
+formatDistance(value, unit, decimals)
+buildDistanceExplanation(value, origin, destination, decimals)
+isDistanceUnit(value)
+```
+
+### Responsabilidades de la página Astro
+
+- Render inicial.
+- Controles de UI.
+- Conversión en tiempo real.
+- Intercambio de unidades.
+- Sincronización de query params.
+- Copia al portapapeles.
+- Anuncios accesibles.
+- Carga de atajos.
+
+### Responsabilidades del módulo puro
+
+- Tipos y metadata de unidades.
+- Factor exacto de conversión.
+- Conversión entre `km` y `mi`.
+- Parseo normalizado.
+- Validación.
+- Formato.
+- Procedimiento de fórmula.
+
+---
+
+## Casos extremos obligatorios
+
+| Entrada | Origen | Resultado esperado |
+|---------|--------|--------------------|
+| `0` | `km` | `0 mi` |
+| `1` | `km` | `0.62137 mi` con 5 decimales |
+| `1` | `mi` | `1.609344 km` con precisión suficiente |
+| `10` | `km` | `6.21 mi` con 2 decimales |
+| `10` | `mi` | `16.09 km` con 2 decimales |
+| `42.195 km` | Detectar `km` | `26.22 mi` con 2 decimales |
+| `26.2 mi` | Detectar `mi` | `42.16 km` con 2 decimales |
+| `1,000 km` | Detectar `km` | `621.37 mi` con 2 decimales |
+| `-5 km` | Detectar `km` | Error por distancia negativa |
+| `5 nmi` | Detectar náutica | Error específico; no tratar como `mi` |
+| `abc` | — | Error de formato |
+| Input vacío | — | Resultado neutral, sin error |
+| `10 km` y origen manual `mi` | Detectar `km` | Actualizar origen a `km` |
+
+Nota de parseo: una sola coma seguida por tres dígitos se interpreta como
+agrupador de miles, siguiendo los parsers actuales del proyecto. Por eso,
+`1,000 km` se normaliza como mil kilómetros. Para expresar tres decimales,
+utilizar punto: `42.195 km`. Añadir pruebas explícitas para evitar decisiones
+inconsistentes.
+
+---
+
+## Pruebas unitarias mínimas
+
+### Conversión
+
+- `1 mi = 1.609344 km`.
+- `1 km = 0.621371192237334 mi` aproximadamente.
+- `5 km ≈ 3.106855961 mi`.
+- `10 km ≈ 6.213711922 mi`.
+- `100 mi = 160.9344 km`.
+- Round-trip `km -> mi -> km` sin pérdida relevante de precisión.
+- Round-trip `mi -> km -> mi` sin pérdida relevante de precisión.
+- Origen y destino iguales conservan el valor.
+
+### Parseo
+
+- Aceptar punto decimal.
+- Aceptar coma decimal.
+- Aceptar separador de miles inequívoco.
+- Aceptar unidad pegada.
+- Detectar `km`, `kilómetros`, `mi` y `millas`.
+- Rechazar texto ambiguo sin modificar silenciosamente el input.
+- Detectar `nmi` y rechazarlo con un error específico.
+- Mantener input vacío e intermedio sin error prematuro.
+
+### Validación
+
+- Aceptar `0`.
+- Rechazar valores negativos.
+- Rechazar `NaN`, `Infinity` y resultados no finitos.
+
+### Formato
+
+- Aplicar decimales visibles elegidos.
+- Usar locale `es-MX`.
+- Redondear únicamente al mostrar.
+- Mostrar precisión adicional para valores pequeños si el resultado visible
+  sería `0`.
+
+### URL
+
+- Leer params válidos.
+- Ignorar params inválidos.
+- Mantener canonical único.
+
+---
+
+## Criterios de aceptación del MVP
+
+1. La página existe en `/conversores/kilometros-a-millas`.
+2. El conversor está registrado en el directorio de calculadoras.
+3. El usuario puede convertir `km -> mi` y `mi -> km` en tiempo real.
+4. El cálculo usa `1 mi = 1.609344 km`, sin aproximaciones intermedias.
+5. El resultado muestra equivalencia directa, inversa y fórmula.
+6. El botón de intercambio conserva la distancia equivalente.
+7. El usuario puede copiar el resultado y limpiar el formulario.
+8. El parser acepta punto, coma decimal y unidades pegadas.
+9. El parser no trata `nmi` como millas terrestres.
+10. Los atajos frecuentes cargan la calculadora principal y actualizan la URL.
+11. La página mantiene canonical único sin duplicar páginas por cantidad.
+12. La interfaz funciona en móvil y puede operarse completamente con teclado.
+13. Los cambios importantes se anuncian sin saturar lectores de pantalla.
+14. La lógica central tiene pruebas unitarias.
+15. El build de Astro termina correctamente.
+
+---
+
+## Fases posteriores
+
+### Fase 2 — Conversor de longitud ampliado
+
+- Añadir metros, centímetros, pies, pulgadas y yardas.
+- Mantener `km` y `mi` como selección prioritaria.
+- Agregar tabla personalizada con inicio, fin y paso.
+- Permitir exportar tabla CSV.
+- Añadir historial de sesión opt-in.
+
+### Fase 3 — Herramientas relacionadas
+
+- Calculadora de ritmo de carrera.
+- Calculadora de velocidad, distancia y tiempo.
+- Consumo de gasolina.
+- Costo por kilómetro.
+- Distancia entre ciudades con una fuente cartográfica adecuada.
+
+### Fase 4 — Navegación
+
+- Conversor independiente de millas náuticas, kilómetros y nudos.
+- Contexto para navegación marítima y aérea.
+- No mezclar este modo con la experiencia inicial sin una separación visual
+  clara.
+
+---
+
+## Fuentes de referencia
+
+- NIST, SI Units — Length:
+  https://www.nist.gov/pml/owm/si-units-length
+- NIST Handbook 133, Appendix E — General Tables of Units of Measurement:
+  https://www.nist.gov/document/2026-hb-133-appendix-e
+- World Athletics, Competition and Technical Rules:
+  https://worldathletics.org/about-iaaf/documents/book-of-rules
