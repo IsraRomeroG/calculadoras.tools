@@ -15,11 +15,13 @@ contenido editorial.
 La primera versión debe priorizar:
 
 - Conversión instantánea entre kilogramos (`kg`) y libras (`lb`).
+- Acceso inmediato a la dirección habitual `kg -> lb` y su inversa `lb -> kg`.
 - Resultado destacado y tabla compacta con unidades relacionadas.
+- Formato adaptativo que evite mostrar como cero un resultado pequeño no nulo.
 - Fórmula visible con procedimiento opcional.
 - Entradas con punto o coma decimal.
 - Atajos para conversiones frecuentes.
-- Accesibilidad, uso móvil y enlaces compartibles.
+- Accesibilidad, diseño mobile-first y enlaces compartibles con acción visible.
 
 ---
 
@@ -85,16 +87,21 @@ en el módulo testeable.
 ### Fase 1 - MVP de lanzamiento
 
 - Conversión principal entre `kg` y `lb`.
-- Unidades secundarias disponibles: gramos (`g`), onzas (`oz`) y stone (`st`).
-- Selector de unidad de origen y unidad de destino.
+- `kg` y `lb` visibles como unidades prioritarias en la primera pantalla.
+- Unidades secundarias disponibles dentro de `Más unidades`: gramos (`g`),
+  onzas (`oz`) y stone (`st`).
+- Selector de unidad de origen y unidad de destino sin ocultar el caso principal.
 - Resultado de destino destacado.
 - Tabla compacta con equivalencias en todas las unidades disponibles.
+- Tasas de referencia para verificar la dirección de conversión.
+- Formatos mixtos útiles para libras y stone.
 - Conversión en tiempo real.
 - Botón para intercambiar origen y destino.
-- Acciones para copiar resultado y limpiar.
+- Acciones para copiar resultado, compartir conversión y limpiar.
 - Fórmula visible y procedimiento desplegable.
 - Atajos de conversiones frecuentes.
 - URL compartible mediante parámetros.
+- Formato de resultados adaptativo.
 - Validaciones, accesibilidad y pruebas unitarias.
 
 ### Fase 2 - Mejoras de utilidad
@@ -142,8 +149,10 @@ con libra troy ni con usos históricos o regionales de la palabra "libra".
 | Stone | `st` | `1 st = 14 lb` |
 
 Estas unidades pueden mostrarse en el mismo selector, pero `kg` y `lb` deben
-ocupar la posición más visible. `st` es útil para usuarios del Reino Unido y no
-debe presentarse como unidad habitual para toda la audiencia.
+ocupar la posición más visible. En móvil, agrupar `g`, `oz` y `st` dentro de
+una acción o bloque `Más unidades` para que no compitan con la conversión
+principal. `st` es útil para usuarios del Reino Unido y no debe presentarse
+como unidad habitual para toda la audiencia.
 
 ### Diferencia entre masa y peso
 
@@ -199,12 +208,17 @@ No redondear durante pasos intermedios.
 | Campo | Tipo | Valor inicial |
 |-------|------|---------------|
 | Peso | Texto con `inputmode="decimal"` | Vacío |
-| Unidad de origen | Selector o botones | `kg` |
-| Unidad de destino | Selector o botones | `lb` |
+| Unidad de origen | Botones prioritarios y selector ampliado | `kg` |
+| Unidad de destino | Botones prioritarios y selector ampliado | `lb` |
 
 Se prefiere `type="text"` con `inputmode="decimal"` en vez de `type="number"`
 para controlar correctamente la coma decimal, el pegado de símbolos y estados
 intermedios como `.` o `,`.
+
+La primera pantalla móvil debe permitir elegir `kg` y `lb` sin abrir un
+desplegable. Las unidades `g`, `oz` y `st` permanecen disponibles mediante
+`Más unidades`. Al elegir una unidad secundaria, la selección activa debe
+seguir siendo visible y fácil de cambiar.
 
 ### Output principal
 
@@ -226,6 +240,29 @@ Debajo se muestra una tabla compacta:
 
 Cada fila debe incluir una acción para copiar el valor con su unidad.
 
+Mostrar también las tasas directas e inversas:
+
+```text
+1 kg = 2.20462 lb
+1 lb = 0.45359237 kg
+```
+
+Adaptar las tasas al par seleccionado cuando el usuario elija una unidad
+secundaria. Las tasas `kg <-> lb` son el ejemplo predeterminado, no un bloque
+fijo para todas las conversiones.
+
+Cuando aporten contexto, mostrar un desglose mixto secundario sin reemplazar el
+resultado decimal principal:
+
+```text
+154.32 lb = 154 lb 5.12 oz aproximadamente
+11.02 st = 11 st 0.28 lb aproximadamente
+```
+
+El desglose mixto debe calcularse desde el valor interno sin redondear y
+etiquetarse como aproximado cuando la parte fraccionaria visible esté
+redondeada.
+
 ### Conversión en tiempo real
 
 - Actualizar resultados al escribir una entrada válida.
@@ -233,6 +270,9 @@ Cada fila debe incluir una acción para copiar el valor con su unidad.
 - Mantener resultados vacíos si el campo está vacío.
 - No mostrar error mientras el usuario escribe un estado intermedio válido,
   por ejemplo `.`, `,`, `70,` o `70.`.
+- Actualizar visualmente sin demora perceptible.
+- Moderar los anuncios para lectores de pantalla mediante debounce o al
+  confirmar el valor; no anunciar una conversión nueva por cada tecla.
 
 ### Intercambio de unidades
 
@@ -250,12 +290,24 @@ al intercambiar:
 
 Usar la precisión interna del resultado, no el valor ya redondeado para mostrar.
 
-### Copiar y limpiar
+### Copiar, compartir y limpiar
 
 - El resultado principal y cada fila incluyen una acción `Copiar`.
 - Al copiar, mostrar confirmación visual durante aproximadamente 2 segundos.
+- Añadir una acción `Compartir conversión` junto al resultado principal.
+- Usar `navigator.share()` cuando esté disponible y haya sido activado por una
+  acción del usuario.
+- Si el navegador no soporta compartir de forma nativa, copiar el enlace
+  compartible y mostrar una confirmación clara.
 - Añadir una acción `Limpiar` que deje el campo vacío y restablezca los
   resultados sin cambiar las unidades elegidas.
+
+Texto copiado para el resultado principal:
+
+```text
+70 kg = 154.32 lb
+Equivalencia: 1 lb = 0.45359237 kg
+```
 
 ---
 
@@ -271,6 +323,9 @@ Usar la precisión interna del resultado, no el valor ya redondeado para mostrar
 154.32lb
 2 000 g
 11 st
+23 kilos
+50 libras
+1e9 g
 ```
 
 ### Reglas
@@ -278,9 +333,15 @@ Usar la precisión interna del resultado, no el valor ya redondeado para mostrar
 - Aceptar punto o coma como separador decimal.
 - Permitir espacios alrededor del valor y la unidad.
 - Aceptar separadores de miles razonables cuando no exista ambigüedad.
-- Si el texto pegado contiene una unidad inequívoca (`kg`, `lb`, `g`, `oz`,
-  `st`), seleccionar automáticamente esa unidad como origen.
-- Interpretar `lbs` como alias de `lb`.
+- Si el texto escrito o pegado contiene una unidad inequívoca, seleccionar
+  automáticamente esa unidad como origen.
+- Interpretar aliases habituales en español e inglés:
+  - Kilogramos: `kg`, `kilo`, `kilos`, `kilogramo`, `kilogramos`.
+  - Libras: `lb`, `lbs`, `libra`, `libras`.
+  - Gramos: `g`, `gramo`, `gramos`.
+  - Onzas: `oz`, `onza`, `onzas`.
+  - Stone: `st`, `stone`, `stones`.
+- Aceptar notación científica válida, por ejemplo `1e9 g`.
 - No asumir una unidad por el tamaño del número.
 - No eliminar silenciosamente caracteres hasta obtener otro número.
 - Si el contenido no puede interpretarse de forma inequívoca, conservar la
@@ -294,14 +355,23 @@ No pudimos interpretar el peso. Usa un formato como 70 kg o 154,3 lb.
 
 ### Separadores ambiguos
 
-El parseo debe documentarse y probarse. Reglas sugeridas:
+El parseo debe documentarse y probarse. Usar una convención consistente con
+`es-MX` y con los parsers actuales del sitio:
 
 - `1,5` y `1.5` significan uno y medio.
 - `1,000.5` significa mil con cinco décimas.
 - `1.000,5` significa mil con cinco décimas.
 - `1 000` significa mil.
-- Una entrada ambigua como `1,000` puede interpretarse según el locale
-  `es-MX`, pero debe mantenerse consistente en todo el sitio.
+- Si aparece punto y coma, interpretar como separador decimal el último y como
+  agrupador de miles el anterior.
+- Una sola coma seguida por exactamente tres dígitos se interpreta como
+  agrupador de miles: `1,000` significa mil.
+- Un solo punto se interpreta como decimal: `1.000` significa uno.
+- Si existen varios separadores del mismo tipo, aceptar únicamente
+  agrupaciones de miles válidas: `1,000,000` significa un millón.
+- Para expresar tres decimales sin ambigüedad, recomendar punto: `1.609 kg`.
+- Si la agrupación no es válida o la intención no puede determinarse de forma
+  consistente, conservar la entrada y mostrar error.
 
 ---
 
@@ -326,6 +396,35 @@ El peso no puede ser negativo.
 
 No fijar un máximo arbitrario bajo: el conversor puede utilizarse para objetos,
 equipaje, productos o logística, no solo para peso corporal.
+
+---
+
+## Formato de resultados
+
+Usar `Intl.NumberFormat` con locale `es-MX`. El formato visual debe adaptarse a
+la magnitud sin sacrificar precisión útil.
+
+| Caso | Comportamiento |
+|------|----------------|
+| Resultado habitual | Mostrar hasta `2` decimales cuando basten para interpretar el valor |
+| Valor exacto con menos decimales | No rellenar ceros innecesarios: `70 kg`, no `70.00 kg` |
+| Valor pequeño no nulo | Aumentar decimales visibles hasta evitar mostrar `0` |
+| Valor grande | Usar separadores de miles |
+| Valor extremo | Usar notación científica cuando mejore la legibilidad |
+| Resultado copiado | Incluir el valor mostrado y una tasa de equivalencia verificable |
+| Intercambio repetido | Conservar precisión interna suficiente para evitar deriva visible |
+
+Ejemplos:
+
+```text
+70 kg = 154.32 lb
+1 g = 0.001 kg
+0.01 oz = 0.00028 kg
+1,000 kg = 2,204.62 lb
+```
+
+Nunca representar visualmente un valor no nulo como `0`. El selector manual de
+decimales puede añadirse en fase 2 sin cambiar la representación interna.
 
 ---
 
@@ -362,7 +461,9 @@ Requisitos:
 
 ## Atajos de conversiones frecuentes
 
-Mostrar tarjetas que precarguen el conversor principal:
+Mostrar chips o tarjetas que precarguen el conversor principal sin recargar la
+página. En móvil, mostrar inicialmente hasta `6` atajos y dejar el resto dentro
+de una acción `Ver más conversiones`.
 
 | Consulta | Resultado aproximado |
 |----------|----------------------|
@@ -373,15 +474,26 @@ Mostrar tarjetas que precarguen el conversor principal:
 | `50 kg` en libras | `110.23 lb` |
 | `70 kg` en libras | `154.32 lb` |
 | `100 kg` en libras | `220.46 lb` |
+| `23 kg` en libras | `50.71 lb` |
+| `50 lb` en kilogramos | `22.68 kg` |
 | `100 lb` en kilogramos | `45.36 kg` |
 | `150 lb` en kilogramos | `68.04 kg` |
 | `200 lb` en kilogramos | `90.72 kg` |
 
-Las tarjetas deben apuntar a la misma página con parámetros de URL:
+Priorizar inicialmente valores cotidianos variados:
+
+```text
+1 kg, 10 kg, 23 kg, 70 kg, 50 lb y 150 lb
+```
+
+Los atajos deben actualizar el conversor y la URL de la misma página:
 
 ```text
 /conversores/conversor-de-peso?valor=70&origen=kg&destino=lb
 ```
+
+Tras seleccionar un atajo, llevar el foco al resultado principal sin provocar
+un desplazamiento animado si el usuario prefiere movimiento reducido.
 
 ---
 
@@ -399,8 +511,13 @@ Requisitos:
 
 - Leer parámetros válidos al cargar la página.
 - Ignorar parámetros desconocidos sin romper la interfaz.
+- Actualizar parámetros después de una conversión válida mediante
+  `history.replaceState()`.
+- Aplicar debounce a la sincronización mientras el usuario escribe.
+- No crear una entrada nueva en el historial del navegador por cada tecla.
 - No indexar páginas duplicadas por parámetros.
 - Mantener el canonical en `/conversores/conversor-de-peso`.
+- Compartir la URL normalizada actual desde la acción `Compartir conversión`.
 
 ---
 
@@ -432,11 +549,21 @@ fórmula y copia el resultado.
 ### Responsive
 
 - Mobile-first.
-- Resultado principal visible cerca del input.
-- Controles cómodos para uso táctil.
-- Tabla con scroll horizontal únicamente si resulta necesario.
+- Validar explícitamente la interfaz en anchos de `320px`, `360px`, `390px` y
+  `430px`.
+- Usar una columna en móvil.
+- Mantener input, dirección `kg <-> lb`, resultado principal y acciones cerca
+  del primer viewport.
+- En pantallas amplias, permitir dos columnas: formulario a la izquierda y
+  resultado a la derecha.
 - Mantener `kg` y `lb` visibles sin desplegables adicionales en la primera
-  pantalla.
+  pantalla; agrupar `g`, `oz` y `st` bajo `Más unidades`.
+- Usar controles táctiles de altura aproximada mínima de `44px`.
+- Permitir wrap natural para resultados largos.
+- Representar equivalencias como filas apiladas o cards compactas en móvil.
+- Evitar scroll horizontal; usarlo únicamente como último recurso para
+  contenido tabular secundario.
+- Mostrar hasta `6` atajos antes de `Ver más conversiones`.
 
 ---
 
@@ -489,13 +616,20 @@ suficiente para evitar páginas pobres o duplicadas.
 
 - Usar `label` asociado a cada input y selector.
 - Mantener objetivos táctiles cómodos en móvil.
-- Anunciar resultados válidos con `aria-live="polite"`.
-- No anunciar cada tecla si la salida todavía no es válida.
+- Usar una región `role="status"` o `aria-live="polite"` para anunciar
+  resultados válidos de forma moderada.
+- Aplicar debounce a los anuncios mientras el usuario escribe; no anunciar una
+  conversión nueva por cada tecla.
+- No anunciar estados intermedios ni salidas inválidas como resultados.
 - Mantener errores próximos al campo y enlazados con `aria-describedby`.
+- Marcar el input inválido con `aria-invalid="true"` mientras exista un error.
 - Permitir navegación completa con teclado.
-- Añadir texto accesible a botones de copiar, limpiar e intercambiar.
+- Añadir texto accesible a botones de copiar, compartir, limpiar e
+  intercambiar.
 - No depender únicamente del color para comunicar errores o confirmaciones.
 - Mantener foco visible.
+- Respetar `prefers-reduced-motion` al llevar el foco al resultado desde un
+  atajo.
 
 ---
 
@@ -508,10 +642,15 @@ Si el sitio incorpora analítica, medir:
 | `weight_conversion_completed` | Conversión válida |
 | `weight_units_swapped` | Uso del botón para intercambiar |
 | `weight_result_copied` | Copia del resultado |
+| `weight_conversion_shared` | Uso de compartir o copia del enlace compartible |
 | `weight_shortcut_selected` | Selección de un atajo |
 
 No enviar el valor capturado. Una cantidad puede representar información
 personal aunque el conversor también tenga usos generales.
+
+Como la conversión ocurre en tiempo real, emitir
+`weight_conversion_completed` con debounce y únicamente cuando cambie el
+estado normalizado de la conversión. No enviar un evento por cada tecla.
 
 ---
 
@@ -526,6 +665,11 @@ personal aunque el conversor también tenga usos generales.
 | `14 lb` | `1 st` |
 | `70,5 kg` | Parsear como `70.5 kg` |
 | `154.32lb` pegado | Extraer valor y seleccionar `lb` |
+| `23 kilos` pegado | Extraer valor y seleccionar `kg` |
+| `50 libras` pegado | Extraer valor y seleccionar `lb` |
+| `1,000 g` | Interpretar como `1000 g` |
+| `1.000 kg` | Interpretar como `1 kg` |
+| `1 g` hacia `kg` | Mostrar `0.001 kg`, nunca `0 kg` |
 | `-1 kg` | Error |
 | `100` con origen `lb` | Respetar `lb`; no asumir `kg` |
 | `1e9 g` | Convertir y formatear de forma legible |
@@ -558,14 +702,25 @@ personal aunque el conversor también tenga usos generales.
 - Aceptar punto decimal.
 - Aceptar coma decimal.
 - Aceptar unidad pegada.
-- Detectar `kg`, `lb`, `lbs`, `g`, `oz` y `st`.
+- Detectar símbolos y aliases definidos para `kg`, `lb`, `g`, `oz` y `st`.
+- Aceptar notación científica válida.
 - No inferir unidad desde un número sin símbolo.
-- Aplicar consistentemente la regla definida para separadores de miles.
+- Aplicar consistentemente las reglas definidas para separadores ambiguos.
+
+### Formato
+
+- No mostrar ceros decimales innecesarios.
+- Aumentar precisión visible para valores pequeños no nulos.
+- Aplicar separadores de miles con locale `es-MX`.
+- Usar notación científica cuando mejore la legibilidad.
+- Mantener estabilidad visual tras intercambios repetidos.
 
 ### URL
 
 - Leer parámetros válidos.
 - Ignorar parámetros inválidos.
+- Actualizar parámetros válidos mediante `history.replaceState()`.
+- Evitar una entrada de historial por cada tecla.
 - Mantener canonical único.
 
 ---
@@ -576,18 +731,28 @@ personal aunque el conversor también tenga usos generales.
 2. El conversor está registrado en el directorio de calculadoras.
 3. El usuario puede convertir entre `kg` y `lb` en tiempo real.
 4. `g`, `oz` y `st` están disponibles como unidades secundarias.
-5. El resultado destacado, la tabla completa y el botón de intercambio son
-   consistentes.
-6. Las entradas con coma decimal y unidades pegadas se interpretan
-   correctamente.
-7. Los valores negativos se rechazan y cero se acepta.
-8. Los errores no modifican silenciosamente el texto ingresado.
-9. La fórmula visible corresponde al par de unidades seleccionado.
-10. Los atajos precargan la misma página mediante parámetros válidos.
-11. La interfaz funciona con teclado y anuncia resultados válidos sin saturar
-    lectores de pantalla.
-12. La lógica central tiene pruebas unitarias.
-13. El build del sitio termina correctamente.
+5. En móvil, `kg` y `lb` pueden elegirse sin abrir un desplegable; `g`, `oz` y
+   `st` permanecen accesibles mediante `Más unidades`.
+6. El resultado destacado, las tasas de referencia, la tabla completa y el
+   botón de intercambio son consistentes.
+7. Los valores pequeños no nulos nunca se muestran como `0` por redondeo.
+8. Los formatos mixtos de libras y stone aparecen como contexto secundario
+   cuando aportan información útil.
+9. Las entradas con coma decimal, notación científica, unidades pegadas y
+   aliases habituales se interpretan correctamente.
+10. Los valores negativos se rechazan y cero se acepta.
+11. Los errores no modifican silenciosamente el texto ingresado.
+12. La fórmula visible corresponde al par de unidades seleccionado.
+13. Los atajos precargan la misma página, actualizan sus parámetros y moderan
+    el movimiento según la preferencia del usuario.
+14. La URL se sincroniza mediante `history.replaceState()` con debounce y se
+    puede compartir mediante acción visible con fallback de copiado.
+15. La interfaz funciona con teclado y anuncia resultados válidos con debounce
+    sin saturar lectores de pantalla.
+16. La interfaz se valida en `320px`, `360px`, `390px` y `430px` sin scroll
+    horizontal en el conversor principal.
+17. La lógica central tiene pruebas unitarias.
+18. El build del sitio termina correctamente.
 
 ---
 
