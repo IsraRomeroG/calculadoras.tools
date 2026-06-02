@@ -1,0 +1,294 @@
+# Especificación MVP — Calculadora de consumo de gasolina
+
+## Resumen
+
+Herramienta para calcular el rendimiento de combustible de un vehículo a partir
+de distancia recorrida y combustible utilizado. Debe mostrar formatos comunes
+como kilómetros por litro (`km/L`), litros por cada cien kilómetros
+(`L/100 km`) y millas por galón estadounidense (`mpg US`).
+
+La calculadora también debe resolver el caso inverso: estimar cuántos litros se
+necesitan para una distancia cuando el usuario ya conoce el rendimiento.
+
+---
+
+## Categoría recomendada
+
+```text
+src/pages/vehiculos
+```
+
+Categoría futura: **Vehículos**.
+
+La intención se relaciona directamente con uso y rendimiento del automóvil.
+Esta spec solo documenta la clasificación; no requiere modificar `src`.
+
+### Ruta propuesta
+
+```text
+src/pages/vehiculos/calculadora-de-consumo-de-gasolina.astro
+/vehiculos/calculadora-de-consumo-de-gasolina
+```
+
+### Registro futuro sugerido
+
+```ts
+{
+  id: "calculadora-de-consumo-de-gasolina",
+  title: "Calculadora de consumo de gasolina",
+  description:
+    "Calcula rendimiento de combustible en km/L, L/100 km y mpg, o estima litros para un trayecto.",
+  href: "/vehiculos/calculadora-de-consumo-de-gasolina",
+  categorySlug: "vehiculos",
+  order: 90,
+}
+```
+
+### Lógica testeable futura
+
+```text
+src/lib/calculators/fuel-consumption.ts
+src/lib/calculators/fuel-consumption.test.ts
+```
+
+---
+
+## Alcance
+
+### Incluido
+
+1. Modo **Calcular rendimiento**.
+2. Modo **Estimar combustible para un trayecto**.
+3. Distancia en kilómetros o millas.
+4. Combustible en litros o galones estadounidenses.
+5. Resultados en `km/L`, `L/100 km` y `mpg US`.
+6. Fórmula visible.
+7. Botones para copiar y limpiar.
+8. URL compartible.
+9. Accesibilidad y pruebas unitarias.
+
+### Fuera del MVP
+
+- Precio del combustible.
+- Costo total del trayecto.
+- Consumo eléctrico.
+- Galón imperial.
+- Registro histórico de cargas.
+- Comparación entre vehículos.
+- Estimación basada en modelo de automóvil.
+- Impacto de tráfico, clima o estilo de manejo.
+
+Enlazar la calculadora de costo por kilómetro para estimar dinero.
+
+---
+
+## Constantes exactas
+
+```text
+1 mi = 1.609344 km
+1 galón estadounidense = 3.785411784 l
+```
+
+Usar la etiqueta `gal US` en selectores y resultados. No mostrar únicamente
+`gal`, porque el galón imperial tiene otro valor.
+
+---
+
+## Modo 1 — Calcular rendimiento
+
+### Inputs
+
+| Campo | Default |
+|-------|---------|
+| Distancia recorrida | Vacío |
+| Unidad de distancia | `km` |
+| Combustible utilizado | Vacío |
+| Unidad de combustible | `l` |
+
+### Normalización
+
+Convertir internamente a kilómetros y litros:
+
+```text
+distanciaKm
+combustibleL
+```
+
+### Fórmulas
+
+```text
+kmPorLitro = distanciaKm ÷ combustibleL
+litrosPor100Km = 100 ÷ kmPorLitro
+mpgUS = kmPorLitro × 2.352145833
+```
+
+### Resultado
+
+Ejemplo:
+
+```text
+Distancia: 500 km
+Combustible: 40 l
+
+Rendimiento: 12.50 km/L
+Consumo: 8.00 L/100 km
+Equivalencia: 29.40 mpg US
+```
+
+---
+
+## Modo 2 — Estimar combustible para un trayecto
+
+### Inputs
+
+| Campo | Default |
+|-------|---------|
+| Distancia del trayecto | Vacío |
+| Unidad de distancia | `km` |
+| Rendimiento conocido | Vacío |
+| Formato de rendimiento | `km/L` |
+
+Permitir:
+
+```text
+km/L
+L/100 km
+mpg US
+```
+
+### Fórmulas
+
+Normalizar primero a `km/L`:
+
+```text
+desde L/100 km: kmPorLitro = 100 ÷ litrosPor100Km
+desde mpg US: kmPorLitro = mpgUS ÷ 2.352145833
+```
+
+Después:
+
+```text
+litrosNecesarios = distanciaKm ÷ kmPorLitro
+```
+
+### Resultado
+
+```text
+Para recorrer 300 km con un rendimiento de 12.5 km/L necesitas
+aproximadamente 24.00 l.
+```
+
+---
+
+## Parseo y validaciones
+
+Aceptar punto o coma decimal.
+
+| Caso | Comportamiento |
+|------|----------------|
+| Campo vacío | Resultado neutral |
+| Distancia `0` | Rechazar: no permite calcular rendimiento útil |
+| Combustible `0` | Rechazar: evita división entre cero |
+| Rendimiento `0` | Rechazar |
+| Valor negativo | Rechazar |
+| Valor no finito | No calcular |
+| Distancia o combustible extremadamente alto | Calcular si es finito; usar formato legible |
+
+Mantener precisión completa durante el cálculo y redondear únicamente al
+mostrar.
+
+---
+
+## URL compartible
+
+```text
+/vehiculos/calculadora-de-consumo-de-gasolina?modo=rendimiento&distancia=500&distanciaUnidad=km&combustible=40&combustibleUnidad=l
+/vehiculos/calculadora-de-consumo-de-gasolina?modo=trayecto&distancia=300&distanciaUnidad=km&rendimiento=12.5&rendimientoUnidad=km-l
+```
+
+Mantener canonical sin query params.
+
+---
+
+## Diseño y contenido
+
+### Hero
+
+**Kicker:** Vehículos
+
+**H1:** Calculadora de consumo de gasolina
+
+**Descripción:**
+
+```text
+Calcula el rendimiento de tu vehículo o estima cuántos litros necesitas para
+un trayecto.
+```
+
+### Secciones
+
+1. Hero y breadcrumbs.
+2. Selector de modo.
+3. Formulario y resultado.
+4. Conversión entre `km/L`, `L/100 km` y `mpg US`.
+5. Cómo medir consumo con una carga completa.
+6. Enlace a costo por kilómetro.
+7. FAQ visibles.
+
+### Nota editorial
+
+Explicar el método práctico:
+
+```text
+Llena el tanque, registra el odómetro, conduce normalmente, vuelve a llenar el
+tanque y divide la distancia recorrida entre los litros cargados.
+```
+
+### FAQ sugeridas
+
+- ¿Cómo calcular el consumo de gasolina?
+- ¿Qué significa km/L?
+- ¿Qué significa L/100 km?
+- ¿Cómo convertir km/L a mpg?
+- ¿Cómo saber cuántos litros necesito para un viaje?
+- ¿La calculadora usa galón estadounidense o imperial?
+
+---
+
+## Funciones puras sugeridas
+
+```ts
+convertDistanceToKm(value, unit)
+convertFuelToLiters(value, unit)
+calculateFuelEfficiency(distanceKm, fuelLiters)
+convertKmPerLiterToLitersPer100Km(value)
+convertKmPerLiterToMpgUs(value)
+normalizeEfficiency(value, unit)
+calculateFuelNeeded(distanceKm, kmPerLiter)
+```
+
+---
+
+## Pruebas mínimas
+
+- `500 km ÷ 40 l = 12.5 km/L`.
+- `12.5 km/L = 8 L/100 km`.
+- `12.5 km/L ≈ 29.4018 mpg US`.
+- `300 km ÷ 12.5 km/L = 24 l`.
+- `1 mi = 1.609344 km`.
+- `1 gal US = 3.785411784 l`.
+- Round-trip entre formatos sin pérdida relevante.
+- Rechazar cero, negativos, `NaN` e `Infinity`.
+
+---
+
+## Criterios de aceptación
+
+1. La spec clasifica la calculadora en `vehiculos`.
+2. La ruta propuesta es `/vehiculos/calculadora-de-consumo-de-gasolina`.
+3. El usuario puede calcular rendimiento o litros para un trayecto.
+4. Los resultados incluyen `km/L`, `L/100 km` y `mpg US`.
+5. La UI distingue galón estadounidense.
+6. El cálculo no mezcla costo monetario.
+7. La URL compartible conserva parámetros válidos.
+

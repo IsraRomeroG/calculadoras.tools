@@ -1,0 +1,341 @@
+# Especificación MVP — Conversor de medidas culinarias
+
+## Resumen
+
+Herramienta para convertir medidas habituales de cocina entre volumen y masa.
+Debe resolver conversiones rápidas para recetas sin mezclar dimensiones ni
+suponer que una taza de cualquier ingrediente pesa lo mismo.
+
+La primera versión prioriza equivalencias verificables entre unidades
+compatibles. Las conversiones por ingrediente, como tazas de harina a gramos,
+requieren densidades específicas y quedan fuera del MVP.
+
+---
+
+## Categoría recomendada
+
+```text
+src/pages/cocina
+```
+
+Categoría futura: **Cocina**.
+
+Esta herramienta debe vivir en `cocina`, no en `conversores`, porque su valor
+principal está en las convenciones culinarias y en explicar diferencias como
+taza estadounidense frente a taza métrica. Esta spec solo documenta la
+categoría recomendada; no requiere modificar `src`.
+
+### Ruta propuesta
+
+```text
+src/pages/cocina/conversor-de-medidas-culinarias.astro
+/cocina/conversor-de-medidas-culinarias
+```
+
+### Registro futuro sugerido
+
+```ts
+{
+  id: "conversor-de-medidas-culinarias",
+  title: "Conversor de medidas culinarias",
+  description:
+    "Convierte tazas, cucharadas, mililitros, gramos y otras medidas comunes de cocina.",
+  href: "/cocina/conversor-de-medidas-culinarias",
+  categorySlug: "cocina",
+  order: 78,
+}
+```
+
+### Lógica testeable futura
+
+```text
+src/lib/calculators/cooking-measures.ts
+src/lib/calculators/cooking-measures.test.ts
+```
+
+---
+
+## Alcance del MVP
+
+### Incluido
+
+1. Conversión bidireccional de unidades de volumen.
+2. Conversión bidireccional de unidades de masa.
+3. Selector explícito de sistema culinario para tazas y cucharas.
+4. Resultado instantáneo mientras la entrada sea válida.
+5. Equivalencias relacionadas en una tabla compacta.
+6. Fórmula aplicada.
+7. Botones para intercambiar unidades, copiar y limpiar.
+8. URL compartible con parámetros validados.
+9. Entradas con punto o coma decimal.
+10. Accesibilidad por teclado y pruebas unitarias.
+
+### Fuera del MVP
+
+- Conversión de volumen a masa por ingrediente.
+- Densidades para harina, azúcar, mantequilla, arroz u otros alimentos.
+- Temperatura de horno.
+- Escalado de recetas por porciones.
+- Fracciones Unicode o campos separados para números mixtos.
+- Conversión de unidades regionales ambiguas sin etiqueta explícita.
+- Importación de recetas.
+
+Enlazar la calculadora para escalar recetas cuando el usuario necesite cambiar
+porciones.
+
+---
+
+## Unidades incluidas
+
+### Volumen
+
+| Unidad | Símbolo interno | Base |
+|--------|-----------------|------|
+| Mililitro | `ml` | `1 ml` |
+| Litro | `l` | `1000 ml` |
+| Taza | `cup` | Depende del sistema elegido |
+| Cucharada | `tbsp` | Depende del sistema elegido |
+| Cucharadita | `tsp` | Depende del sistema elegido |
+| Onza líquida estadounidense | `us-fl-oz` | `29.5735295625 ml` |
+
+### Masa
+
+| Unidad | Símbolo interno | Base |
+|--------|-----------------|------|
+| Gramo | `g` | `1 g` |
+| Kilogramo | `kg` | `1000 g` |
+| Onza avoirdupois | `oz` | `28.349523125 g` |
+| Libra avoirdupois | `lb` | `453.59237 g` |
+
+No usar solamente `oz` para onza líquida: mostrar `fl oz` para volumen y `oz`
+para masa.
+
+---
+
+## Sistemas culinarios para volumen
+
+La palabra **taza** no representa siempre el mismo volumen. Mostrar un selector
+visible:
+
+| Sistema | Taza | Cucharada | Cucharadita |
+|---------|------|-----------|-------------|
+| Métrico | `250 ml` | `15 ml` | `5 ml` |
+| Estadounidense | `236.5882365 ml` | `14.78676478125 ml` | `4.92892159375 ml` |
+
+### Default
+
+Usar **Métrico** por defecto para una audiencia general en español.
+
+### Copy obligatorio
+
+```text
+Las tazas y cucharas pueden variar según el país o la receta. Revisa el sistema
+seleccionado antes de convertir.
+```
+
+No incluir taza imperial ni cucharada australiana durante el MVP. Pueden
+añadirse después con etiquetas explícitas.
+
+---
+
+## Reglas de conversión
+
+Convertir siempre mediante la unidad base del grupo:
+
+```text
+resultado = valor × factorOrigen ÷ factorDestino
+```
+
+Ejemplos:
+
+```text
+2 tazas métricas = 2 × 250 ml = 500 ml
+100 g = 100 ÷ 28.349523125 oz ≈ 3.53 oz
+```
+
+### Regla dimensional
+
+- Permitir volumen → volumen.
+- Permitir masa → masa.
+- No permitir volumen → masa.
+- No permitir masa → volumen.
+
+Mensaje recomendado:
+
+```text
+Para convertir volumen a peso necesitas elegir un ingrediente. Esa conversión
+no está incluida en esta versión.
+```
+
+---
+
+## Interfaz principal
+
+### Inputs
+
+| Campo | Tipo | Default |
+|-------|------|---------|
+| Cantidad | Texto con `inputmode="decimal"` | Vacío |
+| Tipo de medida | Selector: volumen o masa | Volumen |
+| Unidad de origen | Selector filtrado por tipo | `cup` |
+| Unidad de destino | Selector filtrado por tipo | `ml` |
+| Sistema culinario | Selector | Métrico |
+| Decimales visibles | Selector de `0` a `6` | `2` |
+
+Ocultar el selector de sistema cuando ninguna unidad seleccionada dependa de él.
+
+### Resultado principal
+
+```text
+2 tazas métricas = 500 ml
+```
+
+### Resultados secundarios
+
+Para volumen, mostrar equivalencias compactas:
+
+```text
+500 ml
+0.50 l
+2 tazas métricas
+33.33 cucharadas métricas
+```
+
+Para masa:
+
+```text
+500 g
+0.50 kg
+17.64 oz
+1.10 lb
+```
+
+### Acciones
+
+- **Intercambiar unidades**: conservar el valor equivalente con precisión
+  suficiente.
+- **Copiar resultado**: incluir sistema culinario cuando afecte el cálculo.
+- **Limpiar**: vaciar cantidad sin cambiar selectores.
+
+---
+
+## Parseo y validaciones
+
+Aceptar:
+
+```text
+2
+2.5
+2,5
+1,000
+1.000,5
+```
+
+| Caso | Comportamiento |
+|------|----------------|
+| Campo vacío | Resultado neutral |
+| Estado intermedio como `2,` | Esperar más entrada |
+| Valor no numérico | Mostrar error de formato |
+| Valor negativo | Rechazar |
+| Valor `0` | Convertir correctamente |
+| Resultado no finito | No calcular |
+| Origen y destino iguales | Mostrar equivalencia `1:1` |
+| Cambio de volumen a masa | Restablecer unidades compatibles |
+
+Mantener precisión completa durante el cálculo y redondear solo al mostrar.
+
+---
+
+## URL compartible
+
+```text
+/cocina/conversor-de-medidas-culinarias?valor=2&tipo=volumen&origen=cup&destino=ml&sistema=metrico
+/cocina/conversor-de-medidas-culinarias?valor=500&tipo=masa&origen=g&destino=oz
+```
+
+Reglas:
+
+- Leer parámetros válidos al cargar.
+- Ignorar parámetros incompatibles.
+- Mantener canonical sin query params.
+- No generar páginas indexables por cada valor.
+
+---
+
+## Diseño y contenido
+
+### Hero
+
+**Kicker:** Cocina
+
+**H1:** Conversor de medidas culinarias
+
+**Descripción:**
+
+```text
+Convierte tazas, cucharadas, mililitros, gramos y otras medidas habituales para
+seguir una receta con claridad.
+```
+
+### Secciones
+
+1. Hero y breadcrumbs.
+2. Conversor principal.
+3. Tabla de equivalencias relacionadas.
+4. Diferencia entre volumen y masa.
+5. Diferencia entre taza métrica y taza estadounidense.
+6. Enlace a escalar receta por porciones.
+7. FAQ visibles.
+
+### FAQ sugeridas
+
+- ¿Cuántos mililitros tiene una taza?
+- ¿Cuántas cucharadas tiene una taza?
+- ¿Cuántos gramos tiene una onza?
+- ¿Una onza líquida es igual a una onza de peso?
+- ¿Puedo convertir tazas de harina a gramos?
+- ¿Qué diferencia hay entre una taza métrica y una taza estadounidense?
+
+---
+
+## Funciones puras sugeridas
+
+```ts
+convertCookingMeasure(value, origin, destination, system)
+getCookingMeasureDimension(unit)
+getCookingMeasureFactor(unit, system)
+parseCookingMeasureInput(value)
+validateCookingMeasure(value)
+formatCookingMeasure(value, unit, decimals, system)
+```
+
+---
+
+## Pruebas mínimas
+
+- `1 l = 1000 ml`.
+- `1 cup` métrica `= 250 ml`.
+- `1 cup` estadounidense `= 236.5882365 ml`.
+- `1 tbsp` métrica `= 15 ml`.
+- `1 tbsp` estadounidense `= 14.78676478125 ml`.
+- `1 lb = 453.59237 g`.
+- `1 oz = 28.349523125 g`.
+- Rechazar conversión de `cup` a `g`.
+- Aceptar cero, punto y coma decimal.
+- Rechazar negativos, `NaN` e `Infinity`.
+- Round-trip sin pérdida relevante dentro del mismo grupo.
+
+---
+
+## Criterios de aceptación
+
+1. La spec clasifica la calculadora en la categoría futura `cocina`.
+2. La página propuesta usa `/cocina/conversor-de-medidas-culinarias`.
+3. El MVP separa claramente volumen y masa.
+4. El usuario puede elegir sistema métrico o estadounidense para tazas y
+   cucharas.
+5. La interfaz no inventa conversiones de volumen a masa.
+6. Las equivalencias usan factores definidos y pruebas unitarias.
+7. La URL compartible conserva parámetros válidos.
+8. El diseño previsto funciona en móvil y con teclado.
+

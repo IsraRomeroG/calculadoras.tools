@@ -1,0 +1,260 @@
+# Especificación MVP — Calculadora de propina en restaurantes
+
+## Resumen
+
+Herramienta para calcular una propina a partir del monto de consumo y un
+porcentaje elegido por el usuario. Debe mostrar propina, total final y pago por
+persona cuando la cuenta se comparte.
+
+No debe afirmar que existe un porcentaje universalmente correcto: las prácticas
+varían según país, establecimiento y contexto.
+
+---
+
+## Categoría recomendada
+
+```text
+src/pages/eventos-sociales
+```
+
+Categoría futura: **Eventos sociales**.
+
+Debe compartir categoría con la división de cuenta. Esta spec solo documenta
+la clasificación; no requiere modificar `src`.
+
+### Ruta propuesta
+
+```text
+src/pages/eventos-sociales/calculadora-de-propina.astro
+/eventos-sociales/calculadora-de-propina
+```
+
+### Registro futuro sugerido
+
+```ts
+{
+  id: "calculadora-de-propina",
+  title: "Calculadora de propina",
+  description:
+    "Calcula propina, total final y pago por persona con un porcentaje editable.",
+  href: "/eventos-sociales/calculadora-de-propina",
+  categorySlug: "eventos-sociales",
+  order: 88,
+}
+```
+
+### Lógica testeable futura
+
+```text
+src/lib/calculators/tip.ts
+src/lib/calculators/tip.test.ts
+```
+
+---
+
+## Alcance
+
+### Incluido
+
+1. Monto de consumo.
+2. Porcentaje de propina editable.
+3. Presets neutrales de acceso rápido.
+4. Propina calculada.
+5. Total con propina.
+6. División opcional entre personas.
+7. Redondeo opcional de propina.
+8. Resultado copiable y URL compartible.
+9. Accesibilidad y pruebas unitarias.
+
+### Fuera del MVP
+
+- Reglas de propina por país.
+- Recomendaciones normativas.
+- Cálculo automático desde fotografía del ticket.
+- División por platillo.
+- Conversión de monedas.
+- Pago o transferencia.
+
+---
+
+## Inputs
+
+| Campo | Tipo | Default |
+|-------|------|---------|
+| Consumo antes de propina | Texto monetario | Vacío |
+| Porcentaje | Texto con `inputmode="decimal"` | `10` |
+| Personas | Entero | `1` |
+| Moneda para formato | Selector | `MXN` |
+| Redondear propina | Toggle | Desactivado |
+
+Presets:
+
+```text
+0%
+10%
+15%
+20%
+Personalizado
+```
+
+Etiquetar los presets como atajos, no como recomendaciones.
+
+---
+
+## Fórmulas
+
+```text
+propina = consumo × porcentaje ÷ 100
+total = consumo + propina
+propina por persona = propina ÷ personas
+total por persona = total ÷ personas
+```
+
+### Redondeo opcional
+
+Permitir redondear la **propina total** hacia arriba a:
+
+```text
+unidad monetaria completa
+múltiplo de 5
+múltiplo de 10
+```
+
+Recalcular el porcentaje efectivo:
+
+```text
+porcentaje efectivo = propina redondeada ÷ consumo × 100
+```
+
+Mostrarlo para que el usuario entienda el ajuste.
+
+---
+
+## Resultado
+
+Ejemplo:
+
+```text
+Consumo: $850.00 MXN
+Propina (15%): $127.50 MXN
+Total: $977.50 MXN
+```
+
+Con división:
+
+```text
+3 personas
+Propina por persona: $42.50 MXN
+Total por persona: $325.83 MXN
+```
+
+### Copy obligatorio
+
+```text
+Revisa si el establecimiento ya incluyó servicio o propina antes de añadir un
+monto adicional.
+```
+
+---
+
+## Validaciones
+
+| Caso | Comportamiento |
+|------|----------------|
+| Consumo vacío | Resultado neutral |
+| Consumo negativo | Rechazar |
+| Consumo `0` | Permitir; propina y total `0` |
+| Porcentaje negativo | Rechazar |
+| Porcentaje mayor que `100` | Pedir revisar |
+| Personas menor que `1` | Rechazar |
+| Personas no enteras | Rechazar |
+| Resultado no finito | No calcular |
+
+Aceptar punto o coma decimal. Mantener precisión completa y redondear según la
+moneda solamente al mostrar.
+
+---
+
+## URL compartible
+
+```text
+/eventos-sociales/calculadora-de-propina?consumo=850&porcentaje=15&personas=3&moneda=MXN
+```
+
+Mantener canonical sin query params y no generar páginas indexables por monto.
+
+---
+
+## Diseño y contenido
+
+### Hero
+
+**Kicker:** Eventos sociales
+
+**H1:** Calculadora de propina
+
+**Descripción:**
+
+```text
+Calcula una propina con el porcentaje que elijas y revisa el total o el pago
+por persona.
+```
+
+### Secciones
+
+1. Hero y breadcrumbs.
+2. Formulario y resultado.
+3. Atajos de porcentaje.
+4. Nota sobre servicio ya incluido.
+5. Enlace para dividir cuenta.
+6. FAQ visibles.
+
+### FAQ sugeridas
+
+- ¿Cómo calcular una propina?
+- ¿Cómo calcular el total con propina?
+- ¿Cómo dividir la propina entre varias personas?
+- ¿La propina ya puede estar incluida en la cuenta?
+- ¿Qué porcentaje debo usar?
+
+La respuesta a la última pregunta debe explicar que depende del contexto y no
+presentar un preset como regla universal.
+
+---
+
+## Funciones puras sugeridas
+
+```ts
+calculateTip(consumption, percentage)
+calculateTipTotal(consumption, tip)
+calculateTipPerPerson(total, tip, people)
+roundTipUp(tip, increment)
+calculateEffectiveTipPercentage(consumption, roundedTip)
+parseMoneyInput(value)
+```
+
+---
+
+## Pruebas mínimas
+
+- `850 × 15% = 127.5`.
+- Total de `850` con `15%` → `977.5`.
+- Dividir total entre `3`.
+- Preset `0%` conserva total original.
+- Redondear propina hacia arriba y recalcular porcentaje efectivo.
+- Rechazar porcentaje negativo o mayor que `100`.
+- Rechazar personas no enteras o menores que `1`.
+- Aceptar punto y coma decimal.
+
+---
+
+## Criterios de aceptación
+
+1. La spec clasifica la calculadora en `eventos-sociales`.
+2. La ruta propuesta es `/eventos-sociales/calculadora-de-propina`.
+3. Los presets se presentan como atajos neutrales.
+4. La UI muestra propina, total y división opcional.
+5. El redondeo recalcula el porcentaje efectivo.
+6. La página recuerda revisar si el servicio ya está incluido.
+7. La URL compartible conserva parámetros válidos.
+

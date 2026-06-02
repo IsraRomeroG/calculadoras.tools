@@ -1,0 +1,287 @@
+# Especificación MVP — Calculadora de costo por kilómetro
+
+## Resumen
+
+Herramienta para estimar cuánto cuesta recorrer un trayecto en automóvil a
+partir de distancia, rendimiento y precio del combustible. Debe mostrar costo
+de combustible, gastos adicionales opcionales, costo total y costo por
+kilómetro.
+
+La primera versión calcula costos variables del viaje. No debe presentar el
+resultado como costo total de propiedad del vehículo.
+
+---
+
+## Categoría recomendada
+
+```text
+src/pages/vehiculos
+```
+
+Categoría futura: **Vehículos**.
+
+Debe compartir categoría con consumo de gasolina. Esta spec solo documenta la
+clasificación; no requiere modificar `src`.
+
+### Ruta propuesta
+
+```text
+src/pages/vehiculos/calculadora-de-costo-por-kilometro.astro
+/vehiculos/calculadora-de-costo-por-kilometro
+```
+
+### Registro futuro sugerido
+
+```ts
+{
+  id: "calculadora-de-costo-por-kilometro",
+  title: "Calculadora de costo por kilómetro",
+  description:
+    "Estima combustible, costo de un trayecto y costo por kilómetro con gastos adicionales opcionales.",
+  href: "/vehiculos/calculadora-de-costo-por-kilometro",
+  categorySlug: "vehiculos",
+  order: 92,
+}
+```
+
+### Lógica testeable futura
+
+```text
+src/lib/calculators/cost-per-kilometer.ts
+src/lib/calculators/cost-per-kilometer.test.ts
+```
+
+---
+
+## Alcance
+
+### Incluido
+
+1. Distancia del trayecto.
+2. Opción de ida o ida y vuelta.
+3. Rendimiento en `km/L`, `L/100 km` o `mpg US`.
+4. Precio por litro o por galón estadounidense.
+5. Costo de combustible.
+6. Casetas, estacionamiento y otros gastos variables opcionales.
+7. Costo total.
+8. Costo por kilómetro.
+9. División opcional entre pasajeros.
+10. URL compartible, copia y pruebas unitarias.
+
+### Fuera del MVP
+
+- Depreciación.
+- Mantenimiento por kilometraje.
+- Seguro, impuestos y financiamiento.
+- Costo total de propiedad.
+- Vehículos eléctricos.
+- Tarifas automáticas de casetas.
+- Mapas o cálculo de ruta.
+- Historial de precios.
+
+Añadir en fase posterior un modo avanzado de costo total de propiedad, separado
+visualmente del estimador de viaje.
+
+---
+
+## Constantes
+
+```text
+1 mi = 1.609344 km
+1 gal US = 3.785411784 l
+```
+
+---
+
+## Inputs
+
+| Campo | Default |
+|-------|---------|
+| Distancia | Vacío |
+| Unidad de distancia | `km` |
+| Trayecto | Solo ida |
+| Rendimiento | Vacío |
+| Formato de rendimiento | `km/L` |
+| Precio de combustible | Vacío |
+| Precio por | `l` |
+| Casetas | `0` |
+| Estacionamiento | `0` |
+| Otros gastos variables | `0` |
+| Pasajeros para dividir | `1` |
+| Moneda para formato | `MXN` |
+
+No consultar precios externos durante el MVP.
+
+---
+
+## Fórmulas
+
+### Distancia total
+
+```text
+distanciaTotalKm = distanciaNormalizadaKm × multiplicadorTrayecto
+multiplicadorTrayecto = 1 para solo ida
+multiplicadorTrayecto = 2 para ida y vuelta
+```
+
+### Rendimiento normalizado
+
+```text
+desde km/L: kmPorLitro = valor
+desde L/100 km: kmPorLitro = 100 ÷ valor
+desde mpg US: kmPorLitro = valor ÷ 2.352145833
+```
+
+### Precio normalizado
+
+```text
+desde precio por litro: precioPorLitro = valor
+desde precio por gal US: precioPorLitro = valor ÷ 3.785411784
+```
+
+### Resultado
+
+```text
+litrosNecesarios = distanciaTotalKm ÷ kmPorLitro
+costoCombustible = litrosNecesarios × precioPorLitro
+gastosAdicionales = casetas + estacionamiento + otros
+costoTotal = costoCombustible + gastosAdicionales
+costoPorKm = costoTotal ÷ distanciaTotalKm
+costoPorPasajero = costoTotal ÷ pasajeros
+```
+
+---
+
+## Resultado
+
+Ejemplo:
+
+```text
+Distancia total: 300 km
+Combustible estimado: 24.00 l
+Costo de combustible: $576.00 MXN
+Gastos adicionales: $250.00 MXN
+Costo total: $826.00 MXN
+Costo por kilómetro: $2.75 MXN/km
+```
+
+Con pasajeros:
+
+```text
+4 pasajeros
+Costo por pasajero: $206.50 MXN
+```
+
+### Copy obligatorio
+
+```text
+Es una estimación de costos variables del trayecto. No incluye mantenimiento,
+depreciación, seguro ni otros costos de propiedad del vehículo.
+```
+
+---
+
+## Validaciones
+
+| Caso | Comportamiento |
+|------|----------------|
+| Distancia vacía | Resultado neutral |
+| Distancia `<= 0` | Rechazar |
+| Rendimiento `<= 0` | Rechazar |
+| Precio negativo | Rechazar |
+| Precio `0` | Permitir |
+| Gastos opcionales negativos | Rechazar |
+| Pasajeros menor que `1` o no entero | Rechazar |
+| Resultado no finito | No calcular |
+
+Aceptar punto o coma decimal. Mantener precisión completa durante el cálculo y
+redondear solo al mostrar.
+
+---
+
+## URL compartible
+
+```text
+/vehiculos/calculadora-de-costo-por-kilometro?distancia=300&unidad=km&trayecto=ida&rendimiento=12.5&rendimientoUnidad=km-l&precio=24&precioUnidad=l&moneda=MXN
+```
+
+No sincronizar gastos opcionales si el usuario no los capturó. Mantener
+canonical sin query params.
+
+---
+
+## Diseño y contenido
+
+### Hero
+
+**Kicker:** Vehículos
+
+**H1:** Calculadora de costo por kilómetro
+
+**Descripción:**
+
+```text
+Estima cuánto cuesta un trayecto según distancia, rendimiento, precio del
+combustible y gastos adicionales.
+```
+
+### Secciones
+
+1. Hero y breadcrumbs.
+2. Trayecto, rendimiento y precio.
+3. Gastos adicionales opcionales.
+4. Resultado.
+5. Qué incluye y qué no incluye la estimación.
+6. Enlace a consumo de gasolina.
+7. FAQ visibles.
+
+### FAQ sugeridas
+
+- ¿Cómo calcular el costo por kilómetro?
+- ¿Cómo calcular gasolina para un viaje?
+- ¿Cómo añadir casetas y estacionamiento?
+- ¿Cómo dividir el costo entre pasajeros?
+- ¿La calculadora incluye mantenimiento y depreciación?
+- ¿Puedo usar millas y galones?
+
+---
+
+## Funciones puras sugeridas
+
+```ts
+normalizeTripDistance(value, unit, isRoundTrip)
+normalizeFuelEfficiency(value, unit)
+normalizeFuelPrice(value, unit)
+calculateTripFuelLiters(distanceKm, kmPerLiter)
+calculateVariableTripCost(input)
+calculateCostPerPassenger(total, passengers)
+parseMoneyInput(value)
+```
+
+---
+
+## Pruebas mínimas
+
+- `300 km`, `12.5 km/L` → `24 l`.
+- `24 l × $24 = $576`.
+- Agregar `$250` → total `$826`.
+- `$826 ÷ 300 km ≈ $2.7533/km`.
+- Ida y vuelta duplica distancia y combustible, no gastos manuales.
+- Convertir precio por galón a precio por litro.
+- Normalizar `L/100 km` y `mpg US`.
+- Dividir total entre pasajeros.
+- Rechazar cero donde produce división inválida.
+- Rechazar negativos, `NaN` e `Infinity`.
+
+---
+
+## Criterios de aceptación
+
+1. La spec clasifica la calculadora en `vehiculos`.
+2. La ruta propuesta es `/vehiculos/calculadora-de-costo-por-kilometro`.
+3. El MVP calcula costos variables de un trayecto.
+4. La UI distingue ida de ida y vuelta.
+5. La herramienta acepta formatos comunes de rendimiento.
+6. Los costos de propiedad quedan explícitamente fuera del resultado.
+7. La URL compartible conserva parámetros válidos.
+

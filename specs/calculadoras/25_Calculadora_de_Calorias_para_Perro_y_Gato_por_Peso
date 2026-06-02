@@ -1,0 +1,294 @@
+# Especificación MVP — Calculadora de calorías para perro o gato por peso
+
+## Resumen
+
+Herramienta orientativa para estimar las calorías diarias de mantenimiento de
+un perro o gato adulto a partir de su peso y perfil general. Debe mostrar el
+requerimiento energético en reposo (`RER`) y un rango estimado de mantenimiento
+(`MER`).
+
+La calculadora no prescribe dietas. Las necesidades reales cambian con
+condición corporal, actividad, edad, estado reproductivo y salud. El resultado
+debe invitar a validarlo con un veterinario.
+
+---
+
+## Categoría recomendada
+
+```text
+src/pages/mascotas
+```
+
+Categoría futura: **Mascotas**.
+
+Debe compartir categoría con la calculadora de edad de mascota. Esta spec solo
+documenta la clasificación; no requiere modificar `src`.
+
+### Ruta propuesta
+
+```text
+src/pages/mascotas/calorias-diarias-para-perro-o-gato.astro
+/mascotas/calorias-diarias-para-perro-o-gato
+```
+
+### Registro futuro sugerido
+
+```ts
+{
+  id: "calorias-diarias-para-perro-o-gato",
+  title: "Calorías diarias para perro o gato",
+  description:
+    "Estima un rango orientativo de calorías diarias para perros y gatos adultos según peso y perfil.",
+  href: "/mascotas/calorias-diarias-para-perro-o-gato",
+  categorySlug: "mascotas",
+  order: 84,
+}
+```
+
+### Lógica testeable futura
+
+```text
+src/lib/calculators/pet-calories.ts
+src/lib/calculators/pet-calories.test.ts
+```
+
+---
+
+## Fuente veterinaria
+
+Basar el MVP en las fórmulas y factores publicados en las guías de nutrición y
+manejo de peso de AAHA:
+
+```text
+https://www.aaha.org/resources/2021-aaha-nutrition-and-weight-management-guidelines/weight-reduction-in-the-obese-pet/
+```
+
+La propia guía indica que los factores son lineamientos generales y que el
+ajuste debe realizarse monitorizando peso y condición corporal.
+
+---
+
+## Alcance
+
+### Incluido
+
+1. Selector de especie: perro o gato.
+2. Peso en kilogramos o libras.
+3. Conversión interna exacta de libras a kilogramos.
+4. Cálculo de `RER`.
+5. Estimación de rango `MER` para perfiles adultos permitidos.
+6. Fórmula y factor visibles.
+7. Avisos veterinarios claros.
+8. Botones para copiar y limpiar.
+9. URL compartible con parámetros validados.
+10. Accesibilidad y pruebas unitarias.
+
+### Fuera del MVP
+
+- Cachorros y gatitos en crecimiento.
+- Gestación y lactancia.
+- Perros de trabajo.
+- Planes para bajar o subir de peso.
+- Mascotas hospitalizadas o con enfermedades.
+- Dietas terapéuticas.
+- Recomendaciones de marcas o alimentos.
+- Conversión automática a tazas, latas o gramos de alimento.
+- Sustitución de una consulta veterinaria.
+
+Cuando el usuario elija un caso fuera de alcance, no improvisar un resultado:
+mostrar una recomendación explícita de consultar al veterinario.
+
+---
+
+## Fórmulas
+
+### Conversión de peso
+
+```text
+kg = lb × 0.45359237
+```
+
+### Requerimiento energético en reposo
+
+```text
+RER = 70 × pesoKg^0.75
+```
+
+### Requerimiento energético de mantenimiento
+
+```text
+MER = RER × factor
+```
+
+Mostrar un rango cuando AAHA publique un intervalo de factores.
+
+---
+
+## Factores incluidos
+
+| Perfil adulto | Gato | Perro |
+|---------------|------|-------|
+| Esterilizado | `1.2–1.4 × RER` | `1.4–1.6 × RER` |
+| No esterilizado | `1.4–1.6 × RER` | `1.6–1.8 × RER` |
+| Inactivo o con tendencia a obesidad | `1.0 × RER` | `1.0–1.2 × RER` |
+
+No incluir en el selector principal los factores de pérdida de peso,
+gestación, lactancia, crecimiento o trabajo. La guía los contempla, pero esos
+casos necesitan contexto veterinario adicional.
+
+---
+
+## Interfaz
+
+### Inputs
+
+| Campo | Default |
+|-------|---------|
+| Especie | Perro |
+| Peso | Vacío |
+| Unidad | `kg` |
+| Perfil adulto | Esterilizado |
+
+### Resultado
+
+Ejemplo para un perro esterilizado de `10 kg`:
+
+```text
+RER estimado: 394 kcal/día
+Mantenimiento orientativo: 551–630 kcal/día
+Factor aplicado: 1.4–1.6 × RER
+```
+
+El resultado principal debe ser el rango `MER`. Mostrar `RER` como dato
+explicativo, no como cantidad recomendada por defecto.
+
+### Copy obligatorio
+
+```text
+Esta estimación es un punto de partida, no una prescripción. La cantidad real
+debe ajustarse según peso, condición corporal, actividad y salud con apoyo de
+tu veterinario.
+```
+
+### Casos fuera del MVP
+
+Mostrar opciones informativas no calculables:
+
+```text
+Cachorro o gatito
+Gestación o lactancia
+Objetivo de pérdida o aumento de peso
+Enfermedad o dieta terapéutica
+```
+
+Al elegirlas, sustituir el resultado por:
+
+```text
+Este caso necesita una recomendación individual. Consulta a tu veterinario
+antes de ajustar la alimentación.
+```
+
+---
+
+## Validaciones
+
+| Caso | Comportamiento |
+|------|----------------|
+| Peso vacío | Resultado neutral |
+| Peso `<= 0` | Rechazar |
+| Peso no numérico | Mostrar error |
+| Peso no finito | Rechazar |
+| Peso mayor que `150 kg` | Pedir revisar el valor |
+| Caso fuera del MVP | No calcular MER |
+
+Aceptar punto o coma decimal. Mantener precisión completa durante el cálculo y
+redondear kilocalorías al entero más cercano al mostrar.
+
+---
+
+## URL compartible
+
+```text
+/mascotas/calorias-diarias-para-perro-o-gato?especie=perro&peso=10&unidad=kg&perfil=esterilizado
+/mascotas/calorias-diarias-para-perro-o-gato?especie=gato&peso=4.5&unidad=kg&perfil=inactivo
+```
+
+No incluir datos sensibles ni generar variantes indexables. Mantener canonical
+sin query params.
+
+---
+
+## Diseño y contenido
+
+### Hero
+
+**Kicker:** Mascotas
+
+**H1:** Calorías diarias para perro o gato
+
+**Descripción:**
+
+```text
+Estima un rango orientativo de calorías diarias para un perro o gato adulto
+según su peso y perfil general.
+```
+
+### Secciones
+
+1. Hero y breadcrumbs.
+2. Formulario y resultado.
+3. Qué significan `RER` y `MER`.
+4. Por qué el resultado es un rango.
+5. Cuándo consultar al veterinario antes de ajustar alimento.
+6. Herramientas relacionadas.
+7. FAQ visibles.
+
+### FAQ sugeridas
+
+- ¿Cuántas calorías necesita mi perro al día?
+- ¿Cuántas calorías necesita mi gato al día?
+- ¿Qué significa RER?
+- ¿Qué significa MER?
+- ¿Por qué la calculadora muestra un rango?
+- ¿Puedo usar esta calculadora para que mi mascota baje de peso?
+- ¿Cómo convierto calorías a gramos o tazas de alimento?
+
+---
+
+## Funciones puras sugeridas
+
+```ts
+convertPetWeightToKg(value, unit)
+calculatePetRer(weightKg)
+getPetMerFactorRange(species, profile)
+calculatePetMerRange(rer, factorRange)
+validatePetCaloriesInput(input)
+formatPetCalories(value)
+```
+
+---
+
+## Pruebas mínimas
+
+- `1 lb = 0.45359237 kg`.
+- `RER(10 kg) ≈ 393.64 kcal/día`.
+- Perro esterilizado de `10 kg` → `MER ≈ 551.10–629.82`.
+- Gato esterilizado de `4 kg` usa `1.2–1.4 × RER`.
+- Gato inactivo usa exactamente `1.0 × RER`.
+- Rechazar peso `0`, negativo, `NaN` e `Infinity`.
+- Pedir revisión para peso mayor a `150 kg`.
+- No calcular casos de crecimiento, gestación, lactancia o pérdida de peso.
+- Aceptar punto y coma decimal.
+
+---
+
+## Criterios de aceptación
+
+1. La spec clasifica la calculadora en la categoría futura `mascotas`.
+2. La ruta propuesta es `/mascotas/calorias-diarias-para-perro-o-gato`.
+3. El cálculo usa `RER = 70 × kg^0.75`.
+4. El resultado principal muestra un rango `MER`.
+5. Los factores incluidos coinciden con los lineamientos AAHA para adultos.
+6. La UI excluye casos que necesitan evaluación individual.
+7. El resultado se presenta como estimación, no como prescripción.
+8. La fuente veterinaria queda citada.

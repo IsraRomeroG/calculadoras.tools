@@ -1,0 +1,492 @@
+# Especificación MVP — Calculadora de área y perímetro
+
+## Resumen
+
+Herramienta para calcular el área y el perímetro de figuras geométricas
+cotidianas con fórmulas visibles, sustitución de valores y resultados fáciles
+de interpretar.
+
+La calculadora debe resolver una figura a la vez. El MVP no busca reemplazar
+software de dibujo técnico: debe ayudar a estudiantes y a usuarios que necesitan
+estimar rápidamente superficies o contornos para tareas, compras y proyectos
+domésticos.
+
+---
+
+## Objetivo de producto
+
+- Calcular área y perímetro para las figuras más consultadas.
+- Mostrar las unidades lineales y cuadradas correctamente.
+- Explicar la fórmula aplicada sin exigir conocimientos previos.
+- Aceptar punto o coma decimal.
+- Permitir copiar el resultado y compartir una URL con los datos principales.
+- Separar la lógica matemática en funciones puras con pruebas unitarias.
+
+---
+
+## Decisiones de alcance
+
+### Incluido en el MVP
+
+1. Cuadrado.
+2. Rectángulo.
+3. Triángulo por tres lados.
+4. Triángulo por base y altura.
+5. Círculo.
+6. Polígono regular.
+7. Selector de unidad: sin unidad, `mm`, `cm`, `m`, `km`, `in` y `ft`.
+8. Resultado de área y perímetro cuando existan datos suficientes.
+9. Fórmula visible y procedimiento desplegable.
+10. URL compartible mediante query params.
+11. Botones para copiar resultado y limpiar.
+12. Accesibilidad por teclado y pruebas unitarias.
+
+### Fuera del MVP
+
+- Conversión automática entre unidades mezcladas.
+- Figuras compuestas o superficies con huecos.
+- Trapecios, rombos, elipses, sectores circulares y polígonos irregulares.
+- Cálculo de volumen.
+- Dibujo a escala o medición sobre planos.
+- Presupuestos de pintura, piso, cercas o materiales.
+- Exportación de diagramas.
+
+Las figuras adicionales pueden incorporarse después sin sobrecargar la primera
+versión.
+
+---
+
+## Categoría, ruta e integración
+
+### Categoría elegida
+
+```text
+src/pages/geometria
+```
+
+Área y perímetro debe vivir en **Geometría**, no en `matematicas`, porque la
+intención principal es calcular propiedades de figuras.
+
+### Alta de la categoría
+
+La categoría `geometria` todavía no existe en el proyecto. Antes de publicar
+esta calculadora, agregarla a:
+
+```text
+src/lib/constants/categories.ts
+```
+
+Entrada sugerida:
+
+```ts
+geometria: {
+  slug: "geometria",
+  label: "Geometría",
+  description:
+    "Calculadoras para resolver áreas, perímetros, triángulos y otras medidas geométricas con fórmulas claras.",
+},
+```
+
+Añadir también `"geometria"` a `CATEGORY_SLUGS`.
+
+### Archivo principal
+
+```text
+src/pages/geometria/calculadora-de-area-y-perimetro.astro
+```
+
+### URL pública y canonical
+
+```text
+/geometria/calculadora-de-area-y-perimetro
+```
+
+### Registro en el directorio
+
+Agregar a:
+
+```text
+src/lib/constants/calculators.ts
+```
+
+Propuesta:
+
+```ts
+{
+  id: "calculadora-de-area-y-perimetro",
+  title: "Calculadora de área y perímetro",
+  description:
+    "Calcula área y perímetro de cuadrados, rectángulos, triángulos, círculos y polígonos regulares.",
+  href: "/geometria/calculadora-de-area-y-perimetro",
+  categorySlug: "geometria",
+  order: 72,
+}
+```
+
+### Lógica testeable
+
+Crear:
+
+```text
+src/lib/calculators/area-perimeter.ts
+src/lib/calculators/area-perimeter.test.ts
+```
+
+La página Astro debe concentrarse en presentación y eventos del navegador. Las
+fórmulas, validaciones y formatos reutilizables deben vivir en el módulo puro.
+
+---
+
+## Figuras y fórmulas
+
+### Cuadrado
+
+```text
+área = lado²
+perímetro = 4 × lado
+```
+
+### Rectángulo
+
+```text
+área = base × altura
+perímetro = 2 × (base + altura)
+```
+
+### Triángulo por tres lados
+
+Usar la fórmula de Herón:
+
+```text
+semiperímetro = (a + b + c) ÷ 2
+área = √(semiperímetro × (semiperímetro - a) × (semiperímetro - b) × (semiperímetro - c))
+perímetro = a + b + c
+```
+
+Validar la desigualdad triangular antes de calcular.
+
+### Triángulo por base y altura
+
+```text
+área = (base × altura) ÷ 2
+```
+
+En este modo no mostrar un perímetro inventado. Explicar que se necesitan los
+tres lados para calcularlo.
+
+### Círculo
+
+```text
+área = π × radio²
+circunferencia = 2 × π × radio
+```
+
+Permitir capturar radio o diámetro:
+
+```text
+radio = diámetro ÷ 2
+```
+
+Usar la palabra **circunferencia** como resultado principal y aclarar que es el
+perímetro del círculo.
+
+### Polígono regular
+
+Inputs: número de lados y longitud de cada lado.
+
+```text
+perímetro = número de lados × lado
+apotema = lado ÷ (2 × tan(π ÷ número de lados))
+área = (perímetro × apotema) ÷ 2
+```
+
+Mostrar la apotema calculada como dato secundario.
+
+---
+
+## Interfaz principal
+
+### Selector de figura
+
+Usar tarjetas o botones claramente etiquetados:
+
+```text
+Cuadrado
+Rectángulo
+Triángulo
+Círculo
+Polígono regular
+```
+
+Al elegir `Triángulo`, mostrar un selector secundario:
+
+```text
+Conozco los tres lados
+Conozco la base y la altura
+```
+
+Al elegir `Círculo`, permitir alternar:
+
+```text
+Radio
+Diámetro
+```
+
+### Inputs
+
+- Usar `type="text"` con `inputmode="decimal"` para medidas.
+- Usar un entero entre `3` y `1000` para el número de lados.
+- Mostrar únicamente los campos relevantes para la figura activa.
+- Mantener etiquetas visibles y ejemplos breves.
+
+### Output
+
+Ejemplo para un rectángulo de `5 m × 3 m`:
+
+```text
+Área: 15 m²
+Perímetro: 16 m
+```
+
+Ejemplo para un triángulo capturado por base y altura:
+
+```text
+Área: 12 cm²
+Perímetro: necesitas indicar los tres lados para calcularlo.
+```
+
+### Fórmula visible
+
+Ejemplo:
+
+```text
+Fórmula del área: base × altura
+Sustituyendo: 5 m × 3 m
+Resultado: 15 m²
+```
+
+Incluir un desplegable **Ver procedimiento** para evitar saturar la primera
+vista.
+
+### Acciones
+
+- **Copiar resultado**: copiar figura, entradas, área y perímetro disponible.
+- **Limpiar**: vaciar valores sin cambiar figura ni unidad.
+- Al cambiar de figura, limpiar campos incompatibles y actualizar la URL.
+
+---
+
+## Parseo, unidades y formato
+
+### Entradas aceptadas
+
+```text
+10
+10.5
+10,5
+1,000
+1.000,5
+```
+
+Aplicar el mismo criterio de normalización que los conversores existentes:
+
+- Aceptar punto o coma decimal.
+- Si existen punto y coma, interpretar el último separador como decimal.
+- Una sola coma seguida por tres dígitos se interpreta como agrupador de miles.
+- No eliminar silenciosamente texto desconocido hasta producir otro número.
+
+### Unidades
+
+Todos los inputs de una figura usan la misma unidad seleccionada. No aceptar
+mezclas como `2 m` y `30 cm` durante el MVP.
+
+| Tipo de resultado | Ejemplo |
+|-------------------|---------|
+| Longitud | `16 m` |
+| Área | `15 m²` |
+| Sin unidad | `15 unidades²` |
+
+Mantener precisión completa durante el cálculo y redondear solamente al mostrar.
+Permitir entre `0` y `6` decimales visibles, con default `2`.
+
+---
+
+## Validaciones
+
+| Caso | Comportamiento |
+|------|----------------|
+| Campo vacío | Resultado neutral, sin error prematuro |
+| Valor no numérico | Mostrar mensaje de formato inválido |
+| Valor `0` o negativo | Rechazar: cada medida debe ser mayor que cero |
+| Resultado no finito | No calcular |
+| Triángulo imposible | Explicar que la suma de dos lados debe ser mayor que el tercero |
+| Polígono con menos de `3` lados | Rechazar |
+| Polígono con más de `1000` lados | Pedir revisar el número |
+| Mezcla de unidades pegadas al input | Pedir usar una sola unidad en el selector |
+
+No redondear valores antes de comprobar si un triángulo es válido.
+
+---
+
+## URL compartible
+
+Ejemplos:
+
+```text
+/geometria/calculadora-de-area-y-perimetro?figura=rectangulo&base=5&altura=3&unidad=m
+/geometria/calculadora-de-area-y-perimetro?figura=circulo&medida=radio&radio=2.5&unidad=cm
+/geometria/calculadora-de-area-y-perimetro?figura=poligono-regular&lados=6&lado=4&unidad=cm
+```
+
+Reglas:
+
+- Leer únicamente params válidos.
+- Ignorar params incompatibles con la figura elegida.
+- Mantener canonical sin query params.
+- No generar páginas indexables separadas para cada combinación.
+
+---
+
+## Diseño de página
+
+### Hero
+
+**Kicker:** Geometría
+
+**H1:** Calculadora de área y perímetro
+
+**Descripción:**
+
+```text
+Calcula el área y el perímetro de figuras comunes. Elige una figura, escribe
+sus medidas y consulta la fórmula paso a paso.
+```
+
+### Orden de secciones
+
+1. Hero y breadcrumbs.
+2. Selector de figura y formulario.
+3. Resultado y procedimiento.
+4. Tabla compacta de fórmulas.
+5. Explicación de unidades lineales y cuadradas.
+6. Enlace a la calculadora del teorema de Pitágoras.
+7. Preguntas frecuentes visibles.
+
+### Componentes existentes
+
+Reutilizar:
+
+```text
+BaseLayout
+PageShell
+Container
+PageHero
+SectionIntro
+FaqSection
+```
+
+No incorporar frameworks ni librerías adicionales.
+
+---
+
+## Accesibilidad
+
+- Asociar un `label` visible a cada input.
+- Usar `aria-describedby` para errores.
+- Marcar campos inválidos con `aria-invalid`.
+- Anunciar cambios de resultado con `aria-live="polite"`.
+- No anunciar errores mientras el usuario escribe un estado intermedio.
+- Permitir operar selectores, desplegables y botones con teclado.
+- No depender únicamente del color para diferenciar errores o figura activa.
+
+---
+
+## SEO
+
+### Metadata
+
+```text
+Title: Calculadora de Área y Perímetro — Fórmulas por Figura
+Description: Calcula área y perímetro de cuadrados, rectángulos, triángulos, círculos y polígonos regulares con fórmula y procedimiento.
+Canonical: /geometria/calculadora-de-area-y-perimetro
+```
+
+### FAQ visibles
+
+- ¿Cuál es la diferencia entre área y perímetro?
+- ¿Cómo calcular el área de un rectángulo?
+- ¿Cómo calcular el perímetro de un rectángulo?
+- ¿Cómo calcular el área de un triángulo?
+- ¿Cómo calcular el área de un círculo?
+- ¿La circunferencia es el perímetro de un círculo?
+- ¿Qué unidad se usa para expresar un área?
+
+Generar `FAQPage` JSON-LD únicamente para preguntas visibles.
+
+---
+
+## Funciones puras sugeridas
+
+```ts
+calculateSquare(side)
+calculateRectangle(base, height)
+calculateTriangleFromSides(a, b, c)
+calculateTriangleAreaFromBaseHeight(base, height)
+calculateCircle(radius)
+calculateRegularPolygon(sideCount, sideLength)
+parseMeasurement(value)
+validatePositiveMeasurement(value)
+formatLinearMeasurement(value, unit, decimals)
+formatAreaMeasurement(value, unit, decimals)
+```
+
+---
+
+## Pruebas unitarias mínimas
+
+- Cuadrado de lado `4`: área `16`, perímetro `16`.
+- Rectángulo `5 × 3`: área `15`, perímetro `16`.
+- Triángulo `3, 4, 5`: área `6`, perímetro `12`.
+- Triángulo `1, 2, 3`: rechazar por desigualdad triangular.
+- Triángulo por base `8` y altura `3`: área `12`, sin perímetro.
+- Círculo de radio `2`: área `4π`, circunferencia `4π`.
+- Círculo de diámetro `10`: radio normalizado `5`.
+- Hexágono regular de lado `4`: perímetro `24`, área aproximada `41.5692`.
+- Aceptar punto y coma decimal.
+- Rechazar `NaN`, `Infinity`, cero y negativos.
+- Formatear unidades lineales y cuadradas correctamente.
+
+---
+
+## Criterios de aceptación
+
+1. La página existe en `/geometria/calculadora-de-area-y-perimetro`.
+2. La categoría `geometria` está registrada y aparece en el directorio al
+   publicar la calculadora.
+3. El usuario puede calcular las cinco figuras incluidas.
+4. El triángulo por base y altura no muestra un perímetro inventado.
+5. El triángulo por tres lados valida la desigualdad triangular.
+6. El círculo comunica que la circunferencia es su perímetro.
+7. Los resultados distinguen unidades lineales y cuadradas.
+8. La fórmula y la sustitución de valores son visibles.
+9. La URL compartible conserva figura, valores y unidad válidos.
+10. La interfaz funciona con teclado y en pantallas móviles.
+11. La lógica central tiene pruebas unitarias.
+12. El build de Astro termina correctamente.
+
+---
+
+## Fases posteriores
+
+### Fase 2 — Más figuras
+
+- Trapecio, rombo, paralelogramo, elipse y sector circular.
+- Conversión automática entre unidades.
+- Comparación de dos figuras.
+
+### Fase 3 — Aplicaciones prácticas
+
+- Figuras compuestas.
+- Estimador de pintura, piso y cercas.
+- Exportación e impresión de resultados.
+

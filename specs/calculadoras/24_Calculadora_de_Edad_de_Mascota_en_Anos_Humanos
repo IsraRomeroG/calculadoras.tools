@@ -1,0 +1,330 @@
+# Especificación MVP — Calculadora de edad de mascota en años humanos
+
+## Resumen
+
+Herramienta educativa para estimar la edad fisiológica aproximada de un perro o
+gato en años humanos. Debe evitar la regla simplificada de multiplicar por `7`:
+las equivalencias cambian por especie y, en perros, también por talla.
+
+El resultado no es un diagnóstico ni determina por sí solo la etapa clínica de
+una mascota. La interfaz debe comunicar que peso, raza, salud y estilo de vida
+también influyen en el envejecimiento.
+
+---
+
+## Categoría recomendada
+
+```text
+src/pages/mascotas
+```
+
+Categoría futura: **Mascotas**.
+
+La herramienta debe vivir en una categoría propia de mascotas porque su
+interpretación depende de especie y talla. Esta spec solo documenta la
+categoría recomendada; no requiere modificar `src`.
+
+### Ruta propuesta
+
+```text
+src/pages/mascotas/edad-de-mascota-en-anos-humanos.astro
+/mascotas/edad-de-mascota-en-anos-humanos
+```
+
+### Registro futuro sugerido
+
+```ts
+{
+  id: "edad-de-mascota-en-anos-humanos",
+  title: "Edad de mascota en años humanos",
+  description:
+    "Estima la edad equivalente de perros y gatos con una tabla orientativa por especie y talla.",
+  href: "/mascotas/edad-de-mascota-en-anos-humanos",
+  categorySlug: "mascotas",
+  order: 82,
+}
+```
+
+### Lógica testeable futura
+
+```text
+src/lib/calculators/pet-age.ts
+src/lib/calculators/pet-age.test.ts
+```
+
+---
+
+## Fuente y criterio del MVP
+
+Usar como fuente principal la tabla de edad fisiológica publicada por AAHA:
+
+```text
+https://www.aaha.org/wp-content/uploads/globalassets/02-guidelines/canine-life-stage-2019/canine_and_feline_age_chart_poster.pdf
+```
+
+La tabla distingue gatos y cuatro tallas de perro. Como apoyo editorial, enlazar
+el material preventivo de AVMA, que también aclara que las equivalencias son
+aproximadas y que otros factores influyen:
+
+```text
+https://ebusiness.avma.org/files/productdownloads/PetsAgeFasterPoster.pdf
+```
+
+No presentar el resultado como una equivalencia exacta.
+
+---
+
+## Alcance
+
+### Incluido
+
+1. Selector de especie: perro o gato.
+2. Edad capturada en años y meses.
+3. Selector de talla para perros.
+4. Conversión mediante tabla de referencia.
+5. Interpolación lineal documentada para meses entre dos edades tabuladas.
+6. Resultado aproximado y explicación breve.
+7. Tabla de equivalencias visible.
+8. Botones para copiar y limpiar.
+9. URL compartible con parámetros validados.
+10. Accesibilidad y pruebas unitarias.
+
+### Fuera del MVP
+
+- Diagnóstico de etapa de vida.
+- Recomendaciones médicas o de vacunación.
+- Predicción de esperanza de vida.
+- Ajuste específico por raza.
+- Evaluación de peso corporal o condición física.
+- Cálculo de calorías.
+- Extrapolación más allá de la tabla publicada.
+
+Enlazar la calculadora de calorías para perro o gato como herramienta
+relacionada, con una separación visual clara.
+
+---
+
+## Tallas de perro
+
+Usar peso adulto aproximado, no peso transitorio de cachorro:
+
+| Talla | Peso adulto |
+|-------|------------|
+| Pequeña | `≤ 9.07 kg` (`≤ 20 lb`) |
+| Mediana | `9.52–22.7 kg` (`21–50 lb`) |
+| Grande | `23.1–40.8 kg` (`51–90 lb`) |
+| Muy grande | `> 40.8 kg` (`> 90 lb`) |
+
+Hay pequeños huecos por conversión y redondeo entre libras y kilogramos. En la
+UI, pedir al usuario seleccionar la talla; no inferirla automáticamente a partir
+de un peso ambiguo.
+
+---
+
+## Tabla de referencia
+
+### Gatos
+
+| Edad real | Edad humana aproximada |
+|-----------|------------------------|
+| `6 meses` | `10` |
+| `1 año` | `15` |
+| `2 años` | `24` |
+| `3 años` | `28` |
+| `4 años` | `32` |
+| `5 años` | `36` |
+| `6 años` | `40` |
+| `7 años` | `44` |
+| `8 años` | `48` |
+| `9 años` | `52` |
+| `10 años` | `56` |
+| `15 años` | `76` |
+| `20 años` | `96` |
+| `21 años` | `100` |
+
+Entre `10` y `21` años, la tabla continúa incrementando `4` años humanos por
+año real.
+
+### Perros
+
+| Edad real | Pequeña | Mediana | Grande | Muy grande |
+|-----------|---------|---------|--------|------------|
+| `1 año` | `15` | `15` | `15` | `15` |
+| `2 años` | `24` | `24` | `24` | `24` |
+| `3 años` | `28` | `28` | `30` | `32` |
+| `4 años` | `32` | `33` | `35` | `37` |
+| `5 años` | `36` | `37` | `40` | `42` |
+| `6 años` | `40` | `42` | `45` | `49` |
+| `7 años` | `44` | `47` | `50` | `56` |
+| `8 años` | `48` | `51` | `55` | `64` |
+| `9 años` | `52` | `56` | `61` | `71` |
+| `10 años` | `56` | `60` | `66` | `78` |
+| `15 años` | `76` | `83` | `93` | `115` |
+| `16 años` | `80` | `87` | `99` | `123` |
+| `20 años` | `96` | `105` | `120` | Sin dato publicado |
+
+El módulo debe incluir todos los renglones anuales de la tabla AAHA, aunque la
+UI editorial muestre una versión resumida.
+
+---
+
+## Interpolación para meses
+
+La tabla fuente usa anclas discretas. Para ofrecer una respuesta cuando el
+usuario captura meses:
+
+```text
+proporción = mesesTranscurridos ÷ mesesEntreAnclas
+edadHumana = valorInferior + proporción × (valorSuperior - valorInferior)
+```
+
+Reglas:
+
+- Comunicar el resultado como **estimación aproximada**.
+- Redondear la salida a un decimal.
+- Para gatos menores de `6` meses, no interpolar: mostrar que la tabla del MVP
+  inicia en `6` meses.
+- Para perros menores de `1` año, no interpolar: mostrar que la tabla del MVP
+  inicia en `1` año.
+- No extrapolar más allá del último dato disponible para la especie y talla.
+
+---
+
+## Interfaz
+
+### Inputs
+
+| Campo | Cuándo aparece |
+|-------|----------------|
+| Especie: perro o gato | Siempre |
+| Años | Siempre |
+| Meses: `0–11` | Siempre |
+| Talla adulta | Solo para perros |
+
+### Resultado
+
+```text
+Tu perro mediano de 7 años equivale aproximadamente a 47 años humanos.
+```
+
+```text
+Tu gato de 2 años y 6 meses equivale aproximadamente a 26 años humanos.
+```
+
+### Copy obligatorio
+
+```text
+Es una referencia orientativa. La raza, la talla, el peso, la salud y el estilo
+de vida pueden cambiar cómo envejece una mascota. Consulta a tu veterinario para
+interpretar su etapa de vida y sus cuidados.
+```
+
+### Acciones
+
+- **Copiar resultado**.
+- **Limpiar**.
+- **Ver tabla completa**.
+
+---
+
+## Validaciones
+
+| Caso | Comportamiento |
+|------|----------------|
+| Edad vacía | Resultado neutral |
+| Años negativos | Rechazar |
+| Meses fuera de `0–11` | Rechazar |
+| Gato menor de `6` meses | Mostrar límite del MVP |
+| Perro menor de `1` año | Mostrar límite del MVP |
+| Gato mayor de `21` años | No extrapolar |
+| Perro fuera de la tabla de su talla | No extrapolar |
+| Perro sin talla elegida | Pedir talla antes de calcular |
+
+---
+
+## URL compartible
+
+```text
+/mascotas/edad-de-mascota-en-anos-humanos?especie=gato&anos=7&meses=0
+/mascotas/edad-de-mascota-en-anos-humanos?especie=perro&talla=mediana&anos=7&meses=6
+```
+
+Mantener canonical sin query params.
+
+---
+
+## Diseño y contenido
+
+### Hero
+
+**Kicker:** Mascotas
+
+**H1:** Edad de mascota en años humanos
+
+**Descripción:**
+
+```text
+Estima la edad equivalente de tu perro o gato con una tabla orientativa por
+especie y talla.
+```
+
+### Secciones
+
+1. Hero y breadcrumbs.
+2. Formulario y resultado.
+3. Por qué multiplicar por siete no es suficiente.
+4. Tabla de equivalencias.
+5. Nota de cuidado preventivo.
+6. Herramientas relacionadas.
+7. FAQ visibles.
+
+### FAQ sugeridas
+
+- ¿Cuántos años humanos tiene mi perro?
+- ¿Cuántos años humanos tiene mi gato?
+- ¿Por qué no basta multiplicar la edad de un perro por siete?
+- ¿La talla cambia la edad equivalente de un perro?
+- ¿La edad equivalente reemplaza una revisión veterinaria?
+
+---
+
+## Funciones puras sugeridas
+
+```ts
+getPetHumanAge(species, ageInMonths, dogSize)
+interpolatePetAge(lowerAnchor, upperAnchor, ageInMonths)
+validatePetAgeInput(input)
+getPetAgeTable(species, dogSize)
+formatPetAgeResult(result)
+```
+
+---
+
+## Pruebas mínimas
+
+- Gato de `6` meses → `10`.
+- Gato de `1` año → `15`.
+- Gato de `2` años → `24`.
+- Gato de `2 años 6 meses` → `26`.
+- Perro pequeño de `7` años → `44`.
+- Perro mediano de `7` años → `47`.
+- Perro grande de `7` años → `50`.
+- Perro muy grande de `7` años → `56`.
+- Rechazar meses fuera de rango.
+- No extrapolar gato de más de `21` años.
+- No extrapolar perro muy grande fuera de su tabla.
+- Pedir talla para perros.
+
+---
+
+## Criterios de aceptación
+
+1. La spec clasifica la calculadora en la categoría futura `mascotas`.
+2. La ruta propuesta es `/mascotas/edad-de-mascota-en-anos-humanos`.
+3. El MVP usa una tabla veterinaria publicada y cita su fuente.
+4. Los perros se calculan por talla adulta.
+5. La interfaz no usa la regla simplificada de multiplicar por `7`.
+6. Los meses se interpolan únicamente entre anclas disponibles.
+7. La UI no extrapola fuera de la tabla.
+8. El resultado se comunica siempre como aproximado.
+

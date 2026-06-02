@@ -1,0 +1,356 @@
+# Especificación MVP — Calculadora para escalar receta por porciones
+
+## Resumen
+
+Herramienta para ajustar las cantidades de una receta cuando cambia el número
+de porciones. El usuario indica cuántas porciones rinde la receta original,
+cuántas necesita preparar y captura sus ingredientes. La calculadora aplica un
+factor único y muestra las nuevas cantidades sin alterar innecesariamente las
+unidades.
+
+---
+
+## Categoría recomendada
+
+```text
+src/pages/cocina
+```
+
+Categoría futura: **Cocina**.
+
+Debe compartir categoría con el conversor de medidas culinarias. Esta spec solo
+documenta la clasificación; no requiere modificar `src`.
+
+### Ruta propuesta
+
+```text
+src/pages/cocina/escalar-receta-por-porciones.astro
+/cocina/escalar-receta-por-porciones
+```
+
+### Registro futuro sugerido
+
+```ts
+{
+  id: "escalar-receta-por-porciones",
+  title: "Escalar receta por porciones",
+  description:
+    "Ajusta las cantidades de una receta según las porciones que necesitas preparar.",
+  href: "/cocina/escalar-receta-por-porciones",
+  categorySlug: "cocina",
+  order: 80,
+}
+```
+
+### Lógica testeable futura
+
+```text
+src/lib/calculators/recipe-scaling.ts
+src/lib/calculators/recipe-scaling.test.ts
+```
+
+---
+
+## Objetivo del MVP
+
+- Calcular un factor de escalado confiable.
+- Multiplicar cada cantidad capturada por el mismo factor.
+- Conservar nombre y unidad de cada ingrediente.
+- Aceptar decimales y fracciones habituales.
+- Mostrar advertencias útiles cuando una cantidad necesita criterio práctico.
+- Permitir copiar el resultado como texto.
+
+---
+
+## Alcance
+
+### Incluido
+
+1. Porciones originales y porciones deseadas.
+2. Factor de escalado visible.
+3. Lista editable de hasta `50` ingredientes.
+4. Cantidad, unidad y nombre por ingrediente.
+5. Soporte para enteros, decimales, fracciones y números mixtos.
+6. Resultado en decimal o fracción culinaria aproximada.
+7. Copiar receta escalada.
+8. Limpiar y cargar ejemplo.
+9. URL compartible para el factor, sin serializar la receta.
+10. Persistencia opcional en `localStorage` para evitar perder una receta
+    durante la sesión.
+11. Accesibilidad y pruebas unitarias.
+
+### Fuera del MVP
+
+- Conversión automática entre unidades.
+- Densidades por ingrediente.
+- Reglas automáticas especiales para huevos, moldes, tiempos u hornos.
+- Importación desde una URL.
+- OCR de fotografías.
+- Cuenta de usuario o recetas guardadas en servidor.
+- Cálculo nutricional.
+- Sustitución de ingredientes.
+
+---
+
+## Fórmula principal
+
+```text
+factor = porciones deseadas ÷ porciones originales
+cantidad escalada = cantidad original × factor
+```
+
+Ejemplo:
+
+```text
+Receta original: 4 porciones
+Necesitas: 10 porciones
+Factor: 10 ÷ 4 = 2.5
+
+2 tazas de harina × 2.5 = 5 tazas de harina
+```
+
+---
+
+## Modelo de ingrediente
+
+| Campo | Tipo | Requerido |
+|-------|------|-----------|
+| Cantidad | Texto con `inputmode="decimal"` | Sí |
+| Unidad | Selector con opción libre | No |
+| Ingrediente | Texto corto | Sí |
+
+### Unidades sugeridas
+
+```text
+unidad
+g
+kg
+ml
+l
+taza
+cucharada
+cucharadita
+oz
+lb
+pieza
+paquete
+pizca
+al gusto
+```
+
+Permitir texto libre porque las recetas contienen unidades contextuales como
+`lata`, `ramita` o `diente`.
+
+Para `al gusto`, aceptar una fila sin cantidad y conservar el texto sin
+escalarlo.
+
+---
+
+## Fracciones culinarias
+
+### Entradas aceptadas
+
+```text
+2
+2.5
+2,5
+1/2
+3/4
+1 1/2
+```
+
+### Salida
+
+Mostrar:
+
+- Decimal normalizado.
+- Fracción culinaria aproximada cuando resulte útil.
+
+Ejemplo:
+
+```text
+0.666666... taza
+≈ 2/3 taza
+```
+
+### Denominadores permitidos
+
+```text
+2, 3, 4, 8, 16
+```
+
+No ocultar la aproximación. Si la fracción no es exacta, usar el símbolo `≈` y
+mantener accesible el valor decimal.
+
+---
+
+## Interfaz
+
+### Inputs principales
+
+| Campo | Default |
+|-------|---------|
+| Porciones originales | `4` |
+| Porciones deseadas | `6` |
+
+### Lista
+
+- Mostrar inicialmente tres filas.
+- Permitir agregar y eliminar filas.
+- Conservar el orden capturado.
+- No exigir unidad.
+- Permitir pegar líneas simples en una fase posterior, no en el MVP.
+
+### Resultado
+
+```text
+Factor de escalado: × 1.5
+
+Ingredientes ajustados para 6 porciones:
+3 tazas de harina
+1.5 cucharaditas de sal
+2 huevos
+```
+
+### Avisos prácticos
+
+Mostrar un bloque breve:
+
+```text
+Algunos ingredientes y pasos necesitan criterio práctico. Revisa especialmente
+huevos, levadura, especias, tamaño del molde y tiempo de cocción.
+```
+
+No aplicar redondeos automáticos destructivos como cambiar `1.5 huevos` a `2`.
+
+### Acciones
+
+- **Copiar receta escalada**.
+- **Cargar ejemplo**.
+- **Limpiar receta**.
+- Enlace al conversor de medidas culinarias.
+
+---
+
+## Validaciones
+
+| Caso | Comportamiento |
+|------|----------------|
+| Porciones vacías | No calcular |
+| Porciones `<= 0` | Rechazar |
+| Porciones no enteras | Permitir si son positivas |
+| Cantidad inválida | Señalar la fila |
+| Cantidad negativa | Rechazar |
+| Cantidad `0` | Permitir |
+| Fracción con denominador `0` | Rechazar |
+| Más de `50` ingredientes | Impedir nuevas filas |
+| Ingrediente vacío | Mantener fila editable y señalarla al copiar |
+| Fila `al gusto` sin cantidad | Conservar sin escalar |
+
+Mantener precisión completa durante el cálculo. Redondear únicamente en la
+presentación.
+
+---
+
+## URL compartible y persistencia
+
+### URL
+
+```text
+/cocina/escalar-receta-por-porciones?original=4&deseadas=10
+```
+
+No serializar ingredientes en la URL durante el MVP:
+
+- Puede producir URLs excesivas.
+- Los nombres pueden contener información personal.
+- La URL principal debe seguir siendo legible.
+
+### Persistencia local
+
+Guardar borrador únicamente en `localStorage`, con botón visible:
+
+```text
+Guardar borrador en este dispositivo
+```
+
+No guardar automáticamente sin comunicarlo.
+
+---
+
+## Diseño y contenido
+
+### Hero
+
+**Kicker:** Cocina
+
+**H1:** Escalar receta por porciones
+
+**Descripción:**
+
+```text
+Ajusta las cantidades de una receta según las porciones que necesitas preparar
+y copia la nueva lista de ingredientes.
+```
+
+### Secciones
+
+1. Hero y breadcrumbs.
+2. Porciones y factor.
+3. Ingredientes editables.
+4. Resultado copiable.
+5. Nota sobre redondeos prácticos.
+6. Enlace al conversor culinario.
+7. FAQ visibles.
+
+### FAQ sugeridas
+
+- ¿Cómo ajustar una receta para más personas?
+- ¿Cómo calcular el factor de una receta?
+- ¿Debo redondear los huevos?
+- ¿Cambian los tiempos de cocción al duplicar una receta?
+- ¿La calculadora convierte tazas a gramos?
+- ¿Cómo escalar una receta a la mitad?
+
+---
+
+## Funciones puras sugeridas
+
+```ts
+calculateRecipeScaleFactor(originalServings, desiredServings)
+scaleIngredientQuantity(quantity, factor)
+parseRecipeQuantity(value)
+formatRecipeQuantity(value, mode)
+approximateCookingFraction(value)
+validateRecipeIngredient(ingredient)
+```
+
+---
+
+## Pruebas mínimas
+
+- `4 → 10` porciones produce factor `2.5`.
+- `8 → 4` porciones produce factor `0.5`.
+- `1/2 × 3 = 1.5`.
+- `1 1/2 × 2 = 3`.
+- Aproximar `0.666666...` como `2/3`.
+- Preservar una fila `sal al gusto`.
+- No redondear automáticamente `1.5 huevos`.
+- Rechazar porciones `0`, negativas, `NaN` e `Infinity`.
+- Rechazar fracción con denominador `0`.
+- Respetar límite de `50` ingredientes.
+
+---
+
+## Criterios de aceptación
+
+1. La spec clasifica la calculadora en la categoría futura `cocina`.
+2. La ruta propuesta es `/cocina/escalar-receta-por-porciones`.
+3. El cálculo usa un factor único visible.
+4. Cada ingrediente conserva su unidad y nombre.
+5. El parser acepta enteros, decimales, fracciones y números mixtos.
+6. Las aproximaciones se comunican como aproximaciones.
+7. La interfaz no redondea huevos ni otros ingredientes silenciosamente.
+8. La URL comparte el factor, no la receta completa.
+9. La lógica central queda prevista para pruebas unitarias.
+

@@ -1,0 +1,274 @@
+# Especificación MVP — Calculadora para dividir cuenta en restaurante
+
+## Resumen
+
+Herramienta para repartir una cuenta de restaurante entre varias personas de
+forma clara. Debe calcular cuánto paga cada persona, permitir añadir una
+propina opcional y mostrar cualquier diferencia creada por redondeo.
+
+El MVP se concentra en división equitativa. El reparto por platillos o consumos
+individuales queda para una fase posterior.
+
+---
+
+## Categoría recomendada
+
+```text
+src/pages/eventos-sociales
+```
+
+Categoría futura: **Eventos sociales**.
+
+La intención principal ocurre en comidas compartidas, reuniones y salidas. La
+categoría permite agrupar esta herramienta con la calculadora de propina sin
+mezclarla con finanzas personales. Esta spec solo documenta la clasificación;
+no requiere modificar `src`.
+
+### Ruta propuesta
+
+```text
+src/pages/eventos-sociales/dividir-cuenta-en-restaurante.astro
+/eventos-sociales/dividir-cuenta-en-restaurante
+```
+
+### Registro futuro sugerido
+
+```ts
+{
+  id: "dividir-cuenta-en-restaurante",
+  title: "Dividir cuenta en restaurante",
+  description:
+    "Divide una cuenta entre varias personas, añade propina opcional y revisa el ajuste por redondeo.",
+  href: "/eventos-sociales/dividir-cuenta-en-restaurante",
+  categorySlug: "eventos-sociales",
+  order: 86,
+}
+```
+
+### Lógica testeable futura
+
+```text
+src/lib/calculators/bill-splitting.ts
+src/lib/calculators/bill-splitting.test.ts
+```
+
+---
+
+## Alcance
+
+### Incluido
+
+1. Monto de la cuenta antes de propina.
+2. Número de personas.
+3. Propina opcional por porcentaje o monto fijo.
+4. Cargos adicionales opcionales.
+5. División equitativa.
+6. Redondeo configurable del pago individual.
+7. Diferencia causada por redondeo.
+8. Resultado copiable y URL compartible.
+9. Accesibilidad y pruebas unitarias.
+
+### Fuera del MVP
+
+- División por platillo.
+- Consumos diferentes por persona.
+- Pagos parciales ya realizados.
+- Monedas mezcladas.
+- Solicitudes de pago o enlaces bancarios.
+- Escaneo de tickets.
+- Cálculo de impuestos por país.
+
+Enlazar la calculadora de propina para quien necesite revisar porcentajes con
+más detalle.
+
+---
+
+## Inputs
+
+| Campo | Tipo | Default |
+|-------|------|---------|
+| Cuenta antes de propina | Texto monetario | Vacío |
+| Personas | Entero | `2` |
+| Propina | Toggle: porcentaje o monto | `0%` |
+| Cargos adicionales | Monto opcional | `0` |
+| Redondear pago individual | Toggle | Desactivado |
+| Incremento de redondeo | Selector | `1`, `5`, `10` o unidad monetaria mínima |
+
+No asumir símbolo monetario. Permitir seleccionar moneda solo para formato:
+
+```text
+MXN
+USD
+EUR
+COP
+ARS
+CLP
+PEN
+BRL
+Otra
+```
+
+No realizar conversión de divisas.
+
+---
+
+## Fórmulas
+
+### Propina porcentual
+
+```text
+propina = cuenta × porcentaje ÷ 100
+```
+
+### Total
+
+```text
+total = cuenta + propina + cargos adicionales
+pago individual exacto = total ÷ personas
+```
+
+### Redondeo opcional hacia arriba
+
+```text
+pago individual redondeado =
+  ceil(pago individual exacto ÷ incremento) × incremento
+
+total reunido = pago individual redondeado × personas
+diferencia = total reunido - total
+```
+
+Mostrar siempre la diferencia. No ocultar que el redondeo puede reunir más
+dinero que el total de la cuenta.
+
+---
+
+## Resultado
+
+Ejemplo:
+
+```text
+Cuenta: $1,200.00 MXN
+Propina (10%): $120.00 MXN
+Cargos adicionales: $0.00 MXN
+Total: $1,320.00 MXN
+
+Cada persona paga: $330.00 MXN
+4 personas
+```
+
+Ejemplo con redondeo:
+
+```text
+Pago exacto por persona: $326.67 MXN
+Pago redondeado por persona: $330.00 MXN
+Total reunido: $990.00 MXN
+Diferencia: +$10.00 MXN
+```
+
+---
+
+## Validaciones
+
+| Caso | Comportamiento |
+|------|----------------|
+| Cuenta vacía | Resultado neutral |
+| Cuenta negativa | Rechazar |
+| Cuenta `0` | Permitir |
+| Personas menor que `1` | Rechazar |
+| Personas no enteras | Rechazar |
+| Personas mayor que `100` | Pedir revisar |
+| Propina porcentual menor que `0` | Rechazar |
+| Propina porcentual mayor que `100` | Pedir revisar |
+| Cargo adicional negativo | Rechazar |
+| Resultado no finito | No calcular |
+
+Aceptar punto o coma decimal. Mantener precisión completa y redondear al
+mostrar según la moneda seleccionada.
+
+---
+
+## URL compartible
+
+```text
+/eventos-sociales/dividir-cuenta-en-restaurante?cuenta=1200&personas=4&propina=10&moneda=MXN
+```
+
+Reglas:
+
+- Leer únicamente parámetros válidos.
+- No almacenar información personal.
+- Mantener canonical sin query params.
+- No indexar variantes por monto.
+
+---
+
+## Diseño y contenido
+
+### Hero
+
+**Kicker:** Eventos sociales
+
+**H1:** Dividir cuenta en restaurante
+
+**Descripción:**
+
+```text
+Divide una cuenta entre varias personas, añade una propina opcional y revisa
+cuánto debe pagar cada quien.
+```
+
+### Secciones
+
+1. Hero y breadcrumbs.
+2. Formulario y resultado.
+3. Ajuste opcional por redondeo.
+4. Diferencia entre cuenta, propina y total.
+5. Enlace a calculadora de propina.
+6. FAQ visibles.
+
+### FAQ sugeridas
+
+- ¿Cómo dividir una cuenta entre varias personas?
+- ¿Cómo añadir propina antes de dividir la cuenta?
+- ¿Qué pasa si el total no se divide exactamente?
+- ¿Cómo redondear el pago sin perder dinero?
+- ¿La calculadora convierte monedas?
+
+---
+
+## Funciones puras sugeridas
+
+```ts
+calculateTipAmount(bill, tipInput)
+calculateEqualBillSplit(input)
+roundIndividualPaymentUp(amount, increment)
+calculateRoundingDifference(total, roundedPayment, people)
+parseMoneyInput(value)
+formatMoney(value, currency)
+```
+
+---
+
+## Pruebas mínimas
+
+- Cuenta `1200`, `4` personas, `10%` → `330` por persona.
+- Cuenta `1000`, `3` personas, sin propina → `333.333...`.
+- Redondear `326.67` a incremento `10` → `330`.
+- Calcular diferencia reunida después de redondear.
+- Propina fija se suma una sola vez antes de dividir.
+- Cargos adicionales se suman una sola vez.
+- Rechazar personas `0`, negativas o no enteras.
+- Rechazar montos negativos, `NaN` e `Infinity`.
+
+---
+
+## Criterios de aceptación
+
+1. La spec clasifica la calculadora en `eventos-sociales`.
+2. La ruta propuesta es `/eventos-sociales/dividir-cuenta-en-restaurante`.
+3. El MVP divide una cuenta equitativamente.
+4. La propina puede capturarse como porcentaje o monto.
+5. El redondeo opcional muestra la diferencia reunida.
+6. La herramienta no promete reparto por platillos.
+7. La URL compartible conserva parámetros válidos.
+
