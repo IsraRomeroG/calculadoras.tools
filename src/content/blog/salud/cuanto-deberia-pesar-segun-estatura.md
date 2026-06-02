@@ -2,7 +2,7 @@
 title: "Cuánto debería pesar según mi estatura"
 seoTitle: "Cuánto debería pesar según mi estatura: rango saludable"
 description: "Aprende a estimar un rango de peso saludable según tu estatura usando el IMC adulto como referencia."
-pubDate: 2026-06-01
+pubDate: 2026-06-10
 categorySlug: "salud"
 tags:
   - peso
@@ -49,10 +49,10 @@ Ese rango no significa que cualquier persona de 1.70 m deba apuntar a un número
 ## Ejemplos por estatura
 
 | Estatura | Rango saludable de referencia |
-|----------|-------------------------------|
-| 1.60 m | 47.4 a 63.7 kg |
-| 1.70 m | 53.5 a 72.0 kg |
-| 1.80 m | 59.9 a 80.7 kg |
+| -------- | ----------------------------- |
+| 1.60 m   | 47.4 a 63.7 kg                |
+| 1.70 m   | 53.5 a 72.0 kg                |
+| 1.80 m   | 59.9 a 80.7 kg                |
 
 Puedes ver más alturas en la guía de [peso saludable según estatura](/blog/peso-saludable-segun-estatura) o calcular tu dato exacto con la [calculadora de IMC](/salud/calculadora-de-imc).
 

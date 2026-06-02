@@ -2,7 +2,7 @@
 title: "Préstamo de $100,000: cuánto pago al mes"
 seoTitle: "Préstamo de 100000: mensualidad, intereses y costo total"
 description: "Revisa escenarios para estimar cuánto pagarías por un préstamo de $100,000 según tasa, plazo, comisiones y seguros."
-pubDate: 2026-06-01
+pubDate: 2026-06-10
 categorySlug: "finanzas"
 tags:
   - préstamo 100000
@@ -34,11 +34,11 @@ Por ejemplo, con `$100,000`, tasa anual de `24%` y plazo de `36 meses`, la mensu
 
 Estos ejemplos no incluyen comisión ni seguro:
 
-| Escenario | Tasa anual | Plazo | Mensualidad estimada | Intereses estimados | Total pagado |
-|---|---:|---:|---:|---:|---:|
-| Tasa moderada | 18% | 24 meses | $4,992.41 | $19,817.84 | $119,817.84 |
-| Intermedio | 24% | 36 meses | $3,923.29 | $41,238.27 | $141,238.27 |
-| Alto costo | 36% | 48 meses | $3,957.78 | $89,973.31 | $189,973.31 |
+| Escenario     | Tasa anual |    Plazo | Mensualidad estimada | Intereses estimados | Total pagado |
+| ------------- | ---------: | -------: | -------------------: | ------------------: | -----------: |
+| Tasa moderada |        18% | 24 meses |            $4,992.41 |          $19,817.84 |  $119,817.84 |
+| Intermedio    |        24% | 36 meses |            $3,923.29 |          $41,238.27 |  $141,238.27 |
+| Alto costo    |        36% | 48 meses |            $3,957.78 |          $89,973.31 |  $189,973.31 |
 
 El último escenario tiene una mensualidad parecida al de 36 meses, pero el costo total es mucho mayor. La tasa y el plazo trabajan juntos: una tasa alta durante muchos meses puede duplicar casi el costo financiero.
 

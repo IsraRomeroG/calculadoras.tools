@@ -2,7 +2,7 @@
 title: "Cómo hacer una tabla de amortización en Excel"
 seoTitle: "Tabla de amortización en Excel: fórmulas de pago, interés y capital"
 description: "Aprende a crear una tabla de amortización en Excel o Google Sheets con fórmulas para pago, intereses, capital y saldo."
-pubDate: 2026-06-15
+pubDate: 2026-06-01
 categorySlug: "finanzas"
 tags:
   - tabla de amortización
@@ -22,12 +22,12 @@ También sirve para validar una simulación, revisar pagos extra o entender por 
 
 Antes de construir la tabla, define estas celdas:
 
-| Dato | Ejemplo |
-|---|---:|
-| Monto del préstamo | $50,000 |
-| Tasa anual | 24% |
-| Plazo | 24 meses |
-| Tasa mensual | 2% |
+| Dato               |  Ejemplo |
+| ------------------ | -------: |
+| Monto del préstamo |  $50,000 |
+| Tasa anual         |      24% |
+| Plazo              | 24 meses |
+| Tasa mensual       |       2% |
 
 La tasa mensual se calcula así:
 
@@ -65,10 +65,10 @@ Google Sheets también tiene la función `PAGO` con argumentos equivalentes.
 
 Crea columnas como estas:
 
-| Mes | Pago | Interés | Capital | Saldo pendiente |
-|---:|---:|---:|---:|---:|
-| 1 | fórmula | fórmula | fórmula | fórmula |
-| 2 | fórmula | fórmula | fórmula | fórmula |
+| Mes |    Pago | Interés | Capital | Saldo pendiente |
+| --: | ------: | ------: | ------: | --------------: |
+|   1 | fórmula | fórmula | fórmula |         fórmula |
+|   2 | fórmula | fórmula | fórmula |         fórmula |
 
 El saldo inicial del mes 1 es el monto del préstamo. Después, cada fila usa el saldo final de la fila anterior.
 
@@ -94,11 +94,11 @@ El segundo mes usa `$48,356.45` como saldo anterior.
 
 ## Ejemplo de primeras filas
 
-| Mes | Pago | Interés | Capital | Saldo pendiente |
-|---:|---:|---:|---:|---:|
-| 1 | $2,643.55 | $1,000.00 | $1,643.55 | $48,356.45 |
-| 2 | $2,643.55 | $967.13 | $1,676.43 | $46,680.02 |
-| 3 | $2,643.55 | $933.60 | $1,709.95 | $44,970.06 |
+| Mes |      Pago |   Interés |   Capital | Saldo pendiente |
+| --: | --------: | --------: | --------: | --------------: |
+|   1 | $2,643.55 | $1,000.00 | $1,643.55 |      $48,356.45 |
+|   2 | $2,643.55 |   $967.13 | $1,676.43 |      $46,680.02 |
+|   3 | $2,643.55 |   $933.60 | $1,709.95 |      $44,970.06 |
 
 Si la última fila no llega exactamente a cero, puede ser por redondeos. En ese caso, ajusta el último pago para liquidar el saldo pendiente.
 

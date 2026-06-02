@@ -2,7 +2,7 @@
 title: "Qué incluye la cuota hipotecaria"
 seoTitle: "Qué incluye una cuota hipotecaria: capital, intereses y otros costos"
 description: "Entiende qué puede incluir una cuota hipotecaria, qué calcula nuestra herramienta y qué costos debes revisar por separado."
-pubDate: 2026-06-06
+pubDate: 2026-06-01
 categorySlug: "inmuebles"
 tags:
   - cuota hipotecaria
@@ -37,14 +37,14 @@ La herramienta también muestra total pagado, total de intereses y tabla de amor
 
 Una hipoteca real puede incluir o requerir costos adicionales:
 
-| Concepto | Cómo puede afectar |
-|---|---|
-| Seguros | Pueden sumarse al pago mensual |
-| Comisiones | Pueden cobrarse al inicio o bajo condiciones específicas |
-| Avalúo | Puede ser un costo previo o inicial |
-| Gastos notariales | Se relacionan con formalización de la compraventa |
-| Impuestos y derechos | Dependen de la ubicación y operación |
-| Gastos administrativos | Varían por institución y contrato |
+| Concepto               | Cómo puede afectar                                       |
+| ---------------------- | -------------------------------------------------------- |
+| Seguros                | Pueden sumarse al pago mensual                           |
+| Comisiones             | Pueden cobrarse al inicio o bajo condiciones específicas |
+| Avalúo                 | Puede ser un costo previo o inicial                      |
+| Gastos notariales      | Se relacionan con formalización de la compraventa        |
+| Impuestos y derechos   | Dependen de la ubicación y operación                     |
+| Gastos administrativos | Varían por institución y contrato                        |
 
 No todos los productos funcionan igual. La institución debe aclarar qué conceptos están incluidos en su cotización.
 

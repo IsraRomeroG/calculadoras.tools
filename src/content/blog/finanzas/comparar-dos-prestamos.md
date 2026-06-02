@@ -2,7 +2,7 @@
 title: "Cómo comparar dos préstamos: tasa, CAT, plazo y comisiones"
 seoTitle: "Cómo comparar préstamos: mensualidad, CAT, intereses y costo total"
 description: "Aprende a comparar dos préstamos revisando tasa, CAT, comisión, seguro, plazo, mensualidad y costo total."
-pubDate: 2026-06-11
+pubDate: 2026-06-01
 categorySlug: "finanzas"
 tags:
   - comparar préstamos
@@ -65,17 +65,17 @@ También revisa si los pagos extra se aplican a capital. Si no, quizá no genere
 
 Supongamos dos ofertas para pedir `$50,000`.
 
-| Dato | Préstamo A | Préstamo B |
-|---|---:|---:|
-| Tasa anual | 24% | 18% |
-| Plazo | 24 meses | 36 meses |
-| Comisión | $0.00 | $1,000.00 |
-| Seguro mensual | $0.00 | $150.00 |
-| Mensualidad total | $2,643.55 | $1,957.62 |
+| Dato                | Préstamo A | Préstamo B |
+| ------------------- | ---------: | ---------: |
+| Tasa anual          |        24% |        18% |
+| Plazo               |   24 meses |   36 meses |
+| Comisión            |      $0.00 |  $1,000.00 |
+| Seguro mensual      |      $0.00 |    $150.00 |
+| Mensualidad total   |  $2,643.55 |  $1,957.62 |
 | Intereses estimados | $13,445.32 | $15,074.31 |
-| Seguro total | $0.00 | $5,400.00 |
-| Costo total | $63,445.32 | $71,474.31 |
-| CAT aproximado | 26.82% | 28.53% |
+| Seguro total        |      $0.00 |  $5,400.00 |
+| Costo total         | $63,445.32 | $71,474.31 |
+| CAT aproximado      |     26.82% |     28.53% |
 
 El préstamo B tiene menor tasa y menor mensualidad, pero cuesta más al final por el plazo más largo, la comisión y el seguro. Este es justo el tipo de caso en el que conviene mirar más allá del pago mensual.
 
