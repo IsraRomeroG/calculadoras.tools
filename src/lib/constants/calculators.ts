@@ -160,4 +160,13 @@ export const CALCULATORS: CalculatorDirectoryItem[] = [
     categorySlug: "geometria",
     order: 72,
   },
+  {
+    id: "calculadora-del-teorema-de-pitagoras",
+    title: "Calculadora del teorema de Pitágoras",
+    description:
+      "Calcula la hipotenusa o un cateto de un triángulo rectángulo con fórmula y procedimiento.",
+    href: "/geometria/calculadora-del-teorema-de-pitagoras",
+    categorySlug: "geometria",
+    order: 74,
+  },
 ];
