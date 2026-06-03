@@ -67,7 +67,9 @@ src/lib/calculators/cocina/conversor-de-medidas-culinarias/cookingMeasures.test.
 7. Botones para intercambiar unidades, copiar y limpiar.
 8. URL compartible con parámetros validados.
 9. Entradas con punto o coma decimal.
-10. Accesibilidad por teclado y pruebas unitarias.
+10. Fracciones culinarias ASCII comunes, como `1/2`, `3/4` y `1 1/2`.
+11. Resultado práctico para cocinar cuando exista una equivalencia legible.
+12. Accesibilidad por teclado y pruebas unitarias.
 
 ### Fuera del MVP
 
@@ -108,6 +110,22 @@ porciones.
 
 No usar solamente `oz` para onza líquida: mostrar `fl oz` para volumen y `oz`
 para masa.
+
+### Etiquetas y aliases visibles
+
+Las unidades deben mostrarse con nombres claros y abreviaturas habituales para
+que el usuario pueda reconocer recetas de distintos países:
+
+| Unidad | Etiqueta corta | Alias de apoyo |
+|--------|----------------|----------------|
+| Taza | taza | cup |
+| Cucharada | cda | tbsp |
+| Cucharadita | cdta | tsp |
+| Onza líquida estadounidense | fl oz | onza líquida |
+| Onza avoirdupois | oz | onza de peso |
+
+Usar badges o texto secundario para diferenciar `fl oz` de `oz` cuando ambas
+aparezcan cerca en la interfaz.
 
 ---
 
@@ -166,6 +184,16 @@ Para convertir volumen a peso necesitas elegir un ingrediente. Esa conversión
 no está incluida en esta versión.
 ```
 
+Cuando el usuario intente una conversión entre volumen y masa, el estado debe
+ser útil y no solo bloquear el cálculo:
+
+- Explicar que harina, azúcar, mantequilla, arroz y otros alimentos tienen
+  densidades distintas.
+- Mantener visible el valor introducido para que el usuario pueda cambiar una
+  unidad sin volver a escribir.
+- Ofrecer un enlace contextual a una futura calculadora por ingrediente o al
+  contenido que explique la diferencia entre volumen y masa.
+
 ---
 
 ## Interfaz principal
@@ -188,6 +216,17 @@ Ocultar el selector de sistema cuando ninguna unidad seleccionada dependa de él
 ```text
 2 tazas métricas = 500 ml
 ```
+
+Cuando el resultado pueda expresarse con una equivalencia culinaria fácil de
+usar, mostrarla junto al resultado numérico sin perder precisión interna:
+
+```text
+500 ml = 2 tazas métricas
+1 cucharada métrica = 3 cucharaditas métricas
+```
+
+No forzar equivalencias prácticas si requieren redondeos engañosos. En esos
+casos, mostrar el valor decimal con los decimales configurados.
 
 ### Resultados secundarios
 
@@ -228,6 +267,9 @@ Aceptar:
 2,5
 1,000
 1.000,5
+1/2
+3/4
+1 1/2
 ```
 
 | Caso | Comportamiento |
@@ -237,11 +279,31 @@ Aceptar:
 | Valor no numérico | Mostrar error de formato |
 | Valor negativo | Rechazar |
 | Valor `0` | Convertir correctamente |
+| Fracción válida como `1/2` | Convertir a decimal internamente |
+| Número mixto como `1 1/2` | Interpretar como `1.5` |
+| Fracción con denominador `0` | Mostrar error de formato |
 | Resultado no finito | No calcular |
 | Origen y destino iguales | Mostrar equivalencia `1:1` |
 | Cambio de volumen a masa | Restablecer unidades compatibles |
 
 Mantener precisión completa durante el cálculo y redondear solo al mostrar.
+
+### Separadores ambiguos
+
+Detectar formato español e inglés para separadores decimales y de miles:
+
+- `1,000` puede interpretarse como `1` o `1000` según contexto regional.
+- `1.000,5` debe interpretarse como `1000.5`.
+- `1,000.5` debe interpretarse como `1000.5`.
+
+Si la entrada tiene un único separador y la interpretación no es obvia, mostrar
+un texto auxiliar corto con la interpretación aplicada, por ejemplo:
+
+```text
+Interpretado como 1000
+```
+
+No bloquear la conversión salvo que el formato sea inválido.
 
 ---
 
@@ -262,6 +324,9 @@ Reglas:
 ---
 
 ## Diseño y contenido
+
+El diseño debe ser **mobile first**: la calculadora es la primera experiencia
+útil de la página y debe poder completarse cómodamente en una pantalla estrecha.
 
 ### Hero
 
@@ -286,6 +351,32 @@ seguir una receta con claridad.
 6. Enlace a escalar receta por porciones.
 7. FAQ visibles.
 
+### Orden mobile first
+
+En móvil, priorizar el flujo de uso antes del contenido explicativo:
+
+1. Cantidad.
+2. Tipo de medida: volumen o masa.
+3. Unidad de origen y unidad de destino.
+4. Resultado principal grande y acción de copiar.
+5. Equivalencias compactas.
+6. Sistema culinario, visible cuando afecte a la conversión.
+7. Explicaciones, tablas y FAQ en bloques posteriores o acordeones.
+
+### Criterios de diseño móvil
+
+- No debe haber scroll horizontal a `360 px` de ancho.
+- Los controles táctiles deben medir al menos `44 px` de alto.
+- El resultado principal debe quedar visible inmediatamente después de escribir
+  una cantidad válida.
+- Los selectores de unidades deben usar etiquetas cortas y comprensibles, como
+  `taza`, `cda`, `cdta`, `ml`, `g`, `fl oz` y `oz`.
+- Las tablas de equivalencias deben convertirse en cards o filas compactas en
+  móvil.
+- El botón de copiar debe estar junto al resultado y ser fácil de activar con
+  el pulgar.
+- El texto auxiliar no debe tapar ni desplazar de forma brusca el resultado.
+
 ### FAQ sugeridas
 
 - ¿Cuántos mililitros tiene una taza?
@@ -306,6 +397,7 @@ getCookingMeasureFactor(unit, system)
 parseCookingMeasureInput(value)
 validateCookingMeasure(value)
 formatCookingMeasure(value, unit, decimals, system)
+formatPracticalCookingResult(value, unit, system, decimals)
 ```
 
 ---
@@ -321,7 +413,14 @@ formatCookingMeasure(value, unit, decimals, system)
 - `1 oz = 28.349523125 g`.
 - Rechazar conversión de `cup` a `g`.
 - Aceptar cero, punto y coma decimal.
+- Aceptar fracciones ASCII válidas: `1/2`, `3/4` y `1 1/2`.
+- Rechazar fracciones inválidas como `1/0` y `1 / / 2`.
+- Interpretar separadores de miles y decimales documentados.
 - Rechazar negativos, `NaN` e `Infinity`.
+- Mostrar copy útil al intentar volumen → masa o masa → volumen.
+- Diferenciar visualmente `fl oz` de `oz`.
+- Generar resultado práctico cuando la equivalencia sea exacta o suficientemente
+  clara para cocinar.
 - Round-trip sin pérdida relevante dentro del mismo grupo.
 
 ---
@@ -337,3 +436,8 @@ formatCookingMeasure(value, unit, decimals, system)
 6. Las equivalencias usan factores definidos y pruebas unitarias.
 7. La URL compartible conserva parámetros válidos.
 8. El diseño previsto funciona en móvil y con teclado.
+9. La experiencia mobile first permite calcular sin scroll horizontal en
+   pantallas de `360 px`.
+10. El parser acepta fracciones culinarias ASCII comunes y rechaza formatos
+    ambiguos o inválidos con mensajes claros.
+11. Los resultados distinguen onza líquida (`fl oz`) de onza de peso (`oz`).

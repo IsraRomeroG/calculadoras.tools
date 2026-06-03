@@ -178,4 +178,13 @@ export const CALCULATORS: CalculatorDirectoryItem[] = [
     categorySlug: "matematicas",
     order: 76,
   },
+  {
+    id: "conversor-de-medidas-culinarias",
+    title: "Conversor de medidas culinarias",
+    description:
+      "Convierte tazas, cucharadas, mililitros, gramos y otras medidas comunes de cocina.",
+    href: "/cocina/conversor-de-medidas-culinarias",
+    categorySlug: "cocina",
+    order: 78,
+  },
 ];
