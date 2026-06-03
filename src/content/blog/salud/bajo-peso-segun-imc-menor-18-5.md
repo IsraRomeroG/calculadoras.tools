@@ -2,7 +2,7 @@
 title: "Bajo peso según IMC: qué significa estar por debajo de 18.5"
 seoTitle: "Bajo peso según IMC: rangos, ejemplos y limitaciones"
 description: "Aprende qué significa un IMC menor a 18.5, cuáles son los rangos de delgadez y cómo interpretar el resultado."
-pubDate: 2026-06-04
+pubDate: 2026-06-14
 categorySlug: "salud"
 tags:
   - bajo peso
@@ -28,12 +28,12 @@ IMC menor a 18.5 = bajo peso
 
 Tabla más detallada:
 
-| IMC | Categoría |
-|-----|-----------|
-| Menos de 16.0 | Delgadez severa |
-| 16.0 a 16.9 | Delgadez moderada |
-| 17.0 a 18.4 | Delgadez leve |
-| 18.5 a 24.9 | Rango saludable |
+| IMC           | Categoría         |
+| ------------- | ----------------- |
+| Menos de 16.0 | Delgadez severa   |
+| 16.0 a 16.9   | Delgadez moderada |
+| 17.0 a 18.4   | Delgadez leve     |
+| 18.5 a 24.9   | Rango saludable   |
 
 Puedes calcular tu resultado con la [calculadora de IMC](/salud/calculadora-de-imc).
 

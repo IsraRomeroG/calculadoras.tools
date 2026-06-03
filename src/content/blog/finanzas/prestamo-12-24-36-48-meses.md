@@ -2,7 +2,7 @@
 title: "Préstamo a 12, 24, 36 o 48 meses: qué plazo conviene"
 seoTitle: "Préstamo a 12, 24, 36 o 48 meses: mensualidad vs intereses"
 description: "Compara cómo cambia la mensualidad y el costo total de un préstamo cuando eliges 12, 24, 36 o 48 meses."
-pubDate: 2026-06-05
+pubDate: 2026-06-03
 categorySlug: "finanzas"
 tags:
   - plazo de préstamo
@@ -41,12 +41,12 @@ La [calculadora de préstamo](/finanzas/calculadora-de-prestamo) permite cambiar
 
 ## Tabla 12, 24, 36 y 48 meses
 
-| Plazo | Mensualidad estimada | Intereses estimados | Total pagado |
-|---:|---:|---:|---:|
-| 12 meses | $4,727.98 | $6,735.76 | $56,735.76 |
-| 24 meses | $2,643.55 | $13,445.32 | $63,445.32 |
-| 36 meses | $1,961.64 | $20,619.13 | $70,619.13 |
-| 48 meses | $1,630.09 | $28,244.41 | $78,244.41 |
+|    Plazo | Mensualidad estimada | Intereses estimados | Total pagado |
+| -------: | -------------------: | ------------------: | -----------: |
+| 12 meses |            $4,727.98 |           $6,735.76 |   $56,735.76 |
+| 24 meses |            $2,643.55 |          $13,445.32 |   $63,445.32 |
+| 36 meses |            $1,961.64 |          $20,619.13 |   $70,619.13 |
+| 48 meses |            $1,630.09 |          $28,244.41 |   $78,244.41 |
 
 La mensualidad de 48 meses es mucho menor que la de 12 meses, pero el interés total es más de cuatro veces mayor.
 

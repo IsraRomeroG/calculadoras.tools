@@ -2,7 +2,7 @@
 title: "Cómo hacer una tabla de amortización hipotecaria en Excel"
 seoTitle: "Tabla de amortización hipotecaria en Excel: fórmulas paso a paso"
 description: "Aprende a crear una tabla de amortización hipotecaria en Excel o Google Sheets con fórmulas para pago, interés, capital y saldo."
-pubDate: 2026-06-18
+pubDate: 2026-06-03
 categorySlug: "inmuebles"
 tags:
   - tabla de amortización
@@ -50,14 +50,14 @@ El signo negativo del monto se usa porque la función distingue entradas y salid
 
 Usa estas columnas:
 
-| Columna | Descripción |
-|---|---|
-| Mes | Número de pago |
-| Saldo inicial | Saldo antes del pago |
-| Pago | Cuota del mes |
-| Interés | Interés calculado sobre saldo inicial |
-| Capital | Pago menos interés |
-| Saldo final | Saldo inicial menos capital |
+| Columna       | Descripción                           |
+| ------------- | ------------------------------------- |
+| Mes           | Número de pago                        |
+| Saldo inicial | Saldo antes del pago                  |
+| Pago          | Cuota del mes                         |
+| Interés       | Interés calculado sobre saldo inicial |
+| Capital       | Pago menos interés                    |
+| Saldo final   | Saldo inicial menos capital           |
 
 Si agregas pago extra, inclúyelo como columna adicional o súmalo al pago planeado.
 
@@ -84,11 +84,11 @@ La última fila debe ajustarse para no dejar saldo negativo.
 
 Para `$2,000,000`, `9%` anual y `20 años`, la cuota es `$17,994.52`.
 
-| Mes | Pago | Capital | Interés | Saldo |
-|---:|---:|---:|---:|---:|
-| 1 | $17,994.52 | $2,994.52 | $15,000.00 | $1,997,005.48 |
-| 2 | $17,994.52 | $3,016.98 | $14,977.54 | $1,993,988.50 |
-| 3 | $17,994.52 | $3,039.61 | $14,954.91 | $1,990,948.90 |
+| Mes |       Pago |   Capital |    Interés |         Saldo |
+| --: | ---------: | --------: | ---------: | ------------: |
+|   1 | $17,994.52 | $2,994.52 | $15,000.00 | $1,997,005.48 |
+|   2 | $17,994.52 | $3,016.98 | $14,977.54 | $1,993,988.50 |
+|   3 | $17,994.52 | $3,039.61 | $14,954.91 | $1,990,948.90 |
 
 ## Errores comunes en Excel
 

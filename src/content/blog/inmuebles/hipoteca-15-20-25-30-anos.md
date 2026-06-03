@@ -2,7 +2,7 @@
 title: "Hipoteca a 15, 20, 25 o 30 años: qué plazo conviene"
 seoTitle: "Hipoteca a 15, 20, 25 o 30 años: mensualidad vs intereses"
 description: "Compara cómo cambia la mensualidad y el costo total de una hipoteca cuando eliges 15, 20, 25 o 30 años."
-pubDate: 2026-06-04
+pubDate: 2026-06-14
 categorySlug: "inmuebles"
 tags:
   - plazo hipotecario
@@ -41,12 +41,12 @@ Los resultados son estimaciones de capital e intereses. No incluyen seguros, imp
 
 ## Tabla 15, 20, 25 y 30 años
 
-| Plazo | Cuota estimada | Total pagado | Intereses |
-|---:|---:|---:|---:|
-| 15 años | $20,285.33 | $3,651,359.70 | $1,651,359.70 |
-| 20 años | $17,994.52 | $4,318,684.59 | $2,318,684.59 |
-| 25 años | $16,783.93 | $5,035,178.18 | $3,035,178.18 |
-| 30 años | $16,092.45 | $5,793,282.84 | $3,793,282.84 |
+|   Plazo | Cuota estimada |  Total pagado |     Intereses |
+| ------: | -------------: | ------------: | ------------: |
+| 15 años |     $20,285.33 | $3,651,359.70 | $1,651,359.70 |
+| 20 años |     $17,994.52 | $4,318,684.59 | $2,318,684.59 |
+| 25 años |     $16,783.93 | $5,035,178.18 | $3,035,178.18 |
+| 30 años |     $16,092.45 | $5,793,282.84 | $3,793,282.84 |
 
 La diferencia entre 15 y 30 años es clara: la mensualidad baja, pero los intereses estimados suben mucho.
 

@@ -2,7 +2,7 @@
 title: "Gastos notariales, avalúo e impuestos en una hipoteca"
 seoTitle: "Gastos de comprar casa con hipoteca: notaría, avalúo e impuestos"
 description: "Conoce costos que pueden aparecer al comprar una vivienda con hipoteca y que no forman parte de la cuota de capital e intereses."
-pubDate: 2026-06-07
+pubDate: 2026-06-03
 categorySlug: "inmuebles"
 tags:
   - gastos notariales
