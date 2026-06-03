@@ -151,4 +151,13 @@ export const CALCULATORS: CalculatorDirectoryItem[] = [
     categorySlug: "conversores",
     order: 70,
   },
+  {
+    id: "calculadora-de-area-y-perimetro",
+    title: "Calculadora de área y perímetro",
+    description:
+      "Calcula área y perímetro de cuadrados, rectángulos, triángulos, círculos y polígonos regulares.",
+    href: "/geometria/calculadora-de-area-y-perimetro",
+    categorySlug: "geometria",
+    order: 72,
+  },
 ];

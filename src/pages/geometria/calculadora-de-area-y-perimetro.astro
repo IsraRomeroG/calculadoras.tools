@@ -1,0 +1,1976 @@
+---
+import Container from "@components/layout/Container.astro";
+import PageShell from "@components/layout/PageShell.astro";
+import BaseLayout from "@layouts/BaseLayout.astro";
+import FaqSection from "@components/shared/FaqSection.astro";
+import PageHero from "@components/shared/PageHero.astro";
+import SectionIntro from "@components/shared/SectionIntro.astro";
+import { buildFaqJsonLd } from "@lib/seo";
+import {
+  AREA_PERIMETER_UNITS,
+  MEASUREMENT_UNIT_METADATA,
+} from "@lib/calculators/geometria/calculadora-de-area-y-perimetro/areaPerimeter";
+
+const title = "Calculadora de Área y Perímetro — Fórmulas por Figura";
+const description =
+  "Calcula área y perímetro de cuadrados, rectángulos, triángulos, círculos y polígonos regulares con fórmula y procedimiento.";
+const canonical = "/geometria/calculadora-de-area-y-perimetro";
+
+const shapeOptions = [
+  { value: "square", label: "Cuadrado" },
+  { value: "rectangle", label: "Rectángulo" },
+  { value: "triangle", label: "Triángulo" },
+  { value: "circle", label: "Círculo" },
+  { value: "regularPolygon", label: "Polígono regular" },
+];
+
+const decimalOptions = [
+  { value: "auto", label: "Automático" },
+  { value: "0", label: "0 decimales" },
+  { value: "1", label: "1 decimal" },
+  { value: "2", label: "2 decimales" },
+  { value: "3", label: "3 decimales" },
+  { value: "4", label: "4 decimales" },
+  { value: "5", label: "5 decimales" },
+  { value: "6", label: "6 decimales" },
+];
+
+const formulaRows = [
+  {
+    figure: "Cuadrado",
+    area: "lado²",
+    perimeter: "4 × lado",
+  },
+  {
+    figure: "Rectángulo",
+    area: "base × altura",
+    perimeter: "2 × (base + altura)",
+  },
+  {
+    figure: "Triángulo por lados",
+    area: "√(s × (s - a) × (s - b) × (s - c))",
+    perimeter: "a + b + c",
+  },
+  {
+    figure: "Triángulo por base y altura",
+    area: "(base × altura) ÷ 2",
+    perimeter: "Se necesitan los tres lados",
+  },
+  {
+    figure: "Círculo",
+    area: "π × radio²",
+    perimeter: "2 × π × radio",
+  },
+  {
+    figure: "Polígono regular",
+    area: "(perímetro × apotema) ÷ 2",
+    perimeter: "número de lados × lado",
+  },
+];
+
+const faqs = [
+  {
+    question: "¿Cuál es la diferencia entre área y perímetro?",
+    answer:
+      "El área mide la superficie que ocupa una figura. El perímetro mide la longitud de su contorno.",
+  },
+  {
+    question: "¿Cuándo debo usar el área y cuándo el perímetro?",
+    answer:
+      "Usa el área para cubrir superficies, como piso, pintura o terreno. Usa el perímetro para bordear, cercar, enmarcar o medir contornos.",
+  },
+  {
+    question: "¿Cómo calcular el área de un rectángulo?",
+    answer:
+      "Multiplica la base por la altura. Por ejemplo, un rectángulo de 5 m por 3 m tiene área de 15 m².",
+  },
+  {
+    question: "¿Cómo calcular el perímetro de un rectángulo?",
+    answer:
+      "Suma base y altura, y multiplica por 2. Por ejemplo, con base 5 m y altura 3 m: 2 × (5 + 3) = 16 m.",
+  },
+  {
+    question: "¿Cómo calcular el área de un triángulo?",
+    answer:
+      "Si conoces base y altura, multiplica base por altura y divide entre 2. Si conoces los tres lados, puedes usar la fórmula de Herón.",
+  },
+  {
+    question: "¿Cómo calcular el área de un círculo?",
+    answer:
+      "Multiplica π por el radio al cuadrado. Si tienes el diámetro, primero divídelo entre 2 para obtener el radio.",
+  },
+  {
+    question: "¿La circunferencia es el perímetro de un círculo?",
+    answer:
+      "Sí. En un círculo, la longitud del contorno se llama circunferencia y se calcula como 2 × π × radio.",
+  },
+  {
+    question: "¿Qué unidad se usa para expresar un área?",
+    answer:
+      "El área se expresa en unidades cuadradas, como cm², m² o ft². El perímetro se expresa en unidades lineales, como cm, m o ft.",
+  },
+  {
+    question: "¿Qué significa que un polígono sea regular?",
+    answer:
+      "Un polígono regular tiene todos sus lados con la misma longitud y todos sus ángulos iguales.",
+  },
+];
+
+const faqJsonLd = buildFaqJsonLd(faqs);
+---
+
+<BaseLayout title={title} description={description} canonical={canonical}>
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={JSON.stringify(faqJsonLd)} />
+  </Fragment>
+
+  <PageShell>
+    <PageHero
+      title="Calculadora de área y perímetro"
+      description="Calcula el área y el perímetro de figuras comunes. Elige una figura, escribe sus medidas y consulta la fórmula paso a paso."
+      kicker="Geometría"
+      collapseBreadcrumbOnMobile
+      containerClass="py-5 md:py-7"
+      titleClass="mt-2 text-3xl font-bold leading-tight md:text-5xl"
+      descriptionClass="mt-3 text-base leading-relaxed text-gray-400"
+      breadcrumbs={[
+        { label: "Inicio", href: "/", ariaLabel: "Inicio" },
+        { label: "Geometría", href: "/geometria", optional: true },
+        { label: "Calculadora de área y perímetro", truncate: true },
+      ]}
+    />
+
+    <Container as="section" class="py-5 md:py-8">
+      <div
+        id="area-perimeter-calculator"
+        class="grid gap-4 lg:grid-cols-[minmax(0,1.05fr)_minmax(19rem,0.95fr)]"
+      >
+        <section
+          class="overflow-hidden rounded-lg border border-gray-700 bg-gray-950 shadow-xl shadow-gray-950/30"
+          aria-labelledby="calculator-heading"
+        >
+          <div class="border-b border-gray-800 p-4 sm:p-5">
+            <h2 id="calculator-heading" class="text-xl font-semibold">
+              Figura y medidas
+            </h2>
+            <p class="mt-2 text-sm leading-relaxed text-gray-400">
+              Usa una sola unidad para todas las medidas de la figura.
+            </p>
+          </div>
+
+          <div class="p-4 sm:p-5">
+            <div class="grid grid-cols-2 gap-2 sm:grid-cols-3">
+              {
+                shapeOptions.map((shape) => (
+                  <button
+                    type="button"
+                    class="min-h-11 rounded-lg border border-gray-700 px-3 py-2 text-sm font-semibold text-gray-200 transition hover:border-amber-400 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/40"
+                    data-shape-option={shape.value}
+                    aria-pressed="false"
+                  >
+                    {shape.label}
+                  </button>
+                ))
+              }
+            </div>
+
+            <div
+              class="mt-5 grid gap-4 md:grid-cols-[minmax(0,1fr)_13rem]"
+            >
+              <div>
+                <div
+                  class="mb-4 hidden rounded-lg border border-gray-800 bg-gray-900 p-3"
+                  data-triangle-mode-wrapper
+                >
+                  <p class="text-sm font-semibold text-gray-200">
+                    Datos del triángulo
+                  </p>
+                  <div class="mt-3 grid grid-cols-2 gap-2">
+                    <button
+                      type="button"
+                      class="min-h-11 rounded-lg border border-gray-700 px-3 py-2 text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/40"
+                      data-triangle-mode-option="sides"
+                      aria-pressed="true"
+                    >
+                      Tengo los 3 lados
+                    </button>
+                    <button
+                      type="button"
+                      class="min-h-11 rounded-lg border border-gray-700 px-3 py-2 text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/40"
+                      data-triangle-mode-option="baseHeight"
+                      aria-pressed="false"
+                    >
+                      Tengo base y altura
+                    </button>
+                  </div>
+                </div>
+
+                <div
+                  class="mb-4 hidden rounded-lg border border-gray-800 bg-gray-900 p-3"
+                  data-circle-measure-wrapper
+                >
+                  <p class="text-sm font-semibold text-gray-200">
+                    Medida conocida
+                  </p>
+                  <div class="mt-3 grid grid-cols-2 gap-2">
+                    <button
+                      type="button"
+                      class="min-h-11 rounded-lg border border-gray-700 px-3 py-2 text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/40"
+                      data-circle-measure-option="radius"
+                      aria-pressed="true"
+                    >
+                      Radio
+                    </button>
+                    <button
+                      type="button"
+                      class="min-h-11 rounded-lg border border-gray-700 px-3 py-2 text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/40"
+                      data-circle-measure-option="diameter"
+                      aria-pressed="false"
+                    >
+                      Diámetro
+                    </button>
+                  </div>
+                </div>
+
+                <div class="space-y-4">
+                  <div data-input-panel="square">
+                    <div class="grid gap-4 sm:grid-cols-2">
+                      <label class="block">
+                        <span class="text-sm font-medium text-gray-200">
+                          Lado
+                        </span>
+                        <input
+                          id="square-side"
+                          class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-900 px-4 text-base text-white outline-none transition placeholder:text-gray-600 focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15"
+                          type="text"
+                          inputmode="decimal"
+                          autocomplete="off"
+                          placeholder="4"
+                          data-input="side"
+                          aria-describedby="square-side-error"
+                        />
+                      </label>
+                      <p
+                        id="square-side-error"
+                        class="hidden self-end text-sm text-red-300"
+                        data-error-for="side"
+                      >
+                      </p>
+                    </div>
+                  </div>
+
+                  <div data-input-panel="rectangle" hidden>
+                    <div class="grid gap-4 sm:grid-cols-2">
+                      <label class="block">
+                        <span class="text-sm font-medium text-gray-200">
+                          Base
+                        </span>
+                        <input
+                          id="rectangle-base"
+                          class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-900 px-4 text-base text-white outline-none transition placeholder:text-gray-600 focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15"
+                          type="text"
+                          inputmode="decimal"
+                          autocomplete="off"
+                          placeholder="5"
+                          data-input="base"
+                          aria-describedby="rectangle-base-error"
+                        />
+                        <span
+                          id="rectangle-base-error"
+                          class="mt-2 hidden text-sm text-red-300"
+                          data-error-for="base"
+                        >
+                        </span>
+                      </label>
+                      <label class="block">
+                        <span class="text-sm font-medium text-gray-200">
+                          Altura
+                        </span>
+                        <input
+                          id="rectangle-height"
+                          class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-900 px-4 text-base text-white outline-none transition placeholder:text-gray-600 focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15"
+                          type="text"
+                          inputmode="decimal"
+                          autocomplete="off"
+                          placeholder="3"
+                          data-input="height"
+                          aria-describedby="rectangle-height-error"
+                        />
+                        <span
+                          id="rectangle-height-error"
+                          class="mt-2 hidden text-sm text-red-300"
+                          data-error-for="height"
+                        >
+                        </span>
+                      </label>
+                    </div>
+                  </div>
+
+                  <div data-input-panel="triangle-sides" hidden>
+                    <div class="grid gap-4 sm:grid-cols-3">
+                      {
+                        ["a", "b", "c"].map((side) => (
+                          <label class="block">
+                            <span class="text-sm font-medium text-gray-200">
+                              Lado {side}
+                            </span>
+                            <input
+                              id={`triangle-side-${side}`}
+                              class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-900 px-4 text-base text-white outline-none transition placeholder:text-gray-600 focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15"
+                              type="text"
+                              inputmode="decimal"
+                              autocomplete="off"
+                              placeholder={side === "a" ? "3" : side === "b" ? "4" : "5"}
+                              data-input={side}
+                              aria-describedby={`triangle-side-${side}-error`}
+                            />
+                            <span
+                              id={`triangle-side-${side}-error`}
+                              class="mt-2 hidden text-sm text-red-300"
+                              data-error-for={side}
+                            >
+                            </span>
+                          </label>
+                        ))
+                      }
+                    </div>
+                  </div>
+
+                  <div data-input-panel="triangle-base-height" hidden>
+                    <div class="grid gap-4 sm:grid-cols-2">
+                      <label class="block">
+                        <span class="text-sm font-medium text-gray-200">
+                          Base
+                        </span>
+                        <input
+                          id="triangle-base"
+                          class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-900 px-4 text-base text-white outline-none transition placeholder:text-gray-600 focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15"
+                          type="text"
+                          inputmode="decimal"
+                          autocomplete="off"
+                          placeholder="8"
+                          data-input="base"
+                          aria-describedby="triangle-base-error"
+                        />
+                        <span
+                          id="triangle-base-error"
+                          class="mt-2 hidden text-sm text-red-300"
+                          data-error-for="base"
+                        >
+                        </span>
+                      </label>
+                      <label class="block">
+                        <span class="text-sm font-medium text-gray-200">
+                          Altura
+                        </span>
+                        <input
+                          id="triangle-height"
+                          class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-900 px-4 text-base text-white outline-none transition placeholder:text-gray-600 focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15"
+                          type="text"
+                          inputmode="decimal"
+                          autocomplete="off"
+                          placeholder="3"
+                          data-input="height"
+                          aria-describedby="triangle-height-error"
+                        />
+                        <span
+                          id="triangle-height-error"
+                          class="mt-2 hidden text-sm text-red-300"
+                          data-error-for="height"
+                        >
+                        </span>
+                      </label>
+                    </div>
+                  </div>
+
+                  <div data-input-panel="circle-radius" hidden>
+                    <label class="block">
+                      <span class="text-sm font-medium text-gray-200">
+                        Radio
+                      </span>
+                      <input
+                        id="circle-radius"
+                        class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-900 px-4 text-base text-white outline-none transition placeholder:text-gray-600 focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15"
+                        type="text"
+                        inputmode="decimal"
+                        autocomplete="off"
+                        placeholder="2.5"
+                        data-input="radius"
+                        aria-describedby="circle-radius-error"
+                      />
+                      <span
+                        id="circle-radius-error"
+                        class="mt-2 hidden text-sm text-red-300"
+                        data-error-for="radius"
+                      >
+                      </span>
+                    </label>
+                  </div>
+
+                  <div data-input-panel="circle-diameter" hidden>
+                    <label class="block">
+                      <span class="text-sm font-medium text-gray-200">
+                        Diámetro
+                      </span>
+                      <input
+                        id="circle-diameter"
+                        class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-900 px-4 text-base text-white outline-none transition placeholder:text-gray-600 focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15"
+                        type="text"
+                        inputmode="decimal"
+                        autocomplete="off"
+                        placeholder="10"
+                        data-input="diameter"
+                        aria-describedby="circle-diameter-error"
+                      />
+                      <span
+                        id="circle-diameter-error"
+                        class="mt-2 hidden text-sm text-red-300"
+                        data-error-for="diameter"
+                      >
+                      </span>
+                    </label>
+                  </div>
+
+                  <div data-input-panel="regular-polygon" hidden>
+                    <div class="grid gap-4 sm:grid-cols-2">
+                      <label class="block">
+                        <span class="text-sm font-medium text-gray-200">
+                          Número de lados
+                        </span>
+                        <input
+                          id="polygon-sides"
+                          class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-900 px-4 text-base text-white outline-none transition placeholder:text-gray-600 focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15"
+                          type="text"
+                          inputmode="numeric"
+                          autocomplete="off"
+                          placeholder="6"
+                          data-input="sideCount"
+                          aria-describedby="polygon-sides-error"
+                        />
+                        <span
+                          id="polygon-sides-error"
+                          class="mt-2 hidden text-sm text-red-300"
+                          data-error-for="sideCount"
+                        >
+                        </span>
+                      </label>
+                      <label class="block">
+                        <span class="text-sm font-medium text-gray-200">
+                          Longitud de cada lado
+                        </span>
+                        <input
+                          id="polygon-side-length"
+                          class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-900 px-4 text-base text-white outline-none transition placeholder:text-gray-600 focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15"
+                          type="text"
+                          inputmode="decimal"
+                          autocomplete="off"
+                          placeholder="4"
+                          data-input="sideLength"
+                          aria-describedby="polygon-side-length-error"
+                        />
+                        <span
+                          id="polygon-side-length-error"
+                          class="mt-2 hidden text-sm text-red-300"
+                          data-error-for="sideLength"
+                        >
+                        </span>
+                      </label>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="mt-5 grid gap-4 sm:grid-cols-2">
+                  <label class="block">
+                    <span class="text-sm font-medium text-gray-200">
+                      Unidad
+                    </span>
+                    <select
+                      class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-900 px-4 text-base text-white outline-none transition focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15"
+                      data-unit-select
+                    >
+                      {
+                        AREA_PERIMETER_UNITS.map((unit) => (
+                          <option value={unit}>
+                            {MEASUREMENT_UNIT_METADATA[unit].label}
+                          </option>
+                        ))
+                      }
+                    </select>
+                  </label>
+
+                  <label class="block">
+                    <span class="text-sm font-medium text-gray-200">
+                      Decimales
+                    </span>
+                    <select
+                      class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-900 px-4 text-base text-white outline-none transition focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15"
+                      data-decimals-select
+                    >
+                      {
+                        decimalOptions.map((option) => (
+                          <option value={option.value}>{option.label}</option>
+                        ))
+                      }
+                    </select>
+                  </label>
+                </div>
+
+                <div class="mt-5 flex flex-col gap-3 sm:flex-row">
+                  <button
+                    type="button"
+                    class="inline-flex min-h-11 items-center justify-center rounded-lg border border-gray-700 px-4 py-2 text-sm font-semibold text-gray-200 transition hover:border-amber-400 hover:text-white focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/40"
+                    data-clear-calculator
+                  >
+                    Limpiar
+                  </button>
+                </div>
+              </div>
+
+              <aside
+                class="rounded-lg border border-gray-800 bg-gray-900 p-3 text-gray-300"
+                aria-labelledby="diagram-title"
+              >
+                <h3
+                  id="diagram-title"
+                  class="text-sm font-semibold text-white"
+                  data-diagram-title
+                >
+                  Cuadrado
+                </h3>
+                <p class="mt-1 text-xs leading-relaxed text-gray-500" data-diagram-note>
+                  Cada lado mide lo mismo.
+                </p>
+
+                <div class="mt-3 aspect-square w-full text-amber-300">
+                  <svg
+                    class="h-full w-full"
+                    viewBox="0 0 160 160"
+                    role="img"
+                    aria-label="Esquema de cuadrado con lado"
+                    data-diagram="square"
+                  >
+                    <rect
+                      x="38"
+                      y="36"
+                      width="84"
+                      height="84"
+                      rx="3"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="5"
+                    />
+                    <text x="80" y="137" text-anchor="middle" class="fill-gray-200 text-[13px]">
+                      lado
+                    </text>
+                  </svg>
+
+                  <svg
+                    class="hidden h-full w-full"
+                    viewBox="0 0 160 160"
+                    role="img"
+                    aria-label="Esquema de rectángulo con base y altura"
+                    data-diagram="rectangle"
+                  >
+                    <rect
+                      x="28"
+                      y="48"
+                      width="104"
+                      height="64"
+                      rx="3"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="5"
+                    />
+                    <text x="80" y="131" text-anchor="middle" class="fill-gray-200 text-[13px]">
+                      base
+                    </text>
+                    <text x="142" y="83" text-anchor="middle" class="fill-gray-200 text-[13px]">
+                      altura
+                    </text>
+                  </svg>
+
+                  <svg
+                    class="hidden h-full w-full"
+                    viewBox="0 0 160 160"
+                    role="img"
+                    aria-label="Esquema de triángulo con lados a, b y c"
+                    data-diagram="triangle-sides"
+                  >
+                    <path
+                      d="M28 118 L80 32 L132 118 Z"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="5"
+                      stroke-linejoin="round"
+                    />
+                    <text x="49" y="74" text-anchor="middle" class="fill-gray-200 text-[13px]">
+                      a
+                    </text>
+                    <text x="111" y="74" text-anchor="middle" class="fill-gray-200 text-[13px]">
+                      b
+                    </text>
+                    <text x="80" y="136" text-anchor="middle" class="fill-gray-200 text-[13px]">
+                      c
+                    </text>
+                  </svg>
+
+                  <svg
+                    class="hidden h-full w-full"
+                    viewBox="0 0 160 160"
+                    role="img"
+                    aria-label="Esquema de triángulo con base y altura"
+                    data-diagram="triangle-base-height"
+                  >
+                    <path
+                      d="M30 120 L122 120 L80 34 Z"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="5"
+                      stroke-linejoin="round"
+                    />
+                    <path
+                      d="M80 34 L80 120"
+                      stroke="currentColor"
+                      stroke-width="3"
+                      stroke-dasharray="6 5"
+                    />
+                    <text x="76" y="82" text-anchor="end" class="fill-gray-200 text-[13px]">
+                      altura
+                    </text>
+                    <text x="76" y="139" text-anchor="middle" class="fill-gray-200 text-[13px]">
+                      base
+                    </text>
+                  </svg>
+
+                  <svg
+                    class="hidden h-full w-full"
+                    viewBox="0 0 160 160"
+                    role="img"
+                    aria-label="Esquema de círculo con radio"
+                    data-diagram="circle-radius"
+                  >
+                    <circle
+                      cx="80"
+                      cy="80"
+                      r="48"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="5"
+                    />
+                    <path d="M80 80 L128 80" stroke="currentColor" stroke-width="4" />
+                    <circle cx="80" cy="80" r="4" fill="currentColor" />
+                    <text x="104" y="72" text-anchor="middle" class="fill-gray-200 text-[13px]">
+                      radio
+                    </text>
+                  </svg>
+
+                  <svg
+                    class="hidden h-full w-full"
+                    viewBox="0 0 160 160"
+                    role="img"
+                    aria-label="Esquema de círculo con diámetro"
+                    data-diagram="circle-diameter"
+                  >
+                    <circle
+                      cx="80"
+                      cy="80"
+                      r="48"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="5"
+                    />
+                    <path d="M32 80 L128 80" stroke="currentColor" stroke-width="4" />
+                    <text x="80" y="70" text-anchor="middle" class="fill-gray-200 text-[13px]">
+                      diámetro
+                    </text>
+                  </svg>
+
+                  <svg
+                    class="hidden h-full w-full"
+                    viewBox="0 0 160 160"
+                    role="img"
+                    aria-label="Esquema de polígono regular con lado y apotema"
+                    data-diagram="regular-polygon"
+                  >
+                    <path
+                      d="M80 28 L125 54 L125 106 L80 132 L35 106 L35 54 Z"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="5"
+                      stroke-linejoin="round"
+                    />
+                    <path
+                      d="M80 80 L80 132"
+                      stroke="currentColor"
+                      stroke-width="3"
+                      stroke-dasharray="6 5"
+                    />
+                    <text x="103" y="126" text-anchor="middle" class="fill-gray-200 text-[13px]">
+                      lado
+                    </text>
+                    <text x="74" y="108" text-anchor="end" class="fill-gray-200 text-[13px]">
+                      apotema
+                    </text>
+                  </svg>
+                </div>
+              </aside>
+            </div>
+          </div>
+        </section>
+
+        <section
+          class="rounded-lg border border-gray-700 bg-gray-950 p-4 shadow-xl shadow-gray-950/30 sm:p-5"
+          aria-labelledby="result-heading"
+        >
+          <div aria-live="polite" data-result-region>
+            <p class="text-sm font-semibold uppercase tracking-wide text-amber-400" data-result-kicker>
+              Resultado
+            </p>
+            <h2 id="result-heading" class="mt-2 text-2xl font-bold" data-main-result>
+              Escribe las medidas
+            </h2>
+            <p class="mt-2 text-sm leading-relaxed text-gray-400" data-result-note>
+              El área, el perímetro y la fórmula aparecerán aquí.
+            </p>
+          </div>
+
+          <dl class="mt-5 divide-y divide-gray-800 rounded-lg border border-gray-800">
+            <div class="grid gap-1 p-4 sm:grid-cols-[8rem_1fr]">
+              <dt class="text-sm text-gray-500">Área</dt>
+              <dd class="text-base font-semibold text-white" data-area-result>
+                Pendiente
+              </dd>
+            </div>
+            <div class="grid gap-1 p-4 sm:grid-cols-[8rem_1fr]">
+              <dt class="text-sm text-gray-500" data-perimeter-label>
+                Perímetro
+              </dt>
+              <dd class="text-base font-semibold text-white" data-perimeter-result>
+                Pendiente
+              </dd>
+            </div>
+            <div class="hidden grid gap-1 p-4 sm:grid-cols-[8rem_1fr]" data-extra-row>
+              <dt class="text-sm text-gray-500" data-extra-label>Dato</dt>
+              <dd class="text-base font-semibold text-white" data-extra-result></dd>
+            </div>
+          </dl>
+
+          <div class="mt-5 rounded-lg border border-gray-800 bg-gray-900 p-4">
+            <h3 class="text-sm font-semibold text-white">Uso práctico</h3>
+            <p class="mt-2 text-sm leading-relaxed text-gray-400" data-practical-note>
+              Usa el área para superficies y el perímetro para contornos.
+            </p>
+          </div>
+
+          <details class="mt-5 rounded-lg border border-gray-800 bg-gray-900 p-4">
+            <summary class="cursor-pointer list-none text-sm font-semibold text-white">
+              Ver procedimiento
+            </summary>
+            <div class="mt-4 space-y-3 text-sm leading-relaxed text-gray-300">
+              <p>
+                <span class="font-semibold text-gray-100">Fórmula:</span>
+                <span data-formula>Selecciona una figura y escribe sus medidas.</span>
+              </p>
+              <p>
+                <span class="font-semibold text-gray-100">Sustituyendo:</span>
+                <span data-substitution>Los valores aparecerán aquí.</span>
+              </p>
+              <p>
+                <span class="font-semibold text-gray-100">Resultado:</span>
+                <span data-procedure-result>Completa los campos para calcular.</span>
+              </p>
+            </div>
+          </details>
+
+          <div class="mt-5 grid gap-3 sm:grid-cols-2">
+            <button
+              type="button"
+              class="inline-flex min-h-11 items-center justify-center rounded-lg bg-amber-400 px-4 py-2 text-sm font-semibold text-gray-950 transition hover:bg-amber-300 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/40 disabled:cursor-not-allowed disabled:opacity-50"
+              data-copy-result
+              disabled
+            >
+              Copiar resultado
+            </button>
+            <button
+              type="button"
+              class="inline-flex min-h-11 items-center justify-center rounded-lg border border-gray-700 px-4 py-2 text-sm font-semibold text-gray-200 transition hover:border-amber-400 hover:text-white focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/40"
+              data-copy-link
+            >
+              Copiar enlace
+            </button>
+          </div>
+          <p
+            class="mt-3 min-h-5 text-sm text-emerald-300"
+            role="status"
+            aria-live="polite"
+            data-copy-status
+          >
+          </p>
+        </section>
+      </div>
+    </Container>
+
+    <Container as="section" class="py-8 md:py-10">
+      <SectionIntro
+        title="Fórmulas por figura"
+        description="La calculadora usa estas fórmulas y conserva precisión completa durante el cálculo."
+        class="mb-5"
+      />
+
+      <div class="overflow-x-auto rounded-lg border border-gray-700">
+        <table class="min-w-full divide-y divide-gray-700 bg-gray-950 text-left text-sm">
+          <thead class="bg-gray-900 text-gray-300">
+            <tr>
+              <th class="px-4 py-3 font-semibold" scope="col">Figura</th>
+              <th class="px-4 py-3 font-semibold" scope="col">Área</th>
+              <th class="px-4 py-3 font-semibold" scope="col">Perímetro</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-gray-800 text-gray-300">
+            {
+              formulaRows.map((row) => (
+                <tr>
+                  <th class="px-4 py-3 font-semibold text-white" scope="row">
+                    {row.figure}
+                  </th>
+                  <td class="px-4 py-3">{row.area}</td>
+                  <td class="px-4 py-3">{row.perimeter}</td>
+                </tr>
+              ))
+            }
+          </tbody>
+        </table>
+      </div>
+    </Container>
+
+    <Container as="section" class="py-8 md:py-10">
+      <div class="grid gap-6 md:grid-cols-2">
+        <section>
+          <SectionIntro
+            title="Unidades lineales y cuadradas"
+            description="El perímetro conserva la unidad de longitud. El área usa esa misma unidad elevada al cuadrado."
+            class="mb-4"
+          />
+          <div class="rounded-lg border border-gray-700 bg-gray-950 p-5 text-sm leading-relaxed text-gray-300">
+            <p>
+              Si escribes metros, el perímetro sale en `m` y el área en `m²`.
+              Sin unidad seleccionada, el área se muestra como `unidades²`.
+            </p>
+          </div>
+        </section>
+
+        <section>
+          <SectionIntro
+            title="Área o perímetro"
+            description="Elegir la medida correcta evita estimaciones confusas."
+            class="mb-4"
+          />
+          <div class="rounded-lg border border-gray-700 bg-gray-950 p-5 text-sm leading-relaxed text-gray-300">
+            <p>
+              Usa área para superficies como piso, pintura, tela o terreno. Usa
+              perímetro para cercas, bordes, marcos, zoclos o cualquier contorno.
+            </p>
+          </div>
+        </section>
+      </div>
+    </Container>
+
+    <FaqSection faqs={faqs} />
+  </PageShell>
+</BaseLayout>
+
+<script>
+  import {
+    calculateCircle,
+    calculateCircleFromDiameter,
+    calculateRectangle,
+    calculateRegularPolygon,
+    calculateSquare,
+    calculateTriangleAreaFromBaseHeight,
+    calculateTriangleFromSides,
+    formatAreaMeasurement,
+    formatLinearMeasurement,
+    formatMeasurementNumber,
+    getRegularPolygonName,
+    isMeasurementUnit,
+    parseMeasurement,
+    validatePositiveMeasurement,
+  } from "@lib/calculators/geometria/calculadora-de-area-y-perimetro/areaPerimeter";
+
+  const SHAPE_LABELS = {
+    square: "Cuadrado",
+    rectangle: "Rectángulo",
+    triangle: "Triángulo",
+    circle: "Círculo",
+    regularPolygon: "Polígono regular",
+  };
+
+  const SHAPE_TO_PARAM = {
+    square: "cuadrado",
+    rectangle: "rectangulo",
+    triangle: "triangulo",
+    circle: "circulo",
+    regularPolygon: "poligono-regular",
+  };
+
+  const PARAM_TO_SHAPE = Object.fromEntries(
+    Object.entries(SHAPE_TO_PARAM).map(([shape, param]) => [param, shape]),
+  );
+
+  const FIELD_LABELS = {
+    side: "lado",
+    base: "base",
+    height: "altura",
+    a: "lado a",
+    b: "lado b",
+    c: "lado c",
+    radius: "radio",
+    diameter: "diámetro",
+    sideCount: "número de lados",
+    sideLength: "longitud de lado",
+  };
+
+  const ERROR_MESSAGES = {
+    empty: "Completa este campo.",
+    incomplete: "Termina de escribir el número.",
+    invalid: "Ingresa un número válido.",
+    unit: "Usa una sola unidad en el selector.",
+    non_finite: "Ingresa un número finito.",
+    non_positive: "La medida debe ser mayor que cero.",
+    integer: "Ingresa un número entero.",
+    min_sides: "El polígono debe tener al menos 3 lados.",
+    max_sides: "Usa 1000 lados o menos.",
+    triangle: "La suma de dos lados debe ser mayor que el tercero.",
+  };
+
+  const DIAGRAM_COPY = {
+    square: {
+      title: "Cuadrado",
+      note: "Cada lado mide lo mismo.",
+    },
+    rectangle: {
+      title: "Rectángulo",
+      note: "La base y la altura forman ángulos rectos.",
+    },
+    "triangle-sides": {
+      title: "Triángulo por lados",
+      note: "Con tres lados se calcula área y perímetro.",
+    },
+    "triangle-base-height": {
+      title: "Triángulo por base y altura",
+      note: "Con base y altura se calcula el área.",
+    },
+    "circle-radius": {
+      title: "Círculo por radio",
+      note: "El radio va del centro al borde.",
+    },
+    "circle-diameter": {
+      title: "Círculo por diámetro",
+      note: "El diámetro cruza el círculo por el centro.",
+    },
+    "regular-polygon": {
+      title: "Polígono regular",
+      note: "Todos los lados y ángulos son iguales.",
+    },
+  };
+
+  const shapeButtons = Array.from(document.querySelectorAll("[data-shape-option]"));
+  const inputPanels = Array.from(document.querySelectorAll("[data-input-panel]"));
+  const triangleModeWrapper = document.querySelector("[data-triangle-mode-wrapper]");
+  const triangleModeButtons = Array.from(
+    document.querySelectorAll("[data-triangle-mode-option]"),
+  );
+  const circleMeasureWrapper = document.querySelector("[data-circle-measure-wrapper]");
+  const circleMeasureButtons = Array.from(
+    document.querySelectorAll("[data-circle-measure-option]"),
+  );
+  const unitSelect = document.querySelector("[data-unit-select]");
+  const decimalsSelect = document.querySelector("[data-decimals-select]");
+  const diagramTitle = document.querySelector("[data-diagram-title]");
+  const diagramNote = document.querySelector("[data-diagram-note]");
+  const diagrams = Array.from(document.querySelectorAll("[data-diagram]"));
+  const resultKicker = document.querySelector("[data-result-kicker]");
+  const mainResult = document.querySelector("[data-main-result]");
+  const resultNote = document.querySelector("[data-result-note]");
+  const areaResult = document.querySelector("[data-area-result]");
+  const perimeterLabel = document.querySelector("[data-perimeter-label]");
+  const perimeterResult = document.querySelector("[data-perimeter-result]");
+  const extraRow = document.querySelector("[data-extra-row]");
+  const extraLabel = document.querySelector("[data-extra-label]");
+  const extraResult = document.querySelector("[data-extra-result]");
+  const practicalNote = document.querySelector("[data-practical-note]");
+  const formula = document.querySelector("[data-formula]");
+  const substitution = document.querySelector("[data-substitution]");
+  const procedureResult = document.querySelector("[data-procedure-result]");
+  const copyResultButton = document.querySelector("[data-copy-result]");
+  const copyLinkButton = document.querySelector("[data-copy-link]");
+  const copyStatus = document.querySelector("[data-copy-status]");
+  const clearButton = document.querySelector("[data-clear-calculator]");
+
+  let activeShape = "square";
+  let triangleMode = "sides";
+  let circleMeasure = "radius";
+  let currentCopyText = "";
+  let currentShareUrl = window.location.href;
+  let copyTimeout = 0;
+  let hasHydratedFromUrl = false;
+
+  function getModeKey() {
+    if (activeShape === "triangle") {
+      return triangleMode === "sides"
+        ? "triangle-sides"
+        : "triangle-base-height";
+    }
+
+    if (activeShape === "circle") {
+      return circleMeasure === "radius" ? "circle-radius" : "circle-diameter";
+    }
+
+    if (activeShape === "regularPolygon") {
+      return "regular-polygon";
+    }
+
+    return activeShape;
+  }
+
+  function getActivePanel() {
+    return document.querySelector(`[data-input-panel="${getModeKey()}"]`);
+  }
+
+  function getActiveInputs() {
+    return Array.from(getActivePanel()?.querySelectorAll("[data-input]") ?? []);
+  }
+
+  function getFieldInput(field) {
+    return getActivePanel()?.querySelector(`[data-input="${field}"]`);
+  }
+
+  function getUnit() {
+    const value = unitSelect?.value ?? "none";
+
+    return isMeasurementUnit(value) ? value : "none";
+  }
+
+  function getDecimals() {
+    const value = decimalsSelect?.value ?? "auto";
+
+    return value === "auto" ? "auto" : Number(value);
+  }
+
+  function setOptionState(button, isActive) {
+    button.setAttribute("aria-pressed", String(isActive));
+    button.classList.toggle("border-amber-400", isActive);
+    button.classList.toggle("bg-amber-400", isActive);
+    button.classList.toggle("text-gray-950", isActive);
+    button.classList.toggle("border-gray-700", !isActive);
+    button.classList.toggle("text-gray-300", !isActive);
+    button.classList.toggle("hover:border-amber-400", !isActive);
+  }
+
+  function setActiveShape(shape, options = {}) {
+    activeShape = shape;
+
+    shapeButtons.forEach((button) => {
+      setOptionState(button, button.dataset.shapeOption === shape);
+    });
+
+    if (triangleModeWrapper) {
+      triangleModeWrapper.classList.toggle("hidden", shape !== "triangle");
+    }
+
+    if (circleMeasureWrapper) {
+      circleMeasureWrapper.classList.toggle("hidden", shape !== "circle");
+    }
+
+    if (options.clear) {
+      clearAllInputValues();
+    }
+
+    renderMode();
+    updateCalculator();
+  }
+
+  function setTriangleMode(mode, options = {}) {
+    triangleMode = mode;
+
+    triangleModeButtons.forEach((button) => {
+      setOptionState(button, button.dataset.triangleModeOption === mode);
+    });
+
+    if (options.clear) {
+      clearAllInputValues();
+    }
+
+    renderMode();
+    updateCalculator();
+  }
+
+  function setCircleMeasure(measure, options = {}) {
+    circleMeasure = measure;
+
+    circleMeasureButtons.forEach((button) => {
+      setOptionState(button, button.dataset.circleMeasureOption === measure);
+    });
+
+    if (options.clear) {
+      clearAllInputValues();
+    }
+
+    renderMode();
+    updateCalculator();
+  }
+
+  function renderMode() {
+    const modeKey = getModeKey();
+
+    inputPanels.forEach((panel) => {
+      panel.hidden = panel.dataset.inputPanel !== modeKey;
+    });
+
+    diagrams.forEach((diagram) => {
+      diagram.classList.toggle("hidden", diagram.dataset.diagram !== modeKey);
+    });
+
+    const copy = DIAGRAM_COPY[modeKey] ?? DIAGRAM_COPY.square;
+
+    if (diagramTitle) {
+      diagramTitle.textContent = copy.title;
+    }
+
+    if (diagramNote) {
+      diagramNote.textContent = copy.note;
+    }
+
+    clearErrors();
+  }
+
+  function parseInputValue(input) {
+    if (input.dataset.input === "sideCount") {
+      return parseSideCount(input.value);
+    }
+
+    const parsed = parseMeasurement(input.value);
+
+    if (!parsed.ok) {
+      return parsed;
+    }
+
+    const validation = validatePositiveMeasurement(parsed.value);
+
+    if (!validation.ok) {
+      return { ok: false, error: validation.error };
+    }
+
+    return parsed;
+  }
+
+  function parseSideCount(rawValue) {
+    const parsed = parseMeasurement(rawValue);
+
+    if (!parsed.ok) {
+      return parsed;
+    }
+
+    const validation = validatePositiveMeasurement(parsed.value);
+
+    if (!validation.ok) {
+      return { ok: false, error: validation.error };
+    }
+
+    if (!Number.isInteger(parsed.value)) {
+      return { ok: false, error: "integer" };
+    }
+
+    if (parsed.value < 3) {
+      return { ok: false, error: "min_sides" };
+    }
+
+    if (parsed.value > 1000) {
+      return { ok: false, error: "max_sides" };
+    }
+
+    return parsed;
+  }
+
+  function parseActiveValues() {
+    const values = {};
+    const errors = {};
+    const normalized = {};
+
+    getActiveInputs().forEach((input) => {
+      const field = input.dataset.input;
+      const parsed = parseInputValue(input);
+
+      if (parsed.ok) {
+        values[field] = parsed.value;
+        normalized[field] = parsed.normalized;
+        return;
+      }
+
+      errors[field] = parsed.error;
+    });
+
+    return { values, errors, normalized };
+  }
+
+  function clearErrors() {
+    document.querySelectorAll("[data-error-for]").forEach((errorElement) => {
+      errorElement.textContent = "";
+      errorElement.classList.add("hidden");
+    });
+
+    document.querySelectorAll("[data-input]").forEach((input) => {
+      input.removeAttribute("aria-invalid");
+    });
+  }
+
+  function showErrors(errors) {
+    clearErrors();
+
+    const activePanel = getActivePanel();
+
+    Object.entries(errors).forEach(([field, error]) => {
+      if (error === "empty") {
+        return;
+      }
+
+      const input = activePanel?.querySelector(`[data-input="${field}"]`);
+      const errorElement = activePanel?.querySelector(`[data-error-for="${field}"]`);
+
+      if (!errorElement) {
+        return;
+      }
+
+      errorElement.textContent = ERROR_MESSAGES[error] ?? ERROR_MESSAGES.invalid;
+      errorElement.classList.remove("hidden");
+      input?.setAttribute("aria-invalid", "true");
+    });
+  }
+
+  function hasAnyActiveValue() {
+    return getActiveInputs().some((input) => input.value.trim() !== "");
+  }
+
+  function getMissingFields(errors) {
+    return Object.entries(errors)
+      .filter(([, error]) => error === "empty")
+      .map(([field]) => FIELD_LABELS[field] ?? field);
+  }
+
+  function setNeutralState(message) {
+    if (resultKicker) {
+      resultKicker.textContent = "Pendiente";
+    }
+
+    if (mainResult) {
+      mainResult.textContent = "Escribe las medidas";
+      mainResult.classList.remove("text-red-300");
+      mainResult.classList.add("text-white");
+    }
+
+    if (resultNote) {
+      resultNote.textContent = message;
+    }
+
+    if (areaResult) {
+      areaResult.textContent = "Pendiente";
+    }
+
+    if (perimeterLabel) {
+      perimeterLabel.textContent = "Perímetro";
+    }
+
+    if (perimeterResult) {
+      perimeterResult.textContent = "Pendiente";
+    }
+
+    if (extraRow) {
+      extraRow.classList.add("hidden");
+    }
+
+    if (practicalNote) {
+      practicalNote.textContent =
+        "Usa el área para superficies y el perímetro para contornos.";
+    }
+
+    if (formula) {
+      formula.textContent = getFormulaText().formula;
+    }
+
+    if (substitution) {
+      substitution.textContent = "Completa las medidas para ver la sustitución.";
+    }
+
+    if (procedureResult) {
+      procedureResult.textContent = "Completa los campos para calcular.";
+    }
+
+    if (copyResultButton) {
+      copyResultButton.disabled = true;
+    }
+
+    currentCopyText = "";
+  }
+
+  function setInvalidState(errors) {
+    if (resultKicker) {
+      resultKicker.textContent = "Revisa los datos";
+    }
+
+    if (mainResult) {
+      mainResult.textContent = "No se puede calcular todavía";
+      mainResult.classList.add("text-red-300");
+    }
+
+    if (resultNote) {
+      resultNote.textContent =
+        Object.values(errors).includes("triangle")
+          ? ERROR_MESSAGES.triangle
+          : "Corrige el campo marcado para continuar.";
+    }
+
+    if (copyResultButton) {
+      copyResultButton.disabled = true;
+    }
+
+    currentCopyText = "";
+  }
+
+  function setValidState(result) {
+    if (resultKicker) {
+      resultKicker.textContent = SHAPE_LABELS[activeShape];
+    }
+
+    if (mainResult) {
+      mainResult.textContent = result.main;
+      mainResult.classList.remove("text-red-300");
+      mainResult.classList.add("text-white");
+    }
+
+    if (resultNote) {
+      resultNote.textContent = result.note;
+    }
+
+    if (areaResult) {
+      areaResult.textContent = result.area;
+    }
+
+    if (perimeterLabel) {
+      perimeterLabel.textContent = result.perimeterLabel;
+    }
+
+    if (perimeterResult) {
+      perimeterResult.textContent = result.perimeter;
+    }
+
+    if (extraRow && extraLabel && extraResult) {
+      extraRow.classList.toggle("hidden", !result.extra);
+
+      if (result.extra) {
+        extraLabel.textContent = result.extra.label;
+        extraResult.textContent = result.extra.value;
+      }
+    }
+
+    if (practicalNote) {
+      practicalNote.textContent = result.practical;
+    }
+
+    if (formula) {
+      formula.textContent = result.formula;
+    }
+
+    if (substitution) {
+      substitution.textContent = result.substitution;
+    }
+
+    if (procedureResult) {
+      procedureResult.textContent = result.procedureResult;
+    }
+
+    if (copyResultButton) {
+      copyResultButton.disabled = false;
+    }
+
+    currentCopyText = result.copyText;
+  }
+
+  function updateCalculator() {
+    const { values, errors, normalized } = parseActiveValues();
+    const blockingErrors = Object.fromEntries(
+      Object.entries(errors).filter(([, error]) => error !== "empty"),
+    );
+
+    if (!hasAnyActiveValue()) {
+      clearErrors();
+      setNeutralState(getInitialHelpText());
+      updateUrl(normalized);
+      return;
+    }
+
+    if (Object.keys(blockingErrors).length > 0) {
+      showErrors(blockingErrors);
+      setInvalidState(blockingErrors);
+      updateUrl(normalized);
+      return;
+    }
+
+    const missingFields = getMissingFields(errors);
+
+    if (missingFields.length > 0) {
+      clearErrors();
+      setNeutralState(`Falta ${missingFields.join(", ")} para calcular.`);
+      updateUrl(normalized);
+      return;
+    }
+
+    try {
+      const result = computeResult(values);
+      clearErrors();
+      setValidState(result);
+      updateUrl(normalized);
+    } catch (error) {
+      const triangleError =
+        activeShape === "triangle" && triangleMode === "sides"
+          ? { c: "triangle" }
+          : { side: "invalid" };
+
+      showErrors(triangleError);
+      setInvalidState(triangleError);
+      updateUrl(normalized);
+    }
+  }
+
+  function computeResult(values) {
+    const unit = getUnit();
+    const decimals = getDecimals();
+    const modeKey = getModeKey();
+    const formulaData = getFormulaText(values);
+
+    if (modeKey === "square") {
+      const result = calculateSquare(values.side);
+      const area = formatAreaMeasurement(result.area, unit, decimals);
+      const perimeter = formatLinearMeasurement(result.perimeter, unit, decimals);
+
+      return buildResult({
+        main: `Área: ${area}`,
+        area,
+        perimeter,
+        formulaData,
+        practical:
+          "El área ayuda a estimar superficie; el perímetro ayuda a medir el borde completo del cuadrado.",
+        copyLines: [
+          "Figura: cuadrado",
+          `Lado: ${formatLinearMeasurement(values.side, unit, decimals)}`,
+          `Área: ${area}`,
+          `Perímetro: ${perimeter}`,
+        ],
+      });
+    }
+
+    if (modeKey === "rectangle") {
+      const result = calculateRectangle(values.base, values.height);
+      const area = formatAreaMeasurement(result.area, unit, decimals);
+      const perimeter = formatLinearMeasurement(result.perimeter, unit, decimals);
+
+      return buildResult({
+        main: `Área: ${area}`,
+        area,
+        perimeter,
+        formulaData,
+        practical:
+          "Usa el área para superficies rectangulares y el perímetro para bordes, marcos o zoclos.",
+        copyLines: [
+          "Figura: rectángulo",
+          `Base: ${formatLinearMeasurement(values.base, unit, decimals)}`,
+          `Altura: ${formatLinearMeasurement(values.height, unit, decimals)}`,
+          `Área: ${area}`,
+          `Perímetro: ${perimeter}`,
+        ],
+      });
+    }
+
+    if (modeKey === "triangle-sides") {
+      const result = calculateTriangleFromSides(values.a, values.b, values.c);
+      const area = formatAreaMeasurement(result.area, unit, decimals);
+      const perimeter = formatLinearMeasurement(result.perimeter, unit, decimals);
+
+      return buildResult({
+        main: `Área: ${area}`,
+        area,
+        perimeter,
+        formulaData,
+        practical:
+          "Con los tres lados puedes estimar superficie y también el contorno total del triángulo.",
+        copyLines: [
+          "Figura: triángulo por tres lados",
+          `Lado a: ${formatLinearMeasurement(values.a, unit, decimals)}`,
+          `Lado b: ${formatLinearMeasurement(values.b, unit, decimals)}`,
+          `Lado c: ${formatLinearMeasurement(values.c, unit, decimals)}`,
+          `Área: ${area}`,
+          `Perímetro: ${perimeter}`,
+        ],
+      });
+    }
+
+    if (modeKey === "triangle-base-height") {
+      const result = calculateTriangleAreaFromBaseHeight(values.base, values.height);
+      const area = formatAreaMeasurement(result.area, unit, decimals);
+
+      return buildResult({
+        main: `Área: ${area}`,
+        area,
+        perimeter: "Necesitas indicar los tres lados para calcularlo.",
+        formulaData,
+        practical:
+          "La base y la altura bastan para superficie. Para bordear el triángulo se necesitan sus tres lados.",
+        copyLines: [
+          "Figura: triángulo por base y altura",
+          `Base: ${formatLinearMeasurement(values.base, unit, decimals)}`,
+          `Altura: ${formatLinearMeasurement(values.height, unit, decimals)}`,
+          `Área: ${area}`,
+          "Perímetro: necesitas indicar los tres lados para calcularlo.",
+        ],
+      });
+    }
+
+    if (modeKey === "circle-radius" || modeKey === "circle-diameter") {
+      const result =
+        modeKey === "circle-radius"
+          ? calculateCircle(values.radius)
+          : calculateCircleFromDiameter(values.diameter);
+      const area = formatAreaMeasurement(result.area, unit, decimals);
+      const circumference = formatLinearMeasurement(
+        result.circumference,
+        unit,
+        decimals,
+      );
+
+      return buildResult({
+        main: `Área: ${area}`,
+        area,
+        perimeter: circumference,
+        perimeterLabel: "Circunferencia",
+        formulaData,
+        practical:
+          "En un círculo, la circunferencia es el perímetro: úsala para el contorno y el área para la superficie.",
+        extra: {
+          label: "Radio usado",
+          value: formatLinearMeasurement(result.radius, unit, decimals),
+        },
+        copyLines: [
+          `Figura: círculo por ${modeKey === "circle-radius" ? "radio" : "diámetro"}`,
+          modeKey === "circle-radius"
+            ? `Radio: ${formatLinearMeasurement(values.radius, unit, decimals)}`
+            : `Diámetro: ${formatLinearMeasurement(values.diameter, unit, decimals)}`,
+          `Área: ${area}`,
+          `Circunferencia: ${circumference}`,
+        ],
+      });
+    }
+
+    const result = calculateRegularPolygon(values.sideCount, values.sideLength);
+    const area = formatAreaMeasurement(result.area, unit, decimals);
+    const perimeter = formatLinearMeasurement(result.perimeter, unit, decimals);
+    const apothem = formatLinearMeasurement(result.apothem, unit, decimals);
+    const polygonName = getRegularPolygonName(values.sideCount);
+
+    return buildResult({
+      main: polygonName ? `${polygonName}: ${area}` : `Área: ${area}`,
+      area,
+      perimeter,
+      formulaData,
+      practical:
+        "El área estima la superficie del polígono regular; el perímetro mide la suma de todos sus lados.",
+      extra: {
+        label: polygonName ? "Nombre" : "Apotema",
+        value: polygonName ? `${polygonName}; apotema ${apothem}` : apothem,
+      },
+      copyLines: [
+        `Figura: ${polygonName ?? "polígono regular"}`,
+        `Lados: ${formatMeasurementNumber(values.sideCount, 0)}`,
+        `Lado: ${formatLinearMeasurement(values.sideLength, unit, decimals)}`,
+        `Área: ${area}`,
+        `Perímetro: ${perimeter}`,
+        `Apotema: ${apothem}`,
+      ],
+    });
+  }
+
+  function buildResult({
+    main,
+    area,
+    perimeter,
+    formulaData,
+    practical,
+    copyLines,
+    perimeterLabel: label = "Perímetro",
+    extra = null,
+  }) {
+    return {
+      main,
+      area,
+      perimeter,
+      perimeterLabel: label,
+      note: "Resultado calculado con las unidades seleccionadas.",
+      practical:
+        `${practical} Si comprarás material, revisa desperdicio, cortes y margen extra.`,
+      formula: formulaData.formula,
+      substitution: formulaData.substitution,
+      procedureResult: formulaData.result,
+      extra,
+      copyText: copyLines.join("\n"),
+    };
+  }
+
+  function getFormulaText(values = {}) {
+    const decimals = getDecimals();
+    const unit = getUnit();
+    const fmt = (value) => formatLinearMeasurement(value, unit, decimals);
+
+    if (activeShape === "square") {
+      return {
+        formula: "área = lado²; perímetro = 4 × lado",
+        substitution:
+          values.side === undefined
+            ? "lado pendiente"
+            : `área = ${fmt(values.side)}²; perímetro = 4 × ${fmt(values.side)}`,
+        result:
+          values.side === undefined
+            ? "Completa el lado."
+            : `área = ${formatAreaMeasurement(values.side ** 2, unit, decimals)}; perímetro = ${formatLinearMeasurement(4 * values.side, unit, decimals)}`,
+      };
+    }
+
+    if (activeShape === "rectangle") {
+      return {
+        formula: "área = base × altura; perímetro = 2 × (base + altura)",
+        substitution:
+          values.base === undefined || values.height === undefined
+            ? "base y altura pendientes"
+            : `área = ${fmt(values.base)} × ${fmt(values.height)}; perímetro = 2 × (${fmt(values.base)} + ${fmt(values.height)})`,
+        result:
+          values.base === undefined || values.height === undefined
+            ? "Completa base y altura."
+            : `área = ${formatAreaMeasurement(values.base * values.height, unit, decimals)}; perímetro = ${formatLinearMeasurement(2 * (values.base + values.height), unit, decimals)}`,
+      };
+    }
+
+    if (activeShape === "triangle" && triangleMode === "sides") {
+      const hasValues =
+        values.a !== undefined && values.b !== undefined && values.c !== undefined;
+      const semiperimeter = hasValues ? (values.a + values.b + values.c) / 2 : 0;
+
+      return {
+        formula: "s = (a + b + c) ÷ 2; área = √(s × (s - a) × (s - b) × (s - c)); perímetro = a + b + c",
+        substitution: hasValues
+          ? `s = (${fmt(values.a)} + ${fmt(values.b)} + ${fmt(values.c)}) ÷ 2 = ${fmt(semiperimeter)}`
+          : "lados a, b y c pendientes",
+        result: hasValues
+          ? `área = ${formatAreaMeasurement(calculateTriangleFromSides(values.a, values.b, values.c).area, unit, decimals)}; perímetro = ${formatLinearMeasurement(values.a + values.b + values.c, unit, decimals)}`
+          : "Completa los tres lados.",
+      };
+    }
+
+    if (activeShape === "triangle") {
+      return {
+        formula: "área = (base × altura) ÷ 2",
+        substitution:
+          values.base === undefined || values.height === undefined
+            ? "base y altura pendientes"
+            : `área = (${fmt(values.base)} × ${fmt(values.height)}) ÷ 2`,
+        result:
+          values.base === undefined || values.height === undefined
+            ? "Completa base y altura."
+            : `área = ${formatAreaMeasurement((values.base * values.height) / 2, unit, decimals)}`,
+      };
+    }
+
+    if (activeShape === "circle") {
+      const value = circleMeasure === "radius" ? values.radius : values.diameter;
+      const radius =
+        value === undefined ? undefined : circleMeasure === "radius" ? value : value / 2;
+
+      return {
+        formula: "área = π × radio²; circunferencia = 2 × π × radio",
+        substitution:
+          radius === undefined
+            ? "radio pendiente"
+            : `radio = ${fmt(radius)}; área = π × ${fmt(radius)}²; circunferencia = 2 × π × ${fmt(radius)}`,
+        result:
+          radius === undefined
+            ? "Completa radio o diámetro."
+            : `área = ${formatAreaMeasurement(Math.PI * radius ** 2, unit, decimals)}; circunferencia = ${formatLinearMeasurement(2 * Math.PI * radius, unit, decimals)}`,
+      };
+    }
+
+    return {
+      formula: "perímetro = número de lados × lado; apotema = lado ÷ (2 × tan(π ÷ número de lados)); área = (perímetro × apotema) ÷ 2",
+      substitution:
+        values.sideCount === undefined || values.sideLength === undefined
+          ? "número de lados y longitud pendientes"
+          : `perímetro = ${formatMeasurementNumber(values.sideCount, 0)} × ${fmt(values.sideLength)}`,
+      result:
+        values.sideCount === undefined || values.sideLength === undefined
+          ? "Completa número de lados y longitud."
+          : `área = ${formatAreaMeasurement(calculateRegularPolygon(values.sideCount, values.sideLength).area, unit, decimals)}; perímetro = ${formatLinearMeasurement(values.sideCount * values.sideLength, unit, decimals)}`,
+    };
+  }
+
+  function getInitialHelpText() {
+    const modeKey = getModeKey();
+
+    if (modeKey === "square") {
+      return "Escribe el lado para calcular el área y el perímetro.";
+    }
+
+    if (modeKey === "rectangle") {
+      return "Escribe la base y la altura para calcular área y perímetro.";
+    }
+
+    if (modeKey === "triangle-sides") {
+      return "Escribe los tres lados para calcular área y perímetro.";
+    }
+
+    if (modeKey === "triangle-base-height") {
+      return "Escribe la base y la altura para calcular el área.";
+    }
+
+    if (modeKey === "circle-radius") {
+      return "Escribe el radio para calcular área y circunferencia.";
+    }
+
+    if (modeKey === "circle-diameter") {
+      return "Escribe el diámetro para calcular área y circunferencia.";
+    }
+
+    return "Escribe el número de lados y la longitud de cada lado.";
+  }
+
+  function updateUrl(normalizedValues = {}) {
+    const url = new URL(window.location.href);
+    url.search = "";
+    url.searchParams.set("figura", SHAPE_TO_PARAM[activeShape]);
+
+    if (activeShape === "triangle") {
+      url.searchParams.set(
+        "modo",
+        triangleMode === "sides" ? "tres-lados" : "base-altura",
+      );
+    }
+
+    if (activeShape === "circle") {
+      url.searchParams.set(
+        "medida",
+        circleMeasure === "radius" ? "radio" : "diametro",
+      );
+    }
+
+    const unit = getUnit();
+
+    if (unit !== "none") {
+      url.searchParams.set("unidad", unit);
+    }
+
+    const decimals = decimalsSelect?.value ?? "auto";
+
+    if (decimals !== "auto") {
+      url.searchParams.set("decimales", decimals);
+    }
+
+    const paramNames = getParamNames();
+
+    Object.entries(paramNames).forEach(([field, paramName]) => {
+      if (normalizedValues[field]) {
+        url.searchParams.set(paramName, normalizedValues[field]);
+      }
+    });
+
+    currentShareUrl = url.toString();
+
+    if (hasHydratedFromUrl) {
+      window.history.replaceState({}, "", url);
+    }
+  }
+
+  function getParamNames() {
+    if (activeShape === "square") {
+      return { side: "lado" };
+    }
+
+    if (activeShape === "rectangle") {
+      return { base: "base", height: "altura" };
+    }
+
+    if (activeShape === "triangle" && triangleMode === "sides") {
+      return { a: "a", b: "b", c: "c" };
+    }
+
+    if (activeShape === "triangle") {
+      return { base: "base", height: "altura" };
+    }
+
+    if (activeShape === "circle" && circleMeasure === "radius") {
+      return { radius: "radio" };
+    }
+
+    if (activeShape === "circle") {
+      return { diameter: "diametro" };
+    }
+
+    return { sideCount: "lados", sideLength: "lado" };
+  }
+
+  function hydrateFromUrl() {
+    const params = new URLSearchParams(window.location.search);
+    const shapeParam = params.get("figura") ?? "cuadrado";
+    const shape = PARAM_TO_SHAPE[shapeParam] ?? "square";
+    const unit = params.get("unidad");
+    const decimals = params.get("decimales");
+
+    if (shape === "triangle") {
+      triangleMode = params.get("modo") === "base-altura" ? "baseHeight" : "sides";
+    }
+
+    if (shape === "circle") {
+      circleMeasure = params.get("medida") === "diametro" ? "diameter" : "radius";
+    }
+
+    if (unitSelect && unit && isMeasurementUnit(unit)) {
+      unitSelect.value = unit;
+    }
+
+    if (
+      decimalsSelect &&
+      decimals &&
+      ["0", "1", "2", "3", "4", "5", "6"].includes(decimals)
+    ) {
+      decimalsSelect.value = decimals;
+    }
+
+    activeShape = shape;
+    setTriangleMode(triangleMode);
+    setCircleMeasure(circleMeasure);
+    setActiveShape(activeShape);
+
+    const paramNames = getParamNames();
+
+    Object.entries(paramNames).forEach(([field, paramName]) => {
+      const input = getFieldInput(field);
+      const value = params.get(paramName);
+
+      if (input && value !== null) {
+        input.value = value;
+      }
+    });
+
+    hasHydratedFromUrl = true;
+    updateCalculator();
+  }
+
+  function clearAllInputValues() {
+    document.querySelectorAll("[data-input]").forEach((input) => {
+      input.value = "";
+      delete input.dataset.touched;
+      input.removeAttribute("aria-invalid");
+    });
+    clearErrors();
+  }
+
+  function clearActiveCalculator() {
+    getActiveInputs().forEach((input) => {
+      input.value = "";
+      delete input.dataset.touched;
+      input.removeAttribute("aria-invalid");
+    });
+    clearErrors();
+    updateCalculator();
+  }
+
+  async function writeClipboard(text) {
+    if (navigator.clipboard?.writeText) {
+      await navigator.clipboard.writeText(text);
+      return;
+    }
+
+    const textArea = document.createElement("textarea");
+    textArea.value = text;
+    textArea.setAttribute("readonly", "");
+    textArea.style.position = "fixed";
+    textArea.style.opacity = "0";
+    document.body.append(textArea);
+    textArea.select();
+    document.execCommand("copy");
+    textArea.remove();
+  }
+
+  function setCopyStatus(message) {
+    if (!copyStatus) {
+      return;
+    }
+
+    window.clearTimeout(copyTimeout);
+    copyStatus.textContent = message;
+    copyTimeout = window.setTimeout(() => {
+      copyStatus.textContent = "";
+    }, 2200);
+  }
+
+  shapeButtons.forEach((button) => {
+    button.addEventListener("click", () => {
+      setActiveShape(button.dataset.shapeOption, { clear: true });
+    });
+  });
+
+  triangleModeButtons.forEach((button) => {
+    button.addEventListener("click", () => {
+      setTriangleMode(button.dataset.triangleModeOption, { clear: true });
+    });
+  });
+
+  circleMeasureButtons.forEach((button) => {
+    button.addEventListener("click", () => {
+      setCircleMeasure(button.dataset.circleMeasureOption, { clear: true });
+    });
+  });
+
+  document.querySelectorAll("[data-input]").forEach((input) => {
+    input.addEventListener("input", () => {
+      input.dataset.touched = "true";
+      updateCalculator();
+    });
+
+    input.addEventListener("blur", () => {
+      input.dataset.touched = "true";
+      updateCalculator();
+    });
+  });
+
+  unitSelect?.addEventListener("change", updateCalculator);
+  decimalsSelect?.addEventListener("change", updateCalculator);
+  clearButton?.addEventListener("click", clearActiveCalculator);
+
+  copyResultButton?.addEventListener("click", async () => {
+    if (!currentCopyText) {
+      return;
+    }
+
+    try {
+      await writeClipboard(currentCopyText);
+      setCopyStatus("Resultado copiado.");
+    } catch {
+      setCopyStatus("No se pudo copiar el resultado.");
+    }
+  });
+
+  copyLinkButton?.addEventListener("click", async () => {
+    try {
+      await writeClipboard(currentShareUrl);
+      setCopyStatus("Enlace copiado.");
+    } catch {
+      setCopyStatus("No se pudo copiar el enlace.");
+    }
+  });
+
+  hydrateFromUrl();
+</script>

@@ -10,6 +10,7 @@ export const CATEGORY_SLUGS = [
   "inmuebles",
   "legal-impuestos",
   "matematicas",
+  "geometria",
   "salud",
   "fecha-tiempo",
   "conversores",
@@ -42,6 +43,12 @@ export const CATEGORIES = {
     label: "Matemáticas",
     description:
       "Calculadoras para porcentajes, proporciones y reglas de tres, con resultados directos para tareas, compras y trabajo.",
+  },
+  geometria: {
+    slug: "geometria",
+    label: "Geometría",
+    description:
+      "Calculadoras para resolver áreas, perímetros, triángulos y otras medidas geométricas con fórmulas claras.",
   },
   salud: {
     slug: "salud",
