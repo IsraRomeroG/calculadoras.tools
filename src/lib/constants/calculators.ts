@@ -134,6 +134,15 @@ export const CALCULATORS: CalculatorDirectoryItem[] = [
     order: 65,
   },
   {
+    id: "kilometros-a-millas",
+    title: "Kilómetros a millas",
+    description:
+      "Convierte kilómetros y millas terrestres al instante con fórmula y equivalencias frecuentes.",
+    href: "/conversores/kilometros-a-millas",
+    categorySlug: "conversores",
+    order: 69,
+  },
+  {
     id: "conversor-de-peso",
     title: "Conversor de peso",
     description:
