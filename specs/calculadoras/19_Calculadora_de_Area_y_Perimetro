@@ -3,13 +3,17 @@
 ## Resumen
 
 Herramienta para calcular el área y el perímetro de figuras geométricas
-cotidianas con fórmulas visibles, sustitución de valores y resultados fáciles
-de interpretar.
+cotidianas con fórmulas visibles, sustitución de valores, interpretación
+práctica y resultados fáciles de usar en tareas, compras y proyectos
+domésticos.
 
 La calculadora debe resolver una figura a la vez. El MVP no busca reemplazar
 software de dibujo técnico: debe ayudar a estudiantes y a usuarios que necesitan
-estimar rápidamente superficies o contornos para tareas, compras y proyectos
-domésticos.
+estimar rápidamente superficies o contornos.
+
+La experiencia debe ser **mobile first**: la calculadora, los campos y el
+resultado deben aparecer antes que el contenido educativo largo, con controles
+táctiles claros y sin saturar la primera vista.
 
 ---
 
@@ -18,8 +22,9 @@ domésticos.
 - Calcular área y perímetro para las figuras más consultadas.
 - Mostrar las unidades lineales y cuadradas correctamente.
 - Explicar la fórmula aplicada sin exigir conocimientos previos.
+- Ayudar al usuario a entender cuándo usar área y cuándo usar perímetro.
 - Aceptar punto o coma decimal.
-- Permitir copiar el resultado y compartir una URL con los datos principales.
+- Permitir copiar el resultado y copiar una URL con los datos principales.
 - Separar la lógica matemática en funciones puras con pruebas unitarias.
 
 ---
@@ -35,11 +40,15 @@ domésticos.
 5. Círculo.
 6. Polígono regular.
 7. Selector de unidad: sin unidad, `mm`, `cm`, `m`, `km`, `in` y `ft`.
-8. Resultado de área y perímetro cuando existan datos suficientes.
-9. Fórmula visible y procedimiento desplegable.
-10. URL compartible mediante query params.
-11. Botones para copiar resultado y limpiar.
-12. Accesibilidad por teclado y pruebas unitarias.
+8. Selector de decimales visibles entre `0` y `6`, con modo recomendado
+   `Automático`.
+9. Resultado de área y perímetro cuando existan datos suficientes.
+10. Fórmula visible y procedimiento desplegable.
+11. Esquema visual simple de la figura activa, sin escala real.
+12. Interpretación práctica del resultado: superficie, contorno o ambos.
+13. URL compartible mediante query params.
+14. Botones para copiar resultado, copiar enlace y limpiar.
+15. Accesibilidad por teclado y pruebas unitarias.
 
 ### Fuera del MVP
 
@@ -48,8 +57,12 @@ domésticos.
 - Trapecios, rombos, elipses, sectores circulares y polígonos irregulares.
 - Cálculo de volumen.
 - Dibujo a escala o medición sobre planos.
-- Presupuestos de pintura, piso, cercas o materiales.
+- Presupuestos completos de pintura, piso, cercas o materiales.
 - Exportación de diagramas.
+
+Sí se permite dar orientación práctica breve, por ejemplo: "usa el área para
+cubrir superficies" o "usa el perímetro para bordear, cercar o enmarcar". No
+calcular cantidades de material ni costos durante el MVP.
 
 Las figuras adicionales pueden incorporarse después sin sobrecargar la primera
 versión.
@@ -125,15 +138,39 @@ Propuesta:
 
 ### Lógica testeable
 
+Seguir el patrón real del proyecto:
+
+```text
+src/lib/calculators/<categoria>/<slug-calculadora>/<modulo>.ts
+src/lib/calculators/<categoria>/<slug-calculadora>/<modulo>.test.ts
+```
+
 Crear:
 
 ```text
-src/lib/calculators/area-perimeter.ts
-src/lib/calculators/area-perimeter.test.ts
+src/lib/calculators/geometria/calculadora-de-area-y-perimetro/areaPerimeter.ts
+src/lib/calculators/geometria/calculadora-de-area-y-perimetro/areaPerimeter.test.ts
 ```
 
 La página Astro debe concentrarse en presentación y eventos del navegador. Las
-fórmulas, validaciones y formatos reutilizables deben vivir en el módulo puro.
+fórmulas, validaciones, parseo y formatos reutilizables deben vivir en el módulo
+puro.
+
+### Imports esperados
+
+Usar las rutas de alias existentes:
+
+```ts
+import BaseLayout from "@layouts/BaseLayout.astro";
+import PageShell from "@components/layout/PageShell.astro";
+import Container from "@components/layout/Container.astro";
+import PageHero from "@components/shared/PageHero.astro";
+import SectionIntro from "@components/shared/SectionIntro.astro";
+import FaqSection from "@components/shared/FaqSection.astro";
+import { buildFaqJsonLd } from "@lib/seo";
+```
+
+No incorporar frameworks ni librerías adicionales.
 
 ---
 
@@ -202,13 +239,40 @@ apotema = lado ÷ (2 × tan(π ÷ número de lados))
 
 Mostrar la apotema calculada como dato secundario.
 
+Si el número de lados corresponde a una figura común, mostrar el nombre humano
+como ayuda:
+
+| Lados | Nombre sugerido |
+|-------|-----------------|
+| 3 | Triángulo equilátero |
+| 4 | Cuadrado |
+| 5 | Pentágono regular |
+| 6 | Hexágono regular |
+| 8 | Octágono regular |
+
+Explicar brevemente que un polígono regular tiene todos sus lados y ángulos
+iguales.
+
 ---
 
 ## Interfaz principal
 
+### Principios mobile first
+
+- El hero debe ser compacto.
+- La calculadora debe aparecer en la primera vista móvil o lo más arriba posible.
+- El resultado debe mostrarse inmediatamente debajo de los inputs en móvil.
+- En desktop puede usarse un layout de dos columnas: formulario a la izquierda y
+  resultado/procedimiento a la derecha.
+- Los controles táctiles deben tener al menos `44px` de alto.
+- Evitar tablas anchas en la primera vista; las tablas educativas deben usar
+  scroll horizontal o layout compacto.
+- Fórmulas, explicación de unidades y FAQ deben ir después del cálculo.
+
 ### Selector de figura
 
-Usar tarjetas o botones claramente etiquetados:
+Usar botones o control segmentado claramente etiquetado. En móvil, usar una
+rejilla compacta de 2 columnas cuando quepa bien:
 
 ```text
 Cuadrado
@@ -218,11 +282,12 @@ Círculo
 Polígono regular
 ```
 
-Al elegir `Triángulo`, mostrar un selector secundario:
+Al elegir `Triángulo`, mostrar un selector secundario con lenguaje orientado al
+usuario:
 
 ```text
-Conozco los tres lados
-Conozco la base y la altura
+Tengo los 3 lados
+Tengo base y altura
 ```
 
 Al elegir `Círculo`, permitir alternar:
@@ -232,12 +297,42 @@ Radio
 Diámetro
 ```
 
+### Esquema visual de la figura
+
+Mostrar un esquema simple de la figura activa con etiquetas de las medidas
+relevantes:
+
+- Cuadrado: `lado`.
+- Rectángulo: `base` y `altura`.
+- Triángulo por tres lados: `a`, `b`, `c`.
+- Triángulo por base y altura: `base` y `altura`.
+- Círculo: `radio` o `diámetro`.
+- Polígono regular: `lado` y, cuando aplique, `apotema`.
+
+El esquema no debe prometer escala real. Debe ayudar a saber qué dato escribir,
+no funcionar como plano técnico.
+
 ### Inputs
 
 - Usar `type="text"` con `inputmode="decimal"` para medidas.
 - Usar un entero entre `3` y `1000` para el número de lados.
 - Mostrar únicamente los campos relevantes para la figura activa.
 - Mantener etiquetas visibles y ejemplos breves.
+- No colocar texto largo dentro de botones o controles pequeños.
+- Si el usuario escribe unidades pegadas al input, mostrar una indicación para
+  usar el selector de unidad.
+
+### Estados de ayuda
+
+Antes de tener todos los datos, mostrar mensajes neutrales y útiles:
+
+```text
+Escribe el lado para calcular el área y el perímetro.
+Escribe la base y la altura para calcular el área.
+Para calcular el perímetro del triángulo necesitas indicar sus tres lados.
+```
+
+No mostrar errores prematuros mientras el usuario escribe un estado intermedio.
 
 ### Output
 
@@ -255,6 +350,20 @@ Ejemplo para un triángulo capturado por base y altura:
 Perímetro: necesitas indicar los tres lados para calcularlo.
 ```
 
+Añadir una interpretación práctica breve:
+
+```text
+Usa el área para estimar superficies: piso, pintura, tela o terreno.
+Usa el perímetro para estimar contornos: cercas, bordes, marcos o zoclos.
+```
+
+Cuando el resultado pueda implicar compra de material, mostrar una nota breve y
+no prescriptiva:
+
+```text
+Si comprarás material, considera revisar desperdicio, cortes y margen extra.
+```
+
 ### Fórmula visible
 
 Ejemplo:
@@ -266,13 +375,18 @@ Resultado: 15 m²
 ```
 
 Incluir un desplegable **Ver procedimiento** para evitar saturar la primera
-vista.
+vista. El procedimiento puede estar cerrado por default en móvil y abierto o
+visible en desktop si no compite con el resultado principal.
 
 ### Acciones
 
 - **Copiar resultado**: copiar figura, entradas, área y perímetro disponible.
+- **Copiar enlace**: copiar la URL con query params válidos.
 - **Limpiar**: vaciar valores sin cambiar figura ni unidad.
 - Al cambiar de figura, limpiar campos incompatibles y actualizar la URL.
+
+Los botones deben ser cómodos en móvil y conservar mensajes de estado, por
+ejemplo: `Resultado copiado` o `Enlace copiado`.
 
 ---
 
@@ -307,7 +421,19 @@ mezclas como `2 m` y `30 cm` durante el MVP.
 | Sin unidad | `15 unidades²` |
 
 Mantener precisión completa durante el cálculo y redondear solamente al mostrar.
-Permitir entre `0` y `6` decimales visibles, con default `2`.
+
+### Decimales visibles
+
+Permitir entre `0` y `6` decimales visibles.
+
+El modo recomendado debe ser `Automático`:
+
+- Mostrar enteros sin decimales cuando el resultado sea exacto.
+- Mostrar hasta `2` decimales para la mayoría de resultados cotidianos.
+- Usar más decimales solo cuando el usuario lo elija.
+
+Si se prefiere simplificar el MVP, usar default `2`, pero dejar preparada la
+estructura para `Automático`.
 
 ---
 
@@ -344,6 +470,7 @@ Reglas:
 - Ignorar params incompatibles con la figura elegida.
 - Mantener canonical sin query params.
 - No generar páginas indexables separadas para cada combinación.
+- El botón **Copiar enlace** debe copiar la URL normalizada actual.
 
 ---
 
@@ -362,15 +489,27 @@ Calcula el área y el perímetro de figuras comunes. Elige una figura, escribe
 sus medidas y consulta la fórmula paso a paso.
 ```
 
+El hero debe ser breve. En móvil no debe empujar la calculadora fuera de la zona
+inicial de la página.
+
 ### Orden de secciones
 
-1. Hero y breadcrumbs.
-2. Selector de figura y formulario.
-3. Resultado y procedimiento.
-4. Tabla compacta de fórmulas.
-5. Explicación de unidades lineales y cuadradas.
-6. Enlace a la calculadora del teorema de Pitágoras.
-7. Preguntas frecuentes visibles.
+1. Hero compacto y breadcrumbs.
+2. Selector de figura, esquema visual y formulario.
+3. Resultado, interpretación práctica y acciones.
+4. Procedimiento desplegable.
+5. Tabla compacta de fórmulas.
+6. Explicación de unidades lineales y cuadradas.
+7. Cuándo usar área y cuándo usar perímetro.
+8. Preguntas frecuentes visibles.
+
+### Enlaces relacionados
+
+La spec anterior proponía un enlace a la calculadora del teorema de Pitágoras,
+pero esa página no existe actualmente en el proyecto. Para evitar enlaces rotos:
+
+- Omitir ese enlace en el MVP, o
+- Agregarlo solo cuando exista una página publicada y registrada.
 
 ### Componentes existentes
 
@@ -392,12 +531,15 @@ No incorporar frameworks ni librerías adicionales.
 ## Accesibilidad
 
 - Asociar un `label` visible a cada input.
-- Usar `aria-describedby` para errores.
+- Usar `aria-describedby` para errores y textos de ayuda.
 - Marcar campos inválidos con `aria-invalid`.
 - Anunciar cambios de resultado con `aria-live="polite"`.
 - No anunciar errores mientras el usuario escribe un estado intermedio.
 - Permitir operar selectores, desplegables y botones con teclado.
 - No depender únicamente del color para diferenciar errores o figura activa.
+- Mantener targets táctiles de al menos `44px`.
+- El esquema visual debe tener texto alternativo o estar marcado como decorativo
+  si la misma información ya está disponible en etiquetas visibles.
 
 ---
 
@@ -414,12 +556,14 @@ Canonical: /geometria/calculadora-de-area-y-perimetro
 ### FAQ visibles
 
 - ¿Cuál es la diferencia entre área y perímetro?
+- ¿Cuándo debo usar el área y cuándo el perímetro?
 - ¿Cómo calcular el área de un rectángulo?
 - ¿Cómo calcular el perímetro de un rectángulo?
 - ¿Cómo calcular el área de un triángulo?
 - ¿Cómo calcular el área de un círculo?
 - ¿La circunferencia es el perímetro de un círculo?
 - ¿Qué unidad se usa para expresar un área?
+- ¿Qué significa que un polígono sea regular?
 
 Generar `FAQPage` JSON-LD únicamente para preguntas visibles.
 
@@ -433,11 +577,14 @@ calculateRectangle(base, height)
 calculateTriangleFromSides(a, b, c)
 calculateTriangleAreaFromBaseHeight(base, height)
 calculateCircle(radius)
+calculateCircleFromDiameter(diameter)
 calculateRegularPolygon(sideCount, sideLength)
+getRegularPolygonName(sideCount)
 parseMeasurement(value)
 validatePositiveMeasurement(value)
 formatLinearMeasurement(value, unit, decimals)
 formatAreaMeasurement(value, unit, decimals)
+formatMeasurementAuto(value, maxDecimals)
 ```
 
 ---
@@ -452,9 +599,12 @@ formatAreaMeasurement(value, unit, decimals)
 - Círculo de radio `2`: área `4π`, circunferencia `4π`.
 - Círculo de diámetro `10`: radio normalizado `5`.
 - Hexágono regular de lado `4`: perímetro `24`, área aproximada `41.5692`.
+- Polígono de `6` lados: nombre sugerido `Hexágono regular`.
 - Aceptar punto y coma decimal.
 - Rechazar `NaN`, `Infinity`, cero y negativos.
+- Rechazar texto desconocido pegado a números.
 - Formatear unidades lineales y cuadradas correctamente.
+- Formatear resultados enteros sin decimales en modo automático.
 
 ---
 
@@ -463,16 +613,22 @@ formatAreaMeasurement(value, unit, decimals)
 1. La página existe en `/geometria/calculadora-de-area-y-perimetro`.
 2. La categoría `geometria` está registrada y aparece en el directorio al
    publicar la calculadora.
-3. El usuario puede calcular las cinco figuras incluidas.
-4. El triángulo por base y altura no muestra un perímetro inventado.
-5. El triángulo por tres lados valida la desigualdad triangular.
-6. El círculo comunica que la circunferencia es su perímetro.
-7. Los resultados distinguen unidades lineales y cuadradas.
-8. La fórmula y la sustitución de valores son visibles.
-9. La URL compartible conserva figura, valores y unidad válidos.
-10. La interfaz funciona con teclado y en pantallas móviles.
-11. La lógica central tiene pruebas unitarias.
-12. El build de Astro termina correctamente.
+3. La lógica pura vive en
+   `src/lib/calculators/geometria/calculadora-de-area-y-perimetro/`.
+4. El usuario puede calcular las cinco figuras incluidas.
+5. El triángulo por base y altura no muestra un perímetro inventado.
+6. El triángulo por tres lados valida la desigualdad triangular.
+7. El círculo comunica que la circunferencia es su perímetro.
+8. Los resultados distinguen unidades lineales y cuadradas.
+9. La fórmula y la sustitución de valores son visibles.
+10. La calculadora muestra un esquema visual simple de la figura activa.
+11. El resultado incluye una interpretación práctica breve.
+12. La URL compartible conserva figura, valores y unidad válidos.
+13. El usuario puede copiar resultado y copiar enlace.
+14. La interfaz funciona con teclado y en pantallas móviles.
+15. La primera vista móvil prioriza selector, inputs y resultado.
+16. La lógica central tiene pruebas unitarias.
+17. El build de Astro termina correctamente.
 
 ---
 
@@ -483,10 +639,10 @@ formatAreaMeasurement(value, unit, decimals)
 - Trapecio, rombo, paralelogramo, elipse y sector circular.
 - Conversión automática entre unidades.
 - Comparación de dos figuras.
+- Calculadora del teorema de Pitágoras y enlaces cruzados cuando exista.
 
 ### Fase 3 — Aplicaciones prácticas
 
 - Figuras compuestas.
 - Estimador de pintura, piso y cercas.
 - Exportación e impresión de resultados.
-
