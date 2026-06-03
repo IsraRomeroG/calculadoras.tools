@@ -10,16 +10,17 @@ unidades.
 
 ---
 
-## Categoría recomendada
+## Categoría, ruta e integración
 
 ```text
 src/pages/cocina
 ```
 
-Categoría futura: **Cocina**.
+Categoría objetivo: **Cocina** (`cocina`).
 
-Debe compartir categoría con el conversor de medidas culinarias. Esta spec solo
-documenta la clasificación; no requiere modificar `src`.
+Debe compartir categoría con el conversor de medidas culinarias. Si la categoría
+`cocina` aún no existe en `src/lib/constants/categories.ts`, debe añadirse al
+implementar la página y el registro.
 
 ### Ruta propuesta
 
@@ -28,7 +29,7 @@ src/pages/cocina/escalar-receta-por-porciones.astro
 /cocina/escalar-receta-por-porciones
 ```
 
-### Registro futuro sugerido
+### Registro sugerido
 
 ```ts
 {
@@ -42,11 +43,11 @@ src/pages/cocina/escalar-receta-por-porciones.astro
 }
 ```
 
-### Lógica testeable futura
+### Lógica testeable
 
 ```text
-src/lib/calculators/recipe-scaling.ts
-src/lib/calculators/recipe-scaling.test.ts
+src/lib/calculators/cocina/escalar-receta-por-porciones/recipeScaling.ts
+src/lib/calculators/cocina/escalar-receta-por-porciones/recipeScaling.test.ts
 ```
 
 ---
@@ -344,7 +345,7 @@ validateRecipeIngredient(ingredient)
 
 ## Criterios de aceptación
 
-1. La spec clasifica la calculadora en la categoría futura `cocina`.
+1. La spec clasifica la calculadora en la categoría `cocina`.
 2. La ruta propuesta es `/cocina/escalar-receta-por-porciones`.
 3. El cálculo usa un factor único visible.
 4. Cada ingrediente conserva su unidad y nombre.
@@ -353,4 +354,3 @@ validateRecipeIngredient(ingredient)
 7. La interfaz no redondea huevos ni otros ingredientes silenciosamente.
 8. La URL comparte el factor, no la receta completa.
 9. La lógica central queda prevista para pruebas unitarias.
-

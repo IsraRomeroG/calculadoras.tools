@@ -12,18 +12,17 @@ requieren densidades específicas y quedan fuera del MVP.
 
 ---
 
-## Categoría recomendada
+## Categoría, ruta e integración
 
 ```text
 src/pages/cocina
 ```
 
-Categoría futura: **Cocina**.
+Categoría objetivo: **Cocina** (`cocina`).
 
-Esta herramienta debe vivir en `cocina`, no en `conversores`, porque su valor
-principal está en las convenciones culinarias y en explicar diferencias como
-taza estadounidense frente a taza métrica. Esta spec solo documenta la
-categoría recomendada; no requiere modificar `src`.
+La herramienta pertenece a cocina porque convierte unidades habituales de
+recetas. Si la categoría aún no existe en `src/lib/constants/categories.ts`,
+debe añadirse al implementar la página y el registro.
 
 ### Ruta propuesta
 
@@ -32,7 +31,7 @@ src/pages/cocina/conversor-de-medidas-culinarias.astro
 /cocina/conversor-de-medidas-culinarias
 ```
 
-### Registro futuro sugerido
+### Registro sugerido
 
 ```ts
 {
@@ -46,11 +45,11 @@ src/pages/cocina/conversor-de-medidas-culinarias.astro
 }
 ```
 
-### Lógica testeable futura
+### Lógica testeable
 
 ```text
-src/lib/calculators/cooking-measures.ts
-src/lib/calculators/cooking-measures.test.ts
+src/lib/calculators/cocina/conversor-de-medidas-culinarias/cookingMeasures.ts
+src/lib/calculators/cocina/conversor-de-medidas-culinarias/cookingMeasures.test.ts
 ```
 
 ---
@@ -329,7 +328,7 @@ formatCookingMeasure(value, unit, decimals, system)
 
 ## Criterios de aceptación
 
-1. La spec clasifica la calculadora en la categoría futura `cocina`.
+1. La spec clasifica la calculadora en la categoría `cocina`.
 2. La página propuesta usa `/cocina/conversor-de-medidas-culinarias`.
 3. El MVP separa claramente volumen y masa.
 4. El usuario puede elegir sistema métrico o estadounidense para tazas y
@@ -338,4 +337,3 @@ formatCookingMeasure(value, unit, decimals, system)
 6. Las equivalencias usan factores definidos y pruebas unitarias.
 7. La URL compartible conserva parámetros válidos.
 8. El diseño previsto funciona en móvil y con teclado.
-

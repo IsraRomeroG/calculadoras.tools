@@ -1,0 +1,725 @@
+# Especificación MVP — Calculadora de estadística básica
+
+## Resumen
+
+Herramienta para analizar una lista de números y obtener media, mediana y moda
+de forma inmediata. Debe mostrar también un resumen compacto que ayude a
+interpretar el conjunto: cantidad de datos, suma, mínimo, máximo, rango y tabla
+de frecuencias.
+
+La calculadora debe ser útil para tareas, calificaciones, mediciones y revisiones
+rápidas de datos sin convertirse todavía en una suite estadística avanzada.
+
+---
+
+## Objetivo de producto
+
+- Calcular media, mediana y moda de una lista numérica.
+- Explicar cómo se obtuvo cada medida.
+- Mostrar una lectura breve que ayude a interpretar el conjunto, no solo el
+  resultado numérico.
+- Ordenar y resumir los datos sin modificar el texto capturado.
+- Resolver correctamente listas sin moda y listas multimodales.
+- Guiar al usuario con ejemplos de calificaciones, mediciones, listas sin moda y
+  listas multimodales.
+- Permitir copiar el resumen, la tabla de frecuencias y compartir datos
+  razonablemente cortos.
+- Mantener parseo, cálculos y formatos en funciones puras testeables.
+
+---
+
+## Decisiones de alcance
+
+### Incluido en el MVP
+
+1. Captura de una lista de números en un `textarea`.
+2. Separación por salto de línea, punto y coma, espacio o coma no ambigua.
+3. Soporte para punto o coma decimal.
+4. Media aritmética.
+5. Mediana.
+6. Moda única, múltiples modas o ausencia de moda.
+7. Cantidad de datos, suma, mínimo, máximo y rango.
+8. Lista ordenada.
+9. Tabla de frecuencias.
+10. Selector de decimales visibles entre `0` y `6`.
+11. Lectura interpretativa breve del resultado.
+12. Explicación de media, mediana y moda usando los datos reales capturados.
+13. Ejemplos guiados para cargar distintos casos comunes.
+14. Botones para copiar resumen, copiar enlace, copiar tabla de frecuencias,
+    cargar ejemplo y limpiar.
+15. URL compartible para listas cortas.
+16. Tabla de frecuencias con porcentaje y barra proporcional compacta.
+17. Accesibilidad y pruebas unitarias.
+
+### Fuera del MVP
+
+- Media ponderada.
+- Media geométrica o armónica.
+- Varianza, desviación estándar y coeficiente de variación.
+- Cuartiles, percentiles, rango intercuartílico y detección de valores atípicos.
+- Histogramas y gráficas.
+- Barras, histogramas o visualizaciones interactivas avanzadas. La barra
+  proporcional en la tabla de frecuencias sí forma parte del MVP.
+- Importación de CSV, Excel o Google Sheets.
+- Columnas múltiples.
+- Procesamiento de datasets grandes.
+
+Las medidas de dispersión y visualizaciones deben evaluarse como una segunda
+fase para mantener clara la experiencia inicial.
+
+---
+
+## Categoría, ruta e integración
+
+### Categoría elegida
+
+```text
+src/pages/matematicas
+```
+
+Estadística básica debe vivir en **Matemáticas** durante el MVP. La categoría ya
+existe y reúne herramientas educativas y de cálculo cotidiano.
+
+### Archivo principal
+
+```text
+src/pages/matematicas/calculadora-de-estadistica-basica.astro
+```
+
+### URL pública y canonical
+
+```text
+/matematicas/calculadora-de-estadistica-basica
+```
+
+### Registro en el directorio
+
+Agregar a:
+
+```text
+src/lib/constants/calculators.ts
+```
+
+Propuesta:
+
+```ts
+{
+  id: "calculadora-de-estadistica-basica",
+  title: "Calculadora de estadística básica",
+  description:
+    "Calcula media, mediana y moda de una lista de números con resumen y tabla de frecuencias.",
+  href: "/matematicas/calculadora-de-estadistica-basica",
+  categorySlug: "matematicas",
+  order: 76,
+}
+```
+
+### Lógica testeable
+
+Crear:
+
+```text
+src/lib/calculators/matematicas/calculadora-de-estadistica-basica/basic-statistics.ts
+src/lib/calculators/matematicas/calculadora-de-estadistica-basica/basic-statistics.test.ts
+```
+
+---
+
+## Conceptos que debe comunicar la interfaz
+
+### Media aritmética
+
+```text
+media = suma de los valores ÷ cantidad de valores
+```
+
+Ejemplo:
+
+```text
+(2 + 4 + 6) ÷ 3 = 4
+```
+
+### Mediana
+
+Ordenar primero los valores:
+
+- Si la cantidad es impar, usar el valor central.
+- Si la cantidad es par, promediar los dos valores centrales.
+
+Ejemplo:
+
+```text
+2, 4, 6, 8
+mediana = (4 + 6) ÷ 2 = 5
+```
+
+### Moda
+
+La moda es el valor con mayor frecuencia.
+
+- Si ningún valor se repite, mostrar **No hay moda**.
+- Si un valor tiene la frecuencia máxima, mostrar ese valor.
+- Si varios valores empatan con la frecuencia máxima y esta es mayor que `1`,
+  mostrar todas las modas.
+
+Ejemplo:
+
+```text
+1, 1, 2, 2, 3
+modas = 1 y 2
+```
+
+### Rango
+
+```text
+rango = máximo - mínimo
+```
+
+### Lectura interpretativa
+
+Después de calcular, mostrar una frase breve que ayude a leer el conjunto. No
+debe sonar diagnóstica ni exagerada; solo orientar.
+
+Ejemplos:
+
+```text
+La media es mayor que la mediana; algunos valores altos pueden estar empujando el promedio.
+No hay moda porque todos los valores aparecen una sola vez.
+El valor más frecuente es 18 y aparece 2 veces.
+```
+
+La interpretación debe basarse en reglas simples:
+
+- Si `media > mediana` de forma visible tras el formato elegido, sugerir que
+  valores altos pueden elevar el promedio.
+- Si `media < mediana`, sugerir que valores bajos pueden bajar el promedio.
+- Si media y mediana son iguales o muy cercanas, indicar que ambas medidas están
+  alineadas.
+- Si no hay moda, explicar que ningún valor se repite.
+- Si hay una moda o varias modas, indicar la frecuencia máxima.
+- Para un único valor, mostrar una nota breve: el único valor también es la moda
+  por definición operativa en esta calculadora.
+
+---
+
+## Interfaz principal
+
+### Entrada
+
+Usar un `textarea` con `inputmode="decimal"`:
+
+```text
+Escribe o pega tus números
+```
+
+Placeholder:
+
+```text
+Ejemplo: 12; 15; 18; 18; 20
+```
+
+Usar punto y coma en el ejemplo principal porque no entra en conflicto con la
+coma decimal.
+
+En móvil, el `textarea` no debe ocupar una altura excesiva al cargar. Usar una
+altura inicial compacta, por ejemplo `8` a `10` líneas, y permitir que el usuario
+lo expanda o que crezca con límite máximo antes de usar scroll interno.
+
+### Ayuda visible
+
+```text
+Separa los números con saltos de línea, punto y coma o espacios. También puedes
+usar comas en listas no ambiguas. Para decimales con coma, usa punto y coma:
+1,5; 2,5; 3,75.
+```
+
+La ayuda larga de formatos aceptados puede ir en un bloque plegable para no
+empujar el resultado en pantallas pequeñas.
+
+### Resultado principal
+
+En móvil, el resultado principal debe aparecer inmediatamente después del
+`textarea` y de las acciones principales. El usuario no debe tener que pasar por
+explicaciones extensas para ver media, mediana y moda.
+
+Para:
+
+```text
+12; 15; 18; 18; 20
+```
+
+mostrar:
+
+```text
+Media: 16.60
+Mediana: 18
+Moda: 18
+```
+
+Debajo de los tres resultados, mostrar una lectura compacta:
+
+```text
+El valor más frecuente es 18 y aparece 2 veces.
+```
+
+Si hay redondeo visible, mostrar una nota discreta cuando pueda haber confusión:
+
+```text
+Los cálculos usan los valores completos; el selector de decimales solo cambia cómo se muestran.
+```
+
+### Resumen secundario
+
+```text
+Cantidad de datos: 5
+Suma: 83
+Mínimo: 12
+Máximo: 20
+Rango: 8
+```
+
+El resumen debe permanecer compacto en móvil. Usar una grilla de dos columnas si
+cabe cómodamente; si no, una lista vertical.
+
+### Datos ordenados
+
+Mostrar en un bloque plegable:
+
+```text
+12, 15, 18, 18, 20
+```
+
+### Tabla de frecuencias
+
+| Valor | Frecuencia | Porcentaje |
+| ----- | ---------- | ---------- |
+| `12`  | `1`        | `20%`      |
+| `15`  | `1`        | `20%`      |
+| `18`  | `2`        | `40%`      |
+| `20`  | `1`        | `20%`      |
+
+Ordenar por valor ascendente.
+
+Agregar una barra proporcional compacta por fila para que la distribución sea
+escaneable sin convertir la página en una herramienta de gráficos. La barra debe
+tener texto accesible o `aria-label` equivalente.
+
+### Acciones
+
+- **Copiar resumen**: copiar resultados, lectura interpretativa y lista
+  normalizada.
+- **Copiar tabla**: copiar tabla de frecuencias en texto plano.
+- **Copiar enlace**: copiar la URL compartible si la lista cumple los límites.
+  Si no cumple, mostrar una explicación breve y sugerir copiar el resumen.
+- **Cargar ejemplo**: cargar una lista corta. Debe ofrecer variantes:
+  calificaciones, mediciones con decimales, lista sin moda y lista multimodal.
+- **Limpiar**: vaciar entrada y resultados.
+
+Las acciones deben ser botones compactos en móvil. Si no caben en una fila,
+pueden acomodarse en dos filas sin scroll horizontal.
+
+### Ejemplos guiados
+
+El botón o selector de ejemplos debe permitir cargar casos que enseñen distintas
+lecturas:
+
+| Ejemplo              | Datos sugeridos       | Objetivo                             |
+| -------------------- | --------------------- | ------------------------------------ |
+| Calificaciones       | `70; 85; 85; 90; 100` | Mostrar moda y promedio escolar.     |
+| Mediciones decimales | `1,5; 1,7; 1,7; 2,1`  | Enseñar decimales con coma.          |
+| Sin moda             | `2; 4; 6; 8`          | Explicar que ningún valor se repite. |
+| Multimodal           | `1; 1; 2; 2; 3`       | Mostrar varias modas.                |
+
+Al cargar un ejemplo, no debe borrar silenciosamente un texto largo del usuario
+si ya hay datos capturados. En ese caso, pedir confirmación mediante un diálogo
+nativo o un control visible.
+
+---
+
+## Parseo de listas
+
+### Formatos aceptados
+
+```text
+1 2 3 4
+1; 2; 3; 4
+1
+2
+3
+4
+1, 2, 3, 4
+1,5; 2,5; 3,75
+1.5 2.5 3.75
+```
+
+### Reglas de prioridad
+
+1. Si existen saltos de línea o punto y coma, usarlos como separadores
+   principales. Dentro de cada token aceptar punto o coma decimal.
+2. Si no existen saltos de línea ni punto y coma, permitir espacios como
+   separadores.
+3. Permitir coma seguida por espacio como separador de lista: `1, 2, 3`.
+4. Una sola coma sin espacios dentro de un token se interpreta como separador
+   decimal: `1,5`.
+5. Rechazar secuencias ambiguas en vez de adivinar. Por ejemplo, `1,2,3` debe
+   mostrar ayuda para usar `1; 2; 3` o `1,2; 3`.
+6. No aceptar separadores de miles en el MVP porque entran en conflicto con las
+   listas. Pedir valores sin agrupación: escribir `1500`, no `1,500`.
+7. No eliminar silenciosamente caracteres desconocidos.
+
+### Mensajes de ayuda ante errores
+
+Los errores deben ser específicos y accionables. No basta con mostrar "lista
+inválida".
+
+Ejemplos:
+
+| Entrada       | Mensaje sugerido                                                                            |
+| ------------- | ------------------------------------------------------------------------------------------- |
+| `1,2,3`       | `La lista es ambigua. Si son tres valores, usa 1; 2; 3. Si 1,2 es decimal, escribe 1,2; 3.` |
+| `1,500`       | `No uses separadores de miles. Escribe 1500 para mil quinientos.`                           |
+| `12; abc; 15` | `No se pudo leer "abc" como número. Corrige ese valor para continuar.`                      |
+| `Infinity`    | `Infinity no es un número válido para esta calculadora.`                                    |
+
+El token problemático debe mantenerse visible en el mensaje y el input original
+no debe modificarse automáticamente.
+
+### Límite
+
+- Máximo `1000` valores por lista.
+- Máximo `10000` caracteres en el `textarea`.
+
+Estos límites mantienen fluida la interfaz. Para conjuntos mayores, recomendar
+una hoja de cálculo.
+
+---
+
+## Precisión y comparación de modas
+
+Usar los valores numéricos normalizados para calcular media, mediana, suma y
+rango.
+
+Para frecuencias y moda:
+
+- Considerar iguales los valores numéricamente equivalentes: `2`, `2.0` y
+  `2,00`.
+- No redondear antes de contar.
+- No agrupar valores cercanos: `2` y `2.0001` son diferentes.
+
+Mantener precisión completa durante el cálculo y redondear solamente al mostrar.
+
+---
+
+## Validaciones
+
+| Caso                                   | Comportamiento                                        |
+| -------------------------------------- | ----------------------------------------------------- |
+| Campo vacío                            | Resultado neutral                                     |
+| Un solo valor                          | Media, mediana y moda disponibles; rango `0`          |
+| Token inválido                         | Conservar el input y señalar el token problemático    |
+| Lista ambigua                          | Mostrar ayuda para usar punto y coma o salto de línea |
+| Más de `1000` valores                  | Rechazar y explicar el límite                         |
+| Más de `10000` caracteres              | Rechazar y explicar el límite                         |
+| `NaN` o `Infinity`                     | Rechazar                                              |
+| Valores negativos                      | Aceptar                                               |
+| Valores repetidos                      | Contar sin redondeo prematuro                         |
+| Separador de miles aparente            | Rechazar y pedir escribir sin agrupación              |
+| Redondeo visual que oculta diferencias | Mantener cálculo exacto y mostrar nota discreta       |
+
+Para un único valor, mostrarlo como moda porque es el valor con mayor
+frecuencia. Añadir una nota breve para evitar confusión.
+
+---
+
+## URL compartible
+
+Ejemplo:
+
+```text
+/matematicas/calculadora-de-estadistica-basica?datos=12%3B15%3B18%3B18%3B20
+```
+
+Reglas:
+
+- Sincronizar únicamente listas válidas con hasta `50` valores y `500`
+  caracteres normalizados.
+- Para listas mayores, mantener canonical y omitir `datos` de la URL.
+- Leer params válidos al cargar.
+- Ignorar params inválidos.
+- Mantener canonical sin query params.
+- No indexar variantes por conjunto de datos.
+- La acción **Copiar enlace** debe copiar la URL con `datos` únicamente cuando
+  la lista sea válida y cumpla los límites.
+- Si la lista es válida pero demasiado larga para compartir por URL, la acción
+  debe deshabilitarse o mostrar: `Esta lista es larga para un enlace; copia el
+resumen en su lugar.`
+- La URL compartible no debe incluir el número de decimales visibles salvo que
+  se decida explícitamente persistir esa preferencia. Por defecto, los decimales
+  son una preferencia de visualización local.
+
+---
+
+## Diseño de página
+
+### Hero
+
+**Kicker:** Matemáticas
+
+**H1:** Calculadora de media, mediana y moda
+
+**Descripción:**
+
+```text
+Escribe una lista de números y calcula media, mediana, moda, rango y frecuencias
+con una explicación clara de cada resultado.
+```
+
+### Orden de secciones
+
+1. Hero y breadcrumbs.
+2. Entrada de datos y ayuda de formato.
+3. Acciones principales y selector de ejemplos.
+4. Media, mediana y moda destacadas.
+5. Lectura interpretativa y resumen compacto.
+6. Datos ordenados y tabla de frecuencias en bloques plegables o pestañas.
+7. Explicación de cada medida usando los datos capturados.
+8. Ejemplos resueltos.
+9. Bloque breve para enlazar o anticipar herramientas de dispersión, como
+   desviación estándar, sin calcularlas en este MVP.
+10. Preguntas frecuentes visibles.
+
+### Responsive
+
+- Una columna en móvil.
+- El resultado principal debe quedar inmediatamente debajo de la entrada y de
+  las acciones, antes de cualquier contenido educativo largo.
+- Resultados principales en tarjetas compactas.
+- Evitar que el `textarea` inicial empuje los resultados por debajo de varios
+  pliegues. Usar altura inicial limitada y expansión controlada.
+- Usar acordeones, pestañas o bloques plegables para detalles: datos ordenados,
+  tabla de frecuencias y explicación paso a paso.
+- Tabla de frecuencias con scroll horizontal cuando sea necesario.
+- No renderizar cientos de filas visibles sin una opción para plegarlas. Mostrar
+  primero una cantidad razonable, por ejemplo `20`, con acción para ver más.
+- En pantallas medianas o grandes, se puede usar layout de dos columnas con
+  entrada a la izquierda y resultados a la derecha, manteniendo el orden
+  semántico correcto para móvil.
+
+### Componentes existentes
+
+Reutilizar:
+
+```text
+BaseLayout
+PageShell
+Container
+PageHero
+SectionIntro
+FaqSection
+```
+
+No incorporar librerías estadísticas ni frameworks adicionales.
+
+---
+
+## Accesibilidad
+
+- Asociar un `label` visible al `textarea`.
+- Relacionar ayuda y errores con `aria-describedby`.
+- Marcar input inválido con `aria-invalid`.
+- Anunciar el resumen con `aria-live="polite"` después de una lista válida.
+- No anunciar cada cambio de tabla de frecuencias mientras se escribe.
+- Usar encabezados correctos en la tabla.
+- La barra proporcional de la tabla de frecuencias debe tener nombre accesible o
+  texto equivalente. No comunicar frecuencia solo mediante color o longitud.
+- Permitir operar botones y bloques plegables con teclado.
+- Mantener el token problemático visible en el mensaje de error.
+- Los estados de copiado deben anunciarse de forma breve: `Resumen copiado`,
+  `Tabla copiada`, `Enlace copiado` o `No se pudo copiar`.
+- Si se pide confirmación antes de cargar un ejemplo sobre datos existentes, el
+  control debe ser operable con teclado.
+
+---
+
+## SEO
+
+### Metadata
+
+```text
+Title: Calculadora de Media, Mediana y Moda — Estadística Básica
+Description: Calcula media, mediana, moda, rango y frecuencias de una lista de números con explicación y ejemplos.
+Canonical: /matematicas/calculadora-de-estadistica-basica
+```
+
+### FAQ visibles
+
+- ¿Cómo calcular la media?
+- ¿Cómo calcular la mediana?
+- ¿Cómo calcular la moda?
+- ¿Qué pasa si hay dos modas?
+- ¿Puede una lista no tener moda?
+- ¿Cuál es la diferencia entre media y mediana?
+- ¿Cómo calcular el rango?
+- ¿Puedo usar números decimales o negativos?
+
+Generar `FAQPage` JSON-LD únicamente para preguntas visibles.
+
+---
+
+## Funciones puras sugeridas
+
+```ts
+parseStatisticsInput(value);
+calculateMean(values);
+calculateMedian(values);
+calculateModes(values);
+calculateRange(values);
+buildFrequencyTable(values);
+calculateBasicStatistics(values);
+buildStatisticsInterpretation(statistics);
+buildCalculationSteps(values, statistics);
+formatStatistic(value, decimals);
+buildStatisticsSummary(values, statistics);
+buildFrequencyTableText(frequencyTable);
+buildShareableStatisticsUrl(values);
+```
+
+Tipo sugerido:
+
+```ts
+interface BasicStatistics {
+  count: number;
+  sum: number;
+  mean: number;
+  median: number;
+  modes: number[];
+  hasMode: boolean;
+  min: number;
+  max: number;
+  range: number;
+  sortedValues: number[];
+  maxFrequency: number;
+}
+```
+
+Tipo sugerido para explicación:
+
+```ts
+interface StatisticsCalculationSteps {
+  mean: string;
+  median: string;
+  mode: string;
+  range: string;
+}
+```
+
+Tipo sugerido para ejemplos:
+
+```ts
+interface StatisticsExample {
+  id: string;
+  label: string;
+  description: string;
+  value: string;
+}
+```
+
+---
+
+## Pruebas unitarias mínimas
+
+### Cálculos
+
+- `[2, 4, 6]`: media `4`, mediana `4`, sin moda, rango `4`.
+- `[1, 2, 2, 3]`: moda `2`.
+- `[1, 1, 2, 2, 3]`: modas `1` y `2`.
+- `[1, 2, 3, 4]`: mediana `2.5`.
+- `[-5, 0, 5]`: media `0`, mediana `0`, rango `10`.
+- `[7]`: media `7`, mediana `7`, moda `7`, rango `0`.
+- `[2, 2.0, 2.00]`: una misma moda con frecuencia `3`.
+- `[2, 2.0001]`: valores distintos.
+
+### Parseo
+
+- Aceptar espacios.
+- Aceptar saltos de línea.
+- Aceptar punto y coma.
+- Aceptar lista con coma seguida por espacio.
+- Aceptar decimales con coma separados por punto y coma.
+- Rechazar `1,2,3` como ambiguo.
+- Rechazar tokens desconocidos, `NaN` e `Infinity`.
+- Rechazar listas por encima del límite.
+
+### Formato y URL
+
+- Redondear únicamente al mostrar.
+- Respetar decimales visibles elegidos.
+- Mostrar nota cuando el redondeo pueda ocultar diferencias entre valores.
+- Compartir listas cortas.
+- Omitir query param para listas largas.
+- Mantener canonical único.
+- Copiar enlace solo cuando la lista sea válida y cumpla límites.
+
+### Interpretación y contenido
+
+- Construir lectura para lista sin moda.
+- Construir lectura para moda única.
+- Construir lectura para lista multimodal.
+- Construir nota para un único valor.
+- Construir explicación de media con `suma / cantidad`.
+- Construir explicación de mediana impar y par usando la lista ordenada.
+- Construir tabla de frecuencias en texto plano para copiar.
+- Cargar ejemplos de calificaciones, mediciones decimales, lista sin moda y
+  lista multimodal.
+
+---
+
+## Criterios de aceptación
+
+1. La página existe en `/matematicas/calculadora-de-estadistica-basica`.
+2. La calculadora está registrada bajo `categorySlug: "matematicas"`.
+3. El usuario puede pegar una lista y obtener media, mediana y moda.
+4. El resultado distingue lista sin moda, moda única y múltiples modas.
+5. La tabla de frecuencias cuenta valores equivalentes sin redondear antes de
+   tiempo.
+6. La tabla de frecuencias muestra frecuencia, porcentaje y barra proporcional
+   accesible.
+7. El parser acepta punto y coma, saltos de línea, espacios y listas con coma
+   no ambigua.
+8. El parser rechaza listas ambiguas, separadores de miles aparentes y tokens
+   inválidos con mensajes específicos.
+9. El resumen incluye cantidad, suma, mínimo, máximo y rango.
+10. La calculadora muestra una lectura interpretativa breve del conjunto.
+11. La explicación de media, mediana, moda y rango usa los datos reales del
+    usuario.
+12. Las listas cortas pueden compartirse mediante URL y copiarse con un botón
+    visible.
+13. Las listas largas evitan `datos` en la URL y explican por qué no se copia un
+    enlace compartible.
+14. El usuario puede copiar resumen y tabla de frecuencias por separado.
+15. El usuario puede cargar ejemplos de calificaciones, decimales, lista sin
+    moda y lista multimodal.
+16. En móvil, el resultado principal aparece inmediatamente después de la
+    entrada y de las acciones principales.
+17. La interfaz funciona con teclado y en pantallas móviles.
+18. La lógica central tiene pruebas unitarias.
+19. El build de Astro termina correctamente.
+
+---
+
+## Fases posteriores
+
+### Fase 2 — Dispersión
+
+- Varianza poblacional y muestral.
+- Desviación estándar.
+- Cuartiles, percentiles y rango intercuartílico.
+- Detección explicada de valores atípicos.
+
+### Fase 3 — Datos y visualización
+
+- Histograma.
+- Importación CSV.
+- Columnas múltiples.
+- Comparación entre conjuntos.
+- Exportación del resumen.

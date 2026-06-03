@@ -11,18 +11,18 @@ individuales queda para una fase posterior.
 
 ---
 
-## Categoría recomendada
+## Categoría, ruta e integración
 
 ```text
 src/pages/eventos-sociales
 ```
 
-Categoría futura: **Eventos sociales**.
+Categoría objetivo: **Eventos sociales** (`eventos-sociales`).
 
-La intención principal ocurre en comidas compartidas, reuniones y salidas. La
-categoría permite agrupar esta herramienta con la calculadora de propina sin
-mezclarla con finanzas personales. Esta spec solo documenta la clasificación;
-no requiere modificar `src`.
+La intención principal ocurre en comidas compartidas, reuniones y salidas, pero
+la implementación debe quedar agrupada con otras herramientas para cuentas y
+propinas. Si la categoría aún no existe en `src/lib/constants/categories.ts`,
+debe añadirse al implementar la página y el registro.
 
 ### Ruta propuesta
 
@@ -31,7 +31,7 @@ src/pages/eventos-sociales/dividir-cuenta-en-restaurante.astro
 /eventos-sociales/dividir-cuenta-en-restaurante
 ```
 
-### Registro futuro sugerido
+### Registro sugerido
 
 ```ts
 {
@@ -45,11 +45,11 @@ src/pages/eventos-sociales/dividir-cuenta-en-restaurante.astro
 }
 ```
 
-### Lógica testeable futura
+### Lógica testeable
 
 ```text
-src/lib/calculators/bill-splitting.ts
-src/lib/calculators/bill-splitting.test.ts
+src/lib/calculators/eventos-sociales/dividir-cuenta-en-restaurante/billSplitting.ts
+src/lib/calculators/eventos-sociales/dividir-cuenta-en-restaurante/billSplitting.test.ts
 ```
 
 ---
@@ -271,4 +271,3 @@ formatMoney(value, currency)
 5. El redondeo opcional muestra la diferencia reunida.
 6. La herramienta no promete reparto por platillos.
 7. La URL compartible conserva parámetros válidos.
-
