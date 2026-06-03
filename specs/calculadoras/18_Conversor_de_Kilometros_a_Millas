@@ -20,9 +20,12 @@ navegador: no requiere backend, base de datos ni llamadas de red.
 
 - Convertir kilómetros a millas terrestres y millas terrestres a kilómetros.
 - Mostrar el resultado mientras el usuario escribe una entrada válida.
+- Hacer evidente la dirección de conversión desde el primer bloque, sobre todo
+  en móvil.
 - Evitar confundir la milla terrestre con la milla náutica.
 - Ofrecer una fórmula visible y un procedimiento breve.
-- Permitir intercambiar unidades, copiar el resultado y limpiar el formulario.
+- Permitir intercambiar unidades, copiar el resultado, compartir la conversión
+  y limpiar el formulario.
 - Resolver búsquedas frecuentes con atajos que carguen la misma calculadora.
 - Mantener una única URL canónica para la herramienta.
 - Separar la lógica matemática en funciones puras con pruebas unitarias.
@@ -36,14 +39,14 @@ navegador: no requiere backend, base de datos ni llamadas de red.
 1. Conversión bidireccional entre kilómetros (`km`) y millas terrestres (`mi`).
 2. Input de texto con soporte para punto o coma decimal.
 3. Conversión en tiempo real.
-4. Selector de unidad de origen y destino.
+4. Control visible de dirección `km -> mi` y `mi -> km`, optimizado para móvil.
 5. Botón para intercambiar unidades conservando la distancia equivalente.
-6. Selector de decimales visibles: `0`, `1`, `2`, `3`, `4` o `5`.
+6. Selector compacto de decimales visibles: `0`, `1`, `2`, `3`, `4` o `5`.
 7. Resultado destacado, tasa de equivalencia y fórmula aplicada.
 8. Procedimiento desplegable con sustitución de valores.
-9. Botón para copiar resultado.
+9. Botones para copiar resultado y compartir conversión.
 10. Botón para limpiar.
-11. Atajos para conversiones frecuentes.
+11. Atajos para conversiones frecuentes agrupados por intención.
 12. URL compartible mediante query params.
 13. Contenido editorial y preguntas frecuentes visibles.
 14. Accesibilidad por teclado y anuncios moderados para lectores de pantalla.
@@ -106,22 +109,26 @@ Propuesta:
 }
 ```
 
-El orden propuesto deja espacio entre los conversores ya documentados:
+El orden propuesto ubica este conversor entre los conversores actuales y deja
+espacio para futuros conversores:
 
 | Conversor | `order` |
 |-----------|---------|
 | Temperatura | `65` |
-| Divisas | `67` |
 | Kilómetros a millas | `69` |
+| Peso | `70` |
 
 ### Lógica testeable
 
 Crear:
 
 ```text
-src/lib/calculators/distance.ts
-src/lib/calculators/distance.test.ts
+src/lib/calculators/conversores/kilometros-a-millas/distance.ts
+src/lib/calculators/conversores/kilometros-a-millas/distance.test.ts
 ```
+
+Usar la estructura vigente de lógica por categoría y calculadora:
+`src/lib/calculators/<categorySlug>/<calculatorId>/`.
 
 La página Astro debe concentrarse en presentación, eventos del navegador y
 sincronización de URL. La conversión, el parseo y el formato reutilizable deben
@@ -233,13 +240,21 @@ kilómetros = millas × 1.609344
 | Campo | Tipo | Valor inicial |
 |-------|------|---------------|
 | Distancia | Texto con `inputmode="decimal"` | Vacío |
-| Unidad de origen | Selector o botones | Kilómetros (`km`) |
-| Unidad de destino | Selector o botones | Millas terrestres (`mi`) |
-| Decimales visibles | Selector: `0` a `5` | `2` |
+| Dirección | Control segmentado o botones `km -> mi` / `mi -> km` | `km -> mi` |
+| Unidad de origen | Estado derivado de la dirección o selector compacto | Kilómetros (`km`) |
+| Unidad de destino | Estado derivado de la dirección o selector compacto | Millas terrestres (`mi`) |
+| Decimales visibles | Menú compacto **Precisión**: `0` a `5` | `2` |
 
 Se prefiere `type="text"` con `inputmode="decimal"` en vez de `type="number"`
 para controlar correctamente la coma decimal, el pegado de unidades y estados
 intermedios como `12,`.
+
+En móvil, la dirección debe quedar entre el input y el resultado. El usuario no
+debería tener que inferir la conversión inversa desde selectores separados: la
+opción `mi -> km` debe ser tan visible como `km -> mi`.
+
+El ajuste de decimales debe existir, pero no competir visualmente con el valor,
+la dirección y el resultado. Puede vivir en un botón o `details` de precisión.
 
 ### Output principal
 
@@ -289,10 +304,12 @@ El input puede mostrar una versión suficientemente precisa para evitar deriva
 visible en intercambios repetidos. El resultado conserva precisión interna
 completa y se redondea únicamente en pantalla.
 
-### Copiar y limpiar
+### Copiar, compartir y limpiar
 
 - El botón **Copiar resultado** copia texto plano.
 - Tras copiar, mostrar confirmación visual durante aproximadamente 2 segundos.
+- El botón **Compartir conversión** usa `navigator.share()` cuando esté
+  disponible y copia la URL compartible como fallback.
 - El botón **Limpiar** vacía el input y los resultados sin recargar la página.
 - Limpiar no cambia las unidades ni los decimales seleccionados.
 
@@ -335,6 +352,8 @@ Equivalencia: 1 mi = 1.609344 km
 - Documentar esta decisión en pruebas: una entrada con una sola coma y tres
   dígitos posteriores es inherentemente ambigua. Para escribir tres decimales,
   recomendar punto: `1.609 km`.
+- Mostrar una microayuda compacta cerca del input o del control de precisión:
+  “Para tres decimales usa punto: 1.609”.
 - Permitir espacios alrededor del número y la unidad.
 - Detectar unidades pegadas o escritas completas:
   - Kilómetros: `km`, `kilómetro`, `kilómetros`, `kilometro`, `kilometros`.
@@ -445,6 +464,14 @@ Requisitos:
 ## Atajos de conversiones frecuentes
 
 Mostrar tarjetas que carguen el conversor principal sin recargar la página.
+En móvil, mostrar primero los atajos de mayor intención y dejar el resto dentro
+de un bloque expandible para no desplazar demasiado el contenido explicativo.
+
+Agrupar o etiquetar los atajos por intención:
+
+- Carreras: `5 km`, `10 km`, medio maratón y maratón.
+- Carretera y viajes: `50 km`, `100 km`, `50 mi`, `100 mi`.
+- Búsquedas comunes: `1 km`, `1 mi`, `5 mi`, `10 mi`.
 
 ### Kilómetros a millas
 
@@ -552,6 +579,8 @@ Con decimales personalizados:
 - Ignorar params inválidos sin romper la interfaz.
 - Mantener canonical en `/conversores/kilometros-a-millas`.
 - No crear páginas indexables duplicadas por query params.
+- El botón de compartir debe generar o reutilizar una URL con `valor`,
+  `origen`, `destino` y `decimales` cuando haya una conversión válida.
 
 ---
 
@@ -567,13 +596,14 @@ Con decimales personalizados:
 
 ```text
 Convierte kilómetros y millas terrestres al instante. Consulta la fórmula,
-copia el resultado y usa equivalencias frecuentes para carretera o carrera.
+copia o comparte el resultado y usa equivalencias frecuentes para carretera o
+carrera.
 ```
 
 ### Orden de secciones
 
 1. Hero y breadcrumbs.
-2. Conversor principal.
+2. Conversor principal con input, dirección, resultado y acciones principales.
 3. Atajos de conversiones frecuentes.
 4. Tabla breve de equivalencias.
 5. Cómo convertir kilómetros y millas.
@@ -584,13 +614,20 @@ copia el resultado y usa equivalencias frecuentes para carretera o carrera.
 ### Responsive
 
 - Mobile-first.
-- Formulario y resultado cerca del primer viewport.
+- En móvil, el primer bloque debe priorizar: distancia, dirección, resultado,
+  copiar, compartir y limpiar.
+- En un viewport de `360px`, capturar valor, cambiar dirección, ver resultado,
+  copiar y compartir no debe requerir scroll horizontal ni controles
+  superpuestos.
+- Formulario y resultado dentro o muy cerca del primer viewport.
 - Una columna en móvil.
 - Dos columnas en pantallas amplias: formulario a la izquierda y resultado a la
   derecha.
 - Botones táctiles de altura mínima aproximada de `44px`.
 - Resultados largos con wrap natural.
 - Tablas con scroll horizontal si fuera necesario.
+- El resultado debe aparecer antes que fórmula, atajos y contenido editorial en
+  el orden de lectura móvil.
 
 ### Componentes existentes
 
@@ -754,6 +791,7 @@ isDistanceUnit(value)
 - Intercambio de unidades.
 - Sincronización de query params.
 - Copia al portapapeles.
+- Compartir con Web Share API y fallback a copiar URL.
 - Anuncios accesibles.
 - Carga de atajos.
 
@@ -849,15 +887,20 @@ inconsistentes.
 4. El cálculo usa `1 mi = 1.609344 km`, sin aproximaciones intermedias.
 5. El resultado muestra equivalencia directa, inversa y fórmula.
 6. El botón de intercambio conserva la distancia equivalente.
-7. El usuario puede copiar el resultado y limpiar el formulario.
+7. El usuario puede copiar el resultado, compartir la conversión y limpiar el
+   formulario.
 8. El parser acepta punto, coma decimal y unidades pegadas.
 9. El parser no trata `nmi` como millas terrestres.
 10. Los atajos frecuentes cargan la calculadora principal y actualizan la URL.
 11. La página mantiene canonical único sin duplicar páginas por cantidad.
-12. La interfaz funciona en móvil y puede operarse completamente con teclado.
-13. Los cambios importantes se anuncian sin saturar lectores de pantalla.
-14. La lógica central tiene pruebas unitarias.
-15. El build de Astro termina correctamente.
+12. En móvil, el primer bloque muestra input, dirección, resultado y acciones
+    principales sin scroll horizontal ni solapamientos.
+13. La interfaz funciona en móvil y puede operarse completamente con teclado.
+14. Los cambios importantes se anuncian sin saturar lectores de pantalla.
+15. La lógica central usa la estructura
+    `src/lib/calculators/conversores/kilometros-a-millas/` y tiene pruebas
+    unitarias.
+16. El build de Astro termina correctamente.
 
 ---
 
