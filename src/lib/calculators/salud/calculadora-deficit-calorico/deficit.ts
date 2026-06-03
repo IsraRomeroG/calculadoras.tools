@@ -7,7 +7,7 @@ import {
   getActivityFactor,
   parseHealthInput,
   roundTo,
-} from "./tdee";
+} from "@lib/calculators/salud/calculadora-de-calorias-diarias-tdee/tdee";
 
 export { ACTIVITY_OPTIONS, parseHealthInput, roundTo };
 export type { ActivityLevel, FormulaSex };

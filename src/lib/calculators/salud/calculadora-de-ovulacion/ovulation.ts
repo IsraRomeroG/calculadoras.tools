@@ -8,9 +8,9 @@ import {
   isValidDateParts,
   todayInLocalTimeZone,
   type PlainDateParts,
-} from "./date-difference";
+} from "@lib/calculators/fecha-tiempo/diferencia-entre-fechas/date-difference";
 
-export type { PlainDateParts } from "./date-difference";
+export type { PlainDateParts } from "@lib/calculators/fecha-tiempo/diferencia-entre-fechas/date-difference";
 
 export { addCalendarDays, comparePlainDates, diffTotalDays, todayInLocalTimeZone };
 

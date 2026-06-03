@@ -11,15 +11,15 @@ import {
   type PlainDateParts,
   type ParseDatePartsInput,
   type ParseDatePartsResult,
-} from "./date-difference";
+} from "@lib/calculators/fecha-tiempo/diferencia-entre-fechas/date-difference";
 
 export type {
   PlainDateParts,
   ParseDatePartsInput,
   ParseDatePartsResult,
-} from "./date-difference";
+} from "@lib/calculators/fecha-tiempo/diferencia-entre-fechas/date-difference";
 
-export { todayInLocalTimeZone } from "./date-difference";
+export { todayInLocalTimeZone } from "@lib/calculators/fecha-tiempo/diferencia-entre-fechas/date-difference";
 
 export type DueDateMethod =
   | "lmp"
