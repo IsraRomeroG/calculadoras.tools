@@ -2,12 +2,15 @@
 
 ## Resumen
 
-Herramienta para resolver triángulos rectángulos mediante el teorema de
-Pitágoras. El usuario indica qué lado desea calcular, captura los dos valores
-conocidos y obtiene el resultado con fórmula, sustitución y verificación.
+Herramienta mobile-first para resolver triángulos rectángulos mediante el
+teorema de Pitágoras. El usuario indica qué datos tiene, captura los dos
+valores conocidos y obtiene el resultado con fórmula, sustitución y
+verificación.
 
 El MVP debe ser directo: una calculadora educativa y práctica, no un solucionador
-general de triángulos.
+general de triángulos. La experiencia debe priorizar obtener el resultado rápido
+en móvil y permitir continuar con cálculos relacionados cuando el usuario ya
+tiene los tres lados.
 
 ---
 
@@ -19,6 +22,10 @@ general de triángulos.
 - Evitar resultados matemáticamente imposibles.
 - Explicar cuál lado es la hipotenusa.
 - Compartir resultados mediante una URL estable.
+- Ofrecer ejemplos rápidos con ternas pitagóricas frecuentes.
+- Enviar los tres lados resueltos a la calculadora de área y perímetro cuando
+  tenga sentido continuar.
+- Diseñar la interfaz primero para pantallas pequeñas.
 - Mantener la lógica central en funciones puras testeables.
 
 ---
@@ -27,16 +34,19 @@ general de triángulos.
 
 ### Incluido en el MVP
 
-1. Modo **Calcular hipotenusa**.
-2. Modo **Calcular cateto**.
+1. Modo **Tengo dos catetos** para calcular la hipotenusa.
+2. Modo **Tengo hipotenusa y un cateto** para calcular el cateto faltante.
 3. Diagrama SVG sencillo de un triángulo rectángulo.
 4. Selector de unidad: sin unidad, `mm`, `cm`, `m`, `km`, `in` y `ft`.
 5. Resultado redondeado configurable entre `0` y `6` decimales.
 6. Fórmula visible, sustitución y verificación.
-7. Botones para copiar resultado y limpiar.
-8. URL compartible mediante query params.
-9. Accesibilidad completa por teclado.
-10. Pruebas unitarias de cálculo, validación y formato.
+7. Presets de ternas pitagóricas frecuentes.
+8. Botones para copiar resultado, copiar enlace y limpiar.
+9. URL compartible mediante query params.
+10. CTA contextual hacia la calculadora de área y perímetro con valores
+    prellenados cuando ya existan los tres lados.
+11. Accesibilidad completa por teclado.
+12. Pruebas unitarias de cálculo, validación y formato.
 
 ### Fuera del MVP
 
@@ -109,8 +119,23 @@ Propuesta:
 Crear:
 
 ```text
-src/lib/calculators/pythagorean-theorem.ts
-src/lib/calculators/pythagorean-theorem.test.ts
+src/lib/calculators/geometria/calculadora-del-teorema-de-pitagoras/pythagoreanTheorem.ts
+src/lib/calculators/geometria/calculadora-del-teorema-de-pitagoras/pythagoreanTheorem.test.ts
+```
+
+Reutilizar los helpers de medidas ya existentes en geometría cuando sea posible:
+
+- `AREA_PERIMETER_UNITS`
+- `MEASUREMENT_UNIT_METADATA`
+- `parseMeasurement`
+- `validatePositiveMeasurement`
+- `formatLinearMeasurement`
+
+Si para evitar acoplarse a la calculadora de área y perímetro conviene extraer
+helpers compartidos, moverlos a un módulo común de geometría, por ejemplo:
+
+```text
+src/lib/calculators/geometria/shared/measurements.ts
 ```
 
 ---
@@ -141,7 +166,7 @@ a² + b² = c²
 
 ## Modos de cálculo
 
-### Modo 1 — Calcular hipotenusa
+### Modo 1 — Tengo dos catetos
 
 Inputs:
 
@@ -166,13 +191,13 @@ c = √25
 c = 5 cm
 ```
 
-### Modo 2 — Calcular cateto
+### Modo 2 — Tengo hipotenusa y un cateto
 
 Inputs:
 
 ```text
 Hipotenusa c
-Cateto conocido
+Cateto conocido a
 ```
 
 Fórmula:
@@ -191,7 +216,8 @@ b = √144
 b = 12 m
 ```
 
-La hipotenusa capturada debe ser mayor que el cateto conocido.
+En el MVP, el cateto conocido se representa como `a` y el cateto faltante como
+`b`. La hipotenusa capturada debe ser mayor que el cateto conocido.
 
 ---
 
@@ -199,12 +225,34 @@ La hipotenusa capturada debe ser mayor que el cateto conocido.
 
 ### Selector de intención
 
-Mostrar dos opciones:
+Mostrar dos opciones orientadas a lo que el usuario ya conoce:
 
 ```text
-Calcular hipotenusa
-Calcular cateto
+Tengo dos catetos
+Tengo hipotenusa y un cateto
 ```
+
+Debajo de cada opción puede mostrarse una ayuda breve:
+
+```text
+Calcula c
+Calcula b
+```
+
+### Orden mobile-first
+
+En pantallas pequeñas, la calculadora debe priorizar el flujo de tarea:
+
+1. Selector de intención.
+2. Inputs y controles de unidad/decimales.
+3. Resultado principal.
+4. Acciones.
+5. Procedimiento y verificación colapsables.
+6. Diagrama conceptual.
+
+El hero debe ser compacto para que el inicio de la calculadora sea visible en el
+primer viewport móvil. En desktop, formulario/diagrama y resultado pueden
+acomodarse en columnas, respetando el mismo orden semántico.
 
 ### Diagrama
 
@@ -216,6 +264,8 @@ Renderizar un SVG accesible con:
 - El lado desconocido resaltado por estado visual y texto.
 
 El SVG es una ayuda conceptual; no debe sugerir que está dibujado a escala.
+En móvil puede aparecer después del resultado para no desplazar la respuesta
+principal.
 
 ### Resultado principal
 
@@ -242,6 +292,9 @@ Resultado: c = 5 cm
 
 Incluir un desplegable **Ver procedimiento**.
 
+En móvil, el procedimiento debe iniciar colapsado. En desktop puede mostrarse
+como panel secundario si no compite con el resultado principal.
+
 ### Verificación
 
 Después de un resultado válido, mostrar:
@@ -251,18 +304,44 @@ Verificación: 3² + 4² = 5²
 9 + 16 = 25
 ```
 
+Si el resultado mostrado está redondeado, la verificación debe usar lenguaje de
+aproximación o mostrar la igualdad con los valores internos completos para evitar
+igualdades visualmente falsas.
+
+### Presets rápidos
+
+Mostrar chips o botones compactos para ternas frecuentes:
+
+```text
+3, 4 → 5
+5, 12 → 13
+8, 15 → 17
+7, 24 → 25
+```
+
+Al elegir un preset:
+
+- Cambiar al modo **Tengo dos catetos**.
+- Rellenar `a` y `b`.
+- Conservar unidad y decimales seleccionados.
+- Actualizar resultado y URL compartible.
+
 ### Acciones
 
 - **Copiar resultado**: incluir fórmula, sustitución y resultado.
+- **Copiar enlace**: copiar la URL con modo, valores, unidad y decimales.
 - **Limpiar**: vaciar valores sin cambiar modo ni unidad.
-- **Calcular área y perímetro**: enlace contextual a la calculadora relacionada.
+- **Calcular área y perímetro**: enlace contextual a la calculadora relacionada,
+  prellenado con `a`, `b`, `c`, unidad y decimales cuando el resultado sea
+  válido.
 
 ---
 
 ## Parseo, unidades y formato
 
-Usar el mismo parser numérico compartido por las calculadoras matemáticas cuando
-sea posible.
+Usar el parser de medidas de geometría cuando sea posible. Debe aceptar los
+mismos formatos que la calculadora de área y perímetro para que el usuario no
+encuentre reglas distintas dentro de la misma categoría.
 
 Aceptar:
 
@@ -277,10 +356,13 @@ Aceptar:
 Reglas:
 
 - Aceptar punto o coma decimal.
+- Interpretar `1,000` como `1000`, siguiendo el parser geométrico existente.
 - Mantener precisión completa en pasos intermedios.
 - Redondear únicamente al mostrar.
 - Usar la misma unidad seleccionada para todos los lados.
 - Rechazar texto que no pueda interpretarse de forma inequívoca.
+- Mostrar una normalización discreta cuando ayude a evitar dudas, por ejemplo
+  `Interpretado como 1000 cm`.
 - Mostrar `unidades` cuando no se elija una unidad física.
 
 ---
@@ -313,15 +395,29 @@ Ejemplos:
 
 ```text
 /geometria/calculadora-del-teorema-de-pitagoras?calcular=hipotenusa&a=3&b=4&unidad=cm
-/geometria/calculadora-del-teorema-de-pitagoras?calcular=cateto&c=13&conocido=5&unidad=m
+/geometria/calculadora-del-teorema-de-pitagoras?calcular=cateto&c=13&a=5&unidad=m&decimales=2
 ```
 
 Reglas:
 
 - Leer params válidos al cargar.
 - Ignorar params inválidos sin romper la interfaz.
+- Conservar `calcular`, valores conocidos, `unidad` y `decimales`.
+- Actualizar la URL con `history.replaceState` después de hidratar para evitar
+  llenar el historial al escribir.
 - Mantener canonical sin query params.
 - No indexar páginas duplicadas por valores.
+
+### Enlace a área y perímetro
+
+Cuando exista un resultado válido, construir un enlace a:
+
+```text
+/geometria/calculadora-de-area-y-perimetro?figura=triangulo&modo=tres-lados&a=3&b=4&c=5&unidad=cm&decimales=2
+```
+
+Usar los nombres de query params que ya consume la calculadora de área y
+perímetro. Si el usuario no eligió decimales, omitir `decimales`.
 
 ---
 
@@ -343,12 +439,23 @@ paso a paso.
 ### Orden de secciones
 
 1. Hero y breadcrumbs.
-2. Selector de modo, formulario y diagrama.
-3. Resultado, procedimiento y verificación.
+2. Calculadora mobile-first: selector, formulario, resultado y acciones.
+3. Procedimiento, verificación y diagrama conceptual.
 4. Explicación breve del teorema.
-5. Ejemplos resueltos.
+5. Ejemplos resueltos y presets frecuentes.
 6. Enlace a área y perímetro.
 7. Preguntas frecuentes visibles.
+
+### Requisitos visuales mobile-first
+
+- Sin overflow horizontal en anchos de `320px` y `360px`.
+- Inputs, selects y botones con altura táctil mínima de `44px`.
+- El resultado principal debe quedar cerca del formulario y aparecer sin saltos
+  bruscos de layout.
+- El procedimiento debe iniciar colapsado en móvil.
+- El diagrama no debe ser imprescindible para entender qué se calculó.
+- Evitar tarjetas anidadas; usar una superficie principal para la calculadora y
+  paneles secundarios simples.
 
 ### Componentes existentes
 
@@ -411,8 +518,21 @@ calculateMissingLeg(hypotenuse, knownLeg)
 validatePositiveLength(value)
 validateHypotenuseAndLeg(hypotenuse, leg)
 buildPythagoreanExplanation(mode, values, result)
-parseLengthInput(value)
-formatLength(value, unit, decimals)
+buildPythagoreanShareUrl(state)
+buildAreaPerimeterUrl(resolvedTriangle)
+parseLengthInput(value) // wrapper de parseMeasurement si hace falta
+formatLength(value, unit, decimals) // wrapper de formatLinearMeasurement si hace falta
+```
+
+Constantes sugeridas:
+
+```ts
+PYTHAGOREAN_PRESETS = [
+  { a: 3, b: 4, c: 5 },
+  { a: 5, b: 12, c: 13 },
+  { a: 8, b: 15, c: 17 },
+  { a: 7, b: 24, c: 25 },
+]
 ```
 
 ---
@@ -428,7 +548,13 @@ formatLength(value, unit, decimals)
 - Rechazar hipotenusa igual al cateto conocido.
 - Rechazar cero, negativos, `NaN` e `Infinity`.
 - Aceptar punto y coma decimal.
+- Interpretar `1,000` como `1000` según el parser geométrico.
 - Verificar que la explicación usa la fórmula del modo activo.
+- Verificar que la verificación no muestra igualdades exactas falsas cuando el
+  resultado visible está redondeado.
+- Verificar presets frecuentes y que rellenan el modo correcto.
+- Verificar URL compartible con `calcular`, valores, `unidad` y `decimales`.
+- Verificar URL prellenada hacia área y perímetro con los tres lados resueltos.
 - Mantener canonical único.
 
 ---
@@ -442,10 +568,16 @@ formatLength(value, unit, decimals)
 5. El resultado incluye fórmula, sustitución y verificación.
 6. El diagrama identifica el ángulo recto y el lado desconocido.
 7. El SVG tiene descripción textual equivalente.
-8. La URL compartible conserva modo, valores y unidad válidos.
-9. La interfaz funciona con teclado y en pantallas móviles.
-10. La lógica central tiene pruebas unitarias.
-11. El build de Astro termina correctamente.
+8. La URL compartible conserva modo, valores, unidad y decimales válidos.
+9. El usuario puede copiar resultado y enlace compartible.
+10. Los presets rellenan valores y recalculan sin cambiar unidad ni decimales.
+11. El enlace a área y perímetro aparece con valores prellenados después de un
+    resultado válido.
+12. La interfaz funciona con teclado y en pantallas móviles.
+13. No hay overflow horizontal en `320px` ni `360px`.
+14. El resultado principal queda visible cerca del formulario en móvil.
+15. La lógica central tiene pruebas unitarias.
+16. El build de Astro termina correctamente.
 
 ---
 
@@ -453,9 +585,10 @@ formatLength(value, unit, decimals)
 
 ### Fase 2 — Más resultados
 
-- Calcular área y perímetro desde los tres lados resueltos.
+- Calcular área y perímetro dentro de esta calculadora desde los tres lados
+  resueltos.
 - Mostrar ángulos agudos con trigonometría.
-- Presets de ternas pitagóricas frecuentes.
+- Más presets de ternas pitagóricas y ejemplos aplicados.
 
 ### Fase 3 — Solucionador de triángulos
 
@@ -463,4 +596,3 @@ formatLength(value, unit, decimals)
 - Ley de cosenos.
 - Triángulos no rectángulos.
 - Comparación visual entre métodos.
-
