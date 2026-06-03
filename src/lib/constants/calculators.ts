@@ -169,4 +169,13 @@ export const CALCULATORS: CalculatorDirectoryItem[] = [
     categorySlug: "geometria",
     order: 74,
   },
+  {
+    id: "calculadora-de-estadistica-basica",
+    title: "Calculadora de estadistica basica",
+    description:
+      "Calcula media, mediana y moda de una lista de numeros con resumen y tabla de frecuencias.",
+    href: "/matematicas/calculadora-de-estadistica-basica",
+    categorySlug: "matematicas",
+    order: 76,
+  },
 ];
