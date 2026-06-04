@@ -16,6 +16,7 @@ export const CATEGORY_SLUGS = [
   "conversores",
   "mascotas",
   "cocina",
+  "eventos-sociales",
 ] as const;
 
 export type CategorySlug = (typeof CATEGORY_SLUGS)[number];
@@ -82,6 +83,12 @@ export const CATEGORIES = {
     label: "Cocina",
     description:
       "Herramientas para ajustar recetas, convertir medidas culinarias y cocinar con cantidades más claras.",
+  },
+  "eventos-sociales": {
+    slug: "eventos-sociales",
+    label: "Eventos sociales",
+    description:
+      "Herramientas para organizar cuentas, propinas y cálculos prácticos en reuniones, comidas y salidas compartidas.",
   },
 } as const satisfies Record<CategorySlug, CategoryMetadata>;
 

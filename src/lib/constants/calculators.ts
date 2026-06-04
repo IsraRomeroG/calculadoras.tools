@@ -214,4 +214,13 @@ export const CALCULATORS: CalculatorDirectoryItem[] = [
     categorySlug: "mascotas",
     order: 84,
   },
+  {
+    id: "dividir-cuenta-en-restaurante",
+    title: "Dividir cuenta en restaurante",
+    description:
+      "Divide una cuenta entre varias personas, añade propina opcional y ajusta centavos o redondeo.",
+    href: "/eventos-sociales/dividir-cuenta-en-restaurante",
+    categorySlug: "eventos-sociales",
+    order: 86,
+  },
 ];

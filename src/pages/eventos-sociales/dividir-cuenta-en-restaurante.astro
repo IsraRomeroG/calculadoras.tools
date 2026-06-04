@@ -1,0 +1,897 @@
+---
+import BaseLayout from "@layouts/BaseLayout.astro";
+import Container from "@components/layout/Container.astro";
+import PageShell from "@components/layout/PageShell.astro";
+import FaqSection from "@components/shared/FaqSection.astro";
+import PageHero from "@components/shared/PageHero.astro";
+import SectionIntro from "@components/shared/SectionIntro.astro";
+import { buildFaqJsonLd } from "@lib/seo";
+
+const title = "Dividir cuenta en restaurante";
+const description =
+  "Divide una cuenta entre varias personas, añade propina opcional y ajusta centavos o redondeo.";
+const canonical = "/eventos-sociales/dividir-cuenta-en-restaurante";
+
+const faqs = [
+  {
+    question: "¿Cómo dividir una cuenta entre varias personas?",
+    answer:
+      "Escribe el total de la cuenta, el número de personas y la propina si aplica. La calculadora suma propina y cargos extra una sola vez, y después divide el total entre todas las personas.",
+  },
+  {
+    question: "¿Cómo añadir propina antes de dividir la cuenta?",
+    answer:
+      "Puedes capturar la propina como porcentaje de la cuenta o como monto fijo. En ambos casos se suma antes de calcular cuánto paga cada persona.",
+  },
+  {
+    question: "¿Qué pasa si el total no se divide exactamente?",
+    answer:
+      "El ajuste exacto reparte la unidad mínima de la moneda entre algunas personas. Así la cuenta cierra completa sin reunir dinero de más.",
+  },
+  {
+    question: "¿Por qué algunas personas pagan un centavo más?",
+    answer:
+      "Cuando el total no se puede repartir en partes idénticas, una o varias personas pagan una unidad mínima más para que el total reunido coincida con la cuenta.",
+  },
+  {
+    question: "¿Cómo redondear el pago sin perder dinero?",
+    answer:
+      "Activa el redondeo hacia arriba y elige un incremento. La calculadora muestra cuánto se reuniría y cuánto sobra por ese redondeo.",
+  },
+  {
+    question: "¿Qué hago si el ticket ya incluye servicio?",
+    answer:
+      "Activa la opción de servicio incluido. La propina queda en cero por defecto y se muestra un aviso si decides capturar una propina adicional.",
+  },
+  {
+    question: "¿La calculadora convierte monedas?",
+    answer:
+      "No. La moneda solo cambia el formato y la unidad mínima para ajustes. No realiza conversión de divisas.",
+  },
+];
+
+const faqJsonLd = buildFaqJsonLd(faqs);
+
+const currencies = [
+  { value: "MXN", label: "MXN" },
+  { value: "USD", label: "USD" },
+  { value: "EUR", label: "EUR" },
+  { value: "COP", label: "COP" },
+  { value: "ARS", label: "ARS" },
+  { value: "CLP", label: "CLP" },
+  { value: "PEN", label: "PEN" },
+  { value: "BRL", label: "BRL" },
+  { value: "OTHER", label: "Otra" },
+];
+---
+
+<BaseLayout title={title} description={description} canonical={canonical}>
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={JSON.stringify(faqJsonLd)} />
+  </Fragment>
+
+  <PageShell>
+    <PageHero
+      title={title}
+      description="Calcula cuánto paga cada quien, ajusta centavos si el total no divide exacto y revisa cualquier sobrante por redondeo."
+      kicker="Eventos sociales"
+      collapseBreadcrumbOnMobile
+      containerClass="py-5 md:py-7"
+      breadcrumbs={[
+        { label: "Inicio", href: "/", ariaLabel: "Inicio" },
+        {
+          label: "Eventos sociales",
+          href: "/eventos-sociales",
+          optional: true,
+        },
+        { label: "Dividir cuenta", truncate: true },
+      ]}
+    />
+
+    <Container as="section" class="py-4 md:py-7">
+      <section
+        id="bill-splitter"
+        class="overflow-hidden rounded-lg border border-gray-700 bg-gray-950 shadow-xl shadow-gray-950/30"
+        aria-labelledby="calculator-heading"
+      >
+        <div class="grid gap-0 lg:grid-cols-[minmax(0,1fr)_minmax(20rem,0.72fr)]">
+          <div class="p-4 sm:p-6">
+            <h2 id="calculator-heading" class="sr-only">
+              Calculadora para dividir cuenta en restaurante
+            </h2>
+
+            <div class="grid gap-4 sm:grid-cols-[minmax(0,1fr)_10rem]">
+              <div>
+                <label for="bill-amount" class="block text-sm font-semibold text-gray-200">
+                  Cuenta antes de propina
+                </label>
+                <input
+                  id="bill-amount"
+                  class="mt-2 min-h-14 w-full rounded-lg border border-gray-700 bg-gray-900 px-4 text-2xl font-semibold text-white outline-none placeholder:text-gray-600 transition focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15"
+                  type="text"
+                  inputmode="decimal"
+                  autocomplete="off"
+                  placeholder="1200"
+                  aria-describedby="bill-error"
+                  data-bill
+                />
+                <p id="bill-error" class="mt-2 min-h-5 text-sm text-red-300" data-error="bill"></p>
+              </div>
+
+              <div>
+                <label for="currency" class="block text-sm font-semibold text-gray-200">
+                  Moneda
+                </label>
+                <select
+                  id="currency"
+                  class="mt-2 min-h-14 w-full rounded-lg border border-gray-700 bg-gray-900 px-4 text-base text-white outline-none transition focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15"
+                  data-currency
+                >
+                  {currencies.map((currency) => (
+                    <option value={currency.value}>{currency.label}</option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
+            <div class="mt-5">
+              <label for="people" class="block text-sm font-semibold text-gray-200">
+                Personas
+              </label>
+              <div class="mt-2 grid grid-cols-[3.25rem_minmax(0,1fr)_3.25rem] overflow-hidden rounded-lg border border-gray-700 bg-gray-900 focus-within:border-amber-400 focus-within:ring-3 focus-within:ring-amber-400/15">
+                <button
+                  class="min-h-14 border-r border-gray-700 text-xl font-semibold text-gray-200 transition hover:bg-gray-800 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/30"
+                  type="button"
+                  aria-label="Restar persona"
+                  data-people-step="-1"
+                >
+                  -
+                </button>
+                <input
+                  id="people"
+                  class="min-h-14 w-full bg-transparent px-4 text-center text-xl font-semibold text-white outline-none"
+                  type="text"
+                  inputmode="numeric"
+                  autocomplete="off"
+                  value="2"
+                  aria-describedby="people-error people-warning"
+                  data-people
+                />
+                <button
+                  class="min-h-14 border-l border-gray-700 text-xl font-semibold text-gray-200 transition hover:bg-gray-800 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/30"
+                  type="button"
+                  aria-label="Sumar persona"
+                  data-people-step="1"
+                >
+                  +
+                </button>
+              </div>
+              <div class="mt-3 flex gap-2 overflow-x-auto" aria-label="Presets de personas">
+                {[2, 3, 4, 5, 6].map((people) => (
+                  <button
+                    class="min-h-10 min-w-12 rounded-lg border border-gray-700 px-3 text-sm font-semibold text-gray-200 transition hover:border-amber-400 hover:text-white focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/30"
+                    type="button"
+                    data-people-preset={people}
+                  >
+                    {people}
+                  </button>
+                ))}
+              </div>
+              <p id="people-error" class="mt-2 min-h-5 text-sm text-red-300" data-error="people"></p>
+              <p id="people-warning" class="text-sm text-amber-200" data-warning="people"></p>
+            </div>
+
+            <div class="mt-5 rounded-lg border border-gray-800 bg-gray-900/65 p-4">
+              <div class="flex flex-wrap items-center justify-between gap-3">
+                <label for="tip-value" class="text-sm font-semibold text-gray-200">
+                  Propina
+                </label>
+                <div class="flex rounded-lg border border-gray-700 p-1" role="tablist" aria-label="Tipo de propina">
+                  <button
+                    class="min-h-10 rounded-md px-3 text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/30"
+                    type="button"
+                    data-tip-type="percentage"
+                    aria-pressed="true"
+                  >
+                    %
+                  </button>
+                  <button
+                    class="min-h-10 rounded-md px-3 text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/30"
+                    type="button"
+                    data-tip-type="fixed"
+                    aria-pressed="false"
+                  >
+                    monto
+                  </button>
+                </div>
+              </div>
+              <input
+                id="tip-value"
+                class="mt-3 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-950 px-4 text-base text-white outline-none placeholder:text-gray-600 transition focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15"
+                type="text"
+                inputmode="decimal"
+                autocomplete="off"
+                value="0"
+                aria-describedby="tip-error tip-warning"
+                data-tip-value
+              />
+              <p id="tip-error" class="mt-2 min-h-5 text-sm text-red-300" data-error="tip"></p>
+              <p id="tip-warning" class="text-sm text-amber-200" data-warning="tip"></p>
+
+              <label class="mt-3 flex items-start gap-3 rounded-lg border border-gray-800 bg-gray-950 p-3 text-sm text-gray-300">
+                <input
+                  class="mt-1 h-4 w-4 rounded border-gray-700 bg-gray-900 text-amber-400 focus:ring-amber-400"
+                  type="checkbox"
+                  data-service-included
+                />
+                <span>El ticket ya incluye servicio o propina</span>
+              </label>
+            </div>
+
+            <details class="mt-5 rounded-lg border border-gray-800 bg-gray-900/65 p-4">
+              <summary class="cursor-pointer text-sm font-semibold text-gray-200">
+                Opciones avanzadas
+              </summary>
+
+              <div class="mt-4 grid gap-4 sm:grid-cols-2">
+                <div>
+                  <label for="additional-charges" class="block text-sm font-semibold text-gray-200">
+                    Servicio, cargo extra u otros cargos
+                  </label>
+                  <input
+                    id="additional-charges"
+                    class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-950 px-4 text-base text-white outline-none placeholder:text-gray-600 transition focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15"
+                    type="text"
+                    inputmode="decimal"
+                    autocomplete="off"
+                    value="0"
+                    aria-describedby="charges-error"
+                    data-charges
+                  />
+                  <p id="charges-error" class="mt-2 min-h-5 text-sm text-red-300" data-error="charges"></p>
+                </div>
+
+                <div>
+                  <p class="block text-sm font-semibold text-gray-200">Ajustes</p>
+                  <label class="mt-3 flex min-h-12 items-center gap-3 rounded-lg border border-gray-700 bg-gray-950 px-3 text-sm text-gray-300">
+                    <input
+                      class="h-4 w-4 rounded border-gray-700 bg-gray-900 text-amber-400 focus:ring-amber-400"
+                      type="checkbox"
+                      checked
+                      data-exact-adjustment
+                    />
+                    <span>Ajustar centavos exactos</span>
+                  </label>
+                  <label class="mt-3 flex min-h-12 items-center gap-3 rounded-lg border border-gray-700 bg-gray-950 px-3 text-sm text-gray-300">
+                    <input
+                      class="h-4 w-4 rounded border-gray-700 bg-gray-900 text-amber-400 focus:ring-amber-400"
+                      type="checkbox"
+                      data-rounding-enabled
+                    />
+                    <span>Redondear pago hacia arriba</span>
+                  </label>
+                </div>
+              </div>
+
+              <div class="mt-4">
+                <label for="rounding-increment" class="block text-sm font-semibold text-gray-200">
+                  Incremento de redondeo
+                </label>
+                <select
+                  id="rounding-increment"
+                  class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-950 px-4 text-base text-white outline-none transition focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15 disabled:cursor-not-allowed disabled:opacity-60"
+                  disabled
+                  data-rounding-increment
+                >
+                  <option value="1">1</option>
+                  <option value="5">5</option>
+                  <option value="10">10</option>
+                  <option value="minimum">Unidad mínima</option>
+                </select>
+              </div>
+            </details>
+          </div>
+
+          <aside
+            class="border-t border-gray-800 bg-gray-900/70 p-4 sm:p-6 lg:border-l lg:border-t-0"
+            aria-live="polite"
+            data-result-region
+          >
+            <p class="text-xs font-semibold uppercase tracking-wide text-amber-400" data-result-kicker>
+              Resultado
+            </p>
+            <p class="mt-3 break-words text-3xl font-bold leading-tight text-white" data-main-result>
+              Ingresa la cuenta
+            </p>
+            <p class="mt-2 min-h-5 text-sm leading-relaxed text-gray-400" data-result-note>
+              El desglose aparecerá aquí.
+            </p>
+
+            <div class="mt-5 space-y-3" data-breakdown-list></div>
+
+            <div
+              class="mt-4 hidden rounded-lg border border-amber-400/40 bg-amber-400/10 p-3 text-sm leading-relaxed text-amber-100"
+              data-result-warning
+            ></div>
+
+            <div class="mt-5 flex flex-col gap-3 sm:flex-row">
+              <button
+                class="hidden min-h-11 items-center justify-center rounded-lg bg-amber-400 px-4 py-2 text-sm font-semibold text-gray-950 transition hover:bg-amber-300 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/40"
+                type="button"
+                data-copy-result
+              >
+                Copiar resultado
+              </button>
+              <button
+                class="hidden min-h-11 items-center justify-center rounded-lg border border-gray-700 px-4 py-2 text-sm font-semibold text-gray-200 transition hover:border-amber-400 hover:text-white focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/40"
+                type="button"
+                data-copy-url
+              >
+                Copiar enlace
+              </button>
+            </div>
+            <p class="mt-3 min-h-5 text-sm text-emerald-300" role="status" aria-live="polite" data-copy-status></p>
+          </aside>
+        </div>
+      </section>
+
+      <div
+        class="fixed inset-x-0 bottom-0 z-30 hidden border-t border-gray-800 bg-gray-950/95 px-4 py-3 shadow-2xl shadow-black/50 backdrop-blur md:hidden"
+        data-mobile-total
+      >
+        <div class="mx-auto flex max-w-xl items-center justify-between gap-3">
+          <span class="text-xs font-semibold uppercase tracking-wide text-gray-500">Pago</span>
+          <span class="break-words text-right text-lg font-bold text-amber-100" data-mobile-total-text></span>
+        </div>
+      </div>
+    </Container>
+
+    <Container as="section" class="py-6 md:py-8">
+      <SectionIntro
+        title="Formas de cerrar la cuenta"
+        description="Puedes mantener el total exacto con ajuste de centavos o redondear hacia arriba cuando el grupo prefiere pagos más simples."
+      />
+      <div class="grid gap-4 md:grid-cols-3">
+        <article class="rounded-lg border border-gray-800 bg-gray-950 p-5">
+          <h3 class="text-lg font-semibold">Ajuste exacto</h3>
+          <p class="mt-3 text-sm leading-relaxed text-gray-400">
+            Reparte centavos o unidades mínimas para que el total reunido cierre
+            sin sobrante.
+          </p>
+        </article>
+        <article class="rounded-lg border border-gray-800 bg-gray-950 p-5">
+          <h3 class="text-lg font-semibold">Redondeo visible</h3>
+          <p class="mt-3 text-sm leading-relaxed text-gray-400">
+            Si redondeas cada pago, se muestra el total reunido y la diferencia.
+          </p>
+        </article>
+        <article class="rounded-lg border border-gray-800 bg-gray-950 p-5">
+          <h3 class="text-lg font-semibold">Propina incluida</h3>
+          <p class="mt-3 text-sm leading-relaxed text-gray-400">
+            Marca el ticket como servicio incluido para evitar sumar propina dos
+            veces sin darte cuenta.
+          </p>
+        </article>
+      </div>
+    </Container>
+
+    <Container as="section" class="py-6 md:py-8">
+      <SectionIntro
+        title="Propina"
+        description="Si solo necesitas calcular porcentajes de propina con más detalle, usa la calculadora dedicada."
+      />
+      <div class="rounded-lg border border-gray-800 bg-gray-950 p-5">
+        <a
+          href="/eventos-sociales/calculadora-de-propina"
+          class="inline-flex min-h-11 items-center rounded-lg border border-amber-400/60 px-4 py-2 text-sm font-semibold text-amber-300 transition hover:bg-amber-400/10 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/30"
+        >
+          Abrir calculadora de propina
+        </a>
+      </div>
+    </Container>
+
+    <FaqSection faqs={faqs} />
+  </PageShell>
+</BaseLayout>
+
+<script>
+  import {
+    BILL_SPLIT_CURRENCIES,
+    buildShareText,
+    calculateEqualBillSplit,
+    formatMoney,
+    parseMoneyInput,
+  } from "@lib/calculators/eventos-sociales/dividir-cuenta-en-restaurante/billSplitting";
+
+  const ERROR_MESSAGES = {
+    required: "Escribe un monto para calcular.",
+    invalid: "Escribe un monto válido.",
+    negative: "Usa un monto igual o mayor a cero.",
+    too_many_decimals: "Usa máximo 4 decimales.",
+  };
+
+  const billInput = document.querySelector("[data-bill]");
+  const peopleInput = document.querySelector("[data-people]");
+  const currencySelect = document.querySelector("[data-currency]");
+  const tipTypeButtons = Array.from(document.querySelectorAll("[data-tip-type]"));
+  const tipInput = document.querySelector("[data-tip-value]");
+  const serviceIncludedInput = document.querySelector("[data-service-included]");
+  const chargesInput = document.querySelector("[data-charges]");
+  const exactAdjustmentInput = document.querySelector("[data-exact-adjustment]");
+  const roundingEnabledInput = document.querySelector("[data-rounding-enabled]");
+  const roundingIncrementSelect = document.querySelector("[data-rounding-increment]");
+  const mainResult = document.querySelector("[data-main-result]");
+  const resultNote = document.querySelector("[data-result-note]");
+  const breakdownList = document.querySelector("[data-breakdown-list]");
+  const resultWarning = document.querySelector("[data-result-warning]");
+  const copyButton = document.querySelector("[data-copy-result]");
+  const copyUrlButton = document.querySelector("[data-copy-url]");
+  const copyStatus = document.querySelector("[data-copy-status]");
+  const mobileTotal = document.querySelector("[data-mobile-total]");
+  const mobileTotalText = document.querySelector("[data-mobile-total-text]");
+
+  let tipType = "percentage";
+  let currentShareText = "";
+  let currentShareUrl = window.location.href;
+  let copyTimer = 0;
+  let urlTimer = 0;
+
+  function setError(field, message = "") {
+    const element = document.querySelector(`[data-error="${field}"]`);
+
+    if (element) {
+      element.textContent = message;
+    }
+  }
+
+  function setWarning(field, message = "") {
+    const element = document.querySelector(`[data-warning="${field}"]`);
+
+    if (element) {
+      element.textContent = message;
+    }
+  }
+
+  function getCurrency() {
+    return BILL_SPLIT_CURRENCIES.includes(currencySelect.value)
+      ? currencySelect.value
+      : "OTHER";
+  }
+
+  function parseOptionalMoney(input) {
+    if (!input.value.trim()) {
+      return { ok: true, value: 0, normalized: "0" };
+    }
+
+    return parseMoneyInput(input.value);
+  }
+
+  function parsePeople() {
+    const value = peopleInput.value.trim();
+
+    if (!/^\d+$/.test(value)) {
+      return { ok: false, error: "Las personas deben ser un número entero." };
+    }
+
+    const people = Number(value);
+
+    if (!Number.isInteger(people) || people < 1) {
+      return { ok: false, error: "Usa al menos 1 persona." };
+    }
+
+    return { ok: true, value: people };
+  }
+
+  function setTipType(nextType) {
+    tipType = nextType === "fixed" ? "fixed" : "percentage";
+    tipTypeButtons.forEach((button) => {
+      const isActive = button.dataset.tipType === tipType;
+      button.setAttribute("aria-pressed", String(isActive));
+      button.classList.toggle("bg-amber-400", isActive);
+      button.classList.toggle("text-gray-950", isActive);
+      button.classList.toggle("text-gray-300", !isActive);
+    });
+    updateCalculator();
+  }
+
+  function setNeutralResult(message = "Ingresa la cuenta") {
+    mainResult.textContent = message;
+    resultNote.textContent = "El desglose aparecerá aquí.";
+    breakdownList.replaceChildren();
+    resultWarning.classList.add("hidden");
+    resultWarning.textContent = "";
+    copyButton.classList.add("hidden");
+    copyButton.classList.remove("inline-flex");
+    copyUrlButton.classList.add("hidden");
+    copyUrlButton.classList.remove("inline-flex");
+    mobileTotal.classList.add("hidden");
+    currentShareText = "";
+  }
+
+  function addBreakdownRow(label, value) {
+    const row = document.createElement("div");
+    const labelElement = document.createElement("span");
+    const valueElement = document.createElement("span");
+
+    row.className =
+      "flex items-start justify-between gap-4 rounded-lg border border-gray-800 bg-gray-950/70 p-4";
+    labelElement.className = "min-w-0 text-sm text-gray-400";
+    valueElement.className =
+      "break-words text-right text-sm font-semibold text-white";
+    labelElement.textContent = label;
+    valueElement.textContent = value;
+    row.append(labelElement, valueElement);
+    breakdownList.append(row);
+  }
+
+  function getPrimaryPaymentText(result) {
+    if (result.rounding) {
+      return formatMoney(result.rounding.roundedPayment, result.currency);
+    }
+
+    if (result.exactAdjustment?.payments.length === 1) {
+      return formatMoney(result.exactAdjustment.payments[0].amount, result.currency);
+    }
+
+    if (result.exactAdjustment?.payments.length) {
+      return result.exactAdjustment.payments
+        .map(
+          (payment) =>
+            `${payment.count}× ${formatMoney(payment.amount, result.currency)}`,
+        )
+        .join(" · ");
+    }
+
+    return formatMoney(result.exactIndividualPayment, result.currency);
+  }
+
+  function renderResult(result, warnings) {
+    const primaryPayment = getPrimaryPaymentText(result);
+
+    mainResult.textContent = result.rounding
+      ? `Cada persona paga ${primaryPayment}`
+      : primaryPayment;
+    resultNote.textContent = result.rounding
+      ? "Redondeo hacia arriba activo."
+      : result.exactAdjustment?.payments.length > 1
+        ? "Cuenta cerrada con ajuste exacto."
+        : `${result.people} ${result.people === 1 ? "persona" : "personas"}.`;
+    breakdownList.replaceChildren();
+
+    addBreakdownRow("Cuenta", formatMoney(result.bill, result.currency));
+    addBreakdownRow(
+      `Propina (${result.tipLabel})`,
+      formatMoney(result.tipAmount, result.currency),
+    );
+    addBreakdownRow(
+      "Cargos adicionales",
+      formatMoney(result.additionalCharges, result.currency),
+    );
+    addBreakdownRow("Total", formatMoney(result.total, result.currency));
+    addBreakdownRow(
+      "Pago exacto por persona",
+      formatMoney(result.exactIndividualPayment, result.currency),
+    );
+    addBreakdownRow(
+      "Cuenta base por persona",
+      formatMoney(result.basePerPerson, result.currency),
+    );
+    addBreakdownRow(
+      "Propina por persona",
+      formatMoney(result.tipPerPerson, result.currency),
+    );
+    addBreakdownRow(
+      "Cargos por persona",
+      formatMoney(result.chargesPerPerson, result.currency),
+    );
+
+    if (result.rounding) {
+      addBreakdownRow(
+        "Pago redondeado por persona",
+        formatMoney(result.rounding.roundedPayment, result.currency),
+      );
+      addBreakdownRow(
+        "Total reunido",
+        formatMoney(result.rounding.totalCollected, result.currency),
+      );
+      addBreakdownRow(
+        "Diferencia por redondeo",
+        formatMoney(result.rounding.difference, result.currency),
+      );
+    } else if (result.exactAdjustment?.payments.length) {
+      result.exactAdjustment.payments.forEach((payment) => {
+        addBreakdownRow(
+          `${payment.count} ${
+            payment.count === 1 ? "persona paga" : "personas pagan"
+          }`,
+          formatMoney(payment.amount, result.currency),
+        );
+      });
+      addBreakdownRow(
+        "Diferencia",
+        formatMoney(result.exactAdjustment.difference, result.currency),
+      );
+    }
+
+    if (warnings.length) {
+      resultWarning.textContent = warnings.join(" ");
+      resultWarning.classList.remove("hidden");
+    } else {
+      resultWarning.textContent = "";
+      resultWarning.classList.add("hidden");
+    }
+
+    currentShareText = buildShareText(result);
+    copyButton.classList.remove("hidden");
+    copyButton.classList.add("inline-flex");
+    copyUrlButton.classList.remove("hidden");
+    copyUrlButton.classList.add("inline-flex");
+    mobileTotalText.textContent = primaryPayment;
+    mobileTotal.classList.remove("hidden");
+  }
+
+  function updateCalculator({ syncUrl = true } = {}) {
+    setError("bill");
+    setError("people");
+    setError("tip");
+    setError("charges");
+    setWarning("people");
+    setWarning("tip");
+
+    roundingIncrementSelect.disabled = !roundingEnabledInput.checked;
+
+    if (!billInput.value.trim()) {
+      setNeutralResult();
+      if (syncUrl) {
+        syncShareUrl(null);
+      }
+      return;
+    }
+
+    const bill = parseMoneyInput(billInput.value);
+    const people = parsePeople();
+    const tip = parseOptionalMoney(tipInput);
+    const charges = parseOptionalMoney(chargesInput);
+
+    if (!bill.ok) {
+      setError("bill", ERROR_MESSAGES[bill.error] ?? ERROR_MESSAGES.invalid);
+    }
+
+    if (!people.ok) {
+      setError("people", people.error);
+    } else if (people.value > 100) {
+      setWarning("people", "Grupo grande: revisa que el número sea correcto.");
+    }
+
+    if (!tip.ok) {
+      setError("tip", ERROR_MESSAGES[tip.error] ?? ERROR_MESSAGES.invalid);
+    }
+
+    if (!charges.ok) {
+      setError(
+        "charges",
+        ERROR_MESSAGES[charges.error] ?? ERROR_MESSAGES.invalid,
+      );
+    }
+
+    if (!bill.ok || !people.ok || !tip.ok || !charges.ok) {
+      setNeutralResult("Revisa los campos");
+      return;
+    }
+
+    const warnings = [];
+
+    if (tipType === "percentage" && tip.value > 100) {
+      warnings.push("Propina mayor a 100%: revisa que sea intencional.");
+    }
+
+    if (serviceIncludedInput.checked && tip.value > 0) {
+      warnings.push(
+        "Revisa que no estés duplicando una propina o cargo de servicio ya incluido.",
+      );
+    }
+
+    try {
+      const result = calculateEqualBillSplit({
+        bill: bill.value,
+        people: people.value,
+        tip: {
+          type: tipType === "fixed" ? "fixed" : "percentage",
+          value: tip.value,
+        },
+        additionalCharges: charges.value,
+        currency: getCurrency(),
+        exactCentAdjustment: exactAdjustmentInput.checked,
+        rounding: {
+          enabled: roundingEnabledInput.checked,
+          increment:
+            roundingIncrementSelect.value === "minimum"
+              ? "minimum"
+              : Number(roundingIncrementSelect.value),
+        },
+      });
+
+      renderResult(result, warnings);
+
+      if (syncUrl) {
+        syncShareUrl({
+          bill,
+          people: people.value,
+          tip,
+          charges,
+          currency: result.currency,
+        });
+      }
+    } catch {
+      setNeutralResult("No se puede calcular");
+    }
+  }
+
+  function syncShareUrl(values) {
+    const url = new URL(window.location.href);
+    url.search = "";
+
+    if (values) {
+      url.searchParams.set("cuenta", values.bill.normalized);
+      url.searchParams.set("personas", String(values.people));
+      url.searchParams.set(
+        "tipoPropina",
+        tipType === "fixed" ? "monto" : "porcentaje",
+      );
+      url.searchParams.set("propina", values.tip.normalized);
+      url.searchParams.set("cargo", values.charges.normalized);
+      url.searchParams.set(
+        "ajusteCentavos",
+        exactAdjustmentInput.checked ? "1" : "0",
+      );
+      url.searchParams.set(
+        "redondeo",
+        roundingEnabledInput.checked ? "arriba" : "ninguno",
+      );
+      url.searchParams.set("incremento", roundingIncrementSelect.value);
+      url.searchParams.set(
+        "servicioIncluido",
+        serviceIncludedInput.checked ? "1" : "0",
+      );
+      url.searchParams.set("moneda", values.currency);
+    }
+
+    currentShareUrl = url.toString();
+    window.clearTimeout(urlTimer);
+    urlTimer = window.setTimeout(() => {
+      window.history.replaceState({}, "", url);
+    }, 250);
+  }
+
+  function loadUrlParameters() {
+    const params = new URLSearchParams(window.location.search);
+    const cuenta = params.get("cuenta");
+    const personas = params.get("personas");
+    const tipoPropina = params.get("tipoPropina");
+    const propina = params.get("propina");
+    const cargo = params.get("cargo");
+    const moneda = params.get("moneda");
+    const ajusteCentavos = params.get("ajusteCentavos");
+    const redondeo = params.get("redondeo");
+    const incremento = params.get("incremento");
+    const servicioIncluido = params.get("servicioIncluido");
+
+    if (cuenta && parseMoneyInput(cuenta).ok) {
+      billInput.value = cuenta;
+    }
+
+    if (personas && /^\d+$/.test(personas) && Number(personas) >= 1) {
+      peopleInput.value = personas;
+    }
+
+    if (tipoPropina === "monto") {
+      tipType = "fixed";
+    }
+
+    if (propina && parseMoneyInput(propina).ok) {
+      tipInput.value = propina;
+    }
+
+    if (cargo && parseMoneyInput(cargo).ok) {
+      chargesInput.value = cargo;
+    }
+
+    if (moneda && BILL_SPLIT_CURRENCIES.includes(moneda)) {
+      currencySelect.value = moneda;
+    }
+
+    if (ajusteCentavos === "0" || ajusteCentavos === "1") {
+      exactAdjustmentInput.checked = ajusteCentavos === "1";
+    }
+
+    if (redondeo === "arriba" || redondeo === "ninguno") {
+      roundingEnabledInput.checked = redondeo === "arriba";
+    }
+
+    if (["1", "5", "10", "minimum"].includes(incremento)) {
+      roundingIncrementSelect.value = incremento;
+    }
+
+    if (servicioIncluido === "0" || servicioIncluido === "1") {
+      serviceIncludedInput.checked = servicioIncluido === "1";
+    }
+  }
+
+  async function copyText(text, successMessage) {
+    try {
+      if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(text);
+      } else {
+        const textArea = document.createElement("textarea");
+        textArea.value = text;
+        textArea.setAttribute("readonly", "");
+        textArea.style.position = "fixed";
+        textArea.style.opacity = "0";
+        document.body.append(textArea);
+        textArea.select();
+        document.execCommand("copy");
+        textArea.remove();
+      }
+      copyStatus.textContent = successMessage;
+    } catch {
+      copyStatus.textContent = "No fue posible copiar automáticamente.";
+    }
+
+    window.clearTimeout(copyTimer);
+    copyTimer = window.setTimeout(() => {
+      copyStatus.textContent = "";
+    }, 2500);
+  }
+
+  document.querySelectorAll("[data-people-step]").forEach((button) => {
+    button.addEventListener("click", () => {
+      const current = parsePeople();
+      const nextValue = current.ok ? current.value + Number(button.dataset.peopleStep) : 2;
+
+      peopleInput.value = String(Math.max(1, nextValue));
+      updateCalculator();
+    });
+  });
+
+  document.querySelectorAll("[data-people-preset]").forEach((button) => {
+    button.addEventListener("click", () => {
+      peopleInput.value = button.dataset.peoplePreset;
+      updateCalculator();
+    });
+  });
+
+  tipTypeButtons.forEach((button) => {
+    button.addEventListener("click", () => {
+      setTipType(button.dataset.tipType);
+    });
+  });
+
+  [
+    billInput,
+    peopleInput,
+    currencySelect,
+    tipInput,
+    serviceIncludedInput,
+    chargesInput,
+    exactAdjustmentInput,
+    roundingEnabledInput,
+    roundingIncrementSelect,
+  ].forEach((input) => {
+    input.addEventListener("input", () => updateCalculator());
+    input.addEventListener("change", () => updateCalculator());
+  });
+
+  copyButton.addEventListener("click", () => {
+    if (currentShareText) {
+      copyText(currentShareText, "Resultado copiado.");
+    }
+  });
+
+  copyUrlButton.addEventListener("click", () => {
+    copyText(currentShareUrl, "Enlace copiado.");
+  });
+
+  loadUrlParameters();
+  setTipType(tipType);
+  updateCalculator({ syncUrl: false });
+</script>

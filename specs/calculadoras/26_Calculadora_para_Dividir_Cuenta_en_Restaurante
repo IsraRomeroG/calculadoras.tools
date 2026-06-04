@@ -4,7 +4,8 @@
 
 Herramienta para repartir una cuenta de restaurante entre varias personas de
 forma clara. Debe calcular cuánto paga cada persona, permitir añadir una
-propina opcional y mostrar cualquier diferencia creada por redondeo.
+propina opcional, ajustar centavos cuando el total no se divide exactamente y
+mostrar cualquier diferencia creada por redondeo.
 
 El MVP se concentra en división equitativa. El reparto por platillos o consumos
 individuales queda para una fase posterior.
@@ -38,7 +39,7 @@ src/pages/eventos-sociales/dividir-cuenta-en-restaurante.astro
   id: "dividir-cuenta-en-restaurante",
   title: "Dividir cuenta en restaurante",
   description:
-    "Divide una cuenta entre varias personas, añade propina opcional y revisa el ajuste por redondeo.",
+    "Divide una cuenta entre varias personas, añade propina opcional y ajusta centavos o redondeo.",
   href: "/eventos-sociales/dividir-cuenta-en-restaurante",
   categorySlug: "eventos-sociales",
   order: 86,
@@ -63,10 +64,14 @@ src/lib/calculators/eventos-sociales/dividir-cuenta-en-restaurante/billSplitting
 3. Propina opcional por porcentaje o monto fijo.
 4. Cargos adicionales opcionales.
 5. División equitativa.
-6. Redondeo configurable del pago individual.
-7. Diferencia causada por redondeo.
-8. Resultado copiable y URL compartible.
-9. Accesibilidad y pruebas unitarias.
+6. Ajuste exacto de centavos para cerrar el total sin cobrar de más.
+7. Redondeo configurable del pago individual.
+8. Diferencia causada por redondeo.
+9. Aviso cuando el ticket ya incluye servicio o propina.
+10. Desglose por persona de cuenta base, propina, cargos y total.
+11. Resultado copiable listo para compartir por mensaje.
+12. URL compartible.
+13. Accesibilidad y pruebas unitarias.
 
 ### Fuera del MVP
 
@@ -77,6 +82,7 @@ src/lib/calculators/eventos-sociales/dividir-cuenta-en-restaurante/billSplitting
 - Solicitudes de pago o enlaces bancarios.
 - Escaneo de tickets.
 - Cálculo de impuestos por país.
+- Recomendaciones normativas sobre qué propina dejar.
 
 Enlazar la calculadora de propina para quien necesite revisar porcentajes con
 más detalle.
@@ -87,10 +93,13 @@ más detalle.
 
 | Campo | Tipo | Default |
 |-------|------|---------|
-| Cuenta antes de propina | Texto monetario | Vacío |
-| Personas | Entero | `2` |
-| Propina | Toggle: porcentaje o monto | `0%` |
+| Cuenta antes de propina | Texto monetario con `inputmode="decimal"` | Vacío |
+| Personas | Entero con stepper y presets rápidos | `2` |
+| Moneda para formato | Selector | `MXN` |
+| Propina | Control segmentado: porcentaje o monto | `0%` |
+| Servicio o propina ya incluida | Toggle | Desactivado |
 | Cargos adicionales | Monto opcional | `0` |
+| Ajuste de centavos | Toggle | Activado |
 | Redondear pago individual | Toggle | Desactivado |
 | Incremento de redondeo | Selector | `1`, `5`, `10` o unidad monetaria mínima |
 
@@ -110,6 +119,40 @@ Otra
 
 No realizar conversión de divisas.
 
+La moneda solo afecta formato y unidad mínima para ajustes. La implementación
+debe derivar los decimales con un helper estable, por ejemplo:
+
+```text
+MXN, USD, EUR, ARS, PEN, BRL -> 0.01
+CLP, COP -> 1
+Otra -> 0.01
+```
+
+Si una moneda se configura sin decimales, el ajuste exacto reparte unidades
+completas en lugar de centavos.
+
+Presets rápidos para personas:
+
+```text
+2
+3
+4
+5
+6
+```
+
+El campo "Cargos adicionales" debe etiquetarse en UI como "Servicio, cargo extra
+u otros cargos" para que el usuario entienda que se suma una sola vez antes de
+dividir.
+
+Si "Servicio o propina ya incluida" está activo, la propina debe mantenerse en
+`0` por defecto. El usuario puede capturar una propina adicional manualmente,
+pero la UI debe mostrar un aviso claro:
+
+```text
+Revisa que no estés duplicando una propina o cargo de servicio ya incluido.
+```
+
 ---
 
 ## Fórmulas
@@ -127,6 +170,39 @@ total = cuenta + propina + cargos adicionales
 pago individual exacto = total ÷ personas
 ```
 
+### Ajuste exacto de centavos
+
+Cuando el total no se divide exactamente entre todas las personas, permitir
+cerrar la cuenta sin cobrar de más distribuyendo la unidad monetaria mínima
+entre algunas personas.
+
+Para evitar errores de coma flotante, el cálculo de ajuste debe trabajar en
+unidades mínimas enteras cuando sea posible.
+
+```text
+total en unidades = round(total ÷ unidad mínima)
+pago base en unidades = floor(total en unidades ÷ personas)
+unidades restantes = total en unidades - (pago base en unidades × personas)
+
+pago ajustado bajo = pago base en unidades × unidad mínima
+pago ajustado alto = (pago base en unidades + 1) × unidad mínima
+
+personas con pago alto = unidades restantes
+personas con pago bajo = personas - unidades restantes
+```
+
+Ejemplo para `$1,000.00 MXN` entre `3` personas:
+
+```text
+2 personas pagan $333.33 MXN
+1 persona paga $333.34 MXN
+Total reunido: $1,000.00 MXN
+Diferencia: $0.00 MXN
+```
+
+Este ajuste es el comportamiento recomendado por defecto cuando la moneda tiene
+centavos. Para monedas sin decimales, usar la unidad mínima de la moneda.
+
 ### Redondeo opcional hacia arriba
 
 ```text
@@ -139,6 +215,10 @@ diferencia = total reunido - total
 
 Mostrar siempre la diferencia. No ocultar que el redondeo puede reunir más
 dinero que el total de la cuenta.
+
+Si el redondeo hacia arriba está activo, tiene prioridad visual sobre el ajuste
+exacto de centavos, porque puede reunir más dinero que el total real. Aun así,
+mostrar el pago exacto y la diferencia.
 
 ---
 
@@ -156,6 +236,27 @@ Cada persona paga: $330.00 MXN
 4 personas
 ```
 
+Desglose recomendado por persona:
+
+```text
+Cuenta base por persona: $300.00 MXN
+Propina por persona: $30.00 MXN
+Cargos por persona: $0.00 MXN
+Total por persona: $330.00 MXN
+```
+
+Ejemplo con ajuste exacto de centavos:
+
+```text
+Total: $1,000.00 MXN
+Pago exacto por persona: $333.333333... MXN
+
+2 personas pagan: $333.33 MXN
+1 persona paga: $333.34 MXN
+Total reunido: $1,000.00 MXN
+Diferencia: $0.00 MXN
+```
+
 Ejemplo con redondeo:
 
 ```text
@@ -163,6 +264,43 @@ Pago exacto por persona: $326.67 MXN
 Pago redondeado por persona: $330.00 MXN
 Total reunido: $990.00 MXN
 Diferencia: +$10.00 MXN
+```
+
+### Resultado copiable
+
+El botón de copiar debe generar un texto breve y accionable para enviar por
+WhatsApp, mensajes o chat.
+
+Sin redondeo:
+
+```text
+Cuenta dividida:
+Total: $1,320.00 MXN
+Personas: 4
+Cada persona paga: $330.00 MXN
+Propina incluida: $120.00 MXN
+```
+
+Con ajuste exacto de centavos:
+
+```text
+Cuenta dividida:
+Total: $1,000.00 MXN
+Personas: 3
+2 personas pagan: $333.33 MXN
+1 persona paga: $333.34 MXN
+Diferencia: $0.00 MXN
+```
+
+Con redondeo:
+
+```text
+Cuenta dividida:
+Total: $980.00 MXN
+Personas: 3
+Cada persona paga: $330.00 MXN
+Total reunido: $990.00 MXN
+Sobra por redondeo: $10.00 MXN
 ```
 
 ---
@@ -179,30 +317,59 @@ Diferencia: +$10.00 MXN
 | Personas mayor que `100` | Pedir revisar |
 | Propina porcentual menor que `0` | Rechazar |
 | Propina porcentual mayor que `100` | Pedir revisar |
+| Propina fija negativa | Rechazar |
 | Cargo adicional negativo | Rechazar |
+| Moneda no soportada | Usar `Otra` para formato simple |
 | Resultado no finito | No calcular |
 
 Aceptar punto o coma decimal. Mantener precisión completa y redondear al
 mostrar según la moneda seleccionada.
+
+`parseMoneyInput` debe tolerar símbolos de moneda, espacios y separadores
+comunes sin convertir divisas. Casos esperados:
+
+```text
+1200,50      -> 1200.5
+1,200.50     -> 1200.5
+1.200,50     -> 1200.5
+$1,200 MXN   -> 1200
+```
+
+Si la cadena es ambigua o no puede interpretarse con seguridad, no calcular y
+mostrar un mensaje de validación.
 
 ---
 
 ## URL compartible
 
 ```text
-/eventos-sociales/dividir-cuenta-en-restaurante?cuenta=1200&personas=4&propina=10&moneda=MXN
+/eventos-sociales/dividir-cuenta-en-restaurante?cuenta=1200&personas=4&tipoPropina=porcentaje&propina=10&moneda=MXN
 ```
 
 Reglas:
 
 - Leer únicamente parámetros válidos.
+- Usar `tipoPropina=porcentaje` o `tipoPropina=monto` para evitar ambigüedad.
+- Permitir `servicioIncluido=0|1` cuando el ticket ya incluye propina o servicio.
+- Permitir `cargo=0`, `ajusteCentavos=0|1`, `redondeo=ninguno|arriba` e
+  `incremento=1|5|10|minimo`.
 - No almacenar información personal.
 - Mantener canonical sin query params.
 - No indexar variantes por monto.
 
+Ejemplo completo:
+
+```text
+/eventos-sociales/dividir-cuenta-en-restaurante?cuenta=1200&personas=4&tipoPropina=porcentaje&propina=10&cargo=0&ajusteCentavos=1&redondeo=ninguno&moneda=MXN
+```
+
 ---
 
-## Diseño y contenido
+## Diseño mobile-first y contenido
+
+La calculadora debe diseñarse mobile first. En teléfonos, la experiencia de
+calcular debe aparecer en el primer viewport o inmediatamente después de un hero
+compacto. Evitar un hero alto que empuje el formulario fuera de pantalla.
 
 ### Hero
 
@@ -219,19 +386,37 @@ cuánto debe pagar cada quien.
 
 ### Secciones
 
-1. Hero y breadcrumbs.
-2. Formulario y resultado.
-3. Ajuste opcional por redondeo.
-4. Diferencia entre cuenta, propina y total.
-5. Enlace a calculadora de propina.
-6. FAQ visibles.
+1. Hero compacto y breadcrumbs.
+2. Formulario principal y resultado.
+3. Ajuste exacto de centavos.
+4. Redondeo opcional y diferencia reunida.
+5. Desglose entre cuenta, propina, cargos y total.
+6. Aviso sobre servicio o propina ya incluida.
+7. Enlace a calculadora de propina.
+8. FAQ visibles.
+
+### UI móvil
+
+- Formulario en una sola columna.
+- Campo "Cuenta" como primer control y con tamaño cómodo para uso táctil.
+- Stepper `-` y `+` para personas, más presets `2`, `3`, `4`, `5`, `6`.
+- Control segmentado para propina: `%` y `monto`.
+- Moneda en selector compacto, solo para formato.
+- Resultado principal visible justo debajo del formulario.
+- Después de calcular, considerar una barra inferior fija con el monto principal:
+  `Cada persona paga: $330.00 MXN`.
+- "Ajuste de centavos", "redondeo" y "cargos adicionales" pueden vivir en un
+  bloque de opciones avanzadas, pero deben ser fáciles de abrir.
+- Botones de acción: copiar resultado y compartir URL.
 
 ### FAQ sugeridas
 
 - ¿Cómo dividir una cuenta entre varias personas?
 - ¿Cómo añadir propina antes de dividir la cuenta?
 - ¿Qué pasa si el total no se divide exactamente?
+- ¿Por qué algunas personas pagan un centavo más?
 - ¿Cómo redondear el pago sin perder dinero?
+- ¿Qué hago si el ticket ya incluye servicio?
 - ¿La calculadora convierte monedas?
 
 ---
@@ -241,8 +426,11 @@ cuánto debe pagar cada quien.
 ```ts
 calculateTipAmount(bill, tipInput)
 calculateEqualBillSplit(input)
+calculateExactCentAdjustment(total, people, minorUnit)
+getCurrencyMinorUnit(currency)
 roundIndividualPaymentUp(amount, increment)
 calculateRoundingDifference(total, roundedPayment, people)
+buildShareText(result)
 parseMoneyInput(value)
 formatMoney(value, currency)
 ```
@@ -253,10 +441,17 @@ formatMoney(value, currency)
 
 - Cuenta `1200`, `4` personas, `10%` → `330` por persona.
 - Cuenta `1000`, `3` personas, sin propina → `333.333...`.
+- Ajuste exacto de `1000` entre `3` personas → `2 × 333.33` y `1 × 333.34`.
 - Redondear `326.67` a incremento `10` → `330`.
 - Calcular diferencia reunida después de redondear.
 - Propina fija se suma una sola vez antes de dividir.
 - Cargos adicionales se suman una sola vez.
+- Servicio incluido conserva propina `0` por defecto y permite aviso si se añade otra.
+- URL diferencia `tipoPropina=porcentaje` y `tipoPropina=monto`.
+- Parsear `1200,50`, `1,200.50`, `1.200,50` y `$1,200 MXN`.
+- Formatear monedas sin centavos como `CLP` y `COP` según su unidad mínima.
+- Calcular ajuste exacto con unidades mínimas enteras para evitar errores decimales.
+- Generar texto copiable para resultado normal, ajuste exacto y redondeo.
 - Rechazar personas `0`, negativas o no enteras.
 - Rechazar montos negativos, `NaN` e `Infinity`.
 
@@ -268,6 +463,10 @@ formatMoney(value, currency)
 2. La ruta propuesta es `/eventos-sociales/dividir-cuenta-en-restaurante`.
 3. El MVP divide una cuenta equitativamente.
 4. La propina puede capturarse como porcentaje o monto.
-5. El redondeo opcional muestra la diferencia reunida.
-6. La herramienta no promete reparto por platillos.
-7. La URL compartible conserva parámetros válidos.
+5. El ajuste exacto de centavos puede cerrar el total sin cobrar de más.
+6. El redondeo opcional muestra la diferencia reunida.
+7. La UI mobile-first muestra el formulario y el resultado principal sin fricción.
+8. El resultado copiable es claro para enviar por mensaje.
+9. La herramienta advierte cuando el ticket ya incluye servicio o propina.
+10. La herramienta no promete reparto por platillos.
+11. La URL compartible conserva parámetros válidos y distingue tipo de propina.
