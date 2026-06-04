@@ -46,7 +46,7 @@
 24. Edad de mascota en años humanos
 25. Calorías para perro / gato por peso
 
-### 🎂 Eventos sociales
+### 🍽️ Restaurantes
 26. División de cuenta en restaurante
 27. Propina en restaurantes
 

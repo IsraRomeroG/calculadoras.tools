@@ -96,11 +96,15 @@ describe("calculator category directory", () => {
       "legal-impuestos",
     );
     expect(getCategoryByLabel("Fecha y tiempo")?.slug).toBe("fecha-tiempo");
+    expect(getCategoryByLabel("Restaurantes")?.slug).toBe("restaurantes");
     expect(getCategoryBySlugOrLegacySlug("legal-e-impuestos")?.slug).toBe(
       "legal-impuestos",
     );
     expect(getCategoryBySlugOrLegacySlug("fecha-y-tiempo")?.slug).toBe(
       "fecha-tiempo",
+    );
+    expect(getCategoryBySlugOrLegacySlug("eventos-sociales")?.slug).toBe(
+      "restaurantes",
     );
   });
 });

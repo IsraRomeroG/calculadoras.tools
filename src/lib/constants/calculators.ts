@@ -219,8 +219,8 @@ export const CALCULATORS: CalculatorDirectoryItem[] = [
     title: "Dividir cuenta en restaurante",
     description:
       "Divide una cuenta entre varias personas, añade propina opcional y ajusta centavos o redondeo.",
-    href: "/eventos-sociales/dividir-cuenta-en-restaurante",
-    categorySlug: "eventos-sociales",
+    href: "/restaurantes/dividir-cuenta-en-restaurante",
+    categorySlug: "restaurantes",
     order: 86,
   },
   {
@@ -228,8 +228,8 @@ export const CALCULATORS: CalculatorDirectoryItem[] = [
     title: "Calculadora de propina",
     description:
       "Calcula propina, total final, total cerrado y pago por persona.",
-    href: "/eventos-sociales/calculadora-de-propina",
-    categorySlug: "eventos-sociales",
+    href: "/restaurantes/calculadora-de-propina",
+    categorySlug: "restaurantes",
     order: 88,
   },
 ];
