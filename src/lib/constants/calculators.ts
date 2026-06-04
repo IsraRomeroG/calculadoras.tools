@@ -223,4 +223,13 @@ export const CALCULATORS: CalculatorDirectoryItem[] = [
     categorySlug: "eventos-sociales",
     order: 86,
   },
+  {
+    id: "calculadora-de-propina",
+    title: "Calculadora de propina",
+    description:
+      "Calcula propina, total final, total cerrado y pago por persona.",
+    href: "/eventos-sociales/calculadora-de-propina",
+    categorySlug: "eventos-sociales",
+    order: 88,
+  },
 ];

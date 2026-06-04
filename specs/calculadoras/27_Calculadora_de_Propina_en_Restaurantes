@@ -3,8 +3,13 @@
 ## Resumen
 
 Herramienta para calcular una propina a partir del monto de consumo y un
-porcentaje elegido por el usuario. Debe mostrar propina, total final y pago por
-persona cuando la cuenta se comparte.
+porcentaje elegido por el usuario. Debe mostrar propina, total final, porcentaje
+efectivo y pago por persona cuando la cuenta se comparte.
+
+La herramienta debe resolver dos situaciones frecuentes en restaurante:
+
+1. Elegir un porcentaje y ver cuánto dejar.
+2. Cerrar el total a un monto práctico y entender qué propina efectiva implica.
 
 No debe afirmar que existe un porcentaje universalmente correcto: las prácticas
 varían según país, establecimiento y contexto.
@@ -37,7 +42,7 @@ src/pages/eventos-sociales/calculadora-de-propina.astro
   id: "calculadora-de-propina",
   title: "Calculadora de propina",
   description:
-    "Calcula propina, total final y pago por persona con un porcentaje editable.",
+    "Calcula propina, total final, total cerrado y pago por persona.",
   href: "/eventos-sociales/calculadora-de-propina",
   categorySlug: "eventos-sociales",
   order: 88,
@@ -64,8 +69,11 @@ src/lib/calculators/eventos-sociales/calculadora-de-propina/tip.test.ts
 5. Total con propina.
 6. División opcional entre personas.
 7. Redondeo opcional de propina.
-8. Resultado copiable y URL compartible.
-9. Accesibilidad y pruebas unitarias.
+8. Redondeo opcional del total final.
+9. Servicio o propina ya incluida.
+10. Porcentaje efectivo cuando hay redondeo o total cerrado.
+11. Resultado copiable y URL compartible.
+12. Accesibilidad y pruebas unitarias.
 
 ### Fuera del MVP
 
@@ -82,11 +90,13 @@ src/lib/calculators/eventos-sociales/calculadora-de-propina/tip.test.ts
 
 | Campo | Tipo | Default |
 |-------|------|---------|
-| Consumo antes de propina | Texto monetario | Vacío |
+| Consumo antes de propina | Texto monetario con `inputmode="decimal"` | Vacío |
 | Porcentaje | Texto con `inputmode="decimal"` | `10` |
 | Personas | Entero | `1` |
 | Moneda para formato | Selector | `MXN` |
-| Redondear propina | Toggle | Desactivado |
+| Servicio o propina ya incluida | Toggle | Desactivado |
+| Redondeo | Selector | `Sin redondeo` |
+| Incremento de redondeo | Selector | `1` |
 
 Presets:
 
@@ -100,6 +110,40 @@ Personalizado
 
 Etiquetar los presets como atajos, no como recomendaciones.
 
+No asumir símbolo monetario. Permitir seleccionar moneda solo para formato:
+
+```text
+MXN
+USD
+EUR
+COP
+ARS
+CLP
+PEN
+BRL
+Otra
+```
+
+No realizar conversión de divisas.
+
+La moneda solo afecta formato y unidad mínima para redondeos. La implementación
+debe derivar los decimales con un helper estable, por ejemplo:
+
+```text
+MXN, USD, EUR, ARS, PEN, BRL -> 0.01
+CLP, COP -> 1
+Otra -> 0.01
+```
+
+Si "Servicio o propina ya incluida" está activo, la propina debe mantenerse en
+`0` por defecto. El usuario puede capturar una propina adicional manualmente,
+pero la UI debe mostrar un aviso claro:
+
+```text
+Revisa si el establecimiento ya incluyó servicio o propina antes de añadir un
+monto adicional.
+```
+
 ---
 
 ## Fórmulas
@@ -109,11 +153,23 @@ propina = consumo × porcentaje ÷ 100
 total = consumo + propina
 propina por persona = propina ÷ personas
 total por persona = total ÷ personas
+porcentaje efectivo = propina ÷ consumo × 100
 ```
+
+Si `consumo` es `0`, no calcular porcentaje efectivo para evitar división entre
+cero. Mostrar propina, total y total por persona como `0`.
 
 ### Redondeo opcional
 
-Permitir redondear la **propina total** hacia arriba a:
+Permitir tres modos:
+
+```text
+Sin redondeo
+Redondear propina hacia arriba
+Redondear total hacia arriba
+```
+
+Para redondear la **propina total**, permitir subir a:
 
 ```text
 unidad monetaria completa
@@ -121,7 +177,15 @@ múltiplo de 5
 múltiplo de 10
 ```
 
-Recalcular el porcentaje efectivo:
+Para redondear el **total final**, calcular:
+
+```text
+total redondeado = ceil(total ÷ incremento) × incremento
+propina ajustada = total redondeado - consumo
+porcentaje efectivo = propina ajustada ÷ consumo × 100
+```
+
+Para redondear solo la propina:
 
 ```text
 porcentaje efectivo = propina redondeada ÷ consumo × 100
@@ -139,6 +203,15 @@ Ejemplo:
 Consumo: $850.00 MXN
 Propina (15%): $127.50 MXN
 Total: $977.50 MXN
+```
+
+Con total cerrado:
+
+```text
+Consumo: $850.00 MXN
+Total cerrado: $980.00 MXN
+Propina ajustada: $130.00 MXN
+Porcentaje efectivo: 15.29%
 ```
 
 Con división:
@@ -169,10 +242,26 @@ monto adicional.
 | Porcentaje mayor que `100` | Pedir revisar |
 | Personas menor que `1` | Rechazar |
 | Personas no enteras | Rechazar |
+| Personas mayor que `100` | Pedir revisar |
+| Moneda no soportada | Usar `Otra` para formato simple |
 | Resultado no finito | No calcular |
 
 Aceptar punto o coma decimal. Mantener precisión completa y redondear según la
 moneda solamente al mostrar.
+
+`parseMoneyInput` debe tolerar símbolos de moneda, espacios y separadores
+comunes sin convertir divisas. Casos esperados:
+
+```text
+850          -> 850
+850,50       -> 850.5
+1,200.50     -> 1200.5
+1.200,50     -> 1200.5
+$850 MXN     -> 850
+```
+
+Si la cadena es ambigua o no puede interpretarse con seguridad, no calcular y
+mostrar un mensaje de validación.
 
 ---
 
@@ -182,11 +271,29 @@ moneda solamente al mostrar.
 /eventos-sociales/calculadora-de-propina?consumo=850&porcentaje=15&personas=3&moneda=MXN
 ```
 
-Mantener canonical sin query params y no generar páginas indexables por monto.
+Reglas:
+
+- Leer únicamente parámetros válidos.
+- Permitir `servicioIncluido=0|1`.
+- Permitir `redondeo=ninguno|propina|total`.
+- Permitir `incremento=1|5|10|minimo`.
+- No almacenar información personal.
+- Mantener canonical sin query params.
+- No generar páginas indexables por monto.
+
+Ejemplo completo:
+
+```text
+/eventos-sociales/calculadora-de-propina?consumo=850&porcentaje=15&personas=3&moneda=MXN&redondeo=total&incremento=10&servicioIncluido=0
+```
 
 ---
 
-## Diseño y contenido
+## Diseño mobile-first y contenido
+
+La calculadora debe diseñarse mobile first. En teléfonos, la experiencia de
+calcular debe aparecer en el primer viewport o inmediatamente después de un hero
+compacto. Evitar un hero alto que empuje el formulario fuera de pantalla.
 
 ### Hero
 
@@ -206,9 +313,53 @@ por persona.
 1. Hero y breadcrumbs.
 2. Formulario y resultado.
 3. Atajos de porcentaje.
-4. Nota sobre servicio ya incluido.
-5. Enlace para dividir cuenta.
-6. FAQ visibles.
+4. Redondeo de propina o total cerrado.
+5. Nota sobre servicio ya incluido.
+6. Enlace para dividir cuenta.
+7. FAQ visibles.
+
+### UI móvil
+
+- Formulario en una sola columna.
+- Campo "Consumo" como primer control y con tamaño cómodo para uso táctil.
+- Presets de porcentaje como chips táctiles de acceso rápido.
+- Moneda en selector compacto, solo para formato.
+- Resultado principal visible justo debajo del formulario.
+- Mostrar como resultado principal el total final o el total cerrado, según el
+  modo activo.
+- Después de calcular, considerar una barra inferior fija con el monto principal:
+  `Total: $980.00 MXN`.
+- "Servicio incluido", "redondeo" y "personas" pueden vivir en opciones
+  secundarias, pero deben ser fáciles de abrir.
+- Botones de acción: copiar resultado y compartir URL.
+
+### Resultado copiable
+
+El botón de copiar debe generar un texto breve y accionable para enviar por
+WhatsApp, mensajes o chat.
+
+Sin redondeo:
+
+```text
+Propina calculada:
+Consumo: $850.00 MXN
+Propina: $127.50 MXN
+Total: $977.50 MXN
+Personas: 3
+Total por persona: $325.83 MXN
+```
+
+Con total cerrado:
+
+```text
+Propina calculada:
+Consumo: $850.00 MXN
+Total cerrado: $980.00 MXN
+Propina ajustada: $130.00 MXN
+Porcentaje efectivo: 15.29%
+Personas: 3
+Total por persona: $326.67 MXN
+```
 
 ### FAQ sugeridas
 
@@ -216,6 +367,7 @@ por persona.
 - ¿Cómo calcular el total con propina?
 - ¿Cómo dividir la propina entre varias personas?
 - ¿La propina ya puede estar incluida en la cuenta?
+- ¿Cómo cerrar el total a una cantidad redonda?
 - ¿Qué porcentaje debo usar?
 
 La respuesta a la última pregunta debe explicar que depende del contexto y no
@@ -230,8 +382,12 @@ calculateTip(consumption, percentage)
 calculateTipTotal(consumption, tip)
 calculateTipPerPerson(total, tip, people)
 roundTipUp(tip, increment)
-calculateEffectiveTipPercentage(consumption, roundedTip)
+roundTotalUp(total, increment)
+calculateEffectiveTipPercentage(consumption, tipAmount)
+getCurrencyMinorUnit(currency)
 parseMoneyInput(value)
+formatMoney(value, currency)
+buildShareText(result)
 ```
 
 ---
@@ -243,9 +399,14 @@ parseMoneyInput(value)
 - Dividir total entre `3`.
 - Preset `0%` conserva total original.
 - Redondear propina hacia arriba y recalcular porcentaje efectivo.
+- Redondear total hacia arriba y recalcular propina ajustada.
 - Rechazar porcentaje negativo o mayor que `100`.
 - Rechazar personas no enteras o menores que `1`.
-- Aceptar punto y coma decimal.
+- Aceptar punto y coma decimal, símbolos y separadores comunes.
+- Formatear monedas sin centavos como `CLP` y `COP` según su unidad mínima.
+- Servicio incluido conserva propina `0` por defecto y permite aviso si se añade
+  otra.
+- Generar texto copiable con y sin total cerrado.
 
 ---
 
@@ -256,5 +417,8 @@ parseMoneyInput(value)
 3. Los presets se presentan como atajos neutrales.
 4. La UI muestra propina, total y división opcional.
 5. El redondeo recalcula el porcentaje efectivo.
-6. La página recuerda revisar si el servicio ya está incluido.
-7. La URL compartible conserva parámetros válidos.
+6. La UI permite cerrar el total hacia arriba y muestra la propina ajustada.
+7. La página recuerda revisar si el servicio ya está incluido.
+8. La experiencia móvil muestra el formulario y resultado principal sin fricción.
+9. El resultado copiable es claro para enviar por mensaje.
+10. La URL compartible conserva parámetros válidos.
