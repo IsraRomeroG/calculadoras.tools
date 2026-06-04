@@ -196,4 +196,13 @@ export const CALCULATORS: CalculatorDirectoryItem[] = [
     categorySlug: "cocina",
     order: 80,
   },
+  {
+    id: "edad-de-mascota-en-anos-humanos",
+    title: "Edad de mascota en anos humanos",
+    description:
+      "Estima la edad equivalente de perros y gatos con una tabla orientativa por especie y talla.",
+    href: "/mascotas/edad-de-mascota-en-anos-humanos",
+    categorySlug: "mascotas",
+    order: 82,
+  },
 ];

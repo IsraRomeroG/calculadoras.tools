@@ -14,6 +14,7 @@ export const CATEGORY_SLUGS = [
   "salud",
   "fecha-tiempo",
   "conversores",
+  "mascotas",
   "cocina",
 ] as const;
 
@@ -69,6 +70,12 @@ export const CATEGORIES = {
     label: "Conversores",
     description:
       "Conversores rápidos para transformar unidades cotidianas con resultados claros y referencias útiles.",
+  },
+  mascotas: {
+    slug: "mascotas",
+    label: "Mascotas",
+    description:
+      "Herramientas orientativas para estimar datos utiles sobre perros y gatos, con contexto claro para cuidar mejor a tu mascota.",
   },
   cocina: {
     slug: "cocina",

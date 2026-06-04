@@ -1,0 +1,872 @@
+---
+import BaseLayout from "@layouts/BaseLayout.astro";
+import Container from "@components/layout/Container.astro";
+import PageShell from "@components/layout/PageShell.astro";
+import FaqSection from "@components/shared/FaqSection.astro";
+import PageHero from "@components/shared/PageHero.astro";
+import SectionIntro from "@components/shared/SectionIntro.astro";
+import {
+  DOG_SIZES,
+  DOG_SIZE_TABLE_LABELS,
+  getPetAgeTable,
+  type DogSize,
+} from "@lib/calculators/mascotas/edad-de-mascota-en-anos-humanos/petAge";
+import { buildFaqJsonLd } from "@lib/seo";
+
+const title = "Edad de mascota en años humanos";
+const description =
+  "Estima la edad equivalente de perros y gatos en años humanos con una tabla veterinaria orientativa por especie y talla adulta.";
+const canonical = "/mascotas/edad-de-mascota-en-anos-humanos";
+
+const faqs = [
+  {
+    question: "¿Cuántos años humanos tiene mi perro?",
+    answer:
+      "Depende de su edad real y talla adulta. Esta calculadora usa una tabla veterinaria de referencia y evita la regla simplificada de multiplicar por siete.",
+  },
+  {
+    question: "¿Cuántos años humanos tiene mi gato?",
+    answer:
+      "La tabla usada inicia en 6 meses para gatos y llega hasta 21 años. Entre edades publicadas, la calculadora interpola de forma orientativa.",
+  },
+  {
+    question: "¿Por qué no basta multiplicar la edad de un perro por siete?",
+    answer:
+      "Porque el envejecimiento no avanza igual durante toda la vida y, en perros, cambia según la talla adulta.",
+  },
+  {
+    question: "¿La talla cambia la edad equivalente de un perro?",
+    answer:
+      "Sí. A partir de los primeros años, los perros grandes y muy grandes suelen tener equivalencias diferentes a las de perros pequeños o medianos.",
+  },
+  {
+    question: "¿Qué hago si no sé la talla adulta de mi perro?",
+    answer:
+      "Usa el peso adulto aproximado. Si aún es cachorro, elige la talla que esperas que tenga de adulto o consulta a tu veterinario.",
+  },
+  {
+    question: "¿Puedo calcular la edad si solo tengo la fecha de nacimiento?",
+    answer:
+      "Sí. La calculadora puede convertir una fecha de nacimiento a meses completos y usar esa edad para buscar la equivalencia.",
+  },
+  {
+    question: "¿La edad equivalente reemplaza una revisión veterinaria?",
+    answer:
+      "No. Es una referencia educativa. Raza, salud, peso, actividad y estilo de vida pueden cambiar cómo envejece una mascota.",
+  },
+];
+
+const faqJsonLd = buildFaqJsonLd(faqs);
+
+const dogSizeOptions = [
+  {
+    value: "",
+    label: "Selecciona talla",
+    help: "Necesaria para perros",
+  },
+  {
+    value: "pequena",
+    label: "Pequeña",
+    help: "Hasta 9.07 kg adulto",
+  },
+  {
+    value: "mediana",
+    label: "Mediana",
+    help: "9.52 a 22.7 kg adulto",
+  },
+  {
+    value: "grande",
+    label: "Grande",
+    help: "23.1 a 40.8 kg adulto",
+  },
+  {
+    value: "muy-grande",
+    label: "Muy grande",
+    help: "Más de 40.8 kg adulto",
+  },
+  {
+    value: "no-se",
+    label: "No sé la talla",
+    help: "Muestra una guía",
+  },
+];
+
+const tableTabs = [
+  { value: "gato", label: "Gato" },
+  ...DOG_SIZES.map((size) => ({
+    value: size,
+    label: DOG_SIZE_TABLE_LABELS[size as DogSize],
+  })),
+];
+---
+
+<BaseLayout title={title} description={description} canonical={canonical}>
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={JSON.stringify(faqJsonLd)} />
+  </Fragment>
+
+  <PageShell>
+    <PageHero
+      title="Edad de mascota en años humanos"
+      description="Estima la edad equivalente de tu perro o gato con una tabla orientativa por especie y talla adulta."
+      kicker="Mascotas"
+      collapseBreadcrumbOnMobile
+      containerClass="py-5 md:py-7"
+      breadcrumbs={[
+        { label: "Inicio", href: "/", ariaLabel: "Inicio" },
+        { label: "Mascotas", href: "/mascotas", optional: true },
+        { label: "Edad de mascota", truncate: true },
+      ]}
+    />
+
+    <Container as="section" class="py-5 md:py-8">
+      <section
+        id="pet-age-calculator"
+        class="overflow-hidden rounded-lg border border-gray-700 bg-gray-950 shadow-xl shadow-gray-950/30"
+        aria-labelledby="calculator-heading"
+      >
+        <div class="grid gap-0 lg:grid-cols-[minmax(0,1fr)_minmax(19rem,0.82fr)]">
+          <div class="p-4 sm:p-6">
+            <p class="text-sm font-semibold uppercase tracking-wide text-amber-400">
+              Cálculo orientativo
+            </p>
+            <h2 id="calculator-heading" class="mt-2 text-2xl font-semibold">
+              ¿Qué edad tiene tu mascota?
+            </h2>
+            <p class="mt-2 text-sm leading-relaxed text-gray-400">
+              Elige especie, edad y talla adulta si es perro. No usamos la regla
+              de multiplicar por 7.
+            </p>
+
+            <fieldset class="mt-6">
+              <legend class="text-sm font-semibold text-gray-200">Especie</legend>
+              <div class="mt-3 grid grid-cols-2 gap-3" data-species-group>
+                <label class="flex min-h-12 cursor-pointer items-center justify-center rounded-lg border border-amber-400 bg-amber-400 px-4 text-sm font-semibold text-gray-950 transition focus-within:ring-3 focus-within:ring-amber-400/30" data-species-option="perro">
+                  <input class="sr-only" type="radio" name="species" value="perro" checked data-species-input />
+                  Perro
+                </label>
+                <label class="flex min-h-12 cursor-pointer items-center justify-center rounded-lg border border-gray-700 bg-gray-900 px-4 text-sm font-semibold text-gray-200 transition focus-within:ring-3 focus-within:ring-amber-400/30" data-species-option="gato">
+                  <input class="sr-only" type="radio" name="species" value="gato" data-species-input />
+                  Gato
+                </label>
+              </div>
+            </fieldset>
+
+            <div class="mt-5" data-dog-size-panel>
+              <label for="dog-size" class="block text-sm font-semibold text-gray-200">
+                Talla adulta del perro
+              </label>
+              <select
+                id="dog-size"
+                class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-900 px-4 text-base text-white outline-none transition focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15"
+                aria-describedby="dog-size-help"
+                data-dog-size
+              >
+                {
+                  dogSizeOptions.map((option) => (
+                    <option value={option.value}>
+                      {option.label} · {option.help}
+                    </option>
+                  ))
+                }
+              </select>
+              <p id="dog-size-help" class="mt-2 text-sm leading-relaxed text-gray-500">
+                Usa peso adulto aproximado, no el peso transitorio de cachorro.
+              </p>
+            </div>
+
+            <fieldset class="mt-5">
+              <legend class="text-sm font-semibold text-gray-200">
+                Método de captura
+              </legend>
+              <div class="mt-3 grid gap-3 sm:grid-cols-2" data-method-group>
+                <label class="flex min-h-12 cursor-pointer items-center justify-center rounded-lg border border-amber-400 bg-amber-400 px-4 text-sm font-semibold text-gray-950 transition focus-within:ring-3 focus-within:ring-amber-400/30" data-method-option="edad">
+                  <input class="sr-only" type="radio" name="method" value="edad" checked data-method-input />
+                  Edad en años y meses
+                </label>
+                <label class="flex min-h-12 cursor-pointer items-center justify-center rounded-lg border border-gray-700 bg-gray-900 px-4 text-sm font-semibold text-gray-200 transition focus-within:ring-3 focus-within:ring-amber-400/30" data-method-option="fecha">
+                  <input class="sr-only" type="radio" name="method" value="fecha" data-method-input />
+                  Fecha de nacimiento
+                </label>
+              </div>
+            </fieldset>
+
+            <div class="mt-5 grid gap-3 sm:grid-cols-2" data-age-panel>
+              <div>
+                <label for="pet-years" class="block text-sm font-semibold text-gray-200">
+                  Años
+                </label>
+                <input
+                  id="pet-years"
+                  class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-900 px-4 text-base text-white outline-none transition placeholder:text-gray-600 focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15"
+                  type="number"
+                  inputmode="numeric"
+                  min="0"
+                  step="1"
+                  placeholder="Ej. 7"
+                  data-years-input
+                />
+              </div>
+              <div>
+                <label for="pet-months" class="block text-sm font-semibold text-gray-200">
+                  Meses
+                </label>
+                <input
+                  id="pet-months"
+                  class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-900 px-4 text-base text-white outline-none transition placeholder:text-gray-600 focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15"
+                  type="number"
+                  inputmode="numeric"
+                  min="0"
+                  max="11"
+                  step="1"
+                  value="0"
+                  data-months-input
+                />
+              </div>
+            </div>
+
+            <div class="mt-5 hidden" data-date-panel>
+              <label for="birth-date" class="block text-sm font-semibold text-gray-200">
+                Fecha de nacimiento
+              </label>
+              <input
+                id="birth-date"
+                class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-900 px-4 text-base text-white outline-none transition focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15"
+                type="date"
+                data-birth-date
+              />
+              <p class="mt-2 text-sm leading-relaxed text-gray-500">
+                Se convierte a meses completos usando tu fecha local.
+              </p>
+            </div>
+
+            <p class="mt-3 hidden text-sm text-red-300" data-input-error></p>
+
+            <div class="mt-6 grid gap-3 border-t border-gray-800 pt-5 sm:grid-cols-2">
+              <button
+                class="inline-flex min-h-11 items-center justify-center rounded-lg border border-gray-700 px-4 py-2 text-sm font-semibold text-gray-200 transition hover:border-amber-400 hover:text-white focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/40"
+                type="button"
+                data-clear-calculator
+              >
+                Limpiar
+              </button>
+              <button
+                class="hidden min-h-11 items-center justify-center rounded-lg bg-amber-400 px-4 py-2 text-sm font-semibold text-gray-950 transition hover:bg-amber-300 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/40"
+                type="button"
+                data-copy-result
+              >
+                Copiar resultado
+              </button>
+              <button
+                class="hidden min-h-11 items-center justify-center rounded-lg border border-gray-700 px-4 py-2 text-sm font-semibold text-gray-200 transition hover:border-amber-400 hover:text-white focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/40"
+                type="button"
+                data-copy-link
+              >
+                Copiar enlace
+              </button>
+              <button
+                class="hidden min-h-11 items-center justify-center rounded-lg border border-gray-700 px-4 py-2 text-sm font-semibold text-gray-200 transition hover:border-amber-400 hover:text-white focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/40"
+                type="button"
+                data-share-result
+              >
+                Compartir
+              </button>
+            </div>
+            <p class="mt-3 min-h-5 text-sm text-emerald-300" aria-live="polite" data-action-status></p>
+          </div>
+
+          <aside
+            class="border-t border-gray-800 bg-gray-900/70 p-4 sm:p-6 lg:border-l lg:border-t-0"
+            aria-live="polite"
+          >
+            <p class="text-sm font-semibold uppercase tracking-wide text-amber-400" data-result-kicker>
+              Resultado
+            </p>
+            <p class="mt-3 text-3xl font-bold leading-tight text-white md:text-4xl" data-main-result>
+              Ingresa la edad
+            </p>
+            <p class="mt-3 text-sm leading-relaxed text-gray-400" data-result-note>
+              Completa los datos para ver una equivalencia orientativa.
+            </p>
+
+            <div class="mt-5 grid gap-3">
+              <div class="rounded-lg border border-gray-800 bg-gray-950/70 p-4">
+                <span class="block text-xs font-semibold uppercase tracking-wide text-gray-500">
+                  Mascota
+                </span>
+                <span class="mt-2 block text-lg font-semibold text-white" data-pet-summary>
+                  Se mostrará aquí
+                </span>
+              </div>
+              <div class="rounded-lg border border-gray-800 bg-gray-950/70 p-4">
+                <span class="block text-xs font-semibold uppercase tracking-wide text-gray-500">
+                  Edad real interpretada
+                </span>
+                <span class="mt-2 block text-lg font-semibold text-white" data-age-summary>
+                  Se mostrará aquí
+                </span>
+              </div>
+              <div class="rounded-lg border border-gray-800 bg-gray-950/70 p-4">
+                <span class="block text-xs font-semibold uppercase tracking-wide text-gray-500">
+                  Referencia
+                </span>
+                <span class="mt-2 block text-sm leading-relaxed text-gray-300" data-source-summary>
+                  Tabla veterinaria de referencia alojada por AAHA.
+                </span>
+              </div>
+            </div>
+
+            <p class="mt-5 rounded-lg border border-amber-400/25 bg-amber-400/10 p-3 text-sm leading-relaxed text-amber-100">
+              Es una referencia orientativa. La raza, la talla, el peso, la
+              salud y el estilo de vida pueden cambiar cómo envejece una mascota.
+            </p>
+          </aside>
+        </div>
+      </section>
+    </Container>
+
+    <Container as="section" class="py-5 md:py-8">
+      <SectionIntro
+        title="Tabla de equivalencias"
+        description="Elige una vista para consultar la tabla sin depender de una tabla ancha. La fila usada se resalta cuando hay resultado."
+      />
+
+      <div class="rounded-lg border border-gray-700 bg-gray-950 p-4 sm:p-5">
+        <div class="flex gap-2 overflow-x-auto pb-2" role="tablist" aria-label="Tablas por especie y talla">
+          {
+            tableTabs.map((tab) => (
+              <button
+                class="shrink-0 rounded-lg border border-gray-700 bg-gray-900 px-3 py-2 text-sm font-semibold text-gray-200 transition hover:border-amber-400 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/40"
+                type="button"
+                data-table-tab={tab.value}
+              >
+                {tab.label}
+              </button>
+            ))
+          }
+        </div>
+
+        <div class="mt-4 overflow-hidden rounded-lg border border-gray-800">
+          <table class="w-full text-left text-sm">
+            <thead class="bg-gray-900 text-xs uppercase tracking-wide text-gray-500">
+              <tr>
+                <th class="px-4 py-3 font-semibold">Edad real</th>
+                <th class="px-4 py-3 text-right font-semibold">Años humanos aprox.</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-800 bg-gray-950" data-table-body>
+              {
+                getPetAgeTable("gato").map((anchor) => (
+                  <tr data-table-row data-age-months={anchor.ageInMonths}>
+                    <th class="px-4 py-3 font-medium text-gray-300">{anchor.ageInMonths === 6 ? "6 meses" : `${anchor.ageInMonths / 12} años`}</th>
+                    <td class="px-4 py-3 text-right font-semibold text-white">{anchor.humanAge}</td>
+                  </tr>
+                ))
+              }
+            </tbody>
+          </table>
+        </div>
+        <p class="mt-3 text-sm leading-relaxed text-gray-500" data-table-note>
+          La vista inicial muestra gatos. Al elegir perro, se muestra la tabla de su talla.
+        </p>
+      </div>
+    </Container>
+
+    <Container as="section" class="py-5 md:py-8">
+      <div class="grid gap-5 md:grid-cols-2">
+        <article>
+          <h2 class="text-2xl font-semibold">Por qué no basta multiplicar por siete</h2>
+          <p class="mt-3 text-sm leading-relaxed text-gray-400">
+            La regla de multiplicar por 7 es una simplificación popular. El
+            envejecimiento cambia por especie y no avanza al mismo ritmo durante
+            toda la vida. En perros, la talla adulta también modifica la
+            equivalencia aproximada.
+          </p>
+        </article>
+
+        <article>
+          <h2 class="text-2xl font-semibold">Cuidado preventivo</h2>
+          <p class="mt-3 text-sm leading-relaxed text-gray-400">
+            La edad equivalente puede ayudarte a conversar mejor con tu
+            veterinario sobre revisión preventiva, actividad, peso y cambios de
+            comportamiento. No sustituye una evaluación clínica.
+          </p>
+        </article>
+      </div>
+    </Container>
+
+    <Container as="section" class="py-5 md:py-8">
+      <div class="rounded-lg border border-gray-700 bg-gray-950 p-5">
+        <h2 class="text-xl font-semibold">Herramientas relacionadas</h2>
+        <p class="mt-3 text-sm leading-relaxed text-gray-400">
+          La calculadora de calorías para perro o gato por peso pertenece a la
+          misma categoría y puede complementar esta estimación cuando esté
+          publicada.
+        </p>
+      </div>
+    </Container>
+
+    <FaqSection faqs={faqs} />
+  </PageShell>
+</BaseLayout>
+
+<script>
+  import {
+    DOG_SIZE_LABELS,
+    DOG_SIZE_TABLE_LABELS,
+    PET_SOURCE_LABEL,
+    buildPetAgeShareUrl,
+    calculatePetHumanAge,
+    formatHumanAge,
+    formatIsoDate,
+    formatPetAgeResult,
+    formatRealAgeLabel,
+    getPetAgeTable,
+    isDogSize,
+    isPetSpecies,
+    parseIsoDate,
+    parsePetAgeSearchParams,
+    todayInLocalTimeZone,
+  } from "@lib/calculators/mascotas/edad-de-mascota-en-anos-humanos/petAge";
+
+  const speciesInputs = Array.from(document.querySelectorAll("[data-species-input]"));
+  const methodInputs = Array.from(document.querySelectorAll("[data-method-input]"));
+  const dogSizePanel = document.querySelector("[data-dog-size-panel]");
+  const dogSizeSelect = document.querySelector("[data-dog-size]");
+  const agePanel = document.querySelector("[data-age-panel]");
+  const datePanel = document.querySelector("[data-date-panel]");
+  const yearsInput = document.querySelector("[data-years-input]");
+  const monthsInput = document.querySelector("[data-months-input]");
+  const birthDateInput = document.querySelector("[data-birth-date]");
+  const inputError = document.querySelector("[data-input-error]");
+  const resultKicker = document.querySelector("[data-result-kicker]");
+  const mainResult = document.querySelector("[data-main-result]");
+  const resultNote = document.querySelector("[data-result-note]");
+  const petSummary = document.querySelector("[data-pet-summary]");
+  const ageSummary = document.querySelector("[data-age-summary]");
+  const sourceSummary = document.querySelector("[data-source-summary]");
+  const copyResultButton = document.querySelector("[data-copy-result]");
+  const copyLinkButton = document.querySelector("[data-copy-link]");
+  const shareButton = document.querySelector("[data-share-result]");
+  const clearButton = document.querySelector("[data-clear-calculator]");
+  const actionStatus = document.querySelector("[data-action-status]");
+  const tableBody = document.querySelector("[data-table-body]");
+  const tableNote = document.querySelector("[data-table-note]");
+  const tableTabs = Array.from(document.querySelectorAll("[data-table-tab]"));
+
+  let currentCopyText = "";
+  let currentShareUrl = "";
+  let currentTableKey = "gato";
+  let highlightedAnchors = [];
+  let actionTimer = 0;
+
+  function getSpecies() {
+    const value = speciesInputs.find((input) => input.checked)?.value ?? "perro";
+
+    return isPetSpecies(value) ? value : "perro";
+  }
+
+  function getMethod() {
+    return methodInputs.find((input) => input.checked)?.value === "fecha"
+      ? "fecha"
+      : "edad";
+  }
+
+  function getDogSize() {
+    const value = dogSizeSelect.value;
+
+    if (value === "" || value === "no-se" || isDogSize(value)) {
+      return value;
+    }
+
+    return "";
+  }
+
+  function parseIntegerInput(input) {
+    const value = input.value.trim();
+
+    if (!value) {
+      return undefined;
+    }
+
+    if (!/^\d+$/.test(value)) {
+      return Number.NaN;
+    }
+
+    return Number(value);
+  }
+
+  function getBirthDate() {
+    const value = birthDateInput.value;
+
+    return value ? parseIsoDate(value) : undefined;
+  }
+
+  function getCurrentInput() {
+    const species = getSpecies();
+    const method = getMethod();
+    const dogSize = getDogSize();
+
+    if (method === "fecha") {
+      return {
+        species,
+        dogSize,
+        birthDate: getBirthDate(),
+        today: todayInLocalTimeZone(),
+      };
+    }
+
+    return {
+      species,
+      dogSize,
+      years: parseIntegerInput(yearsInput),
+      months: parseIntegerInput(monthsInput),
+    };
+  }
+
+  function updateCalculator({ updateUrl = true } = {}) {
+    updateFormVisibility();
+    updateOptionStyles();
+    setInputError("");
+
+    const species = getSpecies();
+    const input = getCurrentInput();
+    const result = calculatePetHumanAge(input);
+
+    if (result.status === "ok") {
+      renderSuccess(result);
+      setActionButtonsVisible(true);
+      syncTableFromResult(result);
+
+      if (updateUrl) {
+        syncUrl(input, result);
+      }
+
+      return;
+    }
+
+    renderMessage(result);
+    setActionButtonsVisible(false);
+    highlightedAnchors = [];
+    renderTable(currentTableKey || (species === "gato" ? "gato" : "mediana"));
+
+    if (updateUrl) {
+      syncNeutralUrl();
+    }
+  }
+
+  function renderSuccess(result) {
+    const petLabel =
+      result.species === "perro" && result.dogSize
+        ? `Perro ${DOG_SIZE_LABELS[result.dogSize]}`
+        : "Gato";
+
+    currentCopyText = result.copyText;
+    resultKicker.textContent = "Estimación aproximada";
+    mainResult.textContent = `${result.displayHumanAge} años humanos`;
+    resultNote.textContent = `${formatPetAgeResult(result)} ${
+      result.interpolated
+        ? "Se interpoló entre dos edades publicadas."
+        : "Coincide con una edad publicada en la tabla."
+    }`;
+    petSummary.textContent = petLabel;
+    ageSummary.textContent = result.realAgeLabel;
+    sourceSummary.textContent = `${PET_SOURCE_LABEL}. No es una equivalencia exacta ni reemplaza una revisión veterinaria.`;
+  }
+
+  function renderMessage(result) {
+    currentCopyText = "";
+    currentShareUrl = "";
+    resultKicker.textContent =
+      result.status === "empty" ? "Resultado" : "Revisa los datos";
+    mainResult.textContent =
+      result.status === "empty" ? "Ingresa la edad" : "No se puede calcular";
+    resultNote.textContent = result.message;
+    petSummary.textContent = getSpecies() === "perro" ? "Perro" : "Gato";
+    ageSummary.textContent = result.nearestAnchor
+      ? `Dato publicado más cercano: ${formatRealAgeLabel(
+          result.nearestAnchor.ageInMonths,
+        )} ≈ ${formatHumanAge(result.nearestAnchor.humanAge ?? 0)} años humanos`
+      : "Se mostrará aquí";
+    sourceSummary.textContent = "Tabla veterinaria de referencia alojada por AAHA.";
+
+    if (result.status !== "empty") {
+      setInputError(result.message);
+    }
+  }
+
+  function updateFormVisibility() {
+    const species = getSpecies();
+    const method = getMethod();
+
+    dogSizePanel.classList.toggle("hidden", species !== "perro");
+    agePanel.classList.toggle("hidden", method !== "edad");
+    datePanel.classList.toggle("hidden", method !== "fecha");
+  }
+
+  function updateOptionStyles() {
+    speciesInputs.forEach((input) => {
+      setSelectedStyle(
+        document.querySelector(`[data-species-option="${input.value}"]`),
+        input.checked,
+      );
+    });
+    methodInputs.forEach((input) => {
+      setSelectedStyle(
+        document.querySelector(`[data-method-option="${input.value}"]`),
+        input.checked,
+      );
+    });
+  }
+
+  function setSelectedStyle(element, isSelected) {
+    element.classList.toggle("border-amber-400", isSelected);
+    element.classList.toggle("bg-amber-400", isSelected);
+    element.classList.toggle("text-gray-950", isSelected);
+    element.classList.toggle("border-gray-700", !isSelected);
+    element.classList.toggle("bg-gray-900", !isSelected);
+    element.classList.toggle("text-gray-200", !isSelected);
+  }
+
+  function setInputError(message) {
+    inputError.textContent = message;
+    inputError.classList.toggle("hidden", !message);
+  }
+
+  function setActionButtonsVisible(isVisible) {
+    [copyResultButton, copyLinkButton].forEach((button) => {
+      button.classList.toggle("hidden", !isVisible);
+      button.classList.toggle("inline-flex", isVisible);
+    });
+
+    const canShare = Boolean(navigator.share);
+    shareButton.classList.toggle("hidden", !isVisible || !canShare);
+    shareButton.classList.toggle("inline-flex", isVisible && canShare);
+  }
+
+  function syncTableFromResult(result) {
+    currentTableKey =
+      result.species === "gato" ? "gato" : result.dogSize ?? "mediana";
+    highlightedAnchors = [
+      result.lowerAnchor.ageInMonths,
+      result.upperAnchor.ageInMonths,
+    ];
+    renderTable(currentTableKey);
+  }
+
+  function renderTable(key) {
+    currentTableKey = key;
+    tableTabs.forEach((tab) => {
+      const isSelected = tab.dataset.tableTab === key;
+      tab.classList.toggle("border-amber-400", isSelected);
+      tab.classList.toggle("bg-amber-400", isSelected);
+      tab.classList.toggle("text-gray-950", isSelected);
+      tab.classList.toggle("border-gray-700", !isSelected);
+      tab.classList.toggle("bg-gray-900", !isSelected);
+      tab.classList.toggle("text-gray-200", !isSelected);
+    });
+
+    const species = key === "gato" ? "gato" : "perro";
+    const dogSize = key === "gato" ? undefined : key;
+    const rows = getPetAgeTable(species, dogSize);
+
+    tableBody.replaceChildren(
+      ...rows.map((anchor) => {
+        const row = document.createElement("tr");
+        const isHighlighted = highlightedAnchors.includes(anchor.ageInMonths);
+
+        row.className = isHighlighted ? "bg-amber-400/10" : "";
+
+        const ageCell = document.createElement("th");
+        ageCell.className = `px-4 py-3 font-medium ${
+          isHighlighted ? "text-amber-100" : "text-gray-300"
+        }`;
+        ageCell.scope = "row";
+        ageCell.textContent = formatRealAgeLabel(anchor.ageInMonths);
+
+        const valueCell = document.createElement("td");
+        valueCell.className = `px-4 py-3 text-right font-semibold ${
+          isHighlighted ? "text-amber-100" : "text-white"
+        }`;
+        valueCell.textContent =
+          anchor.humanAge === null ? "Sin dato publicado" : String(anchor.humanAge);
+
+        row.append(ageCell, valueCell);
+
+        return row;
+      }),
+    );
+
+    tableNote.textContent =
+      key === "gato"
+        ? "Tabla de gatos. La referencia inicia en 6 meses y llega hasta 21 años."
+        : `Tabla de ${DOG_SIZE_TABLE_LABELS[key]}. La fila resaltada corresponde al cálculo cuando aplica.`;
+  }
+
+  function syncUrl(input, result) {
+    currentShareUrl = buildAbsoluteShareUrl(input, result);
+    window.history.replaceState({}, "", currentShareUrl);
+  }
+
+  function syncNeutralUrl() {
+    const url = new URL(window.location.href);
+    url.search = "";
+    window.history.replaceState({}, "", url);
+  }
+
+  function buildAbsoluteShareUrl(input, result) {
+    const url = new URL(window.location.href);
+    const method = getMethod();
+    const years = method === "edad" ? input.years ?? 0 : undefined;
+    const months = method === "edad" ? input.months ?? 0 : undefined;
+    const birthDate = method === "fecha" ? input.birthDate : undefined;
+    const relativeUrl = buildPetAgeShareUrl({
+      species: result.species,
+      dogSize: result.dogSize,
+      years,
+      months,
+      birthDate,
+    });
+
+    return new URL(relativeUrl, url.origin).toString();
+  }
+
+  function clearCalculator() {
+    speciesInputs.find((input) => input.value === "perro").checked = true;
+    methodInputs.find((input) => input.value === "edad").checked = true;
+    dogSizeSelect.value = "";
+    yearsInput.value = "";
+    monthsInput.value = "0";
+    birthDateInput.value = "";
+    currentCopyText = "";
+    currentShareUrl = "";
+    highlightedAnchors = [];
+    currentTableKey = "gato";
+    setStatus("");
+    updateCalculator();
+  }
+
+  function setStatus(message) {
+    actionStatus.textContent = message;
+    window.clearTimeout(actionTimer);
+
+    if (message) {
+      actionTimer = window.setTimeout(() => {
+        actionStatus.textContent = "";
+      }, 2200);
+    }
+  }
+
+  async function copyText(text, successMessage) {
+    if (!text) {
+      return;
+    }
+
+    try {
+      if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(text);
+      } else {
+        const textArea = document.createElement("textarea");
+        textArea.value = text;
+        textArea.setAttribute("readonly", "");
+        textArea.style.position = "fixed";
+        textArea.style.opacity = "0";
+        document.body.append(textArea);
+        textArea.select();
+        document.execCommand("copy");
+        textArea.remove();
+      }
+
+      setStatus(successMessage);
+    } catch {
+      setStatus("No fue posible copiar automáticamente.");
+    }
+  }
+
+  function loadFromUrl() {
+    const parsed = parsePetAgeSearchParams(
+      new URLSearchParams(window.location.search),
+      todayInLocalTimeZone(),
+    );
+
+    speciesInputs.forEach((input) => {
+      input.checked = input.value === parsed.species;
+    });
+
+    if (parsed.species === "perro" && parsed.dogSize) {
+      dogSizeSelect.value = parsed.dogSize;
+    }
+
+    methodInputs.forEach((input) => {
+      input.checked = input.value === parsed.method;
+    });
+
+    if (parsed.birthDate) {
+      birthDateInput.value = formatIsoDate(parsed.birthDate);
+    } else {
+      yearsInput.value =
+        typeof parsed.years === "number" ? String(parsed.years) : "";
+      monthsInput.value =
+        typeof parsed.months === "number" ? String(parsed.months) : "0";
+    }
+
+    if (parsed.hadInvalidParams) {
+      setStatus("Algunos parámetros del enlace se ignoraron.");
+    }
+
+    updateCalculator({ updateUrl: false });
+  }
+
+  speciesInputs.forEach((input) => {
+    input.addEventListener("change", () => {
+      if (getSpecies() === "gato") {
+        dogSizeSelect.value = "";
+      }
+
+      updateCalculator();
+    });
+  });
+
+  methodInputs.forEach((input) => {
+    input.addEventListener("change", () => updateCalculator());
+  });
+
+  [dogSizeSelect, yearsInput, monthsInput, birthDateInput].forEach((input) => {
+    input.addEventListener("input", () => updateCalculator());
+    input.addEventListener("change", () => updateCalculator());
+  });
+
+  tableTabs.forEach((tab) => {
+    tab.addEventListener("click", () => {
+      highlightedAnchors = [];
+      renderTable(tab.dataset.tableTab ?? "gato");
+    });
+  });
+
+  clearButton.addEventListener("click", clearCalculator);
+  copyResultButton.addEventListener("click", () => {
+    copyText(currentCopyText, "Resultado copiado.");
+  });
+  copyLinkButton.addEventListener("click", () => {
+    copyText(currentShareUrl || window.location.href, "Enlace copiado.");
+  });
+  shareButton.addEventListener("click", async () => {
+    if (!navigator.share) {
+      copyText(currentShareUrl || window.location.href, "Enlace copiado.");
+      return;
+    }
+
+    try {
+      await navigator.share({
+        title: "Edad de mascota en años humanos",
+        text: currentCopyText,
+        url: currentShareUrl || window.location.href,
+      });
+      setStatus("Listo para compartir.");
+    } catch {
+      setStatus("");
+    }
+  });
+
+  loadFromUrl();
+</script>
