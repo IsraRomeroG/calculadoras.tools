@@ -58,6 +58,9 @@ src/lib/calculators/cocina/escalar-receta-por-porciones/recipeScaling.test.ts
 - Multiplicar cada cantidad capturada por el mismo factor.
 - Conservar nombre y unidad de cada ingrediente.
 - Aceptar decimales y fracciones habituales.
+- Permitir pegar una lista simple de ingredientes y convertirla en filas
+  editables.
+- Mostrar el resultado escalado en vivo por ingrediente.
 - Mostrar advertencias útiles cuando una cantidad necesita criterio práctico.
 - Permitir copiar el resultado como texto.
 
@@ -73,12 +76,15 @@ src/lib/calculators/cocina/escalar-receta-por-porciones/recipeScaling.test.ts
 4. Cantidad, unidad y nombre por ingrediente.
 5. Soporte para enteros, decimales, fracciones y números mixtos.
 6. Resultado en decimal o fracción culinaria aproximada.
-7. Copiar receta escalada.
-8. Limpiar y cargar ejemplo.
-9. URL compartible para el factor, sin serializar la receta.
-10. Persistencia opcional en `localStorage` para evitar perder una receta
+7. Control de formato de salida: fracción práctica, decimal o ambos.
+8. Pegado simple de ingredientes desde texto multilínea.
+9. Resultado en vivo por ingrediente y resultado final copiable.
+10. Copiar receta escalada con contexto de porciones y factor.
+11. Limpiar y cargar ejemplo.
+12. URL compartible para el factor, sin serializar la receta.
+13. Persistencia opcional en `localStorage` para evitar perder una receta
     durante la sesión.
-11. Accesibilidad y pruebas unitarias.
+14. Accesibilidad y pruebas unitarias.
 
 ### Fuera del MVP
 
@@ -119,6 +125,10 @@ Factor: 10 ÷ 4 = 2.5
 | Cantidad | Texto con `inputmode="decimal"` | Sí |
 | Unidad | Selector con opción libre | No |
 | Ingrediente | Texto corto | Sí |
+
+La cantidad es requerida salvo cuando la fila represente un ingrediente o nota
+`al gusto`. Una fila se considera válida sin cantidad si contiene ingrediente y
+la unidad o el texto indica `al gusto`.
 
 ### Unidades sugeridas
 
@@ -177,15 +187,33 @@ Ejemplo:
 ### Denominadores permitidos
 
 ```text
-2, 3, 4, 8, 16
+2, 3, 4, 6, 8, 12, 16
 ```
 
 No ocultar la aproximación. Si la fracción no es exacta, usar el símbolo `≈` y
 mantener accesible el valor decimal.
 
+### Formato de salida
+
+Incluir un control visible con tres opciones:
+
+- **Fracción práctica**: opción predeterminada. Muestra una fracción culinaria
+  cuando sea útil y conserva el decimal como apoyo cuando sea aproximada.
+- **Decimal**: muestra solo el valor decimal normalizado.
+- **Ambos**: muestra decimal y fracción práctica.
+
+Mantener precisión completa durante el cálculo y redondear únicamente para la
+presentación.
+
 ---
 
 ## Interfaz
+
+La interfaz debe ser **mobile first**. En pantallas pequeñas no debe usarse una
+tabla rígida ni provocar scroll horizontal. Cada ingrediente debe mostrarse como
+un bloque compacto editable con sus campos y el resultado escalado inmediato.
+En pantallas amplias puede usarse una distribución más densa, siempre que el
+flujo principal siga siendo claro y escaneable.
 
 ### Inputs principales
 
@@ -200,7 +228,29 @@ mantener accesible el valor decimal.
 - Permitir agregar y eliminar filas.
 - Conservar el orden capturado.
 - No exigir unidad.
-- Permitir pegar líneas simples en una fase posterior, no en el MVP.
+- Mostrar el resultado escalado de cada ingrediente junto a sus campos.
+- Evitar que estados de error, ayudas o resultados cambien bruscamente el alto
+  de filas ya renderizadas.
+
+### Pegado simple de ingredientes
+
+Permitir pegar una lista multilínea en el MVP y convertir cada línea en una fila
+editable. El parser debe ser conservador: si no puede separar cantidad, unidad e
+ingrediente con confianza, debe conservar el texto como ingrediente para que el
+usuario lo ajuste manualmente.
+
+Ejemplos aceptados:
+
+```text
+2 tazas harina
+1/2 cucharadita sal
+3 huevos
+sal al gusto
+1 1/2 taza leche
+```
+
+No es necesario soportar recetas completas con instrucciones, encabezados,
+temperaturas o secciones complejas durante el MVP.
 
 ### Resultado
 
@@ -211,6 +261,26 @@ Ingredientes ajustados para 6 porciones:
 3 tazas de harina
 1.5 cucharaditas de sal
 2 huevos
+```
+
+El resultado final debe poder copiarse como texto e incluir contexto suficiente:
+
+```text
+Receta escalada de 4 a 6 porciones (× 1.5)
+
+Ingredientes:
+3 tazas de harina
+1.5 cucharaditas de sal
+2 huevos
+
+Nota: revisa redondeos prácticos en huevos, levadura, especias, molde y tiempo
+de cocción.
+```
+
+Además del bloque final, cada fila debe mostrar una vista inmediata:
+
+```text
+1/2 taza de harina → 3/4 taza de harina
 ```
 
 ### Avisos prácticos
@@ -224,9 +294,27 @@ huevos, levadura, especias, tamaño del molde y tiempo de cocción.
 
 No aplicar redondeos automáticos destructivos como cambiar `1.5 huevos` a `2`.
 
+También se pueden mostrar avisos contextuales no destructivos si el ingrediente
+contiene términos sensibles como:
+
+```text
+huevo
+levadura
+polvo para hornear
+bicarbonato
+sal
+especia
+molde
+horno
+```
+
+Estos avisos no deben modificar cantidades. Solo deben recordar que el usuario
+revise el ingrediente o el paso antes de redondear.
+
 ### Acciones
 
 - **Copiar receta escalada**.
+- **Pegar ingredientes**.
 - **Cargar ejemplo**.
 - **Limpiar receta**.
 - Enlace al conversor de medidas culinarias.
@@ -248,8 +336,9 @@ No aplicar redondeos automáticos destructivos como cambiar `1.5 huevos` a `2`.
 | Ingrediente vacío | Mantener fila editable y señalarla al copiar |
 | Fila `al gusto` sin cantidad | Conservar sin escalar |
 
-Mantener precisión completa durante el cálculo. Redondear únicamente en la
-presentación.
+El pegado multilínea debe respetar el límite de `50` ingredientes. Si el texto
+pegado supera el límite, añadir solo las filas permitidas y comunicar cuántas no
+se cargaron.
 
 ---
 
@@ -291,14 +380,15 @@ No guardar automáticamente sin comunicarlo.
 
 ```text
 Ajusta las cantidades de una receta según las porciones que necesitas preparar
-y copia la nueva lista de ingredientes.
+y copia la nueva lista de ingredientes. Duplica, reduce a la mitad o adapta una
+receta a cualquier número de porciones.
 ```
 
 ### Secciones
 
 1. Hero y breadcrumbs.
 2. Porciones y factor.
-3. Ingredientes editables.
+3. Ingredientes editables con pegado simple.
 4. Resultado copiable.
 5. Nota sobre redondeos prácticos.
 6. Enlace al conversor culinario.
@@ -312,6 +402,7 @@ y copia la nueva lista de ingredientes.
 - ¿Cambian los tiempos de cocción al duplicar una receta?
 - ¿La calculadora convierte tazas a gramos?
 - ¿Cómo escalar una receta a la mitad?
+- ¿Puedo pegar una lista de ingredientes?
 
 ---
 
@@ -324,6 +415,9 @@ parseRecipeQuantity(value)
 formatRecipeQuantity(value, mode)
 approximateCookingFraction(value)
 validateRecipeIngredient(ingredient)
+parsePastedIngredientLine(line)
+parsePastedIngredients(text, maxIngredients)
+detectPracticalWarnings(ingredient)
 ```
 
 ---
@@ -335,11 +429,18 @@ validateRecipeIngredient(ingredient)
 - `1/2 × 3 = 1.5`.
 - `1 1/2 × 2 = 3`.
 - Aproximar `0.666666...` como `2/3`.
+- Aproximar valores útiles con denominadores `6` y `12` cuando corresponda.
 - Preservar una fila `sal al gusto`.
 - No redondear automáticamente `1.5 huevos`.
 - Rechazar porciones `0`, negativas, `NaN` e `Infinity`.
 - Rechazar fracción con denominador `0`.
 - Respetar límite de `50` ingredientes.
+- Aceptar decimal con coma: `1,5`.
+- Aceptar fracciones con espacios: `1 / 2`.
+- Parsear pegado simple: `2 tazas harina`, `1/2 cucharadita sal`, `3 huevos`.
+- Conservar como editable una línea pegada que no pueda parsearse con confianza.
+- Señalar ingrediente vacío al copiar sin bloquear la edición.
+- Detectar avisos prácticos sin modificar cantidades.
 
 ---
 
@@ -354,3 +455,8 @@ validateRecipeIngredient(ingredient)
 7. La interfaz no redondea huevos ni otros ingredientes silenciosamente.
 8. La URL comparte el factor, no la receta completa.
 9. La lógica central queda prevista para pruebas unitarias.
+10. La interfaz es mobile first y no usa una tabla rígida en pantallas pequeñas.
+11. El usuario puede pegar ingredientes simples y editarlos después.
+12. Cada ingrediente muestra su resultado escalado en vivo.
+13. El texto copiado incluye porciones originales, porciones deseadas, factor,
+    ingredientes y nota breve de redondeos prácticos.

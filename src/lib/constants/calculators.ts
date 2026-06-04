@@ -187,4 +187,13 @@ export const CALCULATORS: CalculatorDirectoryItem[] = [
     categorySlug: "cocina",
     order: 78,
   },
+  {
+    id: "escalar-receta-por-porciones",
+    title: "Escalar receta por porciones",
+    description:
+      "Ajusta las cantidades de una receta segun las porciones que necesitas preparar.",
+    href: "/cocina/escalar-receta-por-porciones",
+    categorySlug: "cocina",
+    order: 80,
+  },
 ];

@@ -1,0 +1,859 @@
+---
+import BaseLayout from "@layouts/BaseLayout.astro";
+import Container from "@components/layout/Container.astro";
+import PageShell from "@components/layout/PageShell.astro";
+import FaqSection from "@components/shared/FaqSection.astro";
+import PageHero from "@components/shared/PageHero.astro";
+import SectionIntro from "@components/shared/SectionIntro.astro";
+import { buildFaqJsonLd } from "@lib/seo";
+
+const title = "Escalar receta por porciones";
+const description =
+  "Ajusta las cantidades de una receta segun las porciones que necesitas preparar y copia la nueva lista de ingredientes.";
+const canonical = "/cocina/escalar-receta-por-porciones";
+
+const faqs = [
+  {
+    question: "Como ajustar una receta para mas personas?",
+    answer:
+      "Divide las porciones deseadas entre las porciones originales y multiplica cada cantidad por ese factor. Esta calculadora hace ese calculo por ingrediente.",
+  },
+  {
+    question: "Como calcular el factor de una receta?",
+    answer:
+      "El factor es porciones deseadas dividido entre porciones originales. Por ejemplo, de 4 a 10 porciones el factor es 10 / 4 = 2.5.",
+  },
+  {
+    question: "Debo redondear los huevos?",
+    answer:
+      "No siempre. La calculadora no redondea automaticamente 1.5 huevos a 2. Decide segun la receta, el tamano del huevo y el margen de error aceptable.",
+  },
+  {
+    question: "Cambian los tiempos de coccion al duplicar una receta?",
+    answer:
+      "Pueden cambiar. Las cantidades escalan de forma lineal, pero el molde, grosor de la mezcla, horno y tipo de receta pueden modificar el tiempo real.",
+  },
+  {
+    question: "La calculadora convierte tazas a gramos?",
+    answer:
+      "No en este MVP. Conserva las unidades capturadas. Para convertir medidas compatibles usa el conversor de medidas culinarias.",
+    relatedHref: "/cocina/conversor-de-medidas-culinarias",
+    relatedLabel: "Abrir conversor culinario",
+  },
+  {
+    question: "Como escalar una receta a la mitad?",
+    answer:
+      "Escribe las porciones originales y la mitad como porciones deseadas. Por ejemplo, si la receta rinde 8 porciones y necesitas 4, el factor sera 0.5.",
+  },
+  {
+    question: "Puedo pegar una lista de ingredientes?",
+    answer:
+      "Si. Pega lineas simples como '2 tazas harina', '1/2 cucharadita sal' o 'sal al gusto'. Cada linea queda editable antes de copiar el resultado.",
+  },
+];
+
+const faqJsonLd = buildFaqJsonLd(faqs);
+
+const unitSuggestions = [
+  "unidad",
+  "g",
+  "kg",
+  "ml",
+  "l",
+  "taza",
+  "cucharada",
+  "cucharadita",
+  "oz",
+  "lb",
+  "pieza",
+  "paquete",
+  "pizca",
+  "lata",
+  "ramita",
+  "diente",
+  "al gusto",
+];
+---
+
+<BaseLayout title={title} description={description} canonical={canonical}>
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={JSON.stringify(faqJsonLd)} />
+  </Fragment>
+
+  <PageShell>
+    <PageHero
+      title={title}
+      description="Ajusta las cantidades de una receta segun las porciones que necesitas preparar. Duplica, reduce a la mitad o adapta una receta a cualquier numero de porciones."
+      kicker="Cocina"
+      collapseBreadcrumbOnMobile
+      containerClass="py-6 md:py-8"
+      breadcrumbs={[
+        { label: "Inicio", href: "/", ariaLabel: "Inicio" },
+        { label: "Cocina", href: "/cocina", optional: true },
+        { label: "Escalar receta", truncate: true },
+      ]}
+    />
+
+    <Container as="section" class="py-5 md:py-8">
+      <section
+        id="recipe-scaler"
+        class="overflow-hidden rounded-lg border border-gray-700 bg-gray-950 shadow-xl shadow-gray-950/30"
+        aria-labelledby="calculator-heading"
+      >
+        <div class="grid gap-0 xl:grid-cols-[minmax(0,1fr)_minmax(21rem,0.72fr)]">
+          <div class="p-4 sm:p-6">
+            <p class="text-sm font-semibold text-amber-300">Porciones y factor</p>
+            <h2 id="calculator-heading" class="mt-2 text-2xl font-semibold">
+              Ajusta ingredientes en vivo
+            </h2>
+            <p class="mt-2 text-sm leading-relaxed text-gray-400">
+              Escribe decimales o fracciones como <span class="text-gray-200">1/2</span>,
+              <span class="text-gray-200">2,5</span> o
+              <span class="text-gray-200">1 1/2</span>.
+            </p>
+
+            <div class="mt-5 grid gap-4 sm:grid-cols-2">
+              <div>
+                <label for="original-servings" class="block text-sm font-semibold text-gray-200">
+                  Porciones originales
+                </label>
+                <input
+                  id="original-servings"
+                  class="mt-2 min-h-14 w-full rounded-lg border border-gray-700 bg-gray-900 px-4 text-xl text-white outline-none placeholder:text-gray-600 transition focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15"
+                  type="text"
+                  inputmode="decimal"
+                  autocomplete="off"
+                  value="4"
+                  data-original-servings
+                />
+              </div>
+              <div>
+                <label for="desired-servings" class="block text-sm font-semibold text-gray-200">
+                  Porciones deseadas
+                </label>
+                <input
+                  id="desired-servings"
+                  class="mt-2 min-h-14 w-full rounded-lg border border-gray-700 bg-gray-900 px-4 text-xl text-white outline-none placeholder:text-gray-600 transition focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15"
+                  type="text"
+                  inputmode="decimal"
+                  autocomplete="off"
+                  value="6"
+                  data-desired-servings
+                />
+              </div>
+            </div>
+
+            <p class="mt-3 min-h-5 text-sm text-red-300" data-servings-error></p>
+
+            <div class="mt-5">
+              <label for="quantity-format" class="block text-sm font-semibold text-gray-200">
+                Formato de cantidades
+              </label>
+              <select
+                id="quantity-format"
+                class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-900 px-4 text-base text-white outline-none transition focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15"
+                data-format-mode
+              >
+                <option value="fraction" selected>Fraccion practica</option>
+                <option value="decimal">Decimal</option>
+                <option value="both">Decimal y fraccion</option>
+              </select>
+            </div>
+
+            <div class="mt-6 rounded-lg border border-gray-800 bg-gray-900/65 p-4">
+              <label for="paste-ingredients" class="block text-sm font-semibold text-gray-200">
+                Pegar ingredientes
+              </label>
+              <textarea
+                id="paste-ingredients"
+                class="mt-2 min-h-32 w-full resize-y rounded-lg border border-gray-700 bg-gray-950 px-4 py-3 text-base text-white outline-none placeholder:text-gray-600 transition focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15"
+                placeholder="2 tazas harina&#10;1/2 cucharadita sal&#10;3 huevos&#10;sal al gusto"
+                data-paste-input
+              ></textarea>
+              <div class="mt-3 flex flex-wrap gap-3">
+                <button
+                  class="min-h-11 rounded-lg bg-amber-400 px-4 py-2 text-sm font-semibold text-gray-950 transition hover:bg-amber-300 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-300/40"
+                  type="button"
+                  data-paste-button
+                >
+                  Pegar ingredientes
+                </button>
+                <button
+                  class="min-h-11 rounded-lg border border-gray-700 px-4 py-2 text-sm font-semibold text-gray-200 transition hover:border-gray-500 hover:bg-gray-900 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-gray-400/30"
+                  type="button"
+                  data-example-button
+                >
+                  Cargar ejemplo
+                </button>
+              </div>
+              <p class="mt-2 min-h-5 text-sm text-gray-400" data-paste-status></p>
+            </div>
+
+            <div class="mt-6">
+              <div class="flex items-center justify-between gap-3">
+                <h3 class="text-lg font-semibold">Ingredientes</h3>
+                <span class="text-sm text-gray-500" data-ingredient-count>0/50</span>
+              </div>
+
+              <datalist id="recipe-unit-options">
+                {unitSuggestions.map((unit) => <option value={unit} />)}
+              </datalist>
+
+              <div class="mt-3 space-y-3" data-ingredients-list></div>
+
+              <div class="mt-4 flex flex-wrap gap-3">
+                <button
+                  class="min-h-11 rounded-lg border border-amber-400/60 px-4 py-2 text-sm font-semibold text-amber-300 transition hover:bg-amber-400/10 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/30"
+                  type="button"
+                  data-add-row
+                >
+                  Agregar ingrediente
+                </button>
+                <button
+                  class="min-h-11 rounded-lg border border-gray-700 px-4 py-2 text-sm font-semibold text-gray-200 transition hover:border-gray-500 hover:bg-gray-900 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-gray-400/30"
+                  type="button"
+                  data-save-draft
+                >
+                  Guardar borrador en este dispositivo
+                </button>
+                <button
+                  class="hidden min-h-11 rounded-lg border border-gray-700 px-4 py-2 text-sm font-semibold text-gray-200 transition hover:border-gray-500 hover:bg-gray-900 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-gray-400/30"
+                  type="button"
+                  data-load-draft
+                >
+                  Cargar borrador
+                </button>
+                <button
+                  class="min-h-11 rounded-lg border border-gray-700 px-4 py-2 text-sm font-semibold text-gray-200 transition hover:border-gray-500 hover:bg-gray-900 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-gray-400/30"
+                  type="button"
+                  data-clear-button
+                >
+                  Limpiar receta
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <aside class="border-t border-gray-800 bg-gray-900/65 p-4 sm:p-6 xl:border-l xl:border-t-0">
+            <p class="text-xs font-semibold uppercase tracking-wide text-gray-500">
+              Resultado
+            </p>
+            <p class="mt-3 text-3xl font-semibold text-amber-100" data-factor-result>
+              x 1.5
+            </p>
+            <p class="mt-2 min-h-5 text-sm leading-relaxed text-gray-400" data-factor-note>
+              Factor de escalado para 6 porciones.
+            </p>
+
+            <div class="mt-5 rounded-lg border border-gray-800 bg-gray-950 p-4">
+              <h3 class="text-base font-semibold">Ingredientes ajustados</h3>
+              <div class="mt-3 min-h-32 space-y-2 text-sm leading-relaxed text-gray-300" data-result-list>
+                <p>Agrega ingredientes para ver la receta escalada.</p>
+              </div>
+            </div>
+
+            <div class="mt-4 rounded-lg border border-amber-400/20 bg-amber-400/10 p-4">
+              <p class="text-sm leading-relaxed text-amber-100" data-practical-note>
+                Algunos ingredientes y pasos necesitan criterio practico. Revisa especialmente huevos, levadura, especias, tamano del molde y tiempo de coccion.
+              </p>
+            </div>
+
+            <div class="mt-4 flex flex-wrap gap-3">
+              <button
+                class="min-h-11 rounded-lg bg-amber-400 px-4 py-2 text-sm font-semibold text-gray-950 transition hover:bg-amber-300 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-300/40"
+                type="button"
+                data-copy-button
+              >
+                Copiar receta escalada
+              </button>
+            </div>
+            <p class="sr-only" role="status" aria-live="polite" data-live-status></p>
+            <p class="mt-3 min-h-5 text-sm text-emerald-300" role="status" aria-live="polite" data-copy-status></p>
+          </aside>
+        </div>
+      </section>
+    </Container>
+
+    <Container as="section" class="py-6 md:py-8">
+      <SectionIntro
+        title="Criterio practico al cocinar"
+        description="La multiplicacion de cantidades es lineal; la cocina real a veces no. La calculadora conserva los valores para que decidas sin redondeos ocultos."
+      />
+      <div class="grid gap-4 md:grid-cols-3">
+        <article class="rounded-lg border border-gray-800 bg-gray-950 p-5">
+          <h3 class="text-lg font-semibold">Huevos y piezas</h3>
+          <p class="mt-3 text-sm leading-relaxed text-gray-400">
+            Un resultado como 1.5 huevos se muestra tal cual. Puedes batir y
+            medir, o redondear segun la receta.
+          </p>
+        </article>
+        <article class="rounded-lg border border-gray-800 bg-gray-950 p-5">
+          <h3 class="text-lg font-semibold">Leudantes y especias</h3>
+          <p class="mt-3 text-sm leading-relaxed text-gray-400">
+            Levadura, sal y especias pueden necesitar ajustes de sabor,
+            fermentacion o textura.
+          </p>
+        </article>
+        <article class="rounded-lg border border-gray-800 bg-gray-950 p-5">
+          <h3 class="text-lg font-semibold">Molde y horno</h3>
+          <p class="mt-3 text-sm leading-relaxed text-gray-400">
+            Al cambiar el tamano de la receta, el grosor y tiempo de coccion no
+            siempre escalan igual.
+          </p>
+        </article>
+      </div>
+    </Container>
+
+    <Container as="section" class="py-6 md:py-8">
+      <SectionIntro
+        title="Medidas culinarias"
+        description="Esta calculadora conserva las unidades. Si necesitas convertir medidas compatibles, abre el conversor culinario."
+      />
+      <div class="rounded-lg border border-gray-800 bg-gray-950 p-5">
+        <a
+          href="/cocina/conversor-de-medidas-culinarias"
+          class="inline-flex min-h-11 items-center rounded-lg border border-amber-400/60 px-4 py-2 text-sm font-semibold text-amber-300 transition hover:bg-amber-400/10 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/30"
+        >
+          Abrir conversor de medidas culinarias
+        </a>
+      </div>
+    </Container>
+
+    <FaqSection faqs={faqs} />
+  </PageShell>
+</BaseLayout>
+
+<script>
+  import {
+    RECIPE_SCALING_MAX_INGREDIENTS,
+    calculateRecipeScaleFactor,
+    detectPracticalWarnings,
+    formatRecipeQuantity,
+    parsePastedIngredients,
+    parseRecipeQuantity,
+    scaleIngredientQuantity,
+    validateRecipeIngredient,
+  } from "@lib/calculators/cocina/escalar-receta-por-porciones/recipeScaling";
+
+  const STORAGE_KEY = "calculadoras.tools.recipe-scaler.draft.v1";
+  const defaultRows = [
+    { quantity: "", unit: "", name: "" },
+    { quantity: "", unit: "", name: "" },
+    { quantity: "", unit: "", name: "" },
+  ];
+  const exampleRows = [
+    { quantity: "2", unit: "tazas", name: "harina" },
+    { quantity: "1/2", unit: "cucharadita", name: "sal" },
+    { quantity: "3", unit: "", name: "huevos" },
+    { quantity: "", unit: "al gusto", name: "pimienta" },
+  ];
+
+  const originalInput = document.querySelector("[data-original-servings]");
+  const desiredInput = document.querySelector("[data-desired-servings]");
+  const formatSelect = document.querySelector("[data-format-mode]");
+  const servingsError = document.querySelector("[data-servings-error]");
+  const pasteInput = document.querySelector("[data-paste-input]");
+  const pasteButton = document.querySelector("[data-paste-button]");
+  const pasteStatus = document.querySelector("[data-paste-status]");
+  const exampleButton = document.querySelector("[data-example-button]");
+  const ingredientsList = document.querySelector("[data-ingredients-list]");
+  const ingredientCount = document.querySelector("[data-ingredient-count]");
+  const addRowButton = document.querySelector("[data-add-row]");
+  const saveDraftButton = document.querySelector("[data-save-draft]");
+  const loadDraftButton = document.querySelector("[data-load-draft]");
+  const clearButton = document.querySelector("[data-clear-button]");
+  const factorResult = document.querySelector("[data-factor-result]");
+  const factorNote = document.querySelector("[data-factor-note]");
+  const resultList = document.querySelector("[data-result-list]");
+  const practicalNote = document.querySelector("[data-practical-note]");
+  const copyButton = document.querySelector("[data-copy-button]");
+  const copyStatus = document.querySelector("[data-copy-status]");
+  const liveStatus = document.querySelector("[data-live-status]");
+
+  let ingredients = structuredClone(defaultRows);
+  let currentCopyText = "";
+  let copyTimer = 0;
+  let urlTimer = 0;
+
+  function getFormatMode() {
+    return ["fraction", "decimal", "both"].includes(formatSelect.value)
+      ? formatSelect.value
+      : "fraction";
+  }
+
+  function createInput({ label, value, field, index, inputMode = "text", list = "" }) {
+    const wrapper = document.createElement("label");
+    const labelText = document.createElement("span");
+    const input = document.createElement("input");
+
+    wrapper.className = "block";
+    labelText.className = "block text-xs font-semibold uppercase tracking-wide text-gray-500";
+    labelText.textContent = label;
+    input.className =
+      "mt-1 min-h-11 w-full rounded-lg border border-gray-700 bg-gray-950 px-3 text-base text-white outline-none placeholder:text-gray-600 transition focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15";
+    input.value = value;
+    input.dataset.field = field;
+    input.dataset.index = String(index);
+    input.autocomplete = "off";
+    input.inputMode = inputMode;
+
+    if (list) {
+      input.setAttribute("list", list);
+    }
+
+    wrapper.append(labelText, input);
+
+    return wrapper;
+  }
+
+  function renderRows() {
+    ingredientsList.replaceChildren(
+      ...ingredients.map((ingredient, index) => {
+        const row = document.createElement("article");
+        const header = document.createElement("div");
+        const title = document.createElement("h4");
+        const removeButton = document.createElement("button");
+        const fields = document.createElement("div");
+        const result = document.createElement("p");
+        const warning = document.createElement("p");
+        const error = document.createElement("p");
+
+        row.className =
+          "rounded-lg border border-gray-800 bg-gray-900/65 p-4 transition";
+        row.dataset.row = String(index);
+        header.className = "flex items-center justify-between gap-3";
+        title.className = "text-sm font-semibold text-gray-200";
+        title.textContent = `Ingrediente ${index + 1}`;
+        removeButton.className =
+          "min-h-10 rounded-lg border border-gray-700 px-3 text-sm font-semibold text-gray-300 transition hover:border-red-300 hover:text-red-200 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-red-300/30";
+        removeButton.type = "button";
+        removeButton.textContent = "Eliminar";
+        removeButton.dataset.removeIndex = String(index);
+        removeButton.disabled = ingredients.length <= 1;
+        fields.className = "mt-3 grid gap-3 sm:grid-cols-[8rem_9rem_minmax(0,1fr)]";
+        result.className = "mt-3 min-h-5 text-sm leading-relaxed text-amber-100";
+        result.dataset.rowResult = String(index);
+        warning.className = "mt-2 min-h-5 text-sm leading-relaxed text-amber-200";
+        warning.dataset.rowWarning = String(index);
+        error.className = "mt-2 min-h-5 text-sm leading-relaxed text-red-300";
+        error.dataset.rowError = String(index);
+
+        fields.append(
+          createInput({
+            label: "Cantidad",
+            value: ingredient.quantity,
+            field: "quantity",
+            index,
+            inputMode: "decimal",
+          }),
+          createInput({
+            label: "Unidad",
+            value: ingredient.unit,
+            field: "unit",
+            index,
+            list: "recipe-unit-options",
+          }),
+          createInput({
+            label: "Ingrediente",
+            value: ingredient.name,
+            field: "name",
+            index,
+          }),
+        );
+        header.append(title, removeButton);
+        row.append(header, fields, result, warning, error);
+
+        return row;
+      }),
+    );
+
+    ingredientCount.textContent = `${ingredients.length}/${RECIPE_SCALING_MAX_INGREDIENTS}`;
+    addRowButton.disabled = ingredients.length >= RECIPE_SCALING_MAX_INGREDIENTS;
+    addRowButton.classList.toggle("opacity-50", addRowButton.disabled);
+    renderCalculations();
+  }
+
+  function parseServings() {
+    const original = parseRecipeQuantity(originalInput.value);
+    const desired = parseRecipeQuantity(desiredInput.value);
+
+    if (!original.ok || !desired.ok) {
+      return { ok: false, message: "Escribe porciones validas para calcular." };
+    }
+
+    if (original.value <= 0 || desired.value <= 0) {
+      return { ok: false, message: "Las porciones deben ser mayores que cero." };
+    }
+
+    try {
+      return {
+        ok: true,
+        original: original.value,
+        desired: desired.value,
+        factor: calculateRecipeScaleFactor(original.value, desired.value),
+      };
+    } catch {
+      return { ok: false, message: "Las porciones deben ser numeros positivos." };
+    }
+  }
+
+  function formatIngredientLine(quantity, unit, name) {
+    const cleanUnit = unit.trim();
+    const cleanName = name.trim().replace(/^de\s+/i, "");
+
+    if (!cleanUnit) {
+      return `${quantity} ${cleanName}`.trim();
+    }
+
+    if (cleanUnit.toLowerCase() === "al gusto") {
+      if (/\bal gusto\b/i.test(cleanName)) {
+        return cleanName;
+      }
+
+      return `${cleanName} al gusto`.trim();
+    }
+
+    return `${quantity} ${cleanUnit} de ${cleanName}`.trim();
+  }
+
+  function syncUrl(servings) {
+    const url = new URL(window.location.href);
+
+    if (servings.ok) {
+      url.searchParams.set("original", String(servings.original));
+      url.searchParams.set("deseadas", String(servings.desired));
+    } else {
+      url.searchParams.delete("original");
+      url.searchParams.delete("deseadas");
+    }
+
+    window.clearTimeout(urlTimer);
+    urlTimer = window.setTimeout(() => {
+      window.history.replaceState({}, "", url);
+    }, 250);
+  }
+
+  function renderCalculations(options = {}) {
+    const { updateUrl = true } = options;
+    const servings = parseServings();
+    const resultLines = [];
+    const warnings = new Map();
+    const invalidRows = [];
+    const mode = getFormatMode();
+
+    servingsError.textContent = servings.ok ? "" : servings.message;
+
+    if (!servings.ok) {
+      factorResult.textContent = "Sin factor";
+      factorNote.textContent = "Revisa las porciones para calcular.";
+      currentCopyText = "";
+      resultList.replaceChildren(document.createElement("p"));
+      resultList.firstElementChild.textContent = "No hay resultado disponible.";
+      if (updateUrl) {
+        syncUrl(servings);
+      }
+      return;
+    }
+
+    factorResult.textContent = `x ${formatRecipeQuantity(servings.factor, "decimal")}`;
+    factorNote.textContent = `Factor de escalado para ${formatRecipeQuantity(servings.desired, "decimal")} porciones.`;
+
+    ingredients.forEach((ingredient, index) => {
+      const row = document.querySelector(`[data-row="${index}"]`);
+      const rowResult = document.querySelector(`[data-row-result="${index}"]`);
+      const rowWarning = document.querySelector(`[data-row-warning="${index}"]`);
+      const rowError = document.querySelector(`[data-row-error="${index}"]`);
+      const isBlankRow =
+        !ingredient.quantity.trim() &&
+        !ingredient.unit.trim() &&
+        !ingredient.name.trim();
+
+      if (isBlankRow) {
+        row?.classList.remove("border-red-300/70");
+        rowResult.textContent = "Fila lista para capturar.";
+        rowWarning.textContent = "";
+        rowError.textContent = "";
+        return;
+      }
+
+      const validation = validateRecipeIngredient(ingredient);
+      const warningMatches = detectPracticalWarnings(ingredient);
+
+      row?.classList.toggle("border-red-300/70", !validation.valid);
+      rowError.textContent = validation.errors.join(" ");
+      rowWarning.textContent = warningMatches.map((warning) => warning.message).join(" ");
+      warningMatches.forEach((warning) => warnings.set(warning.term, warning.message));
+
+      if (validation.isTasteOnly && ingredient.name.trim()) {
+        const line = formatIngredientLine("", "al gusto", ingredient.name);
+
+        rowResult.textContent = line;
+        resultLines.push(line);
+        return;
+      }
+
+      if (!validation.valid) {
+        rowResult.textContent = "Revisa esta fila para incluirla en el resultado.";
+        invalidRows.push(index + 1);
+        return;
+      }
+
+      const scaled = scaleIngredientQuantity(ingredient.quantity, servings.factor);
+      const scaledQuantity = formatRecipeQuantity(scaled, mode);
+      const line = formatIngredientLine(scaledQuantity, ingredient.unit, ingredient.name);
+      const originalLine = formatIngredientLine(
+        ingredient.quantity,
+        ingredient.unit,
+        ingredient.name,
+      );
+
+      rowResult.textContent = `${originalLine} -> ${line}`;
+      resultLines.push(line);
+    });
+
+    resultList.replaceChildren(
+      ...(resultLines.length
+        ? resultLines.map((line) => {
+            const item = document.createElement("p");
+
+            item.textContent = line;
+
+            return item;
+          })
+        : [document.createElement("p")]),
+    );
+
+    if (!resultLines.length) {
+      resultList.firstElementChild.textContent =
+        "Agrega ingredientes para ver la receta escalada.";
+    }
+
+    practicalNote.textContent = warnings.size
+      ? `Revisa antes de redondear: ${[...warnings.values()].join(" ")}`
+      : "Algunos ingredientes y pasos necesitan criterio practico. Revisa especialmente huevos, levadura, especias, tamano del molde y tiempo de coccion.";
+
+    currentCopyText = [
+      `Receta escalada de ${formatRecipeQuantity(servings.original, "decimal")} a ${formatRecipeQuantity(servings.desired, "decimal")} porciones (x ${formatRecipeQuantity(servings.factor, "decimal")})`,
+      "",
+      "Ingredientes:",
+      ...(resultLines.length ? resultLines : ["Sin ingredientes capturados."]),
+      "",
+      "Nota: revisa redondeos practicos en huevos, levadura, especias, molde y tiempo de coccion.",
+    ].join("\n");
+
+    copyButton.dataset.invalidRows = invalidRows.join(", ");
+
+    if (updateUrl) {
+      syncUrl(servings);
+    }
+
+    liveStatus.textContent = servings.ok
+      ? `Factor actualizado: ${factorResult.textContent}`
+      : "";
+  }
+
+  function loadUrlParameters() {
+    const parameters = new URLSearchParams(window.location.search);
+    const original = parameters.get("original");
+    const desired = parameters.get("deseadas");
+
+    if (original && parseRecipeQuantity(original).ok) {
+      originalInput.value = original;
+    }
+
+    if (desired && parseRecipeQuantity(desired).ok) {
+      desiredInput.value = desired;
+    }
+  }
+
+  function hasSavedDraft() {
+    try {
+      return Boolean(window.localStorage.getItem(STORAGE_KEY));
+    } catch {
+      return false;
+    }
+  }
+
+  function syncDraftButton() {
+    loadDraftButton.classList.toggle("hidden", !hasSavedDraft());
+  }
+
+  function saveDraft() {
+    try {
+      window.localStorage.setItem(
+        STORAGE_KEY,
+        JSON.stringify({
+          original: originalInput.value,
+          desired: desiredInput.value,
+          formatMode: getFormatMode(),
+          ingredients,
+        }),
+      );
+      copyStatus.textContent = "Borrador guardado en este dispositivo.";
+      syncDraftButton();
+    } catch {
+      copyStatus.textContent = "No fue posible guardar el borrador.";
+    }
+  }
+
+  function loadDraft() {
+    try {
+      const rawDraft = window.localStorage.getItem(STORAGE_KEY);
+
+      if (!rawDraft) {
+        return;
+      }
+
+      const draft = JSON.parse(rawDraft);
+
+      if (typeof draft.original === "string") {
+        originalInput.value = draft.original;
+      }
+
+      if (typeof draft.desired === "string") {
+        desiredInput.value = draft.desired;
+      }
+
+      if (["fraction", "decimal", "both"].includes(draft.formatMode)) {
+        formatSelect.value = draft.formatMode;
+      }
+
+      if (Array.isArray(draft.ingredients)) {
+        ingredients = draft.ingredients
+          .slice(0, RECIPE_SCALING_MAX_INGREDIENTS)
+          .map((ingredient) => ({
+            quantity: String(ingredient.quantity ?? ""),
+            unit: String(ingredient.unit ?? ""),
+            name: String(ingredient.name ?? ""),
+          }));
+      }
+
+      renderRows();
+      copyStatus.textContent = "Borrador cargado.";
+    } catch {
+      copyStatus.textContent = "No fue posible cargar el borrador.";
+    }
+  }
+
+  async function copyRecipe() {
+    const invalidRows = copyButton.dataset.invalidRows;
+
+    if (invalidRows) {
+      copyStatus.textContent = `Revisa las filas ${invalidRows} antes de copiar.`;
+      return;
+    }
+
+    try {
+      await navigator.clipboard.writeText(currentCopyText);
+      copyStatus.textContent = "Receta escalada copiada.";
+    } catch {
+      copyStatus.textContent = "No fue posible copiar automaticamente.";
+    }
+
+    window.clearTimeout(copyTimer);
+    copyTimer = window.setTimeout(() => {
+      copyStatus.textContent = "";
+    }, 2500);
+  }
+
+  function resetRecipe() {
+    originalInput.value = "4";
+    desiredInput.value = "6";
+    formatSelect.value = "fraction";
+    pasteInput.value = "";
+    pasteStatus.textContent = "";
+    ingredients = structuredClone(defaultRows);
+    renderRows();
+  }
+
+  ingredientsList.addEventListener("input", (event) => {
+    const input = event.target;
+    const index = Number(input.dataset.index);
+    const field = input.dataset.field;
+
+    if (!Number.isInteger(index) || !["quantity", "unit", "name"].includes(field)) {
+      return;
+    }
+
+    ingredients[index][field] = input.value;
+    renderCalculations();
+  });
+
+  ingredientsList.addEventListener("click", (event) => {
+    const button = event.target.closest("[data-remove-index]");
+
+    if (!button) {
+      return;
+    }
+
+    const index = Number(button.dataset.removeIndex);
+
+    if (!Number.isInteger(index) || ingredients.length <= 1) {
+      return;
+    }
+
+    ingredients.splice(index, 1);
+    renderRows();
+  });
+
+  [originalInput, desiredInput, formatSelect].forEach((input) => {
+    input.addEventListener("input", () => {
+      renderCalculations();
+    });
+    input.addEventListener("change", () => {
+      renderCalculations();
+    });
+  });
+
+  pasteButton.addEventListener("click", () => {
+    const remaining = RECIPE_SCALING_MAX_INGREDIENTS - ingredients.length;
+    const existingBlankOnly = ingredients.every(
+      (ingredient) =>
+        !ingredient.quantity.trim() && !ingredient.unit.trim() && !ingredient.name.trim(),
+    );
+    const limit = existingBlankOnly ? RECIPE_SCALING_MAX_INGREDIENTS : remaining;
+    const parsed = parsePastedIngredients(pasteInput.value, limit);
+
+    if (!parsed.ingredients.length) {
+      pasteStatus.textContent = "Pega al menos una linea de ingrediente.";
+      return;
+    }
+
+    ingredients = existingBlankOnly
+      ? parsed.ingredients
+      : [...ingredients, ...parsed.ingredients];
+
+    pasteStatus.textContent =
+      parsed.truncatedCount > 0
+        ? `Se cargaron ${parsed.ingredients.length} ingredientes. ${parsed.truncatedCount} no se agregaron por el limite de 50.`
+        : `Se cargaron ${parsed.ingredients.length} ingredientes.`;
+    renderRows();
+  });
+
+  addRowButton.addEventListener("click", () => {
+    if (ingredients.length >= RECIPE_SCALING_MAX_INGREDIENTS) {
+      pasteStatus.textContent = "Llegaste al limite de 50 ingredientes.";
+      return;
+    }
+
+    ingredients.push({ quantity: "", unit: "", name: "" });
+    renderRows();
+  });
+
+  exampleButton.addEventListener("click", () => {
+    originalInput.value = "4";
+    desiredInput.value = "6";
+    ingredients = structuredClone(exampleRows);
+    pasteStatus.textContent = "Ejemplo cargado.";
+    renderRows();
+  });
+
+  saveDraftButton.addEventListener("click", saveDraft);
+  loadDraftButton.addEventListener("click", loadDraft);
+  clearButton.addEventListener("click", resetRecipe);
+  copyButton.addEventListener("click", copyRecipe);
+
+  loadUrlParameters();
+  syncDraftButton();
+  renderRows();
+</script>
