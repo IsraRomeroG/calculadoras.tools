@@ -63,10 +63,13 @@ src/lib/calculators/vehiculos/calculadora-de-consumo-de-gasolina/fuelConsumption
 3. Distancia en kilómetros o millas.
 4. Combustible en litros o galones estadounidenses.
 5. Resultados en `km/L`, `L/100 km` y `mpg US`.
-6. Fórmula visible.
-7. Botones para copiar y limpiar.
-8. URL compartible.
-9. Accesibilidad y pruebas unitarias.
+6. Lectura práctica del resultado en lenguaje natural.
+7. Trayecto de solo ida o ida y vuelta en el modo de estimación.
+8. Margen de seguridad opcional para combustible estimado.
+9. Fórmula visible.
+10. Botones para copiar, limpiar y compartir.
+11. URL compartible.
+12. Diseño mobile first, accesibilidad y pruebas unitarias.
 
 ### Fuera del MVP
 
@@ -136,6 +139,19 @@ Consumo: 8.00 L/100 km
 Equivalencia: 29.40 mpg US
 ```
 
+### Lectura práctica
+
+Además de las tres métricas, mostrar una interpretación breve:
+
+```text
+Cada litro rinde aproximadamente 12.50 km.
+Para recorrer 100 km usarías cerca de 8.00 l.
+Con 40 l podrías recorrer cerca de 500 km.
+```
+
+La lectura práctica debe aparecer como apoyo del resultado, no como un bloque de
+texto largo. En móvil debe ser fácil de escanear en 2 o 3 líneas.
+
 ---
 
 ## Modo 2 — Estimar combustible para un trayecto
@@ -146,8 +162,10 @@ Equivalencia: 29.40 mpg US
 |-------|---------|
 | Distancia del trayecto | Vacío |
 | Unidad de distancia | `km` |
+| Trayecto | `Solo ida` |
 | Rendimiento conocido | Vacío |
 | Formato de rendimiento | `km/L` |
+| Margen de seguridad | `Sin margen` |
 
 Permitir:
 
@@ -156,6 +174,25 @@ km/L
 L/100 km
 mpg US
 ```
+
+Trayecto:
+
+```text
+Solo ida
+Ida y vuelta
+```
+
+Margen de seguridad:
+
+```text
+Sin margen
++10%
++15%
+```
+
+El margen no intenta modelar tráfico, clima ni estilo de manejo. Solo añade una
+reserva simple sobre los litros calculados para que el usuario planee con más
+holgura.
 
 ### Fórmulas
 
@@ -169,7 +206,13 @@ desde mpg US: kmPorLitro = mpgUS ÷ 2.352145833
 Después:
 
 ```text
-litrosNecesarios = distanciaKm ÷ kmPorLitro
+distanciaTotalKm = distanciaKm × multiplicadorTrayecto
+multiplicadorTrayecto = 1 para solo ida
+multiplicadorTrayecto = 2 para ida y vuelta
+
+litrosBase = distanciaTotalKm ÷ kmPorLitro
+litrosNecesarios = litrosBase × (1 + margen ÷ 100)
+galonesUSNecesarios = litrosNecesarios ÷ 3.785411784
 ```
 
 ### Resultado
@@ -177,6 +220,22 @@ litrosNecesarios = distanciaKm ÷ kmPorLitro
 ```text
 Para recorrer 300 km con un rendimiento de 12.5 km/L necesitas
 aproximadamente 24.00 l.
+```
+
+Mostrar también la equivalencia en galones estadounidenses:
+
+```text
+Combustible estimado: 24.00 l
+Equivalencia: 6.34 gal US
+```
+
+Con ida y vuelta o margen:
+
+```text
+Distancia total: 600 km
+Combustible base: 48.00 l
+Con margen de 10%: 52.80 l
+Equivalencia: 13.95 gal US
 ```
 
 ---
@@ -194,6 +253,8 @@ Aceptar punto o coma decimal.
 | Valor negativo | Rechazar |
 | Valor no finito | No calcular |
 | Distancia o combustible extremadamente alto | Calcular si es finito; usar formato legible |
+| Trayecto no soportado | Usar `Solo ida` |
+| Margen no soportado | Usar `Sin margen` |
 
 Mantener precisión completa durante el cálculo y redondear únicamente al
 mostrar.
@@ -205,13 +266,19 @@ mostrar.
 ```text
 /vehiculos/calculadora-de-consumo-de-gasolina?modo=rendimiento&distancia=500&distanciaUnidad=km&combustible=40&combustibleUnidad=l
 /vehiculos/calculadora-de-consumo-de-gasolina?modo=trayecto&distancia=300&distanciaUnidad=km&rendimiento=12.5&rendimientoUnidad=km-l
+/vehiculos/calculadora-de-consumo-de-gasolina?modo=trayecto&distancia=300&distanciaUnidad=km&trayecto=ida-vuelta&rendimiento=12.5&rendimientoUnidad=km-l&margen=10
 ```
 
 Mantener canonical sin query params.
 
 ---
 
-## Diseño y contenido
+## Diseño mobile first y contenido
+
+La calculadora debe diseñarse mobile first. En teléfonos, el usuario debe poder
+elegir el modo, capturar los datos principales y ver el resultado sin navegar
+por una página larga antes de llegar al formulario. Evitar un hero alto que
+empuje la calculadora fuera del primer viewport.
 
 ### Hero
 
@@ -232,9 +299,81 @@ un trayecto.
 2. Selector de modo.
 3. Formulario y resultado.
 4. Conversión entre `km/L`, `L/100 km` y `mpg US`.
-5. Cómo medir consumo con una carga completa.
-6. Enlace a costo por kilómetro.
-7. FAQ visibles.
+5. Lectura práctica del resultado.
+6. Cómo medir consumo con una carga completa.
+7. Enlace a costo por kilómetro.
+8. FAQ visibles.
+
+### UI móvil
+
+- Layout de una sola columna.
+- Hero compacto; el selector de modo y el primer campo deben quedar visibles
+  pronto en móvil.
+- Selector de modo como control segmentado: `Rendimiento` y `Litros para viaje`.
+- Inputs numéricos con `inputmode="decimal"` y etiquetas claras.
+- Selectores de unidad junto al campo correspondiente, sin obligar a abrir
+  opciones avanzadas para cambiar `km`, `mi`, `l` o `gal US`.
+- En modo trayecto, `Solo ida` / `Ida y vuelta` debe ser un control táctil
+  visible, no una opción escondida.
+- El margen de seguridad puede vivir como chips compactos: `0%`, `10%`, `15%`.
+- Resultado principal inmediatamente después de los campos.
+- Usar `aria-live` para anunciar cambios de resultado.
+- Evitar tablas anchas en móvil; mostrar conversiones como filas o tarjetas
+  compactas.
+- Botones de acción: copiar resultado, compartir enlace y limpiar. En móvil
+  deben ocupar el ancho disponible o envolver sin desbordar.
+- Después de calcular, considerar una barra inferior fija o resumida con el
+  dato principal: `24.00 l` o `12.50 km/L`.
+
+### Resultado copiable
+
+El botón de copiar debe generar un texto breve y útil para mensajes o chat.
+
+Modo rendimiento:
+
+```text
+Consumo de gasolina:
+Distancia: 500 km
+Combustible: 40 l
+Rendimiento: 12.50 km/L
+Consumo: 8.00 L/100 km
+Equivalencia: 29.40 mpg US
+```
+
+Modo trayecto:
+
+```text
+Gasolina para trayecto:
+Distancia total: 300 km
+Rendimiento: 12.5 km/L
+Combustible estimado: 24.00 l
+Equivalencia: 6.34 gal US
+```
+
+Con margen:
+
+```text
+Gasolina para trayecto:
+Distancia total: 600 km
+Rendimiento: 12.5 km/L
+Combustible base: 48.00 l
+Margen: 10%
+Combustible estimado: 52.80 l
+Equivalencia: 13.95 gal US
+```
+
+### Enlace a costo por kilómetro
+
+No mezclar costo monetario en esta calculadora. Cuando el usuario tenga datos
+suficientes, el enlace hacia costo por kilómetro debe pasar parámetros válidos
+para evitar que repita captura:
+
+```text
+/vehiculos/calculadora-de-costo-por-kilometro?distancia=300&unidad=km&trayecto=ida&rendimiento=12.5&rendimientoUnidad=km-l
+```
+
+Si el usuario calculó rendimiento en el primer modo, el enlace puede pasar solo
+el rendimiento normalizado.
 
 ### Nota editorial
 
@@ -252,6 +391,8 @@ tanque y divide la distancia recorrida entre los litros cargados.
 - ¿Qué significa L/100 km?
 - ¿Cómo convertir km/L a mpg?
 - ¿Cómo saber cuántos litros necesito para un viaje?
+- ¿Cómo calcular gasolina para ida y vuelta?
+- ¿Conviene agregar un margen de seguridad?
 - ¿La calculadora usa galón estadounidense o imperial?
 
 ---
@@ -266,6 +407,10 @@ convertKmPerLiterToLitersPer100Km(value)
 convertKmPerLiterToMpgUs(value)
 normalizeEfficiency(value, unit)
 calculateFuelNeeded(distanceKm, kmPerLiter)
+applyTripMultiplier(distanceKm, tripType)
+applyFuelSafetyMargin(liters, marginPercent)
+convertLitersToGallonsUs(value)
+buildFuelConsumptionShareText(result)
 ```
 
 ---
@@ -276,9 +421,13 @@ calculateFuelNeeded(distanceKm, kmPerLiter)
 - `12.5 km/L = 8 L/100 km`.
 - `12.5 km/L ≈ 29.4018 mpg US`.
 - `300 km ÷ 12.5 km/L = 24 l`.
+- `24 l ≈ 6.3401 gal US`.
+- Ida y vuelta duplica distancia y litros base.
+- Margen de `10%` sobre `48 l` produce `52.8 l`.
 - `1 mi = 1.609344 km`.
 - `1 gal US = 3.785411784 l`.
 - Round-trip entre formatos sin pérdida relevante.
+- Generar texto copiable para ambos modos.
 - Rechazar cero, negativos, `NaN` e `Infinity`.
 
 ---
@@ -291,4 +440,9 @@ calculateFuelNeeded(distanceKm, kmPerLiter)
 4. Los resultados incluyen `km/L`, `L/100 km` y `mpg US`.
 5. La UI distingue galón estadounidense.
 6. El cálculo no mezcla costo monetario.
-7. La URL compartible conserva parámetros válidos.
+7. El modo trayecto permite solo ida o ida y vuelta.
+8. El modo trayecto permite margen de seguridad simple.
+9. El resultado incluye una lectura práctica breve.
+10. El resultado copiable es claro para enviar por mensaje.
+11. La UI es mobile first y no produce scroll horizontal en pantallas pequeñas.
+12. La URL compartible conserva parámetros válidos.

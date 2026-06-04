@@ -232,4 +232,13 @@ export const CALCULATORS: CalculatorDirectoryItem[] = [
     categorySlug: "restaurantes",
     order: 88,
   },
+  {
+    id: "calculadora-de-consumo-de-gasolina",
+    title: "Calculadora de consumo de gasolina",
+    description:
+      "Calcula rendimiento de combustible en km/L, L/100 km y mpg, o estima litros para un trayecto.",
+    href: "/vehiculos/calculadora-de-consumo-de-gasolina",
+    categorySlug: "vehiculos",
+    order: 90,
+  },
 ];

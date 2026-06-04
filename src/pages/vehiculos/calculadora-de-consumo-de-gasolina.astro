@@ -1,0 +1,828 @@
+---
+import BaseLayout from "@layouts/BaseLayout.astro";
+import Container from "@components/layout/Container.astro";
+import PageShell from "@components/layout/PageShell.astro";
+import FaqSection from "@components/shared/FaqSection.astro";
+import PageHero from "@components/shared/PageHero.astro";
+import SectionIntro from "@components/shared/SectionIntro.astro";
+import { buildFaqJsonLd } from "@lib/seo";
+
+const title = "Calculadora de consumo de gasolina";
+const description =
+  "Calcula el rendimiento de tu vehiculo en km/L, L/100 km y mpg US, o estima cuantos litros necesitas para un trayecto.";
+const canonical = "/vehiculos/calculadora-de-consumo-de-gasolina";
+
+const faqs = [
+  {
+    question: "Como calcular el consumo de gasolina?",
+    answer:
+      "Divide la distancia recorrida entre el combustible utilizado. Si recorriste 500 km y cargaste 40 l, el rendimiento es 12.5 km/L.",
+  },
+  {
+    question: "Que significa km/L?",
+    answer:
+      "Kilometros por litro indica cuantos kilometros puede recorrer el vehiculo con un litro de combustible.",
+  },
+  {
+    question: "Que significa L/100 km?",
+    answer:
+      "Litros por cada 100 kilometros indica cuanto combustible usa el vehiculo para recorrer 100 km. En este formato, un numero menor significa menor consumo.",
+  },
+  {
+    question: "Como convertir km/L a mpg?",
+    answer:
+      "Multiplica los km/L por 2.352145833 para obtener millas por galon estadounidense.",
+  },
+  {
+    question: "Como saber cuantos litros necesito para un viaje?",
+    answer:
+      "Convierte tu rendimiento a km/L y divide la distancia total entre ese rendimiento. La calculadora tambien puede sumar ida y vuelta y un margen simple.",
+  },
+  {
+    question: "Como calcular gasolina para ida y vuelta?",
+    answer:
+      "Usa el modo Litros para viaje y elige Ida y vuelta. La calculadora duplica la distancia antes de estimar los litros.",
+  },
+  {
+    question: "Conviene agregar un margen de seguridad?",
+    answer:
+      "Puede servir para planear con holgura. El margen de 10% o 15% solo suma una reserva simple; no modela trafico, clima ni estilo de manejo.",
+  },
+  {
+    question: "La calculadora usa galon estadounidense o imperial?",
+    answer:
+      "Usa galon estadounidense, etiquetado como gal US. No usa galon imperial.",
+  },
+];
+
+const faqJsonLd = buildFaqJsonLd(faqs);
+---
+
+<BaseLayout title={title} description={description} canonical={canonical}>
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={JSON.stringify(faqJsonLd)} />
+  </Fragment>
+
+  <PageShell>
+    <PageHero
+      title={title}
+      description="Calcula el rendimiento de tu vehiculo o estima cuantos litros necesitas para un trayecto."
+      kicker="Vehiculos"
+      collapseBreadcrumbOnMobile
+      containerClass="py-5 md:py-7"
+      breadcrumbs={[
+        { label: "Inicio", href: "/", ariaLabel: "Inicio" },
+        { label: "Vehiculos", href: "/vehiculos", optional: true },
+        { label: "Consumo de gasolina", truncate: true },
+      ]}
+    />
+
+    <Container as="section" class="py-4 md:py-7">
+      <section
+        id="fuel-calculator"
+        class="overflow-hidden rounded-lg border border-gray-700 bg-gray-950 shadow-xl shadow-gray-950/30"
+        aria-labelledby="calculator-heading"
+      >
+        <div class="grid gap-0 lg:grid-cols-[minmax(0,1fr)_minmax(20rem,0.78fr)]">
+          <div class="p-4 sm:p-6">
+            <h2 id="calculator-heading" class="sr-only">
+              Calculadora de consumo de gasolina
+            </h2>
+
+            <div
+              class="grid rounded-lg border border-gray-700 bg-gray-900 p-1 sm:grid-cols-2"
+              role="tablist"
+              aria-label="Modo de calculo"
+            >
+              <button
+                class="min-h-12 rounded-md px-3 text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-sky-400/35"
+                type="button"
+                role="tab"
+                aria-selected="true"
+                data-mode-button="rendimiento"
+              >
+                Rendimiento
+              </button>
+              <button
+                class="min-h-12 rounded-md px-3 text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-sky-400/35"
+                type="button"
+                role="tab"
+                aria-selected="false"
+                data-mode-button="trayecto"
+              >
+                Litros para viaje
+              </button>
+            </div>
+
+            <div class="mt-5 grid gap-5" data-mode-panel="rendimiento">
+              <div>
+                <label for="distance" class="block text-sm font-semibold text-gray-200">
+                  Distancia recorrida
+                </label>
+                <div class="mt-2 grid grid-cols-[minmax(0,1fr)_6.75rem] overflow-hidden rounded-lg border border-gray-700 bg-gray-900 focus-within:border-sky-400 focus-within:ring-3 focus-within:ring-sky-400/15">
+                  <input
+                    id="distance"
+                    class="min-h-14 w-full bg-transparent px-4 text-2xl font-semibold text-white outline-none placeholder:text-gray-600"
+                    type="text"
+                    inputmode="decimal"
+                    autocomplete="off"
+                    placeholder="500"
+                    aria-describedby="distance-error"
+                    data-distance
+                  />
+                  <select
+                    class="border-l border-gray-700 bg-gray-950 px-3 text-sm font-semibold text-gray-100 outline-none"
+                    aria-label="Unidad de distancia"
+                    data-distance-unit
+                  >
+                    <option value="km">km</option>
+                    <option value="mi">mi</option>
+                  </select>
+                </div>
+                <p id="distance-error" class="mt-2 min-h-5 text-sm text-red-300" data-error="distance"></p>
+              </div>
+
+              <div>
+                <label for="fuel" class="block text-sm font-semibold text-gray-200">
+                  Combustible utilizado
+                </label>
+                <div class="mt-2 grid grid-cols-[minmax(0,1fr)_6.75rem] overflow-hidden rounded-lg border border-gray-700 bg-gray-900 focus-within:border-sky-400 focus-within:ring-3 focus-within:ring-sky-400/15">
+                  <input
+                    id="fuel"
+                    class="min-h-14 w-full bg-transparent px-4 text-2xl font-semibold text-white outline-none placeholder:text-gray-600"
+                    type="text"
+                    inputmode="decimal"
+                    autocomplete="off"
+                    placeholder="40"
+                    aria-describedby="fuel-error"
+                    data-fuel
+                  />
+                  <select
+                    class="border-l border-gray-700 bg-gray-950 px-3 text-sm font-semibold text-gray-100 outline-none"
+                    aria-label="Unidad de combustible"
+                    data-fuel-unit
+                  >
+                    <option value="l">l</option>
+                    <option value="gal-us">gal US</option>
+                  </select>
+                </div>
+                <p id="fuel-error" class="mt-2 min-h-5 text-sm text-red-300" data-error="fuel"></p>
+              </div>
+            </div>
+
+            <div class="mt-5 hidden grid gap-5" data-mode-panel="trayecto">
+              <div>
+                <label for="trip-distance" class="block text-sm font-semibold text-gray-200">
+                  Distancia del trayecto
+                </label>
+                <div class="mt-2 grid grid-cols-[minmax(0,1fr)_6.75rem] overflow-hidden rounded-lg border border-gray-700 bg-gray-900 focus-within:border-sky-400 focus-within:ring-3 focus-within:ring-sky-400/15">
+                  <input
+                    id="trip-distance"
+                    class="min-h-14 w-full bg-transparent px-4 text-2xl font-semibold text-white outline-none placeholder:text-gray-600"
+                    type="text"
+                    inputmode="decimal"
+                    autocomplete="off"
+                    placeholder="300"
+                    aria-describedby="trip-distance-error"
+                    data-trip-distance
+                  />
+                  <select
+                    class="border-l border-gray-700 bg-gray-950 px-3 text-sm font-semibold text-gray-100 outline-none"
+                    aria-label="Unidad de distancia"
+                    data-trip-distance-unit
+                  >
+                    <option value="km">km</option>
+                    <option value="mi">mi</option>
+                  </select>
+                </div>
+                <p id="trip-distance-error" class="mt-2 min-h-5 text-sm text-red-300" data-error="trip-distance"></p>
+              </div>
+
+              <div>
+                <span class="block text-sm font-semibold text-gray-200">Trayecto</span>
+                <div class="mt-2 grid grid-cols-2 gap-2" aria-label="Tipo de trayecto">
+                  <button
+                    class="min-h-11 rounded-lg border border-gray-700 px-3 text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-sky-400/30"
+                    type="button"
+                    data-trip-type="ida"
+                    aria-pressed="true"
+                  >
+                    Solo ida
+                  </button>
+                  <button
+                    class="min-h-11 rounded-lg border border-gray-700 px-3 text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-sky-400/30"
+                    type="button"
+                    data-trip-type="ida-vuelta"
+                    aria-pressed="false"
+                  >
+                    Ida y vuelta
+                  </button>
+                </div>
+              </div>
+
+              <div>
+                <label for="efficiency" class="block text-sm font-semibold text-gray-200">
+                  Rendimiento conocido
+                </label>
+                <div class="mt-2 grid grid-cols-[minmax(0,1fr)_8rem] overflow-hidden rounded-lg border border-gray-700 bg-gray-900 focus-within:border-sky-400 focus-within:ring-3 focus-within:ring-sky-400/15">
+                  <input
+                    id="efficiency"
+                    class="min-h-14 w-full bg-transparent px-4 text-2xl font-semibold text-white outline-none placeholder:text-gray-600"
+                    type="text"
+                    inputmode="decimal"
+                    autocomplete="off"
+                    placeholder="12.5"
+                    aria-describedby="efficiency-error"
+                    data-efficiency
+                  />
+                  <select
+                    class="border-l border-gray-700 bg-gray-950 px-3 text-sm font-semibold text-gray-100 outline-none"
+                    aria-label="Formato de rendimiento"
+                    data-efficiency-unit
+                  >
+                    <option value="km-l">km/L</option>
+                    <option value="l-100-km">L/100 km</option>
+                    <option value="mpg-us">mpg US</option>
+                  </select>
+                </div>
+                <p id="efficiency-error" class="mt-2 min-h-5 text-sm text-red-300" data-error="efficiency"></p>
+              </div>
+
+              <div>
+                <span class="block text-sm font-semibold text-gray-200">Margen de seguridad</span>
+                <div class="mt-2 grid grid-cols-3 gap-2" aria-label="Margen de seguridad">
+                  {[0, 10, 15].map((margin) => (
+                    <button
+                      class="min-h-11 rounded-lg border border-gray-700 px-3 text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-sky-400/30"
+                      type="button"
+                      data-margin={margin}
+                      aria-pressed={margin === 0 ? "true" : "false"}
+                    >
+                      {margin === 0 ? "0%" : `+${margin}%`}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            <div class="mt-5 flex flex-col gap-3 sm:flex-row">
+              <button
+                class="min-h-11 justify-center rounded-lg border border-gray-700 px-4 py-2 text-sm font-semibold text-gray-200 transition hover:border-sky-400 hover:text-white focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-sky-400/30"
+                type="button"
+                data-clear
+              >
+                Limpiar
+              </button>
+            </div>
+          </div>
+
+          <aside
+            class="border-t border-gray-800 bg-gray-900/70 p-4 sm:p-6 lg:border-l lg:border-t-0"
+            aria-live="polite"
+            data-result-region
+          >
+            <p class="text-xs font-semibold uppercase tracking-wide text-sky-300">
+              Resultado
+            </p>
+            <p class="mt-3 break-words text-3xl font-bold leading-tight text-white" data-main-result>
+              Ingresa tus datos
+            </p>
+            <p class="mt-2 min-h-5 text-sm leading-relaxed text-gray-400" data-result-note>
+              El rendimiento o combustible estimado aparecera aqui.
+            </p>
+
+            <div class="mt-5 space-y-3" data-breakdown-list></div>
+            <div class="mt-4 grid gap-2 text-sm leading-relaxed text-gray-300" data-practical-list></div>
+
+            <div class="mt-5 flex flex-col gap-3 sm:flex-row">
+              <button
+                class="hidden min-h-11 items-center justify-center rounded-lg bg-sky-300 px-4 py-2 text-sm font-semibold text-gray-950 transition hover:bg-sky-200 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-sky-300/40"
+                type="button"
+                data-copy-result
+              >
+                Copiar resultado
+              </button>
+              <button
+                class="hidden min-h-11 items-center justify-center rounded-lg border border-gray-700 px-4 py-2 text-sm font-semibold text-gray-200 transition hover:border-sky-400 hover:text-white focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-sky-400/40"
+                type="button"
+                data-copy-url
+              >
+                Compartir enlace
+              </button>
+            </div>
+            <p class="mt-3 min-h-5 text-sm text-sky-200" role="status" aria-live="polite" data-copy-status></p>
+
+            <a
+              class="mt-5 hidden rounded-lg border border-gray-700 bg-gray-950/70 p-4 text-sm leading-relaxed text-gray-200 transition hover:border-sky-400 hover:text-white focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-sky-400/30"
+              href="/vehiculos/calculadora-de-costo-por-kilometro"
+              data-cost-link
+            >
+              Estimar costo por kilometro con estos datos
+            </a>
+          </aside>
+        </div>
+      </section>
+
+      <div
+        class="fixed inset-x-0 bottom-0 z-30 hidden border-t border-gray-800 bg-gray-950/95 px-4 py-3 shadow-2xl shadow-black/50 backdrop-blur md:hidden"
+        data-mobile-total
+      >
+        <div class="mx-auto flex max-w-xl items-center justify-between gap-3">
+          <span class="text-xs font-semibold uppercase tracking-wide text-gray-500" data-mobile-total-label>
+            Resultado
+          </span>
+          <span class="break-words text-right text-lg font-bold text-sky-100" data-mobile-total-text></span>
+        </div>
+      </div>
+    </Container>
+
+    <Container as="section" class="py-6 md:py-8">
+      <SectionIntro
+        title="Conversion rapida"
+        description="El mismo rendimiento se puede leer como distancia por litro, litros por 100 km o millas por galon estadounidense."
+      />
+      <div class="grid gap-4 md:grid-cols-3">
+        <article class="rounded-lg border border-gray-800 bg-gray-950 p-5">
+          <h3 class="text-lg font-semibold">km/L</h3>
+          <p class="mt-3 text-sm leading-relaxed text-gray-400">
+            Muestra cuantos kilometros recorre el vehiculo por cada litro.
+          </p>
+        </article>
+        <article class="rounded-lg border border-gray-800 bg-gray-950 p-5">
+          <h3 class="text-lg font-semibold">L/100 km</h3>
+          <p class="mt-3 text-sm leading-relaxed text-gray-400">
+            Muestra cuantos litros usa para recorrer 100 km.
+          </p>
+        </article>
+        <article class="rounded-lg border border-gray-800 bg-gray-950 p-5">
+          <h3 class="text-lg font-semibold">mpg US</h3>
+          <p class="mt-3 text-sm leading-relaxed text-gray-400">
+            Usa millas por galon estadounidense, no galon imperial.
+          </p>
+        </article>
+      </div>
+    </Container>
+
+    <Container as="section" class="py-6 md:py-8">
+      <SectionIntro
+        title="Como medirlo"
+        description="Llena el tanque, registra el odometro, conduce normalmente, vuelve a llenar el tanque y divide la distancia recorrida entre los litros cargados."
+      />
+      <div class="rounded-lg border border-gray-800 bg-gray-950 p-5">
+        <p class="text-sm leading-relaxed text-gray-400">
+          Usa la misma bomba o el mismo criterio de llenado cuando puedas. El
+          resultado real puede cambiar entre ciudad, carretera, carga del auto y
+          estilo de manejo.
+        </p>
+      </div>
+    </Container>
+
+    <FaqSection faqs={faqs} />
+  </PageShell>
+</BaseLayout>
+
+<script>
+  import {
+    buildFuelConsumptionShareText,
+    calculateFuelEfficiency,
+    calculateFuelNeededForTrip,
+    convertDistanceToKm,
+    convertFuelToLiters,
+    formatCompactNumber,
+    formatFuelNumber,
+    parseDecimalInput,
+  } from "@lib/calculators/vehiculos/calculadora-de-consumo-de-gasolina/fuelConsumption";
+
+  const modeButtons = Array.from(document.querySelectorAll("[data-mode-button]"));
+  const modePanels = Array.from(document.querySelectorAll("[data-mode-panel]"));
+  const distanceInput = document.querySelector("[data-distance]");
+  const distanceUnitSelect = document.querySelector("[data-distance-unit]");
+  const fuelInput = document.querySelector("[data-fuel]");
+  const fuelUnitSelect = document.querySelector("[data-fuel-unit]");
+  const tripDistanceInput = document.querySelector("[data-trip-distance]");
+  const tripDistanceUnitSelect = document.querySelector("[data-trip-distance-unit]");
+  const efficiencyInput = document.querySelector("[data-efficiency]");
+  const efficiencyUnitSelect = document.querySelector("[data-efficiency-unit]");
+  const tripTypeButtons = Array.from(document.querySelectorAll("[data-trip-type]"));
+  const marginButtons = Array.from(document.querySelectorAll("[data-margin]"));
+  const clearButton = document.querySelector("[data-clear]");
+  const mainResult = document.querySelector("[data-main-result]");
+  const resultNote = document.querySelector("[data-result-note]");
+  const breakdownList = document.querySelector("[data-breakdown-list]");
+  const practicalList = document.querySelector("[data-practical-list]");
+  const copyButton = document.querySelector("[data-copy-result]");
+  const copyUrlButton = document.querySelector("[data-copy-url]");
+  const copyStatus = document.querySelector("[data-copy-status]");
+  const mobileTotal = document.querySelector("[data-mobile-total]");
+  const mobileTotalLabel = document.querySelector("[data-mobile-total-label]");
+  const mobileTotalText = document.querySelector("[data-mobile-total-text]");
+  const costLink = document.querySelector("[data-cost-link]");
+
+  const FIELD_MESSAGES = {
+    required: "Completa este campo para calcular.",
+    invalid: "Escribe un numero valido.",
+    negative: "Usa un numero mayor a cero.",
+    zero: "Usa un numero mayor a cero.",
+  };
+
+  let currentMode = "rendimiento";
+  let currentTripType = "ida";
+  let currentMargin = 0;
+  let currentShareText = "";
+  let currentShareUrl = window.location.href;
+  let copyTimer = 0;
+  let urlTimer = 0;
+
+  function setMode(mode, { sync = true } = {}) {
+    currentMode = mode;
+
+    modeButtons.forEach((button) => {
+      const active = button.dataset.modeButton === mode;
+      button.setAttribute("aria-selected", String(active));
+      button.classList.toggle("bg-sky-300", active);
+      button.classList.toggle("text-gray-950", active);
+      button.classList.toggle("text-gray-300", !active);
+    });
+
+    modePanels.forEach((panel) => {
+      panel.classList.toggle("hidden", panel.dataset.modePanel !== mode);
+    });
+
+    updateCalculator({ syncUrl: sync });
+  }
+
+  function setTripType(type) {
+    currentTripType = type === "ida-vuelta" ? "ida-vuelta" : "ida";
+    setButtonGroupState(tripTypeButtons, "tripType", currentTripType);
+    updateCalculator();
+  }
+
+  function setMargin(value) {
+    const numericValue = Number(value);
+    currentMargin = [0, 10, 15].includes(numericValue) ? numericValue : 0;
+    setButtonGroupState(marginButtons, "margin", String(currentMargin));
+    updateCalculator();
+  }
+
+  function setButtonGroupState(buttons, datasetKey, activeValue) {
+    buttons.forEach((button) => {
+      const active = button.dataset[datasetKey] === activeValue;
+      button.setAttribute("aria-pressed", String(active));
+      button.classList.toggle("bg-sky-300", active);
+      button.classList.toggle("text-gray-950", active);
+      button.classList.toggle("border-sky-300", active);
+      button.classList.toggle("text-gray-200", !active);
+    });
+  }
+
+  function setError(field, message = "") {
+    const element = document.querySelector(`[data-error="${field}"]`);
+
+    if (element) {
+      element.textContent = message;
+    }
+  }
+
+  function parsePositiveField(input, field) {
+    const parsed = parseDecimalInput(input.value);
+
+    if (!parsed.ok) {
+      setError(field, FIELD_MESSAGES[parsed.error]);
+      return parsed;
+    }
+
+    if (parsed.value <= 0) {
+      setError(field, FIELD_MESSAGES.zero);
+      return { ok: false, error: "zero" };
+    }
+
+    setError(field);
+    return parsed;
+  }
+
+  function addBreakdownRow(label, value) {
+    const row = document.createElement("div");
+    const labelElement = document.createElement("span");
+    const valueElement = document.createElement("span");
+
+    row.className =
+      "flex items-start justify-between gap-4 rounded-lg border border-gray-800 bg-gray-950/70 p-4";
+    labelElement.className = "min-w-0 text-sm text-gray-400";
+    valueElement.className =
+      "break-words text-right text-sm font-semibold text-white";
+    labelElement.textContent = label;
+    valueElement.textContent = value;
+    row.append(labelElement, valueElement);
+    breakdownList.append(row);
+  }
+
+  function addPracticalLine(text) {
+    const line = document.createElement("p");
+    line.className = "rounded-lg border border-sky-300/20 bg-sky-300/10 p-3";
+    line.textContent = text;
+    practicalList.append(line);
+  }
+
+  function setNeutralResult(message = "Ingresa tus datos") {
+    mainResult.textContent = message;
+    resultNote.textContent = "El rendimiento o combustible estimado aparecera aqui.";
+    breakdownList.replaceChildren();
+    practicalList.replaceChildren();
+    copyButton.classList.add("hidden");
+    copyButton.classList.remove("inline-flex");
+    copyUrlButton.classList.add("hidden");
+    copyUrlButton.classList.remove("inline-flex");
+    mobileTotal.classList.add("hidden");
+    costLink.classList.add("hidden");
+    currentShareText = "";
+  }
+
+  function renderEfficiencyResult(distance, fuel) {
+    const distanceKm = convertDistanceToKm(distance.value, distanceUnitSelect.value);
+    const fuelLiters = convertFuelToLiters(fuel.value, fuelUnitSelect.value);
+    const result = calculateFuelEfficiency(distanceKm, fuelLiters);
+    const distanceLabel = `${distance.normalized} ${distanceUnitSelect.value}`;
+    const fuelUnitLabel = fuelUnitSelect.value === "gal-us" ? "gal US" : "l";
+    const fuelLabel = `${fuel.normalized} ${fuelUnitLabel}`;
+
+    mainResult.textContent = `${formatFuelNumber(result.kmPerLiter)} km/L`;
+    resultNote.textContent = "Rendimiento calculado con distancia y combustible capturados.";
+    breakdownList.replaceChildren();
+    practicalList.replaceChildren();
+
+    addBreakdownRow("Rendimiento", `${formatFuelNumber(result.kmPerLiter)} km/L`);
+    addBreakdownRow("Consumo", `${formatFuelNumber(result.litersPer100Km)} L/100 km`);
+    addBreakdownRow("Equivalencia", `${formatFuelNumber(result.mpgUs)} mpg US`);
+    addPracticalLine(`Cada litro rinde aproximadamente ${formatFuelNumber(result.kmPerLiter)} km.`);
+    addPracticalLine(`Para recorrer 100 km usarias cerca de ${formatFuelNumber(result.litersPer100Km)} l.`);
+    addPracticalLine(`Con ${fuelLabel} podrias recorrer cerca de ${formatCompactNumber(result.rangeWithFuelKm)} km.`);
+
+    currentShareText = buildFuelConsumptionShareText({
+      mode: "rendimiento",
+      distanceLabel,
+      fuelLabel,
+      efficiency: result,
+    });
+    mobileTotalLabel.textContent = "Rendimiento";
+    mobileTotalText.textContent = `${formatFuelNumber(result.kmPerLiter)} km/L`;
+    mobileTotal.classList.remove("hidden");
+
+    const url = new URL("/vehiculos/calculadora-de-costo-por-kilometro", window.location.origin);
+    url.searchParams.set("rendimiento", formatCompactNumber(result.kmPerLiter, 6).replace(/,/g, ""));
+    url.searchParams.set("rendimientoUnidad", "km-l");
+    costLink.href = url.pathname + url.search;
+    costLink.classList.remove("hidden");
+  }
+
+  function renderTripResult(distance, efficiency) {
+    const result = calculateFuelNeededForTrip({
+      distance: distance.value,
+      distanceUnit: tripDistanceUnitSelect.value,
+      tripType: currentTripType,
+      efficiency: efficiency.value,
+      efficiencyUnit: efficiencyUnitSelect.value,
+      marginPercent: currentMargin,
+    });
+    const distanceLabel = `${formatCompactNumber(result.totalDistanceKm)} km`;
+    const efficiencyLabel = `${efficiency.normalized} ${getEfficiencyUnitLabel(efficiencyUnitSelect.value)}`;
+
+    mainResult.textContent = `${formatFuelNumber(result.litersNeeded)} l`;
+    resultNote.textContent =
+      currentMargin > 0
+        ? `Incluye margen de seguridad de ${currentMargin}%.`
+        : "Combustible estimado para la distancia total.";
+    breakdownList.replaceChildren();
+    practicalList.replaceChildren();
+
+    addBreakdownRow("Distancia total", distanceLabel);
+    addBreakdownRow("Combustible estimado", `${formatFuelNumber(result.litersNeeded)} l`);
+    addBreakdownRow("Equivalencia", `${formatFuelNumber(result.gallonsUsNeeded)} gal US`);
+
+    if (currentMargin > 0) {
+      addBreakdownRow("Combustible base", `${formatFuelNumber(result.baseLiters)} l`);
+      addBreakdownRow("Margen", `${currentMargin}%`);
+    }
+
+    addPracticalLine(`Para ${distanceLabel} necesitas cerca de ${formatFuelNumber(result.litersNeeded)} l.`);
+    addPracticalLine(`Eso equivale aproximadamente a ${formatFuelNumber(result.gallonsUsNeeded)} gal US.`);
+
+    currentShareText = buildFuelConsumptionShareText({
+      mode: "trayecto",
+      distanceLabel,
+      efficiencyLabel,
+      estimate: result,
+    });
+    mobileTotalLabel.textContent = "Combustible";
+    mobileTotalText.textContent = `${formatFuelNumber(result.litersNeeded)} l`;
+    mobileTotal.classList.remove("hidden");
+
+    const costUrl = new URL("/vehiculos/calculadora-de-costo-por-kilometro", window.location.origin);
+    costUrl.searchParams.set("distancia", distance.normalized);
+    costUrl.searchParams.set("unidad", tripDistanceUnitSelect.value);
+    costUrl.searchParams.set("trayecto", currentTripType);
+    costUrl.searchParams.set("rendimiento", efficiency.normalized);
+    costUrl.searchParams.set("rendimientoUnidad", efficiencyUnitSelect.value);
+    costLink.href = costUrl.pathname + costUrl.search;
+    costLink.classList.remove("hidden");
+  }
+
+  function updateCalculator({ syncUrl = true } = {}) {
+    setError("distance");
+    setError("fuel");
+    setError("trip-distance");
+    setError("efficiency");
+
+    try {
+      if (currentMode === "rendimiento") {
+        if (!distanceInput.value.trim() && !fuelInput.value.trim()) {
+          setNeutralResult();
+          if (syncUrl) syncShareUrl(null);
+          return;
+        }
+
+        const distance = parsePositiveField(distanceInput, "distance");
+        const fuel = parsePositiveField(fuelInput, "fuel");
+
+        if (!distance.ok || !fuel.ok) {
+          setNeutralResult("Revisa los campos");
+          return;
+        }
+
+        renderEfficiencyResult(distance, fuel);
+        showActionButtons();
+        if (syncUrl) syncShareUrl({ distance, fuel });
+        return;
+      }
+
+      if (!tripDistanceInput.value.trim() && !efficiencyInput.value.trim()) {
+        setNeutralResult();
+        if (syncUrl) syncShareUrl(null);
+        return;
+      }
+
+      const distance = parsePositiveField(tripDistanceInput, "trip-distance");
+      const efficiency = parsePositiveField(efficiencyInput, "efficiency");
+
+      if (!distance.ok || !efficiency.ok) {
+        setNeutralResult("Revisa los campos");
+        return;
+      }
+
+      renderTripResult(distance, efficiency);
+      showActionButtons();
+      if (syncUrl) syncShareUrl({ distance, efficiency });
+    } catch {
+      setNeutralResult("No se puede calcular");
+    }
+  }
+
+  function showActionButtons() {
+    copyButton.classList.remove("hidden");
+    copyButton.classList.add("inline-flex");
+    copyUrlButton.classList.remove("hidden");
+    copyUrlButton.classList.add("inline-flex");
+  }
+
+  function syncShareUrl(values) {
+    const url = new URL(window.location.href);
+    url.search = "";
+
+    if (values) {
+      url.searchParams.set("modo", currentMode);
+
+      if (currentMode === "rendimiento") {
+        url.searchParams.set("distancia", values.distance.normalized);
+        url.searchParams.set("distanciaUnidad", distanceUnitSelect.value);
+        url.searchParams.set("combustible", values.fuel.normalized);
+        url.searchParams.set("combustibleUnidad", fuelUnitSelect.value);
+      } else {
+        url.searchParams.set("distancia", values.distance.normalized);
+        url.searchParams.set("distanciaUnidad", tripDistanceUnitSelect.value);
+        url.searchParams.set("trayecto", currentTripType);
+        url.searchParams.set("rendimiento", values.efficiency.normalized);
+        url.searchParams.set("rendimientoUnidad", efficiencyUnitSelect.value);
+        url.searchParams.set("margen", String(currentMargin));
+      }
+    }
+
+    currentShareUrl = url.toString();
+    window.clearTimeout(urlTimer);
+    urlTimer = window.setTimeout(() => {
+      window.history.replaceState({}, "", url);
+    }, 250);
+  }
+
+  function loadUrlParameters() {
+    const params = new URLSearchParams(window.location.search);
+    const mode = params.get("modo") === "trayecto" ? "trayecto" : "rendimiento";
+    const distance = params.get("distancia");
+    const distanceUnit = params.get("distanciaUnidad");
+
+    if (mode === "rendimiento") {
+      const fuel = params.get("combustible");
+      const fuelUnit = params.get("combustibleUnidad");
+
+      if (distance && parseDecimalInput(distance).ok) distanceInput.value = distance;
+      if (distanceUnit === "km" || distanceUnit === "mi") distanceUnitSelect.value = distanceUnit;
+      if (fuel && parseDecimalInput(fuel).ok) fuelInput.value = fuel;
+      if (fuelUnit === "l" || fuelUnit === "gal-us") fuelUnitSelect.value = fuelUnit;
+    } else {
+      const efficiency = params.get("rendimiento");
+      const efficiencyUnit = params.get("rendimientoUnidad");
+      const tripType = params.get("trayecto");
+      const margin = params.get("margen");
+
+      if (distance && parseDecimalInput(distance).ok) tripDistanceInput.value = distance;
+      if (distanceUnit === "km" || distanceUnit === "mi") tripDistanceUnitSelect.value = distanceUnit;
+      if (efficiency && parseDecimalInput(efficiency).ok) efficiencyInput.value = efficiency;
+      if (["km-l", "l-100-km", "mpg-us"].includes(efficiencyUnit)) {
+        efficiencyUnitSelect.value = efficiencyUnit;
+      }
+      currentTripType = tripType === "ida-vuelta" ? "ida-vuelta" : "ida";
+      currentMargin = [0, 10, 15].includes(Number(margin)) ? Number(margin) : 0;
+    }
+
+    setButtonGroupState(tripTypeButtons, "tripType", currentTripType);
+    setButtonGroupState(marginButtons, "margin", String(currentMargin));
+    setMode(mode, { sync: false });
+  }
+
+  function getEfficiencyUnitLabel(unit) {
+    if (unit === "l-100-km") return "L/100 km";
+    if (unit === "mpg-us") return "mpg US";
+    return "km/L";
+  }
+
+  async function copyText(text, successMessage) {
+    try {
+      if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(text);
+      } else {
+        const textArea = document.createElement("textarea");
+        textArea.value = text;
+        textArea.setAttribute("readonly", "");
+        textArea.style.position = "fixed";
+        textArea.style.opacity = "0";
+        document.body.append(textArea);
+        textArea.select();
+        document.execCommand("copy");
+        textArea.remove();
+      }
+      copyStatus.textContent = successMessage;
+    } catch {
+      copyStatus.textContent = "No fue posible copiar automaticamente.";
+    }
+
+    window.clearTimeout(copyTimer);
+    copyTimer = window.setTimeout(() => {
+      copyStatus.textContent = "";
+    }, 2500);
+  }
+
+  modeButtons.forEach((button) => {
+    button.addEventListener("click", () => setMode(button.dataset.modeButton));
+  });
+
+  tripTypeButtons.forEach((button) => {
+    button.addEventListener("click", () => setTripType(button.dataset.tripType));
+  });
+
+  marginButtons.forEach((button) => {
+    button.addEventListener("click", () => setMargin(button.dataset.margin));
+  });
+
+  [
+    distanceInput,
+    distanceUnitSelect,
+    fuelInput,
+    fuelUnitSelect,
+    tripDistanceInput,
+    tripDistanceUnitSelect,
+    efficiencyInput,
+    efficiencyUnitSelect,
+  ].forEach((input) => {
+    input.addEventListener("input", () => updateCalculator());
+    input.addEventListener("change", () => updateCalculator());
+  });
+
+  clearButton.addEventListener("click", () => {
+    distanceInput.value = "";
+    fuelInput.value = "";
+    tripDistanceInput.value = "";
+    efficiencyInput.value = "";
+    setNeutralResult();
+    syncShareUrl(null);
+  });
+
+  copyButton.addEventListener("click", () => {
+    if (currentShareText) {
+      copyText(currentShareText, "Resultado copiado.");
+    }
+  });
+
+  copyUrlButton.addEventListener("click", () => {
+    copyText(currentShareUrl, "Enlace copiado.");
+  });
+
+  loadUrlParameters();
+</script>
