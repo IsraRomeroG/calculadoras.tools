@@ -1,29 +1,34 @@
-# Especificación MVP — Calculadora de calorías para perro o gato por peso
+# Especificacion MVP - Calculadora de calorias para perro o gato por peso
 
 ## Resumen
 
-Herramienta orientativa para estimar las calorías diarias de mantenimiento de
-un perro o gato adulto a partir de su peso y perfil general. Debe mostrar el
-requerimiento energético en reposo (`RER`) y un rango estimado de mantenimiento
-(`MER`).
+Herramienta orientativa para estimar las calorias diarias de mantenimiento de
+un perro o gato adulto a partir de su peso, especie, perfil general y contexto
+basico de condicion corporal. Debe mostrar el requerimiento energetico en
+reposo (`RER`) y un rango estimado de mantenimiento (`MER`).
 
-La calculadora no prescribe dietas. Las necesidades reales cambian con
-condición corporal, actividad, edad, estado reproductivo y salud. El resultado
-debe invitar a validarlo con un veterinario.
+La calculadora no prescribe dietas ni planes de perdida o aumento de peso. Las
+necesidades reales cambian con condicion corporal, actividad, edad, estado
+reproductivo, salud, alimento usado y seguimiento del peso. El resultado debe
+presentarse como punto de partida y debe invitar a validarlo con un veterinario.
+
+El valor diferencial de esta calculadora no debe ser solo "dar un numero":
+tambien debe ayudar al usuario a entender si esta usando peso actual o ideal,
+si el caso requiere supervision veterinaria, cuanto margen hay para premios y
+como se compara la estimacion con lo que la mascota come hoy.
 
 ---
 
-## Categoría, ruta e integración
+## Categoria, ruta e integracion
 
 ```text
 src/pages/mascotas
 ```
 
-Categoría objetivo: **Mascotas** (`mascotas`).
+Categoria objetivo: **Mascotas** (`mascotas`).
 
-Debe compartir categoría con la calculadora de edad de mascota. Si la categoría
-`mascotas` aún no existe en `src/lib/constants/categories.ts`, debe añadirse al
-implementar la página y el registro.
+La categoria `mascotas` ya existe en `src/lib/constants/categories.ts` y debe
+compartirse con la calculadora de edad de mascota.
 
 ### Ruta propuesta
 
@@ -37,16 +42,16 @@ src/pages/mascotas/calorias-diarias-para-perro-o-gato.astro
 ```ts
 {
   id: "calorias-diarias-para-perro-o-gato",
-  title: "Calorías diarias para perro o gato",
+  title: "Calorias diarias para perro o gato",
   description:
-    "Estima un rango orientativo de calorías diarias para perros y gatos adultos según peso y perfil.",
+    "Estima un rango orientativo de calorias diarias para perros y gatos adultos segun peso, perfil y condicion corporal.",
   href: "/mascotas/calorias-diarias-para-perro-o-gato",
   categorySlug: "mascotas",
   order: 84,
 }
 ```
 
-### Lógica testeable
+### Logica testeable
 
 ```text
 src/lib/calculators/mascotas/calorias-diarias-para-perro-o-gato/petCalories.ts
@@ -57,15 +62,19 @@ src/lib/calculators/mascotas/calorias-diarias-para-perro-o-gato/petCalories.test
 
 ## Fuente veterinaria
 
-Basar el MVP en las fórmulas y factores publicados en las guías de nutrición y
+Basar el MVP en las formulas y factores publicados en las guias de nutricion y
 manejo de peso de AAHA:
 
 ```text
 https://www.aaha.org/resources/2021-aaha-nutrition-and-weight-management-guidelines/weight-reduction-in-the-obese-pet/
+https://www.aaha.org/resources/2021-aaha-nutrition-and-weight-management-guidelines/feeding-plans-for-healthy-appropriate-weight-cats-and-dogs/
+https://www.aaha.org/resources/2021-aaha-nutrition-and-weight-management-guidelines/prevention-of-obesity/
 ```
 
-La propia guía indica que los factores son lineamientos generales y que el
-ajuste debe realizarse monitorizando peso y condición corporal.
+La guia indica que los factores son lineamientos generales y que el ajuste debe
+realizarse monitorizando peso y condicion corporal. Tambien recomienda evaluar
+la ingesta calorica actual, considerar el peso ideal cuando aplique y mantener
+premios/snacks y otros extras en torno al 10% o menos de las calorias diarias.
 
 ---
 
@@ -75,53 +84,93 @@ ajuste debe realizarse monitorizando peso y condición corporal.
 
 1. Selector de especie: perro o gato.
 2. Peso en kilogramos o libras.
-3. Conversión interna exacta de libras a kilogramos.
-4. Cálculo de `RER`.
-5. Estimación de rango `MER` para perfiles adultos permitidos.
-6. Fórmula y factor visibles.
-7. Avisos veterinarios claros.
-8. Botones para copiar y limpiar.
-9. URL compartible con parámetros validados.
-10. Accesibilidad y pruebas unitarias.
+3. Selector de tipo de peso: actual, ideal o no se.
+4. Selector simple de condicion corporal: delgado, ideal, sobrepeso o no se.
+5. Conversion interna exacta de libras a kilogramos.
+6. Calculo de `RER`.
+7. Estimacion de rango `MER` para perfiles adultos permitidos.
+8. Limite orientativo de premios/snacks del 10% del `MER`.
+9. Comparacion opcional con calorias que la mascota come hoy.
+10. Formula, factor y fuente visibles.
+11. Avisos veterinarios claros segun contexto.
+12. Botones para copiar, limpiar y copiar enlace.
+13. URL compartible con parametros validados.
+14. Diseno mobile first, accesibilidad y pruebas unitarias.
 
 ### Fuera del MVP
 
 - Cachorros y gatitos en crecimiento.
-- Gestación y lactancia.
+- Gestacion y lactancia.
 - Perros de trabajo.
 - Planes para bajar o subir de peso.
 - Mascotas hospitalizadas o con enfermedades.
-- Dietas terapéuticas.
+- Dietas terapeuticas.
 - Recomendaciones de marcas o alimentos.
-- Conversión automática a tazas, latas o gramos de alimento.
-- Sustitución de una consulta veterinaria.
+- Conversion automatica a tazas, latas o gramos de alimento.
+- Sustitucion de una consulta veterinaria.
 
 Cuando el usuario elija un caso fuera de alcance, no improvisar un resultado:
-mostrar una recomendación explícita de consultar al veterinario.
+mostrar una recomendacion explicita de consultar al veterinario antes de ajustar
+la alimentacion.
 
 ---
 
-## Fórmulas
+## Formulas
 
-### Conversión de peso
+### Conversion de peso
 
 ```text
-kg = lb × 0.45359237
+kg = lb * 0.45359237
 ```
 
-### Requerimiento energético en reposo
+### Requerimiento energetico en reposo
 
 ```text
-RER = 70 × pesoKg^0.75
+RER = 70 * pesoKg^0.75
 ```
 
-### Requerimiento energético de mantenimiento
+### Requerimiento energetico de mantenimiento
 
 ```text
-MER = RER × factor
+MER = RER * factor
 ```
 
 Mostrar un rango cuando AAHA publique un intervalo de factores.
+
+### Premios/snacks orientativos
+
+```text
+premiosMaximos = MER * 0.10
+alimentoPrincipalAprox = MER * 0.90
+```
+
+Si el `MER` es un rango, mostrar ambos valores como rango:
+
+```text
+Premios/snacks: hasta 55-63 kcal/dia
+Alimento principal: aprox. 496-567 kcal/dia
+```
+
+Este dato es educativo. No debe convertirse automaticamente a gramos, tazas,
+latas o porciones porque depende de la densidad calorica del alimento.
+
+### Comparacion opcional con ingesta actual
+
+Si el usuario captura calorias actuales diarias, comparar contra el rango `MER`:
+
+```text
+ingestaActual = caloriasAlimentoActual + caloriasPremiosActuales
+```
+
+Estados sugeridos:
+
+- `below-range`: por debajo del rango estimado.
+- `within-range`: dentro del rango estimado.
+- `above-range`: por encima del rango estimado.
+
+La comparacion no debe recomendar subir o bajar raciones de forma automatica.
+Debe decir que la diferencia sirve para conversar con el veterinario o revisar
+etiquetas y porciones.
 
 ---
 
@@ -129,64 +178,131 @@ Mostrar un rango cuando AAHA publique un intervalo de factores.
 
 | Perfil adulto | Gato | Perro |
 |---------------|------|-------|
-| Esterilizado | `1.2–1.4 × RER` | `1.4–1.6 × RER` |
-| No esterilizado | `1.4–1.6 × RER` | `1.6–1.8 × RER` |
-| Inactivo o con tendencia a obesidad | `1.0 × RER` | `1.0–1.2 × RER` |
+| Esterilizado | `1.2-1.4 * RER` | `1.4-1.6 * RER` |
+| No esterilizado | `1.4-1.6 * RER` | `1.6-1.8 * RER` |
+| Inactivo o con tendencia a obesidad | `1.0 * RER` | `1.0-1.2 * RER` |
 
-No incluir en el selector principal los factores de pérdida de peso,
-gestación, lactancia, crecimiento o trabajo. La guía los contempla, pero esos
-casos necesitan contexto veterinario adicional.
+No incluir en el selector principal los factores de perdida de peso, gestacion,
+lactancia, crecimiento o trabajo. La guia los contempla, pero esos casos
+necesitan contexto veterinario adicional.
 
 ---
 
 ## Interfaz
 
-### Inputs
+### Principios mobile first
 
-| Campo | Default |
-|-------|---------|
-| Especie | Perro |
-| Peso | Vacío |
-| Unidad | `kg` |
-| Perfil adulto | Esterilizado |
+1. En movil, el formulario y el resultado deben estar en una sola columna.
+2. El resultado principal debe aparecer inmediatamente despues de los inputs
+   relevantes, sin obligar a bajar hasta secciones educativas.
+3. Los controles tactiles deben tener al menos `44-48px` de alto.
+4. El selector de especie debe ser un control segmentado grande.
+5. El selector de unidad debe estar cerca del peso y no esconderse.
+6. Formula, fuente y explicaciones tecnicas deben ir en bloques plegables o
+   secciones posteriores para no competir con el resultado.
+7. Los botones de accion deben apilarse en movil y pasar a layout horizontal en
+   pantallas mayores.
+8. No debe haber tablas anchas en el primer viewport movil. Si se usan tablas en
+   contenido educativo, deben ser responsivas.
+
+### Inputs principales
+
+| Campo | Default | Notas |
+|-------|---------|-------|
+| Especie | Perro | Control segmentado |
+| Peso | Vacio | Aceptar punto o coma decimal |
+| Unidad | `kg` | `kg` o `lb` |
+| Tipo de peso | Actual | Actual, ideal o no se |
+| Perfil adulto | Esterilizado | Esterilizado, no esterilizado o inactivo/tendencia a obesidad |
+| Condicion corporal | No se | Delgado, ideal, sobrepeso o no se |
+
+### Inputs opcionales de ingesta actual
+
+Mostrar como bloque opcional: "Comparar con lo que come hoy".
+
+| Campo | Default | Notas |
+|-------|---------|-------|
+| Calorias de alimento al dia | Vacio | kcal/dia segun etiqueta o calculo del usuario |
+| Calorias de premios/snacks al dia | Vacio | kcal/dia de premios, restos, suplementos o extras |
+
+Si ambos campos estan vacios, no mostrar comparacion. Si uno esta lleno, tratar
+el campo vacio como `0`, pero mostrar el texto con claridad.
+
+### Casos fuera del MVP
+
+Mostrar como bloque visible antes del resultado:
+
+```text
+¿Alguna de estas situaciones aplica?
+```
+
+Opciones informativas no calculables:
+
+```text
+Cachorro o gatito
+Gestacion o lactancia
+Objetivo de perdida o aumento de peso
+Enfermedad o dieta terapeutica
+Perro de trabajo o actividad extrema
+```
+
+Al elegir cualquiera, sustituir el resultado por:
+
+```text
+Este caso necesita una recomendacion individual. Consulta a tu veterinario
+antes de ajustar la alimentacion.
+```
+
+No calcular `MER`, premios ni comparacion de ingesta actual mientras haya un
+caso fuera de alcance seleccionado.
 
 ### Resultado
 
 Ejemplo para un perro esterilizado de `10 kg`:
 
 ```text
-RER estimado: 394 kcal/día
-Mantenimiento orientativo: 551–630 kcal/día
-Factor aplicado: 1.4–1.6 × RER
+Mantenimiento orientativo: 551-630 kcal/dia
+RER estimado: 394 kcal/dia
+Factor aplicado: 1.4-1.6 * RER
+Premios/snacks: hasta 55-63 kcal/dia
+Alimento principal: aprox. 496-567 kcal/dia
 ```
 
 El resultado principal debe ser el rango `MER`. Mostrar `RER` como dato
 explicativo, no como cantidad recomendada por defecto.
 
+Si el usuario captura ingesta actual:
+
+```text
+Hoy reportas: 720 kcal/dia
+Comparacion: por encima del rango estimado.
+Usa esta diferencia como referencia para revisar porciones, etiquetas y premios
+con tu veterinario.
+```
+
+### Avisos contextuales
+
+Mostrar avisos adicionales segun seleccion:
+
+- Tipo de peso `actual`: "Si tu mascota no esta en condicion corporal ideal, el
+  peso actual puede no ser el mejor punto de partida para estimar calorias."
+- Tipo de peso `ideal`: "Usar peso ideal puede ser mas util cuando hay
+  sobrepeso, pero debe validarse con tu veterinario."
+- Tipo de peso `no se`: "Si no sabes el peso ideal, usa este resultado solo como
+  referencia inicial."
+- Condicion corporal `sobrepeso`: "Esta calculadora no crea un plan de perdida
+  de peso. Consulta al veterinario antes de recortar raciones."
+- Condicion corporal `delgado`: "Si tu mascota esta por debajo de su condicion
+  ideal, consulta al veterinario antes de aumentar alimento."
+- Perfil `inactivo`: "El extremo bajo del rango suele ser mas prudente para
+  mascotas sedentarias, pero debe ajustarse con seguimiento."
+
 ### Copy obligatorio
 
 ```text
-Esta estimación es un punto de partida, no una prescripción. La cantidad real
-debe ajustarse según peso, condición corporal, actividad y salud con apoyo de
+Esta estimacion es un punto de partida, no una prescripcion. La cantidad real
+debe ajustarse segun peso, condicion corporal, actividad y salud con apoyo de
 tu veterinario.
-```
-
-### Casos fuera del MVP
-
-Mostrar opciones informativas no calculables:
-
-```text
-Cachorro o gatito
-Gestación o lactancia
-Objetivo de pérdida o aumento de peso
-Enfermedad o dieta terapéutica
-```
-
-Al elegirlas, sustituir el resultado por:
-
-```text
-Este caso necesita una recomendación individual. Consulta a tu veterinario
-antes de ajustar la alimentación.
 ```
 
 ---
@@ -195,23 +311,46 @@ antes de ajustar la alimentación.
 
 | Caso | Comportamiento |
 |------|----------------|
-| Peso vacío | Resultado neutral |
+| Peso vacio | Resultado neutral |
 | Peso `<= 0` | Rechazar |
-| Peso no numérico | Mostrar error |
+| Peso no numerico | Mostrar error |
 | Peso no finito | Rechazar |
-| Peso mayor que `150 kg` | Pedir revisar el valor |
+| Perro con peso mayor que `150 kg` | Pedir revisar el valor |
+| Gato con peso mayor que `25 kg` | Pedir revisar unidad o valor |
+| Peso menor que `0.5 kg` | Pedir revisar si es adulto o si el valor es correcto |
+| Calorias actuales negativas | Rechazar |
+| Calorias actuales no numericas | Mostrar error |
+| Calorias actuales no finitas | Rechazar |
 | Caso fuera del MVP | No calcular MER |
 
-Aceptar punto o coma decimal. Mantener precisión completa durante el cálculo y
-redondear kilocalorías al entero más cercano al mostrar.
+Aceptar punto o coma decimal. Mantener precision completa durante el calculo y
+redondear kilocalorias al entero mas cercano al mostrar.
+
+Las validaciones de peso maximo son advertencias fuertes de revision, no
+diagnosticos. Deben ayudar a detectar errores de unidad, escritura o casos fuera
+del alcance.
 
 ---
 
 ## URL compartible
 
 ```text
-/mascotas/calorias-diarias-para-perro-o-gato?especie=perro&peso=10&unidad=kg&perfil=esterilizado
-/mascotas/calorias-diarias-para-perro-o-gato?especie=gato&peso=4.5&unidad=kg&perfil=inactivo
+/mascotas/calorias-diarias-para-perro-o-gato?especie=perro&peso=10&unidad=kg&perfil=esterilizado&tipoPeso=actual&condicion=no-se
+/mascotas/calorias-diarias-para-perro-o-gato?especie=gato&peso=4.5&unidad=kg&perfil=inactivo&tipoPeso=ideal&condicion=sobrepeso
+```
+
+Parametros permitidos:
+
+```text
+especie=perro|gato
+peso=numero-validado
+unidad=kg|lb
+perfil=esterilizado|no-esterilizado|inactivo
+tipoPeso=actual|ideal|no-se
+condicion=delgado|ideal|sobrepeso|no-se
+caloriasAlimento=numero-validado-opcional
+caloriasPremios=numero-validado-opcional
+casoEspecial=cachorro|gestacion-lactancia|perdida-aumento|enfermedad|trabajo
 ```
 
 No incluir datos sensibles ni generar variantes indexables. Mantener canonical
@@ -219,77 +358,107 @@ sin query params.
 
 ---
 
-## Diseño y contenido
+## Diseno y contenido
 
 ### Hero
 
 **Kicker:** Mascotas
 
-**H1:** Calorías diarias para perro o gato
+**H1:** Calorias diarias para perro o gato
 
-**Descripción:**
+**Descripcion:**
 
 ```text
-Estima un rango orientativo de calorías diarias para un perro o gato adulto
-según su peso y perfil general.
+Estima un rango orientativo de calorias diarias para un perro o gato adulto
+segun su peso, perfil y condicion corporal.
 ```
 
 ### Secciones
 
 1. Hero y breadcrumbs.
 2. Formulario y resultado.
-3. Qué significan `RER` y `MER`.
-4. Por qué el resultado es un rango.
-5. Cuándo consultar al veterinario antes de ajustar alimento.
-6. Herramientas relacionadas.
-7. FAQ visibles.
+3. Comparacion con lo que come hoy.
+4. Que significan `RER` y `MER`.
+5. Por que el resultado es un rango.
+6. Peso actual, peso ideal y condicion corporal.
+7. Premios, snacks y el margen del 10%.
+8. Cuando consultar al veterinario antes de ajustar alimento.
+9. Herramientas relacionadas.
+10. FAQ visibles.
 
 ### FAQ sugeridas
 
-- ¿Cuántas calorías necesita mi perro al día?
-- ¿Cuántas calorías necesita mi gato al día?
-- ¿Qué significa RER?
-- ¿Qué significa MER?
-- ¿Por qué la calculadora muestra un rango?
+- ¿Cuantas calorias necesita mi perro al dia?
+- ¿Cuantas calorias necesita mi gato al dia?
+- ¿Que significa RER?
+- ¿Que significa MER?
+- ¿Por que la calculadora muestra un rango?
+- ¿Debo usar el peso actual o el peso ideal de mi mascota?
+- ¿Que hago si mi mascota tiene sobrepeso?
 - ¿Puedo usar esta calculadora para que mi mascota baje de peso?
-- ¿Cómo convierto calorías a gramos o tazas de alimento?
+- ¿Cuantas calorias pueden venir de premios o snacks?
+- ¿Como comparo el resultado con las calorias que come hoy?
+- ¿Como convierto calorias a gramos o tazas de alimento?
 
 ---
 
 ## Funciones puras sugeridas
 
 ```ts
+parsePetDecimalInput(value)
 convertPetWeightToKg(value, unit)
 calculatePetRer(weightKg)
 getPetMerFactorRange(species, profile)
 calculatePetMerRange(rer, factorRange)
+calculatePetTreatRange(merRange)
+calculatePetMainFoodRange(merRange)
+calculateCurrentPetIntake(foodCalories, treatCalories)
+comparePetIntakeWithMer(currentIntake, merRange)
 validatePetCaloriesInput(input)
+validatePetCurrentIntakeInput(input)
+getPetContextWarnings(input)
 formatPetCalories(value)
+buildPetCaloriesCopyText(result)
 ```
 
 ---
 
-## Pruebas mínimas
+## Pruebas minimas
 
 - `1 lb = 0.45359237 kg`.
-- `RER(10 kg) ≈ 393.64 kcal/día`.
-- Perro esterilizado de `10 kg` → `MER ≈ 551.10–629.82`.
-- Gato esterilizado de `4 kg` usa `1.2–1.4 × RER`.
-- Gato inactivo usa exactamente `1.0 × RER`.
+- `RER(10 kg) ~= 393.64 kcal/dia`.
+- Perro esterilizado de `10 kg` -> `MER ~= 551.10-629.82`.
+- Perro esterilizado de `10 kg` -> premios `~= 55.11-62.98`.
+- Perro esterilizado de `10 kg` -> alimento principal `~= 495.99-566.84`.
+- Gato esterilizado de `4 kg` usa `1.2-1.4 * RER`.
+- Gato inactivo usa exactamente `1.0 * RER`.
+- Comparacion de ingesta actual clasifica debajo, dentro y encima del rango.
 - Rechazar peso `0`, negativo, `NaN` e `Infinity`.
-- Pedir revisión para peso mayor a `150 kg`.
-- No calcular casos de crecimiento, gestación, lactancia o pérdida de peso.
+- Pedir revision para perro mayor a `150 kg`.
+- Pedir revision para gato mayor a `25 kg`.
+- Pedir revision para adulto menor a `0.5 kg`.
+- Rechazar calorias actuales negativas, `NaN` e `Infinity`.
+- No calcular casos de crecimiento, gestacion, lactancia, trabajo, enfermedad o
+  objetivo de perdida/aumento de peso.
 - Aceptar punto y coma decimal.
+- Generar avisos contextuales para peso actual, peso ideal, condicion corporal
+  sobrepeso y condicion corporal delgado.
 
 ---
 
-## Criterios de aceptación
+## Criterios de aceptacion
 
-1. La spec clasifica la calculadora en la categoría `mascotas`.
+1. La calculadora se clasifica en la categoria `mascotas`.
 2. La ruta propuesta es `/mascotas/calorias-diarias-para-perro-o-gato`.
-3. El cálculo usa `RER = 70 × kg^0.75`.
+3. El calculo usa `RER = 70 * kg^0.75`.
 4. El resultado principal muestra un rango `MER`.
 5. Los factores incluidos coinciden con los lineamientos AAHA para adultos.
-6. La UI excluye casos que necesitan evaluación individual.
-7. El resultado se presenta como estimación, no como prescripción.
-8. La fuente veterinaria queda citada.
+6. La UI excluye casos que necesitan evaluacion individual.
+7. El resultado se presenta como estimacion, no como prescripcion.
+8. La calculadora pregunta si el peso es actual, ideal o desconocido.
+9. La calculadora incluye condicion corporal simple sin diagnosticar.
+10. La calculadora muestra margen orientativo de premios/snacks del 10%.
+11. La calculadora permite comparar opcionalmente contra ingesta actual.
+12. Las validaciones distinguen limites razonables para perro y gato.
+13. El diseno del primer viewport es mobile first y prioriza resultado util.
+14. La fuente veterinaria queda citada.

@@ -205,4 +205,13 @@ export const CALCULATORS: CalculatorDirectoryItem[] = [
     categorySlug: "mascotas",
     order: 82,
   },
+  {
+    id: "calorias-diarias-para-perro-o-gato",
+    title: "Calorias diarias para perro o gato",
+    description:
+      "Estima un rango orientativo de calorias diarias para perros y gatos adultos segun peso, perfil y condicion corporal.",
+    href: "/mascotas/calorias-diarias-para-perro-o-gato",
+    categorySlug: "mascotas",
+    order: 84,
+  },
 ];

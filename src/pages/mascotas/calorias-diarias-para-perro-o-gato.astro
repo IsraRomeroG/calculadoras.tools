@@ -1,0 +1,848 @@
+---
+import BaseLayout from "@layouts/BaseLayout.astro";
+import Container from "@components/layout/Container.astro";
+import PageShell from "@components/layout/PageShell.astro";
+import FaqSection from "@components/shared/FaqSection.astro";
+import PageHero from "@components/shared/PageHero.astro";
+import SectionIntro from "@components/shared/SectionIntro.astro";
+import {
+  PET_BODY_CONDITION_LABELS,
+  PET_PROFILE_LABELS,
+  PET_SPECIAL_CASE_LABELS,
+  PET_WEIGHT_CONTEXT_LABELS,
+  type PetAdultProfile,
+  type PetBodyCondition,
+  type PetSpecialCase,
+  type PetWeightContext,
+} from "@lib/calculators/mascotas/calorias-diarias-para-perro-o-gato/petCalories";
+import { buildFaqJsonLd } from "@lib/seo";
+
+const title = "Calorias diarias para perro o gato";
+const description =
+  "Estima un rango orientativo de calorias diarias para perros y gatos adultos segun peso, perfil y condicion corporal.";
+const canonical = "/mascotas/calorias-diarias-para-perro-o-gato";
+
+const faqs = [
+  {
+    question: "Cuantas calorias necesita mi perro al dia?",
+    answer:
+      "Depende de su peso, esterilizacion, actividad, condicion corporal y salud. Esta calculadora estima RER y MER como punto de partida para perros adultos.",
+  },
+  {
+    question: "Cuantas calorias necesita mi gato al dia?",
+    answer:
+      "Un gato adulto puede estimarse con RER y un factor MER segun su perfil. La cantidad real debe ajustarse con seguimiento de peso y condicion corporal.",
+  },
+  {
+    question: "Que significa RER?",
+    answer:
+      "RER es el requerimiento energetico en reposo. Estima las calorias basicas que usa una mascota en reposo y se calcula con 70 por peso en kg elevado a 0.75.",
+  },
+  {
+    question: "Que significa MER?",
+    answer:
+      "MER es el requerimiento energetico de mantenimiento. Se obtiene multiplicando el RER por un factor segun especie y perfil adulto.",
+  },
+  {
+    question: "Por que la calculadora muestra un rango?",
+    answer:
+      "Porque las guias veterinarias publican factores aproximados y cada mascota responde distinto por actividad, metabolismo, salud y condicion corporal.",
+  },
+  {
+    question: "Debo usar el peso actual o el peso ideal de mi mascota?",
+    answer:
+      "Si tu mascota esta en condicion corporal ideal, el peso actual puede servir como referencia. Si hay sobrepeso o bajo peso, conviene validar el peso ideal con un veterinario.",
+  },
+  {
+    question: "Que hago si mi mascota tiene sobrepeso?",
+    answer:
+      "No uses esta calculadora como plan de perdida de peso. Recortar raciones sin supervision puede ser riesgoso; consulta a tu veterinario.",
+  },
+  {
+    question: "Cuantas calorias pueden venir de premios o snacks?",
+    answer:
+      "Como referencia general, premios, snacks y extras no deberian superar alrededor del 10% de las calorias diarias.",
+  },
+  {
+    question: "Como comparo el resultado con las calorias que come hoy?",
+    answer:
+      "Suma las calorias del alimento principal y los premios del dia. La calculadora puede comparar ese total contra el rango estimado, sin indicar ajustes automaticos.",
+  },
+  {
+    question: "Como convierto calorias a gramos o tazas de alimento?",
+    answer:
+      "Revisa las kcal por taza, lata o gramo en la etiqueta del alimento. La calculadora no convierte porciones porque la densidad calorica cambia por producto.",
+  },
+];
+
+const faqJsonLd = buildFaqJsonLd(faqs);
+
+const profileOptions: PetAdultProfile[] = [
+  "esterilizado",
+  "no-esterilizado",
+  "inactivo",
+];
+const weightContextOptions: PetWeightContext[] = ["actual", "ideal", "no-se"];
+const bodyConditionOptions: PetBodyCondition[] = [
+  "no-se",
+  "ideal",
+  "sobrepeso",
+  "delgado",
+];
+const specialCaseOptions: PetSpecialCase[] = [
+  "cachorro",
+  "gestacion-lactancia",
+  "perdida-aumento",
+  "enfermedad",
+  "trabajo",
+];
+
+const sources = [
+  {
+    label: "AAHA: Weight Reduction in the Obese Pet",
+    href: "https://www.aaha.org/resources/2021-aaha-nutrition-and-weight-management-guidelines/weight-reduction-in-the-obese-pet/",
+  },
+  {
+    label: "AAHA: Feeding Plans for Healthy Cats and Dogs",
+    href: "https://www.aaha.org/resources/2021-aaha-nutrition-and-weight-management-guidelines/feeding-plans-for-healthy-appropriate-weight-cats-and-dogs/",
+  },
+  {
+    label: "AAHA: Prevention of Obesity",
+    href: "https://www.aaha.org/resources/2021-aaha-nutrition-and-weight-management-guidelines/prevention-of-obesity/",
+  },
+];
+---
+
+<BaseLayout title={title} description={description} canonical={canonical}>
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={JSON.stringify(faqJsonLd)} />
+  </Fragment>
+
+  <PageShell>
+    <PageHero
+      title="Calorias diarias para perro o gato"
+      description="Estima un rango orientativo de calorias diarias para un perro o gato adulto segun su peso, perfil y condicion corporal."
+      kicker="Mascotas"
+      collapseBreadcrumbOnMobile
+      containerClass="py-5 md:py-7"
+      breadcrumbs={[
+        { label: "Inicio", href: "/", ariaLabel: "Inicio" },
+        { label: "Mascotas", href: "/mascotas", optional: true },
+        { label: "Calorias de mascota", truncate: true },
+      ]}
+    />
+
+    <Container as="section" class="py-5 md:py-8">
+      <section
+        id="pet-calories-calculator"
+        class="overflow-hidden rounded-lg border border-gray-700 bg-gray-950 shadow-xl shadow-gray-950/30"
+        aria-labelledby="calculator-heading"
+      >
+        <div class="grid gap-0 xl:grid-cols-[minmax(0,1fr)_minmax(21rem,0.78fr)]">
+          <div class="p-4 sm:p-6">
+            <p class="text-sm font-semibold uppercase tracking-wide text-amber-400">
+              Calculo orientativo
+            </p>
+            <h2 id="calculator-heading" class="mt-2 text-2xl font-semibold">
+              Estima el mantenimiento diario
+            </h2>
+            <p class="mt-2 text-sm leading-relaxed text-gray-400">
+              Usa peso, especie y perfil adulto. El resultado es una referencia
+              para conversar mejor con tu veterinario, no una receta cerrada.
+            </p>
+
+            <fieldset class="mt-6">
+              <legend class="text-sm font-semibold text-gray-200">Especie</legend>
+              <div class="mt-3 grid grid-cols-2 gap-3" data-species-group>
+                <label class="flex min-h-12 cursor-pointer items-center justify-center rounded-lg border border-amber-400 bg-amber-400 px-4 text-sm font-semibold text-gray-950 transition focus-within:ring-3 focus-within:ring-amber-400/30" data-species-option="perro">
+                  <input class="sr-only" type="radio" name="species" value="perro" checked data-species-input />
+                  Perro
+                </label>
+                <label class="flex min-h-12 cursor-pointer items-center justify-center rounded-lg border border-gray-700 bg-gray-900 px-4 text-sm font-semibold text-gray-200 transition focus-within:ring-3 focus-within:ring-amber-400/30" data-species-option="gato">
+                  <input class="sr-only" type="radio" name="species" value="gato" data-species-input />
+                  Gato
+                </label>
+              </div>
+            </fieldset>
+
+            <fieldset class="mt-5">
+              <legend class="text-sm font-semibold text-gray-200">
+                Alguna situacion especial?
+              </legend>
+              <div class="mt-3 grid gap-2 sm:grid-cols-2">
+                {
+                  specialCaseOptions.map((specialCase) => (
+                    <label class="flex min-h-11 cursor-pointer items-start gap-3 rounded-lg border border-gray-800 bg-gray-900/70 px-3 py-2 text-sm leading-relaxed text-gray-300 transition focus-within:border-amber-400 focus-within:ring-3 focus-within:ring-amber-400/20">
+                      <input
+                        class="mt-1 size-4 accent-amber-400"
+                        type="checkbox"
+                        value={specialCase}
+                        data-special-case-input
+                      />
+                      <span>{PET_SPECIAL_CASE_LABELS[specialCase]}</span>
+                    </label>
+                  ))
+                }
+              </div>
+              <p class="mt-2 text-sm leading-relaxed text-gray-500">
+                Si aplica una de estas opciones, no calculamos racion: se necesita
+                recomendacion individual.
+              </p>
+            </fieldset>
+
+            <div class="mt-5 grid gap-3 sm:grid-cols-[minmax(0,1fr)_9rem]">
+              <div>
+                <label for="pet-weight" class="block text-sm font-semibold text-gray-200">
+                  Peso
+                </label>
+                <input
+                  id="pet-weight"
+                  class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-900 px-4 text-base text-white outline-none transition placeholder:text-gray-600 focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15"
+                  type="text"
+                  inputmode="decimal"
+                  autocomplete="off"
+                  placeholder="Ej. 10"
+                  data-weight-input
+                />
+              </div>
+
+              <fieldset>
+                <legend class="block text-sm font-semibold text-gray-200">Unidad</legend>
+                <div class="mt-2 grid min-h-12 grid-cols-2 rounded-lg border border-gray-700 bg-gray-900 p-1" data-unit-group>
+                  <label class="flex cursor-pointer items-center justify-center rounded-md bg-amber-400 px-3 text-sm font-semibold text-gray-950" data-unit-option="kg">
+                    <input class="sr-only" type="radio" name="unit" value="kg" checked data-unit-input />
+                    kg
+                  </label>
+                  <label class="flex cursor-pointer items-center justify-center rounded-md px-3 text-sm font-semibold text-gray-300" data-unit-option="lb">
+                    <input class="sr-only" type="radio" name="unit" value="lb" data-unit-input />
+                    lb
+                  </label>
+                </div>
+              </fieldset>
+            </div>
+
+            <div class="mt-5 grid gap-4 sm:grid-cols-2">
+              <div>
+                <label for="pet-profile" class="block text-sm font-semibold text-gray-200">
+                  Perfil adulto
+                </label>
+                <select
+                  id="pet-profile"
+                  class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-900 px-4 text-base text-white outline-none transition focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15"
+                  data-profile-input
+                >
+                  {
+                    profileOptions.map((profile) => (
+                      <option value={profile}>{PET_PROFILE_LABELS[profile]}</option>
+                    ))
+                  }
+                </select>
+              </div>
+
+              <div>
+                <label for="weight-context" class="block text-sm font-semibold text-gray-200">
+                  Tipo de peso
+                </label>
+                <select
+                  id="weight-context"
+                  class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-900 px-4 text-base text-white outline-none transition focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15"
+                  data-weight-context-input
+                >
+                  {
+                    weightContextOptions.map((context) => (
+                      <option value={context}>{PET_WEIGHT_CONTEXT_LABELS[context]}</option>
+                    ))
+                  }
+                </select>
+              </div>
+
+              <div>
+                <label for="body-condition" class="block text-sm font-semibold text-gray-200">
+                  Condicion corporal
+                </label>
+                <select
+                  id="body-condition"
+                  class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-900 px-4 text-base text-white outline-none transition focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15"
+                  data-body-condition-input
+                >
+                  {
+                    bodyConditionOptions.map((condition) => (
+                      <option value={condition}>{PET_BODY_CONDITION_LABELS[condition]}</option>
+                    ))
+                  }
+                </select>
+              </div>
+            </div>
+
+            <details class="mt-5 rounded-lg border border-gray-800 bg-gray-900/60 p-4">
+              <summary class="cursor-pointer text-sm font-semibold text-gray-200">
+                Comparar con lo que come hoy
+              </summary>
+              <div class="mt-4 grid gap-4 sm:grid-cols-2">
+                <div>
+                  <label for="food-calories" class="block text-sm font-semibold text-gray-200">
+                    Calorias de alimento al dia
+                  </label>
+                  <input
+                    id="food-calories"
+                    class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-950 px-4 text-base text-white outline-none transition placeholder:text-gray-600 focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15"
+                    type="text"
+                    inputmode="decimal"
+                    autocomplete="off"
+                    placeholder="Ej. 520"
+                    data-food-calories-input
+                  />
+                </div>
+                <div>
+                  <label for="treat-calories" class="block text-sm font-semibold text-gray-200">
+                    Calorias de premios al dia
+                  </label>
+                  <input
+                    id="treat-calories"
+                    class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-950 px-4 text-base text-white outline-none transition placeholder:text-gray-600 focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15"
+                    type="text"
+                    inputmode="decimal"
+                    autocomplete="off"
+                    placeholder="Ej. 40"
+                    data-treat-calories-input
+                  />
+                </div>
+              </div>
+              <p class="mt-3 text-sm leading-relaxed text-gray-500">
+                Si capturas solo un campo, el otro se toma como 0. La comparacion
+                no recomienda cambios automaticos.
+              </p>
+            </details>
+
+            <p class="mt-3 hidden text-sm text-red-300" data-input-error></p>
+
+            <div class="mt-6 grid gap-3 border-t border-gray-800 pt-5 sm:grid-cols-3">
+              <button
+                class="inline-flex min-h-11 items-center justify-center rounded-lg border border-gray-700 px-4 py-2 text-sm font-semibold text-gray-200 transition hover:border-amber-400 hover:text-white focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/40"
+                type="button"
+                data-clear-calculator
+              >
+                Limpiar
+              </button>
+              <button
+                class="hidden min-h-11 items-center justify-center rounded-lg bg-amber-400 px-4 py-2 text-sm font-semibold text-gray-950 transition hover:bg-amber-300 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/40"
+                type="button"
+                data-copy-result
+              >
+                Copiar resultado
+              </button>
+              <button
+                class="hidden min-h-11 items-center justify-center rounded-lg border border-gray-700 px-4 py-2 text-sm font-semibold text-gray-200 transition hover:border-amber-400 hover:text-white focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/40"
+                type="button"
+                data-copy-link
+              >
+                Copiar enlace
+              </button>
+            </div>
+            <p class="mt-3 min-h-5 text-sm text-emerald-300" aria-live="polite" data-action-status></p>
+          </div>
+
+          <aside
+            class="border-t border-gray-800 bg-gray-900/70 p-4 sm:p-6 xl:border-l xl:border-t-0"
+            aria-live="polite"
+          >
+            <p class="text-sm font-semibold uppercase tracking-wide text-amber-400" data-result-kicker>
+              Resultado
+            </p>
+            <p class="mt-3 text-3xl font-bold leading-tight text-white md:text-4xl" data-main-result>
+              Ingresa el peso
+            </p>
+            <p class="mt-3 text-sm leading-relaxed text-gray-400" data-result-note>
+              Completa los datos para ver RER, MER y margen de premios.
+            </p>
+
+            <dl class="mt-5 grid gap-3" data-result-details>
+              <div class="rounded-lg border border-gray-800 bg-gray-950/70 p-4">
+                <dt class="text-xs font-semibold uppercase tracking-wide text-gray-500">RER</dt>
+                <dd class="mt-2 text-lg font-semibold text-white" data-rer-result>Se mostrara aqui</dd>
+              </div>
+              <div class="rounded-lg border border-gray-800 bg-gray-950/70 p-4">
+                <dt class="text-xs font-semibold uppercase tracking-wide text-gray-500">Factor</dt>
+                <dd class="mt-2 text-lg font-semibold text-white" data-factor-result>Se mostrara aqui</dd>
+              </div>
+              <div class="rounded-lg border border-gray-800 bg-gray-950/70 p-4">
+                <dt class="text-xs font-semibold uppercase tracking-wide text-gray-500">Premios/snacks</dt>
+                <dd class="mt-2 text-lg font-semibold text-white" data-treat-result>Se mostrara aqui</dd>
+              </div>
+              <div class="rounded-lg border border-gray-800 bg-gray-950/70 p-4">
+                <dt class="text-xs font-semibold uppercase tracking-wide text-gray-500">Alimento principal</dt>
+                <dd class="mt-2 text-lg font-semibold text-white" data-main-food-result>Se mostrara aqui</dd>
+              </div>
+            </dl>
+
+            <div class="mt-4 hidden rounded-lg border border-cyan-400/25 bg-cyan-400/10 p-3 text-sm leading-relaxed text-cyan-100" data-intake-panel>
+              <p class="font-semibold" data-intake-title></p>
+              <p class="mt-1" data-intake-note></p>
+            </div>
+
+            <div class="mt-4 hidden rounded-lg border border-amber-400/25 bg-amber-400/10 p-3 text-sm leading-relaxed text-amber-100" data-warning-panel>
+              <p class="font-semibold">Notas importantes</p>
+              <ul class="mt-2 list-disc space-y-1 pl-5" data-warning-list></ul>
+            </div>
+
+            <p class="mt-5 rounded-lg border border-gray-700 bg-gray-950/70 p-3 text-sm leading-relaxed text-gray-300">
+              Esta estimacion es un punto de partida, no una prescripcion. La
+              cantidad real debe ajustarse segun peso, condicion corporal,
+              actividad y salud con apoyo de tu veterinario.
+            </p>
+          </aside>
+        </div>
+      </section>
+    </Container>
+
+    <Container as="section" class="py-5 md:py-8">
+      <SectionIntro
+        title="Que significan RER y MER"
+        description="La calculadora usa la formula veterinaria como base y despues aplica factores generales de mantenimiento adulto."
+      />
+      <div class="grid gap-5 md:grid-cols-2">
+        <article>
+          <h2 class="text-2xl font-semibold">RER</h2>
+          <p class="mt-3 text-sm leading-relaxed text-gray-400">
+            RER estima el requerimiento energetico en reposo. En esta herramienta
+            se calcula como <code>70 * pesoKg^0.75</code>. No es la racion diaria
+            recomendada por defecto.
+          </p>
+        </article>
+        <article>
+          <h2 class="text-2xl font-semibold">MER</h2>
+          <p class="mt-3 text-sm leading-relaxed text-gray-400">
+            MER ajusta el RER con un factor segun especie y perfil adulto. Por
+            eso el resultado principal es un rango, no un unico numero rigido.
+          </p>
+        </article>
+      </div>
+    </Container>
+
+    <Container as="section" class="py-5 md:py-8">
+      <SectionIntro
+        title="Peso, condicion y premios"
+        description="Tres detalles practicos suelen cambiar la interpretacion del resultado."
+      />
+      <div class="grid gap-5 md:grid-cols-3">
+        <article>
+          <h2 class="text-xl font-semibold">Peso actual o ideal</h2>
+          <p class="mt-3 text-sm leading-relaxed text-gray-400">
+            Si la mascota no esta en condicion corporal ideal, el peso actual
+            puede distorsionar la estimacion. El peso ideal debe validarse con
+            un veterinario.
+          </p>
+        </article>
+        <article>
+          <h2 class="text-xl font-semibold">Condicion corporal</h2>
+          <p class="mt-3 text-sm leading-relaxed text-gray-400">
+            Delgado, ideal o sobrepeso no son diagnosticos en esta calculadora:
+            solo ayudan a mostrar avisos y evitar ajustes inseguros.
+          </p>
+        </article>
+        <article>
+          <h2 class="text-xl font-semibold">Premios y snacks</h2>
+          <p class="mt-3 text-sm leading-relaxed text-gray-400">
+            Como guia general, premios y extras deberian quedarse cerca del 10%
+            o menos de las calorias diarias.
+          </p>
+        </article>
+      </div>
+    </Container>
+
+    <Container as="section" class="py-5 md:py-8">
+      <div class="grid gap-5 md:grid-cols-[minmax(0,1fr)_minmax(16rem,0.8fr)]">
+        <article>
+          <h2 class="text-2xl font-semibold">Cuando consultar antes de ajustar</h2>
+          <p class="mt-3 text-sm leading-relaxed text-gray-400">
+            Cachorros, gatitos, gestacion, lactancia, enfermedad, dietas
+            terapeuticas, perros de trabajo y objetivos de perdida o aumento de
+            peso necesitan una recomendacion individual.
+          </p>
+        </article>
+        <aside class="rounded-lg border border-gray-700 bg-gray-950 p-4">
+          <h2 class="text-lg font-semibold">Fuentes</h2>
+          <ul class="mt-3 space-y-2 text-sm leading-relaxed">
+            {
+              sources.map((source) => (
+                <li>
+                  <a
+                    class="text-amber-300 underline-offset-4 hover:underline"
+                    href={source.href}
+                    rel="noreferrer"
+                  >
+                    {source.label}
+                  </a>
+                </li>
+              ))
+            }
+          </ul>
+        </aside>
+      </div>
+    </Container>
+
+    <Container as="section" class="py-5 md:py-8">
+      <div class="rounded-lg border border-gray-700 bg-gray-950 p-5">
+        <h2 class="text-xl font-semibold">Herramientas relacionadas</h2>
+        <p class="mt-3 text-sm leading-relaxed text-gray-400">
+          Tambien puedes usar la calculadora de edad de mascota para estimar la
+          edad equivalente de perros y gatos con una tabla orientativa.
+        </p>
+        <a
+          class="mt-4 inline-flex min-h-11 items-center justify-center rounded-lg border border-gray-700 px-4 py-2 text-sm font-semibold text-gray-200 transition hover:border-amber-400 hover:text-white focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/40"
+          href="/mascotas/edad-de-mascota-en-anos-humanos"
+        >
+          Ver edad de mascota
+        </a>
+      </div>
+    </Container>
+
+    <FaqSection faqs={faqs} />
+  </PageShell>
+</BaseLayout>
+
+<script>
+  import {
+    PET_BODY_CONDITION_LABELS,
+    PET_PROFILE_LABELS,
+    PET_SPECIAL_CASE_LABELS,
+    PET_WEIGHT_CONTEXT_LABELS,
+    buildPetCaloriesShareUrl,
+    calculatePetCalories,
+    formatPetCalorieRange,
+    formatPetCalories,
+    formatPetFactorRange,
+    isPetAdultProfile,
+    isPetBodyCondition,
+    isPetCalorieSpecies,
+    isPetWeightContext,
+    isPetWeightUnit,
+    parsePetCaloriesSearchParams,
+    parsePetDecimalInput,
+  } from "@lib/calculators/mascotas/calorias-diarias-para-perro-o-gato/petCalories";
+
+  const speciesInputs = Array.from(document.querySelectorAll("[data-species-input]"));
+  const unitInputs = Array.from(document.querySelectorAll("[data-unit-input]"));
+  const specialCaseInputs = Array.from(
+    document.querySelectorAll("[data-special-case-input]"),
+  );
+  const weightInput = document.querySelector("[data-weight-input]");
+  const profileInput = document.querySelector("[data-profile-input]");
+  const weightContextInput = document.querySelector("[data-weight-context-input]");
+  const bodyConditionInput = document.querySelector("[data-body-condition-input]");
+  const foodCaloriesInput = document.querySelector("[data-food-calories-input]");
+  const treatCaloriesInput = document.querySelector("[data-treat-calories-input]");
+  const inputError = document.querySelector("[data-input-error]");
+  const resultKicker = document.querySelector("[data-result-kicker]");
+  const mainResult = document.querySelector("[data-main-result]");
+  const resultNote = document.querySelector("[data-result-note]");
+  const rerResult = document.querySelector("[data-rer-result]");
+  const factorResult = document.querySelector("[data-factor-result]");
+  const treatResult = document.querySelector("[data-treat-result]");
+  const mainFoodResult = document.querySelector("[data-main-food-result]");
+  const intakePanel = document.querySelector("[data-intake-panel]");
+  const intakeTitle = document.querySelector("[data-intake-title]");
+  const intakeNote = document.querySelector("[data-intake-note]");
+  const warningPanel = document.querySelector("[data-warning-panel]");
+  const warningList = document.querySelector("[data-warning-list]");
+  const clearButton = document.querySelector("[data-clear-calculator]");
+  const copyResultButton = document.querySelector("[data-copy-result]");
+  const copyLinkButton = document.querySelector("[data-copy-link]");
+  const actionStatus = document.querySelector("[data-action-status]");
+
+  let currentCopyText = "";
+  let currentShareUrl = "";
+  let actionTimer = 0;
+
+  function getCheckedValue(inputs, fallback) {
+    return inputs.find((input) => input.checked)?.value ?? fallback;
+  }
+
+  function parseOptionalDecimalInput(input) {
+    return parsePetDecimalInput(input.value);
+  }
+
+  function getSpecialCases() {
+    return specialCaseInputs
+      .filter((input) => input.checked)
+      .map((input) => input.value);
+  }
+
+  function getCurrentInput() {
+    const species = getCheckedValue(speciesInputs, "perro");
+    const unit = getCheckedValue(unitInputs, "kg");
+    const profile = profileInput.value;
+    const weightContext = weightContextInput.value;
+    const bodyCondition = bodyConditionInput.value;
+
+    return {
+      species: isPetCalorieSpecies(species) ? species : "perro",
+      weight: parseOptionalDecimalInput(weightInput),
+      unit: isPetWeightUnit(unit) ? unit : "kg",
+      profile: isPetAdultProfile(profile) ? profile : "esterilizado",
+      weightContext: isPetWeightContext(weightContext) ? weightContext : "actual",
+      bodyCondition: isPetBodyCondition(bodyCondition) ? bodyCondition : "no-se",
+      foodCalories: parseOptionalDecimalInput(foodCaloriesInput),
+      treatCalories: parseOptionalDecimalInput(treatCaloriesInput),
+      specialCases: getSpecialCases(),
+    };
+  }
+
+  function updateCalculator({ updateUrl = true } = {}) {
+    updateOptionStyles();
+    setInputError("");
+
+    const input = getCurrentInput();
+    const result = calculatePetCalories(input);
+    currentShareUrl = buildAbsoluteShareUrl(input);
+
+    if (updateUrl) {
+      syncUrl(input);
+    }
+
+    if (result.status === "ok") {
+      renderSuccess(result, input);
+      setActionButtonsVisible(true);
+      return;
+    }
+
+    renderMessage(result, input);
+    setActionButtonsVisible(false);
+  }
+
+  function renderSuccess(result, input) {
+    currentCopyText = result.copyText;
+    resultKicker.textContent = "Mantenimiento orientativo";
+    mainResult.textContent = `${formatPetCalorieRange(result.merRange)} kcal/dia`;
+    resultNote.textContent = `${input.species === "perro" ? "Perro" : "Gato"} adulto, ${PET_PROFILE_LABELS[input.profile].toLowerCase()}. Peso usado: ${roundTo(result.weightKg, 2)} kg (${PET_WEIGHT_CONTEXT_LABELS[input.weightContext].toLowerCase()}).`;
+    rerResult.textContent = `${formatPetCalories(result.rer)} kcal/dia`;
+    factorResult.textContent = `${formatPetFactorRange(result.factorRange)} x RER`;
+    treatResult.textContent = `Hasta ${formatPetCalorieRange(result.treatRange)} kcal/dia`;
+    mainFoodResult.textContent = `Aprox. ${formatPetCalorieRange(result.mainFoodRange)} kcal/dia`;
+    renderIntakeComparison(result);
+    renderWarnings(result.warnings);
+  }
+
+  function renderMessage(result, input) {
+    currentCopyText = "";
+    resultKicker.textContent =
+      result.status === "empty" ? "Resultado" : "Revisa los datos";
+    mainResult.textContent =
+      result.status === "empty" ? "Ingresa el peso" : "No se calcula";
+    resultNote.textContent = result.message;
+    rerResult.textContent = "Se mostrara aqui";
+    factorResult.textContent = PET_PROFILE_LABELS[input.profile];
+    treatResult.textContent = "Se mostrara aqui";
+    mainFoodResult.textContent = "Se mostrara aqui";
+    renderIntakeComparison();
+    renderWarnings(result.warnings ?? []);
+
+    if (result.status !== "empty") {
+      setInputError(result.message);
+    }
+  }
+
+  function renderIntakeComparison(result) {
+    const comparison = result?.intakeComparison;
+
+    intakePanel.classList.toggle("hidden", !comparison);
+
+    if (!comparison) {
+      intakeTitle.textContent = "";
+      intakeNote.textContent = "";
+      return;
+    }
+
+    intakeTitle.textContent = `Hoy reportas ${formatPetCalories(comparison.totalCalories)} kcal/dia: ${comparison.message}.`;
+    intakeNote.textContent =
+      "Usa esta diferencia como referencia para revisar porciones, etiquetas y premios con tu veterinario.";
+  }
+
+  function renderWarnings(warnings) {
+    warningPanel.classList.toggle("hidden", warnings.length === 0);
+    warningList.replaceChildren(
+      ...warnings.map((warning) => {
+        const item = document.createElement("li");
+        item.textContent = warning;
+
+        return item;
+      }),
+    );
+  }
+
+  function updateOptionStyles() {
+    speciesInputs.forEach((input) => {
+      setSegmentStyle(
+        document.querySelector(`[data-species-option="${input.value}"]`),
+        input.checked,
+      );
+    });
+    unitInputs.forEach((input) => {
+      setSegmentStyle(
+        document.querySelector(`[data-unit-option="${input.value}"]`),
+        input.checked,
+      );
+    });
+  }
+
+  function setSegmentStyle(element, isSelected) {
+    element.classList.toggle("border-amber-400", isSelected);
+    element.classList.toggle("bg-amber-400", isSelected);
+    element.classList.toggle("text-gray-950", isSelected);
+    element.classList.toggle("border-gray-700", !isSelected);
+    element.classList.toggle("bg-gray-900", !isSelected);
+    element.classList.toggle("text-gray-200", !isSelected);
+  }
+
+  function setInputError(message) {
+    inputError.textContent = message;
+    inputError.classList.toggle("hidden", !message);
+  }
+
+  function setActionButtonsVisible(isVisible) {
+    [copyResultButton, copyLinkButton].forEach((button) => {
+      button.classList.toggle("hidden", !isVisible);
+      button.classList.toggle("inline-flex", isVisible);
+    });
+  }
+
+  function syncUrl(input) {
+    const hasWeight = typeof input.weight === "number" && Number.isFinite(input.weight);
+    const hasSpecialCases = input.specialCases.length > 0;
+    const hasIntake =
+      typeof input.foodCalories === "number" ||
+      typeof input.treatCalories === "number";
+    const url = new URL(window.location.href);
+
+    if (!hasWeight && !hasSpecialCases && !hasIntake) {
+      url.search = "";
+      currentShareUrl = url.toString();
+      window.history.replaceState({}, "", url);
+      return;
+    }
+
+    window.history.replaceState({}, "", currentShareUrl);
+  }
+
+  function buildAbsoluteShareUrl(input) {
+    return new URL(buildPetCaloriesShareUrl(input), window.location.origin).toString();
+  }
+
+  function clearCalculator() {
+    speciesInputs.find((input) => input.value === "perro").checked = true;
+    unitInputs.find((input) => input.value === "kg").checked = true;
+    specialCaseInputs.forEach((input) => {
+      input.checked = false;
+    });
+    weightInput.value = "";
+    profileInput.value = "esterilizado";
+    weightContextInput.value = "actual";
+    bodyConditionInput.value = "no-se";
+    foodCaloriesInput.value = "";
+    treatCaloriesInput.value = "";
+    currentCopyText = "";
+    setStatus("");
+    updateCalculator();
+  }
+
+  function setStatus(message) {
+    actionStatus.textContent = message;
+    window.clearTimeout(actionTimer);
+
+    if (message) {
+      actionTimer = window.setTimeout(() => {
+        actionStatus.textContent = "";
+      }, 2200);
+    }
+  }
+
+  async function copyText(text, successMessage) {
+    if (!text) {
+      return;
+    }
+
+    try {
+      if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(text);
+      } else {
+        const textArea = document.createElement("textarea");
+        textArea.value = text;
+        textArea.setAttribute("readonly", "");
+        textArea.style.position = "fixed";
+        textArea.style.opacity = "0";
+        document.body.append(textArea);
+        textArea.select();
+        document.execCommand("copy");
+        textArea.remove();
+      }
+
+      setStatus(successMessage);
+    } catch {
+      setStatus("No fue posible copiar automaticamente.");
+    }
+  }
+
+  function loadFromUrl() {
+    const parsed = parsePetCaloriesSearchParams(
+      new URLSearchParams(window.location.search),
+    );
+
+    speciesInputs.forEach((input) => {
+      input.checked = input.value === parsed.species;
+    });
+    unitInputs.forEach((input) => {
+      input.checked = input.value === parsed.unit;
+    });
+    specialCaseInputs.forEach((input) => {
+      input.checked = parsed.specialCases.includes(input.value);
+    });
+    weightInput.value =
+      typeof parsed.weight === "number" ? String(parsed.weight) : "";
+    profileInput.value = parsed.profile;
+    weightContextInput.value = parsed.weightContext;
+    bodyConditionInput.value = parsed.bodyCondition;
+    foodCaloriesInput.value =
+      typeof parsed.foodCalories === "number" ? String(parsed.foodCalories) : "";
+    treatCaloriesInput.value =
+      typeof parsed.treatCalories === "number"
+        ? String(parsed.treatCalories)
+        : "";
+
+    if (parsed.hadInvalidParams) {
+      setStatus("Algunos parametros del enlace se ignoraron.");
+    }
+
+    updateCalculator({ updateUrl: false });
+  }
+
+  function roundTo(value, decimals) {
+    const factor = 10 ** decimals;
+
+    return Math.round(value * factor) / factor;
+  }
+
+  [
+    ...speciesInputs,
+    ...unitInputs,
+    ...specialCaseInputs,
+    weightInput,
+    profileInput,
+    weightContextInput,
+    bodyConditionInput,
+    foodCaloriesInput,
+    treatCaloriesInput,
+  ].forEach((input) => {
+    input.addEventListener("input", () => updateCalculator());
+    input.addEventListener("change", () => updateCalculator());
+  });
+
+  clearButton.addEventListener("click", clearCalculator);
+  copyResultButton.addEventListener("click", () => {
+    copyText(currentCopyText, "Resultado copiado.");
+  });
+  copyLinkButton.addEventListener("click", () => {
+    copyText(currentShareUrl || window.location.href, "Enlace copiado.");
+  });
+
+  loadFromUrl();
+</script>
