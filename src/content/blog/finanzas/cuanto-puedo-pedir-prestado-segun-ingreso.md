@@ -2,7 +2,7 @@
 title: "Cuánto puedo pedir prestado según mi ingreso"
 seoTitle: "Cuánto puedo pedir prestado: calcula una mensualidad manejable"
 description: "Aprende a estimar cuánto podrías pedir prestado según tu ingreso, deudas actuales, tasa, plazo y pago mensual."
-pubDate: 2026-06-08
+pubDate: 2026-06-04
 categorySlug: "finanzas"
 tags:
   - capacidad de pago
@@ -52,13 +52,13 @@ Si ya pagas tarjeta, auto, crédito de nómina u otro préstamo, esos pagos redu
 
 Haz una lista:
 
-| Concepto | Monto mensual |
-|---|---:|
-| Ingreso neto | $30,000 |
-| Gastos fijos | $19,000 |
-| Ahorro mínimo | $3,000 |
-| Deudas actuales | $2,000 |
-| Margen antes de nuevo crédito | $6,000 |
+| Concepto                      | Monto mensual |
+| ----------------------------- | ------------: |
+| Ingreso neto                  |       $30,000 |
+| Gastos fijos                  |       $19,000 |
+| Ahorro mínimo                 |        $3,000 |
+| Deudas actuales               |        $2,000 |
+| Margen antes de nuevo crédito |        $6,000 |
 
 En este ejemplo, aunque sobran `$6,000`, quizá no conviene usar todo. Podrías fijar una mensualidad objetivo de `$3,000` y dejar el resto como margen.
 
