@@ -1,0 +1,1193 @@
+---
+import BaseLayout from "@layouts/BaseLayout.astro";
+import Container from "@components/layout/Container.astro";
+import PageShell from "@components/layout/PageShell.astro";
+import FaqSection from "@components/shared/FaqSection.astro";
+import PageHero from "@components/shared/PageHero.astro";
+import SectionIntro from "@components/shared/SectionIntro.astro";
+import { buildFaqJsonLd } from "@lib/seo";
+
+const title = "Calculadora de costo por kilometro";
+const description =
+  "Estima combustible, costo total, costo por kilometro y costo por pasajero para un trayecto en auto.";
+const canonical = "/vehiculos/calculadora-de-costo-por-kilometro";
+
+const faqs = [
+  {
+    question: "Como calcular el costo por kilometro?",
+    answer:
+      "Suma el costo de combustible y los gastos variables del trayecto. Despues divide el total entre la distancia recorrida.",
+  },
+  {
+    question: "Como calcular gasolina para un viaje?",
+    answer:
+      "Convierte el rendimiento a km/L y divide la distancia total entre ese rendimiento. La calculadora tambien puede sumar un margen simple.",
+  },
+  {
+    question: "Como anadir casetas y estacionamiento?",
+    answer:
+      "Captura esos importes en gastos adicionales. Se suman al costo de combustible para obtener el costo total del trayecto.",
+  },
+  {
+    question: "Las casetas se duplican en ida y vuelta?",
+    answer:
+      "Por defecto se interpretan como gastos totales ya capturados. Si quieres tratarlas como costo de un tramo, activa Duplicar gastos en ida y vuelta.",
+  },
+  {
+    question: "Como dividir el costo entre pasajeros?",
+    answer:
+      "Indica el numero de pasajeros. La calculadora divide el costo total entre ese numero.",
+  },
+  {
+    question: "Como estimar cuanto gasto al mes en el mismo trayecto?",
+    answer:
+      "Usa el campo opcional de viajes recurrentes y elige semana o mes. La proyeccion multiplica solo los costos variables del trayecto.",
+  },
+  {
+    question: "Como saber si el viaje cabe en mi presupuesto?",
+    answer:
+      "Captura un presupuesto disponible. El resultado muestra cuanto queda o cuanto falta respecto al costo total.",
+  },
+  {
+    question: "La calculadora incluye mantenimiento y depreciacion?",
+    answer:
+      "No. Es una estimacion de costos variables del trayecto. No incluye mantenimiento, depreciacion, seguro ni otros costos de propiedad del vehiculo.",
+  },
+  {
+    question: "Puedo usar millas y galones?",
+    answer:
+      "Si. La distancia acepta km o mi, el rendimiento acepta km/L, L/100 km o mpg US, y el precio puede capturarse por litro o por galon estadounidense.",
+  },
+];
+
+const faqJsonLd = buildFaqJsonLd(faqs);
+---
+
+<BaseLayout title={title} description={description} canonical={canonical}>
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={JSON.stringify(faqJsonLd)} />
+  </Fragment>
+
+  <PageShell>
+    <PageHero
+      title={title}
+      description="Estima cuanto cuesta un trayecto segun distancia, rendimiento, precio del combustible y gastos adicionales."
+      kicker="Vehiculos"
+      collapseBreadcrumbOnMobile
+      containerClass="py-5 md:py-7"
+      breadcrumbs={[
+        { label: "Inicio", href: "/", ariaLabel: "Inicio" },
+        { label: "Vehiculos", href: "/vehiculos", optional: true },
+        { label: "Costo por kilometro", truncate: true },
+      ]}
+    />
+
+    <Container as="section" class="py-4 md:py-7">
+      <section
+        id="cost-calculator"
+        class="overflow-hidden rounded-lg border border-gray-700 bg-gray-950 shadow-xl shadow-gray-950/30"
+        aria-labelledby="calculator-heading"
+      >
+        <div class="grid gap-0 lg:grid-cols-[minmax(0,1fr)_minmax(20rem,0.8fr)]">
+          <div class="p-4 sm:p-6">
+            <h2 id="calculator-heading" class="sr-only">
+              Calculadora de costo por kilometro
+            </h2>
+
+            <div class="grid gap-5">
+              <div>
+                <label for="distance" class="block text-sm font-semibold text-gray-200">
+                  Distancia del trayecto
+                </label>
+                <div class="mt-2 grid grid-cols-[minmax(0,1fr)_6.75rem] overflow-hidden rounded-lg border border-gray-700 bg-gray-900 focus-within:border-sky-400 focus-within:ring-3 focus-within:ring-sky-400/15">
+                  <input
+                    id="distance"
+                    class="min-h-14 w-full bg-transparent px-4 text-2xl font-semibold text-white outline-none placeholder:text-gray-600"
+                    type="text"
+                    inputmode="decimal"
+                    autocomplete="off"
+                    placeholder="300"
+                    aria-describedby="distance-error"
+                    data-distance
+                  />
+                  <select
+                    class="border-l border-gray-700 bg-gray-950 px-3 text-sm font-semibold text-gray-100 outline-none"
+                    aria-label="Unidad de distancia"
+                    data-distance-unit
+                  >
+                    <option value="km">km</option>
+                    <option value="mi">mi</option>
+                  </select>
+                </div>
+                <p id="distance-error" class="mt-2 min-h-5 text-sm text-red-300" data-error="distance"></p>
+              </div>
+
+              <div>
+                <span class="block text-sm font-semibold text-gray-200">Trayecto</span>
+                <div class="mt-2 grid grid-cols-2 gap-2" aria-label="Tipo de trayecto">
+                  <button
+                    class="min-h-11 rounded-lg border border-gray-700 px-3 text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-sky-400/30"
+                    type="button"
+                    data-trip-type="ida"
+                    aria-pressed="true"
+                  >
+                    Solo ida
+                  </button>
+                  <button
+                    class="min-h-11 rounded-lg border border-gray-700 px-3 text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-sky-400/30"
+                    type="button"
+                    data-trip-type="ida-vuelta"
+                    aria-pressed="false"
+                  >
+                    Ida y vuelta
+                  </button>
+                </div>
+              </div>
+
+              <div>
+                <label for="efficiency" class="block text-sm font-semibold text-gray-200">
+                  Rendimiento
+                </label>
+                <div class="mt-2 grid grid-cols-[minmax(0,1fr)_8rem] overflow-hidden rounded-lg border border-gray-700 bg-gray-900 focus-within:border-sky-400 focus-within:ring-3 focus-within:ring-sky-400/15">
+                  <input
+                    id="efficiency"
+                    class="min-h-14 w-full bg-transparent px-4 text-2xl font-semibold text-white outline-none placeholder:text-gray-600"
+                    type="text"
+                    inputmode="decimal"
+                    autocomplete="off"
+                    placeholder="12.5"
+                    aria-describedby="efficiency-error"
+                    data-efficiency
+                  />
+                  <select
+                    class="border-l border-gray-700 bg-gray-950 px-3 text-sm font-semibold text-gray-100 outline-none"
+                    aria-label="Formato de rendimiento"
+                    data-efficiency-unit
+                  >
+                    <option value="km-l">km/L</option>
+                    <option value="l-100-km">L/100 km</option>
+                    <option value="mpg-us">mpg US</option>
+                  </select>
+                </div>
+                <p id="efficiency-error" class="mt-2 min-h-5 text-sm text-red-300" data-error="efficiency"></p>
+              </div>
+
+              <div>
+                <label for="fuel-price" class="block text-sm font-semibold text-gray-200">
+                  Precio de combustible
+                </label>
+                <div class="mt-2 grid grid-cols-[minmax(0,1fr)_6.75rem] overflow-hidden rounded-lg border border-gray-700 bg-gray-900 focus-within:border-sky-400 focus-within:ring-3 focus-within:ring-sky-400/15">
+                  <input
+                    id="fuel-price"
+                    class="min-h-14 w-full bg-transparent px-4 text-2xl font-semibold text-white outline-none placeholder:text-gray-600"
+                    type="text"
+                    inputmode="decimal"
+                    autocomplete="off"
+                    placeholder="24"
+                    aria-describedby="fuel-price-error"
+                    data-fuel-price
+                  />
+                  <select
+                    class="border-l border-gray-700 bg-gray-950 px-3 text-sm font-semibold text-gray-100 outline-none"
+                    aria-label="Precio por"
+                    data-fuel-price-unit
+                  >
+                    <option value="l">/ l</option>
+                    <option value="gal-us">/ gal US</option>
+                  </select>
+                </div>
+                <p id="fuel-price-error" class="mt-2 min-h-5 text-sm text-red-300" data-error="fuel-price"></p>
+              </div>
+
+              <div class="grid gap-5 sm:grid-cols-[minmax(0,1fr)_10rem]">
+                <div>
+                  <span class="block text-sm font-semibold text-gray-200">Margen de consumo</span>
+                  <div class="mt-2 grid grid-cols-3 gap-2" aria-label="Margen de consumo">
+                    {[0, 10, 15].map((margin) => (
+                      <button
+                        class="min-h-11 rounded-lg border border-gray-700 px-3 text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-sky-400/30"
+                        type="button"
+                        data-margin={margin}
+                        aria-pressed={margin === 0 ? "true" : "false"}
+                      >
+                        {margin === 0 ? "0%" : `+${margin}%`}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div>
+                  <label for="currency" class="block text-sm font-semibold text-gray-200">
+                    Moneda
+                  </label>
+                  <select
+                    id="currency"
+                    class="mt-2 min-h-11 w-full rounded-lg border border-gray-700 bg-gray-900 px-3 text-sm font-semibold text-gray-100 outline-none focus:border-sky-400 focus:ring-3 focus:ring-sky-400/15"
+                    data-currency
+                  >
+                    <option value="MXN" selected>MXN</option>
+                    <option value="USD">USD</option>
+                    <option value="EUR">EUR</option>
+                    <option value="COP">COP</option>
+                    <option value="CLP">CLP</option>
+                    <option value="ARS">ARS</option>
+                    <option value="PEN">PEN</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <details class="mt-5 rounded-lg border border-gray-800 bg-gray-900/70 p-4" open>
+              <summary class="cursor-pointer list-none text-sm font-semibold text-white">
+                Gastos adicionales
+              </summary>
+
+              <div class="mt-4 grid gap-4 sm:grid-cols-3">
+                <div>
+                  <label for="tolls" class="block text-sm font-semibold text-gray-200">
+                    Casetas
+                  </label>
+                  <input
+                    id="tolls"
+                    class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-950 px-3 text-lg font-semibold text-white outline-none placeholder:text-gray-600 focus:border-sky-400 focus:ring-3 focus:ring-sky-400/15"
+                    type="text"
+                    inputmode="decimal"
+                    autocomplete="off"
+                    placeholder="0"
+                    aria-describedby="tolls-error"
+                    data-tolls
+                  />
+                  <p id="tolls-error" class="mt-2 min-h-5 text-sm text-red-300" data-error="tolls"></p>
+                </div>
+
+                <div>
+                  <label for="parking" class="block text-sm font-semibold text-gray-200">
+                    Estacionamiento
+                  </label>
+                  <input
+                    id="parking"
+                    class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-950 px-3 text-lg font-semibold text-white outline-none placeholder:text-gray-600 focus:border-sky-400 focus:ring-3 focus:ring-sky-400/15"
+                    type="text"
+                    inputmode="decimal"
+                    autocomplete="off"
+                    placeholder="0"
+                    aria-describedby="parking-error"
+                    data-parking
+                  />
+                  <p id="parking-error" class="mt-2 min-h-5 text-sm text-red-300" data-error="parking"></p>
+                </div>
+
+                <div>
+                  <label for="other-costs" class="block text-sm font-semibold text-gray-200">
+                    Otros
+                  </label>
+                  <input
+                    id="other-costs"
+                    class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-950 px-3 text-lg font-semibold text-white outline-none placeholder:text-gray-600 focus:border-sky-400 focus:ring-3 focus:ring-sky-400/15"
+                    type="text"
+                    inputmode="decimal"
+                    autocomplete="off"
+                    placeholder="0"
+                    aria-describedby="other-costs-error"
+                    data-other-costs
+                  />
+                  <p id="other-costs-error" class="mt-2 min-h-5 text-sm text-red-300" data-error="other-costs"></p>
+                </div>
+              </div>
+
+              <div class="mt-2 hidden" data-additional-mode-wrap>
+                <span class="block text-sm font-semibold text-gray-200">
+                  Gastos en ida y vuelta
+                </span>
+                <div class="mt-2 grid gap-2 sm:grid-cols-2" aria-label="Tratamiento de gastos">
+                  <button
+                    class="min-h-11 rounded-lg border border-gray-700 px-3 text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-sky-400/30"
+                    type="button"
+                    data-additional-mode="total"
+                    aria-pressed="true"
+                  >
+                    Gastos ya son totales
+                  </button>
+                  <button
+                    class="min-h-11 rounded-lg border border-gray-700 px-3 text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-sky-400/30"
+                    type="button"
+                    data-additional-mode="duplicar-ida-vuelta"
+                    aria-pressed="false"
+                  >
+                    Duplicar gastos
+                  </button>
+                </div>
+              </div>
+            </details>
+
+            <details class="mt-5 rounded-lg border border-gray-800 bg-gray-900/70 p-4">
+              <summary class="cursor-pointer list-none text-sm font-semibold text-white">
+                Pasajeros y planeacion
+              </summary>
+
+              <div class="mt-4 grid gap-4 sm:grid-cols-2">
+                <div>
+                  <label for="passengers" class="block text-sm font-semibold text-gray-200">
+                    Pasajeros
+                  </label>
+                  <input
+                    id="passengers"
+                    class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-950 px-3 text-lg font-semibold text-white outline-none placeholder:text-gray-600 focus:border-sky-400 focus:ring-3 focus:ring-sky-400/15"
+                    type="number"
+                    inputmode="numeric"
+                    min="1"
+                    step="1"
+                    value="1"
+                    aria-describedby="passengers-error"
+                    data-passengers
+                  />
+                  <p id="passengers-error" class="mt-2 min-h-5 text-sm text-red-300" data-error="passengers"></p>
+                </div>
+
+                <div>
+                  <label for="budget" class="block text-sm font-semibold text-gray-200">
+                    Presupuesto
+                  </label>
+                  <input
+                    id="budget"
+                    class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-950 px-3 text-lg font-semibold text-white outline-none placeholder:text-gray-600 focus:border-sky-400 focus:ring-3 focus:ring-sky-400/15"
+                    type="text"
+                    inputmode="decimal"
+                    autocomplete="off"
+                    placeholder="900"
+                    aria-describedby="budget-error"
+                    data-budget
+                  />
+                  <p id="budget-error" class="mt-2 min-h-5 text-sm text-red-300" data-error="budget"></p>
+                </div>
+
+                <div>
+                  <label for="recurring-trips" class="block text-sm font-semibold text-gray-200">
+                    Viajes recurrentes
+                  </label>
+                  <input
+                    id="recurring-trips"
+                    class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-950 px-3 text-lg font-semibold text-white outline-none placeholder:text-gray-600 focus:border-sky-400 focus:ring-3 focus:ring-sky-400/15"
+                    type="number"
+                    inputmode="numeric"
+                    min="1"
+                    step="1"
+                    placeholder="20"
+                    aria-describedby="recurring-trips-error"
+                    data-recurring-trips
+                  />
+                  <p id="recurring-trips-error" class="mt-2 min-h-5 text-sm text-red-300" data-error="recurring-trips"></p>
+                </div>
+
+                <div>
+                  <label for="projection-period" class="block text-sm font-semibold text-gray-200">
+                    Periodo
+                  </label>
+                  <select
+                    id="projection-period"
+                    class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-950 px-3 text-sm font-semibold text-gray-100 outline-none focus:border-sky-400 focus:ring-3 focus:ring-sky-400/15"
+                    data-projection-period
+                  >
+                    <option value="mes">mes</option>
+                    <option value="semana">semana</option>
+                  </select>
+                </div>
+              </div>
+            </details>
+
+            <div class="mt-5 flex flex-col gap-3 sm:flex-row">
+              <button
+                class="min-h-11 justify-center rounded-lg border border-gray-700 px-4 py-2 text-sm font-semibold text-gray-200 transition hover:border-sky-400 hover:text-white focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-sky-400/30"
+                type="button"
+                data-clear
+              >
+                Limpiar
+              </button>
+            </div>
+          </div>
+
+          <aside
+            class="border-t border-gray-800 bg-gray-900/70 p-4 sm:p-6 lg:border-l lg:border-t-0"
+            aria-live="polite"
+            data-result-region
+          >
+            <p class="text-xs font-semibold uppercase tracking-wide text-sky-300">
+              Resultado
+            </p>
+            <p class="mt-3 break-words text-3xl font-bold leading-tight text-white" data-main-result>
+              Ingresa tus datos
+            </p>
+            <p class="mt-2 min-h-5 text-sm leading-relaxed text-gray-400" data-result-note>
+              El costo estimado aparecera aqui.
+            </p>
+
+            <div class="mt-5 space-y-3" data-breakdown-list></div>
+            <div class="mt-4 grid gap-2 text-sm leading-relaxed text-gray-300" data-practical-list></div>
+
+            <p class="mt-5 rounded-lg border border-amber-300/20 bg-amber-300/10 p-3 text-sm leading-relaxed text-amber-100">
+              Es una estimacion de costos variables del trayecto. No incluye
+              mantenimiento, depreciacion, seguro ni otros costos de propiedad
+              del vehiculo.
+            </p>
+
+            <div class="mt-5 flex flex-col gap-3 sm:flex-row">
+              <button
+                class="hidden min-h-11 items-center justify-center rounded-lg bg-sky-300 px-4 py-2 text-sm font-semibold text-gray-950 transition hover:bg-sky-200 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-sky-300/40"
+                type="button"
+                data-copy-result
+              >
+                Copiar resultado
+              </button>
+              <button
+                class="hidden min-h-11 items-center justify-center rounded-lg border border-gray-700 px-4 py-2 text-sm font-semibold text-gray-200 transition hover:border-sky-400 hover:text-white focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-sky-400/40"
+                type="button"
+                data-copy-url
+              >
+                Compartir enlace
+              </button>
+            </div>
+            <p class="mt-3 min-h-5 text-sm text-sky-200" role="status" aria-live="polite" data-copy-status></p>
+
+            <a
+              class="mt-5 inline-flex rounded-lg border border-gray-700 bg-gray-950/70 p-4 text-sm leading-relaxed text-gray-200 transition hover:border-sky-400 hover:text-white focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-sky-400/30"
+              href="/vehiculos/calculadora-de-consumo-de-gasolina"
+            >
+              Calcular consumo de gasolina
+            </a>
+          </aside>
+        </div>
+      </section>
+
+      <div
+        class="fixed inset-x-0 bottom-0 z-30 hidden border-t border-gray-800 bg-gray-950/95 px-4 py-3 shadow-2xl shadow-black/50 backdrop-blur md:hidden"
+        data-mobile-total
+      >
+        <div class="mx-auto flex max-w-xl items-center justify-between gap-3">
+          <span class="text-xs font-semibold uppercase tracking-wide text-gray-500">
+            Total
+          </span>
+          <span class="break-words text-right text-lg font-bold text-sky-100" data-mobile-total-text></span>
+        </div>
+      </div>
+    </Container>
+
+    <Container as="section" class="py-6 md:py-8">
+      <SectionIntro
+        title="Que incluye"
+        description="El resultado combina combustible y gastos variables capturados por el usuario."
+      />
+      <div class="grid gap-4 md:grid-cols-3">
+        <article class="rounded-lg border border-gray-800 bg-gray-950 p-5">
+          <h3 class="text-lg font-semibold">Combustible</h3>
+          <p class="mt-3 text-sm leading-relaxed text-gray-400">
+            Usa distancia, rendimiento y precio por litro o galon US para
+            estimar litros y costo.
+          </p>
+        </article>
+        <article class="rounded-lg border border-gray-800 bg-gray-950 p-5">
+          <h3 class="text-lg font-semibold">Gastos variables</h3>
+          <p class="mt-3 text-sm leading-relaxed text-gray-400">
+            Casetas, estacionamiento y otros gastos se suman al costo del
+            trayecto.
+          </p>
+        </article>
+        <article class="rounded-lg border border-gray-800 bg-gray-950 p-5">
+          <h3 class="text-lg font-semibold">No propiedad</h3>
+          <p class="mt-3 text-sm leading-relaxed text-gray-400">
+            No incluye seguro, depreciacion, mantenimiento, impuestos ni
+            financiamiento.
+          </p>
+        </article>
+      </div>
+    </Container>
+
+    <Container as="section" class="py-6 md:py-8">
+      <SectionIntro
+        title="Planeacion"
+        description="La recurrencia y el presupuesto ayudan a leer el mismo costo del viaje como gasto semanal, mensual o comparado contra un limite."
+      />
+      <div class="rounded-lg border border-gray-800 bg-gray-950 p-5">
+        <p class="text-sm leading-relaxed text-gray-400">
+          Estas proyecciones multiplican solo costos variables capturados. Para
+          costo total de propiedad haria falta considerar mantenimiento,
+          depreciacion, seguro e impuestos en un modo separado.
+        </p>
+      </div>
+    </Container>
+
+    <FaqSection faqs={faqs} />
+  </PageShell>
+</BaseLayout>
+
+<script>
+  import {
+    buildCostPerKilometerShareText,
+    calculateVariableTripCost,
+    formatCompactNumber,
+    formatCostCurrency,
+    formatFixedNumber,
+    parseMoneyInput,
+  } from "@lib/calculators/vehiculos/calculadora-de-costo-por-kilometro/costPerKilometer";
+
+  const distanceInput = document.querySelector("[data-distance]");
+  const distanceUnitSelect = document.querySelector("[data-distance-unit]");
+  const tripTypeButtons = Array.from(document.querySelectorAll("[data-trip-type]"));
+  const efficiencyInput = document.querySelector("[data-efficiency]");
+  const efficiencyUnitSelect = document.querySelector("[data-efficiency-unit]");
+  const fuelPriceInput = document.querySelector("[data-fuel-price]");
+  const fuelPriceUnitSelect = document.querySelector("[data-fuel-price-unit]");
+  const marginButtons = Array.from(document.querySelectorAll("[data-margin]"));
+  const currencySelect = document.querySelector("[data-currency]");
+  const tollsInput = document.querySelector("[data-tolls]");
+  const parkingInput = document.querySelector("[data-parking]");
+  const otherCostsInput = document.querySelector("[data-other-costs]");
+  const additionalModeButtons = Array.from(document.querySelectorAll("[data-additional-mode]"));
+  const additionalModeWrap = document.querySelector("[data-additional-mode-wrap]");
+  const passengersInput = document.querySelector("[data-passengers]");
+  const budgetInput = document.querySelector("[data-budget]");
+  const recurringTripsInput = document.querySelector("[data-recurring-trips]");
+  const projectionPeriodSelect = document.querySelector("[data-projection-period]");
+  const clearButton = document.querySelector("[data-clear]");
+  const mainResult = document.querySelector("[data-main-result]");
+  const resultNote = document.querySelector("[data-result-note]");
+  const breakdownList = document.querySelector("[data-breakdown-list]");
+  const practicalList = document.querySelector("[data-practical-list]");
+  const copyButton = document.querySelector("[data-copy-result]");
+  const copyUrlButton = document.querySelector("[data-copy-url]");
+  const copyStatus = document.querySelector("[data-copy-status]");
+  const mobileTotal = document.querySelector("[data-mobile-total]");
+  const mobileTotalText = document.querySelector("[data-mobile-total-text]");
+
+  const FIELD_MESSAGES = {
+    required: "Completa este campo para calcular.",
+    invalid: "Escribe un numero valido.",
+    negative: "Usa un numero mayor o igual a cero.",
+    zero: "Usa un numero mayor a cero.",
+    integer: "Usa un numero entero mayor o igual a uno.",
+  };
+
+  let currentTripType = "ida";
+  let currentMargin = 0;
+  let currentAdditionalMode = "total";
+  let currentShareText = "";
+  let currentShareUrl = window.location.href;
+  let copyTimer = 0;
+  let urlTimer = 0;
+
+  function setButtonGroupState(buttons, datasetKey, activeValue) {
+    buttons.forEach((button) => {
+      const active = button.dataset[datasetKey] === activeValue;
+      button.setAttribute("aria-pressed", String(active));
+      button.classList.toggle("bg-sky-300", active);
+      button.classList.toggle("text-gray-950", active);
+      button.classList.toggle("border-sky-300", active);
+      button.classList.toggle("text-gray-200", !active);
+    });
+  }
+
+  function setTripType(type) {
+    currentTripType = type === "ida-vuelta" ? "ida-vuelta" : "ida";
+    setButtonGroupState(tripTypeButtons, "tripType", currentTripType);
+    additionalModeWrap.classList.toggle("hidden", currentTripType !== "ida-vuelta");
+    updateCalculator();
+  }
+
+  function setMargin(value) {
+    const numericValue = Number(value);
+    currentMargin = [0, 10, 15].includes(numericValue) ? numericValue : 0;
+    setButtonGroupState(marginButtons, "margin", String(currentMargin));
+    updateCalculator();
+  }
+
+  function setAdditionalMode(mode) {
+    currentAdditionalMode =
+      mode === "duplicar-ida-vuelta" ? "duplicar-ida-vuelta" : "total";
+    setButtonGroupState(additionalModeButtons, "additionalMode", currentAdditionalMode);
+    updateCalculator();
+  }
+
+  function setError(field, message = "") {
+    const element = document.querySelector(`[data-error="${field}"]`);
+
+    if (element) {
+      element.textContent = message;
+    }
+  }
+
+  function parseRequiredPositive(input, field) {
+    const parsed = parseMoneyInput(input.value);
+
+    if (!parsed.ok) {
+      setError(field, FIELD_MESSAGES[parsed.error]);
+      return parsed;
+    }
+
+    if (parsed.value <= 0) {
+      setError(field, FIELD_MESSAGES.zero);
+      return { ok: false, error: "zero" };
+    }
+
+    setError(field);
+    return parsed;
+  }
+
+  function parseRequiredNonNegative(input, field) {
+    const parsed = parseMoneyInput(input.value);
+
+    if (!parsed.ok) {
+      setError(field, FIELD_MESSAGES[parsed.error]);
+      return parsed;
+    }
+
+    setError(field);
+    return parsed;
+  }
+
+  function parseOptionalMoney(input, field) {
+    if (!input.value.trim()) {
+      setError(field);
+      return { ok: true, value: 0, normalized: "0", captured: false };
+    }
+
+    const parsed = parseMoneyInput(input.value);
+
+    if (!parsed.ok) {
+      setError(field, FIELD_MESSAGES[parsed.error]);
+      return parsed;
+    }
+
+    setError(field);
+    return { ...parsed, captured: true };
+  }
+
+  function parseOptionalBudget(input) {
+    if (!input.value.trim()) {
+      setError("budget");
+      return { ok: true, value: undefined, normalized: "", captured: false };
+    }
+
+    const parsed = parseMoneyInput(input.value);
+
+    if (!parsed.ok) {
+      setError("budget", FIELD_MESSAGES[parsed.error]);
+      return parsed;
+    }
+
+    setError("budget");
+    return { ...parsed, captured: true };
+  }
+
+  function parseIntegerInput(input, field, fallback) {
+    const rawValue = input.value.trim();
+
+    if (!rawValue && fallback !== undefined) {
+      setError(field);
+      return {
+        ok: true,
+        value: fallback,
+        normalized: String(fallback),
+        captured: false,
+      };
+    }
+
+    if (!rawValue) {
+      setError(field);
+      return { ok: true, value: undefined, normalized: "", captured: false };
+    }
+
+    const value = Number(rawValue);
+
+    if (!Number.isInteger(value) || value < 1) {
+      setError(field, FIELD_MESSAGES.integer);
+      return { ok: false, error: "integer" };
+    }
+
+    setError(field);
+    return {
+      ok: true,
+      value,
+      normalized: String(value),
+      captured: true,
+    };
+  }
+
+  function addBreakdownRow(label, value, tone = "default") {
+    const row = document.createElement("div");
+    const labelElement = document.createElement("span");
+    const valueElement = document.createElement("span");
+
+    row.className =
+      tone === "strong"
+        ? "flex items-start justify-between gap-4 rounded-lg border border-sky-300/30 bg-sky-300/10 p-4"
+        : "flex items-start justify-between gap-4 rounded-lg border border-gray-800 bg-gray-950/70 p-4";
+    labelElement.className = "min-w-0 text-sm text-gray-400";
+    valueElement.className =
+      "break-words text-right text-sm font-semibold text-white";
+    labelElement.textContent = label;
+    valueElement.textContent = value;
+    row.append(labelElement, valueElement);
+    breakdownList.append(row);
+  }
+
+  function addPracticalLine(text, tone = "info") {
+    const line = document.createElement("p");
+    line.className =
+      tone === "warning"
+        ? "rounded-lg border border-amber-300/20 bg-amber-300/10 p-3 text-amber-100"
+        : "rounded-lg border border-sky-300/20 bg-sky-300/10 p-3";
+    line.textContent = text;
+    practicalList.append(line);
+  }
+
+  function setNeutralResult(message = "Ingresa tus datos") {
+    mainResult.textContent = message;
+    resultNote.textContent = "El costo estimado aparecera aqui.";
+    breakdownList.replaceChildren();
+    practicalList.replaceChildren();
+    copyButton.classList.add("hidden");
+    copyButton.classList.remove("inline-flex");
+    copyUrlButton.classList.add("hidden");
+    copyUrlButton.classList.remove("inline-flex");
+    mobileTotal.classList.add("hidden");
+    currentShareText = "";
+  }
+
+  function showActionButtons() {
+    copyButton.classList.remove("hidden");
+    copyButton.classList.add("inline-flex");
+    copyUrlButton.classList.remove("hidden");
+    copyUrlButton.classList.add("inline-flex");
+  }
+
+  function resetErrors() {
+    [
+      "distance",
+      "efficiency",
+      "fuel-price",
+      "tolls",
+      "parking",
+      "other-costs",
+      "passengers",
+      "budget",
+      "recurring-trips",
+    ].forEach((field) => setError(field));
+  }
+
+  function hasAnyMainInput() {
+    return (
+      distanceInput.value.trim() ||
+      efficiencyInput.value.trim() ||
+      fuelPriceInput.value.trim()
+    );
+  }
+
+  function hasAllMainInputs() {
+    return (
+      distanceInput.value.trim() &&
+      efficiencyInput.value.trim() &&
+      fuelPriceInput.value.trim()
+    );
+  }
+
+  function buildInputValues() {
+    const distance = parseRequiredPositive(distanceInput, "distance");
+    const efficiency = parseRequiredPositive(efficiencyInput, "efficiency");
+    const fuelPrice = parseRequiredNonNegative(fuelPriceInput, "fuel-price");
+    const tolls = parseOptionalMoney(tollsInput, "tolls");
+    const parking = parseOptionalMoney(parkingInput, "parking");
+    const otherCosts = parseOptionalMoney(otherCostsInput, "other-costs");
+    const passengers = parseIntegerInput(passengersInput, "passengers", 1);
+    const recurringTrips = parseIntegerInput(
+      recurringTripsInput,
+      "recurring-trips",
+    );
+    const budget = parseOptionalBudget(budgetInput);
+
+    const parsedValues = [
+      distance,
+      efficiency,
+      fuelPrice,
+      tolls,
+      parking,
+      otherCosts,
+      passengers,
+      recurringTrips,
+      budget,
+    ];
+
+    if (parsedValues.some((value) => !value.ok)) {
+      return { ok: false };
+    }
+
+    return {
+      ok: true,
+      distance,
+      efficiency,
+      fuelPrice,
+      tolls,
+      parking,
+      otherCosts,
+      passengers,
+      recurringTrips,
+      budget,
+    };
+  }
+
+  function renderResult(result) {
+    const currency = currencySelect.value;
+
+    mainResult.textContent = formatCostCurrency(result.totalCost, currency);
+    resultNote.textContent = `${formatCostCurrency(
+      result.totalCostPerKm,
+      currency,
+    )}/km - ${formatFixedNumber(result.litersNeeded)} l`;
+    breakdownList.replaceChildren();
+    practicalList.replaceChildren();
+
+    addBreakdownRow("Costo total", formatCostCurrency(result.totalCost, currency), "strong");
+    addBreakdownRow(
+      "Costo total/km",
+      `${formatCostCurrency(result.totalCostPerKm, currency)}/km`,
+      "strong",
+    );
+
+    if (result.passengers > 1) {
+      addBreakdownRow(
+        "Costo por pasajero",
+        formatCostCurrency(result.costPerPassenger, currency),
+        "strong",
+      );
+    }
+
+    addBreakdownRow("Distancia total", `${formatCompactNumber(result.totalDistanceKm)} km`);
+    addBreakdownRow("Combustible estimado", `${formatFixedNumber(result.litersNeeded)} l`);
+
+    if (result.fuelMarginPercent > 0) {
+      addBreakdownRow("Combustible base", `${formatFixedNumber(result.baseLiters)} l`);
+      addBreakdownRow("Margen de consumo", `${result.fuelMarginPercent}%`);
+    }
+
+    addBreakdownRow("Costo de combustible", formatCostCurrency(result.fuelCost, currency));
+    addBreakdownRow(
+      "Combustible/km",
+      `${formatCostCurrency(result.fuelCostPerKm, currency)}/km`,
+    );
+    addBreakdownRow(
+      "Gastos adicionales",
+      formatCostCurrency(result.additionalCosts, currency),
+    );
+
+    if (result.additionalCostMultiplier === 2) {
+      addBreakdownRow("Gastos de ida y vuelta", "duplicados");
+    }
+
+    if (result.recurringCost) {
+      addBreakdownRow(
+        `Costo por ${result.recurringCost.period}`,
+        formatCostCurrency(result.recurringCost.totalCost, currency),
+      );
+    }
+
+    if (result.budgetComparison) {
+      const difference = Math.abs(result.budgetComparison.difference);
+      const label =
+        result.budgetComparison.status === "remaining"
+          ? "Presupuesto restante"
+          : result.budgetComparison.status === "shortfall"
+            ? "Falta para cubrirlo"
+            : "Presupuesto";
+
+      addBreakdownRow(label, formatCostCurrency(difference, currency));
+    }
+
+    addPracticalLine(
+      `Este trayecto costaria aprox. ${formatCostCurrency(
+        result.totalCost,
+        currency,
+      )}: ${formatCostCurrency(
+        result.fuelCost,
+        currency,
+      )} en combustible y ${formatCostCurrency(
+        result.additionalCosts,
+        currency,
+      )} en gastos adicionales. Equivale a ${formatCostCurrency(
+        result.totalCostPerKm,
+        currency,
+      )}/km.`,
+    );
+
+    if (result.passengers > 1) {
+      addPracticalLine(
+        `Entre ${result.passengers} pasajeros seria ${formatCostCurrency(
+          result.costPerPassenger,
+          currency,
+        )} por persona.`,
+      );
+    }
+
+    if (result.budgetComparison?.status === "remaining") {
+      addPracticalLine(
+        `Con ese presupuesto quedarian ${formatCostCurrency(
+          result.budgetComparison.difference,
+          currency,
+        )}.`,
+      );
+    } else if (result.budgetComparison?.status === "shortfall") {
+      addPracticalLine(
+        `Con ese presupuesto faltarian ${formatCostCurrency(
+          Math.abs(result.budgetComparison.difference),
+          currency,
+        )}.`,
+        "warning",
+      );
+    }
+
+    currentShareText = buildCostPerKilometerShareText(result);
+    mobileTotalText.textContent = `${formatCostCurrency(
+      result.totalCost,
+      currency,
+    )} - ${formatCostCurrency(result.totalCostPerKm, currency)}/km`;
+    mobileTotal.classList.remove("hidden");
+  }
+
+  function updateCalculator({ syncUrl = true } = {}) {
+    resetErrors();
+
+    if (!hasAnyMainInput()) {
+      setNeutralResult();
+      if (syncUrl) syncShareUrl(null);
+      return;
+    }
+
+    if (!hasAllMainInputs()) {
+      setNeutralResult("Completa los datos");
+      return;
+    }
+
+    const parsed = buildInputValues();
+
+    if (!parsed.ok) {
+      setNeutralResult("Revisa los campos");
+      return;
+    }
+
+    try {
+      const result = calculateVariableTripCost({
+        distance: parsed.distance.value,
+        distanceUnit: distanceUnitSelect.value,
+        tripType: currentTripType,
+        efficiency: parsed.efficiency.value,
+        efficiencyUnit: efficiencyUnitSelect.value,
+        fuelPrice: parsed.fuelPrice.value,
+        fuelPriceUnit: fuelPriceUnitSelect.value,
+        fuelMarginPercent: currentMargin,
+        tolls: parsed.tolls.value,
+        parking: parsed.parking.value,
+        otherCosts: parsed.otherCosts.value,
+        additionalCostMode: currentAdditionalMode,
+        passengers: parsed.passengers.value,
+        recurringTrips: parsed.recurringTrips.value,
+        projectionPeriod: projectionPeriodSelect.value,
+        budget: parsed.budget.value,
+        currency: currencySelect.value,
+      });
+
+      renderResult(result);
+      showActionButtons();
+
+      if (syncUrl) {
+        syncShareUrl(parsed);
+      }
+    } catch {
+      setNeutralResult("No se puede calcular");
+    }
+  }
+
+  function syncShareUrl(values) {
+    const url = new URL(window.location.href);
+    url.search = "";
+
+    if (values) {
+      url.searchParams.set("distancia", values.distance.normalized);
+      url.searchParams.set("unidad", distanceUnitSelect.value);
+      url.searchParams.set("trayecto", currentTripType);
+      url.searchParams.set("rendimiento", values.efficiency.normalized);
+      url.searchParams.set("rendimientoUnidad", efficiencyUnitSelect.value);
+      url.searchParams.set("precio", values.fuelPrice.normalized);
+      url.searchParams.set("precioUnidad", fuelPriceUnitSelect.value);
+      url.searchParams.set("margen", String(currentMargin));
+      url.searchParams.set("moneda", currencySelect.value);
+
+      if (values.tolls.captured) url.searchParams.set("casetas", values.tolls.normalized);
+      if (values.parking.captured) {
+        url.searchParams.set("estacionamiento", values.parking.normalized);
+      }
+      if (values.otherCosts.captured) url.searchParams.set("otros", values.otherCosts.normalized);
+
+      if (
+        values.tolls.captured ||
+        values.parking.captured ||
+        values.otherCosts.captured
+      ) {
+        url.searchParams.set("gastosModo", currentAdditionalMode);
+      }
+
+      if (values.passengers.value > 1) {
+        url.searchParams.set("pasajeros", values.passengers.normalized);
+      }
+
+      if (values.recurringTrips.captured) {
+        url.searchParams.set("viajes", values.recurringTrips.normalized);
+        url.searchParams.set("periodo", projectionPeriodSelect.value);
+      }
+
+      if (values.budget.captured) {
+        url.searchParams.set("presupuesto", values.budget.normalized);
+      }
+    }
+
+    currentShareUrl = url.toString();
+    window.clearTimeout(urlTimer);
+    urlTimer = window.setTimeout(() => {
+      window.history.replaceState({}, "", url);
+    }, 250);
+  }
+
+  function setValueFromParam(input, value, parser = parseMoneyInput) {
+    if (value && parser(value).ok) {
+      input.value = value;
+    }
+  }
+
+  function loadUrlParameters() {
+    const params = new URLSearchParams(window.location.search);
+    const distanceUnit = params.get("unidad") ?? params.get("distanciaUnidad");
+    const tripType = params.get("trayecto");
+    const efficiencyUnit = params.get("rendimientoUnidad");
+    const fuelPriceUnit = params.get("precioUnidad");
+    const margin = Number(params.get("margen"));
+    const currency = params.get("moneda");
+    const additionalMode = params.get("gastosModo");
+    const period = params.get("periodo");
+
+    setValueFromParam(distanceInput, params.get("distancia"));
+    setValueFromParam(efficiencyInput, params.get("rendimiento"));
+    setValueFromParam(fuelPriceInput, params.get("precio"));
+    setValueFromParam(tollsInput, params.get("casetas"));
+    setValueFromParam(parkingInput, params.get("estacionamiento"));
+    setValueFromParam(otherCostsInput, params.get("otros"));
+    setValueFromParam(budgetInput, params.get("presupuesto"));
+
+    const passengers = params.get("pasajeros");
+    const trips = params.get("viajes");
+
+    if (passengers) passengersInput.value = passengers;
+    if (trips) recurringTripsInput.value = trips;
+    if (distanceUnit === "km" || distanceUnit === "mi") distanceUnitSelect.value = distanceUnit;
+    if (["km-l", "l-100-km", "mpg-us"].includes(efficiencyUnit)) {
+      efficiencyUnitSelect.value = efficiencyUnit;
+    }
+    if (fuelPriceUnit === "l" || fuelPriceUnit === "gal-us") {
+      fuelPriceUnitSelect.value = fuelPriceUnit;
+    }
+    if ([0, 10, 15].includes(margin)) currentMargin = margin;
+    if (["MXN", "USD", "EUR", "COP", "CLP", "ARS", "PEN"].includes(currency)) {
+      currencySelect.value = currency;
+    }
+    if (period === "semana" || period === "mes") projectionPeriodSelect.value = period;
+
+    currentTripType = tripType === "ida-vuelta" ? "ida-vuelta" : "ida";
+    currentAdditionalMode =
+      additionalMode === "duplicar-ida-vuelta" ? "duplicar-ida-vuelta" : "total";
+
+    setButtonGroupState(tripTypeButtons, "tripType", currentTripType);
+    setButtonGroupState(marginButtons, "margin", String(currentMargin));
+    setButtonGroupState(additionalModeButtons, "additionalMode", currentAdditionalMode);
+    additionalModeWrap.classList.toggle("hidden", currentTripType !== "ida-vuelta");
+    updateCalculator({ syncUrl: false });
+  }
+
+  async function copyText(text, successMessage) {
+    try {
+      if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(text);
+      } else {
+        const textArea = document.createElement("textarea");
+        textArea.value = text;
+        textArea.setAttribute("readonly", "");
+        textArea.style.position = "fixed";
+        textArea.style.opacity = "0";
+        document.body.append(textArea);
+        textArea.select();
+        document.execCommand("copy");
+        textArea.remove();
+      }
+      copyStatus.textContent = successMessage;
+    } catch {
+      copyStatus.textContent = "No fue posible copiar automaticamente.";
+    }
+
+    window.clearTimeout(copyTimer);
+    copyTimer = window.setTimeout(() => {
+      copyStatus.textContent = "";
+    }, 2500);
+  }
+
+  tripTypeButtons.forEach((button) => {
+    button.addEventListener("click", () => setTripType(button.dataset.tripType));
+  });
+
+  marginButtons.forEach((button) => {
+    button.addEventListener("click", () => setMargin(button.dataset.margin));
+  });
+
+  additionalModeButtons.forEach((button) => {
+    button.addEventListener("click", () => setAdditionalMode(button.dataset.additionalMode));
+  });
+
+  [
+    distanceInput,
+    distanceUnitSelect,
+    efficiencyInput,
+    efficiencyUnitSelect,
+    fuelPriceInput,
+    fuelPriceUnitSelect,
+    currencySelect,
+    tollsInput,
+    parkingInput,
+    otherCostsInput,
+    passengersInput,
+    budgetInput,
+    recurringTripsInput,
+    projectionPeriodSelect,
+  ].forEach((input) => {
+    input.addEventListener("input", () => updateCalculator());
+    input.addEventListener("change", () => updateCalculator());
+  });
+
+  clearButton.addEventListener("click", () => {
+    distanceInput.value = "";
+    efficiencyInput.value = "";
+    fuelPriceInput.value = "";
+    tollsInput.value = "";
+    parkingInput.value = "";
+    otherCostsInput.value = "";
+    passengersInput.value = "1";
+    budgetInput.value = "";
+    recurringTripsInput.value = "";
+    setNeutralResult();
+    syncShareUrl(null);
+  });
+
+  copyButton.addEventListener("click", () => {
+    if (currentShareText) {
+      copyText(currentShareText, "Resultado copiado.");
+    }
+  });
+
+  copyUrlButton.addEventListener("click", () => {
+    copyText(currentShareUrl, "Enlace copiado.");
+  });
+
+  loadUrlParameters();
+</script>

@@ -241,4 +241,13 @@ export const CALCULATORS: CalculatorDirectoryItem[] = [
     categorySlug: "vehiculos",
     order: 90,
   },
+  {
+    id: "calculadora-de-costo-por-kilometro",
+    title: "Calculadora de costo por kilómetro",
+    description:
+      "Estima combustible, costo de un trayecto y costo por kilómetro con gastos adicionales opcionales.",
+    href: "/vehiculos/calculadora-de-costo-por-kilometro",
+    categorySlug: "vehiculos",
+    order: 92,
+  },
 ];
