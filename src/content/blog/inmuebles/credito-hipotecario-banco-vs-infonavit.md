@@ -74,7 +74,7 @@ Compara:
 - Condiciones de pago anticipado.
 - Costos de compraventa.
 
-Usa la guía sobre [cómo comparar créditos hipotecarios](/blog/comparar-creditos-hipotecarios) para ordenar la información.
+Usa la guía sobre [cómo comparar créditos hipotecarios](/blog/inmuebles/comparar-creditos-hipotecarios) para ordenar la información.
 
 ## Cómo usar la calculadora como escenario base
 

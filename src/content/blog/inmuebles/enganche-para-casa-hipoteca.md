@@ -88,7 +88,7 @@ Profeco recomienda considerar gastos notariales, registro y avalúo, entre otros
 
 Usa la [calculadora de hipoteca](/inmuebles/calculadora-de-hipoteca) en modo "Precio + enganche". Captura el precio del inmueble, cambia el enganche de porcentaje a monto si lo necesitas y revisa cómo cambia la cuota.
 
-También puedes leer la guía sobre [precio, enganche y monto del préstamo hipotecario](/blog/precio-enganche-monto-prestamo-hipotecario) para evitar errores al capturar los datos.
+También puedes leer la guía sobre [precio, enganche y monto del préstamo hipotecario](/blog/inmuebles/precio-enganche-monto-prestamo-hipotecario) para evitar errores al capturar los datos.
 
 ## Preguntas frecuentes
 

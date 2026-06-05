@@ -78,7 +78,7 @@ No hay un porcentaje universal que funcione para todas las personas. Una mensual
 
 Una forma prudente de empezar es calcular cuánto puedes pagar al mes sin presionar gastos esenciales, ahorro y deudas actuales. Luego, con esa mensualidad objetivo, prueba distintos plazos y tasas.
 
-La guía de [cuánto puedes pedir prestado según tu ingreso](/blog/cuanto-puedo-pedir-prestado-segun-ingreso) desarrolla ese enfoque con más detalle.
+La guía de [cuánto puedes pedir prestado según tu ingreso](/blog/finanzas/cuanto-puedo-pedir-prestado-segun-ingreso) desarrolla ese enfoque con más detalle.
 
 ## Simula tu préstamo de $100,000
 
@@ -91,7 +91,7 @@ En la [calculadora de préstamo](/finanzas/calculadora-de-prestamo) puedes escri
 - Costo total.
 - Tabla de amortización.
 
-Si quieres ver un monto menor para comparar, revisa también el caso de [préstamo de $50,000](/blog/prestamo-50000-cuanto-pago).
+Si quieres ver un monto menor para comparar, revisa también el caso de [préstamo de $50,000](/blog/finanzas/prestamo-50000-cuanto-pago).
 
 ## Preguntas frecuentes
 

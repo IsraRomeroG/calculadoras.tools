@@ -54,7 +54,7 @@ Ese rango no significa que cualquier persona de 1.70 m deba apuntar a un número
 | 1.70 m   | 53.5 a 72.0 kg                |
 | 1.80 m   | 59.9 a 80.7 kg                |
 
-Puedes ver más alturas en la guía de [peso saludable según estatura](/blog/peso-saludable-segun-estatura) o calcular tu dato exacto con la [calculadora de IMC](/salud/calculadora-de-imc).
+Puedes ver más alturas en la guía de [peso saludable según estatura](/blog/salud/peso-saludable-segun-estatura) o calcular tu dato exacto con la [calculadora de IMC](/salud/calculadora-de-imc).
 
 ## Factores que el IMC no considera
 

@@ -60,7 +60,7 @@ capital = $17,994.52 - $15,000
 capital = $2,994.52
 ```
 
-Ese es el principio de la [tabla de amortización hipotecaria](/blog/tabla-amortizacion-hipoteca).
+Ese es el principio de la [tabla de amortización hipotecaria](/blog/inmuebles/tabla-amortizacion-hipoteca).
 
 ## Diferencia entre tasa, CAT y tasa efectiva
 
@@ -75,7 +75,7 @@ No confundas estos conceptos:
 
 La calculadora usa tasa anual de interés para estimar capital e intereses. No usa CAT como tasa de cálculo.
 
-Si estás comparando ofertas, revisa la guía sobre [CAT vs tasa en un crédito hipotecario](/blog/cat-vs-tasa-credito-hipotecario).
+Si estás comparando ofertas, revisa la guía sobre [CAT vs tasa en un crédito hipotecario](/blog/inmuebles/cat-vs-tasa-credito-hipotecario).
 
 ## Errores comunes
 
@@ -93,7 +93,7 @@ El redondeo debe hacerse al mostrar resultados, no en cada paso interno.
 
 La [calculadora de hipoteca](/inmuebles/calculadora-de-hipoteca) convierte la tasa anual a mensual, calcula la cuota y genera la amortización con precisión interna. Solo redondea al mostrar los resultados.
 
-Si quieres replicarlo en una hoja de cálculo, revisa la guía de [fórmula de cuota de hipoteca en Excel y Google Sheets](/blog/formula-cuota-hipoteca-excel-google-sheets).
+Si quieres replicarlo en una hoja de cálculo, revisa la guía de [fórmula de cuota de hipoteca en Excel y Google Sheets](/blog/inmuebles/formula-cuota-hipoteca-excel-google-sheets).
 
 ## Preguntas frecuentes
 

@@ -66,7 +66,7 @@ Además de gastos externos, el crédito puede incluir:
 - Gastos administrativos.
 - Otros cargos contractuales.
 
-Estos conceptos pueden afectar el CAT y el pago mensual total. Para entender la diferencia, revisa [CAT vs tasa en un crédito hipotecario](/blog/cat-vs-tasa-credito-hipotecario).
+Estos conceptos pueden afectar el CAT y el pago mensual total. Para entender la diferencia, revisa [CAT vs tasa en un crédito hipotecario](/blog/inmuebles/cat-vs-tasa-credito-hipotecario).
 
 ## Cómo separar estos costos de la cuota mensual
 

@@ -77,7 +77,7 @@ El plazo de 30 años reduce la mensualidad frente a 15 años, pero aumenta mucho
 
 Un pago extra mensual puede reducir intereses si se aplica a capital. En el ejemplo de `$2,000,000` a `9%` y `20 años`, agregar `$2,000` al mes reduce los intereses estimados de `$2,318,684.59` a `$1,711,832.41`.
 
-Eso equivale a un ahorro aproximado de `$606,852.18`, con liquidación en `186` meses. Revisa más detalles en [pagos extra en una hipoteca](/blog/pagos-extra-hipoteca-abono-capital).
+Eso equivale a un ahorro aproximado de `$606,852.18`, con liquidación en `186` meses. Revisa más detalles en [pagos extra en una hipoteca](/blog/inmuebles/pagos-extra-hipoteca-abono-capital).
 
 ## Calcula tus intereses automáticamente
 

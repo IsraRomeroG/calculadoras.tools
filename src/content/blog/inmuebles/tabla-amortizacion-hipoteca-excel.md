@@ -107,7 +107,7 @@ Si tu tabla no termina en cero, probablemente hay un problema de redondeo o fór
 
 La [calculadora de hipoteca](/inmuebles/calculadora-de-hipoteca) permite exportar CSV con la amortización completa. Puedes usarlo para comparar tu hoja de cálculo o como punto de partida.
 
-También puedes revisar la guía sobre [sistema francés en una hipoteca](/blog/sistema-frances-hipoteca) para entender la lógica detrás de la cuota fija.
+También puedes revisar la guía sobre [sistema francés en una hipoteca](/blog/inmuebles/sistema-frances-hipoteca) para entender la lógica detrás de la cuota fija.
 
 ## Preguntas frecuentes
 

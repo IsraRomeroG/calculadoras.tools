@@ -89,7 +89,7 @@ Estos ejemplos muestran el resultado final después de quitar el porcentaje:
 | 500 - 8%    |      500 x 0.92 |       460 |
 | 2,400 - 25% |    2,400 x 0.75 |     1,800 |
 
-Si el caso es una compra, también puedes ver la guía específica de [cómo calcular un descuento](/blog/porcentaje-de-descuento).
+Si el caso es una compra, también puedes ver la guía específica de [cómo calcular un descuento](/blog/finanzas/porcentaje-de-descuento).
 
 ## Cuándo se usa
 
@@ -101,7 +101,7 @@ En presupuestos, sirve para estimar reducciones. Si un presupuesto de $2,400 baj
 
 También aplica fuera del dinero. Puedes restar un porcentaje a cantidades de piezas, metas, tiempo, peso o cualquier valor que tenga una base clara.
 
-Cuando hay más de una rebaja, no conviene sumar porcentajes sin revisar la base. En ese caso el tema relacionado son los [descuentos sucesivos](/blog/descuentos-sucesivos), porque cada descuento se calcula sobre el valor que queda después del anterior.
+Cuando hay más de una rebaja, no conviene sumar porcentajes sin revisar la base. En ese caso el tema relacionado son los [descuentos sucesivos](/blog/finanzas/descuentos-sucesivos), porque cada descuento se calcula sobre el valor que queda después del anterior.
 
 ## Diferencia entre restar porcentaje y calcular disminución porcentual
 
@@ -113,7 +113,7 @@ Restar un porcentaje parte de una base conocida y produce un valor final. Por ej
 
 La disminución porcentual responde otra pregunta: compara un valor inicial con un valor final ya conocidos para saber qué porcentaje bajó. Por ejemplo, si algo pasó de 500 a 460, la disminución fue de 8%.
 
-En resumen: restar porcentaje sirve para calcular el resultado después de quitar una parte. La [disminución porcentual](/blog/disminucion-porcentual) sirve para medir cuánto bajó algo entre dos valores.
+En resumen: restar porcentaje sirve para calcular el resultado después de quitar una parte. La [disminución porcentual](/blog/matematicas/disminucion-porcentual) sirve para medir cuánto bajó algo entre dos valores.
 
 ## Calcúlalo con la calculadora
 

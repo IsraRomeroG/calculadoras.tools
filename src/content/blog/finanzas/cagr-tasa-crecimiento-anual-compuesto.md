@@ -144,7 +144,7 @@ tasa = (monto final / capital inicial) ^ (1 / anos) - 1
 
 En otras palabras: el CAGR es una forma de encontrar la tasa de interes compuesto anual que explicaria el cambio entre dos valores.
 
-Si quieres entender la formula base con mas detalle, revisa la guia de [formula de interes compuesto](/blog/formula-interes-compuesto). Y si estas comparando tasas financieras, tambien puede ayudarte la diferencia entre [tasa nominal y tasa efectiva](/blog/tasa-nominal-vs-tasa-efectiva).
+Si quieres entender la formula base con mas detalle, revisa la guia de [formula de interes compuesto](/blog/finanzas/formula-interes-compuesto). Y si estas comparando tasas financieras, tambien puede ayudarte la diferencia entre [tasa nominal y tasa efectiva](/blog/finanzas/tasa-nominal-vs-tasa-efectiva).
 
 Como apoyo conceptual, la formula de CAGR tambien se presenta de forma similar en recursos de finanzas como [Corporate Finance Institute](https://corporatefinanceinstitute.com/resources/valuation/what-is-cagr/) y [Wall Street Prep](https://www.wallstreetprep.com/knowledge/cagr-compound-annual-growth-rate/).
 

@@ -76,7 +76,7 @@ Sobrepeso: 25.0 a 29.9
 Obesidad: 30.0 o más
 ```
 
-La obesidad se divide en clases según el valor de IMC. Puedes revisar más detalles en la guía de [obesidad clase 1, 2 y 3 según IMC](/blog/obesidad-clase-1-2-3-imc).
+La obesidad se divide en clases según el valor de IMC. Puedes revisar más detalles en la guía de [obesidad clase 1, 2 y 3 según IMC](/blog/salud/obesidad-clase-1-2-3-imc).
 
 ## Limitaciones del IMC
 

@@ -71,7 +71,7 @@ Así, cada mes baja el interés y sube el abono a capital, siempre que la cuota 
 
 ## Por qué los intereses bajan en una tabla de amortización
 
-La [tabla de amortización](/blog/tabla-amortizacion-prestamo) deja ver este movimiento con claridad. Al inicio, el saldo pendiente es alto, así que el interés del mes también es alto. Conforme pagas capital, el saldo disminuye.
+La [tabla de amortización](/blog/finanzas/tabla-amortizacion-prestamo) deja ver este movimiento con claridad. Al inicio, el saldo pendiente es alto, así que el interés del mes también es alto. Conforme pagas capital, el saldo disminuye.
 
 En el ejemplo anterior, los primeros meses se comportan así:
 
@@ -118,7 +118,7 @@ En muchos préstamos amortizables se calculan sobre el saldo pendiente. Aun así
 
 ### Cómo convierto tasa anual a mensual?
 
-Para una estimación simple, divide la tasa anual entre 12. Por ejemplo, 24% anual equivale a 2% mensual aproximado. Para más detalle, revisa [tasa anual, mensual y diaria](/blog/tasa-anual-mensual-diaria-prestamo).
+Para una estimación simple, divide la tasa anual entre 12. Por ejemplo, 24% anual equivale a 2% mensual aproximado. Para más detalle, revisa [tasa anual, mensual y diaria](/blog/finanzas/tasa-anual-mensual-diaria-prestamo).
 
 ### Por qué pago más intereses al inicio?
 

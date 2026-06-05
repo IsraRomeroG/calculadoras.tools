@@ -50,7 +50,7 @@ Ese total puede bajar si reduces plazo, consigues una tasa menor o haces pagos e
 
 ## Qué cambia con pago extra
 
-Un pago extra mensual no cambia la cuota base, pero puede acelerar la liquidación. Si puedes pagar más de la mensualidad obligatoria, revisa la guía sobre [pagos extra en una hipoteca](/blog/pagos-extra-hipoteca-abono-capital).
+Un pago extra mensual no cambia la cuota base, pero puede acelerar la liquidación. Si puedes pagar más de la mensualidad obligatoria, revisa la guía sobre [pagos extra en una hipoteca](/blog/inmuebles/pagos-extra-hipoteca-abono-capital).
 
 La clave es confirmar que el pago adicional se aplique a capital y que no existan condiciones que reduzcan el beneficio.
 

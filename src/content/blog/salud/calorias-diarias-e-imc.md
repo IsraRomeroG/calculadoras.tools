@@ -62,7 +62,7 @@ Puedes pensar en ambas herramientas así:
 
 Si tu IMC está por encima o por debajo del rango de referencia, el TDEE puede ayudarte a entender la parte energética. Pero el cambio de peso seguro no depende solo de números: también importan calidad de alimentación, actividad física, sueño, salud mental y contexto médico.
 
-Para ver el puente práctico, lee [cómo bajar o subir de peso según tu IMC](/blog/bajar-subir-peso-segun-imc).
+Para ver el puente práctico, lee [cómo bajar o subir de peso según tu IMC](/blog/salud/bajar-subir-peso-segun-imc).
 
 ## Ejemplo práctico
 

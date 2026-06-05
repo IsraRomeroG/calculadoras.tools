@@ -85,7 +85,7 @@ Compara:
 - CAT aproximado.
 - Tabla de amortización.
 
-También puedes complementar con la guía sobre [cómo comparar dos préstamos](/blog/comparar-dos-prestamos) y la explicación de [préstamo a 12, 24, 36 o 48 meses](/blog/prestamo-12-24-36-48-meses).
+También puedes complementar con la guía sobre [cómo comparar dos préstamos](/blog/finanzas/comparar-dos-prestamos) y la explicación de [préstamo a 12, 24, 36 o 48 meses](/blog/finanzas/prestamo-12-24-36-48-meses).
 
 ## Preguntas frecuentes
 

@@ -62,11 +62,11 @@ Estos ejemplos muestran por qué unos pocos kilos pueden cambiar la categoría c
 
 El IMC no mide porcentaje de grasa corporal, cintura, masa muscular, edad o historial médico. Tampoco interpreta igual situaciones como embarazo o adolescencia.
 
-Si entrenas fuerza o tienes mucha masa muscular, revisa también [IMC vs porcentaje de grasa corporal](/blog/imc-vs-porcentaje-grasa-corporal).
+Si entrenas fuerza o tienes mucha masa muscular, revisa también [IMC vs porcentaje de grasa corporal](/blog/salud/imc-vs-porcentaje-grasa-corporal).
 
 ## Calcula tu IMC exacto
 
-Introduce tu peso y estatura en la [calculadora de IMC](/salud/calculadora-de-imc). Para ver otros rangos, consulta la [tabla de peso saludable según estatura](/blog/peso-saludable-segun-estatura).
+Introduce tu peso y estatura en la [calculadora de IMC](/salud/calculadora-de-imc). Para ver otros rangos, consulta la [tabla de peso saludable según estatura](/blog/salud/peso-saludable-segun-estatura).
 
 ## Preguntas frecuentes
 

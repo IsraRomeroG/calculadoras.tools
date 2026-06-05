@@ -64,7 +64,7 @@ Pregunta:
 - Si puedes reducir plazo o mensualidad.
 - Si existe alguna restricción para abonar a capital.
 
-Estos puntos importan mucho si planeas hacer [pagos extra en tu hipoteca](/blog/pagos-extra-hipoteca-abono-capital).
+Estos puntos importan mucho si planeas hacer [pagos extra en tu hipoteca](/blog/inmuebles/pagos-extra-hipoteca-abono-capital).
 
 ## Ejemplo de comparación A vs B
 

@@ -70,7 +70,7 @@ En palabras: 45 es el 22.5% de 200.
 | ¿Qué porcentaje es 7 de 10? | 7 / 10 x 100 | 70% |
 | ¿Qué porcentaje es 250 de 1,000? | 250 / 1,000 x 100 | 25% |
 
-Si quieres repasar la lógica general de los porcentajes, también puedes leer la guía de [cómo calcular porcentajes](/blog/como-calcular-porcentajes).
+Si quieres repasar la lógica general de los porcentajes, también puedes leer la guía de [cómo calcular porcentajes](/blog/matematicas/como-calcular-porcentajes).
 
 ## Cómo usarlo en compras, calificaciones y metas
 
@@ -80,7 +80,7 @@ En calificaciones, la parte puede ser el número de aciertos y el total puede se
 
 En metas, la parte puede ser tu avance actual y el total puede ser el objetivo. Si llevas 120 de 500 unidades, tu avance es de 24%.
 
-También puedes plantearlo como una proporción con [regla de tres](/blog/regla-de-tres): si el total equivale a 100%, la parte equivale al porcentaje que buscas.
+También puedes plantearlo como una proporción con [regla de tres](/blog/matematicas/regla-de-tres): si el total equivale a 100%, la parte equivale al porcentaje que buscas.
 
 ## Errores comunes
 
@@ -90,7 +90,7 @@ Otro error es usar un total igual a cero. No se puede dividir entre cero, así q
 
 También conviene no confundir porcentaje con puntos porcentuales. Un porcentaje compara una parte con un total; los puntos porcentuales comparan diferencias entre porcentajes ya calculados.
 
-Para ver esa diferencia con ejemplos de tasas y encuestas, revisa [porcentaje vs puntos porcentuales](/blog/porcentaje-vs-puntos-porcentuales).
+Para ver esa diferencia con ejemplos de tasas y encuestas, revisa [porcentaje vs puntos porcentuales](/blog/matematicas/porcentaje-vs-puntos-porcentuales).
 
 ## Calcúlalo automáticamente
 

@@ -90,7 +90,7 @@ El resultado final depende de varias decisiones y condiciones:
 - Frecuencia de capitalización: capitalizar de forma mensual, trimestral o anual cambia cuántas veces se suman los intereses al capital.
 - Aportaciones periódicas: agregar dinero cada mes o cada año aumenta el capital que trabaja con el tiempo.
 
-Si quieres profundizar en el cálculo, revisa la [fórmula del interés compuesto](/blog/formula-interes-compuesto). Para comparar el concepto con un cálculo más lineal, también ayuda ver la diferencia entre [interés simple e interés compuesto](/blog/interes-simple-vs-compuesto). Si solo buscas una estimación rápida del tiempo de duplicación, la [regla del 72](/blog/regla-del-72) puede servir como aproximación.
+Si quieres profundizar en el cálculo, revisa la [fórmula del interés compuesto](/blog/finanzas/formula-interes-compuesto). Para comparar el concepto con un cálculo más lineal, también ayuda ver la diferencia entre [interés simple e interés compuesto](/blog/finanzas/interes-simple-vs-compuesto). Si solo buscas una estimación rápida del tiempo de duplicación, la [regla del 72](/blog/finanzas/regla-del-72) puede servir como aproximación.
 
 ## Cuando el interés compuesto trabaja en contra
 

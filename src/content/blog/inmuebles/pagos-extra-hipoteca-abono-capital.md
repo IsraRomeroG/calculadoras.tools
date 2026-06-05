@@ -86,7 +86,7 @@ En créditos como Infonavit o esquemas combinados, las reglas pueden ser especí
 
 La [calculadora de hipoteca](/inmuebles/calculadora-de-hipoteca) muestra una comparación cuando capturas pago extra mensual: plazo efectivo, meses ahorrados e intereses estimados ahorrados.
 
-También puedes revisar la [tabla de amortización hipotecaria](/blog/tabla-amortizacion-hipoteca) para ver en qué mes se liquida la deuda y cómo se reduce el saldo.
+También puedes revisar la [tabla de amortización hipotecaria](/blog/inmuebles/tabla-amortizacion-hipoteca) para ver en qué mes se liquida la deuda y cómo se reduce el saldo.
 
 ## Preguntas frecuentes
 

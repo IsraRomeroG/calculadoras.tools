@@ -62,11 +62,11 @@ La lectura adulta se basa en el valor de IMC, no en el peso por sí solo.
 
 Para 1.85 m, 70 kg y 84 kg pueden estar dentro del rango saludable de referencia, aunque sean pesos bastante distintos. Eso ocurre porque el IMC trabaja con intervalos.
 
-Si quieres entender mejor la diferencia, revisa [peso ideal vs peso saludable](/blog/peso-ideal-vs-peso-saludable).
+Si quieres entender mejor la diferencia, revisa [peso ideal vs peso saludable](/blog/salud/peso-ideal-vs-peso-saludable).
 
 ## Calcula tu IMC exacto
 
-Usa la [calculadora de IMC](/salud/calculadora-de-imc) para calcular tu resultado con tus datos actuales. También puedes revisar la [tabla de peso saludable según estatura](/blog/peso-saludable-segun-estatura).
+Usa la [calculadora de IMC](/salud/calculadora-de-imc) para calcular tu resultado con tus datos actuales. También puedes revisar la [tabla de peso saludable según estatura](/blog/salud/peso-saludable-segun-estatura).
 
 ## Preguntas frecuentes
 

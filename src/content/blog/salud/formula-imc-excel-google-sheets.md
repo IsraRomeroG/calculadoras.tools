@@ -111,7 +111,7 @@ Esa fórmula da un resultado incorrecto porque `172` no está en metros.
 
 Si quieres revisar que tu hoja está bien, compara el resultado con la [calculadora de IMC](/salud/calculadora-de-imc).
 
-También puedes revisar la guía de [qué es el IMC y cómo se calcula](/blog/que-es-el-imc-y-como-se-calcula) y la [tabla de IMC para adultos](/blog/tabla-imc-adultos-rangos-categorias).
+También puedes revisar la guía de [qué es el IMC y cómo se calcula](/blog/salud/que-es-el-imc-y-como-se-calcula) y la [tabla de IMC para adultos](/blog/salud/tabla-imc-adultos-rangos-categorias).
 
 ## Preguntas frecuentes
 

@@ -72,7 +72,7 @@ Empieza por tu presupuesto, no por el monto máximo que te ofrecen. Pregúntate:
 - El préstamo tendrá seguro o comisión?
 - Podrías hacer pagos extra si tus ingresos mejoran?
 
-Si la mensualidad solo cabe en el mejor escenario, el plazo quizá no es tan cómodo como parece. La guía de [cuánto puedes pedir prestado según tu ingreso](/blog/cuanto-puedo-pedir-prestado-segun-ingreso) puede ayudarte a ordenar esa parte.
+Si la mensualidad solo cabe en el mejor escenario, el plazo quizá no es tan cómodo como parece. La guía de [cuánto puedes pedir prestado según tu ingreso](/blog/finanzas/cuanto-puedo-pedir-prestado-segun-ingreso) puede ayudarte a ordenar esa parte.
 
 ## Preguntas frecuentes
 

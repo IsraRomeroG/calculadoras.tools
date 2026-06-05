@@ -121,7 +121,7 @@ La forma más rápida de validar tu tabla es usar la [calculadora de préstamo](
 
 La calculadora también permite exportar CSV, así que puedes generar el archivo y abrirlo en Excel o Google Sheets para revisarlo sin construir todas las fórmulas desde cero.
 
-Para repasar el concepto, lee [tabla de amortización de un préstamo](/blog/tabla-amortizacion-prestamo), [sistema francés de amortización](/blog/sistema-frances-amortizacion) y [cómo calcular la cuota mensual](/blog/como-calcular-cuota-mensual-prestamo).
+Para repasar el concepto, lee [tabla de amortización de un préstamo](/blog/finanzas/tabla-amortizacion-prestamo), [sistema francés de amortización](/blog/finanzas/sistema-frances-amortizacion) y [cómo calcular la cuota mensual](/blog/finanzas/como-calcular-cuota-mensual-prestamo).
 
 ## Preguntas frecuentes
 

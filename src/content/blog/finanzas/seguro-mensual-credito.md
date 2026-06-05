@@ -79,7 +79,7 @@ El CAT puede considerar seguros y otros gastos inherentes al crédito, según la
 
 También es posible que una oferta muestre una mensualidad base atractiva, pero que el pago total suba al agregar seguros. Compara siempre con todos los cargos incluidos.
 
-Para ver el efecto junto con otros cargos, revisa [CAT vs tasa de interés](/blog/cat-vs-tasa-interes) y [comisión por apertura](/blog/comision-apertura-prestamo).
+Para ver el efecto junto con otros cargos, revisa [CAT vs tasa de interés](/blog/finanzas/cat-vs-tasa-interes) y [comisión por apertura](/blog/finanzas/comision-apertura-prestamo).
 
 ## Qué preguntar antes de firmar
 

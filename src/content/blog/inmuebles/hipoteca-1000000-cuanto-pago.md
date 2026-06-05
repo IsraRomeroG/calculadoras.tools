@@ -50,7 +50,7 @@ La [calculadora de hipoteca](/inmuebles/calculadora-de-hipoteca) muestra este da
 
 ## Qué pasa si cambias el plazo
 
-Un plazo corto sube la mensualidad, pero reduce intereses. Un plazo largo puede bajar la cuota mensual, pero aumenta el costo total. Revisa la guía de [hipoteca a 15, 20, 25 o 30 años](/blog/hipoteca-15-20-25-30-anos) para comparar.
+Un plazo corto sube la mensualidad, pero reduce intereses. Un plazo largo puede bajar la cuota mensual, pero aumenta el costo total. Revisa la guía de [hipoteca a 15, 20, 25 o 30 años](/blog/inmuebles/hipoteca-15-20-25-30-anos) para comparar.
 
 ## Qué costos no están incluidos
 

@@ -63,11 +63,11 @@ El IMC no distingue grasa, músculo, hueso o distribución de grasa. Por eso, un
 
 También hay casos donde la tabla adulta no aplica igual: niños, adolescentes, embarazo y algunas situaciones clínicas.
 
-Lee más en [limitaciones del IMC](/blog/limitaciones-del-imc).
+Lee más en [limitaciones del IMC](/blog/salud/limitaciones-del-imc).
 
 ## Calcula tu IMC exacto
 
-Puedes usar la [calculadora de IMC](/salud/calculadora-de-imc) para calcular tu resultado con tu peso real. Para comparar más alturas, revisa la [tabla de peso saludable según estatura](/blog/peso-saludable-segun-estatura).
+Puedes usar la [calculadora de IMC](/salud/calculadora-de-imc) para calcular tu resultado con tu peso real. Para comparar más alturas, revisa la [tabla de peso saludable según estatura](/blog/salud/peso-saludable-segun-estatura).
 
 ## Preguntas frecuentes
 

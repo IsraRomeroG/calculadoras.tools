@@ -54,7 +54,7 @@ Para una lectura más completa, el IMC puede combinarse con:
 - Presión arterial, glucosa, lípidos y otros datos clínicos.
 - Evaluación de hábitos de actividad física, sueño y alimentación.
 
-Puedes profundizar en la comparación entre [IMC y porcentaje de grasa corporal](/blog/imc-vs-porcentaje-grasa-corporal), o revisar las [limitaciones del IMC](/blog/limitaciones-del-imc).
+Puedes profundizar en la comparación entre [IMC y porcentaje de grasa corporal](/blog/salud/imc-vs-porcentaje-grasa-corporal), o revisar las [limitaciones del IMC](/blog/salud/limitaciones-del-imc).
 
 ## Cuándo el IMC sigue siendo útil
 

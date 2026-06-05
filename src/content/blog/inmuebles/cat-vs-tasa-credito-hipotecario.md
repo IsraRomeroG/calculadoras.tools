@@ -106,7 +106,7 @@ Antes de elegir una hipoteca, revisa:
 - Tabla de amortización.
 - Total pagado estimado.
 
-Para profundizar, consulta la guía sobre [cómo comparar créditos hipotecarios](/blog/comparar-creditos-hipotecarios).
+Para profundizar, consulta la guía sobre [cómo comparar créditos hipotecarios](/blog/inmuebles/comparar-creditos-hipotecarios).
 
 ## Preguntas frecuentes
 

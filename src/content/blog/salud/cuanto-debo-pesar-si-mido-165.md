@@ -62,11 +62,11 @@ El redondeo puede mover el resultado por una décima, especialmente cerca de 18.
 
 Si buscas un peso ideal para 1.65 m, evita quedarte con una sola cifra. Un rango es más realista porque permite diferencias entre personas.
 
-Por ejemplo, 55 kg y 65 kg pueden estar dentro del rango adulto de referencia para 1.65 m, aunque sean cuerpos distintos. Lee más en [peso ideal vs peso saludable](/blog/peso-ideal-vs-peso-saludable).
+Por ejemplo, 55 kg y 65 kg pueden estar dentro del rango adulto de referencia para 1.65 m, aunque sean cuerpos distintos. Lee más en [peso ideal vs peso saludable](/blog/salud/peso-ideal-vs-peso-saludable).
 
 ## Calcula tu IMC exacto
 
-Usa la [calculadora de IMC](/salud/calculadora-de-imc) para calcular tu resultado con tu peso actual. También puedes consultar la [tabla de peso saludable según estatura](/blog/peso-saludable-segun-estatura).
+Usa la [calculadora de IMC](/salud/calculadora-de-imc) para calcular tu resultado con tu peso actual. También puedes consultar la [tabla de peso saludable según estatura](/blog/salud/peso-saludable-segun-estatura).
 
 ## Preguntas frecuentes
 

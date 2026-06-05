@@ -37,7 +37,7 @@ Un préstamo personal puede salir mejor si tiene una tasa o CAT menor que la tar
 
 También puede ayudar a poner una fecha de salida: sabes cuántos pagos faltan y cuánto terminarías pagando si cumples el calendario.
 
-Pero no basta con que la mensualidad sea menor. Un préstamo a muchos meses puede bajar el pago mensual y subir el costo total. Para comparar, revisa [CAT vs tasa de interés](/blog/cat-vs-tasa-interes) y simula el préstamo en la [calculadora de préstamo](/finanzas/calculadora-de-prestamo).
+Pero no basta con que la mensualidad sea menor. Un préstamo a muchos meses puede bajar el pago mensual y subir el costo total. Para comparar, revisa [CAT vs tasa de interés](/blog/finanzas/cat-vs-tasa-interes) y simula el préstamo en la [calculadora de préstamo](/finanzas/calculadora-de-prestamo).
 
 ## Cuando una tarjeta puede salir muy cara
 

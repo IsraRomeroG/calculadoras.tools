@@ -57,7 +57,7 @@ Ejemplos comunes:
 
 Pero esos datos no sustituyen la revisión del caso concreto.
 
-Puedes revisar las guías específicas de [IVA en México](/blog/iva-mexico), [IVA en España](/blog/iva-espana), [IVA en Colombia](/blog/iva-colombia) e [IGV en Perú](/blog/igv-peru), o comparar más países en la [tabla de tasas de IVA](/blog/tasas-de-iva-por-pais).
+Puedes revisar las guías específicas de [IVA en México](/blog/legal-impuestos/iva-mexico), [IVA en España](/blog/legal-impuestos/iva-espana), [IVA en Colombia](/blog/legal-impuestos/iva-colombia) e [IGV en Perú](/blog/legal-impuestos/igv-peru), o comparar más países en la [tabla de tasas de IVA](/blog/legal-impuestos/tasas-de-iva-por-pais).
 
 ## Error 4: tratar tasa 0%, exento y excluido como lo mismo
 

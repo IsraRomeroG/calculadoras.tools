@@ -84,7 +84,7 @@ La fórmula solo considera cuota, tasa y plazo. Una aprobación real puede cambi
 - Políticas internas de riesgo.
 - Costos adicionales.
 
-También puede cambiar si el pago mensual real incluye seguros u otros cargos. Por eso conviene revisar [qué incluye la cuota hipotecaria](/blog/que-incluye-cuota-hipotecaria).
+También puede cambiar si el pago mensual real incluye seguros u otros cargos. Por eso conviene revisar [qué incluye la cuota hipotecaria](/blog/inmuebles/que-incluye-cuota-hipotecaria).
 
 ## Cómo usar la calculadora actual
 
@@ -110,7 +110,7 @@ Evita estos errores:
 - Usar tasas que no corresponden a una oferta real.
 - Confundir aprobación bancaria con capacidad financiera personal.
 
-Para una comparación más completa, revisa [cómo comparar créditos hipotecarios](/blog/comparar-creditos-hipotecarios).
+Para una comparación más completa, revisa [cómo comparar créditos hipotecarios](/blog/inmuebles/comparar-creditos-hipotecarios).
 
 ## Preguntas frecuentes
 

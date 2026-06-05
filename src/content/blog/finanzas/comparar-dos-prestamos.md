@@ -49,14 +49,14 @@ El CAT busca expresar el costo anual total del crédito bajo ciertos supuestos. 
 
 El costo total, por su parte, muestra cuánto dinero saldrá de tu bolsillo al final del préstamo. Ambos indicadores se complementan.
 
-Si un préstamo tiene menor tasa pero mayor comisión y seguro, podría terminar costando más. Para entender esta diferencia, revisa [CAT vs tasa de interés](/blog/cat-vs-tasa-interes).
+Si un préstamo tiene menor tasa pero mayor comisión y seguro, podría terminar costando más. Para entender esta diferencia, revisa [CAT vs tasa de interés](/blog/finanzas/cat-vs-tasa-interes).
 
 ## Revisa comisiones, seguros y pagos anticipados
 
 Los cargos adicionales pueden cambiar la decisión:
 
-- Una [comisión por apertura](/blog/comision-apertura-prestamo) puede reducir el dinero neto recibido o subir el costo inicial.
-- Un [seguro mensual](/blog/seguro-mensual-credito) puede elevar el pago total.
+- Una [comisión por apertura](/blog/finanzas/comision-apertura-prestamo) puede reducir el dinero neto recibido o subir el costo inicial.
+- Un [seguro mensual](/blog/finanzas/seguro-mensual-credito) puede elevar el pago total.
 - Una penalización por pago anticipado puede limitar el ahorro si quieres liquidar antes.
 
 También revisa si los pagos extra se aplican a capital. Si no, quizá no generen el ahorro que esperas.

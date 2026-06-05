@@ -102,7 +102,7 @@ La cuota calculada aquí es una base útil, pero no es necesariamente el pago fi
 
 Por eso conviene distinguir entre cuota base y costo total. El CAT, por ejemplo, busca integrar costos del crédito bajo una metodología específica. La cuota de esta calculadora no reemplaza el CAT ni la carátula de una oferta formal.
 
-Si quieres profundizar en esa diferencia, revisa la guía sobre [CAT vs tasa en un crédito hipotecario](/blog/cat-vs-tasa-credito-hipotecario) y el artículo sobre [qué incluye la cuota hipotecaria](/blog/que-incluye-cuota-hipotecaria).
+Si quieres profundizar en esa diferencia, revisa la guía sobre [CAT vs tasa en un crédito hipotecario](/blog/inmuebles/cat-vs-tasa-credito-hipotecario) y el artículo sobre [qué incluye la cuota hipotecaria](/blog/inmuebles/que-incluye-cuota-hipotecaria).
 
 ## Calcula tu hipoteca automáticamente
 

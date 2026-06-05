@@ -109,7 +109,7 @@ Antes de calcular, confirma:
 
 En la [calculadora de préstamo](/finanzas/calculadora-de-prestamo), usa la tasa anual. Si tienes una tasa mensual, puedes anualizarla de forma simple multiplicando por 12 para una estimación inicial, pero revisa si se trata de tasa efectiva o nominal.
 
-Para entender el efecto en la cuota, revisa también [cómo calcular la cuota mensual de un préstamo](/blog/como-calcular-cuota-mensual-prestamo), [cómo calcular intereses](/blog/como-calcular-intereses-prestamo) y [CAT vs tasa de interés](/blog/cat-vs-tasa-interes).
+Para entender el efecto en la cuota, revisa también [cómo calcular la cuota mensual de un préstamo](/blog/finanzas/como-calcular-cuota-mensual-prestamo), [cómo calcular intereses](/blog/finanzas/como-calcular-intereses-prestamo) y [CAT vs tasa de interés](/blog/finanzas/cat-vs-tasa-interes).
 
 ## Preguntas frecuentes
 

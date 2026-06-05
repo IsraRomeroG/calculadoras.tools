@@ -20,7 +20,7 @@ Desglosar IVA significa separar un precio final en dos partes: el precio sin imp
 
 La clave es recordar que el IVA incluido ya forma parte del total. Por eso no se calcula restando directamente la tasa al precio final.
 
-Si estás comparando cotizaciones, también conviene entender la diferencia entre [IVA incluido y precio sin IVA](/blog/iva-incluido-vs-sin-iva).
+Si estás comparando cotizaciones, también conviene entender la diferencia entre [IVA incluido y precio sin IVA](/blog/legal-impuestos/iva-incluido-vs-sin-iva).
 
 ## La fórmula correcta
 
@@ -75,4 +75,4 @@ La [calculadora de IVA](/legal-impuestos/calculadora-de-iva) tiene un modo de "D
 
 El resultado es una ayuda matemática. Para facturación, declaraciones o decisiones contables, revisa la normativa vigente y confirma si el bien o servicio usa tasa general, reducida, tasa 0% o algún tratamiento especial.
 
-Para ver el cálculo completo en ambos sentidos, revisa [cómo calcular el IVA paso a paso](/blog/como-calcular-iva). Si partes de un precio base, el caso opuesto es [sumar IVA a un precio sin impuesto](/blog/como-sumar-iva-a-un-precio).
+Para ver el cálculo completo en ambos sentidos, revisa [cómo calcular el IVA paso a paso](/blog/legal-impuestos/como-calcular-iva). Si partes de un precio base, el caso opuesto es [sumar IVA a un precio sin impuesto](/blog/legal-impuestos/como-sumar-iva-a-un-precio).

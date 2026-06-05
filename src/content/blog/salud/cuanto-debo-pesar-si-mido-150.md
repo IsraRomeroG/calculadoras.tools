@@ -55,7 +55,7 @@ Dos personas de 1.50 m pueden pesar lo mismo y tener distinta composición corpo
 
 Por eso, hablar de rango de peso saludable suele ser más útil que hablar de un "peso ideal" exacto.
 
-Puedes ver el enfoque completo en [peso ideal vs peso saludable](/blog/peso-ideal-vs-peso-saludable).
+Puedes ver el enfoque completo en [peso ideal vs peso saludable](/blog/salud/peso-ideal-vs-peso-saludable).
 
 ## Ejemplos de IMC con diferentes pesos
 
@@ -71,7 +71,7 @@ Estos ejemplos usan categorías adultas. No aplican igual para niños, adolescen
 
 ## Calcula tu IMC exacto
 
-Usa la [calculadora de IMC](/salud/calculadora-de-imc) para ingresar tu peso exacto y obtener tu resultado. También puedes consultar la [tabla de peso saludable según estatura](/blog/peso-saludable-segun-estatura) para comparar otras alturas.
+Usa la [calculadora de IMC](/salud/calculadora-de-imc) para ingresar tu peso exacto y obtener tu resultado. También puedes consultar la [tabla de peso saludable según estatura](/blog/salud/peso-saludable-segun-estatura) para comparar otras alturas.
 
 ## Preguntas frecuentes
 

@@ -56,7 +56,7 @@ En el escenario de `$2,000,000` a `9%` durante `20 años`:
 $4,318,684.59 - $2,000,000 = $2,318,684.59
 ```
 
-Eso no significa que todos los meses pagues la misma proporción de intereses. Al inicio, una parte mayor de la cuota va a intereses. La [tabla de amortización hipotecaria](/blog/tabla-amortizacion-hipoteca) permite ver esa mezcla mes a mes.
+Eso no significa que todos los meses pagues la misma proporción de intereses. Al inicio, una parte mayor de la cuota va a intereses. La [tabla de amortización hipotecaria](/blog/inmuebles/tabla-amortizacion-hipoteca) permite ver esa mezcla mes a mes.
 
 ## Qué cambia si haces pagos extra
 
@@ -88,7 +88,7 @@ Para comparar ofertas reales, revisa también CAT, costo total, condiciones de p
 
 Usa la [calculadora de hipoteca](/inmuebles/calculadora-de-hipoteca) para editar monto, tasa, plazo y pago extra. Si todavía no sabes el monto exacto, puedes partir del precio del inmueble y el enganche.
 
-También puede servirte la guía sobre [hipoteca a 15, 20, 25 o 30 años](/blog/hipoteca-15-20-25-30-anos) para comparar plazos.
+También puede servirte la guía sobre [hipoteca a 15, 20, 25 o 30 años](/blog/inmuebles/hipoteca-15-20-25-30-anos) para comparar plazos.
 
 ## Preguntas frecuentes
 

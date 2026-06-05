@@ -89,7 +89,7 @@ La [calculadora de interés compuesto](/finanzas/calculadora-de-interes-compuest
 
 Una forma práctica de usarla es probar tres escenarios: uno conservador, uno medio y uno optimista. Mantén el mismo capital, plazo y aportaciones, y cambia la inflación o la tasa para ver cómo cambia el poder adquisitivo.
 
-Si quieres reforzar conceptos relacionados, también puedes revisar la [regla del 72](/blog/regla-del-72), la guía sobre [qué es el interés compuesto](/blog/que-es-interes-compuesto) y los [errores comunes al usar una calculadora de interés compuesto](/blog/errores-calculadora-interes-compuesto).
+Si quieres reforzar conceptos relacionados, también puedes revisar la [regla del 72](/blog/finanzas/regla-del-72), la guía sobre [qué es el interés compuesto](/blog/finanzas/que-es-interes-compuesto) y los [errores comunes al usar una calculadora de interés compuesto](/blog/finanzas/errores-calculadora-interes-compuesto).
 
 ## Preguntas frecuentes
 

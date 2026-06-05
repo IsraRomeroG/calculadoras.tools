@@ -79,7 +79,7 @@ Por eso no conviene asumir que cualquier tabla de pagos funciona igual. Revisa s
 
 La [calculadora de hipoteca](/inmuebles/calculadora-de-hipoteca) usa un esquema de cuota fija para estimar capital e intereses. También permite agregar pago extra mensual, lo que puede acortar el plazo real.
 
-Si quieres ver el desglose completo, consulta la guía sobre [tabla de amortización hipotecaria](/blog/tabla-amortizacion-hipoteca).
+Si quieres ver el desglose completo, consulta la guía sobre [tabla de amortización hipotecaria](/blog/inmuebles/tabla-amortizacion-hipoteca).
 
 ## Preguntas frecuentes
 

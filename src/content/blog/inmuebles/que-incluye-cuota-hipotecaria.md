@@ -100,7 +100,7 @@ La cuota base sigue siendo útil para entender capital e intereses, pero no repr
 
 Usa la [calculadora de hipoteca](/inmuebles/calculadora-de-hipoteca) para calcular la base de capital e intereses. Luego compara ese resultado con la oferta formal y separa los costos adicionales.
 
-Para entender mejor esos costos, revisa la guía de [gastos notariales, avalúo e impuestos](/blog/gastos-notariales-avaluo-impuestos-hipoteca).
+Para entender mejor esos costos, revisa la guía de [gastos notariales, avalúo e impuestos](/blog/inmuebles/gastos-notariales-avaluo-impuestos-hipoteca).
 
 ## Preguntas frecuentes
 

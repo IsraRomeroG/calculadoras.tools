@@ -90,7 +90,7 @@ El IMC no mide grasa corporal directamente.
 
 La [calculadora de IMC](/salud/calculadora-de-imc) permite ingresar libras, pies y pulgadas en campos separados. Así evitas errores al convertir la altura.
 
-También puedes consultar [qué es el IMC y cómo se calcula](/blog/que-es-el-imc-y-como-se-calcula) y la [tabla de IMC para adultos](/blog/tabla-imc-adultos-rangos-categorias).
+También puedes consultar [qué es el IMC y cómo se calcula](/blog/salud/que-es-el-imc-y-como-se-calcula) y la [tabla de IMC para adultos](/blog/salud/tabla-imc-adultos-rangos-categorias).
 
 ## Preguntas frecuentes
 

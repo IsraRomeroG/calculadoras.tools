@@ -76,7 +76,7 @@ Cada método tiene margen de error. Por eso, más que obsesionarse con un númer
 
 ## Usa el IMC como punto de partida
 
-El IMC es útil para una primera lectura. Si el resultado no parece coincidir con tu composición corporal, revisa sus [limitaciones](/blog/limitaciones-del-imc) y considera otros indicadores.
+El IMC es útil para una primera lectura. Si el resultado no parece coincidir con tu composición corporal, revisa sus [limitaciones](/blog/salud/limitaciones-del-imc) y considera otros indicadores.
 
 ## Preguntas frecuentes
 

@@ -118,7 +118,7 @@ Si el resultado parece enorme o negativo, revisa signo y tasa.
 
 Después de crear tu fórmula, valida el resultado con la [calculadora de hipoteca](/inmuebles/calculadora-de-hipoteca). La herramienta también genera la tabla de amortización y permite exportar CSV.
 
-Para la tabla completa, revisa [cómo hacer una tabla de amortización hipotecaria en Excel](/blog/tabla-amortizacion-hipoteca-excel).
+Para la tabla completa, revisa [cómo hacer una tabla de amortización hipotecaria en Excel](/blog/inmuebles/tabla-amortizacion-hipoteca-excel).
 
 ## Preguntas frecuentes
 

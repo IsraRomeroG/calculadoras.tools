@@ -52,7 +52,7 @@ La comisión por apertura puede cobrarse como porcentaje del monto. Si el prést
 
 Es decir, `$1,000` adicionales. Si esa comisión se paga al inicio, no cambia la cuota base, pero sí sube el costo total. Si se financia dentro del préstamo, puede aumentar la mensualidad y los intereses.
 
-Para entender mejor este cargo, revisa la guía de [comisión por apertura en un préstamo](/blog/comision-apertura-prestamo).
+Para entender mejor este cargo, revisa la guía de [comisión por apertura en un préstamo](/blog/finanzas/comision-apertura-prestamo).
 
 ## Qué cambia si agregas seguro mensual
 
@@ -82,7 +82,7 @@ Usa estos escenarios como punto de partida, no como respuesta final. En la [calc
 - Seguro mensual.
 - Pago extra mensual.
 
-También puedes comparar este caso con la guía de [préstamo de $100,000](/blog/prestamo-100000-cuanto-pago) si quieres ver cómo cambia la mensualidad al duplicar el monto.
+También puedes comparar este caso con la guía de [préstamo de $100,000](/blog/finanzas/prestamo-100000-cuanto-pago) si quieres ver cómo cambia la mensualidad al duplicar el monto.
 
 ## Preguntas frecuentes
 

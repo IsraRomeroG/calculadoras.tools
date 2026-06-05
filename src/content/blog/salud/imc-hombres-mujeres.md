@@ -56,7 +56,7 @@ Una persona con más masa muscular puede tener un IMC más alto sin que eso sign
 
 También importa dónde se acumula la grasa. El IMC no distingue grasa abdominal de grasa en otras zonas. Por eso puede complementarse con medidas como cintura o índice cintura-altura.
 
-Si quieres profundizar, revisa la guía de [IMC vs porcentaje de grasa corporal](/blog/imc-vs-porcentaje-grasa-corporal).
+Si quieres profundizar, revisa la guía de [IMC vs porcentaje de grasa corporal](/blog/salud/imc-vs-porcentaje-grasa-corporal).
 
 ## Embarazo y otros casos especiales
 
@@ -64,7 +64,7 @@ En embarazo, el IMC actual no se interpreta como en una persona no embarazada. E
 
 En adultos mayores, la pérdida de masa muscular también puede hacer que el IMC sea menos representativo.
 
-Puedes leer más en [IMC y embarazo](/blog/imc-embarazo) y [limitaciones del IMC](/blog/limitaciones-del-imc).
+Puedes leer más en [IMC y embarazo](/blog/salud/imc-embarazo) y [limitaciones del IMC](/blog/salud/limitaciones-del-imc).
 
 ## Calcula tu IMC
 

@@ -89,7 +89,7 @@ Estos son rangos aproximados calculados con IMC adulto de 18.5 a 24.9:
 | 1.80 m | 59.9 a 80.7 kg |
 | 1.90 m | 66.8 a 89.9 kg |
 
-Si quieres una lista más completa, revisa la [tabla de peso saludable según estatura](/blog/peso-saludable-segun-estatura). También puedes ver la guía sobre [cuánto deberías pesar según tu estatura](/blog/cuanto-deberia-pesar-segun-estatura).
+Si quieres una lista más completa, revisa la [tabla de peso saludable según estatura](/blog/salud/peso-saludable-segun-estatura). También puedes ver la guía sobre [cuánto deberías pesar según tu estatura](/blog/salud/cuanto-deberia-pesar-segun-estatura).
 
 ## Calcula tu rango
 

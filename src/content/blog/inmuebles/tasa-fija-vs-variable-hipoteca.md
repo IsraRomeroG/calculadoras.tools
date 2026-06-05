@@ -87,7 +87,7 @@ Pregunta:
 - Cómo se recalcula la cuota?
 - Qué pasa si quiero hacer pagos anticipados?
 
-También revisa [cómo comparar créditos hipotecarios](/blog/comparar-creditos-hipotecarios).
+También revisa [cómo comparar créditos hipotecarios](/blog/inmuebles/comparar-creditos-hipotecarios).
 
 ## Preguntas frecuentes
 

@@ -52,7 +52,7 @@ interés del mes = saldo pendiente x tasa mensual
 
 Al inicio debes casi todo el préstamo, así que el interés del mes es mayor. Después de cada pago, el saldo baja y el interés del siguiente mes también baja.
 
-Esto se ve mejor en una [tabla de amortización](/blog/tabla-amortizacion-prestamo), donde cada fila muestra pago, capital, intereses y saldo pendiente.
+Esto se ve mejor en una [tabla de amortización](/blog/finanzas/tabla-amortizacion-prestamo), donde cada fila muestra pago, capital, intereses y saldo pendiente.
 
 ## Ejemplo con tabla de 3 meses
 
@@ -83,7 +83,7 @@ También calcula la tabla mes a mes para que puedas ver:
 - Cuánto queda de saldo.
 - Cómo cambia el plazo si haces pagos extra.
 
-Si quieres repasar la fórmula paso a paso, lee [cómo calcular la cuota mensual de un préstamo](/blog/como-calcular-cuota-mensual-prestamo) y [cómo calcular intereses de un préstamo](/blog/como-calcular-intereses-prestamo).
+Si quieres repasar la fórmula paso a paso, lee [cómo calcular la cuota mensual de un préstamo](/blog/finanzas/como-calcular-cuota-mensual-prestamo) y [cómo calcular intereses de un préstamo](/blog/finanzas/como-calcular-intereses-prestamo).
 
 ## Preguntas frecuentes
 

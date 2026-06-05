@@ -111,7 +111,7 @@ La [calculadora de interes compuesto](/finanzas/calculadora-de-interes-compuesto
 
 La limitacion es importante: una calculadora de interes compuesto normalmente asume que la tasa se mantiene igual durante todo el periodo. CETES reales pueden tener una tasa distinta en cada vencimiento, y el resultado tambien puede cambiar por ISR, fechas de compra, disponibilidad de plazos y reglas vigentes.
 
-Si quieres entender la formula general detras de la simulacion, revisa la guia de [formula de interes compuesto](/blog/formula-interes-compuesto). Si vas a proyectar varios anos, tambien conviene ajustar el resultado por [inflacion e interes compuesto](/blog/inflacion-interes-compuesto-valor-real). Y si estas comparando escenarios, evita los errores comunes de una [calculadora de interes compuesto](/blog/errores-calculadora-interes-compuesto).
+Si quieres entender la formula general detras de la simulacion, revisa la guia de [formula de interes compuesto](/blog/finanzas/formula-interes-compuesto). Si vas a proyectar varios anos, tambien conviene ajustar el resultado por [inflacion e interes compuesto](/blog/finanzas/inflacion-interes-compuesto-valor-real). Y si estas comparando escenarios, evita los errores comunes de una [calculadora de interes compuesto](/blog/finanzas/errores-calculadora-interes-compuesto).
 
 ## Preguntas frecuentes
 

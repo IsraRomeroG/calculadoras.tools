@@ -111,4 +111,4 @@ Sí. La lógica es la misma, pero cambia la frecuencia de la aportación y la ta
 
 Para estimar tu propio escenario, usa la [calculadora de interés compuesto](/finanzas/calculadora-de-interes-compuesto). Puedes cambiar el capital inicial, la aportación mensual, la tasa, el plazo, la frecuencia de capitalización y el momento de aportación.
 
-También puedes revisar la [fórmula del interés compuesto](/blog/formula-interes-compuesto), comparar este enfoque con una meta concreta en [cuánto ahorrar al mes para una meta](/blog/cuanto-ahorrar-al-mes-para-una-meta) y evitar fallos típicos con la guía de [errores al usar una calculadora de interés compuesto](/blog/errores-calculadora-interes-compuesto).
+También puedes revisar la [fórmula del interés compuesto](/blog/finanzas/formula-interes-compuesto), comparar este enfoque con una meta concreta en [cuánto ahorrar al mes para una meta](/blog/finanzas/cuanto-ahorrar-al-mes-para-una-meta) y evitar fallos típicos con la guía de [errores al usar una calculadora de interés compuesto](/blog/finanzas/errores-calculadora-interes-compuesto).

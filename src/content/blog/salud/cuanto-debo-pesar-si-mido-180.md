@@ -56,11 +56,11 @@ El IMC puede ser menos representativo si tienes mucha masa muscular, si eres adu
 
 Por ejemplo, una persona de 1.80 m con 85 kg y mucha musculatura puede tener un IMC en sobrepeso, pero necesitaría otros indicadores para interpretar mejor su composición corporal.
 
-Lee más en [limitaciones del IMC](/blog/limitaciones-del-imc).
+Lee más en [limitaciones del IMC](/blog/salud/limitaciones-del-imc).
 
 ## Calcula tu IMC exacto
 
-Usa la [calculadora de IMC](/salud/calculadora-de-imc) para obtener tu resultado. Para comparar rangos por altura, revisa la [tabla de peso saludable según estatura](/blog/peso-saludable-segun-estatura).
+Usa la [calculadora de IMC](/salud/calculadora-de-imc) para obtener tu resultado. Para comparar rangos por altura, revisa la [tabla de peso saludable según estatura](/blog/salud/peso-saludable-segun-estatura).
 
 ## Preguntas frecuentes
 

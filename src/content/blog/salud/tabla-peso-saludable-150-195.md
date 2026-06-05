@@ -67,16 +67,16 @@ El resultado corresponde a categorías adultas. Para niños y adolescentes se us
 
 También puedes revisar las páginas específicas por altura:
 
-- [Cuánto debo pesar si mido 1.50 m](/blog/cuanto-debo-pesar-si-mido-150)
-- [Cuánto debo pesar si mido 1.55 m](/blog/cuanto-debo-pesar-si-mido-155)
-- [Cuánto debo pesar si mido 1.60 m](/blog/cuanto-debo-pesar-si-mido-160)
-- [Cuánto debo pesar si mido 1.65 m](/blog/cuanto-debo-pesar-si-mido-165)
-- [Cuánto debo pesar si mido 1.70 m](/blog/cuanto-debo-pesar-si-mido-170)
-- [Cuánto debo pesar si mido 1.75 m](/blog/cuanto-debo-pesar-si-mido-175)
-- [Cuánto debo pesar si mido 1.80 m](/blog/cuanto-debo-pesar-si-mido-180)
-- [Cuánto debo pesar si mido 1.85 m](/blog/cuanto-debo-pesar-si-mido-185)
+- [Cuánto debo pesar si mido 1.50 m](/blog/salud/cuanto-debo-pesar-si-mido-150)
+- [Cuánto debo pesar si mido 1.55 m](/blog/salud/cuanto-debo-pesar-si-mido-155)
+- [Cuánto debo pesar si mido 1.60 m](/blog/salud/cuanto-debo-pesar-si-mido-160)
+- [Cuánto debo pesar si mido 1.65 m](/blog/salud/cuanto-debo-pesar-si-mido-165)
+- [Cuánto debo pesar si mido 1.70 m](/blog/salud/cuanto-debo-pesar-si-mido-170)
+- [Cuánto debo pesar si mido 1.75 m](/blog/salud/cuanto-debo-pesar-si-mido-175)
+- [Cuánto debo pesar si mido 1.80 m](/blog/salud/cuanto-debo-pesar-si-mido-180)
+- [Cuánto debo pesar si mido 1.85 m](/blog/salud/cuanto-debo-pesar-si-mido-185)
 
-Para una explicación más general, revisa [peso saludable según estatura](/blog/peso-saludable-segun-estatura).
+Para una explicación más general, revisa [peso saludable según estatura](/blog/salud/peso-saludable-segun-estatura).
 
 ## Limitaciones
 

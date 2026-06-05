@@ -77,7 +77,7 @@ Puede ser útil mirar ambos cuando:
 - Se quiere considerar grasa abdominal.
 - Se busca una lectura más completa antes de hablar con un profesional.
 
-También puedes revisar [limitaciones del IMC](/blog/limitaciones-del-imc) e [IMC vs porcentaje de grasa corporal](/blog/imc-vs-porcentaje-grasa-corporal).
+También puedes revisar [limitaciones del IMC](/blog/salud/limitaciones-del-imc) e [IMC vs porcentaje de grasa corporal](/blog/salud/imc-vs-porcentaje-grasa-corporal).
 
 ## Calcula tu IMC
 

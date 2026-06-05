@@ -106,7 +106,7 @@ El CAT ayuda a comparar créditos porque resume costos bajo una metodología est
 
 La forma más rápida de evitar errores de tasa, plazo o redondeo es usar la [calculadora de préstamo](/finanzas/calculadora-de-prestamo). Puedes capturar monto, tasa anual y plazo, y también sumar comisión por apertura, seguro mensual o pago extra.
 
-La herramienta muestra la cuota base, el pago mensual total, intereses, costo total y una tabla de amortización. Si estás comparando ofertas, también puedes revisar la guía sobre [CAT vs tasa de interés](/blog/cat-vs-tasa-interes) y la explicación de [cómo calcular intereses de un préstamo](/blog/como-calcular-intereses-prestamo).
+La herramienta muestra la cuota base, el pago mensual total, intereses, costo total y una tabla de amortización. Si estás comparando ofertas, también puedes revisar la guía sobre [CAT vs tasa de interés](/blog/finanzas/cat-vs-tasa-interes) y la explicación de [cómo calcular intereses de un préstamo](/blog/finanzas/como-calcular-intereses-prestamo).
 
 ## Preguntas frecuentes
 

@@ -38,7 +38,7 @@ Si algo pasa de 100 a 120:
 (120 - 100) / 100 x 100 = 20%
 ```
 
-La variación es `20%`, porque el valor final es mayor que el inicial. Si el valor final fuera menor, el resultado sería negativo y estarías midiendo una [disminución porcentual](/blog/disminucion-porcentual).
+La variación es `20%`, porque el valor final es mayor que el inicial. Si el valor final fuera menor, el resultado sería negativo y estarías midiendo una [disminución porcentual](/blog/matematicas/disminucion-porcentual).
 
 ## Qué es la diferencia porcentual
 
@@ -111,7 +111,7 @@ Un error frecuente es llamar diferencia porcentual a cualquier cambio porcentual
 
 Otro error es ignorar la dirección. Decir que de 120 a 100 hubo una "diferencia de 16.67%" mezcla dos ideas: `-16.67%` es una variación porcentual, porque usa 120 como base y expresa una baja. La diferencia porcentual entre 120 y 100 es `18.18%`.
 
-También conviene no confundir estos conceptos con los [puntos porcentuales](/blog/porcentaje-vs-puntos-porcentuales). Pasar de 10% a 15% es un aumento de 5 puntos porcentuales, pero la variación relativa es 50%.
+También conviene no confundir estos conceptos con los [puntos porcentuales](/blog/matematicas/porcentaje-vs-puntos-porcentuales). Pasar de 10% a 15% es un aumento de 5 puntos porcentuales, pero la variación relativa es 50%.
 
 ## Calculadora recomendada
 
@@ -125,7 +125,7 @@ Ese modo usa esta lógica:
 
 Por eso calcula cambio porcentual con dirección, no diferencia porcentual simétrica. Si escribes 100 como valor inicial y 120 como valor final, verás `20%`. Si inviertes los valores, verás `-16.67%`.
 
-Para cambios hacia arriba también puedes revisar la guía de [aumento porcentual](/blog/aumento-porcentual). Para cambios hacia abajo, la explicación relacionada es [disminución porcentual](/blog/disminucion-porcentual).
+Para cambios hacia arriba también puedes revisar la guía de [aumento porcentual](/blog/matematicas/aumento-porcentual). Para cambios hacia abajo, la explicación relacionada es [disminución porcentual](/blog/matematicas/disminucion-porcentual).
 
 ## Preguntas frecuentes
 

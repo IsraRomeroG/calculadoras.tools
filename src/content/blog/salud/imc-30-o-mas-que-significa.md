@@ -43,7 +43,7 @@ El rango de obesidad se divide así:
 
 Esta división ayuda a describir el nivel de IMC, pero no reemplaza una evaluación profesional.
 
-Puedes leer más en [obesidad clase 1, 2 y 3 según IMC](/blog/obesidad-clase-1-2-3-imc).
+Puedes leer más en [obesidad clase 1, 2 y 3 según IMC](/blog/salud/obesidad-clase-1-2-3-imc).
 
 ## Ejemplos por peso y altura
 

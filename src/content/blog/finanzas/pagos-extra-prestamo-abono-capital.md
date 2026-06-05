@@ -41,7 +41,7 @@ interés del mes = saldo pendiente x tasa mensual
 
 Si el saldo baja más rápido, el interés de los meses siguientes también baja. El efecto suele ser mayor cuando haces pagos extra al inicio del crédito, porque todavía queda más saldo y más meses por delante.
 
-Puedes ver esta lógica en una [tabla de amortización](/blog/tabla-amortizacion-prestamo): cada abono a capital adelanta parte del camino.
+Puedes ver esta lógica en una [tabla de amortización](/blog/finanzas/tabla-amortizacion-prestamo): cada abono a capital adelanta parte del camino.
 
 ## Ejemplo con y sin pago extra mensual
 
@@ -94,7 +94,7 @@ La [calculadora de préstamo](/finanzas/calculadora-de-prestamo) tiene un campo 
 - Nueva duración real.
 - Tabla de amortización actualizada.
 
-Para entender de dónde sale el ahorro, revisa también [cómo calcular intereses de un préstamo](/blog/como-calcular-intereses-prestamo) y la guía de [préstamo a 12, 24, 36 o 48 meses](/blog/prestamo-12-24-36-48-meses).
+Para entender de dónde sale el ahorro, revisa también [cómo calcular intereses de un préstamo](/blog/finanzas/como-calcular-intereses-prestamo) y la guía de [préstamo a 12, 24, 36 o 48 meses](/blog/finanzas/prestamo-12-24-36-48-meses).
 
 ## Preguntas frecuentes
 

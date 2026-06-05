@@ -100,7 +100,7 @@ La disminución porcentual responde la pregunta inversa: si ya sabes que algo pa
 (500 - 460) / 500 x 100 = 8%
 ```
 
-En resumen: el [descuento o la resta de porcentaje](/blog/como-restar-un-porcentaje) calcula el valor final. La disminución porcentual mide la reducción entre dos valores ya conocidos.
+En resumen: el [descuento o la resta de porcentaje](/blog/matematicas/como-restar-un-porcentaje) calcula el valor final. La disminución porcentual mide la reducción entre dos valores ya conocidos.
 
 ## Calcúlalo con la calculadora
 
@@ -108,7 +108,7 @@ Si quieres evitar operaciones manuales, usa la [calculadora de porcentajes](/mat
 
 Escribe el valor inicial y el valor final. Si el valor final es menor, la calculadora mostrará una variación negativa. Ese resultado indica una disminución porcentual. Por ejemplo, de 250 a 200 mostrará `-20%`, que se lee como una baja de 20%.
 
-Si estás comparando cambios con dirección, también puede servirte la guía de [aumento porcentual](/blog/aumento-porcentual). Para diferencias entre métodos de comparación, revisa la explicación sobre [diferencia porcentual vs variación porcentual](/blog/diferencia-porcentual-vs-variacion-porcentual).
+Si estás comparando cambios con dirección, también puede servirte la guía de [aumento porcentual](/blog/matematicas/aumento-porcentual). Para diferencias entre métodos de comparación, revisa la explicación sobre [diferencia porcentual vs variación porcentual](/blog/matematicas/diferencia-porcentual-vs-variacion-porcentual).
 
 ## Preguntas frecuentes
 

@@ -34,7 +34,7 @@ Donde:
 
 La parte clave es `(1 + r / n) ^ (n x t)`: ahí se acumula el crecimiento de cada período. Si la capitalización es mensual, por ejemplo, la tasa anual se divide entre 12 y el número de períodos también se multiplica por 12.
 
-Si primero quieres repasar el concepto general, puedes leer la guía sobre [qué es el interés compuesto](/blog/que-es-interes-compuesto).
+Si primero quieres repasar el concepto general, puedes leer la guía sobre [qué es el interés compuesto](/blog/finanzas/que-es-interes-compuesto).
 
 ## Cómo convertir la tasa a decimal
 
@@ -125,7 +125,7 @@ Y si la tasa es 0%, no conviene usar la división entre `i`. En ese caso el mont
 VF = capital inicial + aportaciones totales
 ```
 
-Para escenarios con aportaciones mensuales, aportaciones anuales, inflación o diferentes frecuencias, es más cómodo usar la [calculadora de interés compuesto](/finanzas/calculadora-de-interes-compuesto). Así evitas mezclar períodos y redondeos manuales. Si quieres ver ese caso con más detalle, revisa la guía de [interés compuesto con aportaciones mensuales](/blog/interes-compuesto-aportaciones-mensuales).
+Para escenarios con aportaciones mensuales, aportaciones anuales, inflación o diferentes frecuencias, es más cómodo usar la [calculadora de interés compuesto](/finanzas/calculadora-de-interes-compuesto). Así evitas mezclar períodos y redondeos manuales. Si quieres ver ese caso con más detalle, revisa la guía de [interés compuesto con aportaciones mensuales](/blog/finanzas/interes-compuesto-aportaciones-mensuales).
 
 ## Errores comunes al aplicar la fórmula
 
@@ -135,7 +135,7 @@ Otro error frecuente es mezclar meses con años. Si el plazo es de 18 meses, pue
 
 También es fácil olvidar la frecuencia de capitalización. No es lo mismo capitalización anual que mensual, trimestral o diaria, aunque la tasa anual sea la misma.
 
-Si estás comparando tasas con distintas formas de capitalización, conviene distinguir entre [tasa nominal y tasa efectiva](/blog/tasa-nominal-vs-tasa-efectiva) antes de sustituir datos en la fórmula.
+Si estás comparando tasas con distintas formas de capitalización, conviene distinguir entre [tasa nominal y tasa efectiva](/blog/finanzas/tasa-nominal-vs-tasa-efectiva) antes de sustituir datos en la fórmula.
 
 Por último, evita redondear en cada paso intermedio. Redondea solo al mostrar el resultado final; de lo contrario, los decimales pequeños se acumulan y pueden mover el monto final.
 

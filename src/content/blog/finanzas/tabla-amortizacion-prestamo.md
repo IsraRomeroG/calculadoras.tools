@@ -71,7 +71,7 @@ interés del mes = 1000
 
 Después del primer pago, el saldo ya no es `$50,000`, sino `$48,356.45`. Por eso el interés del segundo mes baja a `$967.13`.
 
-Este comportamiento es normal en los esquemas de cuota fija. Si quieres profundizar en la lógica matemática, revisa la guía sobre [sistema francés de amortización](/blog/sistema-frances-amortizacion).
+Este comportamiento es normal en los esquemas de cuota fija. Si quieres profundizar en la lógica matemática, revisa la guía sobre [sistema francés de amortización](/blog/finanzas/sistema-frances-amortizacion).
 
 ## Cómo usar la tabla para comparar créditos
 
@@ -92,7 +92,7 @@ La CONDUSEF señala que, al comparar créditos, no solo importa la tasa de inter
 
 Puedes generar una tabla completa con la [calculadora de préstamo](/finanzas/calculadora-de-prestamo). Ingresa monto, tasa anual y plazo, y agrega seguro mensual o pago extra si aplica.
 
-La herramienta muestra 12 meses por página y permite exportar CSV. Si prefieres construirla manualmente, también puedes revisar la guía de [tabla de amortización en Excel](/blog/tabla-amortizacion-excel).
+La herramienta muestra 12 meses por página y permite exportar CSV. Si prefieres construirla manualmente, también puedes revisar la guía de [tabla de amortización en Excel](/blog/finanzas/tabla-amortizacion-excel).
 
 ## Preguntas frecuentes
 

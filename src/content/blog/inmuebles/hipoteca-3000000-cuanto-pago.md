@@ -53,7 +53,7 @@ En montos altos, la tasa y el plazo pesan mucho. Un cambio pequeño puede repres
 
 Un plazo largo puede hacer más manejable la cuota mensual, pero mantiene la deuda activa durante más años. Si tus ingresos permiten pagos extra, podrías simular un plazo largo con abonos a capital para ver el efecto.
 
-Consulta la guía sobre [hipoteca a 15, 20, 25 o 30 años](/blog/hipoteca-15-20-25-30-anos) para comparar el intercambio entre cuota e intereses.
+Consulta la guía sobre [hipoteca a 15, 20, 25 o 30 años](/blog/inmuebles/hipoteca-15-20-25-30-anos) para comparar el intercambio entre cuota e intereses.
 
 ## Qué costos no están incluidos
 
@@ -70,7 +70,7 @@ Cuando el monto es alto, estos costos externos también pueden ser relevantes. P
 
 ## Calcula tu caso exacto
 
-Usa la [calculadora de hipoteca](/inmuebles/calculadora-de-hipoteca) para editar monto, tasa, plazo, enganche y pago extra. Si comparas instituciones, revisa también [cómo comparar créditos hipotecarios](/blog/comparar-creditos-hipotecarios).
+Usa la [calculadora de hipoteca](/inmuebles/calculadora-de-hipoteca) para editar monto, tasa, plazo, enganche y pago extra. Si comparas instituciones, revisa también [cómo comparar créditos hipotecarios](/blog/inmuebles/comparar-creditos-hipotecarios).
 
 ## Preguntas frecuentes
 

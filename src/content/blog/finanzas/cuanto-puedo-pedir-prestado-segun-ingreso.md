@@ -84,7 +84,7 @@ Supongamos:
 
 Con esos datos, el monto aproximado sería `$76,466.53`. Pero esa cifra no garantiza aprobación ni incluye comisiones o seguros. Si el crédito tiene seguro mensual, comisión por apertura o CAT más alto, el monto conveniente podría ser menor.
 
-Puedes contrastarlo con el caso de [préstamo de $100,000](/blog/prestamo-100000-cuanto-pago) para ver si la mensualidad se acerca o se aleja de tu presupuesto.
+Puedes contrastarlo con el caso de [préstamo de $100,000](/blog/finanzas/prestamo-100000-cuanto-pago) para ver si la mensualidad se acerca o se aleja de tu presupuesto.
 
 ## Simula el monto con la calculadora
 
@@ -96,7 +96,7 @@ La [calculadora de préstamo](/finanzas/calculadora-de-prestamo) está diseñada
 4. Ajusta el monto hasta acercarte a tu mensualidad objetivo.
 5. Agrega comisión y seguro si la oferta los incluye.
 
-También revisa [préstamo a 12, 24, 36 o 48 meses](/blog/prestamo-12-24-36-48-meses) para entender el intercambio entre pago bajo e intereses.
+También revisa [préstamo a 12, 24, 36 o 48 meses](/blog/finanzas/prestamo-12-24-36-48-meses) para entender el intercambio entre pago bajo e intereses.
 
 ## Preguntas frecuentes
 

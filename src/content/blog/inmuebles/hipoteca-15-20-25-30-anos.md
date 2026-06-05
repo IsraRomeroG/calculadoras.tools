@@ -93,7 +93,7 @@ Antes de decidir, revisa:
 - Costos de compra y mantenimiento.
 - Posibilidad de pagos anticipados.
 
-También conviene leer sobre [pagos extra en una hipoteca](/blog/pagos-extra-hipoteca-abono-capital), porque un plazo largo con abonos a capital puede comportarse mejor que un plazo largo sin pagos adicionales.
+También conviene leer sobre [pagos extra en una hipoteca](/blog/inmuebles/pagos-extra-hipoteca-abono-capital), porque un plazo largo con abonos a capital puede comportarse mejor que un plazo largo sin pagos adicionales.
 
 ## Preguntas frecuentes
 

@@ -97,7 +97,7 @@ En un crédito automotriz, el seguro puede tratarse de varias formas: pagarse de
 
 También revisa si se financian accesorios, placas, garantías extendidas, comisión o gastos administrativos. Si todo se suma al monto del crédito, también puede generar intereses.
 
-Para entender el impacto de un seguro mensual, revisa la guía de [seguro mensual en un crédito](/blog/seguro-mensual-credito).
+Para entender el impacto de un seguro mensual, revisa la guía de [seguro mensual en un crédito](/blog/finanzas/seguro-mensual-credito).
 
 ## Cómo comparar ofertas de agencia y banco
 
@@ -113,7 +113,7 @@ No compares solo mensualidad. Revisa:
 - Costo total.
 - Penalización por prepago.
 
-La guía de [cómo comparar dos préstamos](/blog/comparar-dos-prestamos) te da un checklist para poner dos ofertas lado a lado. También conviene revisar la [tabla de amortización](/blog/tabla-amortizacion-prestamo) para ver cómo baja el saldo.
+La guía de [cómo comparar dos préstamos](/blog/finanzas/comparar-dos-prestamos) te da un checklist para poner dos ofertas lado a lado. También conviene revisar la [tabla de amortización](/blog/finanzas/tabla-amortizacion-prestamo) para ver cómo baja el saldo.
 
 ## Preguntas frecuentes
 

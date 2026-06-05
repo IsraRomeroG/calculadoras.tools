@@ -87,7 +87,7 @@ Para evaluar el efecto de este cargo:
 3. Compara costo total, CAT aproximado e intereses.
 4. Agrega seguro mensual si la oferta lo incluye.
 
-También puedes revisar [CAT vs tasa de interés](/blog/cat-vs-tasa-interes) y la guía de [cómo comparar dos préstamos](/blog/comparar-dos-prestamos) antes de elegir.
+También puedes revisar [CAT vs tasa de interés](/blog/finanzas/cat-vs-tasa-interes) y la guía de [cómo comparar dos préstamos](/blog/finanzas/comparar-dos-prestamos) antes de elegir.
 
 ## Preguntas frecuentes
 

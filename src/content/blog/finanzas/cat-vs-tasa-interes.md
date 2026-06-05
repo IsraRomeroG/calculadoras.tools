@@ -87,7 +87,7 @@ Antes de elegir, compara al menos estos puntos:
 - Seguro mensual.
 - Condiciones de pago anticipado.
 
-Si una oferta tiene menor tasa pero mayor comisión, no la descartes ni la aceptes automáticamente. Simula ambos casos y mira el costo total. La guía de [comisión por apertura](/blog/comision-apertura-prestamo) y la de [seguro mensual en un crédito](/blog/seguro-mensual-credito) ayudan a revisar esos cargos.
+Si una oferta tiene menor tasa pero mayor comisión, no la descartes ni la aceptes automáticamente. Simula ambos casos y mira el costo total. La guía de [comisión por apertura](/blog/finanzas/comision-apertura-prestamo) y la de [seguro mensual en un crédito](/blog/finanzas/seguro-mensual-credito) ayudan a revisar esos cargos.
 
 ## Preguntas frecuentes
 

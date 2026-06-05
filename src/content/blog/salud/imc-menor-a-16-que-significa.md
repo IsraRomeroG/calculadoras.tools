@@ -77,7 +77,7 @@ La intención no es alarmar, sino evitar que un resultado sensible se interprete
 
 Revisa que el peso y la altura estén correctos. En la [calculadora de IMC](/salud/calculadora-de-imc) puedes ingresar datos en kg/cm o lb/ft/in.
 
-También puede ayudarte leer la guía de [bajo peso según IMC](/blog/bajo-peso-segun-imc-menor-18-5) y las [limitaciones del IMC](/blog/limitaciones-del-imc).
+También puede ayudarte leer la guía de [bajo peso según IMC](/blog/salud/bajo-peso-segun-imc-menor-18-5) y las [limitaciones del IMC](/blog/salud/limitaciones-del-imc).
 
 ## Preguntas frecuentes
 

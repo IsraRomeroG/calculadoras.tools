@@ -88,7 +88,7 @@ Estos ejemplos muestran el total después de sumar el porcentaje:
 | 850 + 25% | 850 x 1.25 | 1,062.50 |
 | 300 + 8% | 300 x 1.08 | 324 |
 
-Si quieres repasar la base antes de usar atajos, puedes leer la guía de [cómo calcular porcentajes](/blog/como-calcular-porcentajes).
+Si quieres repasar la base antes de usar atajos, puedes leer la guía de [cómo calcular porcentajes](/blog/matematicas/como-calcular-porcentajes).
 
 ## Casos de uso frecuentes
 
@@ -98,9 +98,9 @@ En salarios, sumar un porcentaje ayuda a estimar el nuevo sueldo después de un 
 
 En propinas, puedes sumar 10%, 15% o 20% al consumo para obtener el total aproximado a pagar. Por ejemplo, una cuenta de $850 con 25% adicional queda en $1,062.50.
 
-En impuestos como el IVA, el procedimiento matemático es el mismo: se calcula el impuesto sobre la base y se agrega al precio. Para ese caso específico, también puedes ver la guía de [cómo sumar IVA a un precio](/blog/como-sumar-iva-a-un-precio).
+En impuestos como el IVA, el procedimiento matemático es el mismo: se calcula el impuesto sobre la base y se agrega al precio. Para ese caso específico, también puedes ver la guía de [cómo sumar IVA a un precio](/blog/legal-impuestos/como-sumar-iva-a-un-precio).
 
-Cuando comparas un valor inicial con un valor final y quieres saber qué tanto creció, el tema relacionado es el [aumento porcentual](/blog/aumento-porcentual).
+Cuando comparas un valor inicial con un valor final y quieres saber qué tanto creció, el tema relacionado es el [aumento porcentual](/blog/matematicas/aumento-porcentual).
 
 ## Errores comunes
 

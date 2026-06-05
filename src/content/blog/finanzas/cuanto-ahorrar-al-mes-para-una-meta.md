@@ -103,7 +103,7 @@ Una forma simple es ajustar la meta por inflacion esperada:
 meta futura = meta actual x (1 + inflacion)^anos
 ```
 
-Despues usa esa meta futura en la formula de aportacion mensual. Para entender mejor la diferencia entre dinero nominal y poder adquisitivo, puedes revisar la guia de [inflacion e interes compuesto](/blog/inflacion-interes-compuesto-valor-real).
+Despues usa esa meta futura en la formula de aportacion mensual. Para entender mejor la diferencia entre dinero nominal y poder adquisitivo, puedes revisar la guia de [inflacion e interes compuesto](/blog/finanzas/inflacion-interes-compuesto-valor-real).
 
 ## Usa la calculadora actual
 
@@ -115,7 +115,7 @@ La [calculadora de interes compuesto](/finanzas/calculadora-de-interes-compuesto
 4. Revisa el monto final.
 5. Sube o baja la aportacion hasta acercarte a la meta.
 
-Si tu objetivo depende mucho de las aportaciones mensuales, tambien te puede servir la guia sobre [interes compuesto con aportaciones mensuales](/blog/interes-compuesto-aportaciones-mensuales).
+Si tu objetivo depende mucho de las aportaciones mensuales, tambien te puede servir la guia sobre [interes compuesto con aportaciones mensuales](/blog/finanzas/interes-compuesto-aportaciones-mensuales).
 
 ## Preguntas frecuentes
 

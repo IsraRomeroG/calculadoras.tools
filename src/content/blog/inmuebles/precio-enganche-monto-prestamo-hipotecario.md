@@ -111,7 +111,7 @@ Evita estos errores:
 - Capturar una tasa mensual donde la calculadora pide tasa anual.
 - Ignorar que algunos costos de compra no están incluidos en la cuota.
 
-Si quieres revisar más casos, consulta la guía de [errores comunes al calcular una hipoteca](/blog/errores-comunes-al-calcular-hipoteca).
+Si quieres revisar más casos, consulta la guía de [errores comunes al calcular una hipoteca](/blog/inmuebles/errores-comunes-al-calcular-hipoteca).
 
 ## Usa el modo correcto en la calculadora
 

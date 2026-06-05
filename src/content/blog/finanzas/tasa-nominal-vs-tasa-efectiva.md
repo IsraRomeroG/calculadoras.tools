@@ -76,7 +76,7 @@ Con la misma tasa nominal anual de 12%, la tasa efectiva cambia según la frecue
 
 La diferencia entre mensual y diaria puede parecer pequeña en un solo año, pero puede acumularse en plazos largos. Esa es una de las razones por las que el interés compuesto se vuelve más visible con el tiempo.
 
-Si quieres repasar la base matemática, puedes revisar la [fórmula del interés compuesto](/blog/formula-interes-compuesto). La lógica es la misma: el saldo crece, los intereses se agregan y el siguiente cálculo parte de una base mayor.
+Si quieres repasar la base matemática, puedes revisar la [fórmula del interés compuesto](/blog/finanzas/formula-interes-compuesto). La lógica es la misma: el saldo crece, los intereses se agregan y el siguiente cálculo parte de una base mayor.
 
 ## Cómo lo muestra la calculadora
 
@@ -94,7 +94,7 @@ Otro error es ignorar comisiones, impuestos o retenciones. La tasa efectiva anua
 
 También es común confundir tasa efectiva con rendimiento garantizado. La fórmula convierte tasas bajo supuestos matemáticos, pero no elimina riesgos de mercado, cambios de tasa, incumplimientos, inflación ni condiciones particulares del producto.
 
-Para revisar otros fallos típicos antes de simular escenarios, puedes consultar los [errores comunes al usar una calculadora de interés compuesto](/blog/errores-calculadora-interes-compuesto).
+Para revisar otros fallos típicos antes de simular escenarios, puedes consultar los [errores comunes al usar una calculadora de interés compuesto](/blog/finanzas/errores-calculadora-interes-compuesto).
 
 ## Preguntas frecuentes
 
@@ -110,6 +110,6 @@ Para revisar otros fallos típicos antes de simular escenarios, puedes consultar
 
 Para comparar bien, lleva todas las opciones a la misma base: anual contra anual, efectiva contra efectiva, y con la misma consideración de comisiones e impuestos. Si una oferta solo muestra la tasa nominal, conviértela a tasa efectiva anual antes de compararla con otra.
 
-Si lo que quieres comparar es el crecimiento entre un valor inicial y uno final durante varios años, el concepto relacionado es el [CAGR o tasa de crecimiento anual compuesto](/blog/cagr-tasa-crecimiento-anual-compuesto).
+Si lo que quieres comparar es el crecimiento entre un valor inicial y uno final durante varios años, el concepto relacionado es el [CAGR o tasa de crecimiento anual compuesto](/blog/finanzas/cagr-tasa-crecimiento-anual-compuesto).
 
 Como apoyo conceptual, Banxico Educa explica que el interés compuesto calcula intereses sobre el capital y sobre intereses acumulados, y que los intereses pueden capitalizarse con distintas frecuencias. Puedes revisar su material de [tasa de interés](https://educa.banxico.org.mx/contactobanxico/recursos/tasa-de-interes.html) para profundizar en la diferencia entre interés simple, interés compuesto y capitalización.
