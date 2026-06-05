@@ -4,12 +4,14 @@ interface Props {
   title: string;
   description: string;
   cta?: string;
+  [key: string]: unknown;
 }
 
-const { href, title, description, cta } = Astro.props;
+const { href, title, description, cta, ...anchorAttributes } = Astro.props;
 ---
 
 <a
+  {...anchorAttributes}
   href={href}
   class="group border border-gray-700 rounded-lg p-5 hover:border-amber-400 transition"
 >
