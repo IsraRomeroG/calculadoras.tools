@@ -30,6 +30,13 @@ Todos los comandos se ejecutan desde la raiz del proyecto.
 | `npm run coverage` | Ejecuta pruebas con reporte de cobertura |
 | `npm run astro -- --help` | Muestra ayuda de la CLI de Astro |
 
+En PowerShell, las validaciones habituales son:
+
+```powershell
+npm.cmd run test:unit:run
+npm.cmd run coverage
+```
+
 ## Estructura principal
 
 ```text
@@ -51,11 +58,7 @@ Todos los comandos se ejecutan desde la raiz del proyecto.
 
 ## Calculadoras disponibles
 
-Las calculadoras publicadas se registran en `src/lib/constants/calculators.ts` y se muestran automaticamente en la pagina de inicio.
-
-- `/matematicas/calculadora-de-porcentajes`
-- `/legal-impuestos/calculadora-de-iva`
-- `/finanzas/calculadora-de-interes-compuesto`
+Las calculadoras publicadas se registran en `src/lib/constants/calculators.ts`. La constante `CALCULATORS` es la fuente de verdad para el directorio: las entradas se muestran automaticamente en la pagina de inicio y evitan mantener una lista manual duplicada en la documentacion.
 
 La logica reutilizable vive en `src/lib/calculators/` junto con sus pruebas unitarias. Cuando agregues una calculadora nueva, crea o actualiza:
 
@@ -66,13 +69,17 @@ La logica reutilizable vive en `src/lib/calculators/` junto con sus pruebas unit
 
 ## Blog y contenido
 
-Los articulos estan en `src/content/blog/` y usan la coleccion definida en `src/content.config.ts`. Cada articulo debe incluir metadatos como `title`, `description`, `pubDate`, `category`, `tags` y, cuando aplique, `relatedCalculator`.
+Los articulos estan en `src/content/blog/` y usan la coleccion definida en `src/content.config.ts`. Cada articulo debe incluir metadatos como `title`, `description`, `pubDate`, `categorySlug`, `tags` y, cuando aplique, `relatedCalculator`.
+
+Las categorias compartidas viven en `src/lib/constants/categories.ts`. Usa esos slugs en `categorySlug` para que el blog, las calculadoras y las rutas publicas compartan la misma taxonomia.
 
 Las rutas del blog se generan desde:
 
 - `src/pages/blog.astro`
-- `src/pages/blog/[...slug].astro`
-- `src/pages/blog/categoria/[category].astro`
+- `src/pages/blog/[category].astro`
+- `src/pages/blog/[category]/[slug].astro`
+- `src/pages/blog/[category]/pagina/[page].astro`
+- `src/pages/blog/pagina/[page].astro`
 
 ## SEO
 
