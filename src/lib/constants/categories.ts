@@ -18,6 +18,7 @@ export const CATEGORY_SLUGS = [
   "cocina",
   "restaurantes",
   "vehiculos",
+  "construccion",
 ] as const;
 
 export type CategorySlug = (typeof CATEGORY_SLUGS)[number];
@@ -97,6 +98,12 @@ export const CATEGORIES = {
     label: "Vehiculos",
     description:
       "Herramientas para estimar rendimiento de combustible, trayectos y datos utiles para manejar con mas claridad.",
+  },
+  construccion: {
+    slug: "construccion",
+    label: "Construccion",
+    description:
+      "Calculadoras para estimar superficies, materiales y cantidades utiles en proyectos de obra, pintura y mejoras del hogar.",
   },
 } as const satisfies Record<CategorySlug, CategoryMetadata>;
 

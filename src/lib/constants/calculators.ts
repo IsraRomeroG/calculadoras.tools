@@ -250,4 +250,13 @@ export const CALCULATORS: CalculatorDirectoryItem[] = [
     categorySlug: "vehiculos",
     order: 92,
   },
+  {
+    id: "metros-cuadrados-de-pintura",
+    title: "Metros cuadrados de pintura",
+    description:
+      "Calcula superficie de paredes o techo y estima litros de pintura segun manos y rendimiento.",
+    href: "/construccion/metros-cuadrados-de-pintura",
+    categorySlug: "construccion",
+    order: 94,
+  },
 ];
