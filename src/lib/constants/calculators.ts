@@ -53,13 +53,22 @@ export const CALCULATORS: CalculatorDirectoryItem[] = [
     order: 36,
   },
   {
+    id: "calculadora-de-roi",
+    title: "Calculadora de ROI",
+    description:
+      "Calcula retorno de inversión, ganancia, punto de equilibrio y cuánto falta para alcanzar tu objetivo.",
+    href: "/finanzas/calculadora-de-roi",
+    categorySlug: "finanzas",
+    order: 37,
+  },
+  {
     id: "calculadora-de-hipoteca",
     title: "Calculadora de hipoteca",
     description:
       "Estima cuota mensual, intereses y tabla de amortización de una hipoteca.",
     href: "/inmuebles/calculadora-de-hipoteca",
     categorySlug: "inmuebles",
-    order: 37,
+    order: 38,
   },
   {
     id: "calculadora-de-imc",
