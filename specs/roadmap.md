@@ -8,54 +8,54 @@
 *Alto volumen de búsqueda, baja-media competencia en español. Construir antes del lanzamiento.*
 
 ### 💰 Finanzas básicas
-1. Calculadora de porcentajes
-2. IVA / impuestos
-3. Calculadora de hipoteca
-4. Calculadora de préstamo
-5. Interés compuesto
-6. Regla de tres
+1. Calculadora de porcentajes — DONE
+2. IVA / impuestos — DONE
+3. Calculadora de hipoteca — DONE
+4. Calculadora de préstamo — DONE
+5. Interés compuesto — DONE
+6. Regla de tres — DONE
 
 ### 🏃 Salud esencial
-7. IMC (índice de masa corporal)
-8. Calorías diarias (TDEE)
-9. Calculadora de macros
-10. Déficit calórico para bajar de peso
+7. IMC (índice de masa corporal) — DONE
+8. Calorías diarias (TDEE) — DONE
+9. Calculadora de macros — DONE
+10. Déficit calórico para bajar de peso — DONE
 
 ### 📅 Fecha y tiempo
-11. Calculadora de edad
-12. Diferencia entre fechas
-13. Fecha probable de parto
-14. Calculadora de ovulación
+11. Calculadora de edad — DONE
+12. Diferencia entre fechas — DONE
+13. Fecha probable de parto — DONE
+14. Calculadora de ovulación — DONE
 
 ### 🔄 Conversores imprescindibles
-15. Temperatura (°C / °F / K)
+15. Temperatura (°C / °F / K) — DONE
 16. Divisas / tipo de cambio
-17. Peso (kg / lb)
-18. Kilómetros a millas
+17. Peso (kg / lb) — DONE
+18. Kilómetros a millas — DONE
 
 ### 📐 Matemáticas cotidianas
-19. Área y perímetro
-20. Teorema de Pitágoras
-21. Estadística básica (media, mediana, moda)
+19. Área y perímetro — DONE
+20. Teorema de Pitágoras — DONE
+21. Estadística básica (media, mediana, moda) — DONE
 
 ### 🍳 Cocina
-22. Conversión de medidas culinarias
-23. Escalar receta (porciones)
+22. Conversión de medidas culinarias — DONE
+23. Escalar receta (porciones) — DONE
 
 ### 🐾 Mascotas
-24. Edad de mascota en años humanos
-25. Calorías para perro / gato por peso
+24. Edad de mascota en años humanos — DONE
+25. Calorías para perro / gato por peso — DONE
 
 ### 🍽️ Restaurantes
-26. División de cuenta en restaurante
-27. Propina en restaurantes
+26. División de cuenta en restaurante — DONE
+27. Propina en restaurantes — DONE
 
 ### 🚗 Vehículos
-28. Consumo de gasolina
-29. Costo por kilómetro
+28. Consumo de gasolina — DONE
+29. Costo por kilómetro — DONE
 
 ### 🏗️ Construcción
-30. Metros cuadrados de pintura
+30. Metros cuadrados de pintura — DONE
 
 ---
 

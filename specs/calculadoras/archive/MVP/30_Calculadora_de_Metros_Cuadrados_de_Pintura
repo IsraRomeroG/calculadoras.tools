@@ -68,8 +68,9 @@ src/lib/calculators/construccion/metros-cuadrados-de-pintura/paintArea.test.ts
 7. Rendimiento editable en `m²/l`.
 8. Margen adicional opcional.
 9. Tamaño opcional de envase para estimar unidades completas.
-10. Resultado copiable y URL compartible.
-11. Accesibilidad y pruebas unitarias.
+10. Presets editables de rendimiento y tamaño de envase.
+11. Resultado copiable, barra móvil fija y URL compartible.
+12. Accesibilidad y pruebas unitarias.
 
 ### Fuera del MVP
 
@@ -81,9 +82,14 @@ src/lib/calculators/construccion/metros-cuadrados-de-pintura/paintArea.test.ts
 - Imprimación, sellador o materiales adicionales.
 - Texturas, fachadas complejas o superficies curvas.
 - Recomendación de marcas.
+- Varias habitaciones sumadas en una misma estimación.
 
 Enlazar la calculadora de área y perímetro para geometrías que requieran un
 cálculo previo.
+
+Como mejora futura de alto valor, considerar un flujo para **agregar otra
+habitación** y sumar litros totales. No forma parte del MVP para mantener el
+primer flujo simple.
 
 ---
 
@@ -109,16 +115,15 @@ perímetroHabitación = 2 × (largo + ancho)
 áreaTecho = largo × ancho
 aberturas = áreaPuertas + áreaVentanas
 
-áreaSeleccionada =
-  (pintarParedes ? áreaParedes : 0)
-  + (pintarTecho ? áreaTecho : 0)
-
-áreaNeta = áreaSeleccionada - aberturas
+áreaParedesNeta = pintarParedes ? áreaParedes - aberturas : 0
+áreaTechoNeta = pintarTecho ? áreaTecho : 0
+áreaNeta = áreaParedesNeta + áreaTechoNeta
 ```
 
-En el MVP, las aberturas se descuentan del total seleccionado. Mostrar un aviso
-cuando el usuario incluya techo para aclarar que puertas y ventanas suelen
-pertenecer a paredes.
+Las aberturas se descuentan solamente de paredes. Si el usuario selecciona solo
+techo, ocultar o desactivar la captura de puertas y ventanas porque no afectan
+el cálculo. Si selecciona paredes y techo, mostrar paredes netas y techo completo
+por separado antes de sumar la superficie neta.
 
 ---
 
@@ -155,6 +160,27 @@ Opcionalmente permitir descuento manual de aberturas:
 El rendimiento es editable porque depende de la pintura y superficie. Indicar
 que debe revisarse la etiqueta del producto.
 
+Ofrecer presets rápidos, siempre editables:
+
+| Preset | Valor |
+|--------|-------|
+| Estándar | `10 m²/l` |
+| Superficie porosa | `8 m²/l` |
+| Alto rendimiento | `12 m²/l` |
+
+Estos valores son atajos de captura, no recomendaciones universales. La UI debe
+dejar claro que el rendimiento real lo define el fabricante.
+
+Para envases, ofrecer chips editables:
+
+```text
+1 l
+4 l
+10 l
+19 l
+Otro
+```
+
 ### Fórmulas
 
 ```text
@@ -168,6 +194,7 @@ Con tamaño de envase:
 ```text
 envases = ceil(litrosConMargen ÷ tamañoEnvase)
 litrosComprados = envases × tamañoEnvase
+litrosSobrantes = litrosComprados - litrosConMargen
 ```
 
 No redondear litros antes de calcular envases.
@@ -194,13 +221,61 @@ Con envases de `4 l`:
 ```text
 Compra estimada: 3 envases de 4 l
 Total comprado: 12 l
+Sobrante estimado: 1.44 l
 ```
+
+Además del desglose técnico, mostrar un resumen accionable tipo lista de compra:
+
+```text
+Superficie neta: 48.00 m²
+Manos: 2
+Litros necesarios: 10.56 l
+Compra estimada: 3 envases de 4 l
+Total comprado: 12 l
+Sobrante estimado: 1.44 l
+```
+
+Incluir una explicación paso a paso breve para dar confianza y ayudar a detectar
+medidas mal capturadas:
+
+```text
+Paredes: 2 × (5 + 4) × 3 = 54.00 m²
+Aberturas: 54.00 - 6.00 = 48.00 m²
+Manos: 48.00 × 2 = 96.00 m² acumulados
+Litros: 96.00 ÷ 10.00 = 9.60 l
+Margen: 9.60 × 1.10 = 10.56 l
+```
+
+### Resultado móvil fijo
+
+En móvil, usar una barra inferior fija cuando exista un resultado válido. Debe
+mostrar el dato primario sin obligar al usuario a volver al bloque de resultado:
+
+```text
+Necesitas 10.56 l
+```
+
+Si hay tamaño de envase válido:
+
+```text
+Compra 3 envases de 4 l
+```
+
+La barra debe tener espacio suficiente para textos largos, no tapar controles
+importantes y respetar safe areas del navegador móvil.
 
 ### Copy obligatorio
 
 ```text
 Es una estimación. Revisa el rendimiento indicado por el fabricante y considera
 el estado de la superficie antes de comprar.
+```
+
+Copy adicional recomendado:
+
+```text
+Si el color anterior es muy oscuro, la pared está porosa o vas a cubrir manchas,
+considera aumentar el margen o revisar si necesitas sellador o imprimación.
 ```
 
 ---
@@ -220,6 +295,17 @@ Para cada abertura:
 área = ancho × alto × cantidad
 ```
 
+Permitir capturar ancho y alto en metros o centímetros. La UI puede usar un
+selector de unidad por grupo (`m` / `cm`) o aceptar sufijos como `90 cm`. El
+cálculo interno debe normalizar todo a metros antes de calcular el área.
+
+Ejemplos equivalentes:
+
+```text
+0.90 m × 2.10 m × 1 = 1.89 m²
+90 cm × 210 cm × 1 = 1.89 m²
+```
+
 Permitir hasta `10` grupos de aberturas:
 
 | Tipo | Cantidad | Ancho | Alto |
@@ -229,6 +315,10 @@ Permitir hasta `10` grupos de aberturas:
 
 La interfaz puede iniciar con captura total para mantener el primer uso simple
 y desplegar el detalle como opción avanzada.
+
+Cuando el usuario seleccione solo techo, ocultar la sección de aberturas o
+mostrarla desactivada con una nota breve: puertas y ventanas se descuentan de
+paredes, no del techo.
 
 ---
 
@@ -240,7 +330,8 @@ y desplegar el detalle como opción avanzada.
 | Medida `<= 0` | Rechazar, excepto aberturas que admiten `0` |
 | No seleccionar paredes ni techo | Pedir seleccionar al menos una superficie |
 | Aberturas negativas | Rechazar |
-| Aberturas mayores o iguales al área seleccionada | Rechazar |
+| Aberturas mayores o iguales al área de paredes | Rechazar si se pintan paredes |
+| Aberturas capturadas al pintar solo techo | Ignorar u ocultar; no descontar del techo |
 | Manos menor que `1` o no enteras | Rechazar |
 | Manos mayor que `10` | Pedir revisar |
 | Rendimiento `<= 0` | Rechazar |
@@ -252,24 +343,56 @@ y desplegar el detalle como opción avanzada.
 Aceptar punto o coma decimal. Mantener precisión completa y redondear solo al
 mostrar.
 
+Aceptar medidas de aberturas en `m` o `cm` y normalizar a metros. Rechazar
+unidades ambiguas o mezclas no parseables dentro de un mismo campo.
+
 ---
 
 ## URL compartible
 
 ```text
-/construccion/metros-cuadrados-de-pintura?modo=habitacion&largo=5&ancho=4&altura=3&paredes=1&techo=0&aberturas=6&manos=2&rendimiento=10&margen=10
+/construccion/metros-cuadrados-de-pintura?modo=habitacion&largo=5&ancho=4&altura=3&paredes=1&techo=0&puertas=2&ventanas=4&manos=2&rendimiento=10&margen=10&envase=4
 ```
 
 Reglas:
 
 - Compartir solamente parámetros válidos.
+- Serializar áreas totales de puertas y ventanas por separado cuando existan.
 - No serializar grupos detallados de aberturas durante el MVP.
+- Incluir `envase` cuando sea válido para conservar la compra estimada.
 - Mantener canonical sin query params.
 - No generar páginas indexables por combinación.
 
 ---
 
 ## Diseño y contenido
+
+La calculadora debe diseñarse **mobile first**. En móvil, priorizar una captura
+guiada de pocas decisiones visibles a la vez y un resultado fijo accesible. En
+desktop, puede mostrarse como dos columnas: formulario a la izquierda y resultado
+a la derecha.
+
+### Flujo mobile first
+
+Orden recomendado en pantallas pequeñas:
+
+1. Selector de modo.
+2. ¿Qué quieres pintar? (`Paredes`, `Techo`, `Ambos`).
+3. Medidas de habitación o superficie manual.
+4. Puertas y ventanas como sección colapsable si se pintan paredes.
+5. Manos, rendimiento y margen.
+6. Envases opcionales.
+7. Resultado completo.
+
+Reglas de interfaz:
+
+- Mantener botones y campos con altura táctil cómoda.
+- Usar controles segmentados para modo y superficies.
+- Usar chips para presets de rendimiento y envase.
+- Mantener opciones avanzadas colapsadas al primer uso.
+- Mostrar errores cerca del campo afectado y un estado neutral cuando falten
+  datos.
+- Evitar que la barra móvil fija tape acciones o mensajes importantes.
 
 ### Hero
 
@@ -288,13 +411,15 @@ necesitas según manos, rendimiento y margen.
 
 1. Hero y breadcrumbs.
 2. Selector de modo.
-3. Medidas y superficies.
-4. Aberturas.
-5. Manos, rendimiento y margen.
-6. Resultado y envases opcionales.
-7. Cómo medir una habitación.
-8. Enlace a área y perímetro.
-9. FAQ visibles.
+3. Superficies a pintar.
+4. Medidas.
+5. Aberturas.
+6. Manos, rendimiento y margen.
+7. Envases opcionales.
+8. Resultado, lista de compra y explicación paso a paso.
+9. Cómo medir una habitación.
+10. Enlace a área y perímetro.
+11. FAQ visibles.
 
 ### FAQ sugeridas
 
@@ -305,6 +430,8 @@ necesitas según manos, rendimiento y margen.
 - ¿Por qué debo indicar el rendimiento de la pintura?
 - ¿Cómo considerar dos manos de pintura?
 - ¿Cuánto margen adicional conviene comprar?
+- ¿Cómo calcular puertas y ventanas si las medí en centímetros?
+- ¿Cómo elegir el tamaño de envase?
 
 La respuesta sobre margen debe presentarlo como decisión editable, no como una
 regla universal.
@@ -318,9 +445,12 @@ calculateRoomPerimeter(length, width)
 calculateWallArea(length, width, height)
 calculateCeilingArea(length, width)
 calculateOpeningArea(openings)
-calculateNetPaintArea(selectedArea, openingArea)
+calculateNetWallArea(wallArea, openingArea)
+calculateNetPaintArea(wallArea, ceilingArea, openingArea, paintWalls, paintCeiling)
 calculatePaintLiters(netArea, coats, coverage, marginPercentage)
 calculatePaintContainers(liters, containerSize)
+calculatePaintSurplus(litersWithMargin, containerCount, containerSize)
+normalizeOpeningMeasurement(value, unit)
 parseMeasurementInput(value)
 ```
 
@@ -331,13 +461,19 @@ parseMeasurementInput(value)
 - Habitación `5 × 4 × 3` → paredes `54 m²`.
 - Techo `5 × 4` → `20 m²`.
 - Descontar `6 m²` de aberturas a paredes `54 m²` → `48 m²`.
+- Paredes `54 m²` + techo `20 m²` - aberturas `6 m²` → `68 m²`
+  porque las aberturas solo descuentan paredes.
+- Pintar solo techo con aberturas capturadas → no descontar aberturas.
 - `48 m² × 2` manos → `96 m²` acumulados.
 - `96 ÷ 10 = 9.6 l`.
 - Agregar `10%` → `10.56 l`.
 - `10.56 l` con envases de `4 l` → `3` envases y `12 l`.
-- Rechazar aberturas mayores o iguales al área.
+- Sobrante con `10.56 l` y `12 l` comprados → `1.44 l`.
+- `90 cm × 210 cm × 1` → `1.89 m²`.
+- Rechazar aberturas mayores o iguales al área de paredes.
 - Rechazar manos no enteras, cero, negativos, `NaN` e `Infinity`.
 - No redondear litros antes de calcular envases.
+- Compartir URL con `puertas`, `ventanas` y `envase` válidos.
 
 ---
 
@@ -346,8 +482,12 @@ parseMeasurementInput(value)
 1. La spec clasifica la calculadora en `construccion`.
 2. La ruta propuesta es `/construccion/metros-cuadrados-de-pintura`.
 3. El MVP calcula paredes, techo opcional y superficie manual.
-4. La UI descuenta puertas y ventanas.
+4. La UI descuenta puertas y ventanas solo de paredes.
 5. El resultado distingue superficie neta y superficie acumulada por manos.
 6. El rendimiento y margen son editables.
-7. El cálculo de envases redondea hacia arriba al final.
-8. La página comunica que el resultado es una estimación.
+7. El rendimiento y tamaño de envase tienen presets editables.
+8. El cálculo de envases redondea hacia arriba al final y muestra sobrante.
+9. La página comunica que el resultado es una estimación.
+10. En móvil, existe una barra fija con litros necesarios o compra estimada.
+11. La UI permite capturar aberturas en metros o centímetros.
+12. La URL compartible conserva puertas, ventanas, margen, rendimiento y envase.
