@@ -44,6 +44,15 @@ export const CALCULATORS: CalculatorDirectoryItem[] = [
     order: 35,
   },
   {
+    id: "plan-de-pago-de-deudas",
+    title: "Plan de pago de deudas",
+    description:
+      "Compara bola de nieve y avalancha, estima intereses y crea un plan mensual de pagos.",
+    href: "/finanzas/plan-de-pago-de-deudas",
+    categorySlug: "finanzas",
+    order: 36,
+  },
+  {
     id: "calculadora-de-hipoteca",
     title: "Calculadora de hipoteca",
     description:
