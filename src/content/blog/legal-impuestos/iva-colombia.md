@@ -11,7 +11,7 @@ readTime: "5 min"
 seoTitle: "IVA en Colombia: tarifa general 19% y cálculo"
 relatedCalculator:
   label: "Calculadora de IVA"
-  href: "/legal-impuestos/calculadora-de-iva"
+  href: "/legal-impuestos/calculadora-de-iva/"
 ---
 
 ## Tarifa general de IVA en Colombia
@@ -58,7 +58,7 @@ precio sin iva = 238000 / 1.19 = 200000
 iva = 238000 - 200000 = 38000
 ```
 
-Para repasar la lógica general, puedes leer [cómo sumar IVA a un precio](/blog/legal-impuestos/como-sumar-iva-a-un-precio) y [cómo desglosar IVA incluido](/blog/legal-impuestos/como-desglosar-iva).
+Para repasar la lógica general, puedes leer [cómo sumar IVA a un precio](/blog/legal-impuestos/como-sumar-iva-a-un-precio/) y [cómo desglosar IVA incluido](/blog/legal-impuestos/como-desglosar-iva/).
 
 ## Tarifa de 5%, exentos y excluidos
 
@@ -77,9 +77,9 @@ Para una estimación matemática, la calculadora te permite editar la tasa. Para
 
 ## Calculadora de IVA para Colombia
 
-Usa la [calculadora de IVA](/legal-impuestos/calculadora-de-iva), selecciona Colombia y elige la tasa de 19% o edítala manualmente si necesitas otro caso.
+Usa la [calculadora de IVA](/legal-impuestos/calculadora-de-iva/), selecciona Colombia y elige la tasa de 19% o edítala manualmente si necesitas otro caso.
 
-Para comparar Colombia con otros países, revisa la [tabla de tasas de IVA por país](/blog/legal-impuestos/tasas-de-iva-por-pais).
+Para comparar Colombia con otros países, revisa la [tabla de tasas de IVA por país](/blog/legal-impuestos/tasas-de-iva-por-pais/).
 
 ## Fuente oficial
 

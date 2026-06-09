@@ -176,7 +176,7 @@ describe("pythagorean URLs and presets", () => {
         decimals: 2,
       }),
     ).toBe(
-      "/geometria/calculadora-de-area-y-perimetro?figura=triangulo&modo=tres-lados&a=3&b=4&c=5&unidad=cm&decimales=2",
+      "/geometria/calculadora-de-area-y-perimetro/?figura=triangulo&modo=tres-lados&a=3&b=4&c=5&unidad=cm&decimales=2",
     );
   });
 });

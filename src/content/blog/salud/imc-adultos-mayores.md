@@ -11,7 +11,7 @@ tags:
 readTime: "5 min"
 relatedCalculator:
   label: "Calculadora de IMC"
-  href: "/salud/calculadora-de-imc"
+  href: "/salud/calculadora-de-imc/"
 ---
 
 El IMC en adultos mayores debe interpretarse con más cuidado. Aunque la fórmula es la misma, los cambios de composición corporal pueden hacer que el número cuente solo una parte de la historia.
@@ -67,7 +67,7 @@ También conviene consultar si el IMC sale muy bajo o muy alto y el resultado ge
 
 ## Calcula tu IMC como referencia
 
-La [calculadora de IMC](/salud/calculadora-de-imc) puede darte una referencia inicial. Si ingresas una edad de 65 años o más, muestra una nota para recordar que el resultado debe interpretarse con otros indicadores.
+La [calculadora de IMC](/salud/calculadora-de-imc/) puede darte una referencia inicial. Si ingresas una edad de 65 años o más, muestra una nota para recordar que el resultado debe interpretarse con otros indicadores.
 
 ## Preguntas frecuentes
 

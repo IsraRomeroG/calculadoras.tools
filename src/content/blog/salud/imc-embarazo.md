@@ -11,7 +11,7 @@ tags:
 readTime: "5 min"
 relatedCalculator:
   label: "Calculadora de IMC"
-  href: "/salud/calculadora-de-imc"
+  href: "/salud/calculadora-de-imc/"
 ---
 
 Durante el embarazo, el IMC actual no se interpreta igual que fuera del embarazo. El peso cambia por el crecimiento del bebé, placenta, líquido amniótico, volumen sanguíneo y otros cambios normales.
@@ -52,7 +52,7 @@ Si tienes dudas sobre peso durante el embarazo, lo más seguro es consultarlo co
 
 ## Qué puede aportar una calculadora de IMC
 
-La [calculadora de IMC](/salud/calculadora-de-imc) puede ayudarte a calcular un IMC de referencia si usas tu peso previo al embarazo o si solo quieres entender la fórmula.
+La [calculadora de IMC](/salud/calculadora-de-imc/) puede ayudarte a calcular un IMC de referencia si usas tu peso previo al embarazo o si solo quieres entender la fórmula.
 
 Si marcas embarazo, la calculadora muestra una advertencia para evitar interpretar el resultado actual como si fuera una evaluación completa.
 

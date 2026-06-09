@@ -11,7 +11,7 @@ tags:
 readTime: "4 min"
 relatedCalculator:
   label: "Calculadora de IMC"
-  href: "/salud/calculadora-de-imc"
+  href: "/salud/calculadora-de-imc/"
 ---
 
 Para calcular el IMC con libras, pies y pulgadas se usa la fórmula imperial. El resultado es equivalente al IMC calculado en kg y metros, pero evita convertir manualmente a sistema métrico.
@@ -66,7 +66,7 @@ IMC = 25.09
 
 El resultado aproximado es `25.09`. En adultos, ese valor cae dentro de la categoría de sobrepeso.
 
-Puedes obtenerlo directamente en modo imperial con la [calculadora de IMC](/salud/calculadora-de-imc).
+Puedes obtenerlo directamente en modo imperial con la [calculadora de IMC](/salud/calculadora-de-imc/).
 
 ## Errores comunes
 
@@ -88,9 +88,9 @@ El IMC no mide grasa corporal directamente.
 
 ## Usa la calculadora con modo imperial
 
-La [calculadora de IMC](/salud/calculadora-de-imc) permite ingresar libras, pies y pulgadas en campos separados. Así evitas errores al convertir la altura.
+La [calculadora de IMC](/salud/calculadora-de-imc/) permite ingresar libras, pies y pulgadas en campos separados. Así evitas errores al convertir la altura.
 
-También puedes consultar [qué es el IMC y cómo se calcula](/blog/salud/que-es-el-imc-y-como-se-calcula) y la [tabla de IMC para adultos](/blog/salud/tabla-imc-adultos-rangos-categorias).
+También puedes consultar [qué es el IMC y cómo se calcula](/blog/salud/que-es-el-imc-y-como-se-calcula/) y la [tabla de IMC para adultos](/blog/salud/tabla-imc-adultos-rangos-categorias/).
 
 ## Preguntas frecuentes
 

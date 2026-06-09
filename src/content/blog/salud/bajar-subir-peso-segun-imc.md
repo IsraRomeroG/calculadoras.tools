@@ -11,7 +11,7 @@ tags:
 readTime: "7 min"
 relatedCalculator:
   label: "Calculadora de IMC"
-  href: "/salud/calculadora-de-imc"
+  href: "/salud/calculadora-de-imc/"
 ---
 
 El IMC puede ayudarte a ubicar tu peso en relación con tu estatura, pero no debe ser la única razón para decidir bajar o subir de peso. Es una referencia inicial, no un plan personalizado.
@@ -29,7 +29,7 @@ Para adultos, las categorías generales son:
 | 25 a menos de 30 | Sobrepeso |
 | 30 o más | Obesidad |
 
-Puedes calcular tu resultado con la [calculadora de IMC](/salud/calculadora-de-imc) y luego revisar la guía de [cómo interpretar tu IMC](/blog/salud/como-interpretar-resultado-imc).
+Puedes calcular tu resultado con la [calculadora de IMC](/salud/calculadora-de-imc/) y luego revisar la guía de [cómo interpretar tu IMC](/blog/salud/como-interpretar-resultado-imc/).
 
 ## Si estás por debajo del rango
 
@@ -80,9 +80,9 @@ Evita usar el IMC como castigo o como orden automática de bajar peso. Úsalo co
 
 El IMC no calcula cuántas calorías necesitas. Solo relaciona peso y estatura.
 
-Para estimar energía diaria se usan herramientas como TDEE, que considera variables como edad, sexo, peso, estatura y actividad física. Por eso, después de calcular el IMC, puede tener sentido revisar la relación entre [calorías diarias e IMC](/blog/salud/calorias-diarias-e-imc).
+Para estimar energía diaria se usan herramientas como TDEE, que considera variables como edad, sexo, peso, estatura y actividad física. Por eso, después de calcular el IMC, puede tener sentido revisar la relación entre [calorías diarias e IMC](/blog/salud/calorias-diarias-e-imc/).
 
-La [calculadora de calorías diarias (TDEE)](/salud/calculadora-de-calorias-diarias-tdee) puede ayudarte a estimar gasto energético diario. Más adelante también puede complementarse con herramientas de déficit o superávit calórico, siempre con enfoque orientativo.
+La [calculadora de calorías diarias (TDEE)](/salud/calculadora-de-calorias-diarias-tdee/) puede ayudarte a estimar gasto energético diario. Más adelante también puede complementarse con herramientas de déficit o superávit calórico, siempre con enfoque orientativo.
 
 ## Cuándo consultar a un profesional
 
@@ -100,7 +100,7 @@ Un profesional puede ayudarte a definir si conviene cambiar peso, mantenerlo o p
 
 ## Calculadoras relacionadas
 
-Empieza con la [calculadora de IMC](/salud/calculadora-de-imc). Luego puedes leer sobre [calorías diarias e IMC](/blog/salud/calorias-diarias-e-imc) para entender qué mide cada herramienta.
+Empieza con la [calculadora de IMC](/salud/calculadora-de-imc/). Luego puedes leer sobre [calorías diarias e IMC](/blog/salud/calorias-diarias-e-imc/) para entender qué mide cada herramienta.
 
 ## Preguntas frecuentes
 

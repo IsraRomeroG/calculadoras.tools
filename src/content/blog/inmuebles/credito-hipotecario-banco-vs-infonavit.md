@@ -11,7 +11,7 @@ tags:
 readTime: "8 min"
 relatedCalculator:
   label: "Calculadora de hipoteca"
-  href: "/inmuebles/calculadora-de-hipoteca"
+  href: "/inmuebles/calculadora-de-hipoteca/"
 ---
 
 En México, muchas personas comparan un crédito hipotecario bancario con opciones relacionadas con Infonavit. No existe una respuesta universal sobre cuál conviene más: depende de tu perfil, salario, ahorro, subcuenta, tasa, plazo, costos y condiciones.
@@ -74,11 +74,11 @@ Compara:
 - Condiciones de pago anticipado.
 - Costos de compraventa.
 
-Usa la guía sobre [cómo comparar créditos hipotecarios](/blog/inmuebles/comparar-creditos-hipotecarios) para ordenar la información.
+Usa la guía sobre [cómo comparar créditos hipotecarios](/blog/inmuebles/comparar-creditos-hipotecarios/) para ordenar la información.
 
 ## Cómo usar la calculadora como escenario base
 
-La [calculadora de hipoteca](/inmuebles/calculadora-de-hipoteca) puede ayudarte a simular capital e intereses si conoces monto, tasa y plazo. Esto no replica todos los detalles de Infonavit ni de un banco, pero da una base para comparar.
+La [calculadora de hipoteca](/inmuebles/calculadora-de-hipoteca/) puede ayudarte a simular capital e intereses si conoces monto, tasa y plazo. Esto no replica todos los detalles de Infonavit ni de un banco, pero da una base para comparar.
 
 Si una opción incluye aportaciones, seguros o reglas especiales, esos elementos deben revisarse por separado.
 

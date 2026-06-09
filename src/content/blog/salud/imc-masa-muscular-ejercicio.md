@@ -11,7 +11,7 @@ tags:
 readTime: "5 min"
 relatedCalculator:
   label: "Calculadora de IMC"
-  href: "/salud/calculadora-de-imc"
+  href: "/salud/calculadora-de-imc/"
 ---
 
 El IMC puede ser menos preciso en personas con mucha masa muscular. La razón es simple: la fórmula usa peso y altura, pero no distingue si el peso viene de grasa, músculo, hueso, agua u otros tejidos.
@@ -54,7 +54,7 @@ Para una lectura más completa, el IMC puede combinarse con:
 - Presión arterial, glucosa, lípidos y otros datos clínicos.
 - Evaluación de hábitos de actividad física, sueño y alimentación.
 
-Puedes profundizar en la comparación entre [IMC y porcentaje de grasa corporal](/blog/salud/imc-vs-porcentaje-grasa-corporal), o revisar las [limitaciones del IMC](/blog/salud/limitaciones-del-imc).
+Puedes profundizar en la comparación entre [IMC y porcentaje de grasa corporal](/blog/salud/imc-vs-porcentaje-grasa-corporal/), o revisar las [limitaciones del IMC](/blog/salud/limitaciones-del-imc/).
 
 ## Cuándo el IMC sigue siendo útil
 
@@ -64,7 +64,7 @@ En población general, el IMC se usa como herramienta de cribado. La clave está
 
 ## Calcula tu IMC como referencia
 
-Usa la [calculadora de IMC](/salud/calculadora-de-imc) para obtener tu número y categoría. Si haces ejercicio intenso o tienes mucha masa muscular, interpreta el resultado junto con otros indicadores, no de forma aislada.
+Usa la [calculadora de IMC](/salud/calculadora-de-imc/) para obtener tu número y categoría. Si haces ejercicio intenso o tienes mucha masa muscular, interpreta el resultado junto con otros indicadores, no de forma aislada.
 
 ## Preguntas frecuentes
 

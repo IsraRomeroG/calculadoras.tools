@@ -11,7 +11,7 @@ tags:
 readTime: "4 min"
 relatedCalculator:
   label: "Usar calculadora de porcentajes"
-  href: "/matematicas/calculadora-de-porcentajes"
+  href: "/matematicas/calculadora-de-porcentajes/"
 ---
 
 Un porcentaje es una forma de expresar una proporción sobre 100. Por eso, `0.25`, `1/4` y `25%` representan la misma cantidad: veinticinco de cada cien.
@@ -102,7 +102,7 @@ Entonces:
 3/4 = 75%
 ```
 
-También puedes resolverlo con [regla de tres](/blog/matematicas/regla-de-tres): si el denominador representa el 100%, el numerador representa el porcentaje que buscas.
+También puedes resolverlo con [regla de tres](/blog/matematicas/regla-de-tres/): si el denominador representa el 100%, el numerador representa el porcentaje que buscas.
 
 ## Tabla de equivalencias comunes
 
@@ -190,9 +190,9 @@ Estas conversiones sirven como base para casi todos los cálculos porcentuales. 
 200 x 0.25 = 50
 ```
 
-Si quieres saber qué porcentaje representa una cantidad respecto a otra, la operación se parece mucho: divides la parte entre el total y multiplicas por 100. Puedes verlo con más detalle en [qué porcentaje es una cantidad de otra](/blog/matematicas/que-porcentaje-es-una-cantidad-de-otra).
+Si quieres saber qué porcentaje representa una cantidad respecto a otra, la operación se parece mucho: divides la parte entre el total y multiplicas por 100. Puedes verlo con más detalle en [qué porcentaje es una cantidad de otra](/blog/matematicas/que-porcentaje-es-una-cantidad-de-otra/).
 
-Para una explicación más general, revisa la guía de [cómo calcular porcentajes](/blog/matematicas/como-calcular-porcentajes). Si solo quieres obtener el resultado rápido, usa la [calculadora de porcentajes](/matematicas/calculadora-de-porcentajes).
+Para una explicación más general, revisa la guía de [cómo calcular porcentajes](/blog/matematicas/como-calcular-porcentajes/). Si solo quieres obtener el resultado rápido, usa la [calculadora de porcentajes](/matematicas/calculadora-de-porcentajes/).
 
 ## Preguntas frecuentes
 

@@ -11,7 +11,7 @@ tags:
 readTime: "4 min"
 relatedCalculator:
   label: "Calculadora de IMC"
-  href: "/salud/calculadora-de-imc"
+  href: "/salud/calculadora-de-imc/"
 ---
 
 Si mides 1.80 m, el rango de peso saludable de referencia para adultos es aproximadamente **59.9 kg a 80.7 kg**, calculado con IMC de 18.5 a 24.9.
@@ -56,11 +56,11 @@ El IMC puede ser menos representativo si tienes mucha masa muscular, si eres adu
 
 Por ejemplo, una persona de 1.80 m con 85 kg y mucha musculatura puede tener un IMC en sobrepeso, pero necesitaría otros indicadores para interpretar mejor su composición corporal.
 
-Lee más en [limitaciones del IMC](/blog/salud/limitaciones-del-imc).
+Lee más en [limitaciones del IMC](/blog/salud/limitaciones-del-imc/).
 
 ## Calcula tu IMC exacto
 
-Usa la [calculadora de IMC](/salud/calculadora-de-imc) para obtener tu resultado. Para comparar rangos por altura, revisa la [tabla de peso saludable según estatura](/blog/salud/peso-saludable-segun-estatura).
+Usa la [calculadora de IMC](/salud/calculadora-de-imc/) para obtener tu resultado. Para comparar rangos por altura, revisa la [tabla de peso saludable según estatura](/blog/salud/peso-saludable-segun-estatura/).
 
 ## Preguntas frecuentes
 

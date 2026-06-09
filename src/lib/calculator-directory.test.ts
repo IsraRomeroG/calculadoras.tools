@@ -15,9 +15,9 @@ import {
 describe("calculator category directory", () => {
   it("uses explicit canonical slugs for category URLs", () => {
     expect(getCalculatorCategoryUrl("legal-impuestos")).toBe(
-      "/legal-impuestos",
+      "/legal-impuestos/",
     );
-    expect(getCalculatorCategoryUrl("fecha-tiempo")).toBe("/fecha-tiempo");
+    expect(getCalculatorCategoryUrl("fecha-tiempo")).toBe("/fecha-tiempo/");
   });
 
   it("keeps display labels separate from canonical slugs", () => {

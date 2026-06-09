@@ -11,25 +11,25 @@ readTime: "6 min"
 seoTitle: "Tasas de IVA por país: tabla orientativa"
 relatedCalculator:
   label: "Calculadora de IVA"
-  href: "/legal-impuestos/calculadora-de-iva"
+  href: "/legal-impuestos/calculadora-de-iva/"
 ---
 
 ## Antes de usar esta tabla
 
 Las tasas de IVA cambian con el tiempo y pueden depender del producto, servicio, región, régimen o tipo de contribuyente. Usa esta tabla como referencia inicial, no como sustituto de una fuente oficial.
 
-Para cálculos rápidos, puedes usar la [calculadora de IVA](/legal-impuestos/calculadora-de-iva) y editar manualmente la tasa.
+Para cálculos rápidos, puedes usar la [calculadora de IVA](/legal-impuestos/calculadora-de-iva/) y editar manualmente la tasa.
 
 ## Tabla orientativa
 
 | País | Impuesto | Tasa general orientativa | Tasas o notas frecuentes |
 |---|---|---:|---|
-| [México](/blog/legal-impuestos/iva-mexico) | IVA | 16% | Estímulo fronterizo 8% en casos específicos; tasa 0% para ciertas operaciones. |
-| [España](/blog/legal-impuestos/iva-espana) | IVA | 21% | Tipos reducidos 10%, 4% y 0% para operaciones determinadas. |
+| [México](/blog/legal-impuestos/iva-mexico/) | IVA | 16% | Estímulo fronterizo 8% en casos específicos; tasa 0% para ciertas operaciones. |
+| [España](/blog/legal-impuestos/iva-espana/) | IVA | 21% | Tipos reducidos 10%, 4% y 0% para operaciones determinadas. |
 | Argentina | IVA | 21% | Existen alícuotas de 10.5% y 27% para casos específicos. |
-| [Colombia](/blog/legal-impuestos/iva-colombia) | IVA | 19% | Algunos bienes o servicios pueden tener 5%, exención o exclusión. |
+| [Colombia](/blog/legal-impuestos/iva-colombia/) | IVA | 19% | Algunos bienes o servicios pueden tener 5%, exención o exclusión. |
 | Chile | IVA | 19% | Tasa general para ventas y servicios gravados. |
-| [Perú](/blog/legal-impuestos/igv-peru) | IGV | 18% | IGV aplicado a operaciones gravadas; revisar exoneraciones e inafectaciones. |
+| [Perú](/blog/legal-impuestos/igv-peru/) | IGV | 18% | IGV aplicado a operaciones gravadas; revisar exoneraciones e inafectaciones. |
 | Ecuador | IVA | Revisar SRI | La tarifa ha tenido cambios recientes; confirma la vigencia en el SRI. |
 | Guatemala | IVA | 12% | Tasa general del IVA. |
 | Costa Rica | IVA | 13% | Existen tarifas reducidas para categorías específicas. |

@@ -11,7 +11,7 @@ tags:
 readTime: "6 min"
 relatedCalculator:
   label: "Calculadora de IMC"
-  href: "/salud/calculadora-de-imc"
+  href: "/salud/calculadora-de-imc/"
 ---
 
 El peso saludable según estatura se puede estimar usando el rango de IMC adulto de 18.5 a 24.9. El resultado no es un peso único, sino un rango de referencia.
@@ -54,7 +54,7 @@ peso máximo = 24.9 x altura_m^2
 | 1.90 m   | 66.8 a 89.9 kg                |
 | 1.95 m   | 70.4 a 94.7 kg                |
 
-Estos valores están redondeados a una decimal. Para calcular tu rango con más precisión, usa la [calculadora de IMC](/salud/calculadora-de-imc).
+Estos valores están redondeados a una decimal. Para calcular tu rango con más precisión, usa la [calculadora de IMC](/salud/calculadora-de-imc/).
 
 ## Ejemplos: 1.60 m, 1.70 m y 1.80 m
 
@@ -100,7 +100,7 @@ Tampoco aplica igual en niños y adolescentes, donde se usan percentiles por eda
 
 ## Calcula tu rango exacto
 
-La [calculadora de IMC](/salud/calculadora-de-imc) calcula tu IMC y el rango saludable estimado para tu altura en kg o lb.
+La [calculadora de IMC](/salud/calculadora-de-imc/) calcula tu IMC y el rango saludable estimado para tu altura en kg o lb.
 
 ## Preguntas frecuentes
 

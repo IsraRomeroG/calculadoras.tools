@@ -11,7 +11,7 @@ readTime: "4 min"
 seoTitle: "Cómo desglosar el IVA incluido de un precio"
 relatedCalculator:
   label: "Calculadora de IVA"
-  href: "/legal-impuestos/calculadora-de-iva"
+  href: "/legal-impuestos/calculadora-de-iva/"
 ---
 
 ## Qué significa desglosar IVA
@@ -20,7 +20,7 @@ Desglosar IVA significa separar un precio final en dos partes: el precio sin imp
 
 La clave es recordar que el IVA incluido ya forma parte del total. Por eso no se calcula restando directamente la tasa al precio final.
 
-Si estás comparando cotizaciones, también conviene entender la diferencia entre [IVA incluido y precio sin IVA](/blog/legal-impuestos/iva-incluido-vs-sin-iva).
+Si estás comparando cotizaciones, también conviene entender la diferencia entre [IVA incluido y precio sin IVA](/blog/legal-impuestos/iva-incluido-vs-sin-iva/).
 
 ## La fórmula correcta
 
@@ -69,10 +69,10 @@ La diferencia parece pequeña en compras simples, pero puede crecer cuando haces
 
 Puedes hacer el desglose a mano si el número es sencillo. Pero cuando hay decimales, importes grandes o tasas distintas por país, una calculadora reduce errores de redondeo.
 
-La [calculadora de IVA](/legal-impuestos/calculadora-de-iva) tiene un modo de "Desglosar" pensado justo para este caso: ingresas el total, eliges o editas la tasa y obtienes el precio sin IVA, el impuesto y el total.
+La [calculadora de IVA](/legal-impuestos/calculadora-de-iva/) tiene un modo de "Desglosar" pensado justo para este caso: ingresas el total, eliges o editas la tasa y obtienes el precio sin IVA, el impuesto y el total.
 
 ## Nota fiscal
 
 El resultado es una ayuda matemática. Para facturación, declaraciones o decisiones contables, revisa la normativa vigente y confirma si el bien o servicio usa tasa general, reducida, tasa 0% o algún tratamiento especial.
 
-Para ver el cálculo completo en ambos sentidos, revisa [cómo calcular el IVA paso a paso](/blog/legal-impuestos/como-calcular-iva). Si partes de un precio base, el caso opuesto es [sumar IVA a un precio sin impuesto](/blog/legal-impuestos/como-sumar-iva-a-un-precio).
+Para ver el cálculo completo en ambos sentidos, revisa [cómo calcular el IVA paso a paso](/blog/legal-impuestos/como-calcular-iva/). Si partes de un precio base, el caso opuesto es [sumar IVA a un precio sin impuesto](/blog/legal-impuestos/como-sumar-iva-a-un-precio/).

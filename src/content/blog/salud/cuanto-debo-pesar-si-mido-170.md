@@ -11,7 +11,7 @@ tags:
 readTime: "4 min"
 relatedCalculator:
   label: "Calculadora de IMC"
-  href: "/salud/calculadora-de-imc"
+  href: "/salud/calculadora-de-imc/"
 ---
 
 Si mides 1.70 m, el rango de peso saludable de referencia para adultos es aproximadamente **53.5 kg a 72.0 kg**. Está calculado con IMC adulto de 18.5 a 24.9.
@@ -53,11 +53,11 @@ La categoría se calcula con el valor exacto, no solo con una etiqueta general.
 
 Este rango no dice cuánta grasa corporal tienes, dónde se acumula, qué tan fuerte estás ni cómo están tus indicadores clínicos. Tampoco reemplaza una consulta médica.
 
-Si tu resultado te preocupa o tienes cambios recientes de peso, revisa [limitaciones del IMC](/blog/salud/limitaciones-del-imc) y considera pedir orientación profesional.
+Si tu resultado te preocupa o tienes cambios recientes de peso, revisa [limitaciones del IMC](/blog/salud/limitaciones-del-imc/) y considera pedir orientación profesional.
 
 ## Calcula tu IMC exacto
 
-Puedes calcularlo en segundos con la [calculadora de IMC](/salud/calculadora-de-imc). Para revisar otros rangos, consulta la [tabla de peso saludable según estatura](/blog/salud/peso-saludable-segun-estatura).
+Puedes calcularlo en segundos con la [calculadora de IMC](/salud/calculadora-de-imc/). Para revisar otros rangos, consulta la [tabla de peso saludable según estatura](/blog/salud/peso-saludable-segun-estatura/).
 
 ## Preguntas frecuentes
 

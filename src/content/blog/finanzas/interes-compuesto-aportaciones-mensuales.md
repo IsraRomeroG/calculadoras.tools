@@ -11,7 +11,7 @@ readTime: "6 min"
 seoTitle: "Interés compuesto con aportaciones mensuales: fórmula y ejemplo"
 relatedCalculator:
   label: "Calculadora de interés compuesto"
-  href: "/finanzas/calculadora-de-interes-compuesto"
+  href: "/finanzas/calculadora-de-interes-compuesto/"
 ---
 
 Cuando inviertes con interés compuesto, el capital inicial no es lo único que puede crecer. Si además haces aportaciones mensuales, cada depósito empieza a trabajar desde el momento en que entra a la inversión.
@@ -30,7 +30,7 @@ Por eso conviene separar tres datos: el capital inicial, el total aportado duran
 
 Supón que empiezas con `$10,000`, aportas `$500` al final de cada mes, obtienes una tasa anual de `8%`, usas capitalización mensual y mantienes el plan durante `20 años`.
 
-Con esos datos, la [calculadora de interés compuesto](/finanzas/calculadora-de-interes-compuesto) estima:
+Con esos datos, la [calculadora de interés compuesto](/finanzas/calculadora-de-interes-compuesto/) estima:
 
 | Concepto                          |       Monto |
 | --------------------------------- | ----------: |
@@ -109,6 +109,6 @@ Sí. La lógica es la misma, pero cambia la frecuencia de la aportación y la ta
 
 ## Simula tus aportaciones
 
-Para estimar tu propio escenario, usa la [calculadora de interés compuesto](/finanzas/calculadora-de-interes-compuesto). Puedes cambiar el capital inicial, la aportación mensual, la tasa, el plazo, la frecuencia de capitalización y el momento de aportación.
+Para estimar tu propio escenario, usa la [calculadora de interés compuesto](/finanzas/calculadora-de-interes-compuesto/). Puedes cambiar el capital inicial, la aportación mensual, la tasa, el plazo, la frecuencia de capitalización y el momento de aportación.
 
-También puedes revisar la [fórmula del interés compuesto](/blog/finanzas/formula-interes-compuesto), comparar este enfoque con una meta concreta en [cuánto ahorrar al mes para una meta](/blog/finanzas/cuanto-ahorrar-al-mes-para-una-meta) y evitar fallos típicos con la guía de [errores al usar una calculadora de interés compuesto](/blog/finanzas/errores-calculadora-interes-compuesto).
+También puedes revisar la [fórmula del interés compuesto](/blog/finanzas/formula-interes-compuesto/), comparar este enfoque con una meta concreta en [cuánto ahorrar al mes para una meta](/blog/finanzas/cuanto-ahorrar-al-mes-para-una-meta/) y evitar fallos típicos con la guía de [errores al usar una calculadora de interés compuesto](/blog/finanzas/errores-calculadora-interes-compuesto/).

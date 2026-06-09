@@ -10,7 +10,7 @@ tags:
 readTime: "3 min"
 relatedCalculator:
   label: "Calculadora de porcentajes"
-  href: "/matematicas/calculadora-de-porcentajes"
+  href: "/matematicas/calculadora-de-porcentajes/"
 ---
 
 ## Qué mide el aumento porcentual
@@ -39,7 +39,7 @@ Un aumento de $50 puede ser pequeño o grande según el valor original. Subir de
 
 Por eso los porcentajes sirven para comparar cambios entre cantidades de distinto tamaño.
 
-Si necesitas repasar la base antes de comparar cambios, puedes empezar por [cómo calcular porcentajes](/blog/matematicas/como-calcular-porcentajes).
+Si necesitas repasar la base antes de comparar cambios, puedes empezar por [cómo calcular porcentajes](/blog/matematicas/como-calcular-porcentajes/).
 
 ## Si el resultado es negativo
 

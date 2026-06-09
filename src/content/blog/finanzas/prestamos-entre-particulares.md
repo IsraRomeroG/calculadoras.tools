@@ -11,7 +11,7 @@ tags:
 readTime: "6 min"
 relatedCalculator:
   label: "Calculadora de préstamo"
-  href: "/finanzas/calculadora-de-prestamo"
+  href: "/finanzas/calculadora-de-prestamo/"
 ---
 
 Un préstamo entre particulares puede ser entre familiares, amigos, socios o conocidos. Justo porque hay confianza, conviene dejar los números claros: monto, plazo, tasa, pagos, fechas y qué pasa si alguien se atrasa.
@@ -60,7 +60,7 @@ Si no habrá intereses, el cálculo es más simple:
 pago mensual = monto / número de pagos
 ```
 
-Puedes generar ambos escenarios en la [calculadora de préstamo](/finanzas/calculadora-de-prestamo), usando tasa `0%` si el acuerdo no cobra intereses.
+Puedes generar ambos escenarios en la [calculadora de préstamo](/finanzas/calculadora-de-prestamo/), usando tasa `0%` si el acuerdo no cobra intereses.
 
 ## Ejemplo con tasa baja y plazo corto
 
@@ -113,7 +113,7 @@ Depende de la regulación aplicable y del acuerdo. Si vas a cobrar intereses, co
 
 ### Cómo calcular pagos iguales?
 
-Usa la fórmula de cuota fija o la [calculadora de préstamo](/finanzas/calculadora-de-prestamo). Captura monto, tasa anual y plazo.
+Usa la fórmula de cuota fija o la [calculadora de préstamo](/finanzas/calculadora-de-prestamo/). Captura monto, tasa anual y plazo.
 
 ### Qué pasa si no quiero cobrar intereses?
 

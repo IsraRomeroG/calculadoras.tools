@@ -11,7 +11,7 @@ readTime: "4 min"
 seoTitle: "Cómo sumar IVA a un precio sin impuesto"
 relatedCalculator:
   label: "Calculadora de IVA"
-  href: "/legal-impuestos/calculadora-de-iva"
+  href: "/legal-impuestos/calculadora-de-iva/"
 ---
 
 ## Cuándo necesitas sumar IVA
@@ -20,7 +20,7 @@ Necesitas sumar IVA cuando partes de un precio base, también llamado precio net
 
 Esto pasa mucho en cotizaciones, presupuestos, servicios profesionales, ventas B2B y comparaciones de precios donde el proveedor muestra importes "más IVA".
 
-Si todavía estás distinguiendo entre precio base y precio final, revisa primero la diferencia entre [IVA incluido y precio sin IVA](/blog/legal-impuestos/iva-incluido-vs-sin-iva).
+Si todavía estás distinguiendo entre precio base y precio final, revisa primero la diferencia entre [IVA incluido y precio sin IVA](/blog/legal-impuestos/iva-incluido-vs-sin-iva/).
 
 ## Fórmula para sumar IVA
 
@@ -92,8 +92,8 @@ Ese formato evita confusiones y ayuda al cliente a entender qué parte correspon
 
 ## Usa la calculadora si cambias de país o tasa
 
-La [calculadora de IVA](/legal-impuestos/calculadora-de-iva) permite elegir país, editar la tasa y copiar el desglose. Es útil cuando trabajas con tasas distintas, como 16%, 19%, 21%, 10%, 8% o 0%.
+La [calculadora de IVA](/legal-impuestos/calculadora-de-iva/) permite elegir país, editar la tasa y copiar el desglose. Es útil cuando trabajas con tasas distintas, como 16%, 19%, 21%, 10%, 8% o 0%.
 
 Recuerda que la tasa correcta depende de la legislación aplicable y del tipo de producto o servicio.
 
-Para una guía más general, puedes volver a [cómo calcular el IVA paso a paso](/blog/legal-impuestos/como-calcular-iva). Si partes de un precio final, el caso opuesto es [desglosar el IVA incluido](/blog/legal-impuestos/como-desglosar-iva).
+Para una guía más general, puedes volver a [cómo calcular el IVA paso a paso](/blog/legal-impuestos/como-calcular-iva/). Si partes de un precio final, el caso opuesto es [desglosar el IVA incluido](/blog/legal-impuestos/como-desglosar-iva/).

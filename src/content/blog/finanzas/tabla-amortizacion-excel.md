@@ -11,7 +11,7 @@ tags:
 readTime: "7 min"
 relatedCalculator:
   label: "Calculadora de préstamo"
-  href: "/finanzas/calculadora-de-prestamo"
+  href: "/finanzas/calculadora-de-prestamo/"
 ---
 
 Hacer una tabla de amortización en Excel o Google Sheets te permite ver cómo se paga un préstamo mes a mes: cuota, intereses, capital y saldo pendiente.
@@ -117,11 +117,11 @@ Si agregas seguro, mantenlo en una columna separada para no confundirlo con inte
 
 ## Exporta o valida con la calculadora
 
-La forma más rápida de validar tu tabla es usar la [calculadora de préstamo](/finanzas/calculadora-de-prestamo). Captura los mismos datos y compara la tabla de amortización.
+La forma más rápida de validar tu tabla es usar la [calculadora de préstamo](/finanzas/calculadora-de-prestamo/). Captura los mismos datos y compara la tabla de amortización.
 
 La calculadora también permite exportar CSV, así que puedes generar el archivo y abrirlo en Excel o Google Sheets para revisarlo sin construir todas las fórmulas desde cero.
 
-Para repasar el concepto, lee [tabla de amortización de un préstamo](/blog/finanzas/tabla-amortizacion-prestamo), [sistema francés de amortización](/blog/finanzas/sistema-frances-amortizacion) y [cómo calcular la cuota mensual](/blog/finanzas/como-calcular-cuota-mensual-prestamo).
+Para repasar el concepto, lee [tabla de amortización de un préstamo](/blog/finanzas/tabla-amortizacion-prestamo/), [sistema francés de amortización](/blog/finanzas/sistema-frances-amortizacion/) y [cómo calcular la cuota mensual](/blog/finanzas/como-calcular-cuota-mensual-prestamo/).
 
 ## Preguntas frecuentes
 

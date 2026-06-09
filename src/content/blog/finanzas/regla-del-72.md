@@ -11,7 +11,7 @@ readTime: "4 min"
 seoTitle: "Regla del 72: fórmula, ejemplos y límites"
 relatedCalculator:
   label: "Calculadora de interés compuesto"
-  href: "/finanzas/calculadora-de-interes-compuesto"
+  href: "/finanzas/calculadora-de-interes-compuesto/"
 ---
 
 ## Qué es la regla del 72
@@ -66,7 +66,7 @@ Sus principales límites son:
 - Pierde precisión cuando las tasas son muy bajas o muy altas.
 - No refleja la volatilidad de una inversión real.
 
-Por eso conviene usarla para una primera idea y después hacer una simulación completa en una [calculadora de interés compuesto](/finanzas/calculadora-de-interes-compuesto).
+Por eso conviene usarla para una primera idea y después hacer una simulación completa en una [calculadora de interés compuesto](/finanzas/calculadora-de-interes-compuesto/).
 
 ## Regla del 72 e inflación
 
@@ -78,7 +78,7 @@ La misma lógica también puede usarse para entender la inflación. Si la inflac
 
 En este caso no estás calculando cuándo se duplica una inversión, sino en cuánto tiempo una misma cantidad de dinero compraría mucho menos si los precios suben a ese ritmo.
 
-Para profundizar en ese efecto, puedes revisar cómo se relacionan [inflación e interés compuesto](/blog/finanzas/inflacion-interes-compuesto-valor-real).
+Para profundizar en ese efecto, puedes revisar cómo se relacionan [inflación e interés compuesto](/blog/finanzas/inflacion-interes-compuesto-valor-real/).
 
 ## Funciona con aportaciones mensuales
 
@@ -86,7 +86,7 @@ La regla del 72 no está diseñada para escenarios con aportaciones mensuales. S
 
 En esos casos, la pregunta ya no es solo "cuándo se duplica el capital inicial", sino cuánto se acumula entre capital inicial, aportaciones e intereses. Para eso conviene hacer el cálculo completo en la calculadora.
 
-Si quieres entender la base conceptual, empieza por [qué es el interés compuesto](/blog/finanzas/que-es-interes-compuesto) y después compara la diferencia entre [interés simple e interés compuesto](/blog/finanzas/interes-simple-vs-compuesto).
+Si quieres entender la base conceptual, empieza por [qué es el interés compuesto](/blog/finanzas/que-es-interes-compuesto/) y después compara la diferencia entre [interés simple e interés compuesto](/blog/finanzas/interes-simple-vs-compuesto/).
 
 ## Preguntas frecuentes
 
@@ -100,4 +100,4 @@ Si quieres entender la base conceptual, empieza por [qué es el interés compues
 
 ## Calcula más que la duplicación
 
-La regla del 72 responde una pregunta rápida: cuánto tarda en duplicarse una cantidad a una tasa anual fija. Si necesitas calcular un monto final, comparar plazos, cambiar la capitalización o agregar aportaciones periódicas, usa la [calculadora de interés compuesto](/finanzas/calculadora-de-interes-compuesto).
+La regla del 72 responde una pregunta rápida: cuánto tarda en duplicarse una cantidad a una tasa anual fija. Si necesitas calcular un monto final, comparar plazos, cambiar la capitalización o agregar aportaciones periódicas, usa la [calculadora de interés compuesto](/finanzas/calculadora-de-interes-compuesto/).

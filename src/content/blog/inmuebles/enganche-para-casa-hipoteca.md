@@ -11,7 +11,7 @@ tags:
 readTime: "6 min"
 relatedCalculator:
   label: "Calculadora de hipoteca"
-  href: "/inmuebles/calculadora-de-hipoteca"
+  href: "/inmuebles/calculadora-de-hipoteca/"
 ---
 
 El enganche es la parte del precio de una vivienda que pagas con recursos propios. En una hipoteca, el enganche reduce el monto que necesitas pedir prestado y, por lo tanto, puede bajar la mensualidad y los intereses totales.
@@ -46,7 +46,7 @@ El enganche puede expresarse en porcentaje o en dinero. Por ejemplo, sobre una v
 | 20% | $500,000 | $2,000,000 |
 | 30% | $750,000 | $1,750,000 |
 
-La [calculadora de hipoteca](/inmuebles/calculadora-de-hipoteca) permite capturar el enganche como porcentaje o como monto para evitar esta conversión manual.
+La [calculadora de hipoteca](/inmuebles/calculadora-de-hipoteca/) permite capturar el enganche como porcentaje o como monto para evitar esta conversión manual.
 
 ## Ejemplo con enganche de 10%, 20% y 30%
 
@@ -86,9 +86,9 @@ Profeco recomienda considerar gastos notariales, registro y avalúo, entre otros
 
 ## Simula tu enganche en la calculadora
 
-Usa la [calculadora de hipoteca](/inmuebles/calculadora-de-hipoteca) en modo "Precio + enganche". Captura el precio del inmueble, cambia el enganche de porcentaje a monto si lo necesitas y revisa cómo cambia la cuota.
+Usa la [calculadora de hipoteca](/inmuebles/calculadora-de-hipoteca/) en modo "Precio + enganche". Captura el precio del inmueble, cambia el enganche de porcentaje a monto si lo necesitas y revisa cómo cambia la cuota.
 
-También puedes leer la guía sobre [precio, enganche y monto del préstamo hipotecario](/blog/inmuebles/precio-enganche-monto-prestamo-hipotecario) para evitar errores al capturar los datos.
+También puedes leer la guía sobre [precio, enganche y monto del préstamo hipotecario](/blog/inmuebles/precio-enganche-monto-prestamo-hipotecario/) para evitar errores al capturar los datos.
 
 ## Preguntas frecuentes
 

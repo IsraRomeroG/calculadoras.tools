@@ -11,7 +11,7 @@ tags:
 readTime: "6 min"
 relatedCalculator:
   label: "Calculadora de IMC"
-  href: "/salud/calculadora-de-imc"
+  href: "/salud/calculadora-de-imc/"
 ---
 
 Interpretar el IMC no consiste solo en mirar un número. Lo más útil es leerlo en tres pasos: número, categoría y contexto.
@@ -37,7 +37,7 @@ Después se compara con rangos adultos:
 
 Si tu resultado es 25.35, por ejemplo, cae en sobrepeso. Si es 22.0, cae dentro del rango saludable. Si es 17.8, cae en bajo peso.
 
-Puedes calcularlo directamente con la [calculadora de IMC](/salud/calculadora-de-imc).
+Puedes calcularlo directamente con la [calculadora de IMC](/salud/calculadora-de-imc/).
 
 ## Después: compara con el rango saludable
 
@@ -87,7 +87,7 @@ Por eso siempre conviene interpretarlo como una herramienta inicial.
 
 ## Calcula o revisa tu IMC
 
-La [calculadora de IMC](/salud/calculadora-de-imc) te ayuda a revisar el resultado, la categoría y el rango saludable estimado para tu altura.
+La [calculadora de IMC](/salud/calculadora-de-imc/) te ayuda a revisar el resultado, la categoría y el rango saludable estimado para tu altura.
 
 ## Preguntas frecuentes
 

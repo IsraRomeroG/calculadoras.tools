@@ -11,7 +11,7 @@ tags:
 readTime: "6 min"
 relatedCalculator:
   label: "Calculadora de préstamo"
-  href: "/finanzas/calculadora-de-prestamo"
+  href: "/finanzas/calculadora-de-prestamo/"
 ---
 
 Los intereses de un préstamo no siempre se calculan sobre el monto original. En muchos esquemas de amortización, se calculan sobre el saldo pendiente. Esa diferencia explica por qué al inicio pagas más intereses y por qué los pagos extra pueden reducir el costo total.
@@ -71,7 +71,7 @@ Así, cada mes baja el interés y sube el abono a capital, siempre que la cuota 
 
 ## Por qué los intereses bajan en una tabla de amortización
 
-La [tabla de amortización](/blog/finanzas/tabla-amortizacion-prestamo) deja ver este movimiento con claridad. Al inicio, el saldo pendiente es alto, así que el interés del mes también es alto. Conforme pagas capital, el saldo disminuye.
+La [tabla de amortización](/blog/finanzas/tabla-amortizacion-prestamo/) deja ver este movimiento con claridad. Al inicio, el saldo pendiente es alto, así que el interés del mes también es alto. Conforme pagas capital, el saldo disminuye.
 
 En el ejemplo anterior, los primeros meses se comportan así:
 
@@ -108,7 +108,7 @@ Un pago extra puede reducir intereses si se aplica a capital. Al bajar el saldo 
 
 Por ejemplo, con un préstamo de `$50,000` a `24%` anual y `24 meses`, la cuota base estimada es `$2,643.55`. Si además haces un pago extra mensual de `$1,000`, el plazo podría bajar a `17 meses` y el ahorro estimado en intereses sería de aproximadamente `$4,407.89`.
 
-Antes de hacerlo, revisa si tu contrato permite pagos anticipados, si hay comisiones y si el pago se aplicará a capital. Puedes simularlo en la [calculadora de préstamo](/finanzas/calculadora-de-prestamo) usando el campo de pago extra mensual.
+Antes de hacerlo, revisa si tu contrato permite pagos anticipados, si hay comisiones y si el pago se aplicará a capital. Puedes simularlo en la [calculadora de préstamo](/finanzas/calculadora-de-prestamo/) usando el campo de pago extra mensual.
 
 ## Preguntas frecuentes
 
@@ -118,7 +118,7 @@ En muchos préstamos amortizables se calculan sobre el saldo pendiente. Aun así
 
 ### Cómo convierto tasa anual a mensual?
 
-Para una estimación simple, divide la tasa anual entre 12. Por ejemplo, 24% anual equivale a 2% mensual aproximado. Para más detalle, revisa [tasa anual, mensual y diaria](/blog/finanzas/tasa-anual-mensual-diaria-prestamo).
+Para una estimación simple, divide la tasa anual entre 12. Por ejemplo, 24% anual equivale a 2% mensual aproximado. Para más detalle, revisa [tasa anual, mensual y diaria](/blog/finanzas/tasa-anual-mensual-diaria-prestamo/).
 
 ### Por qué pago más intereses al inicio?
 

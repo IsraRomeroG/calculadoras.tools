@@ -11,7 +11,7 @@ readTime: "6 min"
 seoTitle: "CAGR: formula de la tasa de crecimiento anual compuesto"
 relatedCalculator:
   label: "Calculadora de interes compuesto"
-  href: "/finanzas/calculadora-de-interes-compuesto"
+  href: "/finanzas/calculadora-de-interes-compuesto/"
 ---
 
 El CAGR, o tasa de crecimiento anual compuesto, sirve para responder una pregunta concreta: si un valor paso de un monto inicial a un monto final durante varios anos, que tasa anual constante habria producido ese mismo resultado?
@@ -107,7 +107,7 @@ Tambien se usa en reportes de inversion para resumir rendimiento historico. En l
 
 En negocios, puede servir para medir crecimiento de ventas, ingresos, clientes, utilidad o trafico. Por ejemplo, si las ventas pasaron de $2 millones a $5 millones en 4 anos, el CAGR ayuda a expresar ese cambio como crecimiento anual compuesto.
 
-Y en planeacion, el CAGR puede usarse al reves: si tienes un monto inicial y supones una tasa anual compuesta, puedes estimar un valor futuro. Para hacer ese tipo de simulacion, puedes usar la [calculadora de interes compuesto](/finanzas/calculadora-de-interes-compuesto).
+Y en planeacion, el CAGR puede usarse al reves: si tienes un monto inicial y supones una tasa anual compuesta, puedes estimar un valor futuro. Para hacer ese tipo de simulacion, puedes usar la [calculadora de interes compuesto](/finanzas/calculadora-de-interes-compuesto/).
 
 ## Limites del CAGR
 
@@ -144,7 +144,7 @@ tasa = (monto final / capital inicial) ^ (1 / anos) - 1
 
 En otras palabras: el CAGR es una forma de encontrar la tasa de interes compuesto anual que explicaria el cambio entre dos valores.
 
-Si quieres entender la formula base con mas detalle, revisa la guia de [formula de interes compuesto](/blog/finanzas/formula-interes-compuesto). Y si estas comparando tasas financieras, tambien puede ayudarte la diferencia entre [tasa nominal y tasa efectiva](/blog/finanzas/tasa-nominal-vs-tasa-efectiva).
+Si quieres entender la formula base con mas detalle, revisa la guia de [formula de interes compuesto](/blog/finanzas/formula-interes-compuesto/). Y si estas comparando tasas financieras, tambien puede ayudarte la diferencia entre [tasa nominal y tasa efectiva](/blog/finanzas/tasa-nominal-vs-tasa-efectiva/).
 
 Como apoyo conceptual, la formula de CAGR tambien se presenta de forma similar en recursos de finanzas como [Corporate Finance Institute](https://corporatefinanceinstitute.com/resources/valuation/what-is-cagr/) y [Wall Street Prep](https://www.wallstreetprep.com/knowledge/cagr-compound-annual-growth-rate/).
 

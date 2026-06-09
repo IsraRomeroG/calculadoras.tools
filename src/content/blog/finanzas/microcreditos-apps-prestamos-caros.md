@@ -11,7 +11,7 @@ tags:
 readTime: "7 min"
 relatedCalculator:
   label: "Calculadora de préstamo"
-  href: "/finanzas/calculadora-de-prestamo"
+  href: "/finanzas/calculadora-de-prestamo/"
 ---
 
 Un microcrédito puede parecer inofensivo porque el monto es pequeño. Pero un préstamo pequeño y de corto plazo puede salir caro si tiene tasa alta, comisión inicial, cargos por atraso o condiciones poco claras.
@@ -47,7 +47,7 @@ Un plazo corto puede hacer que el pago parezca simple: "liquida en 7, 14 o 30 d�
 
 También ten cuidado con tasas diarias. Una tasa diaria pequeña puede convertirse en una tasa anual muy alta si se acumula o se compara de forma equivalente.
 
-Para entender conversiones, revisa [tasa anual, mensual y diaria en préstamos](/blog/finanzas/tasa-anual-mensual-diaria-prestamo).
+Para entender conversiones, revisa [tasa anual, mensual y diaria en préstamos](/blog/finanzas/tasa-anual-mensual-diaria-prestamo/).
 
 ## Ejemplo de costo real en un microcrédito
 
@@ -83,7 +83,7 @@ CONDUSEF advierte sobre falsos préstamos por internet y recomienda no dar diner
 
 ## Simula el pago total antes de contratar
 
-Antes de aceptar, captura monto, tasa, plazo y comisión en la [calculadora de préstamo](/finanzas/calculadora-de-prestamo). Después compara:
+Antes de aceptar, captura monto, tasa, plazo y comisión en la [calculadora de préstamo](/finanzas/calculadora-de-prestamo/). Después compara:
 
 - Cuánto recibes.
 - Cuánto pagas al mes.
@@ -91,7 +91,7 @@ Antes de aceptar, captura monto, tasa, plazo y comisión en la [calculadora de p
 - Cuánto representan comisiones.
 - Qué pasa si te atrasas.
 
-Si la oferta no permite responder esas preguntas, es una mala señal. También revisa [CAT vs tasa de interés](/blog/finanzas/cat-vs-tasa-interes), [comisión por apertura](/blog/finanzas/comision-apertura-prestamo) y [cuánto puedes pedir prestado según tu ingreso](/blog/finanzas/cuanto-puedo-pedir-prestado-segun-ingreso).
+Si la oferta no permite responder esas preguntas, es una mala señal. También revisa [CAT vs tasa de interés](/blog/finanzas/cat-vs-tasa-interes/), [comisión por apertura](/blog/finanzas/comision-apertura-prestamo/) y [cuánto puedes pedir prestado según tu ingreso](/blog/finanzas/cuanto-puedo-pedir-prestado-segun-ingreso/).
 
 ## Preguntas frecuentes
 

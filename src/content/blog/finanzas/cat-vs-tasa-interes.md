@@ -11,7 +11,7 @@ tags:
 readTime: "6 min"
 relatedCalculator:
   label: "Calculadora de préstamo"
-  href: "/finanzas/calculadora-de-prestamo"
+  href: "/finanzas/calculadora-de-prestamo/"
 ---
 
 La tasa de interés y el CAT no significan lo mismo. La tasa de interés te dice cuánto cuesta el dinero prestado; el CAT, o Costo Anual Total, busca mostrar el costo anualizado del crédito considerando otros cargos relacionados.
@@ -60,7 +60,7 @@ Imagina dos préstamos de `$50,000`, tasa anual de `24%` y plazo de `24 meses`.
 
 La tasa de interés es la misma en ambos casos. Lo que cambia es el costo real: el segundo escenario suma comisión por apertura y seguro mensual. Por eso el CAT aproximado y el costo total suben.
 
-Puedes reproducir este ejemplo en la [calculadora de préstamo](/finanzas/calculadora-de-prestamo) agregando `2%` de comisión por apertura y `$200` de seguro mensual.
+Puedes reproducir este ejemplo en la [calculadora de préstamo](/finanzas/calculadora-de-prestamo/) agregando `2%` de comisión por apertura y `$200` de seguro mensual.
 
 ## Cuando el CAT aproximado puede diferir del real
 
@@ -87,7 +87,7 @@ Antes de elegir, compara al menos estos puntos:
 - Seguro mensual.
 - Condiciones de pago anticipado.
 
-Si una oferta tiene menor tasa pero mayor comisión, no la descartes ni la aceptes automáticamente. Simula ambos casos y mira el costo total. La guía de [comisión por apertura](/blog/finanzas/comision-apertura-prestamo) y la de [seguro mensual en un crédito](/blog/finanzas/seguro-mensual-credito) ayudan a revisar esos cargos.
+Si una oferta tiene menor tasa pero mayor comisión, no la descartes ni la aceptes automáticamente. Simula ambos casos y mira el costo total. La guía de [comisión por apertura](/blog/finanzas/comision-apertura-prestamo/) y la de [seguro mensual en un crédito](/blog/finanzas/seguro-mensual-credito/) ayudan a revisar esos cargos.
 
 ## Preguntas frecuentes
 

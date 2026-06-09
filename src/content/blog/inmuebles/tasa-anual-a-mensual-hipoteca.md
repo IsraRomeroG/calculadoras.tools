@@ -11,7 +11,7 @@ tags:
 readTime: "5 min"
 relatedCalculator:
   label: "Calculadora de hipoteca"
-  href: "/inmuebles/calculadora-de-hipoteca"
+  href: "/inmuebles/calculadora-de-hipoteca/"
 ---
 
 Para calcular una hipoteca con pagos mensuales necesitas una tasa mensual. Pero muchas cotizaciones muestran la tasa de interés en términos anuales. Por eso hay que convertirla antes de usarla en la fórmula de cuota.
@@ -22,7 +22,7 @@ Esta conversión parece pequeña, pero un error de tasa puede cambiar completame
 
 Una hipoteca normalmente se paga mes a mes. Si la tabla de amortización calcula intereses mensuales, la tasa que se aplica al saldo pendiente también debe ser mensual.
 
-La [calculadora de hipoteca](/inmuebles/calculadora-de-hipoteca) pide tasa anual porque es el dato más común para el usuario, pero internamente la convierte a tasa mensual.
+La [calculadora de hipoteca](/inmuebles/calculadora-de-hipoteca/) pide tasa anual porque es el dato más común para el usuario, pero internamente la convierte a tasa mensual.
 
 ## Fórmula simple para convertir tasa anual
 
@@ -60,7 +60,7 @@ capital = $17,994.52 - $15,000
 capital = $2,994.52
 ```
 
-Ese es el principio de la [tabla de amortización hipotecaria](/blog/inmuebles/tabla-amortizacion-hipoteca).
+Ese es el principio de la [tabla de amortización hipotecaria](/blog/inmuebles/tabla-amortizacion-hipoteca/).
 
 ## Diferencia entre tasa, CAT y tasa efectiva
 
@@ -75,7 +75,7 @@ No confundas estos conceptos:
 
 La calculadora usa tasa anual de interés para estimar capital e intereses. No usa CAT como tasa de cálculo.
 
-Si estás comparando ofertas, revisa la guía sobre [CAT vs tasa en un crédito hipotecario](/blog/inmuebles/cat-vs-tasa-credito-hipotecario).
+Si estás comparando ofertas, revisa la guía sobre [CAT vs tasa en un crédito hipotecario](/blog/inmuebles/cat-vs-tasa-credito-hipotecario/).
 
 ## Errores comunes
 
@@ -91,9 +91,9 @@ El redondeo debe hacerse al mostrar resultados, no en cada paso interno.
 
 ## Usa la calculadora para evitar redondeos
 
-La [calculadora de hipoteca](/inmuebles/calculadora-de-hipoteca) convierte la tasa anual a mensual, calcula la cuota y genera la amortización con precisión interna. Solo redondea al mostrar los resultados.
+La [calculadora de hipoteca](/inmuebles/calculadora-de-hipoteca/) convierte la tasa anual a mensual, calcula la cuota y genera la amortización con precisión interna. Solo redondea al mostrar los resultados.
 
-Si quieres replicarlo en una hoja de cálculo, revisa la guía de [fórmula de cuota de hipoteca en Excel y Google Sheets](/blog/inmuebles/formula-cuota-hipoteca-excel-google-sheets).
+Si quieres replicarlo en una hoja de cálculo, revisa la guía de [fórmula de cuota de hipoteca en Excel y Google Sheets](/blog/inmuebles/formula-cuota-hipoteca-excel-google-sheets/).
 
 ## Preguntas frecuentes
 

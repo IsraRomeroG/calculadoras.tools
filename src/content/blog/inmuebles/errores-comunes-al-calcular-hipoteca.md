@@ -11,12 +11,12 @@ tags:
 readTime: "6 min"
 relatedCalculator:
   label: "Calculadora de hipoteca"
-  href: "/inmuebles/calculadora-de-hipoteca"
+  href: "/inmuebles/calculadora-de-hipoteca/"
 ---
 
 Calcular una hipoteca parece sencillo: monto, tasa y plazo. Pero varios errores pequeños pueden cambiar mucho el resultado. La mejor forma de evitarlo es separar precio, enganche, monto financiado, tasa, plazo y costos adicionales.
 
-La [calculadora de hipoteca](/inmuebles/calculadora-de-hipoteca) ayuda a ordenar esos datos, pero sigue siendo una estimación de capital e intereses.
+La [calculadora de hipoteca](/inmuebles/calculadora-de-hipoteca/) ayuda a ordenar esos datos, pero sigue siendo una estimación de capital e intereses.
 
 ## Error 1: usar el precio completo en vez del monto financiado
 
@@ -42,7 +42,7 @@ El enganche cambia la deuda. Un enganche mayor puede reducir cuota e intereses, 
 
 Usa el modo "Precio + enganche" de la calculadora si todavía estás partiendo del valor del inmueble. Si ya sabes el monto exacto del crédito, usa "Solo préstamo".
 
-Para profundizar, lee [precio, enganche y monto del préstamo hipotecario](/blog/inmuebles/precio-enganche-monto-prestamo-hipotecario).
+Para profundizar, lee [precio, enganche y monto del préstamo hipotecario](/blog/inmuebles/precio-enganche-monto-prestamo-hipotecario/).
 
 ## Error 3: usar mal la tasa anual
 
@@ -54,7 +54,7 @@ tasa mensual = tasa anual / 12 / 100
 
 Una tasa anual de `9%` no se captura como `9` mensual ni como `0.09` mensual. La tasa mensual usada por la fórmula es `0.0075`.
 
-Tampoco conviene usar el CAT como si fuera tasa de interés. Revisa [CAT vs tasa en un crédito hipotecario](/blog/inmuebles/cat-vs-tasa-credito-hipotecario).
+Tampoco conviene usar el CAT como si fuera tasa de interés. Revisa [CAT vs tasa en un crédito hipotecario](/blog/inmuebles/cat-vs-tasa-credito-hipotecario/).
 
 ## Error 4: comparar solo mensualidad
 
@@ -80,11 +80,11 @@ La cuota de la calculadora incluye capital e intereses. No incluye:
 - Comisiones.
 - Otros costos de compraventa.
 
-Consulta la guía de [gastos notariales, avalúo e impuestos](/blog/inmuebles/gastos-notariales-avaluo-impuestos-hipoteca) para separar esos conceptos.
+Consulta la guía de [gastos notariales, avalúo e impuestos](/blog/inmuebles/gastos-notariales-avaluo-impuestos-hipoteca/) para separar esos conceptos.
 
 ## Error 6: no revisar la tabla de amortización
 
-La mensualidad es solo una parte del análisis. La [tabla de amortización hipotecaria](/blog/inmuebles/tabla-amortizacion-hipoteca) muestra:
+La mensualidad es solo una parte del análisis. La [tabla de amortización hipotecaria](/blog/inmuebles/tabla-amortizacion-hipoteca/) muestra:
 
 - Qué parte va a intereses.
 - Qué parte reduce capital.

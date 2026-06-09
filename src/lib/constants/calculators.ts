@@ -5,7 +5,7 @@ export const CALCULATORS: CalculatorDirectoryItem[] = [
     id: "calculadora-de-porcentajes",
     title: "Calculadora de porcentajes",
     description: "Calcula porcentajes y aumentos/disminuciones en valores.",
-    href: "/matematicas/calculadora-de-porcentajes",
+    href: "/matematicas/calculadora-de-porcentajes/",
     categorySlug: "matematicas",
     order: 10,
   },
@@ -13,7 +13,7 @@ export const CALCULATORS: CalculatorDirectoryItem[] = [
     id: "calculadora-de-regla-de-tres",
     title: "Calculadora de regla de tres",
     description: "Resuelve proporciones directas e inversas paso a paso.",
-    href: "/matematicas/calculadora-de-regla-de-tres",
+    href: "/matematicas/calculadora-de-regla-de-tres/",
     categorySlug: "matematicas",
     order: 15,
   },
@@ -21,7 +21,7 @@ export const CALCULATORS: CalculatorDirectoryItem[] = [
     id: "calculadora-de-iva",
     title: "Calculadora de IVA",
     description: "Agrega o desglosa IVA con tasa editable y presets por país.",
-    href: "/legal-impuestos/calculadora-de-iva",
+    href: "/legal-impuestos/calculadora-de-iva/",
     categorySlug: "legal-impuestos",
     order: 20,
   },
@@ -30,7 +30,7 @@ export const CALCULATORS: CalculatorDirectoryItem[] = [
     title: "Calculadora de interés compuesto",
     description:
       "Simula inversiones con aportaciones, inflación y crecimiento año a año.",
-    href: "/finanzas/calculadora-de-interes-compuesto",
+    href: "/finanzas/calculadora-de-interes-compuesto/",
     categorySlug: "finanzas",
     order: 30,
   },
@@ -39,7 +39,7 @@ export const CALCULATORS: CalculatorDirectoryItem[] = [
     title: "Calculadora de inflación y poder adquisitivo",
     description:
       "Calcula cuánto costará algo en el futuro y cuánto poder de compra conservará tu dinero.",
-    href: "/finanzas/calculadora-de-inflacion-poder-adquisitivo",
+    href: "/finanzas/calculadora-de-inflacion-poder-adquisitivo/",
     categorySlug: "finanzas",
     order: 31,
   },
@@ -48,7 +48,7 @@ export const CALCULATORS: CalculatorDirectoryItem[] = [
     title: "Calculadora de interés simple",
     description:
       "Calcula intereses y total con tasas diarias, mensuales o anuales.",
-    href: "/finanzas/calculadora-de-interes-simple",
+    href: "/finanzas/calculadora-de-interes-simple/",
     categorySlug: "finanzas",
     order: 32,
   },
@@ -57,7 +57,7 @@ export const CALCULATORS: CalculatorDirectoryItem[] = [
     title: "Calculadora de préstamo",
     description:
       "Calcula cuota mensual, intereses, costo total y tabla de amortización.",
-    href: "/finanzas/calculadora-de-prestamo",
+    href: "/finanzas/calculadora-de-prestamo/",
     categorySlug: "finanzas",
     order: 35,
   },
@@ -66,7 +66,7 @@ export const CALCULATORS: CalculatorDirectoryItem[] = [
     title: "Plan de pago de deudas",
     description:
       "Compara bola de nieve y avalancha, estima intereses y crea un plan mensual de pagos.",
-    href: "/finanzas/plan-de-pago-de-deudas",
+    href: "/finanzas/plan-de-pago-de-deudas/",
     categorySlug: "finanzas",
     order: 36,
   },
@@ -75,7 +75,7 @@ export const CALCULATORS: CalculatorDirectoryItem[] = [
     title: "Calculadora de ahorro para un objetivo",
     description:
       "Calcula cuánto ahorrar al mes, cuándo alcanzarás una meta y cómo ajustar tu plan.",
-    href: "/finanzas/calculadora-de-ahorro-para-un-objetivo",
+    href: "/finanzas/calculadora-de-ahorro-para-un-objetivo/",
     categorySlug: "finanzas",
     order: 36.5,
   },
@@ -84,7 +84,7 @@ export const CALCULATORS: CalculatorDirectoryItem[] = [
     title: "Calculadora de ROI",
     description:
       "Calcula retorno de inversión, ganancia, punto de equilibrio y cuánto falta para alcanzar tu objetivo.",
-    href: "/finanzas/calculadora-de-roi",
+    href: "/finanzas/calculadora-de-roi/",
     categorySlug: "finanzas",
     order: 37,
   },
@@ -93,7 +93,7 @@ export const CALCULATORS: CalculatorDirectoryItem[] = [
     title: "Calculadora de precio promedio (DCA)",
     description:
       "Calcula precio promedio, costo efectivo con comisiones y cómo cambiaría con una próxima compra.",
-    href: "/finanzas/calculadora-dca-costo-promedio",
+    href: "/finanzas/calculadora-dca-costo-promedio/",
     categorySlug: "finanzas",
     order: 37.5,
   },
@@ -102,7 +102,7 @@ export const CALCULATORS: CalculatorDirectoryItem[] = [
     title: "Calculadora de hipoteca",
     description:
       "Estima cuota mensual, intereses y tabla de amortización de una hipoteca.",
-    href: "/inmuebles/calculadora-de-hipoteca",
+    href: "/inmuebles/calculadora-de-hipoteca/",
     categorySlug: "inmuebles",
     order: 38,
   },
@@ -111,7 +111,7 @@ export const CALCULATORS: CalculatorDirectoryItem[] = [
     title: "Calculadora de IMC",
     description:
       "Calcula tu Índice de Masa Corporal y revisa tu rango saludable estimado.",
-    href: "/salud/calculadora-de-imc",
+    href: "/salud/calculadora-de-imc/",
     categorySlug: "salud",
     order: 40,
   },
@@ -120,7 +120,7 @@ export const CALCULATORS: CalculatorDirectoryItem[] = [
     title: "Calculadora de calorías diarias (TDEE)",
     description:
       "Estima tu TMB, gasto diario total y calorías orientativas por objetivo.",
-    href: "/salud/calculadora-de-calorias-diarias-tdee",
+    href: "/salud/calculadora-de-calorias-diarias-tdee/",
     categorySlug: "salud",
     order: 45,
   },
@@ -129,7 +129,7 @@ export const CALCULATORS: CalculatorDirectoryItem[] = [
     title: "Calculadora de macros",
     description:
       "Calcula gramos diarios de proteína, carbohidratos y grasas según calorías, peso y objetivo.",
-    href: "/salud/calculadora-de-macros",
+    href: "/salud/calculadora-de-macros/",
     categorySlug: "salud",
     order: 50,
   },
@@ -138,7 +138,7 @@ export const CALCULATORS: CalculatorDirectoryItem[] = [
     title: "Calculadora de deficit calorico",
     description:
       "Estima calorias diarias, deficit, ritmo semanal y plazo para bajar de peso.",
-    href: "/salud/calculadora-deficit-calorico",
+    href: "/salud/calculadora-deficit-calorico/",
     categorySlug: "salud",
     order: 55,
   },
@@ -147,7 +147,7 @@ export const CALCULATORS: CalculatorDirectoryItem[] = [
     title: "Calculadora de fecha probable de parto",
     description:
       "Calcula FPP, semanas de embarazo, ventana de parto y confianza por FUM, ecografia, FIV o FPP oficial.",
-    href: "/salud/fecha-probable-de-parto",
+    href: "/salud/fecha-probable-de-parto/",
     categorySlug: "salud",
     order: 57,
   },
@@ -156,7 +156,7 @@ export const CALCULATORS: CalculatorDirectoryItem[] = [
     title: "Calculadora de ovulacion",
     description:
       "Estima ventana fertil, ovulacion probable, proxima menstruacion y confianza segun tu ciclo.",
-    href: "/salud/calculadora-de-ovulacion",
+    href: "/salud/calculadora-de-ovulacion/",
     categorySlug: "salud",
     order: 58,
   },
@@ -165,7 +165,7 @@ export const CALCULATORS: CalculatorDirectoryItem[] = [
     title: "Calculadora de edad",
     description:
       "Calcula edad exacta, días vividos y próximo cumpleaños con fecha de referencia editable.",
-    href: "/fecha-tiempo/calculadora-de-edad",
+    href: "/fecha-tiempo/calculadora-de-edad/",
     categorySlug: "fecha-tiempo",
     order: 60,
   },
@@ -174,7 +174,7 @@ export const CALCULATORS: CalculatorDirectoryItem[] = [
     title: "Calculadora de diferencia entre fechas",
     description:
       "Cuenta días entre fechas, suma o resta tiempo y calcula días hábiles sin fines de semana.",
-    href: "/fecha-tiempo/diferencia-entre-fechas",
+    href: "/fecha-tiempo/diferencia-entre-fechas/",
     categorySlug: "fecha-tiempo",
     order: 62,
   },
@@ -183,7 +183,7 @@ export const CALCULATORS: CalculatorDirectoryItem[] = [
     title: "Conversor de temperatura",
     description:
       "Convierte temperaturas entre Celsius, Fahrenheit y Kelvin con fórmula y referencias prácticas.",
-    href: "/conversores/conversor-de-temperatura",
+    href: "/conversores/conversor-de-temperatura/",
     categorySlug: "conversores",
     order: 65,
   },
@@ -192,7 +192,7 @@ export const CALCULATORS: CalculatorDirectoryItem[] = [
     title: "Kilómetros a millas",
     description:
       "Convierte kilómetros y millas terrestres al instante con fórmula y equivalencias frecuentes.",
-    href: "/conversores/kilometros-a-millas",
+    href: "/conversores/kilometros-a-millas/",
     categorySlug: "conversores",
     order: 69,
   },
@@ -201,7 +201,7 @@ export const CALCULATORS: CalculatorDirectoryItem[] = [
     title: "Conversor de peso",
     description:
       "Convierte kilogramos y libras al instante con fórmula y equivalencias útiles.",
-    href: "/conversores/conversor-de-peso",
+    href: "/conversores/conversor-de-peso/",
     categorySlug: "conversores",
     order: 70,
   },
@@ -210,7 +210,7 @@ export const CALCULATORS: CalculatorDirectoryItem[] = [
     title: "Calculadora de área y perímetro",
     description:
       "Calcula área y perímetro de cuadrados, rectángulos, triángulos, círculos y polígonos regulares.",
-    href: "/geometria/calculadora-de-area-y-perimetro",
+    href: "/geometria/calculadora-de-area-y-perimetro/",
     categorySlug: "geometria",
     order: 72,
   },
@@ -219,7 +219,7 @@ export const CALCULATORS: CalculatorDirectoryItem[] = [
     title: "Calculadora del teorema de Pitágoras",
     description:
       "Calcula la hipotenusa o un cateto de un triángulo rectángulo con fórmula y procedimiento.",
-    href: "/geometria/calculadora-del-teorema-de-pitagoras",
+    href: "/geometria/calculadora-del-teorema-de-pitagoras/",
     categorySlug: "geometria",
     order: 74,
   },
@@ -228,7 +228,7 @@ export const CALCULATORS: CalculatorDirectoryItem[] = [
     title: "Calculadora de estadistica basica",
     description:
       "Calcula media, mediana y moda de una lista de numeros con resumen y tabla de frecuencias.",
-    href: "/matematicas/calculadora-de-estadistica-basica",
+    href: "/matematicas/calculadora-de-estadistica-basica/",
     categorySlug: "matematicas",
     order: 76,
   },
@@ -237,7 +237,7 @@ export const CALCULATORS: CalculatorDirectoryItem[] = [
     title: "Conversor de medidas culinarias",
     description:
       "Convierte tazas, cucharadas, mililitros, gramos y otras medidas comunes de cocina.",
-    href: "/cocina/conversor-de-medidas-culinarias",
+    href: "/cocina/conversor-de-medidas-culinarias/",
     categorySlug: "cocina",
     order: 78,
   },
@@ -246,7 +246,7 @@ export const CALCULATORS: CalculatorDirectoryItem[] = [
     title: "Escalar receta por porciones",
     description:
       "Ajusta las cantidades de una receta segun las porciones que necesitas preparar.",
-    href: "/cocina/escalar-receta-por-porciones",
+    href: "/cocina/escalar-receta-por-porciones/",
     categorySlug: "cocina",
     order: 80,
   },
@@ -255,7 +255,7 @@ export const CALCULATORS: CalculatorDirectoryItem[] = [
     title: "Edad de mascota en anos humanos",
     description:
       "Estima la edad equivalente de perros y gatos con una tabla orientativa por especie y talla.",
-    href: "/mascotas/edad-de-mascota-en-anos-humanos",
+    href: "/mascotas/edad-de-mascota-en-anos-humanos/",
     categorySlug: "mascotas",
     order: 82,
   },
@@ -264,7 +264,7 @@ export const CALCULATORS: CalculatorDirectoryItem[] = [
     title: "Calorias diarias para perro o gato",
     description:
       "Estima un rango orientativo de calorias diarias para perros y gatos adultos segun peso, perfil y condicion corporal.",
-    href: "/mascotas/calorias-diarias-para-perro-o-gato",
+    href: "/mascotas/calorias-diarias-para-perro-o-gato/",
     categorySlug: "mascotas",
     order: 84,
   },
@@ -273,7 +273,7 @@ export const CALCULATORS: CalculatorDirectoryItem[] = [
     title: "Dividir cuenta en restaurante",
     description:
       "Divide una cuenta entre varias personas, añade propina opcional y ajusta centavos o redondeo.",
-    href: "/restaurantes/dividir-cuenta-en-restaurante",
+    href: "/restaurantes/dividir-cuenta-en-restaurante/",
     categorySlug: "restaurantes",
     order: 86,
   },
@@ -282,7 +282,7 @@ export const CALCULATORS: CalculatorDirectoryItem[] = [
     title: "Calculadora de propina",
     description:
       "Calcula propina, total final, total cerrado y pago por persona.",
-    href: "/restaurantes/calculadora-de-propina",
+    href: "/restaurantes/calculadora-de-propina/",
     categorySlug: "restaurantes",
     order: 88,
   },
@@ -291,7 +291,7 @@ export const CALCULATORS: CalculatorDirectoryItem[] = [
     title: "Calculadora de consumo de gasolina",
     description:
       "Calcula rendimiento de combustible en km/L, L/100 km y mpg, o estima litros para un trayecto.",
-    href: "/vehiculos/calculadora-de-consumo-de-gasolina",
+    href: "/vehiculos/calculadora-de-consumo-de-gasolina/",
     categorySlug: "vehiculos",
     order: 90,
   },
@@ -300,7 +300,7 @@ export const CALCULATORS: CalculatorDirectoryItem[] = [
     title: "Calculadora de costo por kilómetro",
     description:
       "Estima combustible, costo de un trayecto y costo por kilómetro con gastos adicionales opcionales.",
-    href: "/vehiculos/calculadora-de-costo-por-kilometro",
+    href: "/vehiculos/calculadora-de-costo-por-kilometro/",
     categorySlug: "vehiculos",
     order: 92,
   },
@@ -309,7 +309,7 @@ export const CALCULATORS: CalculatorDirectoryItem[] = [
     title: "Metros cuadrados de pintura",
     description:
       "Calcula superficie de paredes o techo y estima litros de pintura segun manos y rendimiento.",
-    href: "/construccion/metros-cuadrados-de-pintura",
+    href: "/construccion/metros-cuadrados-de-pintura/",
     categorySlug: "construccion",
     order: 94,
   },

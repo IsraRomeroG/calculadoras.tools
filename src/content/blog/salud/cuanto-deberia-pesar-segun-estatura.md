@@ -11,7 +11,7 @@ tags:
 readTime: "5 min"
 relatedCalculator:
   label: "Calculadora de IMC"
-  href: "/salud/calculadora-de-imc"
+  href: "/salud/calculadora-de-imc/"
 ---
 
 La pregunta "cuánto debería pesar según mi estatura" no tiene una respuesta única. Lo más responsable es hablar de un rango saludable de referencia, no de un peso exacto.
@@ -54,7 +54,7 @@ Ese rango no significa que cualquier persona de 1.70 m deba apuntar a un número
 | 1.70 m   | 53.5 a 72.0 kg                |
 | 1.80 m   | 59.9 a 80.7 kg                |
 
-Puedes ver más alturas en la guía de [peso saludable según estatura](/blog/salud/peso-saludable-segun-estatura) o calcular tu dato exacto con la [calculadora de IMC](/salud/calculadora-de-imc).
+Puedes ver más alturas en la guía de [peso saludable según estatura](/blog/salud/peso-saludable-segun-estatura/) o calcular tu dato exacto con la [calculadora de IMC](/salud/calculadora-de-imc/).
 
 ## Factores que el IMC no considera
 
@@ -86,7 +86,7 @@ Ejemplo para 1.65 m:
 
 ## Usa la calculadora
 
-La [calculadora de IMC](/salud/calculadora-de-imc) hace el cálculo automáticamente y también muestra tu categoría de referencia.
+La [calculadora de IMC](/salud/calculadora-de-imc/) hace el cálculo automáticamente y también muestra tu categoría de referencia.
 
 ## Preguntas frecuentes
 

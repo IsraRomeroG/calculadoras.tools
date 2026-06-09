@@ -11,12 +11,12 @@ tags:
 readTime: "5 min"
 relatedCalculator:
   label: "Calculadora de préstamo"
-  href: "/finanzas/calculadora-de-prestamo"
+  href: "/finanzas/calculadora-de-prestamo/"
 ---
 
 Un préstamo de `$100,000` puede parecer manejable si solo miras la mensualidad, pero el costo total cambia mucho con la tasa y el plazo. A más meses, el pago mensual puede bajar; al mismo tiempo, los intereses acumulados pueden subir de forma importante.
 
-Los escenarios de esta guía son estimaciones. No representan una oferta de crédito ni garantizan aprobación. Úsalos para comparar y después ajusta tu caso en la [calculadora de préstamo](/finanzas/calculadora-de-prestamo).
+Los escenarios de esta guía son estimaciones. No representan una oferta de crédito ni garantizan aprobación. Úsalos para comparar y después ajusta tu caso en la [calculadora de préstamo](/finanzas/calculadora-de-prestamo/).
 
 ## Cuánto se paga por un préstamo de $100,000
 
@@ -78,11 +78,11 @@ No hay un porcentaje universal que funcione para todas las personas. Una mensual
 
 Una forma prudente de empezar es calcular cuánto puedes pagar al mes sin presionar gastos esenciales, ahorro y deudas actuales. Luego, con esa mensualidad objetivo, prueba distintos plazos y tasas.
 
-La guía de [cuánto puedes pedir prestado según tu ingreso](/blog/finanzas/cuanto-puedo-pedir-prestado-segun-ingreso) desarrolla ese enfoque con más detalle.
+La guía de [cuánto puedes pedir prestado según tu ingreso](/blog/finanzas/cuanto-puedo-pedir-prestado-segun-ingreso/) desarrolla ese enfoque con más detalle.
 
 ## Simula tu préstamo de $100,000
 
-En la [calculadora de préstamo](/finanzas/calculadora-de-prestamo) puedes escribir `$100,000`, elegir tasa y plazo, y agregar comisión, seguro o pago extra. La herramienta muestra:
+En la [calculadora de préstamo](/finanzas/calculadora-de-prestamo/) puedes escribir `$100,000`, elegir tasa y plazo, y agregar comisión, seguro o pago extra. La herramienta muestra:
 
 - Cuota mensual base.
 - Pago mensual total.
@@ -91,7 +91,7 @@ En la [calculadora de préstamo](/finanzas/calculadora-de-prestamo) puedes escri
 - Costo total.
 - Tabla de amortización.
 
-Si quieres ver un monto menor para comparar, revisa también el caso de [préstamo de $50,000](/blog/finanzas/prestamo-50000-cuanto-pago).
+Si quieres ver un monto menor para comparar, revisa también el caso de [préstamo de $50,000](/blog/finanzas/prestamo-50000-cuanto-pago/).
 
 ## Preguntas frecuentes
 

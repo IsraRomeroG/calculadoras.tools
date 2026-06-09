@@ -505,7 +505,7 @@ export function buildPetAgeShareUrl(
     months?: number;
     birthDate?: PlainDateParts;
   },
-  basePath = "/mascotas/edad-de-mascota-en-anos-humanos",
+  basePath = "/mascotas/edad-de-mascota-en-anos-humanos/",
 ): string {
   const params = new URLSearchParams();
 

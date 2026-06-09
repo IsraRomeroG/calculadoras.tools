@@ -11,7 +11,7 @@ readTime: "7 min"
 seoTitle: "Interes compuesto para el retiro: ejemplos a 20, 30 y 40 anos"
 relatedCalculator:
   label: "Calculadora de interes compuesto"
-  href: "/finanzas/calculadora-de-interes-compuesto"
+  href: "/finanzas/calculadora-de-interes-compuesto/"
 ---
 
 El interes compuesto para el retiro ayuda a visualizar una idea sencilla: el tiempo puede pesar tanto como la cantidad que ahorras. Cuando los rendimientos se reinvierten, el capital acumulado puede generar nuevos rendimientos, y ese efecto se vuelve mas visible en plazos largos.
@@ -24,7 +24,7 @@ Una meta de retiro suele tener un horizonte largo. Eso le da al interes compuest
 
 La clave no es solo "ganar intereses". La clave es que los intereses anteriores tambien formen parte del capital que genera nuevos intereses. Por eso, en una simulacion de largo plazo, el crecimiento no suele avanzar en linea recta. Al principio el ahorro propio pesa mas; despues, si el supuesto de rendimiento se mantiene, los intereses acumulados empiezan a representar una parte mayor del monto final.
 
-Para entender la base conceptual, puedes empezar con la guia sobre [que es el interes compuesto](/blog/finanzas/que-es-interes-compuesto). Si vas a hacer aportaciones periodicas, tambien te sirve revisar [interes compuesto con aportaciones mensuales](/blog/finanzas/interes-compuesto-aportaciones-mensuales).
+Para entender la base conceptual, puedes empezar con la guia sobre [que es el interes compuesto](/blog/finanzas/que-es-interes-compuesto/). Si vas a hacer aportaciones periodicas, tambien te sirve revisar [interes compuesto con aportaciones mensuales](/blog/finanzas/interes-compuesto-aportaciones-mensuales/).
 
 ## Ejemplo base para los escenarios
 
@@ -100,13 +100,13 @@ Una simulacion de interes compuesto para el retiro es una herramienta educativa,
 6. Reglas de pension, retiro, liquidez o edad aplicables a productos especificos.
 7. Costos de salud, vivienda u otros gastos futuros.
 
-Por eso conviene leer el monto final junto con el valor real aproximado. Si quieres profundizar en esa parte, revisa [inflacion e interes compuesto](/blog/finanzas/inflacion-interes-compuesto-valor-real).
+Por eso conviene leer el monto final junto con el valor real aproximado. Si quieres profundizar en esa parte, revisa [inflacion e interes compuesto](/blog/finanzas/inflacion-interes-compuesto-valor-real/).
 
-Tambien conviene evitar supuestos demasiado optimistas. Un plan que solo funciona con una tasa alta y constante puede ser fragil. Para revisar tus datos antes de confiar en una simulacion, consulta los [errores comunes al usar una calculadora de interes compuesto](/blog/finanzas/errores-calculadora-interes-compuesto).
+Tambien conviene evitar supuestos demasiado optimistas. Un plan que solo funciona con una tasa alta y constante puede ser fragil. Para revisar tus datos antes de confiar en una simulacion, consulta los [errores comunes al usar una calculadora de interes compuesto](/blog/finanzas/errores-calculadora-interes-compuesto/).
 
 ## Simula tu propio escenario
 
-La [calculadora de interes compuesto](/finanzas/calculadora-de-interes-compuesto) te permite cambiar capital inicial, aportacion, plazo, tasa, frecuencia de capitalizacion e inflacion. Para una meta de retiro, prueba al menos tres versiones:
+La [calculadora de interes compuesto](/finanzas/calculadora-de-interes-compuesto/) te permite cambiar capital inicial, aportacion, plazo, tasa, frecuencia de capitalizacion e inflacion. Para una meta de retiro, prueba al menos tres versiones:
 
 1. Un escenario conservador con una tasa menor.
 2. Un escenario base con una aportacion que puedas sostener.

@@ -11,7 +11,7 @@ tags:
 readTime: "5 min"
 relatedCalculator:
   label: "Calculadora de préstamo"
-  href: "/finanzas/calculadora-de-prestamo"
+  href: "/finanzas/calculadora-de-prestamo/"
 ---
 
 Un préstamo de `$50,000` puede tener mensualidades muy distintas según la tasa y el plazo. Por eso no basta con preguntar "cuánto se paga al mes": también conviene revisar intereses, comisiones, seguros y costo total.
@@ -28,7 +28,7 @@ La mensualidad depende principalmente de tres datos:
 
 Con una tasa anual de `24%` y plazo de `24 meses`, la cuota base estimada para `$50,000` es de `$2,643.55` al mes. El total pagado en cuotas sería de aproximadamente `$63,445.32`, de los cuales `$13,445.32` serían intereses.
 
-Puedes ajustar el monto, la tasa y el plazo en la [calculadora de préstamo](/finanzas/calculadora-de-prestamo).
+Puedes ajustar el monto, la tasa y el plazo en la [calculadora de préstamo](/finanzas/calculadora-de-prestamo/).
 
 ## Tabla de escenarios por tasa y plazo
 
@@ -52,7 +52,7 @@ La comisión por apertura puede cobrarse como porcentaje del monto. Si el prést
 
 Es decir, `$1,000` adicionales. Si esa comisión se paga al inicio, no cambia la cuota base, pero sí sube el costo total. Si se financia dentro del préstamo, puede aumentar la mensualidad y los intereses.
 
-Para entender mejor este cargo, revisa la guía de [comisión por apertura en un préstamo](/blog/finanzas/comision-apertura-prestamo).
+Para entender mejor este cargo, revisa la guía de [comisión por apertura en un préstamo](/blog/finanzas/comision-apertura-prestamo/).
 
 ## Qué cambia si agregas seguro mensual
 
@@ -74,7 +74,7 @@ No todos los contratos tratan igual los pagos anticipados. Antes de pagar extra,
 
 ## Calcula tu caso exacto
 
-Usa estos escenarios como punto de partida, no como respuesta final. En la [calculadora de préstamo](/finanzas/calculadora-de-prestamo) puedes probar:
+Usa estos escenarios como punto de partida, no como respuesta final. En la [calculadora de préstamo](/finanzas/calculadora-de-prestamo/) puedes probar:
 
 - Otra tasa anual.
 - Plazo de 12, 24, 36 o 48 meses.
@@ -82,7 +82,7 @@ Usa estos escenarios como punto de partida, no como respuesta final. En la [calc
 - Seguro mensual.
 - Pago extra mensual.
 
-También puedes comparar este caso con la guía de [préstamo de $100,000](/blog/finanzas/prestamo-100000-cuanto-pago) si quieres ver cómo cambia la mensualidad al duplicar el monto.
+También puedes comparar este caso con la guía de [préstamo de $100,000](/blog/finanzas/prestamo-100000-cuanto-pago/) si quieres ver cómo cambia la mensualidad al duplicar el monto.
 
 ## Preguntas frecuentes
 

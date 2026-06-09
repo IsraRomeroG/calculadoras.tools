@@ -11,7 +11,7 @@ tags:
 readTime: "6 min"
 relatedCalculator:
   label: "Calculadora de préstamo"
-  href: "/finanzas/calculadora-de-prestamo"
+  href: "/finanzas/calculadora-de-prestamo/"
 ---
 
 Para saber cuánto puedes pedir prestado, no empieces por el monto máximo que te ofrecen. Empieza por la mensualidad que podrías pagar sin descuidar renta, comida, transporte, ahorro, deudas actuales e imprevistos.
@@ -84,11 +84,11 @@ Supongamos:
 
 Con esos datos, el monto aproximado sería `$76,466.53`. Pero esa cifra no garantiza aprobación ni incluye comisiones o seguros. Si el crédito tiene seguro mensual, comisión por apertura o CAT más alto, el monto conveniente podría ser menor.
 
-Puedes contrastarlo con el caso de [préstamo de $100,000](/blog/finanzas/prestamo-100000-cuanto-pago) para ver si la mensualidad se acerca o se aleja de tu presupuesto.
+Puedes contrastarlo con el caso de [préstamo de $100,000](/blog/finanzas/prestamo-100000-cuanto-pago/) para ver si la mensualidad se acerca o se aleja de tu presupuesto.
 
 ## Simula el monto con la calculadora
 
-La [calculadora de préstamo](/finanzas/calculadora-de-prestamo) está diseñada principalmente para estimar la mensualidad a partir del monto. Úsala así:
+La [calculadora de préstamo](/finanzas/calculadora-de-prestamo/) está diseñada principalmente para estimar la mensualidad a partir del monto. Úsala así:
 
 1. Escribe un monto tentativo.
 2. Captura tasa y plazo.
@@ -96,7 +96,7 @@ La [calculadora de préstamo](/finanzas/calculadora-de-prestamo) está diseñada
 4. Ajusta el monto hasta acercarte a tu mensualidad objetivo.
 5. Agrega comisión y seguro si la oferta los incluye.
 
-También revisa [préstamo a 12, 24, 36 o 48 meses](/blog/finanzas/prestamo-12-24-36-48-meses) para entender el intercambio entre pago bajo e intereses.
+También revisa [préstamo a 12, 24, 36 o 48 meses](/blog/finanzas/prestamo-12-24-36-48-meses/) para entender el intercambio entre pago bajo e intereses.
 
 ## Preguntas frecuentes
 

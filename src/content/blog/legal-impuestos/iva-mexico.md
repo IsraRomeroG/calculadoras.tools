@@ -11,7 +11,7 @@ readTime: "6 min"
 seoTitle: "IVA en México: 16%, frontera 8% y tasa 0%"
 relatedCalculator:
   label: "Calculadora de IVA"
-  href: "/legal-impuestos/calculadora-de-iva"
+  href: "/legal-impuestos/calculadora-de-iva/"
 ---
 
 ## Tasa general de IVA en México
@@ -75,7 +75,7 @@ precio sin iva = 1160 / 1.16 = 1000
 iva = 1160 - 1000 = 160
 ```
 
-Si necesitas repasar cada operación con más detalle, consulta las guías de [cómo sumar IVA a un precio](/blog/legal-impuestos/como-sumar-iva-a-un-precio) y [cómo desglosar IVA incluido](/blog/legal-impuestos/como-desglosar-iva).
+Si necesitas repasar cada operación con más detalle, consulta las guías de [cómo sumar IVA a un precio](/blog/legal-impuestos/como-sumar-iva-a-un-precio/) y [cómo desglosar IVA incluido](/blog/legal-impuestos/como-desglosar-iva/).
 
 ## Tabla rápida
 
@@ -88,9 +88,9 @@ Si necesitas repasar cada operación con más detalle, consulta las guías de [c
 
 ## Calculadora de IVA para México
 
-Puedes usar la [calculadora de IVA](/legal-impuestos/calculadora-de-iva) con el preset de México para sumar o desglosar IVA de 16%. También puedes cambiar manualmente la tasa si necesitas estimar 8%, 0% u otro caso.
+Puedes usar la [calculadora de IVA](/legal-impuestos/calculadora-de-iva/) con el preset de México para sumar o desglosar IVA de 16%. También puedes cambiar manualmente la tasa si necesitas estimar 8%, 0% u otro caso.
 
-Para comparar México con otros países, revisa la [tabla de tasas de IVA por país](/blog/legal-impuestos/tasas-de-iva-por-pais).
+Para comparar México con otros países, revisa la [tabla de tasas de IVA por país](/blog/legal-impuestos/tasas-de-iva-por-pais/).
 
 ## Fuentes oficiales
 

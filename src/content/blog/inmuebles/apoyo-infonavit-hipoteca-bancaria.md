@@ -11,7 +11,7 @@ tags:
 readTime: "7 min"
 relatedCalculator:
   label: "Calculadora de hipoteca"
-  href: "/inmuebles/calculadora-de-hipoteca"
+  href: "/inmuebles/calculadora-de-hipoteca/"
 ---
 
 Apoyo Infonavit y otros esquemas relacionados con crédito bancario e Infonavit pueden cambiar con el tiempo. Por eso conviene tratarlos con cuidado: revisa condiciones vigentes directamente con Infonavit y con el banco antes de tomar una decisión.
@@ -55,7 +55,7 @@ Pide que la información aparezca en documentos, no solo en explicación verbal.
 
 ## Qué puede simular la calculadora
 
-La [calculadora de hipoteca](/inmuebles/calculadora-de-hipoteca) puede simular:
+La [calculadora de hipoteca](/inmuebles/calculadora-de-hipoteca/) puede simular:
 
 - Cuota base de capital e intereses.
 - Total pagado.

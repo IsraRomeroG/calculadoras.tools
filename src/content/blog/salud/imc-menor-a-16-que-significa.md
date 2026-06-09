@@ -11,7 +11,7 @@ tags:
 readTime: "5 min"
 relatedCalculator:
   label: "Calculadora de IMC"
-  href: "/salud/calculadora-de-imc"
+  href: "/salud/calculadora-de-imc/"
 ---
 
 En adultos, un IMC menor a 16 se clasifica como delgadez severa en tablas detalladas de IMC. Es un resultado que conviene interpretar con cuidado y, especialmente si hay síntomas o pérdida de peso reciente, con orientación profesional.
@@ -31,7 +31,7 @@ La tabla adulta detallada suele dividir el bajo peso así:
 
 Un resultado menor a 16 está por debajo del rango saludable de referencia y dentro del subrango más bajo de la tabla.
 
-Si necesitas revisar tus datos, usa la [calculadora de IMC](/salud/calculadora-de-imc).
+Si necesitas revisar tus datos, usa la [calculadora de IMC](/salud/calculadora-de-imc/).
 
 ## Diferencia con otros rangos de bajo peso
 
@@ -75,9 +75,9 @@ La intención no es alarmar, sino evitar que un resultado sensible se interprete
 
 ## Calcula o revisa tus datos
 
-Revisa que el peso y la altura estén correctos. En la [calculadora de IMC](/salud/calculadora-de-imc) puedes ingresar datos en kg/cm o lb/ft/in.
+Revisa que el peso y la altura estén correctos. En la [calculadora de IMC](/salud/calculadora-de-imc/) puedes ingresar datos en kg/cm o lb/ft/in.
 
-También puede ayudarte leer la guía de [bajo peso según IMC](/blog/salud/bajo-peso-segun-imc-menor-18-5) y las [limitaciones del IMC](/blog/salud/limitaciones-del-imc).
+También puede ayudarte leer la guía de [bajo peso según IMC](/blog/salud/bajo-peso-segun-imc-menor-18-5/) y las [limitaciones del IMC](/blog/salud/limitaciones-del-imc/).
 
 ## Preguntas frecuentes
 

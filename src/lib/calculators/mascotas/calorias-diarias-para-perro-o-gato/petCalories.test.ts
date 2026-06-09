@@ -223,7 +223,7 @@ describe("pet calorie parsing and share params", () => {
         bodyCondition: "no-se",
       }),
     ).toBe(
-      "/mascotas/calorias-diarias-para-perro-o-gato?especie=perro&unidad=kg&perfil=esterilizado&tipoPeso=actual&condicion=no-se&peso=10",
+      "/mascotas/calorias-diarias-para-perro-o-gato/?especie=perro&unidad=kg&perfil=esterilizado&tipoPeso=actual&condicion=no-se&peso=10",
     );
   });
 });

@@ -11,7 +11,7 @@ readTime: "4 min"
 featured: true
 relatedCalculator:
   label: "Calculadora de regla de tres"
-  href: "/matematicas/calculadora-de-regla-de-tres"
+  href: "/matematicas/calculadora-de-regla-de-tres/"
 ---
 
 ## Para qué sirve
@@ -20,7 +20,7 @@ La regla de tres sirve para encontrar un valor desconocido cuando tienes dos can
 
 Por ejemplo: si 3 productos cuestan $180, ¿cuánto cuestan 5 productos?
 
-También puede ayudarte a entender porcentajes, porque muchos cálculos se reducen a una proporción. Para esa base, revisa [cómo calcular porcentajes](/blog/matematicas/como-calcular-porcentajes).
+También puede ayudarte a entender porcentajes, porque muchos cálculos se reducen a una proporción. Para esa base, revisa [cómo calcular porcentajes](/blog/matematicas/como-calcular-porcentajes/).
 
 ## Plantea la proporción
 

@@ -11,7 +11,7 @@ tags:
 readTime: "4 min"
 relatedCalculator:
   label: "Calculadora de IMC"
-  href: "/salud/calculadora-de-imc"
+  href: "/salud/calculadora-de-imc/"
 ---
 
 La tabla de IMC para adultos permite ubicar un resultado en rangos de referencia. Es útil para entender rápidamente si un IMC cae en bajo peso, rango saludable, sobrepeso u obesidad.
@@ -58,7 +58,7 @@ La categoría no debe leerse como una etiqueta definitiva. Sirve para saber si e
 | 36.5 | Obesidad clase 2 |
 | 41.0 | Obesidad clase 3 |
 
-Si quieres ubicar tu resultado sin hacer cálculos manuales, usa la [calculadora de IMC](/salud/calculadora-de-imc).
+Si quieres ubicar tu resultado sin hacer cálculos manuales, usa la [calculadora de IMC](/salud/calculadora-de-imc/).
 
 ## Por qué la tabla no aplica igual en niños
 
@@ -81,7 +81,7 @@ El IMC debe interpretarse junto con otros datos:
 
 ## Usa la calculadora para ubicar tu categoría
 
-La [calculadora de IMC](/salud/calculadora-de-imc) ubica tu resultado en la tabla y además estima el rango de peso saludable para tu altura.
+La [calculadora de IMC](/salud/calculadora-de-imc/) ubica tu resultado en la tabla y además estima el rango de peso saludable para tu altura.
 
 ## Preguntas frecuentes
 

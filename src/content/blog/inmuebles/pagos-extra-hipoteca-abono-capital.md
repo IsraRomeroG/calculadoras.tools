@@ -11,7 +11,7 @@ tags:
 readTime: "7 min"
 relatedCalculator:
   label: "Calculadora de hipoteca"
-  href: "/inmuebles/calculadora-de-hipoteca"
+  href: "/inmuebles/calculadora-de-hipoteca/"
 ---
 
 Un pago extra en una hipoteca puede ayudarte a reducir intereses si se aplica al saldo de capital. La idea es sencilla: mientras menor sea el saldo pendiente, menor será el interés futuro que se calcula sobre ese saldo.
@@ -62,7 +62,7 @@ Si agregas `$2,000` extra al mes:
 
 En este ejemplo, el pago extra reduce la duración aproximada a `15 años 6 meses`, ahorra `54` meses y baja intereses en cerca de `$606,852.18`.
 
-Puedes replicar el escenario en la [calculadora de hipoteca](/inmuebles/calculadora-de-hipoteca) usando el campo de pago extra mensual.
+Puedes replicar el escenario en la [calculadora de hipoteca](/inmuebles/calculadora-de-hipoteca/) usando el campo de pago extra mensual.
 
 ## Por qué se acorta el plazo
 
@@ -84,9 +84,9 @@ En créditos como Infonavit o esquemas combinados, las reglas pueden ser especí
 
 ## Simula tu ahorro en la calculadora
 
-La [calculadora de hipoteca](/inmuebles/calculadora-de-hipoteca) muestra una comparación cuando capturas pago extra mensual: plazo efectivo, meses ahorrados e intereses estimados ahorrados.
+La [calculadora de hipoteca](/inmuebles/calculadora-de-hipoteca/) muestra una comparación cuando capturas pago extra mensual: plazo efectivo, meses ahorrados e intereses estimados ahorrados.
 
-También puedes revisar la [tabla de amortización hipotecaria](/blog/inmuebles/tabla-amortizacion-hipoteca) para ver en qué mes se liquida la deuda y cómo se reduce el saldo.
+También puedes revisar la [tabla de amortización hipotecaria](/blog/inmuebles/tabla-amortizacion-hipoteca/) para ver en qué mes se liquida la deuda y cómo se reduce el saldo.
 
 ## Preguntas frecuentes
 

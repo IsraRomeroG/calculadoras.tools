@@ -52,18 +52,18 @@ export const getBlogPostCategory = (post: Pick<BlogPost, "data">) =>
   getCategory(getBlogPostCategorySlug(post));
 
 export const getBlogPostUrl = (post: Pick<BlogPost, "id" | "data">) =>
-  `/blog/${getBlogPostCategorySlug(post)}/${getBlogPostSlug(post)}`;
+  `/blog/${getBlogPostCategorySlug(post)}/${getBlogPostSlug(post)}/`;
 
 export const getCategoryUrl = (categorySlug: CategorySlug) =>
-  `/blog/${categorySlug}`;
+  `/blog/${categorySlug}/`;
 
 export const getBlogIndexPageUrl = (page: number) =>
-  page <= 1 ? "/blog" : `/blog/pagina/${page}`;
+  page <= 1 ? "/blog/" : `/blog/pagina/${page}/`;
 
 export const getCategoryPageUrl = (categorySlug: CategorySlug, page: number) =>
   page <= 1
     ? getCategoryUrl(categorySlug)
-    : `${getCategoryUrl(categorySlug)}/pagina/${page}`;
+    : `${getCategoryUrl(categorySlug)}pagina/${page}/`;
 
 export const formatBlogDate = (date: Date) => dateFormatter.format(date);
 
@@ -188,15 +188,15 @@ export const getBlogRouteConflicts = (
   categoryRouteSlugs.forEach((targetCategorySlug, routeSlug) => {
     if (reservedBlogCategorySlugs.has(routeSlug)) {
       conflicts.push({
-        route: `/blog/${routeSlug}`,
-        message: `Blog category route "/blog/${routeSlug}" is reserved.`,
+        route: `/blog/${routeSlug}/`,
+        message: `Blog category route "/blog/${routeSlug}/" is reserved.`,
       });
     }
 
     if (legacyArticleSlugs.has(routeSlug)) {
       conflicts.push({
-        route: `/blog/${routeSlug}`,
-        message: `Legacy blog article redirect "/blog/${routeSlug}" conflicts with category route "${getCategoryUrl(targetCategorySlug)}".`,
+        route: `/blog/${routeSlug}/`,
+        message: `Legacy blog article redirect "/blog/${routeSlug}/" conflicts with category route "${getCategoryUrl(targetCategorySlug)}".`,
       });
     }
   });

@@ -11,12 +11,12 @@ tags:
 readTime: "7 min"
 relatedCalculator:
   label: "Calculadora de hipoteca"
-  href: "/inmuebles/calculadora-de-hipoteca"
+  href: "/inmuebles/calculadora-de-hipoteca/"
 ---
 
 Crear una tabla de amortización hipotecaria en Excel o Google Sheets te ayuda a validar cómo se divide cada pago entre capital e intereses. También sirve para revisar redondeos y entender por qué el saldo baja lentamente al inicio.
 
-Si solo quieres el resultado rápido, puedes generar y exportar la tabla desde la [calculadora de hipoteca](/inmuebles/calculadora-de-hipoteca).
+Si solo quieres el resultado rápido, puedes generar y exportar la tabla desde la [calculadora de hipoteca](/inmuebles/calculadora-de-hipoteca/).
 
 ## Datos iniciales
 
@@ -105,9 +105,9 @@ Si tu tabla no termina en cero, probablemente hay un problema de redondeo o fór
 
 ## Exporta o valida con la calculadora
 
-La [calculadora de hipoteca](/inmuebles/calculadora-de-hipoteca) permite exportar CSV con la amortización completa. Puedes usarlo para comparar tu hoja de cálculo o como punto de partida.
+La [calculadora de hipoteca](/inmuebles/calculadora-de-hipoteca/) permite exportar CSV con la amortización completa. Puedes usarlo para comparar tu hoja de cálculo o como punto de partida.
 
-También puedes revisar la guía sobre [sistema francés en una hipoteca](/blog/inmuebles/sistema-frances-hipoteca) para entender la lógica detrás de la cuota fija.
+También puedes revisar la guía sobre [sistema francés en una hipoteca](/blog/inmuebles/sistema-frances-hipoteca/) para entender la lógica detrás de la cuota fija.
 
 ## Preguntas frecuentes
 

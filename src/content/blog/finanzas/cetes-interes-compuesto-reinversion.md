@@ -11,7 +11,7 @@ readTime: "7 min"
 seoTitle: "CETES e interes compuesto: reinversion, tasa y ejemplo"
 relatedCalculator:
   label: "Calculadora de interes compuesto"
-  href: "/finanzas/calculadora-de-interes-compuesto"
+  href: "/finanzas/calculadora-de-interes-compuesto/"
 ---
 
 Nota de actualidad: este articulo fue revisado el 18 de mayo de 2026. No usa tasas vigentes como ejemplo porque los rendimientos de CETES cambian con cada subasta y las reglas fiscales pueden cambiar por ejercicio.
@@ -101,7 +101,7 @@ Por ultimo, revisa si la reinversion esta activa. En Cetesdirecto y otras plataf
 
 ## Usa la calculadora como aproximacion
 
-La [calculadora de interes compuesto](/finanzas/calculadora-de-interes-compuesto) te sirve para construir una simulacion con tasa anual constante. Puedes usarla asi:
+La [calculadora de interes compuesto](/finanzas/calculadora-de-interes-compuesto/) te sirve para construir una simulacion con tasa anual constante. Puedes usarla asi:
 
 1. Escribe el capital inicial.
 2. Usa una tasa anual como supuesto educativo.
@@ -111,7 +111,7 @@ La [calculadora de interes compuesto](/finanzas/calculadora-de-interes-compuesto
 
 La limitacion es importante: una calculadora de interes compuesto normalmente asume que la tasa se mantiene igual durante todo el periodo. CETES reales pueden tener una tasa distinta en cada vencimiento, y el resultado tambien puede cambiar por ISR, fechas de compra, disponibilidad de plazos y reglas vigentes.
 
-Si quieres entender la formula general detras de la simulacion, revisa la guia de [formula de interes compuesto](/blog/finanzas/formula-interes-compuesto). Si vas a proyectar varios anos, tambien conviene ajustar el resultado por [inflacion e interes compuesto](/blog/finanzas/inflacion-interes-compuesto-valor-real). Y si estas comparando escenarios, evita los errores comunes de una [calculadora de interes compuesto](/blog/finanzas/errores-calculadora-interes-compuesto).
+Si quieres entender la formula general detras de la simulacion, revisa la guia de [formula de interes compuesto](/blog/finanzas/formula-interes-compuesto/). Si vas a proyectar varios anos, tambien conviene ajustar el resultado por [inflacion e interes compuesto](/blog/finanzas/inflacion-interes-compuesto-valor-real/). Y si estas comparando escenarios, evita los errores comunes de una [calculadora de interes compuesto](/blog/finanzas/errores-calculadora-interes-compuesto/).
 
 ## Preguntas frecuentes
 

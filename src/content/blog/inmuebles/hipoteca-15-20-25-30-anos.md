@@ -11,7 +11,7 @@ tags:
 readTime: "7 min"
 relatedCalculator:
   label: "Calculadora de hipoteca"
-  href: "/inmuebles/calculadora-de-hipoteca"
+  href: "/inmuebles/calculadora-de-hipoteca/"
 ---
 
 El plazo de una hipoteca cambia dos cosas al mismo tiempo: la mensualidad y los intereses totales. Un plazo más largo puede hacer que la cuota mensual sea más manejable, pero normalmente aumenta el costo acumulado.
@@ -27,7 +27,7 @@ Con el mismo monto y la misma tasa:
 - El plazo largo mantiene la deuda viva más tiempo.
 - Más meses de deuda suelen implicar más intereses.
 
-La [calculadora de hipoteca](/inmuebles/calculadora-de-hipoteca) permite cambiar el plazo de 1 a 30 años para comparar escenarios.
+La [calculadora de hipoteca](/inmuebles/calculadora-de-hipoteca/) permite cambiar el plazo de 1 a 30 años para comparar escenarios.
 
 ## Ejemplo con el mismo monto y tasa
 
@@ -93,7 +93,7 @@ Antes de decidir, revisa:
 - Costos de compra y mantenimiento.
 - Posibilidad de pagos anticipados.
 
-También conviene leer sobre [pagos extra en una hipoteca](/blog/inmuebles/pagos-extra-hipoteca-abono-capital), porque un plazo largo con abonos a capital puede comportarse mejor que un plazo largo sin pagos adicionales.
+También conviene leer sobre [pagos extra en una hipoteca](/blog/inmuebles/pagos-extra-hipoteca-abono-capital/), porque un plazo largo con abonos a capital puede comportarse mejor que un plazo largo sin pagos adicionales.
 
 ## Preguntas frecuentes
 

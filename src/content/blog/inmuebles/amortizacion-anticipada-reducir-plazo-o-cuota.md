@@ -11,12 +11,12 @@ tags:
 readTime: "7 min"
 relatedCalculator:
   label: "Calculadora de hipoteca"
-  href: "/inmuebles/calculadora-de-hipoteca"
+  href: "/inmuebles/calculadora-de-hipoteca/"
 ---
 
 Cuando haces pagos anticipados en una hipoteca, puedes encontrarte con dos posibilidades: reducir el plazo o reducir la mensualidad. Ambas opciones bajan el saldo, pero no tienen el mismo efecto en intereses ni en flujo mensual.
 
-La [calculadora de hipoteca](/inmuebles/calculadora-de-hipoteca) modela pagos extra mensuales que reducen el plazo efectivo manteniendo la cuota base. No recalcula una nueva mensualidad menor.
+La [calculadora de hipoteca](/inmuebles/calculadora-de-hipoteca/) modela pagos extra mensuales que reducen el plazo efectivo manteniendo la cuota base. No recalcula una nueva mensualidad menor.
 
 ## Qué es amortización anticipada
 

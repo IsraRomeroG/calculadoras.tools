@@ -23,11 +23,11 @@ const blogPost = (
 
 describe("blog route helpers", () => {
   it("builds category URLs without the categoria segment", () => {
-    expect(getCategoryUrl("salud")).toBe("/blog/salud");
-    expect(getCategoryPageUrl("salud", 1)).toBe("/blog/salud");
-    expect(getCategoryPageUrl("salud", 2)).toBe("/blog/salud/pagina/2");
-    expect(getCategoryUrl("legal-impuestos")).toBe("/blog/legal-impuestos");
-    expect(getCategoryUrl("fecha-tiempo")).toBe("/blog/fecha-tiempo");
+    expect(getCategoryUrl("salud")).toBe("/blog/salud/");
+    expect(getCategoryPageUrl("salud", 1)).toBe("/blog/salud/");
+    expect(getCategoryPageUrl("salud", 2)).toBe("/blog/salud/pagina/2/");
+    expect(getCategoryUrl("legal-impuestos")).toBe("/blog/legal-impuestos/");
+    expect(getCategoryUrl("fecha-tiempo")).toBe("/blog/fecha-tiempo/");
   });
 
   it("builds article URLs below their category slug", () => {
@@ -35,10 +35,10 @@ describe("blog route helpers", () => {
       getBlogPostUrl(
         blogPost("legal-impuestos/como-calcular-iva", "legal-impuestos"),
       ),
-    ).toBe("/blog/legal-impuestos/como-calcular-iva");
+    ).toBe("/blog/legal-impuestos/como-calcular-iva/");
     expect(
       getBlogPostUrl(blogPost("matematicas/regla-de-tres", "matematicas")),
-    ).toBe("/blog/matematicas/regla-de-tres");
+    ).toBe("/blog/matematicas/regla-de-tres/");
   });
 
   it("gets visible category labels from shared metadata", () => {
@@ -59,7 +59,7 @@ describe("blog route helpers", () => {
     ]);
 
     expect(conflicts.map((conflict) => conflict.route)).toEqual(
-      expect.arrayContaining(["/blog/salud/pagina"]),
+      expect.arrayContaining(["/blog/salud/pagina/"]),
     );
   });
 
@@ -70,7 +70,7 @@ describe("blog route helpers", () => {
     ]);
 
     expect(conflicts.map((conflict) => conflict.route)).toContain(
-      "/blog/salud/repetido",
+      "/blog/salud/repetido/",
     );
   });
 
@@ -81,7 +81,7 @@ describe("blog route helpers", () => {
     ]);
 
     expect(conflicts.map((conflict) => conflict.route)).toContain(
-      "/blog/salud",
+      "/blog/salud/",
     );
   });
 
@@ -92,7 +92,7 @@ describe("blog route helpers", () => {
     ]);
 
     expect(conflicts.map((conflict) => conflict.route)).toContain(
-      "/blog/legal-e-impuestos",
+      "/blog/legal-e-impuestos/",
     );
   });
 });

@@ -11,7 +11,7 @@ tags:
 readTime: "6 min"
 relatedCalculator:
   label: "Calculadora de IMC"
-  href: "/salud/calculadora-de-imc"
+  href: "/salud/calculadora-de-imc/"
 ---
 
 El IMC y el porcentaje de grasa corporal intentan responder preguntas relacionadas, pero no miden lo mismo.
@@ -30,7 +30,7 @@ Usa solo peso y altura. Su ventaja es que es rápido, accesible y fácil de comp
 
 Su limitación principal es que no distingue de qué está hecho el peso.
 
-La [calculadora de IMC](/salud/calculadora-de-imc) te ayuda a obtener ese número y la categoría adulta de referencia.
+La [calculadora de IMC](/salud/calculadora-de-imc/) te ayuda a obtener ese número y la categoría adulta de referencia.
 
 ## Qué mide el porcentaje de grasa corporal
 
@@ -76,7 +76,7 @@ Cada método tiene margen de error. Por eso, más que obsesionarse con un númer
 
 ## Usa el IMC como punto de partida
 
-El IMC es útil para una primera lectura. Si el resultado no parece coincidir con tu composición corporal, revisa sus [limitaciones](/blog/salud/limitaciones-del-imc) y considera otros indicadores.
+El IMC es útil para una primera lectura. Si el resultado no parece coincidir con tu composición corporal, revisa sus [limitaciones](/blog/salud/limitaciones-del-imc/) y considera otros indicadores.
 
 ## Preguntas frecuentes
 

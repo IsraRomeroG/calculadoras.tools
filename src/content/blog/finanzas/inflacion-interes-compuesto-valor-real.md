@@ -11,7 +11,7 @@ readTime: "6 min"
 seoTitle: "Inflación e interés compuesto: valor nominal vs valor real"
 relatedCalculator:
   label: "Calculadora de inflación y poder adquisitivo"
-  href: "/finanzas/calculadora-de-inflacion-poder-adquisitivo"
+  href: "/finanzas/calculadora-de-inflacion-poder-adquisitivo/"
 ---
 
 ## Valor nominal vs valor real
@@ -85,11 +85,11 @@ Usa el cálculo como una referencia para comparar escenarios, no como una predic
 
 ## Simula con inflación
 
-La [calculadora de inflación y poder adquisitivo](/finanzas/calculadora-de-inflacion-poder-adquisitivo) permite explorar cuánto costaría algo en el futuro, cuánto poder de compra conservaría una cantidad y cómo cambia el resultado con distintos escenarios.
+La [calculadora de inflación y poder adquisitivo](/finanzas/calculadora-de-inflacion-poder-adquisitivo/) permite explorar cuánto costaría algo en el futuro, cuánto poder de compra conservaría una cantidad y cómo cambia el resultado con distintos escenarios.
 
 Una forma práctica de usarla es probar tres escenarios: uno conservador, uno medio y uno optimista. Mantén el mismo capital, plazo y aportaciones, y cambia la inflación o la tasa para ver cómo cambia el poder adquisitivo.
 
-Si quieres reforzar conceptos relacionados, también puedes revisar la [regla del 72](/blog/finanzas/regla-del-72), la guía sobre [qué es el interés compuesto](/blog/finanzas/que-es-interes-compuesto) y los [errores comunes al usar una calculadora de interés compuesto](/blog/finanzas/errores-calculadora-interes-compuesto).
+Si quieres reforzar conceptos relacionados, también puedes revisar la [regla del 72](/blog/finanzas/regla-del-72/), la guía sobre [qué es el interés compuesto](/blog/finanzas/que-es-interes-compuesto/) y los [errores comunes al usar una calculadora de interés compuesto](/blog/finanzas/errores-calculadora-interes-compuesto/).
 
 ## Preguntas frecuentes
 

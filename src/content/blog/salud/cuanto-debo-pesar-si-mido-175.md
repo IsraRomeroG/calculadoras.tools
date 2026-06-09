@@ -11,7 +11,7 @@ tags:
 readTime: "4 min"
 relatedCalculator:
   label: "Calculadora de IMC"
-  href: "/salud/calculadora-de-imc"
+  href: "/salud/calculadora-de-imc/"
 ---
 
 Si mides 1.75 m, el rango saludable de referencia para adultos es aproximadamente **56.7 kg a 76.3 kg**. Este rango se obtiene usando IMC adulto entre 18.5 y 24.9.
@@ -61,11 +61,11 @@ Estos ejemplos ayudan a ubicar el resultado, pero no reemplazan una evaluación 
 
 En personas con mucha masa muscular, el IMC puede salir más alto sin reflejar necesariamente mayor grasa corporal. También puede quedarse corto si no se revisa cintura, grasa corporal o marcadores clínicos.
 
-Si haces entrenamiento de fuerza, revisa la guía sobre [IMC y masa muscular](/blog/salud/imc-masa-muscular-ejercicio).
+Si haces entrenamiento de fuerza, revisa la guía sobre [IMC y masa muscular](/blog/salud/imc-masa-muscular-ejercicio/).
 
 ## Calcula tu IMC exacto
 
-La forma más rápida es usar la [calculadora de IMC](/salud/calculadora-de-imc). También puedes comparar con la [tabla de peso saludable según estatura](/blog/salud/peso-saludable-segun-estatura).
+La forma más rápida es usar la [calculadora de IMC](/salud/calculadora-de-imc/). También puedes comparar con la [tabla de peso saludable según estatura](/blog/salud/peso-saludable-segun-estatura/).
 
 ## Preguntas frecuentes
 

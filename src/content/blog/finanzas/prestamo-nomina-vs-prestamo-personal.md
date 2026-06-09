@@ -11,7 +11,7 @@ tags:
 readTime: "6 min"
 relatedCalculator:
   label: "Calculadora de préstamo"
-  href: "/finanzas/calculadora-de-prestamo"
+  href: "/finanzas/calculadora-de-prestamo/"
 ---
 
 Un préstamo de nómina y un préstamo personal pueden parecer similares porque ambos entregan dinero para usarlo libremente. La diferencia principal está en la forma de contratación y pago: el crédito de nómina se vincula al salario y suele descontarse automáticamente.
@@ -56,7 +56,7 @@ Imagina dos escenarios para `$50,000` a `24 meses`:
 
 En este ejemplo, el préstamo de nómina sale más barato. Pero no lo tomes como regla universal: puede haber ofertas personales con mejor CAT o créditos de nómina con comisiones y condiciones menos convenientes.
 
-La forma correcta es simular ambos con el mismo monto y plazo en la [calculadora de préstamo](/finanzas/calculadora-de-prestamo), y después contrastar con la oferta formal.
+La forma correcta es simular ambos con el mismo monto y plazo en la [calculadora de préstamo](/finanzas/calculadora-de-prestamo/), y después contrastar con la oferta formal.
 
 ## Riesgos y condiciones que debes revisar
 
@@ -75,7 +75,7 @@ CONDUSEF explica que el simulador de crédito personal y de nómina permite comp
 
 ## Cómo simular ambos escenarios
 
-En la [calculadora de préstamo](/finanzas/calculadora-de-prestamo), elige el tipo de préstamo más cercano, captura monto, tasa, plazo, comisión y seguro. Luego repite con la segunda oferta.
+En la [calculadora de préstamo](/finanzas/calculadora-de-prestamo/), elige el tipo de préstamo más cercano, captura monto, tasa, plazo, comisión y seguro. Luego repite con la segunda oferta.
 
 Compara:
 
@@ -85,7 +85,7 @@ Compara:
 - CAT aproximado.
 - Tabla de amortización.
 
-También puedes complementar con la guía sobre [cómo comparar dos préstamos](/blog/finanzas/comparar-dos-prestamos) y la explicación de [préstamo a 12, 24, 36 o 48 meses](/blog/finanzas/prestamo-12-24-36-48-meses).
+También puedes complementar con la guía sobre [cómo comparar dos préstamos](/blog/finanzas/comparar-dos-prestamos/) y la explicación de [préstamo a 12, 24, 36 o 48 meses](/blog/finanzas/prestamo-12-24-36-48-meses/).
 
 ## Preguntas frecuentes
 

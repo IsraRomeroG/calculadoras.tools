@@ -194,7 +194,7 @@ describe("pet age share params", () => {
         months: 6,
       }),
     ).toBe(
-      "/mascotas/edad-de-mascota-en-anos-humanos?especie=perro&talla=mediana&anos=7&meses=6",
+      "/mascotas/edad-de-mascota-en-anos-humanos/?especie=perro&talla=mediana&anos=7&meses=6",
     );
     expect(
       buildPetAgeShareUrl({
@@ -202,7 +202,7 @@ describe("pet age share params", () => {
         birthDate: { year: 2020, month: 4, day: 15 },
       }),
     ).toBe(
-      "/mascotas/edad-de-mascota-en-anos-humanos?especie=gato&fecha=2020-04-15",
+      "/mascotas/edad-de-mascota-en-anos-humanos/?especie=gato&fecha=2020-04-15",
     );
   });
 });

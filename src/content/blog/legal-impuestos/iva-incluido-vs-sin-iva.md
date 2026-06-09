@@ -11,7 +11,7 @@ readTime: "4 min"
 seoTitle: "IVA incluido vs precio sin IVA: diferencias y ejemplos"
 relatedCalculator:
   label: "Calculadora de IVA"
-  href: "/legal-impuestos/calculadora-de-iva"
+  href: "/legal-impuestos/calculadora-de-iva/"
 ---
 
 ## La diferencia principal
@@ -41,7 +41,7 @@ Con IVA de 16%:
 
 El monto a pagar sería $580.
 
-Para ese caso, puedes ver la guía específica de [cómo sumar IVA a un precio sin impuesto](/blog/legal-impuestos/como-sumar-iva-a-un-precio).
+Para ese caso, puedes ver la guía específica de [cómo sumar IVA a un precio sin impuesto](/blog/legal-impuestos/como-sumar-iva-a-un-precio/).
 
 ## Qué significa "IVA incluido"
 
@@ -82,6 +82,6 @@ Para comparar de forma justa, lleva todos los precios al mismo formato: todos co
 
 ## Usa el modo correcto de la calculadora
 
-Si tienes un precio sin impuesto, usa el modo "Agregar" en la [calculadora de IVA](/legal-impuestos/calculadora-de-iva). Si tienes un precio final, usa el modo "Desglosar".
+Si tienes un precio sin impuesto, usa el modo "Agregar" en la [calculadora de IVA](/legal-impuestos/calculadora-de-iva/). Si tienes un precio final, usa el modo "Desglosar".
 
-También puedes revisar la guía de [cómo calcular el IVA paso a paso](/blog/legal-impuestos/como-calcular-iva) o la explicación específica de [cómo desglosar el IVA de un precio total](/blog/legal-impuestos/como-desglosar-iva).
+También puedes revisar la guía de [cómo calcular el IVA paso a paso](/blog/legal-impuestos/como-calcular-iva/) o la explicación específica de [cómo desglosar el IVA de un precio total](/blog/legal-impuestos/como-desglosar-iva/).

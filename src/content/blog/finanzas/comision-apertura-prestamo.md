@@ -11,7 +11,7 @@ tags:
 readTime: "5 min"
 relatedCalculator:
   label: "Calculadora de préstamo"
-  href: "/finanzas/calculadora-de-prestamo"
+  href: "/finanzas/calculadora-de-prestamo/"
 ---
 
 La comisión por apertura es un cargo que algunas instituciones cobran al otorgar un préstamo. Puede parecer pequeña si se expresa como porcentaje, pero aumenta el costo total y puede mover el CAT.
@@ -76,7 +76,7 @@ La forma de cobro importa:
 - Si se paga al inicio, recibes el préstamo y pagas la comisión aparte, o recibes menos dinero neto.
 - Si se financia, la comisión puede integrarse al saldo del crédito y generar intereses.
 
-La [calculadora de préstamo](/finanzas/calculadora-de-prestamo) muestra la comisión por apertura como costo inicial separado. Si tu oferta financia la comisión, conviene ajustar el monto o revisar la simulación formal de la institución.
+La [calculadora de préstamo](/finanzas/calculadora-de-prestamo/) muestra la comisión por apertura como costo inicial separado. Si tu oferta financia la comisión, conviene ajustar el monto o revisar la simulación formal de la institución.
 
 ## Cómo compararla en la calculadora
 
@@ -87,7 +87,7 @@ Para evaluar el efecto de este cargo:
 3. Compara costo total, CAT aproximado e intereses.
 4. Agrega seguro mensual si la oferta lo incluye.
 
-También puedes revisar [CAT vs tasa de interés](/blog/finanzas/cat-vs-tasa-interes) y la guía de [cómo comparar dos préstamos](/blog/finanzas/comparar-dos-prestamos) antes de elegir.
+También puedes revisar [CAT vs tasa de interés](/blog/finanzas/cat-vs-tasa-interes/) y la guía de [cómo comparar dos préstamos](/blog/finanzas/comparar-dos-prestamos/) antes de elegir.
 
 ## Preguntas frecuentes
 

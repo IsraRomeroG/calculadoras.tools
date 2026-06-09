@@ -13,12 +13,12 @@ export const MENU: MenuItem[] = [
     name: "Blog",
     description:
       "Blog con artículos sobre finanzas personales, salud, matemáticas y más.",
-    slug: "/blog",
+    slug: "/blog/",
   },
   {
     id: "contacto",
     name: "Contacto",
     description: "Contáctanos para cualquier pregunta o comentario.",
-    slug: "/contacto",
+    slug: "/contacto/",
   },
 ];

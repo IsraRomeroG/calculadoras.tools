@@ -11,7 +11,7 @@ tags:
 readTime: "5 min"
 relatedCalculator:
   label: "Calculadora de préstamo"
-  href: "/finanzas/calculadora-de-prestamo"
+  href: "/finanzas/calculadora-de-prestamo/"
 ---
 
 Convertir correctamente la tasa es esencial para calcular intereses. Si tienes una tasa anual y la usas como si fuera mensual, el resultado queda completamente distorsionado.
@@ -22,7 +22,7 @@ En préstamos, la periodicidad importa: no es lo mismo una tasa anual, mensual, 
 
 La tasa debe coincidir con el periodo del cálculo. Si vas a calcular intereses de un mes, necesitas una tasa mensual. Si vas a calcular intereses diarios, necesitas una tasa diaria.
 
-La [calculadora de préstamo](/finanzas/calculadora-de-prestamo) pide tasa de interés anual. Internamente la convierte a una tasa mensual para estimar la cuota y la tabla de amortización.
+La [calculadora de préstamo](/finanzas/calculadora-de-prestamo/) pide tasa de interés anual. Internamente la convierte a una tasa mensual para estimar la cuota y la tabla de amortización.
 
 ## Cómo convertir tasa anual a mensual
 
@@ -107,9 +107,9 @@ Antes de calcular, confirma:
 
 ## Qué tasa usar en la calculadora
 
-En la [calculadora de préstamo](/finanzas/calculadora-de-prestamo), usa la tasa anual. Si tienes una tasa mensual, puedes anualizarla de forma simple multiplicando por 12 para una estimación inicial, pero revisa si se trata de tasa efectiva o nominal.
+En la [calculadora de préstamo](/finanzas/calculadora-de-prestamo/), usa la tasa anual. Si tienes una tasa mensual, puedes anualizarla de forma simple multiplicando por 12 para una estimación inicial, pero revisa si se trata de tasa efectiva o nominal.
 
-Para entender el efecto en la cuota, revisa también [cómo calcular la cuota mensual de un préstamo](/blog/finanzas/como-calcular-cuota-mensual-prestamo), [cómo calcular intereses](/blog/finanzas/como-calcular-intereses-prestamo) y [CAT vs tasa de interés](/blog/finanzas/cat-vs-tasa-interes).
+Para entender el efecto en la cuota, revisa también [cómo calcular la cuota mensual de un préstamo](/blog/finanzas/como-calcular-cuota-mensual-prestamo/), [cómo calcular intereses](/blog/finanzas/como-calcular-intereses-prestamo/) y [CAT vs tasa de interés](/blog/finanzas/cat-vs-tasa-interes/).
 
 ## Preguntas frecuentes
 

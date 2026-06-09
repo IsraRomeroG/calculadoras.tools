@@ -11,7 +11,7 @@ tags:
 readTime: "4 min"
 relatedCalculator:
   label: "Calculadora de IMC"
-  href: "/salud/calculadora-de-imc"
+  href: "/salud/calculadora-de-imc/"
 ---
 
 En adultos, el IMC normal o rango saludable de referencia suele estar entre `18.5` y `24.9`.
@@ -35,7 +35,7 @@ Por debajo de 18.5 se considera bajo peso. A partir de 25.0 se considera sobrepe
 | 25.0 a 29.9 | Sobrepeso |
 | 30.0 o más | Obesidad |
 
-Si quieres calcularlo con tus datos, puedes usar la [calculadora de IMC](/salud/calculadora-de-imc).
+Si quieres calcularlo con tus datos, puedes usar la [calculadora de IMC](/salud/calculadora-de-imc/).
 
 ## Ejemplos de IMC dentro del rango saludable
 
@@ -93,7 +93,7 @@ En adultos mayores, el IMC también puede requerir lectura más cuidadosa porque
 
 ## Calcula tu IMC
 
-La [calculadora de IMC](/salud/calculadora-de-imc) te muestra si tu resultado cae dentro del rango saludable y cuál sería el rango de peso asociado a tu altura.
+La [calculadora de IMC](/salud/calculadora-de-imc/) te muestra si tu resultado cae dentro del rango saludable y cuál sería el rango de peso asociado a tu altura.
 
 ## Preguntas frecuentes
 

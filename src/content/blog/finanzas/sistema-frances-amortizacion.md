@@ -11,12 +11,12 @@ tags:
 readTime: "6 min"
 relatedCalculator:
   label: "Calculadora de préstamo"
-  href: "/finanzas/calculadora-de-prestamo"
+  href: "/finanzas/calculadora-de-prestamo/"
 ---
 
 El sistema francés de amortización es un método de pago en el que la cuota se mantiene fija durante el plazo, siempre que la tasa y las condiciones no cambien. Cada cuota combina intereses y capital, pero la proporción cambia mes a mes.
 
-La [calculadora de préstamo](/finanzas/calculadora-de-prestamo) usa este esquema como supuesto principal para estimar la mensualidad y construir la tabla de amortización.
+La [calculadora de préstamo](/finanzas/calculadora-de-prestamo/) usa este esquema como supuesto principal para estimar la mensualidad y construir la tabla de amortización.
 
 ## Qué es el sistema francés
 
@@ -52,7 +52,7 @@ interés del mes = saldo pendiente x tasa mensual
 
 Al inicio debes casi todo el préstamo, así que el interés del mes es mayor. Después de cada pago, el saldo baja y el interés del siguiente mes también baja.
 
-Esto se ve mejor en una [tabla de amortización](/blog/finanzas/tabla-amortizacion-prestamo), donde cada fila muestra pago, capital, intereses y saldo pendiente.
+Esto se ve mejor en una [tabla de amortización](/blog/finanzas/tabla-amortizacion-prestamo/), donde cada fila muestra pago, capital, intereses y saldo pendiente.
 
 ## Ejemplo con tabla de 3 meses
 
@@ -74,7 +74,7 @@ El sistema francés prioriza pagos iguales. Eso lo hace fácil de presupuestar, 
 
 ## Cómo lo usa la calculadora
 
-Cuando capturas monto, tasa y plazo, la [calculadora de préstamo](/finanzas/calculadora-de-prestamo) estima una cuota fija base. Luego suma seguro mensual o pago extra si los agregas.
+Cuando capturas monto, tasa y plazo, la [calculadora de préstamo](/finanzas/calculadora-de-prestamo/) estima una cuota fija base. Luego suma seguro mensual o pago extra si los agregas.
 
 También calcula la tabla mes a mes para que puedas ver:
 
@@ -83,7 +83,7 @@ También calcula la tabla mes a mes para que puedas ver:
 - Cuánto queda de saldo.
 - Cómo cambia el plazo si haces pagos extra.
 
-Si quieres repasar la fórmula paso a paso, lee [cómo calcular la cuota mensual de un préstamo](/blog/finanzas/como-calcular-cuota-mensual-prestamo) y [cómo calcular intereses de un préstamo](/blog/finanzas/como-calcular-intereses-prestamo).
+Si quieres repasar la fórmula paso a paso, lee [cómo calcular la cuota mensual de un préstamo](/blog/finanzas/como-calcular-cuota-mensual-prestamo/) y [cómo calcular intereses de un préstamo](/blog/finanzas/como-calcular-intereses-prestamo/).
 
 ## Preguntas frecuentes
 

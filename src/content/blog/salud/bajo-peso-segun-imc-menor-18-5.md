@@ -11,7 +11,7 @@ tags:
 readTime: "5 min"
 relatedCalculator:
   label: "Calculadora de IMC"
-  href: "/salud/calculadora-de-imc"
+  href: "/salud/calculadora-de-imc/"
 ---
 
 En adultos, un IMC menor a 18.5 se clasifica como bajo peso. Algunas tablas dividen ese rango en delgadez leve, moderada y severa.
@@ -35,7 +35,7 @@ Tabla más detallada:
 | 17.0 a 18.4   | Delgadez leve     |
 | 18.5 a 24.9   | Rango saludable   |
 
-Puedes calcular tu resultado con la [calculadora de IMC](/salud/calculadora-de-imc).
+Puedes calcular tu resultado con la [calculadora de IMC](/salud/calculadora-de-imc/).
 
 ## Ejemplos numéricos
 
@@ -82,7 +82,7 @@ La idea no es alarmar, sino evitar interpretar un número sensible sin contexto.
 
 ## Calcula tu IMC
 
-La [calculadora de IMC](/salud/calculadora-de-imc) permite revisar el resultado y ver la categoría adulta de referencia.
+La [calculadora de IMC](/salud/calculadora-de-imc/) permite revisar el resultado y ver la categoría adulta de referencia.
 
 ## Preguntas frecuentes
 

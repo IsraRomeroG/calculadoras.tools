@@ -11,7 +11,7 @@ readTime: "5 min"
 seoTitle: "Interés simple vs compuesto: diferencias, fórmulas y ejemplos"
 relatedCalculator:
   label: "Calculadora de interés compuesto"
-  href: "/finanzas/calculadora-de-interes-compuesto"
+  href: "/finanzas/calculadora-de-interes-compuesto/"
 ---
 
 ## Diferencia principal
@@ -20,7 +20,7 @@ La diferencia entre interés simple e interés compuesto está en la base del c�
 
 En una frase: con interés simple el crecimiento es lineal; con interés compuesto el crecimiento puede acelerarse porque los intereses también generan intereses.
 
-Si quieres partir desde el concepto general antes de comparar, revisa primero [qué es el interés compuesto](/blog/finanzas/que-es-interes-compuesto).
+Si quieres partir desde el concepto general antes de comparar, revisa primero [qué es el interés compuesto](/blog/finanzas/que-es-interes-compuesto/).
 
 ## Fórmula del interés simple
 
@@ -59,7 +59,7 @@ Donde `VF` es el valor futuro, `P` es el capital inicial, `r` es la tasa anual e
 
 La parte clave es `(1 + r / n) ^ (n x t)`: ahí se refleja que cada período suma intereses al saldo y ese nuevo saldo se usa para el siguiente cálculo.
 
-Para una explicación más detallada de cada variable, consulta la [fórmula del interés compuesto](/blog/finanzas/formula-interes-compuesto).
+Para una explicación más detallada de cada variable, consulta la [fórmula del interés compuesto](/blog/finanzas/formula-interes-compuesto/).
 
 ## Ejemplo con los mismos datos
 
@@ -118,11 +118,11 @@ También conviene distinguir entre interés ganado e interés cobrado. En una in
 
 ## Calcula el escenario compuesto
 
-La forma más clara de entender la diferencia es cambiar el plazo, la tasa y la frecuencia de capitalización. En la [calculadora de interés compuesto](/finanzas/calculadora-de-interes-compuesto) puedes probar el mismo capital con capitalización anual, mensual o con aportaciones periódicas.
+La forma más clara de entender la diferencia es cambiar el plazo, la tasa y la frecuencia de capitalización. En la [calculadora de interés compuesto](/finanzas/calculadora-de-interes-compuesto/) puedes probar el mismo capital con capitalización anual, mensual o con aportaciones periódicas.
 
 Esto ayuda a ver cuándo el crecimiento compuesto empieza a separarse del crecimiento simple y cuánto depende del tiempo.
 
-Si solo buscas una estimación rápida de cuánto tarda en duplicarse una cantidad con interés compuesto, la [regla del 72](/blog/finanzas/regla-del-72) puede servir como atajo aproximado.
+Si solo buscas una estimación rápida de cuánto tarda en duplicarse una cantidad con interés compuesto, la [regla del 72](/blog/finanzas/regla-del-72/) puede servir como atajo aproximado.
 
 ## Preguntas frecuentes
 

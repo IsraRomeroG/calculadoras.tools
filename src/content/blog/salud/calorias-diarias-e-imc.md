@@ -11,7 +11,7 @@ tags:
 readTime: "6 min"
 relatedCalculator:
   label: "Calculadora de IMC"
-  href: "/salud/calculadora-de-imc"
+  href: "/salud/calculadora-de-imc/"
 ---
 
 El IMC y las calorías diarias responden preguntas distintas. El IMC te dice cómo se relaciona tu peso con tu estatura. Las calorías diarias o TDEE estiman cuánta energía usa tu cuerpo en un día.
@@ -35,7 +35,7 @@ En adultos, el resultado se interpreta con categorías generales:
 | 25 a menos de 30 | Sobrepeso |
 | 30 o más | Obesidad |
 
-La [calculadora de IMC](/salud/calculadora-de-imc) usa tu peso y altura para darte ese resultado y un rango de peso saludable estimado para tu estatura.
+La [calculadora de IMC](/salud/calculadora-de-imc/) usa tu peso y altura para darte ese resultado y un rango de peso saludable estimado para tu estatura.
 
 ## Qué miden las calorías diarias o TDEE
 
@@ -62,7 +62,7 @@ Puedes pensar en ambas herramientas así:
 
 Si tu IMC está por encima o por debajo del rango de referencia, el TDEE puede ayudarte a entender la parte energética. Pero el cambio de peso seguro no depende solo de números: también importan calidad de alimentación, actividad física, sueño, salud mental y contexto médico.
 
-Para ver el puente práctico, lee [cómo bajar o subir de peso según tu IMC](/blog/salud/bajar-subir-peso-segun-imc).
+Para ver el puente práctico, lee [cómo bajar o subir de peso según tu IMC](/blog/salud/bajar-subir-peso-segun-imc/).
 
 ## Ejemplo práctico
 
@@ -92,7 +92,7 @@ Ambas herramientas son útiles si se interpretan como referencias, no como instr
 
 ## Calculadoras relacionadas
 
-Empieza con la [calculadora de IMC](/salud/calculadora-de-imc). Después puedes usar la [calculadora de calorías diarias (TDEE)](/salud/calculadora-de-calorias-diarias-tdee) para complementar el análisis energético.
+Empieza con la [calculadora de IMC](/salud/calculadora-de-imc/). Después puedes usar la [calculadora de calorías diarias (TDEE)](/salud/calculadora-de-calorias-diarias-tdee/) para complementar el análisis energético.
 
 ## Preguntas frecuentes
 

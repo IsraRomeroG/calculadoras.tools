@@ -11,7 +11,7 @@ tags:
 readTime: "7 min"
 relatedCalculator:
   label: "Calculadora de hipoteca"
-  href: "/inmuebles/calculadora-de-hipoteca"
+  href: "/inmuebles/calculadora-de-hipoteca/"
 ---
 
 Calcular la cuota mensual de una hipoteca sirve para saber cuánto pagarías cada mes por el crédito de una vivienda. Es una estimación clave antes de comparar bancos, revisar el enganche o decidir si un plazo largo realmente te conviene.
@@ -28,7 +28,7 @@ Para estimar la cuota mensual básica necesitas tres datos:
 
 El monto del crédito no siempre es el precio de la vivienda. Si compras una casa de `$2,500,000` y das `$500,000` de enganche, el crédito a calcular es de `$2,000,000`. Esa diferencia es importante porque la cuota se calcula sobre el monto financiado, no sobre el precio completo.
 
-Si quieres partir del precio del inmueble y del enganche, puedes usar la [calculadora de hipoteca](/inmuebles/calculadora-de-hipoteca) en modo "Precio + enganche". Si ya sabes cuánto pedirás prestado, usa el modo "Solo préstamo".
+Si quieres partir del precio del inmueble y del enganche, puedes usar la [calculadora de hipoteca](/inmuebles/calculadora-de-hipoteca/) en modo "Precio + enganche". Si ya sabes cuánto pedirás prestado, usa el modo "Solo préstamo".
 
 ## Fórmula para calcular la cuota mensual
 
@@ -87,7 +87,7 @@ cuota mensual = $17,994.52
 
 Si la tasa y el plazo se mantienen, el total pagado en cuotas sería aproximadamente `$4,318,684.59`. De ese total, `$2,000,000` corresponden al capital prestado y cerca de `$2,318,684.59` a intereses.
 
-Este resultado coincide con el ejemplo base de la [calculadora de hipoteca](/inmuebles/calculadora-de-hipoteca). Puedes cambiar la tasa, el plazo o agregar un pago extra mensual para ver cómo cambia la tabla de amortización.
+Este resultado coincide con el ejemplo base de la [calculadora de hipoteca](/inmuebles/calculadora-de-hipoteca/). Puedes cambiar la tasa, el plazo o agregar un pago extra mensual para ver cómo cambia la tabla de amortización.
 
 ## Qué no incluye esta cuota
 
@@ -102,11 +102,11 @@ La cuota calculada aquí es una base útil, pero no es necesariamente el pago fi
 
 Por eso conviene distinguir entre cuota base y costo total. El CAT, por ejemplo, busca integrar costos del crédito bajo una metodología específica. La cuota de esta calculadora no reemplaza el CAT ni la carátula de una oferta formal.
 
-Si quieres profundizar en esa diferencia, revisa la guía sobre [CAT vs tasa en un crédito hipotecario](/blog/inmuebles/cat-vs-tasa-credito-hipotecario) y el artículo sobre [qué incluye la cuota hipotecaria](/blog/inmuebles/que-incluye-cuota-hipotecaria).
+Si quieres profundizar en esa diferencia, revisa la guía sobre [CAT vs tasa en un crédito hipotecario](/blog/inmuebles/cat-vs-tasa-credito-hipotecario/) y el artículo sobre [qué incluye la cuota hipotecaria](/blog/inmuebles/que-incluye-cuota-hipotecaria/).
 
 ## Calcula tu hipoteca automáticamente
 
-La forma más sencilla de evitar errores de tasa, plazo o redondeo es usar la [calculadora de hipoteca](/inmuebles/calculadora-de-hipoteca). Puedes capturar precio y enganche, o ingresar directamente el monto del préstamo.
+La forma más sencilla de evitar errores de tasa, plazo o redondeo es usar la [calculadora de hipoteca](/inmuebles/calculadora-de-hipoteca/). Puedes capturar precio y enganche, o ingresar directamente el monto del préstamo.
 
 La herramienta muestra:
 

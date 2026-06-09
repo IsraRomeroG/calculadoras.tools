@@ -11,7 +11,7 @@ tags:
 readTime: "6 min"
 relatedCalculator:
   label: "Calculadora de préstamo"
-  href: "/finanzas/calculadora-de-prestamo"
+  href: "/finanzas/calculadora-de-prestamo/"
 ---
 
 Elegir entre 12, 24, 36 o 48 meses cambia dos cosas al mismo tiempo: la mensualidad y los intereses totales. Un plazo corto suele exigir pagos más altos, pero puede reducir el costo final. Un plazo largo puede dar respiro mensual, aunque normalmente aumenta los intereses.
@@ -37,7 +37,7 @@ Usemos el mismo escenario para comparar:
 - Sin comisión ni seguro
 - Plazos: `12`, `24`, `36` y `48 meses`
 
-La [calculadora de préstamo](/finanzas/calculadora-de-prestamo) permite cambiar el plazo y ver el impacto inmediato en mensualidad, intereses y costo total.
+La [calculadora de préstamo](/finanzas/calculadora-de-prestamo/) permite cambiar el plazo y ver el impacto inmediato en mensualidad, intereses y costo total.
 
 ## Tabla 12, 24, 36 y 48 meses
 
@@ -72,7 +72,7 @@ Empieza por tu presupuesto, no por el monto máximo que te ofrecen. Pregúntate:
 - El préstamo tendrá seguro o comisión?
 - Podrías hacer pagos extra si tus ingresos mejoran?
 
-Si la mensualidad solo cabe en el mejor escenario, el plazo quizá no es tan cómodo como parece. La guía de [cuánto puedes pedir prestado según tu ingreso](/blog/finanzas/cuanto-puedo-pedir-prestado-segun-ingreso) puede ayudarte a ordenar esa parte.
+Si la mensualidad solo cabe en el mejor escenario, el plazo quizá no es tan cómodo como parece. La guía de [cuánto puedes pedir prestado según tu ingreso](/blog/finanzas/cuanto-puedo-pedir-prestado-segun-ingreso/) puede ayudarte a ordenar esa parte.
 
 ## Preguntas frecuentes
 

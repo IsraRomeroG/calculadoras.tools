@@ -11,7 +11,7 @@ tags:
 readTime: "4 min"
 relatedCalculator:
   label: "Calculadora de IMC"
-  href: "/salud/calculadora-de-imc"
+  href: "/salud/calculadora-de-imc/"
 ---
 
 En adultos, el IMC se calcula igual para hombres y mujeres. La fórmula no cambia por sexo:
@@ -36,7 +36,7 @@ IMC = 70 / 1.70^2 = 24.22
 
 Ese cálculo no pregunta si la persona es hombre o mujer.
 
-Puedes comprobarlo con la [calculadora de IMC](/salud/calculadora-de-imc), que usa la misma fórmula adulta.
+Puedes comprobarlo con la [calculadora de IMC](/salud/calculadora-de-imc/), que usa la misma fórmula adulta.
 
 ## Por qué la interpretación puede variar
 
@@ -56,7 +56,7 @@ Una persona con más masa muscular puede tener un IMC más alto sin que eso sign
 
 También importa dónde se acumula la grasa. El IMC no distingue grasa abdominal de grasa en otras zonas. Por eso puede complementarse con medidas como cintura o índice cintura-altura.
 
-Si quieres profundizar, revisa la guía de [IMC vs porcentaje de grasa corporal](/blog/salud/imc-vs-porcentaje-grasa-corporal).
+Si quieres profundizar, revisa la guía de [IMC vs porcentaje de grasa corporal](/blog/salud/imc-vs-porcentaje-grasa-corporal/).
 
 ## Embarazo y otros casos especiales
 
@@ -64,11 +64,11 @@ En embarazo, el IMC actual no se interpreta como en una persona no embarazada. E
 
 En adultos mayores, la pérdida de masa muscular también puede hacer que el IMC sea menos representativo.
 
-Puedes leer más en [IMC y embarazo](/blog/salud/imc-embarazo) y [limitaciones del IMC](/blog/salud/limitaciones-del-imc).
+Puedes leer más en [IMC y embarazo](/blog/salud/imc-embarazo/) y [limitaciones del IMC](/blog/salud/limitaciones-del-imc/).
 
 ## Calcula tu IMC
 
-Usa la [calculadora de IMC](/salud/calculadora-de-imc) para obtener el resultado, la categoría adulta de referencia y el rango saludable estimado para tu altura.
+Usa la [calculadora de IMC](/salud/calculadora-de-imc/) para obtener el resultado, la categoría adulta de referencia y el rango saludable estimado para tu altura.
 
 ## Preguntas frecuentes
 

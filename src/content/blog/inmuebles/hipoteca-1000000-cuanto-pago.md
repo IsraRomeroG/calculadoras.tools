@@ -11,7 +11,7 @@ tags:
 readTime: "5 min"
 relatedCalculator:
   label: "Calculadora de hipoteca"
-  href: "/inmuebles/calculadora-de-hipoteca"
+  href: "/inmuebles/calculadora-de-hipoteca/"
 ---
 
 Una hipoteca de `$1,000,000` puede parecer fácil de estimar, pero la mensualidad cambia bastante cuando modificas tasa y plazo. La comparación correcta debe incluir cuota, intereses y total pagado.
@@ -46,11 +46,11 @@ El interés total se obtiene restando el monto del crédito al total pagado. En 
 $2,159,342.29 - $1,000,000 = $1,159,342.29
 ```
 
-La [calculadora de hipoteca](/inmuebles/calculadora-de-hipoteca) muestra este dato automáticamente.
+La [calculadora de hipoteca](/inmuebles/calculadora-de-hipoteca/) muestra este dato automáticamente.
 
 ## Qué pasa si cambias el plazo
 
-Un plazo corto sube la mensualidad, pero reduce intereses. Un plazo largo puede bajar la cuota mensual, pero aumenta el costo total. Revisa la guía de [hipoteca a 15, 20, 25 o 30 años](/blog/inmuebles/hipoteca-15-20-25-30-anos) para comparar.
+Un plazo corto sube la mensualidad, pero reduce intereses. Un plazo largo puede bajar la cuota mensual, pero aumenta el costo total. Revisa la guía de [hipoteca a 15, 20, 25 o 30 años](/blog/inmuebles/hipoteca-15-20-25-30-anos/) para comparar.
 
 ## Qué costos no están incluidos
 
@@ -65,7 +65,7 @@ Estos cálculos no incluyen:
 
 ## Calcula tu caso exacto
 
-Usa la [calculadora de hipoteca](/inmuebles/calculadora-de-hipoteca) para cambiar monto, tasa, plazo y pago extra. Si todavía estás revisando precio y enganche, usa el modo "Precio + enganche".
+Usa la [calculadora de hipoteca](/inmuebles/calculadora-de-hipoteca/) para cambiar monto, tasa, plazo y pago extra. Si todavía estás revisando precio y enganche, usa el modo "Precio + enganche".
 
 ## Preguntas frecuentes
 

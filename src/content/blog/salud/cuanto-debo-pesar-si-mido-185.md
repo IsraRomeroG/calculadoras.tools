@@ -11,7 +11,7 @@ tags:
 readTime: "4 min"
 relatedCalculator:
   label: "Calculadora de IMC"
-  href: "/salud/calculadora-de-imc"
+  href: "/salud/calculadora-de-imc/"
 ---
 
 Si mides 1.85 m, el rango saludable de referencia para adultos es aproximadamente **63.3 kg a 85.2 kg**. El cálculo usa IMC adulto de 18.5 a 24.9.
@@ -62,11 +62,11 @@ La lectura adulta se basa en el valor de IMC, no en el peso por sí solo.
 
 Para 1.85 m, 70 kg y 84 kg pueden estar dentro del rango saludable de referencia, aunque sean pesos bastante distintos. Eso ocurre porque el IMC trabaja con intervalos.
 
-Si quieres entender mejor la diferencia, revisa [peso ideal vs peso saludable](/blog/salud/peso-ideal-vs-peso-saludable).
+Si quieres entender mejor la diferencia, revisa [peso ideal vs peso saludable](/blog/salud/peso-ideal-vs-peso-saludable/).
 
 ## Calcula tu IMC exacto
 
-Usa la [calculadora de IMC](/salud/calculadora-de-imc) para calcular tu resultado con tus datos actuales. También puedes revisar la [tabla de peso saludable según estatura](/blog/salud/peso-saludable-segun-estatura).
+Usa la [calculadora de IMC](/salud/calculadora-de-imc/) para calcular tu resultado con tus datos actuales. También puedes revisar la [tabla de peso saludable según estatura](/blog/salud/peso-saludable-segun-estatura/).
 
 ## Preguntas frecuentes
 
