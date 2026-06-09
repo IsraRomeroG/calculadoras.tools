@@ -1,5 +1,5 @@
 export const PAINT_AREA_CANONICAL_PATH =
-  "/construccion/metros-cuadrados-de-pintura";
+  "/construccion/metros-cuadrados-de-pintura/";
 
 export const PAINT_COVERAGE_PRESETS = [8, 10, 12] as const;
 export const PAINT_CONTAINER_PRESETS = [1, 4, 10, 19] as const;

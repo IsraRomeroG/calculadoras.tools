@@ -170,7 +170,7 @@ describe("basic statistics formatting and sharing", () => {
 
   it("shares short lists and omits long lists", () => {
     expect(buildShareableStatisticsUrl([12, 15, 18, 18, 20])).toBe(
-      "/matematicas/calculadora-de-estadistica-basica?datos=12%3B15%3B18%3B18%3B20",
+      "/matematicas/calculadora-de-estadistica-basica/?datos=12%3B15%3B18%3B18%3B20",
     );
     expect(buildShareableStatisticsUrl(Array.from({ length: 51 }, () => 1))).toBeNull();
   });
