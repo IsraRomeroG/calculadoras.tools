@@ -10,8 +10,8 @@ tags:
 readTime: "6 min"
 seoTitle: "Inflación e interés compuesto: valor nominal vs valor real"
 relatedCalculator:
-  label: "Calculadora de interés compuesto"
-  href: "/finanzas/calculadora-de-interes-compuesto"
+  label: "Calculadora de inflación y poder adquisitivo"
+  href: "/finanzas/calculadora-de-inflacion-poder-adquisitivo"
 ---
 
 ## Valor nominal vs valor real
@@ -85,7 +85,7 @@ Usa el cálculo como una referencia para comparar escenarios, no como una predic
 
 ## Simula con inflación
 
-La [calculadora de interés compuesto](/finanzas/calculadora-de-interes-compuesto) permite ingresar una inflación anual opcional. Así puedes ver el monto futuro y el valor real aproximado en una misma simulación.
+La [calculadora de inflación y poder adquisitivo](/finanzas/calculadora-de-inflacion-poder-adquisitivo) permite explorar cuánto costaría algo en el futuro, cuánto poder de compra conservaría una cantidad y cómo cambia el resultado con distintos escenarios.
 
 Una forma práctica de usarla es probar tres escenarios: uno conservador, uno medio y uno optimista. Mantén el mismo capital, plazo y aportaciones, y cambia la inflación o la tasa para ver cómo cambia el poder adquisitivo.
 

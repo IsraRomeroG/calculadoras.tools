@@ -35,6 +35,15 @@ export const CALCULATORS: CalculatorDirectoryItem[] = [
     order: 30,
   },
   {
+    id: "calculadora-de-inflacion-poder-adquisitivo",
+    title: "Calculadora de inflación y poder adquisitivo",
+    description:
+      "Calcula cuánto costará algo en el futuro y cuánto poder de compra conservará tu dinero.",
+    href: "/finanzas/calculadora-de-inflacion-poder-adquisitivo",
+    categorySlug: "finanzas",
+    order: 31,
+  },
+  {
     id: "calculadora-de-interes-simple",
     title: "Calculadora de interés simple",
     description:

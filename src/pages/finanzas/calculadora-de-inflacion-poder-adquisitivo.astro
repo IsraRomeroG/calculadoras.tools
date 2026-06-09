@@ -1,0 +1,800 @@
+---
+import BaseLayout from "@layouts/BaseLayout.astro";
+import Container from "@components/layout/Container.astro";
+import PageShell from "@components/layout/PageShell.astro";
+import FaqSection from "@components/shared/FaqSection.astro";
+import PageHero from "@components/shared/PageHero.astro";
+import SectionIntro from "@components/shared/SectionIntro.astro";
+import { buildFaqJsonLd } from "@lib/seo";
+
+const title = "Calculadora de inflación y poder adquisitivo";
+const description =
+  "Calcula cuánto necesitarás en el futuro y cuánto poder adquisitivo conservará tu dinero con una tasa de inflación anual.";
+const canonical = "/finanzas/calculadora-de-inflacion-poder-adquisitivo";
+const faqs = [
+  {
+    question: "¿La calculadora usa inflación oficial?",
+    answer:
+      "No. La tasa es ingresada manualmente para explorar escenarios. No consulta datos oficiales ni predice la inflación futura.",
+  },
+  {
+    question: "¿Cómo se calcula cuánto costará algo en el futuro?",
+    answer:
+      "Se multiplica el precio actual por el factor de inflación acumulada: uno más la tasa anual, elevado al número de años.",
+  },
+  {
+    question: "¿Qué es el poder adquisitivo?",
+    answer:
+      "Es la cantidad de bienes y servicios que puedes comprar con una suma de dinero. Cuando los precios aumentan y la cantidad no cambia, su poder adquisitivo disminuye.",
+  },
+  {
+    question:
+      "¿Por qué el aumento de precios y la pérdida de poder adquisitivo son diferentes?",
+    answer:
+      "Porque se calculan sobre bases distintas. Si los precios se duplican, aumentan 100%, pero una cantidad fija solo puede comprar la mitad y pierde 50% de poder adquisitivo.",
+  },
+  {
+    question: "¿Qué tasa de inflación debo ingresar?",
+    answer:
+      "Usa una tasa anual promedio que quieras explorar y compara varios escenarios. La tasa adecuada depende del país, plazo y tipo de gasto.",
+  },
+  {
+    question: "¿Por qué pequeñas diferencias en la tasa cambian tanto el resultado?",
+    answer:
+      "Porque la inflación se acumula de forma compuesta. En plazos largos, cada año también afecta los aumentos acumulados de años anteriores.",
+  },
+];
+const faqJsonLd = buildFaqJsonLd(faqs);
+---
+
+<BaseLayout title={title} description={description} canonical={canonical}>
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={JSON.stringify(faqJsonLd)} />
+  </Fragment>
+
+  <PageShell>
+    <PageHero
+      title="Calculadora de inflación y poder adquisitivo"
+      description="Descubre cuánto necesitarías para comprar lo mismo en el futuro y cuánto poder de compra conservaría una cantidad de dinero."
+      kicker="Finanzas"
+      collapseBreadcrumbOnMobile
+      containerClass="py-6 md:py-8"
+      breadcrumbs={[
+        { label: "Inicio", href: "/", ariaLabel: "Inicio" },
+        { label: "Finanzas", href: "/finanzas", optional: true },
+        { label: "Calculadora de inflación", truncate: true },
+      ]}
+    />
+
+    <Container as="section" class="py-6 md:py-8">
+      <section
+        class="overflow-hidden rounded-lg border border-gray-700 bg-gray-950 shadow-xl shadow-gray-950/30"
+        aria-labelledby="calculator-heading"
+      >
+        <div class="grid lg:grid-cols-[minmax(0,1.05fr)_minmax(19rem,0.95fr)]">
+          <div class="p-4 sm:p-6">
+            <p class="text-sm font-semibold uppercase tracking-wide text-amber-400">
+              Explora un escenario
+            </p>
+            <h2 id="calculator-heading" class="mt-2 text-2xl font-semibold">
+              ¿Qué quieres calcular?
+            </h2>
+
+            <div
+              class="mt-5 grid grid-cols-2 rounded-lg border border-gray-700 bg-gray-900 p-1"
+              role="tablist"
+              aria-label="Modo de cálculo"
+            >
+              <button
+                class="mode-button is-active"
+                type="button"
+                role="tab"
+                aria-selected="true"
+                data-mode-button="future-cost"
+              >
+                ¿Cuánto costará?
+              </button>
+              <button
+                class="mode-button"
+                type="button"
+                role="tab"
+                aria-selected="false"
+                data-mode-button="present-value"
+              >
+                ¿Cuánto valdrá mi dinero?
+              </button>
+            </div>
+
+            <form class="mt-6" novalidate data-inflation-form>
+              <div class="grid gap-4">
+                <div>
+                  <label class="field-label" for="inflation-amount" data-amount-label>
+                    Precio actual
+                  </label>
+                  <div class="field-shell">
+                    <span class="field-affix">$</span>
+                    <input
+                      id="inflation-amount"
+                      class="field-input"
+                      type="text"
+                      inputmode="decimal"
+                      autocomplete="off"
+                      value="10000"
+                      aria-describedby="inflation-amount-help inflation-amount-error"
+                      data-field="amount"
+                    />
+                  </div>
+                  <p id="inflation-amount-help" class="field-help" data-amount-help>
+                    Lo que cuesta hoy el producto, servicio o gasto.
+                  </p>
+                  <p id="inflation-amount-error" class="field-error" data-error-for="amount"></p>
+                </div>
+
+                <div>
+                  <label class="field-label" for="inflation-rate">Inflación anual</label>
+                  <div class="field-shell">
+                    <input
+                      id="inflation-rate"
+                      class="field-input pl-3"
+                      type="text"
+                      inputmode="decimal"
+                      autocomplete="off"
+                      value="5"
+                      aria-describedby="inflation-rate-help inflation-rate-error"
+                      data-field="annualRate"
+                    />
+                    <span class="field-affix">%</span>
+                  </div>
+                  <p id="inflation-rate-help" class="field-help">
+                    Usa una tasa anual promedio que quieras explorar. No representa una
+                    predicción oficial.
+                  </p>
+                  <p id="inflation-rate-error" class="field-error" data-error-for="annualRate"></p>
+                </div>
+
+                <div class="grid grid-cols-[minmax(0,3fr)_minmax(7.25rem,2fr)] gap-3">
+                  <div>
+                    <label class="field-label" for="inflation-duration">Plazo</label>
+                    <input
+                      id="inflation-duration"
+                      class="field"
+                      type="text"
+                      inputmode="decimal"
+                      autocomplete="off"
+                      value="10"
+                      aria-describedby="inflation-duration-error"
+                      data-field="duration"
+                    />
+                    <p id="inflation-duration-error" class="field-error" data-error-for="duration"></p>
+                  </div>
+                  <div>
+                    <label class="field-label" for="inflation-duration-unit">Unidad</label>
+                    <select id="inflation-duration-unit" class="field" data-duration-unit>
+                      <option value="years">Años</option>
+                      <option value="months">Meses</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              <div class="mt-6 flex flex-col gap-3 border-t border-gray-800 pt-5 sm:flex-row sm:flex-wrap">
+                <button class="primary-button" type="submit">Calcular inflación</button>
+                <button class="secondary-button" type="button" data-clear>Limpiar</button>
+                <button class="secondary-button" type="button" data-copy>
+                  <span data-copy-label>Copiar resultado</span>
+                </button>
+                <button class="secondary-button" type="button" data-export>
+                  Exportar CSV
+                </button>
+                <p class="sr-only" aria-live="polite" data-action-status></p>
+              </div>
+            </form>
+          </div>
+
+          <aside
+            class="border-t border-gray-800 bg-gray-900/70 p-4 sm:p-6 lg:border-l lg:border-t-0"
+            aria-live="polite"
+            data-result-region
+          >
+            <p class="text-sm font-semibold uppercase tracking-wide text-amber-400" data-result-kicker>
+              Costo futuro estimado
+            </p>
+            <p class="mt-3 break-words text-4xl font-bold leading-tight text-white" data-main-result>
+              $16,288.95
+            </p>
+            <p class="mt-3 text-sm leading-relaxed text-gray-300" data-interpretation>
+              Para comprar en 10 años lo que hoy cuesta $10,000.00, necesitarías
+              aproximadamente $16,288.95.
+            </p>
+
+            <div class="mt-5 grid grid-cols-2 gap-3" data-summary-grid></div>
+
+            <div class="mt-5 rounded-lg border border-sky-400/30 bg-sky-400/10 p-4" data-power-card>
+              <p class="text-xs font-semibold uppercase tracking-wide text-sky-300">
+                Poder de compra restante
+              </p>
+              <p class="mt-2 text-sm leading-relaxed text-sky-100" data-power-text></p>
+              <div
+                class="mt-3 h-3 overflow-hidden rounded-full bg-gray-950"
+                role="progressbar"
+                aria-label="Poder adquisitivo restante"
+                aria-valuemin="0"
+                aria-valuemax="100"
+                data-power-progress
+              >
+                <div class="h-full rounded-full bg-sky-400" data-power-bar></div>
+              </div>
+            </div>
+
+            <div class="mt-4 hidden rounded-lg border border-amber-400/40 bg-amber-400/10 p-4" data-warning>
+              <p class="text-xs font-semibold uppercase tracking-wide text-amber-300">
+                Revisa el escenario
+              </p>
+              <div class="mt-2 space-y-1 text-sm leading-relaxed text-amber-100" data-warning-lines></div>
+            </div>
+
+            <p class="mt-4 text-xs leading-relaxed text-gray-500">
+              Estimación educativa con una tasa anual constante ingresada por ti.
+              No es una proyección oficial.
+            </p>
+          </aside>
+        </div>
+      </section>
+    </Container>
+
+    <Container as="section" class="py-8" data-scenarios-section>
+      <SectionIntro
+        title="Compara escenarios de inflación"
+        description="Estas tasas son ilustrativas, no pronósticos. Úsalas para ver cuánto cambia el resultado."
+        class="mb-5"
+      />
+      <div class="grid gap-4 md:grid-cols-3" data-scenarios></div>
+    </Container>
+
+    <Container as="section" class="py-8" data-detail-section>
+      <details class="rounded-lg border border-gray-700 bg-gray-950 p-4 sm:p-6" data-detail>
+        <summary class="cursor-pointer text-xl font-semibold text-white">
+          Ver detalle por periodo
+        </summary>
+        <p class="mt-3 text-sm leading-relaxed text-gray-400">
+          Observa cómo se acumulan los precios y cómo disminuye el poder de compra
+          de una cantidad que permanece sin cambios.
+        </p>
+
+        <div class="mt-5 grid gap-3 md:hidden" data-detail-cards></div>
+
+        <div class="mt-5 hidden overflow-x-auto md:block">
+          <table class="w-full min-w-[58rem] text-left text-sm">
+            <thead class="border-b border-gray-700 text-xs uppercase tracking-wide text-gray-500">
+              <tr>
+                <th class="px-3 py-3">Periodo</th>
+                <th class="px-3 py-3">Tasa anual</th>
+                <th class="px-3 py-3">Aumento de precios</th>
+                <th class="px-3 py-3">Costo equivalente</th>
+                <th class="px-3 py-3">Poder adquisitivo equivalente</th>
+                <th class="px-3 py-3">Poder restante</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-800" data-detail-table></tbody>
+          </table>
+        </div>
+      </details>
+    </Container>
+
+    <Container as="section" class="py-8">
+      <SectionIntro
+        title="Cómo leer el resultado"
+        description="El aumento de precios y la pérdida de poder adquisitivo están relacionados, pero no son el mismo porcentaje."
+        class="mb-5"
+      />
+      <div class="grid gap-4 md:grid-cols-3">
+        <article class="info-card">
+          <h2 class="font-semibold text-white">Aumento de precios</h2>
+          <p class="mt-2 text-sm leading-relaxed text-gray-400">
+            Indica cuánto más necesitarías para comprar en el futuro lo que compras
+            hoy.
+          </p>
+        </article>
+        <article class="info-card">
+          <h2 class="font-semibold text-white">Poder adquisitivo restante</h2>
+          <p class="mt-2 text-sm leading-relaxed text-gray-400">
+            Muestra qué porcentaje de compra conservaría una cantidad que no aumenta.
+          </p>
+        </article>
+        <article class="info-card">
+          <h2 class="font-semibold text-white">Pérdida de poder adquisitivo</h2>
+          <p class="mt-2 text-sm leading-relaxed text-gray-400">
+            Expresa cuánto dejaría de comprar esa cantidad frente a los precios futuros.
+          </p>
+        </article>
+      </div>
+    </Container>
+
+    <Container as="section" class="py-8">
+      <div class="grid gap-5 md:grid-cols-2">
+        <article class="rounded-lg border border-gray-700 bg-gray-950 p-5 sm:p-6">
+          <h2 class="text-xl font-semibold">Fórmula de inflación acumulada</h2>
+          <p class="mt-3 text-sm leading-relaxed text-gray-400">
+            Factor de inflación = (1 + tasa anual)<sup>años</sup>. Para estimar el
+            costo futuro se multiplica el precio actual por ese factor. Para expresar
+            una cantidad futura en dinero de hoy se divide entre el mismo factor.
+          </p>
+        </article>
+        <article class="rounded-lg border border-gray-700 bg-gray-950 p-5 sm:p-6">
+          <h2 class="text-xl font-semibold">Inflación compuesta</h2>
+          <p class="mt-3 text-sm leading-relaxed text-gray-400">
+            Cada aumento anual se aplica sobre precios que ya aumentaron. Por eso una
+            pequeña diferencia de tasa puede producir resultados muy distintos en
+            plazos largos.
+          </p>
+        </article>
+      </div>
+    </Container>
+
+    <FaqSection faqs={faqs} />
+  </PageShell>
+</BaseLayout>
+
+<style is:global>
+  .field-label { display: block; font-size: .875rem; font-weight: 500; color: rgb(229 231 235); }
+  .field, .field-shell { margin-top: .5rem; min-height: 3rem; width: 100%; border-radius: .5rem; border: 1px solid rgb(55 65 81); background: rgb(17 24 39); color: white; outline: none; }
+  .field { padding: 0 .75rem; }
+  .field-shell { display: flex; align-items: center; }
+  .field-input { min-height: 2.875rem; min-width: 0; width: 100%; background: transparent; padding: 0 .25rem; color: white; outline: none; }
+  .field-affix { padding: 0 .75rem; color: rgb(107 114 128); }
+  .field:focus, .field-shell:focus-within { border-color: rgb(251 191 36); box-shadow: 0 0 0 3px rgb(251 191 36 / .15); }
+  .field-help { margin-top: .4rem; font-size: .75rem; line-height: 1.4; color: rgb(107 114 128); }
+  .field-error { display: none; margin-top: .4rem; font-size: .8rem; color: rgb(252 165 165); }
+  .field-error:not(:empty) { display: block; }
+  .mode-button { min-height: 3rem; border-radius: .4rem; padding: .5rem .4rem; font-size: .75rem; font-weight: 700; line-height: 1.25; color: rgb(156 163 175); }
+  .mode-button.is-active { background: rgb(251 191 36); color: rgb(3 7 18); }
+  .primary-button, .secondary-button { display: inline-flex; min-height: 3rem; align-items: center; justify-content: center; border-radius: .5rem; padding: .5rem 1rem; font-size: .875rem; font-weight: 700; }
+  .primary-button { background: rgb(251 191 36); color: rgb(3 7 18); }
+  .secondary-button { border: 1px solid rgb(55 65 81); color: rgb(229 231 235); }
+  .secondary-button:hover { border-color: rgb(107 114 128); color: white; }
+  .info-card { border-radius: .5rem; border: 1px solid rgb(55 65 81); background: rgb(3 7 18); padding: 1.25rem; }
+  @media (min-width: 390px) {
+    .mode-button { font-size: .8rem; padding-inline: .65rem; }
+  }
+</style>
+
+<script>
+  import {
+    buildInflationAnnualRows,
+    buildInflationScenarios,
+    calculateInflation,
+    convertDuration,
+    formatCurrency,
+    formatDuration,
+    formatNumber,
+    formatPercent,
+    parseDurationInput,
+    parseMoneyInput,
+    parseRateInput,
+  } from "@lib/calculators/finanzas/calculadora-de-inflacion-poder-adquisitivo/inflation";
+
+  const form = document.querySelector("[data-inflation-form]");
+  const fields = Object.fromEntries(
+    [...document.querySelectorAll("[data-field]")].map((input) => [input.dataset.field, input]),
+  );
+  const durationUnit = document.querySelector("[data-duration-unit]");
+  const amountLabel = document.querySelector("[data-amount-label]");
+  const amountHelp = document.querySelector("[data-amount-help]");
+  const resultKicker = document.querySelector("[data-result-kicker]");
+  const mainResult = document.querySelector("[data-main-result]");
+  const interpretation = document.querySelector("[data-interpretation]");
+  const summaryGrid = document.querySelector("[data-summary-grid]");
+  const powerCard = document.querySelector("[data-power-card]");
+  const powerText = document.querySelector("[data-power-text]");
+  const powerProgress = document.querySelector("[data-power-progress]");
+  const powerBar = document.querySelector("[data-power-bar]");
+  const warning = document.querySelector("[data-warning]");
+  const warningLines = document.querySelector("[data-warning-lines]");
+  const scenariosSection = document.querySelector("[data-scenarios-section]");
+  const scenariosContainer = document.querySelector("[data-scenarios]");
+  const detailSection = document.querySelector("[data-detail-section]");
+  const detail = document.querySelector("[data-detail]");
+  const detailCards = document.querySelector("[data-detail-cards]");
+  const detailTable = document.querySelector("[data-detail-table]");
+  const copyButton = document.querySelector("[data-copy]");
+  const copyLabel = document.querySelector("[data-copy-label]");
+  const exportButton = document.querySelector("[data-export]");
+  const actionStatus = document.querySelector("[data-action-status]");
+  let mode = "future-cost";
+  let previousDurationUnit = "years";
+  let currentInput;
+  let currentResult;
+  let currentRows = [];
+
+  const ERROR_MESSAGES = {
+    required: "Este campo es obligatorio.",
+    invalid: "Ingresa un número válido.",
+    negative: "El valor no puede ser negativo.",
+    too_many_decimals: "Usa como máximo 2 decimales.",
+    greater_than_zero: "El valor debe ser mayor que cero.",
+    amount_high: "Ingresa una cantidad menor a $1,000,000,000,000.",
+    rate_high: "La tasa no puede superar 100%.",
+    duration_high: "El plazo máximo es de 100 años o 1,200 meses.",
+    non_finite: "El resultado es demasiado grande. Reduce cantidad, tasa o plazo.",
+  };
+
+  function setMode(nextMode) {
+    mode = nextMode;
+    document.querySelectorAll("[data-mode-button]").forEach((button) => {
+      const active = button.dataset.modeButton === mode;
+      button.classList.toggle("is-active", active);
+      button.setAttribute("aria-selected", String(active));
+    });
+    const futureMode = mode === "future-cost";
+    amountLabel.textContent = futureMode ? "Precio actual" : "Cantidad futura";
+    amountHelp.textContent = futureMode
+      ? "Lo que cuesta hoy el producto, servicio o gasto."
+      : "El dinero que esperas tener o recibir en el futuro.";
+    calculate();
+  }
+
+  function calculate({ showRequired = false } = {}) {
+    clearErrors();
+    const amount = parseMoneyInput(fields.amount.value);
+    const annualRate = parseRateInput(fields.annualRate.value);
+    const duration = parseDurationInput(fields.duration.value);
+    const parsed = { amount, annualRate, duration };
+    const errors = {};
+
+    Object.entries(parsed).forEach(([key, value]) => {
+      if (!value.ok && (showRequired || value.error !== "required")) {
+        errors[key] = value.error;
+      }
+    });
+    if (amount.ok && amount.value <= 0) errors.amount = "greater_than_zero";
+    if (amount.ok && amount.value > 999_999_999_999.99) errors.amount = "amount_high";
+    if (annualRate.ok && annualRate.value > 100) errors.annualRate = "rate_high";
+    if (duration.ok && duration.value <= 0) errors.duration = "greater_than_zero";
+    if (
+      duration.ok &&
+      ((durationUnit.value === "years" && duration.value > 100) ||
+        (durationUnit.value === "months" && duration.value > 1200))
+    ) {
+      errors.duration = "duration_high";
+    }
+    showErrors(errors);
+
+    const hasEmpty = Object.values(parsed).some(
+      (value) => !value.ok && value.error === "required",
+    );
+    if (
+      Object.keys(errors).length ||
+      hasEmpty ||
+      !amount.ok ||
+      !annualRate.ok ||
+      !duration.ok
+    ) {
+      Object.keys(errors).length ? setInvalidState() : setInitialState();
+      return;
+    }
+
+    const input = {
+      mode,
+      amount: amount.value,
+      annualRate: annualRate.value,
+      duration: duration.value,
+      durationUnit: durationUnit.value,
+    };
+    const result = calculateInflation(input);
+    if (!Object.values(result).filter((value) => typeof value === "number").every(Number.isFinite)) {
+      showErrors({ duration: "non_finite" });
+      setInvalidState();
+      return;
+    }
+
+    renderResult(input, result);
+  }
+
+  function renderResult(input, result) {
+    currentInput = input;
+    currentResult = result;
+    currentRows = buildInflationAnnualRows(input);
+    const durationLabel = formatDuration(result.durationYears * 12);
+    const futureMode = input.mode === "future-cost";
+
+    resultKicker.textContent = futureMode
+      ? "Costo futuro estimado"
+      : "Poder adquisitivo actual";
+    mainResult.textContent = formatCurrency(result.primaryValue);
+    interpretation.textContent = futureMode
+      ? `Para comprar en ${durationLabel} lo que hoy cuesta ${formatCurrency(input.amount)}, necesitarías aproximadamente ${formatCurrency(result.futureCost)}.`
+      : `${formatCurrency(input.amount)} dentro de ${durationLabel} tendría un poder adquisitivo aproximado de ${formatCurrency(result.presentValue)} en dinero de hoy.`;
+
+    const summaryItems = futureMode
+      ? [
+          ["Cantidad adicional necesaria", formatCurrency(result.additionalAmountNeeded)],
+          ["Aumento acumulado de precios", formatPercent(result.priceIncreasePercent)],
+          ["Poder adquisitivo restante", formatPercent(result.purchasingPowerRemainingPercent)],
+          ["Pérdida de poder adquisitivo", `${formatPercent(result.purchasingPowerLossPercent)} · ${formatCurrency(result.purchasingPowerLossAmount)}`],
+        ]
+      : [
+          ["Pérdida de poder adquisitivo", formatCurrency(result.purchasingPowerLossAmount)],
+          ["Aumento acumulado de precios", formatPercent(result.priceIncreasePercent)],
+          ["Poder adquisitivo restante", formatPercent(result.purchasingPowerRemainingPercent)],
+          ["Pérdida porcentual", formatPercent(result.purchasingPowerLossPercent)],
+        ];
+    summaryGrid.innerHTML = summaryItems.map(([label, value]) => summary(label, value)).join("");
+
+    const remaining = Math.max(0, Math.min(100, result.purchasingPowerRemainingPercent));
+    powerText.textContent = `De cada $100, conservarías aproximadamente ${formatCurrency(result.purchasingPowerRemainingPercent)} de poder de compra.`;
+    powerBar.style.width = `${remaining}%`;
+    powerProgress.setAttribute("aria-valuenow", String(remaining));
+    powerCard.classList.remove("hidden");
+    renderWarnings(result.warnings);
+    renderScenarios(input);
+    renderDetail(currentRows);
+    scenariosSection.classList.remove("hidden");
+    detailSection.classList.remove("hidden");
+    copyButton.classList.remove("hidden");
+    exportButton.classList.remove("hidden");
+  }
+
+  function renderWarnings(warnings) {
+    warning.classList.toggle("hidden", warnings.length === 0);
+    warningLines.innerHTML = warnings
+      .map((item) => `<p>${escapeHtml(item)}</p>`)
+      .join("");
+  }
+
+  function renderScenarios(input) {
+    const scenarios = buildInflationScenarios(input);
+    const resultLabel = input.mode === "future-cost" ? "Costo estimado" : "Valor en dinero de hoy";
+    scenariosContainer.innerHTML = scenarios
+      .map((scenario) => {
+        const difference =
+          scenario.key === "current"
+            ? "Escenario base"
+            : `${scenario.differenceFromCurrent >= 0 ? "+" : "−"}${formatCurrency(Math.abs(scenario.differenceFromCurrent))} frente a la tasa ingresada`;
+        return `
+          <article class="rounded-lg border ${scenario.key === "current" ? "border-amber-400/60 bg-amber-400/10" : "border-gray-700 bg-gray-950"} p-4">
+            <div class="flex items-start justify-between gap-3">
+              <h3 class="font-semibold text-white">${escapeHtml(scenario.label)}</h3>
+              <span class="rounded-full border border-gray-700 px-2 py-1 text-xs font-semibold text-gray-300">${escapeHtml(formatPercent(scenario.annualRate))}</span>
+            </div>
+            <p class="mt-4 text-xs font-semibold uppercase tracking-wide text-gray-500">${escapeHtml(resultLabel)}</p>
+            <p class="mt-1 break-words text-2xl font-bold text-white">${escapeHtml(formatCurrency(scenario.primaryValue))}</p>
+            <p class="mt-3 text-sm leading-relaxed text-gray-400">${escapeHtml(difference)}</p>
+            <p class="mt-2 text-sm leading-relaxed text-gray-400">Poder restante: ${escapeHtml(formatPercent(scenario.purchasingPowerRemainingPercent))}</p>
+            ${
+              scenario.key === "current"
+                ? ""
+                : `<button class="secondary-button mt-4 w-full" type="button" data-apply-rate="${scenario.annualRate}">Aplicar escenario</button>`
+            }
+          </article>
+        `;
+      })
+      .join("");
+  }
+
+  function renderDetail(rows) {
+    detail.open = rows.length <= 10;
+    detailCards.innerHTML = rows
+      .map(
+        (row) => `
+          <article class="rounded-lg border border-gray-800 bg-gray-900/60 p-4">
+            <div class="flex items-center justify-between gap-3">
+              <h3 class="font-semibold text-white">${escapeHtml(row.periodLabel)}</h3>
+              <span class="text-sm font-semibold text-amber-300">${escapeHtml(formatPercent(row.annualRate))}</span>
+            </div>
+            <dl class="mt-4 grid grid-cols-2 gap-3 text-sm">
+              ${detailMetric("Aumento de precios", formatPercent(row.priceIncreasePercent))}
+              ${detailMetric("Costo equivalente", formatCurrency(row.equivalentCost))}
+              ${detailMetric("Poder equivalente", formatCurrency(row.equivalentPurchasingPower))}
+              ${detailMetric("Poder restante", formatPercent(row.purchasingPowerRemainingPercent))}
+            </dl>
+          </article>
+        `,
+      )
+      .join("");
+    detailTable.innerHTML = rows
+      .map(
+        (row) => `
+          <tr>
+            <td class="px-3 py-3 font-semibold text-white">${escapeHtml(row.periodLabel)}</td>
+            <td class="px-3 py-3 text-gray-300">${escapeHtml(formatPercent(row.annualRate))}</td>
+            <td class="px-3 py-3 text-gray-300">${escapeHtml(formatPercent(row.priceIncreasePercent))}</td>
+            <td class="px-3 py-3 text-gray-300">${escapeHtml(formatCurrency(row.equivalentCost))}</td>
+            <td class="px-3 py-3 text-gray-300">${escapeHtml(formatCurrency(row.equivalentPurchasingPower))}</td>
+            <td class="px-3 py-3 text-gray-300">${escapeHtml(formatPercent(row.purchasingPowerRemainingPercent))}</td>
+          </tr>
+        `,
+      )
+      .join("");
+  }
+
+  function summary(label, value) {
+    return `<div class="rounded-lg border border-gray-800 bg-gray-950/70 p-3"><span class="block text-xs font-semibold uppercase tracking-wide text-gray-500">${escapeHtml(label)}</span><span class="mt-2 block break-words text-base font-semibold text-white">${escapeHtml(value)}</span></div>`;
+  }
+
+  function detailMetric(label, value) {
+    return `<div><dt class="text-xs font-semibold uppercase tracking-wide text-gray-500">${escapeHtml(label)}</dt><dd class="mt-1 break-words font-semibold text-gray-200">${escapeHtml(value)}</dd></div>`;
+  }
+
+  function clearAll() {
+    Object.values(fields).forEach((input) => {
+      input.value = "";
+    });
+    durationUnit.value = "years";
+    previousDurationUnit = "years";
+    setMode("future-cost");
+    clearErrors();
+    setInitialState();
+  }
+
+  function handleDurationUnitChange() {
+    const nextUnit = durationUnit.value;
+    const parsed = parseDurationInput(fields.duration.value);
+    if (parsed.ok) {
+      fields.duration.value = formatNumber(
+        convertDuration(parsed.value, previousDurationUnit, nextUnit),
+      );
+    }
+    previousDurationUnit = nextUnit;
+    calculate();
+  }
+
+  function applyScenario(rate) {
+    fields.annualRate.value = formatNumber(Number(rate));
+    calculate();
+    document.querySelector("[data-result-region]")?.scrollIntoView({
+      behavior: "smooth",
+      block: "start",
+    });
+  }
+
+  function clearErrors() {
+    document.querySelectorAll("[data-error-for]").forEach((element) => {
+      element.textContent = "";
+    });
+    Object.values(fields).forEach((input) => input.removeAttribute("aria-invalid"));
+  }
+
+  function showErrors(errors) {
+    Object.entries(errors).forEach(([field, error]) => {
+      const element = document.querySelector(`[data-error-for="${field}"]`);
+      if (element) element.textContent = ERROR_MESSAGES[error] ?? ERROR_MESSAGES.invalid;
+      fields[field]?.setAttribute("aria-invalid", "true");
+    });
+  }
+
+  function setInitialState() {
+    currentInput = undefined;
+    currentResult = undefined;
+    currentRows = [];
+    resultKicker.textContent = "Resultado";
+    mainResult.textContent = "Completa los campos";
+    interpretation.textContent =
+      "Captura una cantidad, una tasa anual y un plazo para explorar el escenario.";
+    summaryGrid.innerHTML = "";
+    powerCard.classList.add("hidden");
+    warning.classList.add("hidden");
+    scenariosSection.classList.add("hidden");
+    detailSection.classList.add("hidden");
+    copyButton.classList.add("hidden");
+    exportButton.classList.add("hidden");
+  }
+
+  function setInvalidState() {
+    currentInput = undefined;
+    currentResult = undefined;
+    currentRows = [];
+    resultKicker.textContent = "Revisa los campos";
+    mainResult.textContent = "No se puede calcular";
+    interpretation.textContent = "Corrige los valores marcados para continuar.";
+    summaryGrid.innerHTML = "";
+    powerCard.classList.add("hidden");
+    warning.classList.add("hidden");
+    scenariosSection.classList.add("hidden");
+    detailSection.classList.add("hidden");
+    copyButton.classList.add("hidden");
+    exportButton.classList.add("hidden");
+  }
+
+  function buildCopyText() {
+    if (!currentInput || !currentResult) return "";
+    const durationLabel = formatDuration(currentResult.durationYears * 12);
+    return [
+      "Calculadora de inflación y poder adquisitivo - calculadoras.tools",
+      `Modo: ${currentInput.mode === "future-cost" ? "¿Cuánto costará?" : "¿Cuánto valdrá mi dinero?"}`,
+      `Cantidad: ${formatCurrency(currentInput.amount)}`,
+      `Inflación anual: ${formatPercent(currentInput.annualRate)}`,
+      `Plazo: ${durationLabel}`,
+      `Resultado principal: ${formatCurrency(currentResult.primaryValue)}`,
+      `Aumento acumulado de precios: ${formatPercent(currentResult.priceIncreasePercent)}`,
+      `Poder adquisitivo restante: ${formatPercent(currentResult.purchasingPowerRemainingPercent)}`,
+      `Pérdida de poder adquisitivo: ${formatPercent(currentResult.purchasingPowerLossPercent)} (${formatCurrency(currentResult.purchasingPowerLossAmount)})`,
+      "",
+      "Estimación educativa con una tasa anual constante ingresada por el usuario. No es una proyección oficial.",
+    ].join("\n");
+  }
+
+  async function copyResult() {
+    const text = buildCopyText();
+    if (!text) return;
+    try {
+      await navigator.clipboard.writeText(text);
+      copyLabel.textContent = "Copiado";
+      actionStatus.textContent = "Resultado copiado.";
+      window.setTimeout(() => {
+        copyLabel.textContent = "Copiar resultado";
+        actionStatus.textContent = "";
+      }, 2000);
+    } catch {
+      actionStatus.textContent = "No se pudo copiar el resultado.";
+    }
+  }
+
+  function exportCsv() {
+    if (!currentInput || !currentRows.length) return;
+    const headers = [
+      "Periodo",
+      "Tasa anual",
+      "Aumento acumulado de precios",
+      "Costo equivalente",
+      "Poder adquisitivo equivalente",
+      "Poder adquisitivo restante",
+    ];
+    const lines = [
+      headers.map(csvCell).join(","),
+      ...currentRows.map((row) =>
+        [
+          row.periodLabel,
+          row.annualRate,
+          row.priceIncreasePercent,
+          row.equivalentCost,
+          row.equivalentPurchasingPower,
+          row.purchasingPowerRemainingPercent,
+        ]
+          .map(csvCell)
+          .join(","),
+      ),
+    ];
+    const url = URL.createObjectURL(
+      new Blob([`\uFEFF${lines.join("\n")}`], { type: "text/csv;charset=utf-8" }),
+    );
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "inflacion-poder-adquisitivo.csv";
+    link.click();
+    URL.revokeObjectURL(url);
+    actionStatus.textContent = "CSV exportado.";
+  }
+
+  function csvCell(value) {
+    return `"${String(value).replaceAll('"', '""')}"`;
+  }
+
+  function escapeHtml(value) {
+    return String(value)
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;")
+      .replaceAll("'", "&#039;");
+  }
+
+  document.querySelectorAll("[data-mode-button]").forEach((button) =>
+    button.addEventListener("click", () => setMode(button.dataset.modeButton)),
+  );
+  Object.values(fields).forEach((input) =>
+    input.addEventListener("input", () => calculate()),
+  );
+  form.addEventListener("submit", (event) => {
+    event.preventDefault();
+    calculate({ showRequired: true });
+  });
+  durationUnit.addEventListener("change", handleDurationUnitChange);
+  scenariosContainer.addEventListener("click", (event) => {
+    const button = event.target.closest("[data-apply-rate]");
+    if (button) applyScenario(button.dataset.applyRate);
+  });
+  document.querySelector("[data-clear]").addEventListener("click", clearAll);
+  copyButton.addEventListener("click", copyResult);
+  exportButton.addEventListener("click", exportCsv);
+  calculate();
+</script>
