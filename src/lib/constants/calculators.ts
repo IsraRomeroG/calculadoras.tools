@@ -89,6 +89,15 @@ export const CALCULATORS: CalculatorDirectoryItem[] = [
     order: 37,
   },
   {
+    id: "calculadora-de-margen-y-markup",
+    title: "Calculadora de margen y markup",
+    description:
+      "Calcula ganancia, margen, markup, precio mínimo y precio de venta objetivo incluyendo comisiones.",
+    href: "/finanzas/calculadora-de-margen-y-markup/",
+    categorySlug: "finanzas",
+    order: 37.25,
+  },
+  {
     id: "calculadora-dca-costo-promedio",
     title: "Calculadora de precio promedio (DCA)",
     description:
