@@ -1,0 +1,516 @@
+---
+import BaseLayout from "@layouts/BaseLayout.astro";
+import Container from "@components/layout/Container.astro";
+import PageShell from "@components/layout/PageShell.astro";
+import FaqSection from "@components/shared/FaqSection.astro";
+import PageHero from "@components/shared/PageHero.astro";
+import SectionIntro from "@components/shared/SectionIntro.astro";
+import { buildFaqJsonLd } from "@lib/seo";
+
+const title = "Calculadora de interés simple";
+const description =
+  "Calcula interés simple con tasas diarias, mensuales o anuales. Obtén intereses, total a pagar y fórmula paso a paso.";
+const canonical = "/finanzas/calculadora-de-interes-simple";
+const faqs = [
+  {
+    question: "¿Cuál es la fórmula del interés simple?",
+    answer:
+      "El interés simple se calcula multiplicando el capital inicial por la tasa de cada periodo y por la cantidad de periodos. Los intereses no se suman al capital para generar nuevos intereses.",
+  },
+  {
+    question: "¿Cómo convierto una tasa mensual a anual?",
+    answer:
+      "En interés simple, multiplica la tasa mensual por 12. Por ejemplo, una tasa simple de 2% mensual equivale a 24% anual.",
+  },
+  {
+    question: "¿Qué diferencia hay entre interés simple y compuesto?",
+    answer:
+      "En el interés simple, solo el capital inicial genera intereses. En el compuesto, los intereses acumulados también generan nuevos intereses.",
+  },
+  {
+    question: "¿Qué diferencia hay entre usar 360 y 365 días?",
+    answer:
+      "La convención comercial usa años de 360 días y la civil usa 365. Cuando el plazo está expresado en días y la tasa en meses o años, esta elección puede cambiar el resultado.",
+  },
+  {
+    question: "¿La calculadora sirve para préstamos?",
+    answer:
+      "Sirve para préstamos que calculan interés sobre el capital inicial sin pagos parciales. Para préstamos con cuotas y reducción de saldo conviene usar una calculadora de préstamo.",
+  },
+  {
+    question: "¿El interés simple considera pagos parciales?",
+    answer:
+      "No. Esta calculadora supone que el capital inicial permanece constante durante todo el plazo.",
+  },
+];
+const faqJsonLd = buildFaqJsonLd(faqs);
+---
+
+<BaseLayout title={title} description={description} canonical={canonical}>
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={JSON.stringify(faqJsonLd)} />
+  </Fragment>
+
+  <PageShell>
+    <PageHero
+      title="Calculadora de interés simple"
+      description="Calcula cuánto interés se genera y cuál será el total a pagar o recibir, aunque la tasa y el plazo usen periodos distintos."
+      kicker="Finanzas"
+      collapseBreadcrumbOnMobile
+      containerClass="py-6 md:py-8"
+      breadcrumbs={[
+        { label: "Inicio", href: "/", ariaLabel: "Inicio" },
+        { label: "Finanzas", href: "/finanzas", optional: true },
+        { label: "Calculadora de interés simple", truncate: true },
+      ]}
+    />
+
+    <Container as="section" class="py-6 md:py-8">
+      <section
+        class="overflow-hidden rounded-lg border border-gray-700 bg-gray-950 shadow-xl shadow-gray-950/30"
+        aria-labelledby="calculator-heading"
+      >
+        <div class="grid lg:grid-cols-[minmax(0,1.08fr)_minmax(19rem,0.92fr)]">
+          <div class="p-4 sm:p-6">
+            <p class="text-sm font-semibold uppercase tracking-wide text-amber-400">
+              Cálculo principal
+            </p>
+            <h2 id="calculator-heading" class="mt-2 text-2xl font-semibold">
+              ¿Cuánto interés se genera?
+            </h2>
+            <p class="mt-2 text-sm leading-relaxed text-gray-400">
+              Captura la tasa tal como la conoces. La calculadora convierte
+              automáticamente el plazo al mismo periodo.
+            </p>
+
+            <form class="mt-6" novalidate data-simple-interest-form>
+              <div class="grid gap-4">
+                <div>
+                  <label class="field-label" for="simple-principal">Capital inicial</label>
+                  <div class="field-shell">
+                    <span class="field-affix">$</span>
+                    <input
+                      id="simple-principal"
+                      class="field-input"
+                      type="text"
+                      inputmode="decimal"
+                      autocomplete="off"
+                      placeholder="10000"
+                      aria-describedby="simple-principal-error"
+                      data-field="principal"
+                    />
+                  </div>
+                  <p id="simple-principal-error" class="field-error" data-error-for="principal"></p>
+                </div>
+
+                <div class="grid gap-3 sm:grid-cols-[minmax(0,1fr)_10rem]">
+                  <div>
+                    <label class="field-label" for="simple-rate">Tasa de interés</label>
+                    <div class="field-shell">
+                      <input
+                        id="simple-rate"
+                        class="field-input pl-3"
+                        type="text"
+                        inputmode="decimal"
+                        autocomplete="off"
+                        placeholder="12"
+                        aria-describedby="simple-rate-error"
+                        data-field="rate"
+                      />
+                      <span class="field-affix">%</span>
+                    </div>
+                    <p id="simple-rate-error" class="field-error" data-error-for="rate"></p>
+                  </div>
+                  <div>
+                    <label class="field-label" for="simple-rate-period">Periodo de la tasa</label>
+                    <select id="simple-rate-period" class="field" data-rate-period>
+                      <option value="years">Anual</option>
+                      <option value="months">Mensual</option>
+                      <option value="days">Diaria</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div class="grid gap-3 sm:grid-cols-[minmax(0,1fr)_10rem]">
+                  <div>
+                    <label class="field-label" for="simple-duration">Plazo</label>
+                    <input
+                      id="simple-duration"
+                      class="field"
+                      type="text"
+                      inputmode="decimal"
+                      autocomplete="off"
+                      placeholder="18"
+                      aria-describedby="simple-duration-error"
+                      data-field="duration"
+                    />
+                    <p id="simple-duration-error" class="field-error" data-error-for="duration"></p>
+                  </div>
+                  <div>
+                    <label class="field-label" for="simple-duration-unit">Unidad del plazo</label>
+                    <select id="simple-duration-unit" class="field" data-duration-unit>
+                      <option value="months">Meses</option>
+                      <option value="days">Días</option>
+                      <option value="years">Años</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              <details class="mt-5 rounded-lg border border-gray-700 bg-gray-900/60 p-4">
+                <summary class="cursor-pointer font-semibold text-white">
+                  Opciones avanzadas
+                </summary>
+                <div class="mt-4">
+                  <label class="field-label" for="simple-day-convention">Convención de días</label>
+                  <select id="simple-day-convention" class="field" data-day-convention>
+                    <option value="365">Año civil: 365 días</option>
+                    <option value="360">Año comercial: 360 días</option>
+                  </select>
+                  <p class="field-help">
+                    Solo cambia el resultado cuando la tasa y el plazo usan unidades
+                    que requieren convertir días.
+                  </p>
+                </div>
+              </details>
+
+              <div class="mt-6 flex flex-col gap-3 border-t border-gray-800 pt-5 sm:flex-row sm:flex-wrap">
+                <button class="primary-button" type="submit">Calcular interés</button>
+                <button class="secondary-button" type="button" data-example>Usar ejemplo</button>
+                <button class="secondary-button" type="button" data-clear>Limpiar</button>
+                <button class="secondary-button hidden" type="button" data-copy>
+                  <span data-copy-label>Copiar resultado</span>
+                </button>
+                <p class="sr-only" aria-live="polite" data-copy-status></p>
+              </div>
+            </form>
+          </div>
+
+          <aside
+            class="border-t border-gray-800 bg-gray-900/70 p-4 sm:p-6 lg:border-l lg:border-t-0"
+            aria-live="polite"
+            data-result-region
+          >
+            <p class="text-sm font-semibold uppercase tracking-wide text-amber-400" data-result-kicker>
+              Resultado
+            </p>
+            <p class="mt-3 break-words text-4xl font-bold leading-tight text-white" data-main-result>
+              Ingresa los valores
+            </p>
+            <p class="mt-3 text-sm leading-relaxed text-gray-300" data-explanation>
+              El interés generado y el total aparecerán aquí.
+            </p>
+
+            <div class="mt-5 grid grid-cols-2 gap-3" data-summary-grid>
+              <div class="col-span-2 rounded-lg border border-gray-800 bg-gray-950/70 p-4 text-sm text-gray-400">
+                Puedes usar una tasa diaria, mensual o anual.
+              </div>
+            </div>
+
+            <div class="mt-4 hidden rounded-lg border border-amber-400/40 bg-amber-400/10 p-4" data-warning>
+              <p class="text-xs font-semibold uppercase tracking-wide text-amber-300">Revisa el cálculo</p>
+              <div class="mt-2 space-y-1 text-sm leading-relaxed text-amber-100" data-warning-lines></div>
+            </div>
+
+            <details class="mt-4 hidden rounded-lg border border-gray-800 p-4" data-calculation-details>
+              <summary class="cursor-pointer text-sm font-semibold text-white">Cómo se calculó</summary>
+              <div class="mt-3 space-y-2 text-sm leading-relaxed text-gray-400" data-calculation-lines></div>
+            </details>
+
+            <details class="mt-4 rounded-lg border border-gray-800 p-4">
+              <summary class="cursor-pointer text-sm font-semibold text-white">Supuestos del cálculo</summary>
+              <ul class="mt-3 space-y-2 text-sm leading-relaxed text-gray-400">
+                <li>El interés se calcula siempre sobre el capital inicial.</li>
+                <li>No incluye pagos parciales, comisiones, impuestos ni moratorios.</li>
+                <li>La tasa permanece constante durante todo el plazo.</li>
+              </ul>
+            </details>
+          </aside>
+        </div>
+      </section>
+    </Container>
+
+    <Container as="section" class="py-8">
+      <SectionIntro
+        title="Cómo leer el resultado"
+        description="El interés simple mantiene fijo el capital que genera rendimiento o costo."
+        class="mb-5"
+      />
+      <div class="grid gap-4 md:grid-cols-3">
+        <article class="info-card">
+          <h2 class="font-semibold text-white">Interés generado</h2>
+          <p class="mt-2 text-sm leading-relaxed text-gray-400">
+            Es el costo o rendimiento acumulado durante todo el plazo.
+          </p>
+        </article>
+        <article class="info-card">
+          <h2 class="font-semibold text-white">Total a pagar o recibir</h2>
+          <p class="mt-2 text-sm leading-relaxed text-gray-400">
+            Suma el capital inicial y todos los intereses generados.
+          </p>
+        </article>
+        <article class="info-card">
+          <h2 class="font-semibold text-white">Interés total del plazo</h2>
+          <p class="mt-2 text-sm leading-relaxed text-gray-400">
+            Muestra qué porcentaje del capital representan los intereses acumulados.
+          </p>
+        </article>
+      </div>
+    </Container>
+
+    <Container as="section" class="py-8">
+      <div class="grid gap-5 md:grid-cols-2">
+        <article class="rounded-lg border border-gray-700 bg-gray-950 p-5 sm:p-6">
+          <h2 class="text-xl font-semibold">Fórmula del interés simple</h2>
+          <p class="mt-3 text-sm leading-relaxed text-gray-400">
+            Interés = capital × tasa por periodo × cantidad de periodos. El monto
+            final es el capital inicial más el interés generado.
+          </p>
+        </article>
+        <article class="rounded-lg border border-gray-700 bg-gray-950 p-5 sm:p-6">
+          <h2 class="text-xl font-semibold">¿Necesitas otro tipo de cálculo?</h2>
+          <p class="mt-3 text-sm leading-relaxed text-gray-400">
+            Para cuotas que reducen el saldo usa la
+            <a class="text-amber-300 underline hover:text-amber-200" href="/finanzas/calculadora-de-prestamo">calculadora de préstamo</a>.
+            Para reinvertir intereses usa la
+            <a class="text-amber-300 underline hover:text-amber-200" href="/finanzas/calculadora-de-interes-compuesto">calculadora de interés compuesto</a>.
+          </p>
+        </article>
+      </div>
+    </Container>
+
+    <FaqSection faqs={faqs} />
+  </PageShell>
+</BaseLayout>
+
+<style is:global>
+  .field-label { display: block; font-size: .875rem; font-weight: 500; color: rgb(229 231 235); }
+  .field, .field-shell { margin-top: .5rem; min-height: 3rem; width: 100%; border-radius: .5rem; border: 1px solid rgb(55 65 81); background: rgb(17 24 39); color: white; outline: none; }
+  .field { padding: 0 1rem; }
+  .field-shell { display: flex; align-items: center; }
+  .field-input { min-height: 2.875rem; min-width: 0; width: 100%; background: transparent; padding: 0 .25rem; color: white; outline: none; }
+  .field-affix { padding: 0 .75rem; color: rgb(107 114 128); }
+  .field:focus, .field-shell:focus-within { border-color: rgb(251 191 36); box-shadow: 0 0 0 3px rgb(251 191 36 / .15); }
+  .field-help { margin-top: .4rem; font-size: .75rem; line-height: 1.4; color: rgb(107 114 128); }
+  .field-error { display: none; margin-top: .4rem; font-size: .8rem; color: rgb(252 165 165); }
+  .field-error:not(:empty) { display: block; }
+  .primary-button, .secondary-button { display: inline-flex; min-height: 3rem; align-items: center; justify-content: center; border-radius: .5rem; padding: .5rem 1rem; font-size: .875rem; font-weight: 700; }
+  .primary-button { background: rgb(251 191 36); color: rgb(3 7 18); }
+  .secondary-button { border: 1px solid rgb(55 65 81); color: rgb(229 231 235); }
+  .info-card { border-radius: .5rem; border: 1px solid rgb(55 65 81); background: rgb(3 7 18); padding: 1.25rem; }
+</style>
+
+<script>
+  import {
+    calculateSimpleInterest,
+    formatCurrency,
+    formatNumber,
+    formatPercent,
+    parseDurationInput,
+    parseMoneyInput,
+    parseRateInput,
+  } from "@lib/calculators/finanzas/calculadora-de-interes-simple/simpleInterest";
+
+  const form = document.querySelector("[data-simple-interest-form]");
+  const fields = Object.fromEntries(
+    [...document.querySelectorAll("[data-field]")].map((input) => [input.dataset.field, input]),
+  );
+  const ratePeriod = document.querySelector("[data-rate-period]");
+  const durationUnit = document.querySelector("[data-duration-unit]");
+  const dayConvention = document.querySelector("[data-day-convention]");
+  const resultKicker = document.querySelector("[data-result-kicker]");
+  const mainResult = document.querySelector("[data-main-result]");
+  const explanation = document.querySelector("[data-explanation]");
+  const summaryGrid = document.querySelector("[data-summary-grid]");
+  const warning = document.querySelector("[data-warning]");
+  const warningLines = document.querySelector("[data-warning-lines]");
+  const calculationDetails = document.querySelector("[data-calculation-details]");
+  const calculationLines = document.querySelector("[data-calculation-lines]");
+  const copyButton = document.querySelector("[data-copy]");
+  const copyLabel = document.querySelector("[data-copy-label]");
+  const copyStatus = document.querySelector("[data-copy-status]");
+  let copyText = "";
+
+  const ERROR_MESSAGES = {
+    required: "Este campo es obligatorio.",
+    invalid: "Ingresa un número válido.",
+    negative: "El valor no puede ser negativo.",
+    too_many_decimals: "Usa menos decimales.",
+    greater_than_zero: "El valor debe ser mayor que cero.",
+    rate_high: "La tasa no puede superar 200% por periodo.",
+  };
+  const UNIT_LABELS = {
+    days: { singular: "día", plural: "días", rate: "diaria" },
+    months: { singular: "mes", plural: "meses", rate: "mensual" },
+    years: { singular: "año", plural: "años", rate: "anual" },
+  };
+
+  function calculate({ showRequired = false } = {}) {
+    clearErrors();
+    const principal = parseMoneyInput(fields.principal.value);
+    const rate = parseRateInput(fields.rate.value);
+    const duration = parseDurationInput(fields.duration.value);
+    const parsed = { principal, rate, duration };
+    const errors = {};
+
+    Object.entries(parsed).forEach(([key, value]) => {
+      if (!value.ok && (showRequired || value.error !== "required")) errors[key] = value.error;
+    });
+    if (principal.ok && principal.value <= 0) errors.principal = "greater_than_zero";
+    if (rate.ok && rate.value > 200) errors.rate = "rate_high";
+    if (duration.ok && duration.value <= 0) errors.duration = "greater_than_zero";
+    showErrors(errors);
+
+    const hasEmpty = Object.values(parsed).some((value) => !value.ok && value.error === "required");
+    if (Object.keys(errors).length || hasEmpty || !principal.ok || !rate.ok || !duration.ok) {
+      Object.keys(errors).length ? setInvalidState() : setInitialState();
+      return;
+    }
+
+    const input = {
+      principal: principal.value,
+      rate: rate.value,
+      ratePeriod: ratePeriod.value,
+      duration: duration.value,
+      durationUnit: durationUnit.value,
+      dayConvention: Number(dayConvention.value),
+    };
+    renderResult(input, calculateSimpleInterest(input));
+  }
+
+  function renderResult(input, result) {
+    const durationLabel = unitLabel(input.durationUnit, input.duration);
+    const rateLabel = UNIT_LABELS[input.ratePeriod].rate;
+    const interestUnitLabel = UNIT_LABELS[input.durationUnit].singular;
+    resultKicker.textContent = "Interés generado";
+    mainResult.textContent = formatCurrency(result.interest);
+    explanation.textContent = `Con ${formatCurrency(input.principal)}, una tasa simple ${rateLabel} de ${formatPercent(input.rate)} y un plazo de ${formatNumber(input.duration)} ${durationLabel}, el total a pagar o recibir sería ${formatCurrency(result.finalAmount)}.`;
+    summaryGrid.innerHTML = [
+      ["Total a pagar o recibir", formatCurrency(result.finalAmount)],
+      ["Interés total del plazo", formatPercent(result.totalInterestPercent)],
+      [`Interés por ${interestUnitLabel}`, formatCurrency(result.interestPerDurationUnit)],
+      ["Tasa anual simple equivalente", formatPercent(result.annualSimpleRate)],
+    ].map(([label, value]) => summary(label, value)).join("");
+    renderWarnings(result.warnings);
+    calculationLines.innerHTML = [
+      `Periodos equivalentes de tasa: ${formatNumber(result.durationInRatePeriods)}`,
+      `Interés = ${formatCurrency(input.principal)} × ${formatPercent(input.rate)} × ${formatNumber(result.durationInRatePeriods)} = ${formatCurrency(result.interest)}`,
+      `Total = ${formatCurrency(input.principal)} + ${formatCurrency(result.interest)} = ${formatCurrency(result.finalAmount)}`,
+      `Convención utilizada: ${input.dayConvention} días por año.`,
+    ].map((line) => `<p>${escapeHtml(line)}</p>`).join("");
+    calculationDetails.classList.remove("hidden");
+    copyText = buildCopyText(input, result, durationLabel, rateLabel);
+    copyButton.classList.remove("hidden");
+  }
+
+  function renderWarnings(warnings) {
+    warning.classList.toggle("hidden", warnings.length === 0);
+    warningLines.innerHTML = warnings.map((item) => `<p>${escapeHtml(item)}</p>`).join("");
+  }
+
+  function buildCopyText(input, result, durationLabel, rateLabel) {
+    return [
+      "Calculadora de interés simple - calculadoras.tools",
+      `Capital inicial: ${formatCurrency(input.principal)}`,
+      `Tasa simple ${rateLabel}: ${formatPercent(input.rate)}`,
+      `Plazo: ${formatNumber(input.duration)} ${durationLabel}`,
+      `Convención: ${input.dayConvention} días`,
+      `Interés generado: ${formatCurrency(result.interest)}`,
+      `Total a pagar o recibir: ${formatCurrency(result.finalAmount)}`,
+      `Interés total del plazo: ${formatPercent(result.totalInterestPercent)}`,
+      "",
+      "Supuesto: el capital permanece constante y los intereses no se capitalizan.",
+    ].join("\n");
+  }
+
+  function unitLabel(unit, value) {
+    return Math.abs(value - 1) < Number.EPSILON ? UNIT_LABELS[unit].singular : UNIT_LABELS[unit].plural;
+  }
+
+  function summary(label, value) {
+    return `<div class="rounded-lg border border-gray-800 bg-gray-950/70 p-3"><span class="block text-xs font-semibold uppercase tracking-wide text-gray-500">${escapeHtml(label)}</span><span class="mt-2 block break-words text-base font-semibold text-white">${escapeHtml(value)}</span></div>`;
+  }
+
+  function fillExample() {
+    fields.principal.value = "10000";
+    fields.rate.value = "12";
+    ratePeriod.value = "years";
+    fields.duration.value = "18";
+    durationUnit.value = "months";
+    dayConvention.value = "365";
+    calculate();
+  }
+
+  function clearAll() {
+    Object.values(fields).forEach((input) => { input.value = ""; });
+    ratePeriod.value = "years";
+    durationUnit.value = "months";
+    dayConvention.value = "365";
+    clearErrors();
+    setInitialState();
+  }
+
+  function clearErrors() {
+    document.querySelectorAll("[data-error-for]").forEach((element) => { element.textContent = ""; });
+    Object.values(fields).forEach((input) => input.removeAttribute("aria-invalid"));
+  }
+
+  function showErrors(errors) {
+    Object.entries(errors).forEach(([field, error]) => {
+      const element = document.querySelector(`[data-error-for="${field}"]`);
+      if (element) element.textContent = ERROR_MESSAGES[error] ?? ERROR_MESSAGES.invalid;
+      fields[field]?.setAttribute("aria-invalid", "true");
+    });
+  }
+
+  function setInitialState() {
+    resultKicker.textContent = "Resultado";
+    mainResult.textContent = "Ingresa los valores";
+    explanation.textContent = "El interés generado y el total aparecerán aquí.";
+    summaryGrid.innerHTML = `<div class="col-span-2 rounded-lg border border-gray-800 bg-gray-950/70 p-4 text-sm text-gray-400">Puedes usar una tasa diaria, mensual o anual.</div>`;
+    warning.classList.add("hidden");
+    calculationDetails.classList.add("hidden");
+    copyButton.classList.add("hidden");
+    copyText = "";
+  }
+
+  function setInvalidState() {
+    resultKicker.textContent = "Revisa los campos";
+    mainResult.textContent = "No se puede calcular";
+    explanation.textContent = "Corrige los valores marcados para continuar.";
+    summaryGrid.innerHTML = "";
+    warning.classList.add("hidden");
+    calculationDetails.classList.add("hidden");
+    copyButton.classList.add("hidden");
+    copyText = "";
+  }
+
+  async function copyResult() {
+    if (!copyText) return;
+    try {
+      await navigator.clipboard.writeText(copyText);
+      copyLabel.textContent = "Copiado";
+      copyStatus.textContent = "Resultado copiado.";
+      window.setTimeout(() => {
+        copyLabel.textContent = "Copiar resultado";
+        copyStatus.textContent = "";
+      }, 2000);
+    } catch {
+      copyStatus.textContent = "No se pudo copiar el resultado.";
+    }
+  }
+
+  function escapeHtml(value) {
+    return String(value).replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;").replaceAll("'", "&#039;");
+  }
+
+  form.addEventListener("submit", (event) => {
+    event.preventDefault();
+    calculate({ showRequired: true });
+  });
+  Object.values(fields).forEach((input) => input.addEventListener("input", () => calculate()));
+  [ratePeriod, durationUnit, dayConvention].forEach((select) => select.addEventListener("change", () => calculate()));
+  document.querySelector("[data-example]").addEventListener("click", fillExample);
+  document.querySelector("[data-clear]").addEventListener("click", clearAll);
+  copyButton.addEventListener("click", copyResult);
+</script>

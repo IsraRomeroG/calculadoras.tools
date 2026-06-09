@@ -35,6 +35,15 @@ export const CALCULATORS: CalculatorDirectoryItem[] = [
     order: 30,
   },
   {
+    id: "calculadora-de-interes-simple",
+    title: "Calculadora de interés simple",
+    description:
+      "Calcula intereses y total con tasas diarias, mensuales o anuales.",
+    href: "/finanzas/calculadora-de-interes-simple",
+    categorySlug: "finanzas",
+    order: 32,
+  },
+  {
     id: "calculadora-de-prestamo",
     title: "Calculadora de préstamo",
     description:
