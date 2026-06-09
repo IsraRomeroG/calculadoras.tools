@@ -62,6 +62,15 @@ export const CALCULATORS: CalculatorDirectoryItem[] = [
     order: 37,
   },
   {
+    id: "calculadora-dca-costo-promedio",
+    title: "Calculadora de precio promedio (DCA)",
+    description:
+      "Calcula precio promedio, costo efectivo con comisiones y cómo cambiaría con una próxima compra.",
+    href: "/finanzas/calculadora-dca-costo-promedio",
+    categorySlug: "finanzas",
+    order: 37.5,
+  },
+  {
     id: "calculadora-de-hipoteca",
     title: "Calculadora de hipoteca",
     description:
