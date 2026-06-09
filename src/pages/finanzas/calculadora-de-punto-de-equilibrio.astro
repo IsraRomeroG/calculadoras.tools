@@ -1,0 +1,841 @@
+---
+import BaseLayout from "@layouts/BaseLayout.astro";
+import Container from "@components/layout/Container.astro";
+import PageShell from "@components/layout/PageShell.astro";
+import FaqSection from "@components/shared/FaqSection.astro";
+import PageHero from "@components/shared/PageHero.astro";
+import SectionIntro from "@components/shared/SectionIntro.astro";
+import { buildFaqJsonLd } from "@lib/seo";
+
+const title = "Calculadora de punto de equilibrio y utilidad";
+const description =
+  "Calcula cuántas unidades necesitas vender para cubrir costos, evaluar tus ventas esperadas y alcanzar una utilidad objetivo.";
+const canonical = "/finanzas/calculadora-de-punto-de-equilibrio/";
+const faqs = [
+  {
+    question: "¿Qué es el punto de equilibrio?",
+    answer:
+      "Es el nivel de ventas donde los ingresos cubren exactamente los costos fijos, variables y comisiones capturados. Por encima existe utilidad estimada; por debajo existe pérdida.",
+  },
+  {
+    question: "¿Qué costos fijos y variables debo incluir?",
+    answer:
+      "Los costos fijos existen aunque no vendas, como renta o licencias. Los variables aumentan con cada venta, como materiales, empaque o trabajo directamente asociado.",
+  },
+  {
+    question: "¿Qué es el margen de contribución?",
+    answer:
+      "Es lo que queda de cada venta después del costo variable y la comisión. Ese importe primero cubre los costos fijos y después genera utilidad.",
+  },
+  {
+    question: "¿Qué es el margen de seguridad?",
+    answer:
+      "Mide cuánto pueden bajar tus ventas esperadas antes de llegar al punto de equilibrio. Puede ser negativo cuando tu proyección todavía no cubre los costos.",
+  },
+  {
+    question: "¿Por qué se redondean las unidades hacia arriba?",
+    answer:
+      "Porque vender una cantidad menor al cálculo exacto no alcanza el objetivo. El mínimo práctico se redondea al incremento vendible que selecciones.",
+  },
+  {
+    question: "¿Qué pasa si el costo variable y la comisión superan el precio?",
+    answer:
+      "No existe un punto de equilibrio: cada venta aumenta la pérdida. Necesitas aumentar el precio, reducir costos variables o disminuir la comisión.",
+  },
+  {
+    question: "¿Cómo calculo el equilibrio si vendo varios productos?",
+    answer:
+      "Este MVP analiza una unidad homogénea. Puedes usar un precio y costo variable promedio representativos, pero una mezcla de productos requiere ponderar la contribución de cada uno.",
+  },
+  {
+    question: "¿Debo capturar importes con IVA o sin IVA?",
+    answer:
+      "Usa un criterio consistente: captura todos los importes con impuestos o todos sin impuestos. La calculadora no calcula impuestos automáticamente.",
+  },
+];
+const faqJsonLd = buildFaqJsonLd(faqs);
+---
+
+<BaseLayout title={title} description={description} canonical={canonical}>
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={JSON.stringify(faqJsonLd)} />
+  </Fragment>
+
+  <PageShell>
+    <PageHero
+      title="Calculadora de punto de equilibrio"
+      description="Descubre cuánto necesitas vender para cubrir costos, evaluar tu proyección y alcanzar una utilidad objetivo."
+      kicker="Finanzas"
+      collapseBreadcrumbOnMobile
+      containerClass="py-6 md:py-8"
+      breadcrumbs={[
+        { label: "Inicio", href: "/", ariaLabel: "Inicio" },
+        { label: "Finanzas", href: "/finanzas/", optional: true },
+        { label: "Punto de equilibrio", truncate: true },
+      ]}
+    />
+
+    <Container as="section" class="py-6 md:py-8">
+      <section
+        class="overflow-hidden rounded-lg border border-gray-700 bg-gray-950 shadow-xl shadow-gray-950/30"
+        aria-labelledby="calculator-heading"
+      >
+        <div class="grid lg:grid-cols-[minmax(0,1.08fr)_minmax(19rem,0.92fr)]">
+          <div class="p-4 sm:p-6">
+            <p class="text-sm font-semibold uppercase tracking-wide text-amber-400">
+              Ventas necesarias para no perder
+            </p>
+            <h2 id="calculator-heading" class="mt-2 text-2xl font-semibold">
+              Calcula tu punto de equilibrio
+            </h2>
+            <p class="mt-2 text-sm leading-relaxed text-gray-400">
+              Usa valores del mismo periodo. La calculadora no convierte importes mensuales, anuales o de proyecto.
+            </p>
+
+            <form class="mt-6" novalidate data-break-even-form>
+              <div class="grid gap-4 sm:grid-cols-2">
+                <div>
+                  <label class="field-label" for="break-even-period">Periodo</label>
+                  <select id="break-even-period" class="field" data-period>
+                    <option value="monthly">Mensual</option>
+                    <option value="annual">Anual</option>
+                    <option value="project">Proyecto</option>
+                  </select>
+                  <p class="field-help">Costos, objetivos y ventas deben corresponder al mismo periodo.</p>
+                </div>
+
+                <div>
+                  <label class="field-label" for="break-even-unit">Nombre de la unidad</label>
+                  <input
+                    id="break-even-unit"
+                    class="field"
+                    type="text"
+                    maxlength="30"
+                    value="unidades"
+                    autocomplete="off"
+                    data-unit-name
+                    aria-describedby="break-even-unit-help break-even-unit-error"
+                  />
+                  <p id="break-even-unit-help" class="field-help">Ejemplos: productos, clientes, horas o reservas.</p>
+                  <p id="break-even-unit-error" class="field-error" data-error-for="unitName"></p>
+                </div>
+
+                <div>
+                  <label class="field-label" for="break-even-price">Precio por unidad</label>
+                  <div class="field-shell">
+                    <span class="field-affix">$</span>
+                    <input
+                      id="break-even-price"
+                      class="field-input"
+                      type="text"
+                      inputmode="decimal"
+                      autocomplete="off"
+                      placeholder="250"
+                      data-field="price"
+                      aria-describedby="break-even-price-error"
+                    />
+                  </div>
+                  <p id="break-even-price-error" class="field-error" data-error-for="price"></p>
+                </div>
+
+                <div>
+                  <label class="field-label" for="break-even-variable-cost">Costo variable por unidad</label>
+                  <div class="field-shell">
+                    <span class="field-affix">$</span>
+                    <input
+                      id="break-even-variable-cost"
+                      class="field-input"
+                      type="text"
+                      inputmode="decimal"
+                      autocomplete="off"
+                      placeholder="100"
+                      data-field="variableCost"
+                      aria-describedby="break-even-variable-help break-even-variable-error"
+                    />
+                  </div>
+                  <p id="break-even-variable-help" class="field-help">Costos que aumentan cada vez que realizas una venta.</p>
+                  <p id="break-even-variable-error" class="field-error" data-error-for="variableCost"></p>
+                </div>
+
+                <div class="sm:col-span-2">
+                  <label class="field-label" for="break-even-fixed-costs">Costos fijos del periodo</label>
+                  <div class="field-shell">
+                    <span class="field-affix">$</span>
+                    <input
+                      id="break-even-fixed-costs"
+                      class="field-input"
+                      type="text"
+                      inputmode="decimal"
+                      autocomplete="off"
+                      placeholder="30000"
+                      data-field="fixedCosts"
+                      aria-describedby="break-even-fixed-help break-even-fixed-error"
+                    />
+                  </div>
+                  <p id="break-even-fixed-help" class="field-help">Costos que existen aunque no vendas durante el periodo.</p>
+                  <p id="break-even-fixed-error" class="field-error" data-error-for="fixedCosts"></p>
+                </div>
+              </div>
+
+              <details class="mt-5 rounded-lg border border-gray-700 bg-gray-900/60 p-4" data-options>
+                <summary class="cursor-pointer font-semibold text-white">
+                  Objetivos y opciones
+                </summary>
+                <div class="mt-4 grid gap-4 sm:grid-cols-2">
+                  <div>
+                    <label class="field-label" for="break-even-expected">Unidades que esperas vender</label>
+                    <input
+                      id="break-even-expected"
+                      class="field"
+                      type="text"
+                      inputmode="decimal"
+                      autocomplete="off"
+                      placeholder="240"
+                      data-field="expectedUnits"
+                      aria-describedby="break-even-expected-help break-even-expected-error"
+                    />
+                    <p id="break-even-expected-help" class="field-help">Calcula tu utilidad o pérdida estimada y cuánto falta o sobra.</p>
+                    <p id="break-even-expected-error" class="field-error" data-error-for="expectedUnits"></p>
+                  </div>
+
+                  <div>
+                    <label class="field-label" for="break-even-target">Utilidad objetivo</label>
+                    <div class="field-shell">
+                      <span class="field-affix">$</span>
+                      <input
+                        id="break-even-target"
+                        class="field-input"
+                        type="text"
+                        inputmode="decimal"
+                        autocomplete="off"
+                        placeholder="15000"
+                        data-field="targetProfit"
+                        aria-describedby="break-even-target-error"
+                      />
+                    </div>
+                    <p id="break-even-target-error" class="field-error" data-error-for="targetProfit"></p>
+                  </div>
+
+                  <div>
+                    <label class="field-label" for="break-even-commission">Comisión sobre el precio</label>
+                    <div class="field-shell">
+                      <input
+                        id="break-even-commission"
+                        class="field-input"
+                        type="text"
+                        inputmode="decimal"
+                        value="0"
+                        data-field="commissionRate"
+                        aria-describedby="break-even-commission-help break-even-commission-error"
+                      />
+                      <span class="field-affix">%</span>
+                    </div>
+                    <p id="break-even-commission-help" class="field-help">Se aplica al precio final de cada venta.</p>
+                    <p id="break-even-commission-error" class="field-error" data-error-for="commissionRate"></p>
+                  </div>
+
+                  <div>
+                    <label class="field-label" for="break-even-increment">Incremento mínimo vendible</label>
+                    <select id="break-even-increment" class="field" data-increment>
+                      <option value="1">1 unidad</option>
+                      <option value="0.5">0.5 unidades</option>
+                      <option value="0.25">0.25 unidades</option>
+                    </select>
+                    <p class="field-help">El resultado práctico siempre se redondea hacia arriba.</p>
+                  </div>
+                </div>
+              </details>
+
+              <div class="mt-6 flex flex-col gap-3 border-t border-gray-800 pt-5 sm:flex-row sm:flex-wrap">
+                <button class="primary-button w-full sm:w-auto sm:min-w-48" type="submit">
+                  Calcular punto de equilibrio
+                </button>
+                <button class="secondary-button" type="button" data-example>Usar ejemplo</button>
+                <button class="secondary-button" type="button" data-clear>Limpiar</button>
+                <button class="secondary-button hidden" type="button" data-copy>
+                  <span data-copy-label>Copiar resumen</span>
+                </button>
+                <p class="sr-only" role="status" aria-live="polite" data-copy-status></p>
+              </div>
+            </form>
+          </div>
+
+          <aside
+            class="border-t border-gray-800 bg-gray-900/70 p-4 sm:p-6 lg:border-l lg:border-t-0"
+            aria-live="polite"
+            data-result-region
+          >
+            <p class="text-sm font-semibold uppercase tracking-wide text-amber-400" data-result-kicker>
+              Resultado
+            </p>
+            <p class="mt-3 break-words text-4xl font-bold leading-tight text-white" data-main-result>
+              Ingresa los valores
+            </p>
+            <p class="mt-3 text-sm leading-relaxed text-gray-300" data-interpretation>
+              Verás cuánto necesitas vender para cubrir tus costos.
+            </p>
+
+            <div class="mt-5 grid grid-cols-2 gap-3" data-summary-grid>
+              <div class="col-span-2 rounded-lg border border-gray-800 bg-gray-950/70 p-4 text-sm text-gray-400">
+                Captura precio, costo variable y costos fijos para comenzar.
+              </div>
+            </div>
+
+            <div class="mt-4 hidden rounded-lg border p-4" data-expected-card>
+              <p class="text-xs font-semibold uppercase tracking-wide" data-expected-kicker></p>
+              <p class="mt-2 text-sm leading-relaxed" data-expected-text></p>
+              <div class="mt-4 grid grid-cols-2 gap-3" data-expected-grid></div>
+            </div>
+
+            <div class="mt-4 hidden rounded-lg border border-sky-400/40 bg-sky-400/10 p-4" data-target-card>
+              <p class="text-xs font-semibold uppercase tracking-wide text-sky-300">Utilidad objetivo</p>
+              <p class="mt-2 text-sm leading-relaxed text-sky-100" data-target-text></p>
+            </div>
+
+            <details class="mt-4 hidden rounded-lg border border-gray-800 p-4" data-calculation-details>
+              <summary class="cursor-pointer text-sm font-semibold text-white">Cómo se calculó</summary>
+              <div class="mt-3 space-y-2 text-sm leading-relaxed text-gray-400" data-calculation-lines></div>
+            </details>
+
+            <p class="mt-4 text-xs leading-relaxed text-gray-500">
+              Estimación basada en los datos capturados. No considera cambios de demanda, descuentos, impuestos ni variaciones de costos.
+            </p>
+          </aside>
+        </div>
+      </section>
+    </Container>
+
+    <Container as="section" class="hidden py-6 md:py-8" data-scenarios-section>
+      <SectionIntro
+        title="Escenarios de volumen"
+        description="Compara ingresos, costos y utilidad alrededor del punto de equilibrio."
+        class="mb-5"
+      />
+
+      <div class="grid gap-4 md:hidden" data-scenarios-cards></div>
+
+      <div class="hidden overflow-x-auto rounded-lg border border-gray-700 md:block">
+        <table class="min-w-full divide-y divide-gray-800 text-left text-sm">
+          <thead class="bg-gray-900 text-xs uppercase tracking-wide text-gray-400">
+            <tr>
+              <th class="px-4 py-3 font-semibold">Escenario</th>
+              <th class="px-4 py-3 font-semibold">Unidades</th>
+              <th class="px-4 py-3 font-semibold">Ingresos</th>
+              <th class="px-4 py-3 font-semibold">Costos variables</th>
+              <th class="px-4 py-3 font-semibold">Comisión</th>
+              <th class="px-4 py-3 font-semibold">Costos totales</th>
+              <th class="px-4 py-3 font-semibold">Utilidad o pérdida</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-gray-800 bg-gray-950" data-scenarios-table></tbody>
+        </table>
+      </div>
+    </Container>
+
+    <Container as="section" class="py-8">
+      <SectionIntro
+        title="Cómo interpretar el resultado"
+        description="El punto de equilibrio es un umbral. Estas métricas ayudan a entender qué lo mueve y qué tan lejos estás."
+        class="mb-5"
+      />
+      <div class="grid gap-4 md:grid-cols-3">
+        <article class="info-card">
+          <h2 class="font-semibold text-white">Margen de contribución</h2>
+          <p class="mt-2 text-sm leading-relaxed text-gray-400">
+            Es lo que queda de cada venta después del costo variable y la comisión. Primero cubre costos fijos y después genera utilidad.
+          </p>
+        </article>
+        <article class="info-card">
+          <h2 class="font-semibold text-white">Mínimo práctico</h2>
+          <p class="mt-2 text-sm leading-relaxed text-gray-400">
+            El cálculo exacto puede tener decimales. El mínimo práctico se redondea hacia arriba para no quedar debajo del equilibrio.
+          </p>
+        </article>
+        <article class="info-card">
+          <h2 class="font-semibold text-white">Margen de seguridad</h2>
+          <p class="mt-2 text-sm leading-relaxed text-gray-400">
+            Compara tus ventas esperadas con el equilibrio e indica cuánto podrían bajar antes de comenzar a perder.
+          </p>
+        </article>
+      </div>
+    </Container>
+
+    <Container as="section" class="py-8">
+      <div class="grid gap-5 md:grid-cols-2">
+        <article class="rounded-lg border border-gray-700 bg-gray-950 p-5 sm:p-6">
+          <h2 class="text-xl font-semibold">Qué costos conviene incluir</h2>
+          <p class="mt-3 text-sm leading-relaxed text-gray-400">
+            Separa los costos que aumentan por venta de los que existen durante todo el periodo. Captura cada costo una sola vez y usa el mismo criterio de impuestos en todos los importes.
+          </p>
+        </article>
+        <article class="rounded-lg border border-gray-700 bg-gray-950 p-5 sm:p-6">
+          <h2 class="text-xl font-semibold">Cuando no existe equilibrio</h2>
+          <p class="mt-3 text-sm leading-relaxed text-gray-400">
+            Si el precio no cubre el costo variable y la comisión, vender más aumenta la pérdida. Primero debes mejorar la contribución por venta.
+          </p>
+        </article>
+      </div>
+      <p class="mt-5 text-sm leading-relaxed text-gray-400">
+        Para revisar la rentabilidad de una venta individual, usa la
+        <a class="font-semibold text-amber-400 underline underline-offset-4" href="/finanzas/calculadora-de-margen-y-markup/">calculadora de margen y markup</a>.
+        Para evaluar el retorno total de un proyecto, consulta la
+        <a class="font-semibold text-amber-400 underline underline-offset-4" href="/finanzas/calculadora-de-roi/">calculadora de ROI</a>.
+      </p>
+    </Container>
+
+    <FaqSection faqs={faqs} />
+  </PageShell>
+</BaseLayout>
+
+<style is:global>
+  .field-label { display: block; font-size: .875rem; font-weight: 500; color: rgb(229 231 235); }
+  .field, .field-shell { margin-top: .5rem; min-height: 3rem; width: 100%; border-radius: .5rem; border: 1px solid rgb(55 65 81); background: rgb(17 24 39); color: white; outline: none; }
+  .field { padding: 0 1rem; }
+  .field-shell { display: flex; align-items: center; }
+  .field-input { min-height: 2.875rem; min-width: 0; width: 100%; background: transparent; padding: 0 .25rem; color: white; outline: none; }
+  .field-affix { flex: none; padding: 0 .75rem; color: rgb(107 114 128); }
+  .field:focus, .field-shell:focus-within { border-color: rgb(251 191 36); box-shadow: 0 0 0 3px rgb(251 191 36 / .15); }
+  .field-help { margin-top: .4rem; font-size: .75rem; line-height: 1.4; color: rgb(107 114 128); }
+  .field-error { display: none; margin-top: .4rem; font-size: .8rem; color: rgb(252 165 165); }
+  .field-error:not(:empty) { display: block; }
+  .primary-button { display: inline-flex; min-height: 2.75rem; align-items: center; justify-content: center; border-radius: .5rem; background: rgb(251 191 36); padding: .5rem 1rem; font-size: .875rem; font-weight: 700; color: rgb(3 7 18); }
+  .secondary-button { display: inline-flex; min-height: 2.75rem; align-items: center; justify-content: center; border-radius: .5rem; border: 1px solid rgb(55 65 81); padding: .5rem 1rem; font-size: .875rem; font-weight: 600; color: rgb(229 231 235); }
+  .info-card { border-radius: .5rem; border: 1px solid rgb(55 65 81); background: rgb(3 7 18); padding: 1.25rem; }
+</style>
+
+<script>
+  import {
+    calculateBreakEven,
+    formatCurrency,
+    formatPercent,
+    formatQuantity,
+    parseMoneyInput,
+    parsePercentInput,
+    parseQuantityInput,
+  } from "@lib/calculators/finanzas/calculadora-de-punto-de-equilibrio/breakEven";
+
+  const form = document.querySelector("[data-break-even-form]");
+  const periodSelect = document.querySelector("[data-period]");
+  const incrementSelect = document.querySelector("[data-increment]");
+  const unitNameInput = document.querySelector("[data-unit-name]");
+  const resultKicker = document.querySelector("[data-result-kicker]");
+  const mainResult = document.querySelector("[data-main-result]");
+  const interpretation = document.querySelector("[data-interpretation]");
+  const summaryGrid = document.querySelector("[data-summary-grid]");
+  const expectedCard = document.querySelector("[data-expected-card]");
+  const expectedKicker = document.querySelector("[data-expected-kicker]");
+  const expectedText = document.querySelector("[data-expected-text]");
+  const expectedGrid = document.querySelector("[data-expected-grid]");
+  const targetCard = document.querySelector("[data-target-card]");
+  const targetText = document.querySelector("[data-target-text]");
+  const calculationDetails = document.querySelector("[data-calculation-details]");
+  const calculationLines = document.querySelector("[data-calculation-lines]");
+  const scenariosSection = document.querySelector("[data-scenarios-section]");
+  const scenariosCards = document.querySelector("[data-scenarios-cards]");
+  const scenariosTable = document.querySelector("[data-scenarios-table]");
+  const copyButton = document.querySelector("[data-copy]");
+  const copyLabel = document.querySelector("[data-copy-label]");
+  const copyStatus = document.querySelector("[data-copy-status]");
+  const fields = Object.fromEntries(
+    [...document.querySelectorAll("[data-field]")].map((input) => [input.dataset.field, input]),
+  );
+
+  let copyText = "";
+
+  const ERROR_MESSAGES = {
+    required: "Completa este campo para calcular.",
+    invalid: "Ingresa un número válido.",
+    negative: "El valor no puede ser negativo.",
+    too_many_decimals: "Usa menos decimales.",
+    price_zero: "El precio debe ser mayor que cero.",
+    commission_limit: "La comisión debe ser menor que 100%.",
+    unit_name: "Escribe un nombre de 1 a 30 caracteres.",
+  };
+
+  const PERIODS = {
+    monthly: { result: "del mes", copy: "mensual" },
+    annual: { result: "del año", copy: "anual" },
+    project: { result: "del proyecto", copy: "del proyecto" },
+  };
+
+  function calculate() {
+    clearErrors();
+    const errors = {};
+    const unitName = unitNameInput.value.trim();
+
+    if (!unitName || unitName.length > 30) errors.unitName = "unit_name";
+
+    const price = parseRequired("price", parseMoneyInput, errors);
+    const variableCost = parseRequired("variableCost", parseMoneyInput, errors);
+    const fixedCosts = parseRequired("fixedCosts", parseMoneyInput, errors);
+    const commissionRate = parseOptional("commissionRate", parsePercentInput, errors, 0);
+    const expectedUnits = parseOptional("expectedUnits", parseQuantityInput, errors);
+    const targetProfit = parseOptional("targetProfit", parseMoneyInput, errors);
+
+    if (price !== undefined && price <= 0) errors.price = "price_zero";
+    if (commissionRate !== undefined && commissionRate >= 100) errors.commissionRate = "commission_limit";
+
+    showErrors(errors);
+    if (hasErrors(errors)) {
+      setInvalidState(errors);
+      return;
+    }
+
+    const input = {
+      price,
+      variableCost,
+      fixedCosts,
+      commissionRate,
+      increment: Number(incrementSelect.value),
+      expectedUnits,
+      targetProfit,
+    };
+    const result = calculateBreakEven(input);
+
+    if (!result.feasible) {
+      renderInfeasible(input, result, unitName);
+      return;
+    }
+
+    renderFeasible(input, result, unitName);
+  }
+
+  function parseRequired(field, parser, errors) {
+    const parsed = parser(fields[field].value);
+    if (!parsed.ok) {
+      errors[field] = parsed.error;
+      return undefined;
+    }
+    return parsed.value;
+  }
+
+  function parseOptional(field, parser, errors, fallback = undefined) {
+    if (!fields[field].value.trim()) return fallback;
+    return parseRequired(field, parser, errors);
+  }
+
+  function renderFeasible(input, result, unitName) {
+    const period = PERIODS[periodSelect.value];
+    resultKicker.textContent = "Mínimo práctico";
+    mainResult.textContent = formatUnitCount(result.practicalBreakEvenUnits, unitName);
+    interpretation.textContent = `Necesitas vender al menos ${formatUnitCount(result.practicalBreakEvenUnits, unitName)}, equivalentes a ${formatCurrency(result.practicalBreakEvenSales)}, para cubrir tus costos ${period.result}.`;
+    const summaryItems = [
+      ["Ventas mínimas", formatCurrency(result.practicalBreakEvenSales)],
+      ["Contribución por unidad", formatCurrency(result.contributionPerUnit)],
+      ["Contribución del precio", formatPercent(result.contributionPercent)],
+      ["Equilibrio exacto", formatUnitCount(result.exactBreakEvenUnits, unitName)],
+      ["Ventas exactas", formatCurrency(result.exactBreakEvenSales)],
+      ["Costos variables al mínimo", formatCurrency(result.practicalAnalysis.variableCosts)],
+      ["Utilidad al mínimo práctico", formatSignedCurrency(result.practicalAnalysis.profit)],
+    ];
+    if (input.commissionRate > 0) {
+      summaryItems.push(["Comisión al mínimo", formatCurrency(result.practicalAnalysis.commission)]);
+    }
+    summaryGrid.innerHTML = summaryItems.map(([label, value]) => summary(label, value)).join("");
+
+    renderExpected(result, unitName);
+    renderTarget(result, unitName);
+    renderCalculation(input, result, unitName);
+    renderScenarios(result, unitName);
+    copyText = buildCopyText(input, result, unitName);
+    copyButton.classList.remove("hidden");
+  }
+
+  function renderInfeasible(input, result, unitName) {
+    resultKicker.textContent = "No existe punto de equilibrio";
+    mainResult.textContent = result.contributionPerUnit < 0 ? "Cada venta aumenta la pérdida" : "Cada venta no aporta";
+    interpretation.textContent = result.contributionPerUnit < 0
+      ? `Cada ${unitName} aumenta la pérdida en ${formatCurrency(result.lossPerAdditionalUnit)}. Aumenta el precio, reduce el costo variable o disminuye la comisión antes de buscar más ventas.`
+      : `Cada ${unitName} cubre su costo variable y comisión, pero no aporta a los costos fijos. Aumenta el precio, reduce costos o disminuye la comisión.`;
+    summaryGrid.innerHTML = [
+      ["Contribución por unidad", formatSignedCurrency(result.contributionPerUnit)],
+      ["Contribución del precio", formatPercent(result.contributionPercent)],
+      ["Comisión por unidad", formatCurrency(result.commissionPerUnit)],
+      ["Costo variable por unidad", formatCurrency(input.variableCost)],
+    ].map(([label, value]) => summary(label, value)).join("");
+    expectedCard.classList.add("hidden");
+    targetCard.classList.add("hidden");
+    scenariosSection.classList.add("hidden");
+    renderInfeasibleCalculation(input, result);
+    copyText = buildInfeasibleCopyText(input, result, unitName);
+    copyButton.classList.remove("hidden");
+  }
+
+  function renderExpected(result, unitName) {
+    if (!result.expected) {
+      expectedCard.classList.add("hidden");
+      return;
+    }
+
+    const expected = result.expected;
+    expectedCard.className = "mt-4 rounded-lg border p-4";
+
+    if (expected.status === "below") {
+      expectedCard.classList.add("border-red-400/40", "bg-red-400/10");
+      expectedKicker.className = "text-xs font-semibold uppercase tracking-wide text-red-300";
+      expectedText.className = "mt-2 text-sm leading-relaxed text-red-100";
+      expectedKicker.textContent = "Por debajo del equilibrio";
+      expectedText.textContent = `Con tu volumen esperado perderías ${formatCurrency(Math.abs(expected.profit))}. Te faltan ${formatUnitCount(Math.abs(expected.differenceFromExactUnits), unitName)} para alcanzar el equilibrio exacto.`;
+    } else if (expected.status === "above") {
+      expectedCard.classList.add("border-emerald-400/40", "bg-emerald-400/10");
+      expectedKicker.className = "text-xs font-semibold uppercase tracking-wide text-emerald-300";
+      expectedText.className = "mt-2 text-sm leading-relaxed text-emerald-100";
+      expectedKicker.textContent = "Por encima del equilibrio";
+      expectedText.textContent = `Con tu volumen esperado obtendrías una utilidad aproximada de ${formatCurrency(expected.profit)} y superas el equilibrio exacto por ${formatUnitCount(expected.differenceFromExactUnits, unitName)}.`;
+    } else {
+      expectedCard.classList.add("border-sky-400/40", "bg-sky-400/10");
+      expectedKicker.className = "text-xs font-semibold uppercase tracking-wide text-sky-300";
+      expectedText.className = "mt-2 text-sm leading-relaxed text-sky-100";
+      expectedKicker.textContent = "En equilibrio";
+      expectedText.textContent = "Tus ventas esperadas están en el punto de equilibrio.";
+    }
+
+    expectedGrid.innerHTML = [
+      ["Ventas esperadas", formatCurrency(expected.revenue)],
+      [expected.profit >= 0 ? "Utilidad estimada" : "Pérdida estimada", formatCurrency(Math.abs(expected.profit))],
+      ["Costos totales", formatCurrency(expected.totalCosts)],
+      ["Margen de seguridad", expected.safetyMarginPercent === null ? "No disponible" : formatPercent(expected.safetyMarginPercent)],
+      ["Diferencia en unidades", formatSignedQuantity(expected.differenceFromPracticalUnits, unitName)],
+      ["Diferencia en ventas", formatSignedCurrency(expected.differenceFromExactSales)],
+    ].map(([label, value]) => compactSummary(label, value)).join("");
+    expectedCard.classList.remove("hidden");
+  }
+
+  function renderTarget(result, unitName) {
+    if (!result.target) {
+      targetCard.classList.add("hidden");
+      return;
+    }
+
+    targetText.textContent = `El cálculo exacto es ${formatUnitCount(result.target.exactUnits, unitName)}. Para alcanzar una utilidad objetivo de ${formatCurrency(result.target.targetProfit)}, necesitas vender al menos ${formatUnitCount(result.target.practicalUnits, unitName)}, equivalentes a ${formatCurrency(result.target.practicalSales)}. La utilidad estimada después del redondeo es ${formatCurrency(result.target.actualProfit)}.`;
+    targetCard.classList.remove("hidden");
+  }
+
+  function renderCalculation(input, result, unitName) {
+    const lines = [
+      `Comisión por unidad = ${formatCurrency(input.price)} × ${formatPercent(input.commissionRate)} = ${formatCurrency(result.commissionPerUnit)}`,
+      `Contribución por unidad = ${formatCurrency(input.price)} − ${formatCurrency(input.variableCost)} − ${formatCurrency(result.commissionPerUnit)} = ${formatCurrency(result.contributionPerUnit)}`,
+      `Equilibrio exacto = ${formatCurrency(input.fixedCosts)} ÷ ${formatCurrency(result.contributionPerUnit)} = ${formatUnitCount(result.exactBreakEvenUnits, unitName)}`,
+      `Mínimo práctico = ${formatUnitCount(result.practicalBreakEvenUnits, unitName)} × ${formatCurrency(input.price)} = ${formatCurrency(result.practicalBreakEvenSales)}`,
+    ];
+    calculationLines.innerHTML = lines.map((line) => `<p>${escapeHtml(line)}</p>`).join("");
+    calculationDetails.classList.remove("hidden");
+  }
+
+  function renderInfeasibleCalculation(input, result) {
+    const lines = [
+      `Comisión por unidad = ${formatCurrency(input.price)} × ${formatPercent(input.commissionRate)} = ${formatCurrency(result.commissionPerUnit)}`,
+      `Contribución por unidad = ${formatCurrency(input.price)} − ${formatCurrency(input.variableCost)} − ${formatCurrency(result.commissionPerUnit)} = ${formatSignedCurrency(result.contributionPerUnit)}`,
+    ];
+    calculationLines.innerHTML = lines.map((line) => `<p>${escapeHtml(line)}</p>`).join("");
+    calculationDetails.classList.remove("hidden");
+  }
+
+  function renderScenarios(result, unitName) {
+    const rows = result.scenarios.map((scenario) => ({
+      label: `${scenario.percentage}% del equilibrio`,
+      ...scenario,
+    }));
+
+    if (result.expected && !rows.some((row) => nearlyEqual(row.units, result.expected.units))) {
+      rows.push({ label: "Tu estimación", ...result.expected });
+    }
+
+    if (!rows.length) {
+      scenariosSection.classList.add("hidden");
+      return;
+    }
+
+    scenariosCards.innerHTML = rows.map((row) => `
+      <article class="rounded-lg border border-gray-700 bg-gray-950 p-4">
+        <p class="text-xs font-semibold uppercase tracking-wide text-amber-400">${escapeHtml(row.label)}</p>
+        <p class="mt-2 text-2xl font-bold text-white">${escapeHtml(formatUnitCount(row.units, unitName))}</p>
+        <div class="mt-4 grid grid-cols-2 gap-3 text-sm">
+          ${compactSummary("Ingresos", formatCurrency(row.revenue))}
+          ${compactSummary("Costos variables", formatCurrency(row.variableCosts))}
+          ${compactSummary("Comisión", formatCurrency(row.commission))}
+          ${compactSummary("Costos totales", formatCurrency(row.totalCosts))}
+          <div class="col-span-2">${compactSummary(row.profit >= 0 ? "Utilidad" : "Pérdida", formatCurrency(Math.abs(row.profit)))}</div>
+        </div>
+      </article>`).join("");
+
+    scenariosTable.innerHTML = rows.map((row) => `
+      <tr>
+        <td class="whitespace-nowrap px-4 py-3 font-semibold text-gray-200">${escapeHtml(row.label)}</td>
+        <td class="whitespace-nowrap px-4 py-3 text-gray-300">${escapeHtml(formatQuantity(row.units))}</td>
+        <td class="whitespace-nowrap px-4 py-3 text-gray-300">${escapeHtml(formatCurrency(row.revenue))}</td>
+        <td class="whitespace-nowrap px-4 py-3 text-gray-300">${escapeHtml(formatCurrency(row.variableCosts))}</td>
+        <td class="whitespace-nowrap px-4 py-3 text-gray-300">${escapeHtml(formatCurrency(row.commission))}</td>
+        <td class="whitespace-nowrap px-4 py-3 text-gray-300">${escapeHtml(formatCurrency(row.totalCosts))}</td>
+        <td class="whitespace-nowrap px-4 py-3 font-semibold ${row.profit >= 0 ? "text-emerald-300" : "text-red-300"}">${escapeHtml(formatSignedCurrency(row.profit))}</td>
+      </tr>`).join("");
+    scenariosSection.classList.remove("hidden");
+  }
+
+  function buildCopyText(input, result, unitName) {
+    const period = PERIODS[periodSelect.value];
+    const lines = [
+      `Punto de equilibrio ${period.copy}`,
+      `Precio por ${unitName}: ${formatCurrency(input.price)}`,
+      `Costo variable por ${unitName}: ${formatCurrency(input.variableCost)}`,
+      `Comisión: ${formatPercent(input.commissionRate)} (${formatCurrency(result.commissionPerUnit)} por ${unitName})`,
+      `Costos fijos: ${formatCurrency(input.fixedCosts)}`,
+      `Margen de contribución: ${formatCurrency(result.contributionPerUnit)} (${formatPercent(result.contributionPercent)})`,
+      `Punto de equilibrio exacto: ${formatUnitCount(result.exactBreakEvenUnits, unitName)}`,
+      `Mínimo práctico: ${formatUnitCount(result.practicalBreakEvenUnits, unitName)} (${formatCurrency(result.practicalBreakEvenSales)})`,
+    ];
+
+    if (result.expected) {
+      lines.push(
+        `Ventas esperadas: ${formatUnitCount(result.expected.units, unitName)}`,
+        `${result.expected.profit >= 0 ? "Utilidad" : "Pérdida"} estimada: ${formatCurrency(Math.abs(result.expected.profit))}`,
+        `Margen de seguridad: ${result.expected.safetyMarginPercent === null ? "No disponible" : formatPercent(result.expected.safetyMarginPercent)}`,
+      );
+    }
+    if (result.target) {
+      lines.push(
+        `Utilidad objetivo: ${formatCurrency(result.target.targetProfit)}`,
+        `Mínimo para el objetivo: ${formatUnitCount(result.target.practicalUnits, unitName)} (${formatCurrency(result.target.practicalSales)})`,
+      );
+    }
+    lines.push("", "Estimación basada en los datos capturados.");
+    return lines.join("\n");
+  }
+
+  function buildInfeasibleCopyText(input, result, unitName) {
+    return [
+      "Punto de equilibrio: configuración inviable",
+      `Precio por ${unitName}: ${formatCurrency(input.price)}`,
+      `Costo variable por ${unitName}: ${formatCurrency(input.variableCost)}`,
+      `Comisión: ${formatPercent(input.commissionRate)} (${formatCurrency(result.commissionPerUnit)} por ${unitName})`,
+      `Contribución por ${unitName}: ${formatSignedCurrency(result.contributionPerUnit)}`,
+      "",
+      "Cada venta debe generar una contribución positiva para alcanzar el equilibrio.",
+    ].join("\n");
+  }
+
+  function fillExample() {
+    periodSelect.value = "monthly";
+    unitNameInput.value = "unidades";
+    fields.price.value = "250";
+    fields.variableCost.value = "100";
+    fields.fixedCosts.value = "30000";
+    fields.expectedUnits.value = "240";
+    fields.targetProfit.value = "15000";
+    fields.commissionRate.value = "0";
+    incrementSelect.value = "1";
+    document.querySelector("[data-options]").open = true;
+    calculate();
+  }
+
+  function clearAll() {
+    const hasMeaningfulData = [fields.price, fields.variableCost, fields.fixedCosts, fields.expectedUnits, fields.targetProfit]
+      .some((input) => input.value.trim());
+    if (hasMeaningfulData && !window.confirm("¿Limpiar los datos capturados?")) return;
+
+    periodSelect.value = "monthly";
+    unitNameInput.value = "unidades";
+    Object.values(fields).forEach((input) => { input.value = ""; });
+    fields.commissionRate.value = "0";
+    incrementSelect.value = "1";
+    document.querySelector("[data-options]").open = false;
+    clearErrors();
+    setInitialState();
+  }
+
+  function clearErrors() {
+    document.querySelectorAll("[data-error-for]").forEach((element) => { element.textContent = ""; });
+  }
+
+  function showErrors(errors) {
+    Object.entries(errors).forEach(([field, error]) => {
+      const element = document.querySelector(`[data-error-for="${field}"]`);
+      if (element) element.textContent = ERROR_MESSAGES[error] ?? ERROR_MESSAGES.invalid;
+    });
+  }
+
+  function setInvalidState(errors) {
+    resultKicker.textContent = "Revisa los campos";
+    mainResult.textContent = "No se puede calcular";
+    interpretation.textContent = "Corrige los valores marcados para continuar.";
+    summaryGrid.innerHTML = "";
+    expectedCard.classList.add("hidden");
+    targetCard.classList.add("hidden");
+    calculationDetails.classList.add("hidden");
+    scenariosSection.classList.add("hidden");
+    copyButton.classList.add("hidden");
+    copyText = "";
+    const firstError = Object.keys(errors)[0];
+    if (firstError === "unitName") unitNameInput.focus();
+    else if (firstError && fields[firstError]) fields[firstError].focus();
+  }
+
+  function setInitialState() {
+    resultKicker.textContent = "Resultado";
+    mainResult.textContent = "Ingresa los valores";
+    interpretation.textContent = "Verás cuánto necesitas vender para cubrir tus costos.";
+    summaryGrid.innerHTML = `<div class="col-span-2 rounded-lg border border-gray-800 bg-gray-950/70 p-4 text-sm text-gray-400">Captura precio, costo variable y costos fijos para comenzar.</div>`;
+    expectedCard.classList.add("hidden");
+    targetCard.classList.add("hidden");
+    calculationDetails.classList.add("hidden");
+    scenariosSection.classList.add("hidden");
+    copyButton.classList.add("hidden");
+    copyText = "";
+  }
+
+  async function copyResult() {
+    if (!copyText) return;
+    try {
+      await navigator.clipboard.writeText(copyText);
+      copyLabel.textContent = "Copiado";
+      copyStatus.textContent = "Resumen copiado.";
+      window.setTimeout(() => {
+        copyLabel.textContent = "Copiar resumen";
+        copyStatus.textContent = "";
+      }, 2000);
+    } catch {
+      copyStatus.textContent = "No se pudo copiar el resumen.";
+    }
+  }
+
+  function summary(label, value) {
+    return `<div class="rounded-lg border border-gray-800 bg-gray-950/70 p-3"><span class="block text-xs font-semibold uppercase tracking-wide text-gray-500">${escapeHtml(label)}</span><span class="mt-2 block break-words text-base font-semibold text-white">${escapeHtml(value)}</span></div>`;
+  }
+
+  function compactSummary(label, value) {
+    return `<div class="rounded-lg bg-gray-950/50 p-3"><span class="block text-xs uppercase tracking-wide text-gray-400">${escapeHtml(label)}</span><span class="mt-1 block break-words font-semibold text-white">${escapeHtml(value)}</span></div>`;
+  }
+
+  function formatUnitCount(value, unitName) {
+    return `${formatQuantity(value)} ${unitName}`;
+  }
+
+  function formatSignedCurrency(value) {
+    return value < 0 ? `−${formatCurrency(Math.abs(value))}` : formatCurrency(value);
+  }
+
+  function formatSignedQuantity(value, unitName) {
+    if (Math.abs(value) < 1e-8) return formatUnitCount(0, unitName);
+    return `${value < 0 ? "−" : "+"}${formatUnitCount(Math.abs(value), unitName)}`;
+  }
+
+  function nearlyEqual(left, right) {
+    return Math.abs(left - right) < 1e-8;
+  }
+
+  function hasErrors(errors) {
+    return Object.keys(errors).length > 0;
+  }
+
+  function escapeHtml(value) {
+    return String(value).replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;").replaceAll("'", "&#039;");
+  }
+
+  form.addEventListener("submit", (event) => {
+    event.preventDefault();
+    calculate();
+  });
+  document.querySelector("[data-example]").addEventListener("click", fillExample);
+  document.querySelector("[data-clear]").addEventListener("click", clearAll);
+  copyButton.addEventListener("click", copyResult);
+</script>

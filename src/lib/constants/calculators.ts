@@ -98,6 +98,15 @@ export const CALCULATORS: CalculatorDirectoryItem[] = [
     order: 37.25,
   },
   {
+    id: "calculadora-de-punto-de-equilibrio",
+    title: "Calculadora de punto de equilibrio",
+    description:
+      "Calcula cuánto necesitas vender para cubrir costos, evaluar tu proyección y alcanzar una utilidad objetivo.",
+    href: "/finanzas/calculadora-de-punto-de-equilibrio/",
+    categorySlug: "finanzas",
+    order: 37.4,
+  },
+  {
     id: "calculadora-dca-costo-promedio",
     title: "Calculadora de precio promedio (DCA)",
     description:
