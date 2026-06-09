@@ -62,6 +62,15 @@ export const CALCULATORS: CalculatorDirectoryItem[] = [
     order: 36,
   },
   {
+    id: "calculadora-de-ahorro-para-un-objetivo",
+    title: "Calculadora de ahorro para un objetivo",
+    description:
+      "Calcula cuánto ahorrar al mes, cuándo alcanzarás una meta y cómo ajustar tu plan.",
+    href: "/finanzas/calculadora-de-ahorro-para-un-objetivo",
+    categorySlug: "finanzas",
+    order: 36.5,
+  },
+  {
     id: "calculadora-de-roi",
     title: "Calculadora de ROI",
     description:

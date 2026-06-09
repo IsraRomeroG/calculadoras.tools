@@ -10,8 +10,8 @@ tags:
 readTime: "6 min"
 seoTitle: "Cuanto ahorrar al mes para una meta: formula y ejemplos"
 relatedCalculator:
-  label: "Calculadora de interes compuesto"
-  href: "/finanzas/calculadora-de-interes-compuesto"
+  label: "Calculadora de ahorro para un objetivo"
+  href: "/finanzas/calculadora-de-ahorro-para-un-objetivo"
 ---
 
 ## Empieza por tres datos
@@ -105,17 +105,11 @@ meta futura = meta actual x (1 + inflacion)^anos
 
 Despues usa esa meta futura en la formula de aportacion mensual. Para entender mejor la diferencia entre dinero nominal y poder adquisitivo, puedes revisar la guia de [inflacion e interes compuesto](/blog/finanzas/inflacion-interes-compuesto-valor-real).
 
-## Usa la calculadora actual
+## Crea tu plan de ahorro
 
-La [calculadora de interes compuesto](/finanzas/calculadora-de-interes-compuesto) sirve para simular el crecimiento de un capital con aportaciones periodicas. Aunque no tiene un modo inverso que calcule automaticamente la aportacion necesaria para una meta, puedes usarla por iteracion:
+La [calculadora de ahorro para un objetivo](/finanzas/calculadora-de-ahorro-para-un-objetivo) puede calcular automaticamente cuánto aportar cada mes o cuándo alcanzarías la meta con una aportación fija. También muestra un escenario conservador sin rendimiento y alternativas para ajustar el plazo.
 
-1. Escribe tu capital inicial.
-2. Elige el plazo y la tasa anual que quieres probar.
-3. Ingresa una aportacion mensual tentativa.
-4. Revisa el monto final.
-5. Sube o baja la aportacion hasta acercarte a la meta.
-
-Si tu objetivo depende mucho de las aportaciones mensuales, tambien te puede servir la guia sobre [interes compuesto con aportaciones mensuales](/blog/finanzas/interes-compuesto-aportaciones-mensuales).
+Si quieres explorar con más detalle cómo crece una inversión, también puedes usar la [calculadora de interes compuesto](/finanzas/calculadora-de-interes-compuesto).
 
 ## Preguntas frecuentes
 
@@ -131,6 +125,6 @@ Si la meta se cumplira en el futuro y el precio del bien o servicio puede subir,
 
 La formula de este articulo asume aportaciones al final de cada mes. Si aportas al inicio, cada deposito tiene un mes extra para crecer, asi que la aportacion necesaria podria ser un poco menor.
 
-**La calculadora actual puede decirme la aportacion exacta?**
+**La calculadora puede decirme la aportacion exacta?**
 
-No de forma automatica. Puedes usarla probando distintas aportaciones hasta que el monto final se acerque a tu objetivo. Es una aproximacion practica mientras no exista un modo especifico de meta de ahorro.
+Sí. Calcula una aportación mensual estimada y ajusta la última para evitar aportar más de lo necesario. El resultado sigue dependiendo de los supuestos de rendimiento e inflación capturados.
