@@ -1,0 +1,1091 @@
+---
+import BaseLayout from "@layouts/BaseLayout.astro";
+import Container from "@components/layout/Container.astro";
+import PageShell from "@components/layout/PageShell.astro";
+import FaqSection from "@components/shared/FaqSection.astro";
+import PageHero from "@components/shared/PageHero.astro";
+import SectionIntro from "@components/shared/SectionIntro.astro";
+import { buildFaqJsonLd } from "@lib/seo";
+
+const title = "Calculadora de precio de proyecto freelance";
+const description =
+  "Calcula cuánto cobrar por un proyecto freelance, compara escenarios y analiza si un precio fijo cubre horas, gastos, riesgo y margen.";
+const canonical = "/finanzas/calculadora-de-precio-de-proyecto-freelance";
+const faqs = [
+  {
+    question: "¿Cómo calculo cuánto cobrar por un proyecto freelance?",
+    answer:
+      "Estima las horas de cada fase, asigna una tarifa sostenible, añade gastos directos y reserva tiempo para imprevistos. Después incorpora comisiones y un margen comercial antes de agregar impuestos.",
+  },
+  {
+    question: "¿Qué porcentaje de contingencia conviene usar?",
+    answer:
+      "Depende de qué tan definido esté el alcance. La contingencia representa horas reservadas para coordinación, revisiones y pequeños cambios; conviene revisarla junto con el escenario base y el conservador.",
+  },
+  {
+    question: "¿Cuál es la diferencia entre margen y recargo?",
+    answer:
+      "El margen mide qué porcentaje del precio queda después de costos y comisiones. Un recargo simplemente agrega un porcentaje sobre el costo y no garantiza alcanzar ese mismo margen.",
+  },
+  {
+    question: "¿Cómo sé si un precio fijo me conviene?",
+    answer:
+      "Analiza su tarifa efectiva, el margen alcanzado y cuántas horas puede financiar antes de quedar por debajo del valor modelado de tu tiempo.",
+  },
+  {
+    question: "¿Debo cobrar anticipo?",
+    answer:
+      "Un anticipo ayuda a financiar el inicio y reduce el riesgo de cobro. El porcentaje adecuado depende del proyecto, del cliente y de los gastos que debas cubrir por adelantado.",
+  },
+  {
+    question: "¿Los impuestos forman parte de mi tarifa efectiva?",
+    answer:
+      "No en esta calculadora. El impuesto agregado se muestra por separado y no se trata como ingreso disponible para pagar trabajo, gastos o margen.",
+  },
+  {
+    question: "¿Qué gastos debo incluir en una cotización?",
+    answer:
+      "Incluye únicamente gastos necesarios para ese proyecto, como licencias, materiales, traslados, colaboradores o servicios contratados.",
+  },
+];
+const faqJsonLd = buildFaqJsonLd(faqs);
+---
+
+<BaseLayout title={title} description={description} canonical={canonical}>
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={JSON.stringify(faqJsonLd)} />
+  </Fragment>
+
+  <PageShell>
+    <PageHero
+      title="Calculadora de precio de proyecto freelance"
+      description="Convierte horas, gastos y riesgo en una cotización clara, o revisa si un precio fijo realmente te conviene."
+      kicker="Finanzas"
+      collapseBreadcrumbOnMobile
+      containerClass="py-6 md:py-8"
+      breadcrumbs={[
+        { label: "Inicio", href: "/", ariaLabel: "Inicio" },
+        { label: "Finanzas", href: "/finanzas", optional: true },
+        { label: "Precio de proyecto", truncate: true },
+      ]}
+    />
+
+    <Container as="section" class="py-6 md:py-8">
+      <section
+        class="overflow-hidden rounded-lg border border-gray-700 bg-gray-950 shadow-xl shadow-gray-950/30"
+        aria-labelledby="calculator-heading"
+      >
+        <div class="grid lg:grid-cols-[minmax(0,1.15fr)_minmax(20rem,0.85fr)]">
+          <div class="p-4 sm:p-6">
+            <p class="text-sm font-semibold uppercase tracking-wide text-amber-400">
+              De estimación a cotización
+            </p>
+            <h2 id="calculator-heading" class="mt-2 text-2xl font-semibold">
+              ¿Qué quieres revisar?
+            </h2>
+
+            <div
+              class="mt-5 grid grid-cols-2 rounded-lg border border-gray-700 bg-gray-900 p-1"
+              role="tablist"
+              aria-label="Modo de cálculo"
+            >
+              <button
+                class="mode-button is-active"
+                type="button"
+                role="tab"
+                aria-selected="true"
+                data-mode="recommend"
+              >
+                Recomendar precio
+              </button>
+              <button
+                class="mode-button"
+                type="button"
+                role="tab"
+                aria-selected="false"
+                data-mode="analyze"
+              >
+                Analizar propuesta
+              </button>
+            </div>
+
+            <form class="mt-6" novalidate data-project-form>
+              <div
+                class="hidden rounded-lg border border-red-400/40 bg-red-400/10 p-4 text-sm text-red-100"
+                role="alert"
+                tabindex="-1"
+                data-errors
+              ></div>
+
+              <div class="grid gap-4 sm:grid-cols-2">
+                <div>
+                  <label class="field-label" for="project-base-rate">
+                    Tarifa por hora base <span class="text-gray-500">(opcional si cada fase tiene tarifa)</span>
+                  </label>
+                  <div class="field-shell">
+                    <span class="field-affix">$</span>
+                    <input
+                      id="project-base-rate"
+                      class="field-input"
+                      type="text"
+                      inputmode="decimal"
+                      autocomplete="off"
+                      placeholder="600"
+                      data-field="baseHourlyRate"
+                    />
+                    <span class="field-affix">/ hora</span>
+                  </div>
+                  <p class="field-help">
+                    ¿Aún no la conoces? Usa la
+                    <a class="text-amber-300 underline hover:text-amber-200" href="/finanzas/calculadora-de-tarifa-por-hora-freelance">
+                      calculadora de tarifa freelance
+                    </a>.
+                  </p>
+                </div>
+
+                <div class="hidden" data-proposed-wrap>
+                  <label class="field-label" for="project-proposed-price">
+                    Precio propuesto antes de impuestos
+                  </label>
+                  <div class="field-shell">
+                    <span class="field-affix">$</span>
+                    <input
+                      id="project-proposed-price"
+                      class="field-input"
+                      type="text"
+                      inputmode="decimal"
+                      autocomplete="off"
+                      placeholder="55000"
+                      data-field="proposedPrice"
+                    />
+                  </div>
+                  <p class="field-help">La cantidad fija que quieres evaluar.</p>
+                </div>
+              </div>
+
+              <div class="mt-6 flex items-center justify-between gap-4 border-t border-gray-800 pt-5">
+                <div>
+                  <h3 class="text-lg font-semibold text-white">Fases del proyecto</h3>
+                  <p class="mt-1 text-sm text-gray-500" data-phase-count></p>
+                </div>
+                <button class="secondary-button shrink-0" type="button" data-add-phase>
+                  Agregar fase
+                </button>
+              </div>
+
+              <div class="mt-4 space-y-4" data-phase-list></div>
+
+              <details class="mt-5 rounded-lg border border-gray-700 bg-gray-900/60 p-4" data-risk-options>
+                <summary class="cursor-pointer font-semibold text-white">
+                  Riesgo, gastos y margen
+                </summary>
+                <p class="mt-2 text-xs leading-relaxed text-gray-400" data-risk-summary>
+                  Ajustes: 10% de contingencia, sin gastos y 20% de margen.
+                </p>
+
+                <div class="mt-4 grid gap-4 sm:grid-cols-2">
+                  <label class="block">
+                    <span class="field-label">Gastos directos</span>
+                    <span class="field-shell">
+                      <span class="field-affix">$</span>
+                      <input class="field-input" type="text" inputmode="decimal" value="0" data-field="directExpenses" />
+                    </span>
+                    <span class="field-help">Licencias, materiales, colaboradores o traslados.</span>
+                  </label>
+
+                  <label class="block">
+                    <span class="field-label">Comisión sobre cobros</span>
+                    <span class="field-shell">
+                      <input class="field-input field-input-leading" type="text" inputmode="decimal" value="0" data-field="collectionFeeRate" />
+                      <span class="field-affix">%</span>
+                    </span>
+                    <span class="field-help">Marketplace, plataforma o pasarela de pago.</span>
+                  </label>
+
+                  <label class="block">
+                    <span class="field-label">Contingencia recomendada</span>
+                    <span class="field-shell">
+                      <input class="field-input field-input-leading" type="text" inputmode="decimal" value="10" data-field="recommendedContingencyRate" />
+                      <span class="field-affix">%</span>
+                    </span>
+                    <span class="field-help">Reserva de horas para revisiones e imprevistos.</span>
+                  </label>
+
+                  <label class="block">
+                    <span class="field-label">Contingencia conservadora</span>
+                    <span class="field-shell">
+                      <input class="field-input field-input-leading" type="text" inputmode="decimal" value="20" data-field="conservativeContingencyRate" />
+                      <span class="field-affix">%</span>
+                    </span>
+                    <span class="field-help">Escenario con mayor reserva de trabajo.</span>
+                  </label>
+
+                  <label class="block sm:col-span-2">
+                    <span class="field-label">Margen comercial objetivo</span>
+                    <span class="field-shell">
+                      <input class="field-input field-input-leading" type="text" inputmode="decimal" value="20" data-field="targetMarginRate" />
+                      <span class="field-affix">%</span>
+                    </span>
+                    <span class="field-help">
+                      Porcentaje real del precio que queda después de trabajo, gastos y comisión.
+                    </span>
+                  </label>
+                </div>
+              </details>
+
+              <details class="mt-4 rounded-lg border border-gray-700 bg-gray-900/60 p-4" data-payment-options>
+                <summary class="cursor-pointer font-semibold text-white">
+                  Impuesto y plan de pagos
+                </summary>
+                <p class="mt-2 text-xs leading-relaxed text-gray-400" data-payment-summary>
+                  Sin impuesto agregado. Pagos: 50%, 25% y 25%.
+                </p>
+
+                <div class="mt-4 grid gap-4 sm:grid-cols-2">
+                  <label class="block sm:col-span-2">
+                    <span class="field-label">Impuesto agregado a la cotización</span>
+                    <span class="field-shell">
+                      <input class="field-input field-input-leading" type="text" inputmode="decimal" value="0" data-field="taxRate" />
+                      <span class="field-affix">%</span>
+                    </span>
+                    <span class="field-help">Estimación manual; no calcula obligaciones fiscales ni retenciones.</span>
+                  </label>
+
+                  <label class="block">
+                    <span class="field-label">Anticipo</span>
+                    <span class="field-shell">
+                      <input class="field-input field-input-leading" type="text" inputmode="decimal" value="50" data-field="deposit" />
+                      <span class="field-affix">%</span>
+                    </span>
+                  </label>
+
+                  <label class="block">
+                    <span class="field-label">Pago de avance</span>
+                    <span class="field-shell">
+                      <input class="field-input field-input-leading" type="text" inputmode="decimal" value="25" data-field="progress" />
+                      <span class="field-affix">%</span>
+                    </span>
+                  </label>
+
+                  <label class="block sm:col-span-2">
+                    <span class="field-label">Pago final</span>
+                    <span class="field-shell">
+                      <input class="field-input field-input-leading" type="text" inputmode="decimal" value="25" data-field="final" />
+                      <span class="field-affix">%</span>
+                    </span>
+                  </label>
+                </div>
+              </details>
+
+              <div
+                class="mt-4 hidden rounded-lg border border-amber-400/40 bg-amber-400/10 p-4 text-sm text-amber-100"
+                data-warnings
+              ></div>
+
+              <div class="mt-6 flex flex-col gap-3 border-t border-gray-800 pt-5 sm:flex-row sm:flex-wrap">
+                <button class="primary-button w-full sm:w-auto sm:min-w-56" type="submit" data-submit-label>
+                  Calcular precio recomendado
+                </button>
+                <button class="secondary-button" type="button" data-example>Usar ejemplo</button>
+                <button class="secondary-button" type="button" data-clear>Limpiar</button>
+                <button class="secondary-button hidden" type="button" data-copy>
+                  <span data-copy-label>Copiar resumen para propuesta</span>
+                </button>
+                <p class="sr-only" aria-live="polite" data-copy-status></p>
+              </div>
+            </form>
+          </div>
+
+          <aside
+            class="border-t border-gray-800 bg-gray-900/70 p-4 sm:p-6 lg:border-l lg:border-t-0"
+            aria-live="polite"
+            tabindex="-1"
+            data-result-region
+          >
+            <div
+              class="hidden rounded-lg border border-amber-400/40 bg-amber-400/10 p-3 text-sm text-amber-100"
+              data-stale-notice
+            >
+              Cambiaste los datos. Calcula de nuevo para actualizar este resultado.
+            </div>
+            <p class="mt-1 text-sm font-semibold uppercase tracking-wide text-amber-400" data-result-kicker>
+              Resultado
+            </p>
+            <p class="mt-3 break-words text-4xl font-bold leading-tight text-white" data-main-result>
+              Estima tus fases
+            </p>
+            <p class="mt-3 text-sm leading-relaxed text-gray-300" data-interpretation>
+              Verás un precio base, uno recomendado y un escenario conservador.
+            </p>
+
+            <div class="mt-5 grid grid-cols-2 gap-3" data-summary-grid>
+              <div class="col-span-2 rounded-lg border border-gray-800 bg-gray-950/70 p-4 text-sm text-gray-400">
+                Captura una tarifa y las horas de al menos una fase para comenzar.
+              </div>
+            </div>
+
+            <div class="mt-4 hidden rounded-lg border p-4" data-status-card>
+              <p class="text-xs font-semibold uppercase tracking-wide" data-status-label></p>
+              <p class="mt-2 text-sm leading-relaxed" data-status-text></p>
+            </div>
+
+            <details class="mt-4 hidden rounded-lg border border-gray-800 p-4" data-breakdown-details>
+              <summary class="cursor-pointer text-sm font-semibold text-white">Cómo se calculó</summary>
+              <div class="mt-3 space-y-2 text-sm leading-relaxed text-gray-400" data-breakdown-lines></div>
+            </details>
+
+            <p class="mt-4 text-xs leading-relaxed text-gray-500">
+              Estimación de planeación. No sustituye asesoría fiscal, contractual
+              ni una revisión del alcance con el cliente.
+            </p>
+          </aside>
+        </div>
+      </section>
+
+      <div class="sticky bottom-3 z-20 mt-4 lg:hidden">
+        <button class="primary-button w-full shadow-lg shadow-gray-950/50" type="button" data-mobile-calculate>
+          Calcular precio recomendado
+        </button>
+      </div>
+    </Container>
+
+    <div class="hidden" data-results>
+      <Container as="section" class="py-6 md:py-8">
+        <SectionIntro
+          title="Escenarios de cotización"
+          description="Compara cuánto cambia el precio al reservar más o menos tiempo para el proyecto."
+          class="mb-5"
+        />
+        <div class="grid gap-4 md:grid-cols-3" data-scenario-grid></div>
+      </Container>
+
+      <Container as="section" class="py-6 md:py-8">
+        <div class="grid gap-5 lg:grid-cols-2">
+          <section class="rounded-lg border border-gray-700 bg-gray-950 p-4 sm:p-6">
+            <p class="text-sm font-semibold uppercase tracking-wide text-sky-300">Cobro por hitos</p>
+            <h2 class="mt-2 text-2xl font-semibold">Plan de pagos</h2>
+            <p class="mt-2 text-sm leading-relaxed text-gray-400">
+              Los importes suman el total presentado al cliente, incluido el impuesto agregado.
+            </p>
+            <div class="mt-5 grid gap-3 sm:grid-cols-3 lg:grid-cols-1 xl:grid-cols-3" data-payment-grid></div>
+          </section>
+
+          <section class="rounded-lg border border-gray-700 bg-gray-950 p-4 sm:p-6">
+            <p class="text-sm font-semibold uppercase tracking-wide text-amber-400">Listo para adaptar</p>
+            <h2 class="mt-2 text-2xl font-semibold">Resumen para propuesta</h2>
+            <p class="mt-2 text-sm leading-relaxed text-gray-400" data-proposal-summary></p>
+            <button class="primary-button mt-5 w-full sm:w-auto" type="button" data-copy>
+              <span data-copy-label>Copiar resumen para propuesta</span>
+            </button>
+          </section>
+        </div>
+      </Container>
+    </div>
+
+    <Container as="section" class="py-8">
+      <SectionIntro
+        title="Cómo interpretar tu cotización"
+        description="Un buen precio no solo cubre horas: también hace visible el riesgo y deja espacio para operar."
+        class="mb-5"
+      />
+      <div class="grid gap-4 md:grid-cols-3">
+        <article class="info-card">
+          <h2 class="font-semibold text-white">Contingencia en horas</h2>
+          <p class="mt-2 text-sm leading-relaxed text-gray-400">
+            Convierte el riesgo en tiempo visible para revisiones, coordinación y pequeños cambios.
+          </p>
+        </article>
+        <article class="info-card">
+          <h2 class="font-semibold text-white">Margen no es recargo</h2>
+          <p class="mt-2 text-sm leading-relaxed text-gray-400">
+            El margen indica qué parte del precio queda después del trabajo, los gastos y las comisiones.
+          </p>
+        </article>
+        <article class="info-card">
+          <h2 class="font-semibold text-white">Precio fijo con límites</h2>
+          <p class="mt-2 text-sm leading-relaxed text-gray-400">
+            Revisar horas financiadas y tarifa efectiva ayuda a detectar propuestas demasiado ajustadas.
+          </p>
+        </article>
+      </div>
+    </Container>
+
+    <Container as="section" class="py-8">
+      <section class="rounded-lg border border-gray-700 bg-gray-950 p-5 sm:p-6">
+        <h2 class="text-2xl font-semibold">Antes de enviar la propuesta</h2>
+        <div class="mt-4 grid gap-4 text-sm leading-relaxed text-gray-400 md:grid-cols-2">
+          <p>
+            Define entregables, revisiones incluidas y qué constituye un cambio de alcance. La contingencia reduce riesgo, pero no reemplaza acuerdos claros.
+          </p>
+          <p>
+            Separa el impuesto agregado del ingreso disponible. También confirma cuándo se pagan gastos directos y qué ocurre si el proyecto se pausa.
+          </p>
+        </div>
+        <div class="mt-5 flex flex-wrap gap-3">
+          <a class="secondary-button" href="/finanzas/calculadora-de-tarifa-por-hora-freelance">
+            Calcular tarifa por hora
+          </a>
+          <a class="secondary-button" href="/finanzas/calculadora-de-margen-y-markup">
+            Entender margen y markup
+          </a>
+        </div>
+      </section>
+    </Container>
+
+    <FaqSection faqs={faqs} />
+  </PageShell>
+</BaseLayout>
+
+<style is:global>
+  .field-label { display: block; font-size: .875rem; font-weight: 500; color: rgb(229 231 235); }
+  .field, .field-shell { margin-top: .5rem; min-height: 3rem; width: 100%; border-radius: .5rem; border: 1px solid rgb(55 65 81); background: rgb(17 24 39); color: white; outline: none; }
+  .field { padding: 0 1rem; }
+  .field-shell { display: flex; align-items: center; }
+  .field-input { min-height: 2.875rem; min-width: 0; width: 100%; background: transparent; padding: 0 .25rem; color: white; outline: none; }
+  .field-input-leading { padding-left: .75rem; }
+  .field-affix { flex: none; padding: 0 .75rem; font-size: .875rem; color: rgb(156 163 175); }
+  .field:focus, .field-shell:focus-within { border-color: rgb(251 191 36); box-shadow: 0 0 0 3px rgb(251 191 36 / .15); }
+  .field[aria-invalid="true"], .field-shell:has(.field-input[aria-invalid="true"]) { border-color: rgb(248 113 113); }
+  .field-help { margin-top: .4rem; display: block; font-size: .75rem; line-height: 1.4; color: rgb(107 114 128); }
+  .primary-button, .secondary-button, .mode-button { display: inline-flex; min-height: 2.75rem; align-items: center; justify-content: center; border-radius: .5rem; padding: .5rem 1rem; font-size: .875rem; font-weight: 700; }
+  .primary-button { background: rgb(251 191 36); color: rgb(3 7 18); }
+  .secondary-button { border: 1px solid rgb(55 65 81); color: rgb(229 231 235); }
+  .secondary-button:hover { border-color: rgb(107 114 128); color: white; }
+  .mode-button { min-height: 2.75rem; color: rgb(156 163 175); }
+  .mode-button.is-active { background: rgb(31 41 55); color: rgb(253 230 138); box-shadow: 0 1px 3px rgb(0 0 0 / .3); }
+  .info-card { border-radius: .5rem; border: 1px solid rgb(55 65 81); background: rgb(3 7 18); padding: 1.25rem; }
+  .phase-action { display: inline-flex; min-height: 2.75rem; align-items: center; justify-content: center; border-radius: .375rem; border: 1px solid rgb(55 65 81); padding: .4rem .75rem; font-size: .75rem; font-weight: 600; color: rgb(209 213 219); }
+  .phase-action-danger { border-color: rgb(248 113 113 / .4); color: rgb(254 202 202); }
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+  }
+</style>
+
+<script>
+  import {
+    analyzeProposedPrice,
+    calculateProjectRecommendation,
+    formatProjectCurrency,
+    formatProjectPercent,
+    formatProjectQuantity,
+    parseProjectNumber,
+  } from "@lib/calculators/finanzas/calculadora-de-precio-de-proyecto-freelance/freelanceProjectPrice";
+
+  const get = (selector) => document.querySelector(selector);
+  const phaseList = get("[data-phase-list]");
+  const form = get("[data-project-form]");
+  const resultRegion = get("[data-result-region]");
+  const proposedWrap = get("[data-proposed-wrap]");
+  const submitLabel = get("[data-submit-label]");
+  const mobileCalculate = get("[data-mobile-calculate]");
+  let mode = "recommend";
+  let sequence = 0;
+  let phases = [newPhase()];
+  let conservativeEdited = false;
+  let currentInput = null;
+  let currentRecommendation = null;
+  let currentAnalysis = null;
+  let copyText = "";
+
+  const warningMessages = {
+    no_contingency: "No estás reservando horas para revisiones o cambios menores. Confirma que el alcance está suficientemente definido.",
+    high_contingency: "La reserva supera la mitad del trabajo estimado. Revisa si conviene ajustar el alcance o dividir el proyecto.",
+    expenses_exceed_work: "Los gastos directos representan la mayor parte de la cotización. Confirma importes y condiciones de reembolso.",
+    no_tax: "La cotización no agrega impuestos. Confirma que este supuesto aplica a tu caso.",
+    low_deposit: "Un anticipo bajo puede aumentar el riesgo de financiar el inicio del proyecto.",
+  };
+
+  function newPhase(values = {}) {
+    sequence += 1;
+    return {
+      id: `phase-${sequence}`,
+      name: values.name ?? `Fase ${sequence}`,
+      hours: values.hours ?? "",
+      hourlyRate: values.hourlyRate ?? "",
+      open: values.open ?? true,
+    };
+  }
+
+  function renderPhases(focusLast = false) {
+    get("[data-phase-count]").textContent = `${phases.length} ${phases.length === 1 ? "fase" : "fases"}`;
+    phaseList.innerHTML = phases.map((phase, index) => `
+      <details class="rounded-lg border border-gray-700 bg-gray-900/70 p-4" data-phase-card="${phase.id}" ${phase.open ? "open" : ""}>
+        <summary class="cursor-pointer list-none">
+          <div class="flex items-center justify-between gap-3">
+            <div class="min-w-0">
+              <p class="truncate text-sm font-semibold text-amber-300">${escapeHtml(phase.name || `Fase ${index + 1}`)}</p>
+              <p class="mt-1 truncate text-xs text-gray-500" data-phase-preview="${phase.id}">${escapeHtml(phasePreview(phase))}</p>
+            </div>
+            <span class="text-xs font-semibold text-gray-400">Editar</span>
+          </div>
+        </summary>
+        <div class="mt-4 grid gap-4 sm:grid-cols-2">
+          <label class="block sm:col-span-2">
+            <span class="field-label">Nombre de fase</span>
+            <input class="field" type="text" maxlength="60" value="${escapeHtml(phase.name)}" data-phase-field="name" data-id="${phase.id}" />
+          </label>
+          <label class="block">
+            <span class="field-label">Horas estimadas</span>
+            <span class="field-shell">
+              <input class="field-input field-input-leading" type="text" inputmode="decimal" autocomplete="off" placeholder="20" value="${escapeHtml(phase.hours)}" data-phase-field="hours" data-id="${phase.id}" />
+              <span class="field-affix">horas</span>
+            </span>
+          </label>
+          <label class="block">
+            <span class="field-label">Tarifa específica <span class="text-gray-500">(opcional)</span></span>
+            <span class="field-shell">
+              <span class="field-affix">$</span>
+              <input class="field-input" type="text" inputmode="decimal" autocomplete="off" placeholder="Usar base" value="${escapeHtml(phase.hourlyRate)}" data-phase-field="hourlyRate" data-id="${phase.id}" />
+              <span class="field-affix">/ hora</span>
+            </span>
+          </label>
+        </div>
+        <p class="mt-3 hidden text-sm text-red-200" data-phase-error="${phase.id}"></p>
+        <div class="mt-4 flex flex-wrap justify-end gap-2">
+          <button class="phase-action" type="button" data-phase-action="duplicate" data-id="${phase.id}">Duplicar</button>
+          <button class="phase-action phase-action-danger" type="button" data-phase-action="remove" data-id="${phase.id}">Eliminar</button>
+        </div>
+      </details>
+    `).join("");
+
+    if (focusLast) {
+      phaseList.querySelector("details:last-child input")?.focus();
+    }
+  }
+
+  function phasePreview(phase) {
+    const hours = parseProjectNumber(phase.hours, 2, true);
+    const rate = parseProjectNumber(phase.hourlyRate);
+    const base = parseProjectNumber(getField("baseHourlyRate").value);
+    const appliedRate = rate.ok ? rate.value : base.ok ? base.value : null;
+
+    if (!hours.ok || hours.value <= 0) return "Horas pendientes";
+    if (!appliedRate || appliedRate <= 0) return `${formatProjectQuantity(hours.value)} h · tarifa pendiente`;
+
+    return `${formatProjectQuantity(hours.value)} h · ${formatProjectCurrency(hours.value * appliedRate)}`;
+  }
+
+  function readInput() {
+    clearInvalidFields();
+    const errors = [];
+    const base = parseOptionalNumber("baseHourlyRate", "tarifa por hora base", errors, { positive: true });
+    const parsedPhases = [];
+
+    phases.forEach((phase, index) => {
+      const rowErrors = [];
+      const name = phase.name.trim();
+      const hours = parseProjectNumber(phase.hours, 2, true);
+      const rate = phase.hourlyRate.trim() ? parseProjectNumber(phase.hourlyRate) : null;
+
+      if (!name || name.length > 60) rowErrors.push("agrega un nombre de 1 a 60 caracteres");
+      if (!hours.ok || hours.value <= 0) rowErrors.push("ingresa horas mayores que cero");
+      if (rate && (!rate.ok || rate.value <= 0)) rowErrors.push("revisa la tarifa específica");
+      if (!rate && base === undefined) rowErrors.push("agrega una tarifa específica o una tarifa base");
+
+      const rowError = get(`[data-phase-error="${phase.id}"]`);
+      rowError.textContent = rowErrors.join(". ");
+      rowError.classList.toggle("hidden", !rowErrors.length);
+      errors.push(...rowErrors.map((message) => `Fase ${index + 1}: ${message}.`));
+
+      if (!rowErrors.length && hours.ok) {
+        parsedPhases.push({
+          name,
+          hours: hours.value,
+          hourlyRate: rate?.ok ? rate.value : undefined,
+        });
+      }
+    });
+
+    const directExpenses = parseRequiredNumber("directExpenses", "gastos directos", errors);
+    const recommendedContingencyRate = parseRequiredNumber("recommendedContingencyRate", "contingencia recomendada", errors, { preferDecimal: true });
+    const conservativeContingencyRate = parseRequiredNumber("conservativeContingencyRate", "contingencia conservadora", errors, { preferDecimal: true });
+    const collectionFeeRate = parseRequiredNumber("collectionFeeRate", "comisión sobre cobros", errors, { preferDecimal: true });
+    const targetMarginRate = parseRequiredNumber("targetMarginRate", "margen objetivo", errors, { preferDecimal: true });
+    const taxRate = parseRequiredNumber("taxRate", "impuesto agregado", errors, { preferDecimal: true });
+    const deposit = parseRequiredNumber("deposit", "anticipo", errors, { preferDecimal: true });
+    const progress = parseRequiredNumber("progress", "pago de avance", errors, { preferDecimal: true });
+    const final = parseRequiredNumber("final", "pago final", errors, { preferDecimal: true });
+    const proposedPrice = mode === "analyze"
+      ? parseRequiredNumber("proposedPrice", "precio propuesto", errors, { positive: true })
+      : undefined;
+
+    if (errors.length) return { errors };
+
+    return {
+      errors,
+      proposedPrice,
+      input: {
+        phases: parsedPhases,
+        baseHourlyRate: base,
+        directExpenses,
+        recommendedContingencyRate,
+        conservativeContingencyRate,
+        collectionFeeRate,
+        targetMarginRate,
+        taxRate,
+        paymentRates: { deposit, progress, final },
+      },
+    };
+  }
+
+  function calculate() {
+    const parsed = readInput();
+
+    if (parsed.errors.length) {
+      showErrors(parsed.errors);
+      markStale();
+      get("[data-errors]").focus();
+      return;
+    }
+
+    try {
+      currentRecommendation = calculateProjectRecommendation(parsed.input);
+      currentInput = parsed.input;
+      currentAnalysis = mode === "analyze"
+        ? analyzeProposedPrice(parsed.input, parsed.proposedPrice)
+        : null;
+      showErrors([]);
+      showWarnings(currentRecommendation.warnings);
+      renderResult(currentRecommendation, currentAnalysis);
+      get("[data-results]").classList.remove("hidden");
+      document.querySelectorAll("[data-copy]").forEach((button) => button.classList.remove("hidden"));
+      setCopyEnabled(true);
+      get("[data-stale-notice]").classList.add("hidden");
+      resultRegion.focus({ preventScroll: true });
+      resultRegion.scrollIntoView({
+        behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth",
+        block: "start",
+      });
+    } catch (error) {
+      showErrors([error instanceof Error ? error.message : "No se pudo calcular. Revisa los datos."]);
+      markStale();
+      get("[data-errors]").focus();
+    }
+  }
+
+  function renderResult(recommendation, analysis) {
+    const recommended = recommendation.scenarios.recommended;
+    const activePrice = analysis?.proposedPriceBeforeTax ?? recommended.priceBeforeTax;
+    const activeTotal = analysis?.clientTotal ?? recommended.clientTotal;
+    const activeFee = analysis?.collectionFeeAmount ?? recommended.collectionFeeAmount;
+    const activeEffectiveRate = analysis?.effectiveNetHourlyRate ?? recommended.effectiveNetHourlyRate;
+
+    if (analysis) {
+      const difference = analysis.differenceFromRecommended;
+      get("[data-result-kicker]").textContent = statusLabel(analysis.status);
+      get("[data-main-result]").textContent = Math.abs(difference) < 0.005
+        ? "Coincide con el recomendado"
+        : difference > 0
+          ? `${formatProjectCurrency(difference)} sobre el recomendado`
+          : `${formatProjectCurrency(Math.abs(difference))} debajo del recomendado`;
+      get("[data-interpretation]").textContent = analysisInterpretation(analysis, recommendation);
+      renderStatusCard(analysis);
+    } else {
+      get("[data-result-kicker]").textContent = "Precio recomendado antes de impuestos";
+      get("[data-main-result]").textContent = formatProjectCurrency(recommended.priceBeforeTax);
+      get("[data-interpretation]").textContent =
+        `Reserva ${formatProjectQuantity(recommended.contingencyHours)} horas de contingencia y alcanza un margen comercial estimado de ${formatProjectPercent(recommended.achievedMarginRate)}.`;
+      get("[data-status-card]").classList.add("hidden");
+    }
+
+    const items = [
+      ["Total cliente", formatProjectCurrency(activeTotal)],
+      ["Precio antes de impuestos", formatProjectCurrency(activePrice)],
+      ["Horas estimadas", formatProjectQuantity(recommendation.estimatedHours)],
+      ["Horas con contingencia", formatProjectQuantity(recommended.adjustedHours)],
+      ["Tarifa efectiva neta", `${formatProjectCurrency(activeEffectiveRate)} / h`],
+      ["Gastos directos", formatProjectCurrency(getActiveInput().directExpenses)],
+      ["Comisión estimada", formatProjectCurrency(activeFee)],
+      ["Impuesto agregado", formatProjectCurrency(analysis?.taxAmount ?? recommended.taxAmount)],
+    ];
+
+    if (analysis) {
+      items.push(
+        ["Margen alcanzado", formatProjectPercent(analysis.achievedMarginRate)],
+        ["Horas adicionales", signedHours(analysis.additionalHoursAvailable)],
+        ["Horas financiadas", `${formatProjectQuantity(analysis.financedHours)} h`],
+        ["Mínimo de cobertura", formatProjectCurrency(analysis.minimumCoveragePrice)],
+      );
+    } else {
+      items.push(
+        ["Margen objetivo", formatProjectPercent(recommended.achievedMarginRate)],
+        ["Reserva de trabajo", formatProjectCurrency(recommended.contingencyCost)],
+      );
+    }
+
+    get("[data-summary-grid]").innerHTML = items.map(([label, value]) => summaryCard(label, value)).join("");
+    renderScenarios(recommendation);
+    renderPayments(analysis?.payments ?? recommendation.payments);
+    renderBreakdown(recommendation, analysis);
+    copyText = buildProposalText(recommendation, analysis);
+    get("[data-proposal-summary]").textContent = copyText;
+    get("[data-breakdown-details]").classList.remove("hidden");
+  }
+
+  function renderScenarios(recommendation) {
+    const scenarioData = [
+      ["Base", recommendation.scenarios.base, "Sin reserva de contingencia."],
+      ["Recomendado", recommendation.scenarios.recommended, "Usa tu reserva principal de trabajo."],
+      ["Conservador", recommendation.scenarios.conservative, "Muestra el costo de absorber más riesgo."],
+    ];
+
+    get("[data-scenario-grid]").innerHTML = scenarioData.map(([label, scenario, description]) => `
+      <article class="rounded-lg border ${scenario.kind === "recommended" ? "border-amber-400/50 bg-amber-400/10" : "border-gray-700 bg-gray-950"} p-5">
+        <p class="text-xs font-semibold uppercase tracking-wide ${scenario.kind === "recommended" ? "text-amber-300" : "text-gray-500"}">${escapeHtml(label)}</p>
+        <p class="mt-2 break-words text-2xl font-bold text-white">${escapeHtml(formatProjectCurrency(scenario.priceBeforeTax))}</p>
+        <p class="mt-1 text-xs text-gray-500">Antes de impuestos · total ${escapeHtml(formatProjectCurrency(scenario.clientTotal))}</p>
+        <p class="mt-3 text-sm leading-relaxed text-gray-400">${escapeHtml(description)}</p>
+        <dl class="mt-4 space-y-2 text-sm">
+          ${definitionRow("Contingencia", `${formatProjectPercent(scenario.contingencyRate)} · ${formatProjectQuantity(scenario.contingencyHours)} h`)}
+          ${definitionRow("Reserva de trabajo", formatProjectCurrency(scenario.contingencyCost))}
+          ${definitionRow("Tarifa efectiva", `${formatProjectCurrency(scenario.effectiveNetHourlyRate)} / h`)}
+        </dl>
+      </article>
+    `).join("");
+  }
+
+  function renderPayments(payments) {
+    const labels = { deposit: "Anticipo", progress: "Pago de avance", final: "Pago final" };
+    get("[data-payment-grid]").innerHTML = payments.map((payment) => `
+      <article class="rounded-lg border border-gray-800 bg-gray-900/70 p-4">
+        <p class="text-xs font-semibold uppercase tracking-wide text-gray-500">${escapeHtml(labels[payment.key])}</p>
+        <p class="mt-2 break-words text-xl font-bold text-white">${escapeHtml(formatProjectCurrency(payment.amount))}</p>
+        <p class="mt-1 text-sm text-gray-400">${escapeHtml(formatProjectPercent(payment.rate))}</p>
+      </article>
+    `).join("");
+  }
+
+  function renderBreakdown(recommendation, analysis) {
+    const recommended = recommendation.scenarios.recommended;
+    const lines = [
+      `Trabajo estimado: ${formatProjectQuantity(recommendation.estimatedHours)} h × tarifa promedio ${formatProjectCurrency(recommendation.weightedHourlyRate)} = ${formatProjectCurrency(recommendation.workCost)}.`,
+      `Contingencia recomendada: ${formatProjectPercent(recommended.contingencyRate)} = ${formatProjectQuantity(recommended.contingencyHours)} h y ${formatProjectCurrency(recommended.contingencyCost)}.`,
+      `Costo ajustado con gastos: ${formatProjectCurrency(recommended.adjustedCost)}.`,
+      `Precio recomendado para cubrir comisión y margen: ${formatProjectCurrency(recommended.priceBeforeTax)} antes de impuestos.`,
+    ];
+
+    if (analysis) {
+      lines.push(
+        `Precio propuesto: ${formatProjectCurrency(analysis.proposedPriceBeforeTax)} antes de impuestos.`,
+        `Margen alcanzado: ${formatProjectPercent(analysis.achievedMarginRate)}; objetivo: ${formatProjectPercent(getActiveInput().targetMarginRate)}.`,
+        `Precio mínimo de cobertura con comisión: ${formatProjectCurrency(analysis.minimumCoveragePrice)}.`,
+      );
+    }
+
+    get("[data-breakdown-lines]").innerHTML = lines.map((line) => `<p>${escapeHtml(line)}</p>`).join("");
+  }
+
+  function renderStatusCard(analysis) {
+    const card = get("[data-status-card]");
+    const styles = {
+      healthy: ["border-emerald-400/40", "bg-emerald-400/10", "text-emerald-100"],
+      tight: ["border-amber-400/40", "bg-amber-400/10", "text-amber-100"],
+      below_base: ["border-red-400/40", "bg-red-400/10", "text-red-100"],
+    };
+    card.className = `mt-4 rounded-lg border p-4 ${styles[analysis.status].join(" ")}`;
+    get("[data-status-label]").textContent = statusLabel(analysis.status);
+    get("[data-status-text]").textContent = analysis.status === "healthy"
+      ? "La propuesta alcanza el margen comercial objetivo con los supuestos capturados."
+      : analysis.status === "tight"
+        ? "La propuesta cubre el valor modelado del tiempo, pero no alcanza el margen objetivo."
+        : "La propuesta deja la tarifa efectiva por debajo del valor modelado de tu tiempo.";
+  }
+
+  function analysisInterpretation(analysis, recommendation) {
+    const hours = Math.abs(analysis.additionalHoursAvailable);
+    const direction = analysis.additionalHoursAvailable >= 0 ? "puede financiar" : "queda corta por";
+    return `La propuesta ${direction} aproximadamente ${formatProjectQuantity(hours)} horas frente a la estimación inicial y deja una tarifa efectiva de ${formatProjectCurrency(analysis.effectiveNetHourlyRate)} por hora. Tu tarifa promedio modelada es ${formatProjectCurrency(recommendation.weightedHourlyRate)}.`;
+  }
+
+  function buildProposalText(recommendation, analysis) {
+    const input = getActiveInput();
+    const scenario = recommendation.scenarios.recommended;
+    const price = analysis?.proposedPriceBeforeTax ?? scenario.priceBeforeTax;
+    const total = analysis?.clientTotal ?? scenario.clientTotal;
+    const payments = analysis?.payments ?? recommendation.payments;
+    const expenseLine = input.directExpenses > 0 ? ` y ${formatProjectCurrency(input.directExpenses)} de gastos directos` : "";
+    const taxLine = input.taxRate > 0
+      ? ` Total con ${formatProjectPercent(input.taxRate)} de impuesto agregado: ${formatProjectCurrency(total)}.`
+      : "";
+
+    return `Cotización estimada: ${formatProjectCurrency(price)} antes de impuestos. Incluye ${formatProjectQuantity(recommendation.estimatedHours)} horas estimadas, ${formatProjectQuantity(scenario.contingencyHours)} horas de contingencia${expenseLine}.${taxLine} Pagos: ${formatProjectPercent(payments[0].rate)} anticipo, ${formatProjectPercent(payments[1].rate)} avance y ${formatProjectPercent(payments[2].rate)} entrega. Cambios de alcance no incluidos requieren una nueva estimación.`;
+  }
+
+  function fillExample() {
+    sequence = 0;
+    phases = [
+      newPhase({ name: "Descubrimiento", hours: "10", open: false }),
+      newPhase({ name: "Diseño y ejecución", hours: "40", open: false }),
+      newPhase({ name: "Entrega y ajustes", hours: "10", open: true }),
+    ];
+    setField("baseHourlyRate", "600");
+    setField("directExpenses", "3000");
+    setField("recommendedContingencyRate", "15");
+    setField("conservativeContingencyRate", "25");
+    setField("collectionFeeRate", "3");
+    setField("targetMarginRate", "20");
+    setField("taxRate", "16");
+    setField("deposit", "50");
+    setField("progress", "25");
+    setField("final", "25");
+    setField("proposedPrice", "55000");
+    conservativeEdited = false;
+    renderPhases();
+    updateOptionSummaries();
+    calculate();
+  }
+
+  function clearAll() {
+    if (currentRecommendation && !window.confirm("¿Quieres limpiar la cotización actual?")) return;
+    sequence = 0;
+    phases = [newPhase()];
+    ["baseHourlyRate", "proposedPrice"].forEach((field) => setField(field, ""));
+    setField("directExpenses", "0");
+    setField("recommendedContingencyRate", "10");
+    setField("conservativeContingencyRate", "20");
+    setField("collectionFeeRate", "0");
+    setField("targetMarginRate", "20");
+    setField("taxRate", "0");
+    setField("deposit", "50");
+    setField("progress", "25");
+    setField("final", "25");
+    conservativeEdited = false;
+    currentRecommendation = null;
+    currentInput = null;
+    currentAnalysis = null;
+    copyText = "";
+    renderPhases();
+    showErrors([]);
+    showWarnings([]);
+    get("[data-results]").classList.add("hidden");
+    document.querySelectorAll("[data-copy]").forEach((button) => button.classList.add("hidden"));
+    setCopyEnabled(false);
+    get("[data-stale-notice]").classList.add("hidden");
+    get("[data-breakdown-details]").classList.add("hidden");
+    setInitialResult();
+    updateOptionSummaries();
+  }
+
+  function setMode(nextMode) {
+    mode = nextMode;
+    document.querySelectorAll("[data-mode]").forEach((button) => {
+      const active = button.dataset.mode === mode;
+      button.classList.toggle("is-active", active);
+      button.setAttribute("aria-selected", String(active));
+    });
+    proposedWrap.classList.toggle("hidden", mode !== "analyze");
+    const label = mode === "analyze" ? "Analizar precio propuesto" : "Calcular precio recomendado";
+    submitLabel.textContent = label;
+    mobileCalculate.textContent = label;
+    markStale();
+  }
+
+  function updateOptionSummaries() {
+    const expenses = numericValue("directExpenses", false);
+    const contingency = numericValue("recommendedContingencyRate");
+    const margin = numericValue("targetMarginRate");
+    const tax = numericValue("taxRate");
+    const deposit = numericValue("deposit");
+    const progress = numericValue("progress");
+    const final = numericValue("final");
+    get("[data-risk-summary]").textContent =
+      `Ajustes: ${formatProjectPercent(contingency)} de contingencia, ${expenses > 0 ? formatProjectCurrency(expenses) : "sin gastos"} y ${formatProjectPercent(margin)} de margen.`;
+    get("[data-payment-summary]").textContent =
+      `${tax > 0 ? `${formatProjectPercent(tax)} de impuesto agregado` : "Sin impuesto agregado"}. Pagos: ${formatProjectPercent(deposit)}, ${formatProjectPercent(progress)} y ${formatProjectPercent(final)}.`;
+  }
+
+  function getActiveInput() {
+    return currentInput ?? {
+      directExpenses: numericValue("directExpenses", false),
+      targetMarginRate: numericValue("targetMarginRate"),
+    };
+  }
+
+  function updatePhasePreviews() {
+    phases.forEach((phase) => {
+      const preview = get(`[data-phase-preview="${phase.id}"]`);
+      if (preview) preview.textContent = phasePreview(phase);
+    });
+  }
+
+  function parseRequiredNumber(field, label, errors, options = {}) {
+    const input = getField(field);
+    const parsed = parseProjectNumber(input.value, 2, options.preferDecimal ?? false);
+    const invalid = !parsed.ok || (options.positive && parsed.value <= 0);
+    input.setAttribute("aria-invalid", String(invalid));
+    if (invalid) {
+      errors.push(`Revisa ${label}.`);
+      return 0;
+    }
+    return parsed.value;
+  }
+
+  function parseOptionalNumber(field, label, errors, options = {}) {
+    const input = getField(field);
+    if (!input.value.trim()) {
+      input.removeAttribute("aria-invalid");
+      return undefined;
+    }
+    return parseRequiredNumber(field, label, errors, options);
+  }
+
+  function numericValue(field, preferDecimal = true) {
+    const parsed = parseProjectNumber(getField(field).value, 2, preferDecimal);
+    return parsed.ok ? parsed.value : 0;
+  }
+
+  function getField(field) {
+    return get(`[data-field="${field}"]`);
+  }
+
+  function setField(field, value) {
+    getField(field).value = value;
+  }
+
+  function showErrors(messages) {
+    const box = get("[data-errors]");
+    box.innerHTML = messages.map((message) => `<p>${escapeHtml(message)}</p>`).join("");
+    box.classList.toggle("hidden", !messages.length);
+  }
+
+  function showWarnings(warnings) {
+    const messages = warnings.map((warning) => warningMessages[warning]);
+    const box = get("[data-warnings]");
+    box.innerHTML = messages.map((message) => `<p>${escapeHtml(message)}</p>`).join("");
+    box.classList.toggle("hidden", !messages.length);
+  }
+
+  function clearInvalidFields() {
+    form.querySelectorAll('[aria-invalid="true"]').forEach((field) => field.removeAttribute("aria-invalid"));
+  }
+
+  function markStale() {
+    if (currentRecommendation) {
+      get("[data-stale-notice]").classList.remove("hidden");
+      setCopyEnabled(false);
+    }
+  }
+
+  function setCopyEnabled(enabled) {
+    document.querySelectorAll("[data-copy]").forEach((button) => {
+      button.disabled = !enabled;
+      button.classList.toggle("opacity-50", !enabled);
+      button.classList.toggle("cursor-not-allowed", !enabled);
+    });
+  }
+
+  function setInitialResult() {
+    get("[data-result-kicker]").textContent = "Resultado";
+    get("[data-main-result]").textContent = "Estima tus fases";
+    get("[data-interpretation]").textContent = "Verás un precio base, uno recomendado y un escenario conservador.";
+    get("[data-summary-grid]").innerHTML = '<div class="col-span-2 rounded-lg border border-gray-800 bg-gray-950/70 p-4 text-sm text-gray-400">Captura una tarifa y las horas de al menos una fase para comenzar.</div>';
+    get("[data-status-card]").classList.add("hidden");
+  }
+
+  async function copyResult() {
+    if (!copyText || get("[data-stale-notice]").classList.contains("hidden") === false) return;
+    try {
+      await navigator.clipboard.writeText(copyText);
+      document.querySelectorAll("[data-copy-label]").forEach((label) => label.textContent = "Copiado");
+      get("[data-copy-status]").textContent = "Resumen copiado.";
+      window.setTimeout(() => {
+        document.querySelectorAll("[data-copy-label]").forEach((label) => label.textContent = "Copiar resumen para propuesta");
+        get("[data-copy-status]").textContent = "";
+      }, 2000);
+    } catch {
+      get("[data-copy-status]").textContent = "No se pudo copiar el resumen.";
+    }
+  }
+
+  function summaryCard(label, value) {
+    return `<div class="rounded-lg border border-gray-800 bg-gray-950/70 p-3"><span class="block text-xs font-semibold uppercase tracking-wide text-gray-500">${escapeHtml(label)}</span><span class="mt-2 block break-words text-base font-semibold text-white">${escapeHtml(value)}</span></div>`;
+  }
+
+  function definitionRow(label, value) {
+    return `<div class="flex items-start justify-between gap-3"><dt class="text-gray-500">${escapeHtml(label)}</dt><dd class="text-right font-semibold text-gray-200">${escapeHtml(value)}</dd></div>`;
+  }
+
+  function signedHours(value) {
+    const sign = value > 0 ? "+" : value < 0 ? "−" : "";
+    return `${sign}${formatProjectQuantity(Math.abs(value))} h`;
+  }
+
+  function statusLabel(status) {
+    return ({ healthy: "Precio saludable", tight: "Precio ajustado", below_base: "Por debajo de base" })[status];
+  }
+
+  function escapeHtml(value) {
+    return String(value).replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;").replaceAll("'", "&#039;");
+  }
+
+  phaseList.addEventListener("input", (event) => {
+    const input = event.target.closest("[data-phase-field]");
+    if (!input) return;
+    const phase = phases.find((item) => item.id === input.dataset.id);
+    phase[input.dataset.phaseField] = input.value;
+    const preview = get(`[data-phase-preview="${phase.id}"]`);
+    if (preview) preview.textContent = phasePreview(phase);
+    markStale();
+  });
+
+  phaseList.addEventListener("toggle", (event) => {
+    const card = event.target.closest("[data-phase-card]");
+    if (!card) return;
+    const phase = phases.find((item) => item.id === card.dataset.phaseCard);
+    if (phase) phase.open = card.open;
+  }, true);
+
+  phaseList.addEventListener("click", (event) => {
+    const button = event.target.closest("[data-phase-action]");
+    if (!button) return;
+    const index = phases.findIndex((phase) => phase.id === button.dataset.id);
+    if (button.dataset.phaseAction === "duplicate") {
+      if (phases.length >= 20) {
+        showErrors(["El proyecto admite un máximo de 20 fases."]);
+        return;
+      }
+      phases.splice(index + 1, 0, newPhase({ ...phases[index], name: `${phases[index].name} copia`, open: true }));
+    }
+    if (button.dataset.phaseAction === "remove") {
+      phases.length === 1 ? phases.splice(0, 1, newPhase({ name: "Fase 1" })) : phases.splice(index, 1);
+    }
+    renderPhases();
+    markStale();
+  });
+
+  get("[data-add-phase]").addEventListener("click", () => {
+    if (phases.length >= 20) {
+      showErrors(["El proyecto admite un máximo de 20 fases."]);
+      return;
+    }
+    phases.push(newPhase());
+    renderPhases(true);
+    markStale();
+  });
+
+  form.addEventListener("submit", (event) => {
+    event.preventDefault();
+    calculate();
+  });
+
+  form.addEventListener("input", (event) => {
+    if (event.target.matches("[data-field]")) {
+      if (event.target.dataset.field === "recommendedContingencyRate" && !conservativeEdited) {
+        const parsed = parseProjectNumber(event.target.value, 2, true);
+        if (parsed.ok) setField("conservativeContingencyRate", String(Math.min(100, parsed.value + 10)));
+      }
+      if (event.target.dataset.field === "conservativeContingencyRate") conservativeEdited = true;
+      updateOptionSummaries();
+      if (event.target.dataset.field === "baseHourlyRate") updatePhasePreviews();
+      markStale();
+    }
+  });
+
+  document.querySelectorAll("[data-mode]").forEach((button) => button.addEventListener("click", () => setMode(button.dataset.mode)));
+  document.querySelectorAll("[data-copy]").forEach((button) => button.addEventListener("click", copyResult));
+  get("[data-example]").addEventListener("click", fillExample);
+  get("[data-clear]").addEventListener("click", clearAll);
+  mobileCalculate.addEventListener("click", calculate);
+  renderPhases();
+  updateOptionSummaries();
+</script>

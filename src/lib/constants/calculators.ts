@@ -116,6 +116,15 @@ export const CALCULATORS: CalculatorDirectoryItem[] = [
     order: 37.45,
   },
   {
+    id: "calculadora-de-precio-de-proyecto-freelance",
+    title: "Calculadora de precio de proyecto freelance",
+    description:
+      "Calcula cuánto cobrar por un proyecto, compara escenarios y analiza si un precio fijo cubre horas, gastos, riesgo y margen.",
+    href: "/finanzas/calculadora-de-precio-de-proyecto-freelance",
+    categorySlug: "finanzas",
+    order: 37.47,
+  },
+  {
     id: "calculadora-dca-costo-promedio",
     title: "Calculadora de precio promedio (DCA)",
     description:
@@ -186,6 +195,15 @@ export const CALCULATORS: CalculatorDirectoryItem[] = [
     href: "/salud/calculadora-de-ovulacion",
     categorySlug: "salud",
     order: 58,
+  },
+  {
+    id: "calculadora-de-frecuencia-cardiaca-maxima",
+    title: "Calculadora de frecuencia cardíaca máxima",
+    description:
+      "Estima tu frecuencia cardíaca máxima por edad y consulta rangos generales de actividad moderada y vigorosa.",
+    href: "/salud/calculadora-de-frecuencia-cardiaca-maxima",
+    categorySlug: "salud",
+    order: 59,
   },
   {
     id: "calculadora-de-edad",
