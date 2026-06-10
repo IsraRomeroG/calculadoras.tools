@@ -11,7 +11,7 @@ tags:
 readTime: "5 min"
 relatedCalculator:
   label: "Usar calculadora de porcentajes"
-  href: "/matematicas/calculadora-de-porcentajes/"
+  href: "/matematicas/calculadora-de-porcentajes"
 ---
 
 Porcentaje y puntos porcentuales se parecen, pero no significan lo mismo. La diferencia importa cuando lees noticias sobre encuestas, tasas de interés, inflación, impuestos o cualquier indicador expresado con `%`.
@@ -100,7 +100,7 @@ En una encuesta, pasar de 40% a 50% significa ganar 10 puntos porcentuales. Pero
 
 En una tasa de interés, pasar de 8% a 10% significa subir 2 puntos porcentuales. El cambio relativo es 25%, porque 2 es la cuarta parte de 8.
 
-En impuestos, decir que una tasa de IVA pasa de 16% a 19% significa que la tasa sube 3 puntos porcentuales. Para ver ejemplos de tasas por país, puedes consultar la guía de [tasas de IVA por país](/blog/legal-impuestos/tasas-de-iva-por-pais/).
+En impuestos, decir que una tasa de IVA pasa de 16% a 19% significa que la tasa sube 3 puntos porcentuales. Para ver ejemplos de tasas por país, puedes consultar la guía de [tasas de IVA por país](/blog/legal-impuestos/tasas-de-iva-por-pais).
 
 ## Cómo calcular cada caso
 
@@ -154,13 +154,13 @@ En análisis de datos, reportes y notas económicas, lo ideal es indicar ambos c
 
 Los puntos porcentuales son una resta directa entre porcentajes. El aumento porcentual y la disminución porcentual comparan un valor nuevo contra un valor anterior.
 
-Si el dato sube, puedes repasar la fórmula en la guía de [aumento porcentual](/blog/matematicas/aumento-porcentual/). Si baja, el cálculo equivalente está en [disminución porcentual](/blog/matematicas/disminucion-porcentual/).
+Si el dato sube, puedes repasar la fórmula en la guía de [aumento porcentual](/blog/matematicas/aumento-porcentual). Si baja, el cálculo equivalente está en [disminución porcentual](/blog/matematicas/disminucion-porcentual).
 
-También existe otra confusión común: diferencia porcentual no siempre significa variación porcentual. Para ese caso, revisa la explicación de [diferencia porcentual vs variación porcentual](/blog/matematicas/diferencia-porcentual-vs-variacion-porcentual/).
+También existe otra confusión común: diferencia porcentual no siempre significa variación porcentual. Para ese caso, revisa la explicación de [diferencia porcentual vs variación porcentual](/blog/matematicas/diferencia-porcentual-vs-variacion-porcentual).
 
 ## Calcúlalo con la calculadora
 
-Puedes usar la [calculadora de porcentajes](/matematicas/calculadora-de-porcentajes/) para revisar el cambio relativo entre dos valores.
+Puedes usar la [calculadora de porcentajes](/matematicas/calculadora-de-porcentajes) para revisar el cambio relativo entre dos valores.
 
 Para comparar dos porcentajes:
 

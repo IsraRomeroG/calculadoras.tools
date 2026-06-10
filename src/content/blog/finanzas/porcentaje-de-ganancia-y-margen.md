@@ -11,7 +11,7 @@ tags:
 readTime: "6 min"
 relatedCalculator:
   label: "Usar calculadora de porcentajes"
-  href: "/matematicas/calculadora-de-porcentajes/"
+  href: "/matematicas/calculadora-de-porcentajes"
 ---
 
 El porcentaje de ganancia ayuda a entender cuánto ganas al vender un producto o servicio. El problema es que en negocios se usan palabras parecidas para cálculos distintos: ganancia, margen y markup.
@@ -148,11 +148,11 @@ Vendiendo en $142.86, la ganancia es $42.86 y eso sí representa 30% del precio 
 
 Otro error es olvidar costos adicionales. Comisiones de plataforma, pasarela de pago, envío, empaques, devoluciones, descuentos, impuestos y gastos operativos pueden cambiar la utilidad real. Este artículo muestra la lógica matemática, no sustituye un análisis financiero, contable o fiscal para un negocio concreto.
 
-Si estás comparando promociones o rebajas, también conviene revisar cómo calcular un [porcentaje de descuento](/blog/finanzas/porcentaje-de-descuento/) y por qué los [descuentos sucesivos](/blog/finanzas/descuentos-sucesivos/) no se suman de forma directa.
+Si estás comparando promociones o rebajas, también conviene revisar cómo calcular un [porcentaje de descuento](/blog/finanzas/porcentaje-de-descuento) y por qué los [descuentos sucesivos](/blog/finanzas/descuentos-sucesivos) no se suman de forma directa.
 
 ## Cómo apoyarte en la calculadora de porcentajes
 
-Puedes usar la [calculadora de porcentajes](/matematicas/calculadora-de-porcentajes/) en el modo "X de Y" para calcular margen o markup. La clave es elegir bien qué número pones como base.
+Puedes usar la [calculadora de porcentajes](/matematicas/calculadora-de-porcentajes) en el modo "X de Y" para calcular margen o markup. La clave es elegir bien qué número pones como base.
 
 Para calcular margen:
 
@@ -170,7 +170,7 @@ ganancia / costo x 100
 
 Es decir, pregunta qué porcentaje es la ganancia del costo.
 
-Si necesitas subir un precio agregando un porcentaje al costo, puedes repasar [cómo sumar un porcentaje](/blog/matematicas/como-sumar-un-porcentaje/). Si solo necesitas comparar una parte contra una base, la guía de [qué porcentaje es una cantidad de otra](/blog/matematicas/que-porcentaje-es-una-cantidad-de-otra/) explica la operación general.
+Si necesitas subir un precio agregando un porcentaje al costo, puedes repasar [cómo sumar un porcentaje](/blog/matematicas/como-sumar-un-porcentaje). Si solo necesitas comparar una parte contra una base, la guía de [qué porcentaje es una cantidad de otra](/blog/matematicas/que-porcentaje-es-una-cantidad-de-otra) explica la operación general.
 
 ## Preguntas frecuentes
 

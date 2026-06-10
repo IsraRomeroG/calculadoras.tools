@@ -11,7 +11,7 @@ tags:
 readTime: "5 min"
 relatedCalculator:
   label: "Usar calculadora de porcentajes"
-  href: "/matematicas/calculadora-de-porcentajes/"
+  href: "/matematicas/calculadora-de-porcentajes"
 ---
 
 Calcular calificaciones con porcentajes puede significar dos cosas distintas. La primera es saber qué porcentaje obtuviste en un examen según tus aciertos. La segunda es calcular una nota final cuando cada actividad tiene un peso diferente.
@@ -33,7 +33,7 @@ La clave es identificar bien los datos:
 - Los aciertos son las respuestas correctas.
 - El total es el número completo de preguntas o puntos posibles.
 
-Si quieres repasar esta operación como caso general, es la misma lógica de calcular [qué porcentaje es una cantidad de otra](/blog/matematicas/que-porcentaje-es-una-cantidad-de-otra/): la parte se divide entre el total y luego se multiplica por 100.
+Si quieres repasar esta operación como caso general, es la misma lógica de calcular [qué porcentaje es una cantidad de otra](/blog/matematicas/que-porcentaje-es-una-cantidad-de-otra): la parte se divide entre el total y luego se multiplica por 100.
 
 ## Ejemplo de examen
 
@@ -124,7 +124,7 @@ Esta tabla muestra porcentajes comunes de aciertos en exámenes de 10, 20 y 50 p
 | 50 | 42 | 42 / 50 x 100 | 84% |
 | 50 | 45 | 45 / 50 x 100 | 90% |
 
-Si quieres convertir entre fracciones, decimales y porcentajes, también puedes revisar la guía de [convertir fracciones y decimales a porcentajes](/blog/matematicas/convertir-fracciones-decimales-a-porcentajes/).
+Si quieres convertir entre fracciones, decimales y porcentajes, también puedes revisar la guía de [convertir fracciones y decimales a porcentajes](/blog/matematicas/convertir-fracciones-decimales-a-porcentajes).
 
 ## Errores comunes
 
@@ -138,7 +138,7 @@ Por último, no confundas puntos porcentuales con porcentaje relativo. Si una ac
 
 ## Calcúlalo con la calculadora
 
-Puedes usar la [calculadora de porcentajes](/matematicas/calculadora-de-porcentajes/) para calcular aciertos con el modo "X de Y".
+Puedes usar la [calculadora de porcentajes](/matematicas/calculadora-de-porcentajes) para calcular aciertos con el modo "X de Y".
 
 Por ejemplo, para 42 aciertos de 50:
 
@@ -160,7 +160,7 @@ Luego suma esos resultados para obtener la nota final:
 59.5 + 19 + 10 = 88.5
 ```
 
-Si necesitas repasar la base del cálculo, la guía de [cómo calcular porcentajes](/blog/matematicas/como-calcular-porcentajes/) explica las fórmulas principales con ejemplos sencillos.
+Si necesitas repasar la base del cálculo, la guía de [cómo calcular porcentajes](/blog/matematicas/como-calcular-porcentajes) explica las fórmulas principales con ejemplos sencillos.
 
 ## Preguntas frecuentes
 

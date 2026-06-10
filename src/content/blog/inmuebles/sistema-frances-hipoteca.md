@@ -11,7 +11,7 @@ tags:
 readTime: "6 min"
 relatedCalculator:
   label: "Calculadora de hipoteca"
-  href: "/inmuebles/calculadora-de-hipoteca/"
+  href: "/inmuebles/calculadora-de-hipoteca"
 ---
 
 El sistema francés de amortización es un método de pago con cuota fija. En una hipoteca, significa que la cuota base de capital e intereses se mantiene constante si la tasa no cambia, pero la mezcla interna cambia mes a mes.
@@ -77,9 +77,9 @@ Por eso no conviene asumir que cualquier tabla de pagos funciona igual. Revisa s
 
 ## Cómo lo usa la calculadora
 
-La [calculadora de hipoteca](/inmuebles/calculadora-de-hipoteca/) usa un esquema de cuota fija para estimar capital e intereses. También permite agregar pago extra mensual, lo que puede acortar el plazo real.
+La [calculadora de hipoteca](/inmuebles/calculadora-de-hipoteca) usa un esquema de cuota fija para estimar capital e intereses. También permite agregar pago extra mensual, lo que puede acortar el plazo real.
 
-Si quieres ver el desglose completo, consulta la guía sobre [tabla de amortización hipotecaria](/blog/inmuebles/tabla-amortizacion-hipoteca/).
+Si quieres ver el desglose completo, consulta la guía sobre [tabla de amortización hipotecaria](/blog/inmuebles/tabla-amortizacion-hipoteca).
 
 ## Preguntas frecuentes
 

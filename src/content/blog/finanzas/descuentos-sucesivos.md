@@ -11,7 +11,7 @@ tags:
 readTime: "5 min"
 relatedCalculator:
   label: "Usar calculadora de porcentajes"
-  href: "/matematicas/calculadora-de-porcentajes/"
+  href: "/matematicas/calculadora-de-porcentajes"
 ---
 
 Los descuentos sucesivos aparecen cuando una tienda anuncia algo como "20% de descuento + 10% adicional". Suena tentador pensar que el descuento total es 30%, pero no funciona así.
@@ -125,11 +125,11 @@ Otro error es no revisar en qué orden aplica el cupón. A veces el descuento ad
 
 También conviene revisar si el cupón se aplica antes o después de impuestos, envío, comisiones o meses con intereses. El porcentaje puede verse muy atractivo, pero el dato que decide la compra suele ser el total final que vas a pagar.
 
-Si solo tienes un descuento directo, puedes usar la guía de [cómo calcular un descuento](/blog/finanzas/porcentaje-de-descuento/). Si quieres repasar la operación básica, también sirve ver [cómo restar un porcentaje](/blog/matematicas/como-restar-un-porcentaje/).
+Si solo tienes un descuento directo, puedes usar la guía de [cómo calcular un descuento](/blog/finanzas/porcentaje-de-descuento). Si quieres repasar la operación básica, también sirve ver [cómo restar un porcentaje](/blog/matematicas/como-restar-un-porcentaje).
 
 ## Calcúlalo con la calculadora
 
-Puedes usar la [calculadora de porcentajes](/matematicas/calculadora-de-porcentajes/) en modo "Restar %" y aplicar los descuentos en pasos.
+Puedes usar la [calculadora de porcentajes](/matematicas/calculadora-de-porcentajes) en modo "Restar %" y aplicar los descuentos en pasos.
 
 Por ejemplo, para calcular $1,000 con 20% y 10%:
 
@@ -137,7 +137,7 @@ Por ejemplo, para calcular $1,000 con 20% y 10%:
 2. Usa 800 como nueva base y resta 10%. El resultado es 720.
 3. Compara 720 contra el precio original para saber el descuento efectivo.
 
-Si quieres recuperar el precio original desde un precio ya rebajado, el tema relacionado es el [porcentaje inverso](/blog/matematicas/porcentaje-inverso/), porque ahí se divide entre el multiplicador que produjo el descuento.
+Si quieres recuperar el precio original desde un precio ya rebajado, el tema relacionado es el [porcentaje inverso](/blog/matematicas/porcentaje-inverso), porque ahí se divide entre el multiplicador que produjo el descuento.
 
 ## Preguntas frecuentes
 

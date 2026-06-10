@@ -11,7 +11,7 @@ tags:
 readTime: "7 min"
 relatedCalculator:
   label: "Calculadora de préstamo"
-  href: "/finanzas/calculadora-de-prestamo/"
+  href: "/finanzas/calculadora-de-prestamo"
 ---
 
 Un préstamo personal y una tarjeta de crédito pueden servir para financiar una compra o consolidar deuda, pero funcionan distinto. El préstamo personal suele tener un monto, plazo y pago definidos. La tarjeta de crédito es una línea revolvente: puedes volver a usarla y, si pagas solo una parte, la deuda puede extenderse.
@@ -37,7 +37,7 @@ Un préstamo personal puede salir mejor si tiene una tasa o CAT menor que la tar
 
 También puede ayudar a poner una fecha de salida: sabes cuántos pagos faltan y cuánto terminarías pagando si cumples el calendario.
 
-Pero no basta con que la mensualidad sea menor. Un préstamo a muchos meses puede bajar el pago mensual y subir el costo total. Para comparar, revisa [CAT vs tasa de interés](/blog/finanzas/cat-vs-tasa-interes/) y simula el préstamo en la [calculadora de préstamo](/finanzas/calculadora-de-prestamo/).
+Pero no basta con que la mensualidad sea menor. Un préstamo a muchos meses puede bajar el pago mensual y subir el costo total. Para comparar, revisa [CAT vs tasa de interés](/blog/finanzas/cat-vs-tasa-interes) y simula el préstamo en la [calculadora de préstamo](/finanzas/calculadora-de-prestamo).
 
 ## Cuando una tarjeta puede salir muy cara
 

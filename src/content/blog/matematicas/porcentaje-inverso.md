@@ -11,7 +11,7 @@ tags:
 readTime: "5 min"
 relatedCalculator:
   label: "Usar calculadora de porcentajes"
-  href: "/matematicas/calculadora-de-porcentajes/"
+  href: "/matematicas/calculadora-de-porcentajes"
 ---
 
 El porcentaje inverso sirve cuando conoces el valor final, pero quieres recuperar el valor original. Por ejemplo: pagaste $800 después de un descuento de 20%. ¿Cuál era el precio antes de la rebaja?
@@ -85,7 +85,7 @@ Entonces:
 1,160 / 1.16 = 1,000
 ```
 
-El valor original era $1,000. Si el caso es IVA incluido, el procedimiento es el mismo que se usa para [desglosar IVA](/blog/legal-impuestos/como-desglosar-iva/): dividir el total entre `1 + tasa / 100`.
+El valor original era $1,000. Si el caso es IVA incluido, el procedimiento es el mismo que se usa para [desglosar IVA](/blog/legal-impuestos/como-desglosar-iva): dividir el total entre `1 + tasa / 100`.
 
 ## Ejemplos comunes
 
@@ -122,7 +122,7 @@ Lo mismo pasa al revés: si un precio final ya incluye un aumento de 25%, no rec
 
 ## Cuándo usar la calculadora
 
-La [calculadora de porcentajes](/matematicas/calculadora-de-porcentajes/) es útil para comprobar el resultado después de hacer el cálculo inverso.
+La [calculadora de porcentajes](/matematicas/calculadora-de-porcentajes) es útil para comprobar el resultado después de hacer el cálculo inverso.
 
 Por ejemplo, si obtuviste que el original era $1,000 y el descuento era 20%, puedes usar el modo "Restar %" para confirmar que el precio final queda en $800. Si el caso fue un aumento de 16%, puedes usar "Sumar %" con $1,000 para confirmar que el total queda en $1,160.
 
@@ -136,9 +136,9 @@ El paso importante es elegir bien el multiplicador: menor que 1 si fue descuento
 
 ## Temas relacionados
 
-Si todavía estás calculando el resultado final desde una base conocida, conviene revisar [cómo restar un porcentaje](/blog/matematicas/como-restar-un-porcentaje/) o [cómo sumar un porcentaje](/blog/matematicas/como-sumar-un-porcentaje/).
+Si todavía estás calculando el resultado final desde una base conocida, conviene revisar [cómo restar un porcentaje](/blog/matematicas/como-restar-un-porcentaje) o [cómo sumar un porcentaje](/blog/matematicas/como-sumar-un-porcentaje).
 
-Para compras con promociones, también puedes leer la guía de [porcentaje de descuento](/blog/finanzas/porcentaje-de-descuento/). Para impuestos incluidos en un precio final, el caso relacionado es [cómo desglosar IVA](/blog/legal-impuestos/como-desglosar-iva/).
+Para compras con promociones, también puedes leer la guía de [porcentaje de descuento](/blog/finanzas/porcentaje-de-descuento). Para impuestos incluidos en un precio final, el caso relacionado es [cómo desglosar IVA](/blog/legal-impuestos/como-desglosar-iva).
 
 ## Preguntas frecuentes
 

@@ -11,7 +11,7 @@ tags:
 readTime: "7 min"
 relatedCalculator:
   label: "Calculadora de hipoteca"
-  href: "/inmuebles/calculadora-de-hipoteca/"
+  href: "/inmuebles/calculadora-de-hipoteca"
 ---
 
 Una tabla de amortización hipotecaria muestra cómo se paga una hipoteca mes a mes. No solo indica la mensualidad: separa cuánto va a intereses, cuánto reduce capital y cuánto queda como saldo pendiente después de cada pago.
@@ -26,7 +26,7 @@ La amortización es el proceso de pagar una deuda con pagos periódicos. En una 
 - Con el tiempo aumenta el abono a capital.
 - El saldo pendiente baja después de cada pago.
 
-La [calculadora de hipoteca](/inmuebles/calculadora-de-hipoteca/) genera esta tabla con 12 meses por página y permite exportarla en CSV.
+La [calculadora de hipoteca](/inmuebles/calculadora-de-hipoteca) genera esta tabla con 12 meses por página y permite exportarla en CSV.
 
 ## Qué significa cada columna
 
@@ -75,7 +75,7 @@ $2,000,000 x 0.0075 = $15,000
 
 Después del primer pago, el saldo ya no es `$2,000,000`, sino `$1,997,005.48`. Por eso el interés del segundo mes es un poco menor.
 
-Este comportamiento es típico de un esquema de cuota fija. Si quieres ver la lógica con más detalle, revisa la guía sobre [sistema francés en una hipoteca](/blog/inmuebles/sistema-frances-hipoteca/).
+Este comportamiento es típico de un esquema de cuota fija. Si quieres ver la lógica con más detalle, revisa la guía sobre [sistema francés en una hipoteca](/blog/inmuebles/sistema-frances-hipoteca).
 
 ## Cómo cambia la tabla con pagos extra
 
@@ -90,9 +90,9 @@ Por ejemplo, en una hipoteca de `$2,000,000` a `9%` durante `20 años`, un pago 
 
 ## Cómo generar tu tabla de amortización
 
-Puedes generar una tabla completa con la [calculadora de hipoteca](/inmuebles/calculadora-de-hipoteca/). Ingresa precio y enganche, o captura directamente el monto del préstamo. Después agrega tasa, plazo y pago extra si aplica.
+Puedes generar una tabla completa con la [calculadora de hipoteca](/inmuebles/calculadora-de-hipoteca). Ingresa precio y enganche, o captura directamente el monto del préstamo. Después agrega tasa, plazo y pago extra si aplica.
 
-La herramienta muestra el resumen de capital, intereses, total pagado y duración real. Si prefieres trabajar en hoja de cálculo, revisa la guía para crear una [tabla de amortización hipotecaria en Excel](/blog/inmuebles/tabla-amortizacion-hipoteca-excel/).
+La herramienta muestra el resumen de capital, intereses, total pagado y duración real. Si prefieres trabajar en hoja de cálculo, revisa la guía para crear una [tabla de amortización hipotecaria en Excel](/blog/inmuebles/tabla-amortizacion-hipoteca-excel).
 
 ## Preguntas frecuentes
 

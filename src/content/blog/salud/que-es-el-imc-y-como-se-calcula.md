@@ -11,7 +11,7 @@ tags:
 readTime: "5 min"
 relatedCalculator:
   label: "Calculadora de IMC"
-  href: "/salud/calculadora-de-imc/"
+  href: "/salud/calculadora-de-imc"
 ---
 
 El IMC, o Índice de Masa Corporal, es una medida que compara el peso de una persona con su altura. Se usa como una referencia rápida para ubicar un resultado en rangos generales como bajo peso, rango saludable, sobrepeso u obesidad.
@@ -58,7 +58,7 @@ IMC = 25.35
 
 El resultado es `25.35`. En adultos, ese valor cae dentro del rango de sobrepeso según las categorías habituales de IMC.
 
-Si no quieres hacer el cálculo manualmente, puedes usar la [calculadora de IMC](/salud/calculadora-de-imc/) y obtener también el rango saludable estimado para tu altura.
+Si no quieres hacer el cálculo manualmente, puedes usar la [calculadora de IMC](/salud/calculadora-de-imc) y obtener también el rango saludable estimado para tu altura.
 
 ## Cómo interpretar el resultado
 
@@ -89,7 +89,7 @@ Por ejemplo, una persona que entrena fuerza puede tener un IMC alto por masa mus
 
 ## Calcula tu IMC automáticamente
 
-La forma más cómoda de usar este dato es calcularlo junto con su contexto. La [calculadora de IMC](/salud/calculadora-de-imc/) muestra:
+La forma más cómoda de usar este dato es calcularlo junto con su contexto. La [calculadora de IMC](/salud/calculadora-de-imc) muestra:
 
 - IMC con dos decimales.
 - Categoría adulta de referencia.

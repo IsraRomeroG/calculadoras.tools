@@ -47,7 +47,7 @@ describe("blog content links", () => {
 
       canonicalArticleUrls.set(
         articleSlug,
-        `/blog/${categorySlug}/${articleSlug}/`,
+        `/blog/${categorySlug}/${articleSlug}`,
       );
     }
 

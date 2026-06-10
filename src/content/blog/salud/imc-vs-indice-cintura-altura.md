@@ -11,7 +11,7 @@ tags:
 readTime: "5 min"
 relatedCalculator:
   label: "Calculadora de IMC"
-  href: "/salud/calculadora-de-imc/"
+  href: "/salud/calculadora-de-imc"
 ---
 
 El IMC y el índice cintura-altura son dos formas simples de observar aspectos distintos del cuerpo.
@@ -28,7 +28,7 @@ IMC = peso / altura^2
 
 Sirve como referencia general para ubicar un resultado en categorías adultas como bajo peso, rango saludable, sobrepeso u obesidad.
 
-Puedes calcularlo con la [calculadora de IMC](/salud/calculadora-de-imc/).
+Puedes calcularlo con la [calculadora de IMC](/salud/calculadora-de-imc).
 
 ## Qué es el índice cintura-altura
 
@@ -77,11 +77,11 @@ Puede ser útil mirar ambos cuando:
 - Se quiere considerar grasa abdominal.
 - Se busca una lectura más completa antes de hablar con un profesional.
 
-También puedes revisar [limitaciones del IMC](/blog/salud/limitaciones-del-imc/) e [IMC vs porcentaje de grasa corporal](/blog/salud/imc-vs-porcentaje-grasa-corporal/).
+También puedes revisar [limitaciones del IMC](/blog/salud/limitaciones-del-imc) e [IMC vs porcentaje de grasa corporal](/blog/salud/imc-vs-porcentaje-grasa-corporal).
 
 ## Calcula tu IMC
 
-Empieza con la [calculadora de IMC](/salud/calculadora-de-imc/) para obtener una referencia inicial. Después, si tienes medida de cintura, puedes calcular el índice cintura-altura como complemento.
+Empieza con la [calculadora de IMC](/salud/calculadora-de-imc) para obtener una referencia inicial. Después, si tienes medida de cintura, puedes calcular el índice cintura-altura como complemento.
 
 ## Preguntas frecuentes
 

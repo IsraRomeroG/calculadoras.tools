@@ -11,7 +11,7 @@ tags:
 readTime: "5 min"
 relatedCalculator:
   label: "Calculadora de hipoteca"
-  href: "/inmuebles/calculadora-de-hipoteca/"
+  href: "/inmuebles/calculadora-de-hipoteca"
 ---
 
 Una hipoteca de `$1,500,000` puede tener mensualidades muy distintas según el plazo y la tasa. Antes de comparar ofertas, conviene revisar varios escenarios con el mismo monto.
@@ -50,7 +50,7 @@ Ese total puede bajar si reduces plazo, consigues una tasa menor o haces pagos e
 
 ## Qué cambia con pago extra
 
-Un pago extra mensual no cambia la cuota base, pero puede acelerar la liquidación. Si puedes pagar más de la mensualidad obligatoria, revisa la guía sobre [pagos extra en una hipoteca](/blog/inmuebles/pagos-extra-hipoteca-abono-capital/).
+Un pago extra mensual no cambia la cuota base, pero puede acelerar la liquidación. Si puedes pagar más de la mensualidad obligatoria, revisa la guía sobre [pagos extra en una hipoteca](/blog/inmuebles/pagos-extra-hipoteca-abono-capital).
 
 La clave es confirmar que el pago adicional se aplique a capital y que no existan condiciones que reduzcan el beneficio.
 
@@ -69,7 +69,7 @@ Para comparar ofertas reales, revisa CAT, pago total mensual y condiciones del c
 
 ## Calcula tu caso exacto
 
-Usa la [calculadora de hipoteca](/inmuebles/calculadora-de-hipoteca/) para ajustar monto, tasa, plazo y pago extra. También puedes usar el modo "Precio + enganche" si el monto financiado depende del precio de la vivienda.
+Usa la [calculadora de hipoteca](/inmuebles/calculadora-de-hipoteca) para ajustar monto, tasa, plazo y pago extra. También puedes usar el modo "Precio + enganche" si el monto financiado depende del precio de la vivienda.
 
 ## Preguntas frecuentes
 

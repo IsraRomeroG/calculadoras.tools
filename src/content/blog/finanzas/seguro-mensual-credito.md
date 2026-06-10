@@ -11,7 +11,7 @@ tags:
 readTime: "5 min"
 relatedCalculator:
   label: "Calculadora de préstamo"
-  href: "/finanzas/calculadora-de-prestamo/"
+  href: "/finanzas/calculadora-de-prestamo"
 ---
 
 Un seguro mensual puede hacer que un crédito sea más caro aunque la tasa de interés parezca razonable. Si se suma cada mes, su efecto acumulado puede ser grande.
@@ -54,7 +54,7 @@ pago total = 2843.55
 
 Ese aumento puede parecer pequeño en un mes, pero se acumula durante todo el plazo.
 
-Puedes probar este campo directamente en la [calculadora de préstamo](/finanzas/calculadora-de-prestamo/): escribe la cuota del seguro en "Seguro mensual" y compara el pago total contra el escenario sin seguro.
+Puedes probar este campo directamente en la [calculadora de préstamo](/finanzas/calculadora-de-prestamo): escribe la cuota del seguro en "Seguro mensual" y compara el pago total contra el escenario sin seguro.
 
 ## Ejemplo: seguro de $200 al mes
 
@@ -79,7 +79,7 @@ El CAT puede considerar seguros y otros gastos inherentes al crédito, según la
 
 También es posible que una oferta muestre una mensualidad base atractiva, pero que el pago total suba al agregar seguros. Compara siempre con todos los cargos incluidos.
 
-Para ver el efecto junto con otros cargos, revisa [CAT vs tasa de interés](/blog/finanzas/cat-vs-tasa-interes/) y [comisión por apertura](/blog/finanzas/comision-apertura-prestamo/).
+Para ver el efecto junto con otros cargos, revisa [CAT vs tasa de interés](/blog/finanzas/cat-vs-tasa-interes) y [comisión por apertura](/blog/finanzas/comision-apertura-prestamo).
 
 ## Qué preguntar antes de firmar
 

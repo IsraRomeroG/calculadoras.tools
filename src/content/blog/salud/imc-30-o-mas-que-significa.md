@@ -11,7 +11,7 @@ tags:
 readTime: "5 min"
 relatedCalculator:
   label: "Calculadora de IMC"
-  href: "/salud/calculadora-de-imc/"
+  href: "/salud/calculadora-de-imc"
 ---
 
 En adultos, un IMC de `30.0` o más se clasifica dentro de obesidad. El valor 30 marca el inicio de obesidad clase 1 según los rangos habituales de IMC.
@@ -31,7 +31,7 @@ La tabla general es:
 | 35.0 a 39.9 | Obesidad clase 2 |
 | 40.0 o más | Obesidad clase 3 |
 
-Puedes calcular tu resultado con la [calculadora de IMC](/salud/calculadora-de-imc/).
+Puedes calcular tu resultado con la [calculadora de IMC](/salud/calculadora-de-imc).
 
 ## Clases de obesidad desde IMC 30
 
@@ -43,7 +43,7 @@ El rango de obesidad se divide así:
 
 Esta división ayuda a describir el nivel de IMC, pero no reemplaza una evaluación profesional.
 
-Puedes leer más en [obesidad clase 1, 2 y 3 según IMC](/blog/salud/obesidad-clase-1-2-3-imc/).
+Puedes leer más en [obesidad clase 1, 2 y 3 según IMC](/blog/salud/obesidad-clase-1-2-3-imc).
 
 ## Ejemplos por peso y altura
 
@@ -79,7 +79,7 @@ Busca orientación profesional si el resultado te preocupa, si tienes síntomas,
 
 ## Calcula tu IMC
 
-La [calculadora de IMC](/salud/calculadora-de-imc/) muestra tu resultado, categoría y rango saludable estimado para tu altura.
+La [calculadora de IMC](/salud/calculadora-de-imc) muestra tu resultado, categoría y rango saludable estimado para tu altura.
 
 ## Preguntas frecuentes
 

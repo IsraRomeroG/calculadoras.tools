@@ -10,7 +10,7 @@ tags:
 readTime: "3 min"
 relatedCalculator:
   label: "Calculadora de porcentajes"
-  href: "/matematicas/calculadora-de-porcentajes/"
+  href: "/matematicas/calculadora-de-porcentajes"
 ---
 
 ## Calcula primero el monto del descuento
@@ -21,7 +21,7 @@ Para saber cuánto dinero te descuentan, multiplica el precio original por el po
 precio original x descuento / 100
 ```
 
-Si quieres repasar la lógica general de esta operación, consulta [cómo calcular porcentajes](/blog/matematicas/como-calcular-porcentajes/).
+Si quieres repasar la lógica general de esta operación, consulta [cómo calcular porcentajes](/blog/matematicas/como-calcular-porcentajes).
 
 Si un producto cuesta $1,200 y tiene 25% de descuento:
 

@@ -11,7 +11,7 @@ tags:
 readTime: "4 min"
 relatedCalculator:
   label: "Calculadora de IMC"
-  href: "/salud/calculadora-de-imc/"
+  href: "/salud/calculadora-de-imc"
 ---
 
 Si mides 1.65 m, el rango saludable de referencia para adultos es aproximadamente **50.4 kg a 67.8 kg**, usando IMC de 18.5 a 24.9.
@@ -62,11 +62,11 @@ El redondeo puede mover el resultado por una décima, especialmente cerca de 18.
 
 Si buscas un peso ideal para 1.65 m, evita quedarte con una sola cifra. Un rango es más realista porque permite diferencias entre personas.
 
-Por ejemplo, 55 kg y 65 kg pueden estar dentro del rango adulto de referencia para 1.65 m, aunque sean cuerpos distintos. Lee más en [peso ideal vs peso saludable](/blog/salud/peso-ideal-vs-peso-saludable/).
+Por ejemplo, 55 kg y 65 kg pueden estar dentro del rango adulto de referencia para 1.65 m, aunque sean cuerpos distintos. Lee más en [peso ideal vs peso saludable](/blog/salud/peso-ideal-vs-peso-saludable).
 
 ## Calcula tu IMC exacto
 
-Usa la [calculadora de IMC](/salud/calculadora-de-imc/) para calcular tu resultado con tu peso actual. También puedes consultar la [tabla de peso saludable según estatura](/blog/salud/peso-saludable-segun-estatura/).
+Usa la [calculadora de IMC](/salud/calculadora-de-imc) para calcular tu resultado con tu peso actual. También puedes consultar la [tabla de peso saludable según estatura](/blog/salud/peso-saludable-segun-estatura).
 
 ## Preguntas frecuentes
 

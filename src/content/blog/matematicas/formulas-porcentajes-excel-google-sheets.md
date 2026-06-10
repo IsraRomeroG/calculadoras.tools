@@ -11,7 +11,7 @@ tags:
 readTime: "6 min"
 relatedCalculator:
   label: "Usar calculadora de porcentajes"
-  href: "/matematicas/calculadora-de-porcentajes/"
+  href: "/matematicas/calculadora-de-porcentajes"
 ---
 
 Excel y Google Sheets usan el mismo enfoque para calcular porcentajes básicos: escribes una fórmula en una celda, usas referencias como `A2` o `B2`, y aplicas formato de porcentaje solo cuando quieres mostrar el resultado como porcentaje.
@@ -90,7 +90,7 @@ El resultado interno es `0.225`. Con formato de porcentaje se muestra como:
 22.5%
 ```
 
-Esta es la misma operación explicada en la guía de [qué porcentaje es una cantidad de otra](/blog/matematicas/que-porcentaje-es-una-cantidad-de-otra/). En una hoja de cálculo, solo cambias los números por referencias de celda.
+Esta es la misma operación explicada en la guía de [qué porcentaje es una cantidad de otra](/blog/matematicas/que-porcentaje-es-una-cantidad-de-otra). En una hoja de cálculo, solo cambias los números por referencias de celda.
 
 Si no quieres usar formato de porcentaje, puedes multiplicar por 100:
 
@@ -127,7 +127,7 @@ El resultado interno es `0.20`, que con formato de porcentaje se muestra como:
 20%
 ```
 
-Si el resultado es positivo, hubo aumento. Si es negativo, hubo disminución. Para ver la lógica con más detalle, puedes revisar las guías de [aumento porcentual](/blog/matematicas/aumento-porcentual/) y [diferencia porcentual vs variación porcentual](/blog/matematicas/diferencia-porcentual-vs-variacion-porcentual/).
+Si el resultado es positivo, hubo aumento. Si es negativo, hubo disminución. Para ver la lógica con más detalle, puedes revisar las guías de [aumento porcentual](/blog/matematicas/aumento-porcentual) y [diferencia porcentual vs variación porcentual](/blog/matematicas/diferencia-porcentual-vs-variacion-porcentual).
 
 ## Sumar un porcentaje
 
@@ -159,7 +159,7 @@ Si `B2` contiene `16` como número normal y no `16%`, usa:
 =A2*(1+B2/100)
 ```
 
-Para más ejemplos de este caso, puedes leer [cómo sumar un porcentaje](/blog/matematicas/como-sumar-un-porcentaje/).
+Para más ejemplos de este caso, puedes leer [cómo sumar un porcentaje](/blog/matematicas/como-sumar-un-porcentaje).
 
 ## Restar un porcentaje o calcular descuento
 
@@ -191,7 +191,7 @@ Si el descuento está escrito como `15` y no como `15%`, usa:
 =A2*(1-B2/100)
 ```
 
-Este mismo método sirve para rebajas, retenciones o reducciones. Si quieres verlo sin referencias de celda, revisa la guía de [cómo restar un porcentaje](/blog/matematicas/como-restar-un-porcentaje/).
+Este mismo método sirve para rebajas, retenciones o reducciones. Si quieres verlo sin referencias de celda, revisa la guía de [cómo restar un porcentaje](/blog/matematicas/como-restar-un-porcentaje).
 
 ## Formato porcentaje: cuándo usarlo
 
@@ -230,7 +230,7 @@ Por último, revisa que las referencias estén en el orden correcto. En una vari
 
 ## Cuándo conviene usar la calculadora online
 
-Excel y Google Sheets son ideales cuando tienes una tabla con muchos datos o necesitas repetir la fórmula en varias filas. La [calculadora de porcentajes](/matematicas/calculadora-de-porcentajes/) conviene cuando quieres resolver un caso rápido, validar un resultado o revisar la operación antes de copiarla a una hoja.
+Excel y Google Sheets son ideales cuando tienes una tabla con muchos datos o necesitas repetir la fórmula en varias filas. La [calculadora de porcentajes](/matematicas/calculadora-de-porcentajes) conviene cuando quieres resolver un caso rápido, validar un resultado o revisar la operación antes de copiarla a una hoja.
 
 Por ejemplo, puedes calcular primero un descuento o aumento en la calculadora y después replicar la fórmula en Excel o Google Sheets. Así reduces errores de referencia, formato o interpretación del porcentaje.
 

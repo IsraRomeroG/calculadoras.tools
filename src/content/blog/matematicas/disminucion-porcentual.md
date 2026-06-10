@@ -11,7 +11,7 @@ tags:
 readTime: "4 min"
 relatedCalculator:
   label: "Usar calculadora de porcentajes"
-  href: "/matematicas/calculadora-de-porcentajes/"
+  href: "/matematicas/calculadora-de-porcentajes"
 ---
 
 La disminución porcentual mide cuánto bajó una cantidad respecto a su valor inicial. No basta con restar el valor final al inicial, porque una baja de 20 unidades puede ser grande o pequeña según la base de comparación.
@@ -100,15 +100,15 @@ La disminución porcentual responde la pregunta inversa: si ya sabes que algo pa
 (500 - 460) / 500 x 100 = 8%
 ```
 
-En resumen: el [descuento o la resta de porcentaje](/blog/matematicas/como-restar-un-porcentaje/) calcula el valor final. La disminución porcentual mide la reducción entre dos valores ya conocidos.
+En resumen: el [descuento o la resta de porcentaje](/blog/matematicas/como-restar-un-porcentaje) calcula el valor final. La disminución porcentual mide la reducción entre dos valores ya conocidos.
 
 ## Calcúlalo con la calculadora
 
-Si quieres evitar operaciones manuales, usa la [calculadora de porcentajes](/matematicas/calculadora-de-porcentajes/) y elige el modo "Cambio %".
+Si quieres evitar operaciones manuales, usa la [calculadora de porcentajes](/matematicas/calculadora-de-porcentajes) y elige el modo "Cambio %".
 
 Escribe el valor inicial y el valor final. Si el valor final es menor, la calculadora mostrará una variación negativa. Ese resultado indica una disminución porcentual. Por ejemplo, de 250 a 200 mostrará `-20%`, que se lee como una baja de 20%.
 
-Si estás comparando cambios con dirección, también puede servirte la guía de [aumento porcentual](/blog/matematicas/aumento-porcentual/). Para diferencias entre métodos de comparación, revisa la explicación sobre [diferencia porcentual vs variación porcentual](/blog/matematicas/diferencia-porcentual-vs-variacion-porcentual/).
+Si estás comparando cambios con dirección, también puede servirte la guía de [aumento porcentual](/blog/matematicas/aumento-porcentual). Para diferencias entre métodos de comparación, revisa la explicación sobre [diferencia porcentual vs variación porcentual](/blog/matematicas/diferencia-porcentual-vs-variacion-porcentual).
 
 ## Preguntas frecuentes
 

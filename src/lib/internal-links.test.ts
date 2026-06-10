@@ -14,6 +14,7 @@ const supportedExtensions = new Set([".astro", ".md", ".ts"]);
 const internalLinkPatterns = [
   /\bhref\s*=\s*["'](\/[^"']*)["']/g,
   /\b(?:href|relatedHref|slug):\s*["'](\/[^"']*)["']/g,
+  /\bcanonical\s*[:=]\s*["'](\/[^"']*)["']/g,
   /\]\((\/[^)\s]+)(?:\s+["'][^"']*["'])?\)/g,
   /new URL\(\s*["'](\/[^"']*)["']/g,
 ];
@@ -34,14 +35,14 @@ const getSourceFiles = (path: string): string[] => {
   });
 };
 
-const needsTrailingSlash = (url: string) => {
+const hasTrailingSlash = (url: string) => {
   const path = url.split(/[?#]/, 1)[0];
 
-  return path !== "/" && !path.endsWith("/") && !extname(path);
+  return path !== "/" && path.endsWith("/") && !extname(path);
 };
 
 describe("internal links", () => {
-  it("points literal page links to URLs with trailing slashes", () => {
+  it("points literal page links to URLs without trailing slashes", () => {
     const violations = sourcePaths
       .flatMap(getSourceFiles)
       .flatMap((filePath) => {
@@ -50,10 +51,10 @@ describe("internal links", () => {
         return internalLinkPatterns.flatMap((pattern) =>
           Array.from(content.matchAll(pattern))
             .map((match) => match[1])
-            .filter(needsTrailingSlash)
+            .filter(hasTrailingSlash)
             .map(
               (url) =>
-                `${relative(process.cwd(), filePath)}: add trailing slash to ${url}`,
+                `${relative(process.cwd(), filePath)}: remove trailing slash from ${url}`,
             ),
         );
       });

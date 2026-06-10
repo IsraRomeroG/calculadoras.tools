@@ -11,7 +11,7 @@ tags:
 readTime: "5 min"
 relatedCalculator:
   label: "Calculadora de IMC"
-  href: "/salud/calculadora-de-imc/"
+  href: "/salud/calculadora-de-imc"
 ---
 
 Cuando alguien busca su "peso ideal", normalmente espera encontrar un número exacto. El problema es que el cuerpo no funciona como una talla única: dos personas con la misma estatura pueden tener distinta composición corporal, edad, masa muscular, distribución de grasa y contexto de salud.
@@ -69,7 +69,7 @@ La idea práctica es esta: un rango orienta mejor que un número aislado, pero s
 
 ## Cómo usa el IMC la calculadora
 
-La [calculadora de IMC](/salud/calculadora-de-imc/) toma tu peso y estatura para calcular:
+La [calculadora de IMC](/salud/calculadora-de-imc) toma tu peso y estatura para calcular:
 
 - Tu IMC.
 - La categoría adulta de referencia.
@@ -89,11 +89,11 @@ Estos son rangos aproximados calculados con IMC adulto de 18.5 a 24.9:
 | 1.80 m | 59.9 a 80.7 kg |
 | 1.90 m | 66.8 a 89.9 kg |
 
-Si quieres una lista más completa, revisa la [tabla de peso saludable según estatura](/blog/salud/peso-saludable-segun-estatura/). También puedes ver la guía sobre [cuánto deberías pesar según tu estatura](/blog/salud/cuanto-deberia-pesar-segun-estatura/).
+Si quieres una lista más completa, revisa la [tabla de peso saludable según estatura](/blog/salud/peso-saludable-segun-estatura). También puedes ver la guía sobre [cuánto deberías pesar según tu estatura](/blog/salud/cuanto-deberia-pesar-segun-estatura).
 
 ## Calcula tu rango
 
-Para obtener tu resultado exacto, usa la [calculadora de IMC](/salud/calculadora-de-imc/). Es más preciso que buscar una tabla genérica porque calcula el rango directamente con tu altura.
+Para obtener tu resultado exacto, usa la [calculadora de IMC](/salud/calculadora-de-imc). Es más preciso que buscar una tabla genérica porque calcula el rango directamente con tu altura.
 
 ## Preguntas frecuentes
 

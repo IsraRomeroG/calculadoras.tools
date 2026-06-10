@@ -11,7 +11,7 @@ tags:
 readTime: "7 min"
 relatedCalculator:
   label: "Calculadora de hipoteca"
-  href: "/inmuebles/calculadora-de-hipoteca/"
+  href: "/inmuebles/calculadora-de-hipoteca"
 ---
 
 Para saber cuánto podrías pedir prestado para comprar casa, puedes partir de una pregunta práctica: cuánto puedes pagar al mes sin poner en riesgo tus otros compromisos.
@@ -84,11 +84,11 @@ La fórmula solo considera cuota, tasa y plazo. Una aprobación real puede cambi
 - Políticas internas de riesgo.
 - Costos adicionales.
 
-También puede cambiar si el pago mensual real incluye seguros u otros cargos. Por eso conviene revisar [qué incluye la cuota hipotecaria](/blog/inmuebles/que-incluye-cuota-hipotecaria/).
+También puede cambiar si el pago mensual real incluye seguros u otros cargos. Por eso conviene revisar [qué incluye la cuota hipotecaria](/blog/inmuebles/que-incluye-cuota-hipotecaria).
 
 ## Cómo usar la calculadora actual
 
-La [calculadora de hipoteca](/inmuebles/calculadora-de-hipoteca/) está diseñada para responder la pregunta inversa: dado un monto, tasa y plazo, cuánto pagarías al mes.
+La [calculadora de hipoteca](/inmuebles/calculadora-de-hipoteca) está diseñada para responder la pregunta inversa: dado un monto, tasa y plazo, cuánto pagarías al mes.
 
 Puedes usarla iterando:
 
@@ -110,7 +110,7 @@ Evita estos errores:
 - Usar tasas que no corresponden a una oferta real.
 - Confundir aprobación bancaria con capacidad financiera personal.
 
-Para una comparación más completa, revisa [cómo comparar créditos hipotecarios](/blog/inmuebles/comparar-creditos-hipotecarios/).
+Para una comparación más completa, revisa [cómo comparar créditos hipotecarios](/blog/inmuebles/comparar-creditos-hipotecarios).
 
 ## Preguntas frecuentes
 

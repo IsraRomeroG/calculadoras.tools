@@ -11,7 +11,7 @@ tags:
 readTime: "5 min"
 relatedCalculator:
   label: "Calculadora de IMC"
-  href: "/salud/calculadora-de-imc/"
+  href: "/salud/calculadora-de-imc"
 ---
 
 En adultos, un IMC de `25.0` a `29.9` se clasifica como sobrepeso. Es una categoría de referencia basada en la relación entre peso y altura.
@@ -34,7 +34,7 @@ Por debajo de 25.0, el resultado puede estar dentro del rango saludable si es al
 | 25.0 a 29.9 | Sobrepeso        |
 | 30.0 a 34.9 | Obesidad clase 1 |
 
-Si quieres saber dónde cae tu resultado, usa la [calculadora de IMC](/salud/calculadora-de-imc/).
+Si quieres saber dónde cae tu resultado, usa la [calculadora de IMC](/salud/calculadora-de-imc).
 
 ## Ejemplos de IMC en este rango
 
@@ -76,7 +76,7 @@ Sobrepeso: 25.0 a 29.9
 Obesidad: 30.0 o más
 ```
 
-La obesidad se divide en clases según el valor de IMC. Puedes revisar más detalles en la guía de [obesidad clase 1, 2 y 3 según IMC](/blog/salud/obesidad-clase-1-2-3-imc/).
+La obesidad se divide en clases según el valor de IMC. Puedes revisar más detalles en la guía de [obesidad clase 1, 2 y 3 según IMC](/blog/salud/obesidad-clase-1-2-3-imc).
 
 ## Limitaciones del IMC
 
@@ -86,7 +86,7 @@ Por eso, si tu resultado está en sobrepeso, conviene interpretarlo como una inv
 
 ## Calcula tu IMC y rango de peso
 
-La [calculadora de IMC](/salud/calculadora-de-imc/) muestra tu resultado, categoría y rango saludable estimado para tu altura.
+La [calculadora de IMC](/salud/calculadora-de-imc) muestra tu resultado, categoría y rango saludable estimado para tu altura.
 
 ## Preguntas frecuentes
 

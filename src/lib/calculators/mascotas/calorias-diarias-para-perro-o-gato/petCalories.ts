@@ -119,7 +119,7 @@ export const PET_SPECIAL_CASE_LABELS: Record<PetSpecialCase, string> = {
 };
 
 const POUND_TO_KG = 0.45359237;
-const SHARE_PATH = "/mascotas/calorias-diarias-para-perro-o-gato/";
+const SHARE_PATH = "/mascotas/calorias-diarias-para-perro-o-gato";
 const OUT_OF_SCOPE_MESSAGE =
   "Este caso necesita una recomendacion individual. Consulta a tu veterinario antes de ajustar la alimentacion.";
 

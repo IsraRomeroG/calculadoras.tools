@@ -10,7 +10,7 @@ import { buildFaqJsonLd } from "@lib/seo";
 const title = "Calculadora de consumo de gasolina";
 const description =
   "Calcula el rendimiento de tu vehiculo en km/L, L/100 km y mpg US, o estima cuantos litros necesitas para un trayecto.";
-const canonical = "/vehiculos/calculadora-de-consumo-de-gasolina/";
+const canonical = "/vehiculos/calculadora-de-consumo-de-gasolina";
 
 const faqs = [
   {
@@ -72,7 +72,7 @@ const faqJsonLd = buildFaqJsonLd(faqs);
       containerClass="py-5 md:py-7"
       breadcrumbs={[
         { label: "Inicio", href: "/", ariaLabel: "Inicio" },
-        { label: "Vehiculos", href: "/vehiculos/", optional: true },
+        { label: "Vehiculos", href: "/vehiculos", optional: true },
         { label: "Consumo de gasolina", truncate: true },
       ]}
     />
@@ -314,7 +314,7 @@ const faqJsonLd = buildFaqJsonLd(faqs);
 
             <a
               class="mt-5 hidden rounded-lg border border-gray-700 bg-gray-950/70 p-4 text-sm leading-relaxed text-gray-200 transition hover:border-sky-400 hover:text-white focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-sky-400/30"
-              href="/vehiculos/calculadora-de-costo-por-kilometro/"
+              href="/vehiculos/calculadora-de-costo-por-kilometro"
               data-cost-link
             >
               Estimar costo por kilometro con estos datos
@@ -567,7 +567,7 @@ const faqJsonLd = buildFaqJsonLd(faqs);
     mobileTotalText.textContent = `${formatFuelNumber(result.kmPerLiter)} km/L`;
     mobileTotal.classList.remove("hidden");
 
-    const url = new URL("/vehiculos/calculadora-de-costo-por-kilometro/", window.location.origin);
+    const url = new URL("/vehiculos/calculadora-de-costo-por-kilometro", window.location.origin);
     url.searchParams.set("rendimiento", formatCompactNumber(result.kmPerLiter, 6).replace(/,/g, ""));
     url.searchParams.set("rendimientoUnidad", "km-l");
     costLink.href = url.pathname + url.search;
@@ -616,7 +616,7 @@ const faqJsonLd = buildFaqJsonLd(faqs);
     mobileTotalText.textContent = `${formatFuelNumber(result.litersNeeded)} l`;
     mobileTotal.classList.remove("hidden");
 
-    const costUrl = new URL("/vehiculos/calculadora-de-costo-por-kilometro/", window.location.origin);
+    const costUrl = new URL("/vehiculos/calculadora-de-costo-por-kilometro", window.location.origin);
     costUrl.searchParams.set("distancia", distance.normalized);
     costUrl.searchParams.set("unidad", tripDistanceUnitSelect.value);
     costUrl.searchParams.set("trayecto", currentTripType);

@@ -61,7 +61,7 @@ export const MAX_SHARE_VALUES = 50;
 export const MAX_SHARE_CHARACTERS = 500;
 export const DEFAULT_STATISTICS_DECIMALS = 2;
 export const STATISTICS_CANONICAL_PATH =
-  "/matematicas/calculadora-de-estadistica-basica/";
+  "/matematicas/calculadora-de-estadistica-basica";
 
 export const STATISTICS_EXAMPLES: StatisticsExample[] = [
   {

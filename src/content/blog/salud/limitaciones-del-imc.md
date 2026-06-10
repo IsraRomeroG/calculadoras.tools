@@ -11,7 +11,7 @@ tags:
 readTime: "6 min"
 relatedCalculator:
   label: "Calculadora de IMC"
-  href: "/salud/calculadora-de-imc/"
+  href: "/salud/calculadora-de-imc"
 ---
 
 El IMC es útil porque es simple: usa peso y altura para ubicar un resultado en rangos de referencia. Pero esa misma simplicidad es también su principal limitación.
@@ -76,7 +76,7 @@ Ningún indicador aislado cuenta toda la historia.
 
 ## Usa el IMC como punto de partida
 
-El IMC puede ser útil para una primera estimación. La [calculadora de IMC](/salud/calculadora-de-imc/) te ayuda a obtener el número, la categoría y el rango saludable estimado para tu altura.
+El IMC puede ser útil para una primera estimación. La [calculadora de IMC](/salud/calculadora-de-imc) te ayuda a obtener el número, la categoría y el rango saludable estimado para tu altura.
 
 Después, interpreta el resultado con contexto.
 

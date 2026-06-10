@@ -92,9 +92,9 @@ export const PYTHAGOREAN_PRESETS = [
 ] as const;
 
 export const PYTHAGOREAN_CANONICAL =
-  "/geometria/calculadora-del-teorema-de-pitagoras/";
+  "/geometria/calculadora-del-teorema-de-pitagoras";
 export const AREA_PERIMETER_TRIANGLE_URL =
-  "/geometria/calculadora-de-area-y-perimetro/";
+  "/geometria/calculadora-de-area-y-perimetro";
 
 const DEFAULT_UNIT: PythagoreanUnit = "none";
 const DEFAULT_DECIMALS: PythagoreanDecimalSetting = "auto";

@@ -11,7 +11,7 @@ tags:
 readTime: "6 min"
 relatedCalculator:
   label: "Calculadora de hipoteca"
-  href: "/inmuebles/calculadora-de-hipoteca/"
+  href: "/inmuebles/calculadora-de-hipoteca"
 ---
 
 El total de intereses de una hipoteca muestra cuánto pagarías por financiar la compra de vivienda, además de devolver el capital prestado. Es uno de los datos más útiles para comparar plazos y tasas.
@@ -37,7 +37,7 @@ total intereses = total pagado - monto del préstamo
 
 Pero hay un detalle importante: el total pagado debe venir de la suma real de todas las cuotas de la tabla de amortización. No siempre basta multiplicar cuota por meses, sobre todo si hay pagos extra o una última cuota ajustada.
 
-La [calculadora de hipoteca](/inmuebles/calculadora-de-hipoteca/) suma todas las filas de la amortización para estimar el total.
+La [calculadora de hipoteca](/inmuebles/calculadora-de-hipoteca) suma todas las filas de la amortización para estimar el total.
 
 ## Ejemplo con hipoteca de $2,000,000
 
@@ -77,11 +77,11 @@ El plazo de 30 años reduce la mensualidad frente a 15 años, pero aumenta mucho
 
 Un pago extra mensual puede reducir intereses si se aplica a capital. En el ejemplo de `$2,000,000` a `9%` y `20 años`, agregar `$2,000` al mes reduce los intereses estimados de `$2,318,684.59` a `$1,711,832.41`.
 
-Eso equivale a un ahorro aproximado de `$606,852.18`, con liquidación en `186` meses. Revisa más detalles en [pagos extra en una hipoteca](/blog/inmuebles/pagos-extra-hipoteca-abono-capital/).
+Eso equivale a un ahorro aproximado de `$606,852.18`, con liquidación en `186` meses. Revisa más detalles en [pagos extra en una hipoteca](/blog/inmuebles/pagos-extra-hipoteca-abono-capital).
 
 ## Calcula tus intereses automáticamente
 
-Usa la [calculadora de hipoteca](/inmuebles/calculadora-de-hipoteca/) para estimar cuota, total pagado, intereses y tabla de amortización. También puedes exportar la tabla para revisarla en una hoja de cálculo.
+Usa la [calculadora de hipoteca](/inmuebles/calculadora-de-hipoteca) para estimar cuota, total pagado, intereses y tabla de amortización. También puedes exportar la tabla para revisarla en una hoja de cálculo.
 
 Si estás comparando ofertas reales, no olvides revisar CAT, seguros, comisiones y costos de compra.
 

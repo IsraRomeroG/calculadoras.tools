@@ -11,7 +11,7 @@ tags:
 readTime: "4 min"
 relatedCalculator:
   label: "Usar calculadora de porcentajes"
-  href: "/matematicas/calculadora-de-porcentajes/"
+  href: "/matematicas/calculadora-de-porcentajes"
 ---
 
 Sumar un porcentaje a una cantidad significa aumentar un número base en cierta proporción. Es lo que haces cuando agregas IVA, una comisión, una propina, un recargo o un incremento de precio.
@@ -88,7 +88,7 @@ Estos ejemplos muestran el total después de sumar el porcentaje:
 | 850 + 25% | 850 x 1.25 | 1,062.50 |
 | 300 + 8% | 300 x 1.08 | 324 |
 
-Si quieres repasar la base antes de usar atajos, puedes leer la guía de [cómo calcular porcentajes](/blog/matematicas/como-calcular-porcentajes/).
+Si quieres repasar la base antes de usar atajos, puedes leer la guía de [cómo calcular porcentajes](/blog/matematicas/como-calcular-porcentajes).
 
 ## Casos de uso frecuentes
 
@@ -98,9 +98,9 @@ En salarios, sumar un porcentaje ayuda a estimar el nuevo sueldo después de un 
 
 En propinas, puedes sumar 10%, 15% o 20% al consumo para obtener el total aproximado a pagar. Por ejemplo, una cuenta de $850 con 25% adicional queda en $1,062.50.
 
-En impuestos como el IVA, el procedimiento matemático es el mismo: se calcula el impuesto sobre la base y se agrega al precio. Para ese caso específico, también puedes ver la guía de [cómo sumar IVA a un precio](/blog/legal-impuestos/como-sumar-iva-a-un-precio/).
+En impuestos como el IVA, el procedimiento matemático es el mismo: se calcula el impuesto sobre la base y se agrega al precio. Para ese caso específico, también puedes ver la guía de [cómo sumar IVA a un precio](/blog/legal-impuestos/como-sumar-iva-a-un-precio).
 
-Cuando comparas un valor inicial con un valor final y quieres saber qué tanto creció, el tema relacionado es el [aumento porcentual](/blog/matematicas/aumento-porcentual/).
+Cuando comparas un valor inicial con un valor final y quieres saber qué tanto creció, el tema relacionado es el [aumento porcentual](/blog/matematicas/aumento-porcentual).
 
 ## Errores comunes
 
@@ -112,7 +112,7 @@ También conviene evitar redondear demasiado pronto. Si haces varios cálculos, 
 
 ## Calcúlalo con la calculadora
 
-Si quieres obtener el resultado sin hacer la operación a mano, usa la [calculadora de porcentajes](/matematicas/calculadora-de-porcentajes/) y elige el modo "Sumar %".
+Si quieres obtener el resultado sin hacer la operación a mano, usa la [calculadora de porcentajes](/matematicas/calculadora-de-porcentajes) y elige el modo "Sumar %".
 
 Ese modo está pensado para escribir una cantidad base y el porcentaje que quieres agregar. La calculadora muestra el incremento y el total final, así puedes revisar tanto la parte añadida como el resultado.
 

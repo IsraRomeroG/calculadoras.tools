@@ -142,6 +142,7 @@ const shouldIncludeInSitemap = (page) => {
 // https://astro.build/config
 export default defineConfig({
   site: 'https://calculadoras.tools',
+  trailingSlash: 'never',
 
   markdown: {
     rehypePlugins: [rehypeWrapTables],

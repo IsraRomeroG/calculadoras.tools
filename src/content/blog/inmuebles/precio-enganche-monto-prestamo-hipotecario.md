@@ -11,7 +11,7 @@ tags:
 readTime: "6 min"
 relatedCalculator:
   label: "Calculadora de hipoteca"
-  href: "/inmuebles/calculadora-de-hipoteca/"
+  href: "/inmuebles/calculadora-de-hipoteca"
 ---
 
 Uno de los errores más comunes al calcular una hipoteca es usar el precio completo de la vivienda como si fuera el monto del crédito. Si hay enganche, esos dos números no son iguales.
@@ -61,7 +61,7 @@ monto del préstamo = $2,500,000 - $500,000
 monto del préstamo = $2,000,000
 ```
 
-La [calculadora de hipoteca](/inmuebles/calculadora-de-hipoteca/) sincroniza ambos campos: si editas el porcentaje, calcula el monto; si editas el monto, calcula el porcentaje.
+La [calculadora de hipoteca](/inmuebles/calculadora-de-hipoteca) sincroniza ambos campos: si editas el porcentaje, calcula el monto; si editas el monto, calcula el porcentaje.
 
 ## Enganche en porcentaje vs enganche en pesos
 
@@ -111,11 +111,11 @@ Evita estos errores:
 - Capturar una tasa mensual donde la calculadora pide tasa anual.
 - Ignorar que algunos costos de compra no están incluidos en la cuota.
 
-Si quieres revisar más casos, consulta la guía de [errores comunes al calcular una hipoteca](/blog/inmuebles/errores-comunes-al-calcular-hipoteca/).
+Si quieres revisar más casos, consulta la guía de [errores comunes al calcular una hipoteca](/blog/inmuebles/errores-comunes-al-calcular-hipoteca).
 
 ## Usa el modo correcto en la calculadora
 
-La [calculadora de hipoteca](/inmuebles/calculadora-de-hipoteca/) tiene dos modos:
+La [calculadora de hipoteca](/inmuebles/calculadora-de-hipoteca) tiene dos modos:
 
 - `Precio + enganche`: ideal si partes del valor de la vivienda.
 - `Solo préstamo`: ideal si ya conoces el monto financiado.

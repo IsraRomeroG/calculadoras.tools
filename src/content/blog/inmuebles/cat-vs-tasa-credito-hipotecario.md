@@ -11,12 +11,12 @@ tags:
 readTime: "7 min"
 relatedCalculator:
   label: "Calculadora de hipoteca"
-  href: "/inmuebles/calculadora-de-hipoteca/"
+  href: "/inmuebles/calculadora-de-hipoteca"
 ---
 
 Cuando comparas créditos hipotecarios, es fácil fijarte solo en la tasa de interés o en la mensualidad. Pero esos datos no siempre muestran el costo completo. Por eso también conviene revisar el CAT, el total pagado, comisiones, seguros y condiciones de pago anticipado.
 
-La [calculadora de hipoteca](/inmuebles/calculadora-de-hipoteca/) estima capital e intereses con una tasa anual fija. Es útil para comparar escenarios, pero no sustituye el CAT ni la oferta formal de una institución.
+La [calculadora de hipoteca](/inmuebles/calculadora-de-hipoteca) estima capital e intereses con una tasa anual fija. Es útil para comparar escenarios, pero no sustituye el CAT ni la oferta formal de una institución.
 
 ## Qué es la tasa de interés hipotecaria
 
@@ -90,7 +90,7 @@ Para comparar ofertas, reúne los mismos datos de cada institución:
 | Pago anticipado  | Define flexibilidad para abonar a capital |
 | Total pagado     | Muestra el costo acumulado                |
 
-Después usa la [calculadora de hipoteca](/inmuebles/calculadora-de-hipoteca/) para simular la parte de capital e intereses y compara ese resultado contra la cotización formal.
+Después usa la [calculadora de hipoteca](/inmuebles/calculadora-de-hipoteca) para simular la parte de capital e intereses y compara ese resultado contra la cotización formal.
 
 ## Checklist antes de firmar
 
@@ -106,7 +106,7 @@ Antes de elegir una hipoteca, revisa:
 - Tabla de amortización.
 - Total pagado estimado.
 
-Para profundizar, consulta la guía sobre [cómo comparar créditos hipotecarios](/blog/inmuebles/comparar-creditos-hipotecarios/).
+Para profundizar, consulta la guía sobre [cómo comparar créditos hipotecarios](/blog/inmuebles/comparar-creditos-hipotecarios).
 
 ## Preguntas frecuentes
 

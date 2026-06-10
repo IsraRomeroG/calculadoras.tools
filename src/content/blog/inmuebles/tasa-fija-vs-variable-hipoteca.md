@@ -11,12 +11,12 @@ tags:
 readTime: "7 min"
 relatedCalculator:
   label: "Calculadora de hipoteca"
-  href: "/inmuebles/calculadora-de-hipoteca/"
+  href: "/inmuebles/calculadora-de-hipoteca"
 ---
 
 Una de las decisiones más importantes al comparar hipotecas es entender si la tasa es fija o variable. La diferencia afecta la estabilidad de la mensualidad y el riesgo de que el pago cambie en el futuro.
 
-La [calculadora de hipoteca](/inmuebles/calculadora-de-hipoteca/) trabaja con tasa fija. Sirve para estimar capital e intereses bajo un escenario estable, no para simular cambios futuros de tasa.
+La [calculadora de hipoteca](/inmuebles/calculadora-de-hipoteca) trabaja con tasa fija. Sirve para estimar capital e intereses bajo un escenario estable, no para simular cambios futuros de tasa.
 
 ## Qué es una hipoteca de tasa fija
 
@@ -87,7 +87,7 @@ Pregunta:
 - Cómo se recalcula la cuota?
 - Qué pasa si quiero hacer pagos anticipados?
 
-También revisa [cómo comparar créditos hipotecarios](/blog/inmuebles/comparar-creditos-hipotecarios/).
+También revisa [cómo comparar créditos hipotecarios](/blog/inmuebles/comparar-creditos-hipotecarios).
 
 ## Preguntas frecuentes
 

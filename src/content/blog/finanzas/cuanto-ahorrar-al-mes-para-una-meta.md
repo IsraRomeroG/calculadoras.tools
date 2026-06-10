@@ -11,7 +11,7 @@ readTime: "6 min"
 seoTitle: "Cuanto ahorrar al mes para una meta: formula y ejemplos"
 relatedCalculator:
   label: "Calculadora de ahorro para un objetivo"
-  href: "/finanzas/calculadora-de-ahorro-para-un-objetivo/"
+  href: "/finanzas/calculadora-de-ahorro-para-un-objetivo"
 ---
 
 ## Empieza por tres datos
@@ -103,13 +103,13 @@ Una forma simple es ajustar la meta por inflacion esperada:
 meta futura = meta actual x (1 + inflacion)^anos
 ```
 
-Despues usa esa meta futura en la formula de aportacion mensual. Para entender mejor la diferencia entre dinero nominal y poder adquisitivo, puedes revisar la guia de [inflacion e interes compuesto](/blog/finanzas/inflacion-interes-compuesto-valor-real/).
+Despues usa esa meta futura en la formula de aportacion mensual. Para entender mejor la diferencia entre dinero nominal y poder adquisitivo, puedes revisar la guia de [inflacion e interes compuesto](/blog/finanzas/inflacion-interes-compuesto-valor-real).
 
 ## Crea tu plan de ahorro
 
-La [calculadora de ahorro para un objetivo](/finanzas/calculadora-de-ahorro-para-un-objetivo/) puede calcular automaticamente cuánto aportar cada mes o cuándo alcanzarías la meta con una aportación fija. También muestra un escenario conservador sin rendimiento y alternativas para ajustar el plazo.
+La [calculadora de ahorro para un objetivo](/finanzas/calculadora-de-ahorro-para-un-objetivo) puede calcular automaticamente cuánto aportar cada mes o cuándo alcanzarías la meta con una aportación fija. También muestra un escenario conservador sin rendimiento y alternativas para ajustar el plazo.
 
-Si quieres explorar con más detalle cómo crece una inversión, también puedes usar la [calculadora de interes compuesto](/finanzas/calculadora-de-interes-compuesto/).
+Si quieres explorar con más detalle cómo crece una inversión, también puedes usar la [calculadora de interes compuesto](/finanzas/calculadora-de-interes-compuesto).
 
 ## Preguntas frecuentes
 

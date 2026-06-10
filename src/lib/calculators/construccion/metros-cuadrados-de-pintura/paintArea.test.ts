@@ -164,7 +164,7 @@ describe("paint parsing and sharing", () => {
         containerSize: 4,
       }),
     ).toBe(
-      "/construccion/metros-cuadrados-de-pintura/?modo=habitacion&largo=5&ancho=4&altura=3&puertas=2&ventanas=4&manos=2&rendimiento=10&margen=10&envase=4&paredes=1&techo=0",
+      "/construccion/metros-cuadrados-de-pintura?modo=habitacion&largo=5&ancho=4&altura=3&puertas=2&ventanas=4&manos=2&rendimiento=10&margen=10&envase=4&paredes=1&techo=0",
     );
   });
 

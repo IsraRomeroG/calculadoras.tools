@@ -11,7 +11,7 @@ readTime: "5 min"
 seoTitle: "Calculadora de interes compuesto: errores comunes y como evitarlos"
 relatedCalculator:
   label: "Calculadora de interes compuesto"
-  href: "/finanzas/calculadora-de-interes-compuesto/"
+  href: "/finanzas/calculadora-de-interes-compuesto"
 ---
 
 Una calculadora de interes compuesto puede dar una respuesta muy clara, pero esa respuesta depende por completo de los datos que escribas. Si la tasa, el plazo, las aportaciones o la frecuencia no representan tu caso real, el resultado puede verse preciso aunque parta de un supuesto equivocado.
@@ -39,7 +39,7 @@ tasa anual efectiva = (1 + 0.01)^12 - 1
 tasa anual efectiva = 0.1268 = 12.68%
 ```
 
-Antes de calcular, revisa si la tasa que tienes es mensual, anual, nominal o efectiva. Si quieres profundizar en esta diferencia, revisa la guia sobre [tasa nominal vs tasa efectiva](/blog/finanzas/tasa-nominal-vs-tasa-efectiva/).
+Antes de calcular, revisa si la tasa que tienes es mensual, anual, nominal o efectiva. Si quieres profundizar en esta diferencia, revisa la guia sobre [tasa nominal vs tasa efectiva](/blog/finanzas/tasa-nominal-vs-tasa-efectiva).
 
 ## Confundir rendimiento bruto con rendimiento neto
 
@@ -70,7 +70,7 @@ rendimiento real aproximado = rendimiento nominal - inflacion
 
 No es una conversion perfecta, pero ayuda como lectura rapida. Si usas una tasa nominal de 8% y esperas inflacion de 4%, el crecimiento real podria estar mas cerca de 4% anual antes de otros ajustes.
 
-Para metas de largo plazo, prueba tambien un escenario conservador ajustado por inflacion. Puedes leer mas en la guia de [inflacion e interes compuesto](/blog/finanzas/inflacion-interes-compuesto-valor-real/).
+Para metas de largo plazo, prueba tambien un escenario conservador ajustado por inflacion. Puedes leer mas en la guia de [inflacion e interes compuesto](/blog/finanzas/inflacion-interes-compuesto-valor-real).
 
 ## No separar aportaciones e intereses
 
@@ -101,7 +101,7 @@ ganancia = 95000 - 80000
 ganancia = 15000
 ```
 
-Esta separacion evita interpretar el ahorro propio como rendimiento. Si haces aportaciones frecuentes, revisa tambien la guia de [interes compuesto con aportaciones mensuales](/blog/finanzas/interes-compuesto-aportaciones-mensuales/).
+Esta separacion evita interpretar el ahorro propio como rendimiento. Si haces aportaciones frecuentes, revisa tambien la guia de [interes compuesto con aportaciones mensuales](/blog/finanzas/interes-compuesto-aportaciones-mensuales).
 
 ## Suponer que la tasa sera constante
 
@@ -177,7 +177,7 @@ Despues prueba una tasa menor. Si el plan sigue funcionando con un supuesto cons
 
 ## Usa la calculadora para comparar, no para adivinar el futuro
 
-La [calculadora de interes compuesto](/finanzas/calculadora-de-interes-compuesto/) es mas util cuando la usas para comparar escenarios con supuestos claros:
+La [calculadora de interes compuesto](/finanzas/calculadora-de-interes-compuesto) es mas util cuando la usas para comparar escenarios con supuestos claros:
 
 1. Que pasa si aumento mi aportacion mensual?
 2. Que pasa si empiezo con mas capital?
@@ -186,7 +186,7 @@ La [calculadora de interes compuesto](/finanzas/calculadora-de-interes-compuesto
 
 Ese tipo de comparacion te da una lectura mas honesta que buscar un unico numero "correcto". En interes compuesto, el resultado final depende mucho de pequenas decisiones: tasa, tiempo, aportaciones y frecuencia.
 
-Si quieres revisar la base matematica, empieza por la [formula de interes compuesto](/blog/finanzas/formula-interes-compuesto/). Para aportaciones periodicas, sigue con [interes compuesto con aportaciones mensuales](/blog/finanzas/interes-compuesto-aportaciones-mensuales/).
+Si quieres revisar la base matematica, empieza por la [formula de interes compuesto](/blog/finanzas/formula-interes-compuesto). Para aportaciones periodicas, sigue con [interes compuesto con aportaciones mensuales](/blog/finanzas/interes-compuesto-aportaciones-mensuales).
 
 ## Preguntas frecuentes
 

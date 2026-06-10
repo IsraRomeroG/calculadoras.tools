@@ -11,7 +11,7 @@ readTime: "5 min"
 seoTitle: "Errores comunes al calcular IVA y cómo evitarlos"
 relatedCalculator:
   label: "Calculadora de IVA"
-  href: "/legal-impuestos/calculadora-de-iva/"
+  href: "/legal-impuestos/calculadora-de-iva"
 ---
 
 ## Error 1: quitar el IVA restando el porcentaje directo
@@ -57,7 +57,7 @@ Ejemplos comunes:
 
 Pero esos datos no sustituyen la revisión del caso concreto.
 
-Puedes revisar las guías específicas de [IVA en México](/blog/legal-impuestos/iva-mexico/), [IVA en España](/blog/legal-impuestos/iva-espana/), [IVA en Colombia](/blog/legal-impuestos/iva-colombia/) e [IGV en Perú](/blog/legal-impuestos/igv-peru/), o comparar más países en la [tabla de tasas de IVA](/blog/legal-impuestos/tasas-de-iva-por-pais/).
+Puedes revisar las guías específicas de [IVA en México](/blog/legal-impuestos/iva-mexico), [IVA en España](/blog/legal-impuestos/iva-espana), [IVA en Colombia](/blog/legal-impuestos/iva-colombia) e [IGV en Perú](/blog/legal-impuestos/igv-peru), o comparar más países en la [tabla de tasas de IVA](/blog/legal-impuestos/tasas-de-iva-por-pais).
 
 ## Error 4: tratar tasa 0%, exento y excluido como lo mismo
 
@@ -99,7 +99,7 @@ sumar iva: precio base x (1 + tasa / 100)
 desglosar iva: precio final / (1 + tasa / 100)
 ```
 
-También puedes usar la [calculadora de IVA](/legal-impuestos/calculadora-de-iva/), que muestra el desglose completo y permite cambiar la tasa manualmente.
+También puedes usar la [calculadora de IVA](/legal-impuestos/calculadora-de-iva), que muestra el desglose completo y permite cambiar la tasa manualmente.
 
 ## Cuándo consultar a un especialista
 

@@ -11,7 +11,7 @@ tags:
 readTime: "5 min"
 relatedCalculator:
   label: "Calculadora de IMC"
-  href: "/salud/calculadora-de-imc/"
+  href: "/salud/calculadora-de-imc"
 ---
 
 Puedes calcular el IMC en Excel o Google Sheets con una fórmula sencilla. Solo necesitas peso y altura, pero debes cuidar si la altura está en metros o centímetros.
@@ -109,9 +109,9 @@ Esa fórmula da un resultado incorrecto porque `172` no está en metros.
 
 ## Verifica tu resultado con la calculadora
 
-Si quieres revisar que tu hoja está bien, compara el resultado con la [calculadora de IMC](/salud/calculadora-de-imc/).
+Si quieres revisar que tu hoja está bien, compara el resultado con la [calculadora de IMC](/salud/calculadora-de-imc).
 
-También puedes revisar la guía de [qué es el IMC y cómo se calcula](/blog/salud/que-es-el-imc-y-como-se-calcula/) y la [tabla de IMC para adultos](/blog/salud/tabla-imc-adultos-rangos-categorias/).
+También puedes revisar la guía de [qué es el IMC y cómo se calcula](/blog/salud/que-es-el-imc-y-como-se-calcula) y la [tabla de IMC para adultos](/blog/salud/tabla-imc-adultos-rangos-categorias).
 
 ## Preguntas frecuentes
 

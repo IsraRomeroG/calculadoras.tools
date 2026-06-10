@@ -11,7 +11,7 @@ tags:
 readTime: "7 min"
 relatedCalculator:
   label: "Calculadora de préstamo"
-  href: "/finanzas/calculadora-de-prestamo/"
+  href: "/finanzas/calculadora-de-prestamo"
 ---
 
 Comparar dos préstamos no consiste en elegir la mensualidad más baja. Una mensualidad menor puede esconder un plazo más largo, más intereses, seguros o comisiones.
@@ -49,14 +49,14 @@ El CAT busca expresar el costo anual total del crédito bajo ciertos supuestos. 
 
 El costo total, por su parte, muestra cuánto dinero saldrá de tu bolsillo al final del préstamo. Ambos indicadores se complementan.
 
-Si un préstamo tiene menor tasa pero mayor comisión y seguro, podría terminar costando más. Para entender esta diferencia, revisa [CAT vs tasa de interés](/blog/finanzas/cat-vs-tasa-interes/).
+Si un préstamo tiene menor tasa pero mayor comisión y seguro, podría terminar costando más. Para entender esta diferencia, revisa [CAT vs tasa de interés](/blog/finanzas/cat-vs-tasa-interes).
 
 ## Revisa comisiones, seguros y pagos anticipados
 
 Los cargos adicionales pueden cambiar la decisión:
 
-- Una [comisión por apertura](/blog/finanzas/comision-apertura-prestamo/) puede reducir el dinero neto recibido o subir el costo inicial.
-- Un [seguro mensual](/blog/finanzas/seguro-mensual-credito/) puede elevar el pago total.
+- Una [comisión por apertura](/blog/finanzas/comision-apertura-prestamo) puede reducir el dinero neto recibido o subir el costo inicial.
+- Un [seguro mensual](/blog/finanzas/seguro-mensual-credito) puede elevar el pago total.
 - Una penalización por pago anticipado puede limitar el ahorro si quieres liquidar antes.
 
 También revisa si los pagos extra se aplican a capital. Si no, quizá no generen el ahorro que esperas.
@@ -79,7 +79,7 @@ Supongamos dos ofertas para pedir `$50,000`.
 
 El préstamo B tiene menor tasa y menor mensualidad, pero cuesta más al final por el plazo más largo, la comisión y el seguro. Este es justo el tipo de caso en el que conviene mirar más allá del pago mensual.
 
-Puedes reproducir escenarios parecidos en la [calculadora de préstamo](/finanzas/calculadora-de-prestamo/) cambiando tasa, plazo, comisión y seguro.
+Puedes reproducir escenarios parecidos en la [calculadora de préstamo](/finanzas/calculadora-de-prestamo) cambiando tasa, plazo, comisión y seguro.
 
 ## Checklist antes de firmar
 

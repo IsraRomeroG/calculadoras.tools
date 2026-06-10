@@ -12,7 +12,7 @@ featured: true
 seoTitle: "Qué es el interés compuesto: explicación, fórmula y ejemplos"
 relatedCalculator:
   label: "Calculadora de interés compuesto"
-  href: "/finanzas/calculadora-de-interes-compuesto/"
+  href: "/finanzas/calculadora-de-interes-compuesto"
 ---
 
 ## Qué es el interés compuesto
@@ -90,7 +90,7 @@ El resultado final depende de varias decisiones y condiciones:
 - Frecuencia de capitalización: capitalizar de forma mensual, trimestral o anual cambia cuántas veces se suman los intereses al capital.
 - Aportaciones periódicas: agregar dinero cada mes o cada año aumenta el capital que trabaja con el tiempo.
 
-Si quieres profundizar en el cálculo, revisa la [fórmula del interés compuesto](/blog/finanzas/formula-interes-compuesto/). Para comparar el concepto con un cálculo más lineal, también ayuda ver la diferencia entre [interés simple e interés compuesto](/blog/finanzas/interes-simple-vs-compuesto/). Si solo buscas una estimación rápida del tiempo de duplicación, la [regla del 72](/blog/finanzas/regla-del-72/) puede servir como aproximación.
+Si quieres profundizar en el cálculo, revisa la [fórmula del interés compuesto](/blog/finanzas/formula-interes-compuesto). Para comparar el concepto con un cálculo más lineal, también ayuda ver la diferencia entre [interés simple e interés compuesto](/blog/finanzas/interes-simple-vs-compuesto). Si solo buscas una estimación rápida del tiempo de duplicación, la [regla del 72](/blog/finanzas/regla-del-72) puede servir como aproximación.
 
 ## Cuando el interés compuesto trabaja en contra
 
@@ -104,7 +104,7 @@ La clave no es pensar que el interés compuesto siempre es bueno o malo. Es una 
 
 La forma más clara de entender el efecto del interés compuesto es probar distintos escenarios. Puedes cambiar el capital inicial, la tasa, el plazo, la frecuencia de capitalización y las aportaciones.
 
-Usa la [calculadora de interés compuesto](/finanzas/calculadora-de-interes-compuesto/) para estimar cuánto podría crecer un ahorro o inversión bajo tus propios supuestos. La herramienta muestra el monto final, los intereses generados y una tabla de crecimiento año por año.
+Usa la [calculadora de interés compuesto](/finanzas/calculadora-de-interes-compuesto) para estimar cuánto podría crecer un ahorro o inversión bajo tus propios supuestos. La herramienta muestra el monto final, los intereses generados y una tabla de crecimiento año por año.
 
 Recuerda que el cálculo es educativo: no incluye impuestos, comisiones, cambios de tasa ni variaciones de mercado.
 

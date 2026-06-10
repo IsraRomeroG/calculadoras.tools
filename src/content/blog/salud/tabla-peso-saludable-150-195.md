@@ -11,12 +11,12 @@ tags:
 readTime: "6 min"
 relatedCalculator:
   label: "Calculadora de IMC"
-  href: "/salud/calculadora-de-imc/"
+  href: "/salud/calculadora-de-imc"
 ---
 
 Esta tabla muestra rangos de peso saludable por estatura, calculados con IMC adulto de 18.5 a 24.9. Úsala como una referencia rápida, no como diagnóstico ni como meta personalizada.
 
-Si quieres un resultado con tu dato exacto, usa la [calculadora de IMC](/salud/calculadora-de-imc/).
+Si quieres un resultado con tu dato exacto, usa la [calculadora de IMC](/salud/calculadora-de-imc).
 
 ## Tabla de peso saludable por estatura
 
@@ -67,16 +67,16 @@ El resultado corresponde a categorías adultas. Para niños y adolescentes se us
 
 También puedes revisar las páginas específicas por altura:
 
-- [Cuánto debo pesar si mido 1.50 m](/blog/salud/cuanto-debo-pesar-si-mido-150/)
-- [Cuánto debo pesar si mido 1.55 m](/blog/salud/cuanto-debo-pesar-si-mido-155/)
-- [Cuánto debo pesar si mido 1.60 m](/blog/salud/cuanto-debo-pesar-si-mido-160/)
-- [Cuánto debo pesar si mido 1.65 m](/blog/salud/cuanto-debo-pesar-si-mido-165/)
-- [Cuánto debo pesar si mido 1.70 m](/blog/salud/cuanto-debo-pesar-si-mido-170/)
-- [Cuánto debo pesar si mido 1.75 m](/blog/salud/cuanto-debo-pesar-si-mido-175/)
-- [Cuánto debo pesar si mido 1.80 m](/blog/salud/cuanto-debo-pesar-si-mido-180/)
-- [Cuánto debo pesar si mido 1.85 m](/blog/salud/cuanto-debo-pesar-si-mido-185/)
+- [Cuánto debo pesar si mido 1.50 m](/blog/salud/cuanto-debo-pesar-si-mido-150)
+- [Cuánto debo pesar si mido 1.55 m](/blog/salud/cuanto-debo-pesar-si-mido-155)
+- [Cuánto debo pesar si mido 1.60 m](/blog/salud/cuanto-debo-pesar-si-mido-160)
+- [Cuánto debo pesar si mido 1.65 m](/blog/salud/cuanto-debo-pesar-si-mido-165)
+- [Cuánto debo pesar si mido 1.70 m](/blog/salud/cuanto-debo-pesar-si-mido-170)
+- [Cuánto debo pesar si mido 1.75 m](/blog/salud/cuanto-debo-pesar-si-mido-175)
+- [Cuánto debo pesar si mido 1.80 m](/blog/salud/cuanto-debo-pesar-si-mido-180)
+- [Cuánto debo pesar si mido 1.85 m](/blog/salud/cuanto-debo-pesar-si-mido-185)
 
-Para una explicación más general, revisa [peso saludable según estatura](/blog/salud/peso-saludable-segun-estatura/).
+Para una explicación más general, revisa [peso saludable según estatura](/blog/salud/peso-saludable-segun-estatura).
 
 ## Limitaciones
 
@@ -86,7 +86,7 @@ En personas con mucha masa muscular, adultos mayores o situaciones clínicas par
 
 ## Calcula tu rango exacto
 
-La [calculadora de IMC](/salud/calculadora-de-imc/) permite ingresar tu estatura exacta, incluso si no aparece en la tabla, y calcular el resultado de forma directa.
+La [calculadora de IMC](/salud/calculadora-de-imc) permite ingresar tu estatura exacta, incluso si no aparece en la tabla, y calcular el resultado de forma directa.
 
 ## Preguntas frecuentes
 

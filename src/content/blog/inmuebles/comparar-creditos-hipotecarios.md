@@ -11,7 +11,7 @@ tags:
 readTime: "8 min"
 relatedCalculator:
   label: "Calculadora de hipoteca"
-  href: "/inmuebles/calculadora-de-hipoteca/"
+  href: "/inmuebles/calculadora-de-hipoteca"
 ---
 
 Comparar créditos hipotecarios solo por mensualidad puede llevarte a una mala lectura. Una cuota más baja puede esconder un plazo más largo, mayores seguros, comisiones o un costo total más alto.
@@ -28,7 +28,7 @@ Por ejemplo:
 - Otra puede tener mensualidad menor porque alarga el plazo.
 - Otra puede permitir pagos anticipados con más flexibilidad.
 
-La [calculadora de hipoteca](/inmuebles/calculadora-de-hipoteca/) te ayuda a comparar capital e intereses, pero debes completar el análisis con datos de la oferta formal.
+La [calculadora de hipoteca](/inmuebles/calculadora-de-hipoteca) te ayuda a comparar capital e intereses, pero debes completar el análisis con datos de la oferta formal.
 
 ## Reúne los mismos datos de cada oferta
 
@@ -64,7 +64,7 @@ Pregunta:
 - Si puedes reducir plazo o mensualidad.
 - Si existe alguna restricción para abonar a capital.
 
-Estos puntos importan mucho si planeas hacer [pagos extra en tu hipoteca](/blog/inmuebles/pagos-extra-hipoteca-abono-capital/).
+Estos puntos importan mucho si planeas hacer [pagos extra en tu hipoteca](/blog/inmuebles/pagos-extra-hipoteca-abono-capital).
 
 ## Ejemplo de comparación A vs B
 

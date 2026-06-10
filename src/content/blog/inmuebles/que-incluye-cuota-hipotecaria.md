@@ -11,7 +11,7 @@ tags:
 readTime: "6 min"
 relatedCalculator:
   label: "Calculadora de hipoteca"
-  href: "/inmuebles/calculadora-de-hipoteca/"
+  href: "/inmuebles/calculadora-de-hipoteca"
 ---
 
 La cuota hipotecaria puede significar cosas distintas según el contexto. A veces se usa para hablar solo del pago de capital e intereses. Otras veces se refiere al pago mensual total que incluye seguros u otros cargos.
@@ -20,7 +20,7 @@ Por eso, antes de comparar hipotecas, conviene preguntar qué incluye exactament
 
 ## La cuota base: capital e intereses
 
-La [calculadora de hipoteca](/inmuebles/calculadora-de-hipoteca/) calcula una cuota base de capital e intereses. Esa cuota responde:
+La [calculadora de hipoteca](/inmuebles/calculadora-de-hipoteca) calcula una cuota base de capital e intereses. Esa cuota responde:
 
 ```txt
 Si pido este monto, a esta tasa y por este plazo, cuánto pagaría al mes?
@@ -98,9 +98,9 @@ La cuota base sigue siendo útil para entender capital e intereses, pero no repr
 
 ## Calcula la base de tu hipoteca
 
-Usa la [calculadora de hipoteca](/inmuebles/calculadora-de-hipoteca/) para calcular la base de capital e intereses. Luego compara ese resultado con la oferta formal y separa los costos adicionales.
+Usa la [calculadora de hipoteca](/inmuebles/calculadora-de-hipoteca) para calcular la base de capital e intereses. Luego compara ese resultado con la oferta formal y separa los costos adicionales.
 
-Para entender mejor esos costos, revisa la guía de [gastos notariales, avalúo e impuestos](/blog/inmuebles/gastos-notariales-avaluo-impuestos-hipoteca/).
+Para entender mejor esos costos, revisa la guía de [gastos notariales, avalúo e impuestos](/blog/inmuebles/gastos-notariales-avaluo-impuestos-hipoteca).
 
 ## Preguntas frecuentes
 

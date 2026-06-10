@@ -11,7 +11,7 @@ tags:
 readTime: "6 min"
 relatedCalculator:
   label: "Calculadora de préstamo"
-  href: "/finanzas/calculadora-de-prestamo/"
+  href: "/finanzas/calculadora-de-prestamo"
 ---
 
 Calcular la cuota mensual de un préstamo te ayuda a responder la pregunta más inmediata: si pides cierta cantidad de dinero, cuánto tendrías que pagar cada mes. Pero esa mensualidad no cuenta toda la historia. Para comparar bien también conviene revisar intereses totales, comisiones, seguros y costo total.
@@ -84,7 +84,7 @@ Al terminar los 24 meses, el total pagado en cuotas sería de aproximadamente `$
 
 Este resultado no incluye comisión por apertura ni seguro mensual. Si el préstamo tuviera, por ejemplo, una comisión de 2%, habría que sumar `$1,000` como costo inicial. Si además tuviera un seguro de `$200` al mes, el pago mensual total subiría a `$2,843.55`.
 
-Puedes probar esos mismos datos en la [calculadora de préstamo](/finanzas/calculadora-de-prestamo/) para ver la mensualidad, el costo total y la tabla de amortización completa.
+Puedes probar esos mismos datos en la [calculadora de préstamo](/finanzas/calculadora-de-prestamo) para ver la mensualidad, el costo total y la tabla de amortización completa.
 
 ## Por qué la cuota no siempre es el costo total
 
@@ -104,9 +104,9 @@ El CAT ayuda a comparar créditos porque resume costos bajo una metodología est
 
 ## Calcula tu cuota automáticamente
 
-La forma más rápida de evitar errores de tasa, plazo o redondeo es usar la [calculadora de préstamo](/finanzas/calculadora-de-prestamo/). Puedes capturar monto, tasa anual y plazo, y también sumar comisión por apertura, seguro mensual o pago extra.
+La forma más rápida de evitar errores de tasa, plazo o redondeo es usar la [calculadora de préstamo](/finanzas/calculadora-de-prestamo). Puedes capturar monto, tasa anual y plazo, y también sumar comisión por apertura, seguro mensual o pago extra.
 
-La herramienta muestra la cuota base, el pago mensual total, intereses, costo total y una tabla de amortización. Si estás comparando ofertas, también puedes revisar la guía sobre [CAT vs tasa de interés](/blog/finanzas/cat-vs-tasa-interes/) y la explicación de [cómo calcular intereses de un préstamo](/blog/finanzas/como-calcular-intereses-prestamo/).
+La herramienta muestra la cuota base, el pago mensual total, intereses, costo total y una tabla de amortización. Si estás comparando ofertas, también puedes revisar la guía sobre [CAT vs tasa de interés](/blog/finanzas/cat-vs-tasa-interes) y la explicación de [cómo calcular intereses de un préstamo](/blog/finanzas/como-calcular-intereses-prestamo).
 
 ## Preguntas frecuentes
 

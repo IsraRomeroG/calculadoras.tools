@@ -10,8 +10,10 @@ interface Props {
 }
 
 const { title = "calculadoras.tools", description, canonical } = Astro.props;
-const canonicalUrl = canonical
-  ? new URL(canonical, Astro.site ?? Astro.url).toString()
+const canonicalWithoutTrailingSlash =
+  canonical && canonical !== "/" ? canonical.replace(/\/+$/, "") : canonical;
+const canonicalUrl = canonicalWithoutTrailingSlash
+  ? new URL(canonicalWithoutTrailingSlash, Astro.site ?? Astro.url).toString()
   : undefined;
 ---
 

@@ -11,7 +11,7 @@ tags:
 readTime: "6 min"
 relatedCalculator:
   label: "Calculadora de IMC"
-  href: "/salud/calculadora-de-imc/"
+  href: "/salud/calculadora-de-imc"
 ---
 
 En niños y adolescentes, el IMC no se interpreta igual que en adultos. Aunque la fórmula matemática es la misma, el resultado debe compararse con percentiles por edad y sexo.
@@ -58,7 +58,7 @@ Para interpretar el IMC pediátrico se necesitan:
 
 La edad idealmente debe ser lo más precisa posible, porque el percentil cambia con el crecimiento. Una diferencia de meses puede importar más en niños pequeños que en adultos.
 
-La [calculadora de IMC](/salud/calculadora-de-imc/) actual muestra el IMC bruto y una nota cuando detecta edad pediátrica, pero no sustituye una calculadora pediátrica con tablas de percentiles.
+La [calculadora de IMC](/salud/calculadora-de-imc) actual muestra el IMC bruto y una nota cuando detecta edad pediátrica, pero no sustituye una calculadora pediátrica con tablas de percentiles.
 
 ## Por qué no usar la tabla adulta
 

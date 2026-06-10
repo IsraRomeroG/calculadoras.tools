@@ -151,7 +151,7 @@ describe("pythagorean URLs and presets", () => {
         decimals: 2,
       }),
     ).toBe(
-      "/geometria/calculadora-del-teorema-de-pitagoras/?calcular=hipotenusa&a=3&b=4&unidad=cm&decimales=2",
+      "/geometria/calculadora-del-teorema-de-pitagoras?calcular=hipotenusa&a=3&b=4&unidad=cm&decimales=2",
     );
 
     expect(
@@ -162,7 +162,7 @@ describe("pythagorean URLs and presets", () => {
         unit: "m",
       }),
     ).toBe(
-      "/geometria/calculadora-del-teorema-de-pitagoras/?calcular=cateto&c=13&a=5&unidad=m",
+      "/geometria/calculadora-del-teorema-de-pitagoras?calcular=cateto&c=13&a=5&unidad=m",
     );
   });
 
@@ -176,7 +176,7 @@ describe("pythagorean URLs and presets", () => {
         decimals: 2,
       }),
     ).toBe(
-      "/geometria/calculadora-de-area-y-perimetro/?figura=triangulo&modo=tres-lados&a=3&b=4&c=5&unidad=cm&decimales=2",
+      "/geometria/calculadora-de-area-y-perimetro?figura=triangulo&modo=tres-lados&a=3&b=4&c=5&unidad=cm&decimales=2",
     );
   });
 });

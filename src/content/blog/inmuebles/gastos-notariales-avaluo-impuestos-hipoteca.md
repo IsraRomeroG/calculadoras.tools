@@ -11,12 +11,12 @@ tags:
 readTime: "7 min"
 relatedCalculator:
   label: "Calculadora de hipoteca"
-  href: "/inmuebles/calculadora-de-hipoteca/"
+  href: "/inmuebles/calculadora-de-hipoteca"
 ---
 
 Comprar una vivienda con hipoteca no implica solo pagar la mensualidad del crédito. También pueden existir gastos de compraventa, trámites, avalúo, impuestos, seguros y comisiones.
 
-La [calculadora de hipoteca](/inmuebles/calculadora-de-hipoteca/) estima capital e intereses. Es útil para entender la deuda, pero no incluye todos los costos de comprar una casa.
+La [calculadora de hipoteca](/inmuebles/calculadora-de-hipoteca) estima capital e intereses. Es útil para entender la deuda, pero no incluye todos los costos de comprar una casa.
 
 ## La hipoteca no es el único costo de comprar vivienda
 
@@ -66,7 +66,7 @@ Además de gastos externos, el crédito puede incluir:
 - Gastos administrativos.
 - Otros cargos contractuales.
 
-Estos conceptos pueden afectar el CAT y el pago mensual total. Para entender la diferencia, revisa [CAT vs tasa en un crédito hipotecario](/blog/inmuebles/cat-vs-tasa-credito-hipotecario/).
+Estos conceptos pueden afectar el CAT y el pago mensual total. Para entender la diferencia, revisa [CAT vs tasa en un crédito hipotecario](/blog/inmuebles/cat-vs-tasa-credito-hipotecario).
 
 ## Cómo separar estos costos de la cuota mensual
 

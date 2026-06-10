@@ -11,7 +11,7 @@ tags:
 readTime: "7 min"
 relatedCalculator:
   label: "Calculadora de préstamo"
-  href: "/finanzas/calculadora-de-prestamo/"
+  href: "/finanzas/calculadora-de-prestamo"
 ---
 
 Una tabla de amortización muestra cómo se paga un préstamo mes a mes. No solo indica la mensualidad: también separa cuánto va a intereses, cuánto reduce capital y cuánto queda de saldo pendiente después de cada pago.
@@ -27,7 +27,7 @@ La amortización es el proceso de pagar una deuda con pagos periódicos. En un p
 
 Los intereses se calculan sobre el saldo pendiente. Por eso, al inicio del crédito se paga más interés: todavía debes casi todo el monto original. Conforme el saldo baja, el interés del mes baja y una mayor parte de la cuota reduce capital.
 
-La [calculadora de préstamo](/finanzas/calculadora-de-prestamo/) genera una tabla de amortización mensual con pago, capital, intereses, seguro y saldo pendiente.
+La [calculadora de préstamo](/finanzas/calculadora-de-prestamo) genera una tabla de amortización mensual con pago, capital, intereses, seguro y saldo pendiente.
 
 ## Qué significa cada columna
 
@@ -71,7 +71,7 @@ interés del mes = 1000
 
 Después del primer pago, el saldo ya no es `$50,000`, sino `$48,356.45`. Por eso el interés del segundo mes baja a `$967.13`.
 
-Este comportamiento es normal en los esquemas de cuota fija. Si quieres profundizar en la lógica matemática, revisa la guía sobre [sistema francés de amortización](/blog/finanzas/sistema-frances-amortizacion/).
+Este comportamiento es normal en los esquemas de cuota fija. Si quieres profundizar en la lógica matemática, revisa la guía sobre [sistema francés de amortización](/blog/finanzas/sistema-frances-amortizacion).
 
 ## Cómo usar la tabla para comparar créditos
 
@@ -90,9 +90,9 @@ La CONDUSEF señala que, al comparar créditos, no solo importa la tasa de inter
 
 ## Cómo generar tu tabla de amortización
 
-Puedes generar una tabla completa con la [calculadora de préstamo](/finanzas/calculadora-de-prestamo/). Ingresa monto, tasa anual y plazo, y agrega seguro mensual o pago extra si aplica.
+Puedes generar una tabla completa con la [calculadora de préstamo](/finanzas/calculadora-de-prestamo). Ingresa monto, tasa anual y plazo, y agrega seguro mensual o pago extra si aplica.
 
-La herramienta muestra 12 meses por página y permite exportar CSV. Si prefieres construirla manualmente, también puedes revisar la guía de [tabla de amortización en Excel](/blog/finanzas/tabla-amortizacion-excel/).
+La herramienta muestra 12 meses por página y permite exportar CSV. Si prefieres construirla manualmente, también puedes revisar la guía de [tabla de amortización en Excel](/blog/finanzas/tabla-amortizacion-excel).
 
 ## Preguntas frecuentes
 
