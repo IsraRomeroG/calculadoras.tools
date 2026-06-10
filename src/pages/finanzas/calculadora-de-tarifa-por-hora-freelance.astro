@@ -1,0 +1,823 @@
+---
+import BaseLayout from "@layouts/BaseLayout.astro";
+import Container from "@components/layout/Container.astro";
+import PageShell from "@components/layout/PageShell.astro";
+import FaqSection from "@components/shared/FaqSection.astro";
+import PageHero from "@components/shared/PageHero.astro";
+import SectionIntro from "@components/shared/SectionIntro.astro";
+import { buildFaqJsonLd } from "@lib/seo";
+
+const title = "Calculadora de tarifa por hora freelance";
+const description =
+  "Calcula cuánto cobrar por hora como freelance considerando ingreso deseado, gastos, impuestos, comisiones y horas facturables.";
+const canonical = "/finanzas/calculadora-de-tarifa-por-hora-freelance";
+const faqs = [
+  {
+    question: "¿Cómo calculo cuánto cobrar por hora como freelance?",
+    answer:
+      "Primero estima la facturación mensual necesaria para cubrir gastos, ahorro, comisiones y reserva fiscal. Después divídela entre las horas que realmente puedes facturar cada mes.",
+  },
+  {
+    question: "¿Qué porcentaje de mis horas debería considerar facturable?",
+    answer:
+      "Depende de tu forma de trabajar. Las propuestas, ventas, administración, capacitación y contabilidad consumen tiempo no facturable. Revisa semanas anteriores para estimar un porcentaje realista.",
+  },
+  {
+    question: "¿Por qué debo incluir gastos e impuestos en mi tarifa?",
+    answer:
+      "Porque la facturación no equivale a ingreso personal. Antes de conservar dinero debes cubrir los gastos del negocio, las comisiones de cobro y la reserva estimada para impuestos.",
+  },
+  {
+    question: "¿Cuál es la diferencia entre tarifa mínima y tarifa práctica?",
+    answer:
+      "La tarifa mínima es el resultado matemático exacto. La tarifa práctica se redondea hacia arriba al incremento seleccionado para facilitar cotizaciones sin quedar por debajo del objetivo.",
+  },
+  {
+    question: "¿Por qué mi tarifa por hora no equivale a mi salario?",
+    answer:
+      "Una persona freelance normalmente no factura todas sus horas y debe cubrir gastos, descansos, administración, prestaciones y riesgos que un salario puede absorber de otra manera.",
+  },
+  {
+    question: "¿Cómo convierto mi tarifa por hora en precio por proyecto?",
+    answer:
+      "Estima las horas de cada fase, añade gastos directos, contingencia y alcance. La tarifa por hora sirve como base, pero un precio fijo requiere evaluar el riesgo específico del proyecto.",
+  },
+];
+const faqJsonLd = buildFaqJsonLd(faqs);
+---
+
+<BaseLayout title={title} description={description} canonical={canonical}>
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={JSON.stringify(faqJsonLd)} />
+  </Fragment>
+
+  <PageShell>
+    <PageHero
+      title="Calculadora de tarifa por hora freelance"
+      description="Calcula una tarifa sostenible considerando lo que quieres recibir, tus gastos y el tiempo que realmente puedes facturar."
+      kicker="Finanzas"
+      collapseBreadcrumbOnMobile
+      containerClass="py-6 md:py-8"
+      breadcrumbs={[
+        { label: "Inicio", href: "/", ariaLabel: "Inicio" },
+        { label: "Finanzas", href: "/finanzas", optional: true },
+        { label: "Tarifa freelance", truncate: true },
+      ]}
+    />
+
+    <Container as="section" class="py-6 md:py-8">
+      <section
+        class="overflow-hidden rounded-lg border border-gray-700 bg-gray-950 shadow-xl shadow-gray-950/30"
+        aria-labelledby="calculator-heading"
+      >
+        <div class="grid lg:grid-cols-[minmax(0,1.04fr)_minmax(20rem,0.96fr)]">
+          <div class="p-4 sm:p-6">
+            <p class="text-sm font-semibold uppercase tracking-wide text-amber-400">
+              De ingreso deseado a tarifa sostenible
+            </p>
+            <h2 id="calculator-heading" class="mt-2 text-2xl font-semibold">
+              Calcula cuánto cobrar por hora
+            </h2>
+            <p class="mt-2 text-sm leading-relaxed text-gray-400">
+              Empieza con tres datos. Después puedes ajustar gastos, impuestos,
+              comisiones y tiempo libre.
+            </p>
+
+            <form class="mt-6" novalidate data-rate-form>
+              <div
+                class="mb-4 hidden rounded-lg border border-red-400/40 bg-red-400/10 p-3 text-sm text-red-100"
+                role="alert"
+                data-error-summary
+              ></div>
+
+              <div class="grid gap-4 sm:grid-cols-2">
+                <div class="sm:col-span-2">
+                  <label class="field-label" for="rate-income">
+                    Ingreso personal neto mensual deseado
+                  </label>
+                  <div class="field-shell">
+                    <span class="field-affix">$</span>
+                    <input
+                      id="rate-income"
+                      class="field-input"
+                      type="text"
+                      inputmode="decimal"
+                      autocomplete="off"
+                      placeholder="40000"
+                      data-field="desiredNetMonthlyIncome"
+                      aria-describedby="rate-income-help rate-income-error"
+                    />
+                  </div>
+                  <p id="rate-income-help" class="field-help">
+                    Lo que quieres conservar para uso personal cada mes.
+                  </p>
+                  <p id="rate-income-error" class="field-error" data-error-for="desiredNetMonthlyIncome"></p>
+                </div>
+
+                <div>
+                  <label class="field-label" for="rate-weekly-hours">
+                    Horas de trabajo por semana
+                  </label>
+                  <div class="field-shell">
+                    <input
+                      id="rate-weekly-hours"
+                      class="field-input field-input-leading"
+                      type="text"
+                      inputmode="decimal"
+                      value="40"
+                      data-field="weeklyWorkHours"
+                      aria-describedby="rate-weekly-hours-error"
+                    />
+                    <span class="field-affix">horas</span>
+                  </div>
+                  <p id="rate-weekly-hours-error" class="field-error" data-error-for="weeklyWorkHours"></p>
+                </div>
+
+                <div>
+                  <label class="field-label" for="rate-billable">
+                    Porcentaje facturable
+                  </label>
+                  <div class="field-shell">
+                    <input
+                      id="rate-billable"
+                      class="field-input field-input-leading"
+                      type="text"
+                      inputmode="decimal"
+                      value="60"
+                      data-field="billablePercentage"
+                      aria-describedby="rate-billable-help rate-billable-error"
+                    />
+                    <span class="field-affix">%</span>
+                  </div>
+                  <p id="rate-billable-help" class="field-help">
+                    Tiempo que puedes cobrar a clientes.
+                  </p>
+                  <div class="mt-2 flex flex-wrap gap-2" aria-label="Porcentajes facturables frecuentes">
+                    <button class="chip-button" type="button" data-billable-chip="50">50%</button>
+                    <button class="chip-button" type="button" data-billable-chip="60">60%</button>
+                    <button class="chip-button" type="button" data-billable-chip="70">70%</button>
+                  </div>
+                  <p id="rate-billable-error" class="field-error" data-error-for="billablePercentage"></p>
+                </div>
+              </div>
+
+              <details class="mt-5 rounded-lg border border-gray-700 bg-gray-900/60 p-4" data-options>
+                <summary class="cursor-pointer font-semibold text-white">
+                  Gastos, impuestos y tiempo libre
+                </summary>
+                <p class="mt-2 text-xs leading-relaxed text-gray-400" data-options-summary>
+                  Ajustes: sin gastos, sin reserva fiscal y 4 semanas libres.
+                </p>
+
+                <div class="mt-4 grid gap-4 sm:grid-cols-2">
+                  <div>
+                    <label class="field-label" for="rate-expenses">Gastos mensuales del negocio</label>
+                    <div class="field-shell">
+                      <span class="field-affix">$</span>
+                      <input id="rate-expenses" class="field-input" type="text" inputmode="decimal" value="0" data-field="monthlyBusinessExpenses" aria-describedby="rate-expenses-help rate-expenses-error" />
+                    </div>
+                    <p id="rate-expenses-help" class="field-help">Software, equipo, asesoría, internet y otros costos.</p>
+                    <p id="rate-expenses-error" class="field-error" data-error-for="monthlyBusinessExpenses"></p>
+                  </div>
+
+                  <div>
+                    <label class="field-label" for="rate-savings">Ahorro o reserva mensual</label>
+                    <div class="field-shell">
+                      <span class="field-affix">$</span>
+                      <input id="rate-savings" class="field-input" type="text" inputmode="decimal" value="0" data-field="monthlySavings" aria-describedby="rate-savings-error" />
+                    </div>
+                    <p id="rate-savings-error" class="field-error" data-error-for="monthlySavings"></p>
+                  </div>
+
+                  <div>
+                    <label class="field-label" for="rate-taxes">Reserva estimada para impuestos</label>
+                    <div class="field-shell">
+                      <input id="rate-taxes" class="field-input field-input-leading" type="text" inputmode="decimal" value="0" data-field="taxReserveRate" aria-describedby="rate-taxes-help rate-taxes-error" />
+                      <span class="field-affix">%</span>
+                    </div>
+                    <p id="rate-taxes-help" class="field-help">Estimación manual sobre utilidad; no es un cálculo fiscal.</p>
+                    <p id="rate-taxes-error" class="field-error" data-error-for="taxReserveRate"></p>
+                  </div>
+
+                  <div>
+                    <label class="field-label" for="rate-fee">Comisión sobre cobros</label>
+                    <div class="field-shell">
+                      <input id="rate-fee" class="field-input field-input-leading" type="text" inputmode="decimal" value="0" data-field="collectionFeeRate" aria-describedby="rate-fee-help rate-fee-error" />
+                      <span class="field-affix">%</span>
+                    </div>
+                    <p id="rate-fee-help" class="field-help">Marketplace, plataforma o pasarela de pago.</p>
+                    <p id="rate-fee-error" class="field-error" data-error-for="collectionFeeRate"></p>
+                  </div>
+
+                  <div>
+                    <label class="field-label" for="rate-weeks-off">Semanas no trabajadas al año</label>
+                    <div class="field-shell">
+                      <input id="rate-weeks-off" class="field-input field-input-leading" type="text" inputmode="decimal" value="4" data-field="weeksOffPerYear" aria-describedby="rate-weeks-off-error" />
+                      <span class="field-affix">semanas</span>
+                    </div>
+                    <p id="rate-weeks-off-error" class="field-error" data-error-for="weeksOffPerYear"></p>
+                  </div>
+
+                  <div>
+                    <label class="field-label" for="rate-day-hours">Horas por jornada facturable</label>
+                    <div class="field-shell">
+                      <input id="rate-day-hours" class="field-input field-input-leading" type="text" inputmode="decimal" value="8" data-field="billableDayHours" aria-describedby="rate-day-hours-error" />
+                      <span class="field-affix">horas</span>
+                    </div>
+                    <p id="rate-day-hours-error" class="field-error" data-error-for="billableDayHours"></p>
+                  </div>
+
+                  <div>
+                    <label class="field-label" for="rate-current">Tarifa actual <span class="text-gray-500">(opcional)</span></label>
+                    <div class="field-shell">
+                      <span class="field-affix">$</span>
+                      <input id="rate-current" class="field-input" type="text" inputmode="decimal" placeholder="600" data-field="currentHourlyRate" aria-describedby="rate-current-help rate-current-error" />
+                      <span class="field-affix">/ hora</span>
+                    </div>
+                    <p id="rate-current-help" class="field-help">La compararemos contra tu mínimo sostenible.</p>
+                    <p id="rate-current-error" class="field-error" data-error-for="currentHourlyRate"></p>
+                  </div>
+
+                  <div>
+                    <label class="field-label" for="rate-rounding">Redondear tarifa práctica a</label>
+                    <select id="rate-rounding" class="field" data-rounding>
+                      <option value="1">$1</option>
+                      <option value="10">$10</option>
+                      <option value="50" selected>$50</option>
+                      <option value="100">$100</option>
+                    </select>
+                    <p class="field-help">Siempre se redondea hacia arriba.</p>
+                  </div>
+                </div>
+              </details>
+
+              <div class="mt-6 flex flex-col gap-3 border-t border-gray-800 pt-5 sm:flex-row sm:flex-wrap">
+                <button class="primary-button w-full sm:w-auto sm:min-w-48" type="submit">
+                  Calcular mi tarifa
+                </button>
+                <button class="secondary-button" type="button" data-example>Usar ejemplo</button>
+                <button class="secondary-button" type="button" data-clear>Limpiar</button>
+                <button class="secondary-button hidden" type="button" data-copy>
+                  <span data-copy-label>Copiar resumen</span>
+                </button>
+                <p class="sr-only" role="status" aria-live="polite" data-copy-status></p>
+              </div>
+            </form>
+          </div>
+
+          <aside
+            class="border-t border-gray-800 bg-gray-900/70 p-4 sm:p-6 lg:border-l lg:border-t-0"
+            aria-live="polite"
+            tabindex="-1"
+            data-result-region
+          >
+            <div class="hidden rounded-lg border border-amber-400/40 bg-amber-400/10 p-3 text-sm text-amber-100" data-stale-notice>
+              Cambiaste los datos. Calcula de nuevo para actualizar este resultado.
+            </div>
+            <p class="mt-1 text-sm font-semibold uppercase tracking-wide text-amber-400" data-result-kicker>
+              Resultado
+            </p>
+            <p class="mt-3 break-words text-4xl font-bold leading-tight text-white" data-main-result>
+              Ingresa tu objetivo
+            </p>
+            <p class="mt-3 text-sm leading-relaxed text-gray-300" data-interpretation>
+              Verás una tarifa práctica y el mínimo exacto necesario para sostenerla.
+            </p>
+
+            <div class="mt-5 grid grid-cols-2 gap-3" data-summary-grid>
+              <div class="col-span-2 rounded-lg border border-gray-800 bg-gray-950/70 p-4 text-sm text-gray-400">
+                Captura tu ingreso deseado, horas semanales y porcentaje facturable para comenzar.
+              </div>
+            </div>
+
+            <div class="mt-4 hidden rounded-lg border p-4" data-comparison-card>
+              <p class="text-xs font-semibold uppercase tracking-wide" data-comparison-kicker></p>
+              <p class="mt-2 text-sm leading-relaxed" data-comparison-text></p>
+            </div>
+
+            <div class="mt-4 hidden rounded-lg border border-amber-400/30 bg-amber-400/10 p-4" data-warnings-card>
+              <p class="text-xs font-semibold uppercase tracking-wide text-amber-300">Revisa estos supuestos</p>
+              <ul class="mt-2 space-y-2 text-sm leading-relaxed text-amber-100" data-warnings-list></ul>
+            </div>
+
+            <details class="mt-4 hidden rounded-lg border border-gray-800 p-4" data-breakdown-details>
+              <summary class="cursor-pointer text-sm font-semibold text-white">Destino de la facturación mensual</summary>
+              <div class="mt-3 grid grid-cols-2 gap-2" data-breakdown-grid></div>
+            </details>
+
+            <details class="mt-4 hidden rounded-lg border border-gray-800 p-4" data-calculation-details>
+              <summary class="cursor-pointer text-sm font-semibold text-white">Cómo se calculó</summary>
+              <div class="mt-3 space-y-2 text-sm leading-relaxed text-gray-400" data-calculation-lines></div>
+            </details>
+
+            <p class="mt-4 text-xs leading-relaxed text-gray-500">
+              Estimación de planeación basada en tus supuestos. No sustituye una
+              revisión fiscal ni una referencia de precios de mercado.
+            </p>
+          </aside>
+        </div>
+      </section>
+    </Container>
+
+    <Container as="section" class="hidden py-6 md:py-8" data-scenarios-section>
+      <SectionIntro
+        title="Escenarios de capacidad facturable"
+        description="Compara cómo cambia tu tarifa si puedes cobrar más o menos horas sin modificar tu objetivo mensual."
+        class="mb-5"
+      />
+      <div class="grid gap-4 md:grid-cols-3" data-scenarios-cards></div>
+    </Container>
+
+    <Container as="section" class="py-8">
+      <SectionIntro
+        title="Cómo interpretar tu tarifa"
+        description="La tarifa sostenible no es solo un salario dividido entre horas: también debe financiar el trabajo que no puedes cobrar."
+        class="mb-5"
+      />
+      <div class="grid gap-4 md:grid-cols-3">
+        <article class="info-card">
+          <h2 class="font-semibold text-white">Facturación no es ingreso personal</h2>
+          <p class="mt-2 text-sm leading-relaxed text-gray-400">
+            De lo cobrado todavía deben salir comisiones, gastos del negocio,
+            impuestos y reservas antes de llegar a tu bolsillo.
+          </p>
+        </article>
+        <article class="info-card">
+          <h2 class="font-semibold text-white">No todas las horas se cobran</h2>
+          <p class="mt-2 text-sm leading-relaxed text-gray-400">
+            Ventas, propuestas, seguimiento, capacitación y administración
+            consumen tiempo necesario, aunque no aparezca en una factura.
+          </p>
+        </article>
+        <article class="info-card">
+          <h2 class="font-semibold text-white">Cotiza con margen práctico</h2>
+          <p class="mt-2 text-sm leading-relaxed text-gray-400">
+            La tarifa exacta marca tu mínimo. Redondearla hacia arriba facilita
+            cotizaciones y reduce el riesgo de quedar debajo del objetivo.
+          </p>
+        </article>
+      </div>
+    </Container>
+
+    <Container as="section" class="py-8">
+      <div class="grid gap-5 md:grid-cols-2">
+        <article class="rounded-lg border border-gray-700 bg-gray-950 p-5 sm:p-6">
+          <h2 class="text-xl font-semibold">Cómo estimar tus horas facturables</h2>
+          <p class="mt-3 text-sm leading-relaxed text-gray-400">
+            Revisa dos o cuatro semanas recientes. Suma únicamente el tiempo que
+            podrías cobrar a clientes y divídelo entre todas tus horas de trabajo.
+            Usa un escenario conservador si todavía no tienes datos.
+          </p>
+        </article>
+        <article class="rounded-lg border border-gray-700 bg-gray-950 p-5 sm:p-6">
+          <h2 class="text-xl font-semibold">De tarifa por hora a precio fijo</h2>
+          <p class="mt-3 text-sm leading-relaxed text-gray-400">
+            Para cotizar un proyecto, multiplica esta tarifa por las horas de
+            cada fase y añade gastos directos, contingencia y riesgo de alcance.
+            Una cotización fija necesita más información que una tarifa base.
+          </p>
+          <span class="mt-4 inline-flex min-h-11 items-center rounded-lg border border-gray-700 px-4 text-sm font-semibold text-gray-500" aria-disabled="true">
+            Calculadora de precio por proyecto: próximamente
+          </span>
+        </article>
+      </div>
+    </Container>
+
+    <FaqSection faqs={faqs} />
+  </PageShell>
+</BaseLayout>
+
+<style is:global>
+  .field-label { display: block; font-size: .875rem; font-weight: 500; color: rgb(229 231 235); }
+  .field, .field-shell { margin-top: .5rem; min-height: 3rem; width: 100%; border-radius: .5rem; border: 1px solid rgb(55 65 81); background: rgb(17 24 39); color: white; outline: none; }
+  .field { padding: 0 1rem; }
+  .field-shell { display: flex; align-items: center; }
+  .field-input { min-height: 2.875rem; min-width: 0; width: 100%; background: transparent; padding: 0 .25rem; color: white; outline: none; }
+  .field-input-leading { padding-left: .75rem; }
+  .field-affix { flex: none; padding: 0 .75rem; color: rgb(107 114 128); }
+  .field:focus, .field-shell:focus-within { border-color: rgb(251 191 36); box-shadow: 0 0 0 3px rgb(251 191 36 / .15); }
+  .field-help { margin-top: .4rem; font-size: .75rem; line-height: 1.4; color: rgb(107 114 128); }
+  .field-error { display: none; margin-top: .4rem; font-size: .8rem; color: rgb(252 165 165); }
+  .field-error:not(:empty) { display: block; }
+  .primary-button { display: inline-flex; min-height: 2.75rem; align-items: center; justify-content: center; border-radius: .5rem; background: rgb(251 191 36); padding: .5rem 1rem; font-size: .875rem; font-weight: 700; color: rgb(3 7 18); }
+  .secondary-button, .chip-button { display: inline-flex; min-height: 2.75rem; align-items: center; justify-content: center; border-radius: .5rem; border: 1px solid rgb(55 65 81); padding: .5rem 1rem; font-size: .875rem; font-weight: 600; color: rgb(229 231 235); }
+  .chip-button { min-height: 2.5rem; padding: .35rem .8rem; }
+  .chip-button[aria-pressed="true"] { border-color: rgb(251 191 36); background: rgb(251 191 36 / .15); color: rgb(253 230 138); }
+  .info-card { border-radius: .5rem; border: 1px solid rgb(55 65 81); background: rgb(3 7 18); padding: 1.25rem; }
+</style>
+
+<script>
+  import {
+    calculateFreelanceRate,
+    formatCurrency,
+    formatPercent,
+    formatQuantity,
+    parseMoneyInput,
+    parsePercentInput,
+    parseQuantityInput,
+  } from "@lib/calculators/finanzas/calculadora-de-tarifa-por-hora-freelance/freelanceRate";
+
+  const form = document.querySelector("[data-rate-form]");
+  const options = document.querySelector("[data-options]");
+  const optionsSummary = document.querySelector("[data-options-summary]");
+  const errorSummary = document.querySelector("[data-error-summary]");
+  const roundingSelect = document.querySelector("[data-rounding]");
+  const resultRegion = document.querySelector("[data-result-region]");
+  const resultKicker = document.querySelector("[data-result-kicker]");
+  const mainResult = document.querySelector("[data-main-result]");
+  const interpretation = document.querySelector("[data-interpretation]");
+  const summaryGrid = document.querySelector("[data-summary-grid]");
+  const staleNotice = document.querySelector("[data-stale-notice]");
+  const comparisonCard = document.querySelector("[data-comparison-card]");
+  const comparisonKicker = document.querySelector("[data-comparison-kicker]");
+  const comparisonText = document.querySelector("[data-comparison-text]");
+  const warningsCard = document.querySelector("[data-warnings-card]");
+  const warningsList = document.querySelector("[data-warnings-list]");
+  const breakdownDetails = document.querySelector("[data-breakdown-details]");
+  const breakdownGrid = document.querySelector("[data-breakdown-grid]");
+  const calculationDetails = document.querySelector("[data-calculation-details]");
+  const calculationLines = document.querySelector("[data-calculation-lines]");
+  const scenariosSection = document.querySelector("[data-scenarios-section]");
+  const scenariosCards = document.querySelector("[data-scenarios-cards]");
+  const copyButton = document.querySelector("[data-copy]");
+  const copyLabel = document.querySelector("[data-copy-label]");
+  const copyStatus = document.querySelector("[data-copy-status]");
+  const billableChips = [...document.querySelectorAll("[data-billable-chip]")];
+  const fields = Object.fromEntries(
+    [...document.querySelectorAll("[data-field]")].map((input) => [input.dataset.field, input]),
+  );
+
+  let copyText = "";
+  let hasResult = false;
+
+  const ERROR_MESSAGES = {
+    required: "Completa este campo para calcular.",
+    invalid: "Ingresa un número válido.",
+    negative: "El valor no puede ser negativo.",
+    too_many_decimals: "Usa como máximo dos decimales.",
+    income_zero: "El ingreso deseado debe ser mayor que cero.",
+    weekly_range: "Usa entre 1 y 80 horas por semana.",
+    billable_range: "Usa un porcentaje entre 1% y 100%.",
+    taxes_range: "Usa una reserva entre 0% y 80%.",
+    fee_range: "Usa una comisión entre 0% y 50%.",
+    weeks_range: "Usa entre 0 y 20 semanas.",
+    day_hours_range: "Usa entre 1 y 12 horas.",
+    current_zero: "La tarifa actual debe ser mayor que cero.",
+  };
+
+  const WARNING_MESSAGES = {
+    no_tax_reserve: "No estás reservando dinero para impuestos. Confirma que este supuesto aplica a tu situación.",
+    high_billable_percentage: "Facturar más del 80% de tu tiempo de forma sostenida puede dejar poco margen para ventas, administración y descansos.",
+    low_billable_hours: "Tu capacidad facturable es muy baja; pequeños cambios en tus horas pueden modificar mucho la tarifa.",
+    high_weekly_hours: "Este escenario supone una carga semanal alta. Revisa si puede mantenerse.",
+  };
+
+  function calculate() {
+    clearErrors();
+    const errors = {};
+
+    const desiredNetMonthlyIncome = parseRequired("desiredNetMonthlyIncome", parseMoneyInput, errors);
+    const weeklyWorkHours = parseRequired("weeklyWorkHours", parseQuantityInput, errors);
+    const billablePercentage = parseRequired("billablePercentage", parsePercentInput, errors);
+    const monthlyBusinessExpenses = parseRequired("monthlyBusinessExpenses", parseMoneyInput, errors);
+    const monthlySavings = parseRequired("monthlySavings", parseMoneyInput, errors);
+    const taxReserveRate = parseRequired("taxReserveRate", parsePercentInput, errors);
+    const collectionFeeRate = parseRequired("collectionFeeRate", parsePercentInput, errors);
+    const weeksOffPerYear = parseRequired("weeksOffPerYear", parseQuantityInput, errors);
+    const billableDayHours = parseRequired("billableDayHours", parseQuantityInput, errors);
+    const currentHourlyRate = parseOptional("currentHourlyRate", parseMoneyInput, errors);
+
+    if (desiredNetMonthlyIncome !== undefined && desiredNetMonthlyIncome <= 0) errors.desiredNetMonthlyIncome = "income_zero";
+    if (!inRange(weeklyWorkHours, 1, 80)) errors.weeklyWorkHours = "weekly_range";
+    if (!inRange(billablePercentage, 1, 100)) errors.billablePercentage = "billable_range";
+    if (!inRange(taxReserveRate, 0, 80)) errors.taxReserveRate = "taxes_range";
+    if (!inRange(collectionFeeRate, 0, 50)) errors.collectionFeeRate = "fee_range";
+    if (!inRange(weeksOffPerYear, 0, 20)) errors.weeksOffPerYear = "weeks_range";
+    if (!inRange(billableDayHours, 1, 12)) errors.billableDayHours = "day_hours_range";
+    if (currentHourlyRate !== undefined && currentHourlyRate <= 0) errors.currentHourlyRate = "current_zero";
+
+    showErrors(errors);
+    if (Object.keys(errors).length) {
+      setInvalidState(errors);
+      return;
+    }
+
+    const input = {
+      desiredNetMonthlyIncome,
+      weeklyWorkHours,
+      billablePercentage,
+      monthlyBusinessExpenses,
+      monthlySavings,
+      taxReserveRate,
+      collectionFeeRate,
+      weeksOffPerYear,
+      billableDayHours,
+      roundingIncrement: Number(roundingSelect.value),
+      currentHourlyRate,
+    };
+    const result = calculateFreelanceRate(input);
+
+    renderResult(input, result);
+    hasResult = true;
+    staleNotice.classList.add("hidden");
+    copyButton.classList.remove("hidden");
+    resultRegion.focus({ preventScroll: true });
+    resultRegion.scrollIntoView({ behavior: "smooth", block: "nearest" });
+  }
+
+  function renderResult(input, result) {
+    resultKicker.textContent = "Tarifa práctica sugerida";
+    mainResult.textContent = `${formatCurrency(result.practicalHourlyRate)} por hora`;
+    interpretation.textContent = `Para conservar ${formatCurrency(input.desiredNetMonthlyIncome)} al mes, deberías cotizar al menos ${formatCurrency(result.practicalHourlyRate)} por hora con estos supuestos.`;
+
+    summaryGrid.innerHTML = [
+      ["Mínimo sostenible exacto", `${formatCurrency(result.minimumHourlyRate)} / hora`],
+      [`Jornada de ${formatQuantity(input.billableDayHours)} horas`, formatCurrency(result.practicalDayRate)],
+      ["Facturación mensual necesaria", formatCurrency(result.monthlyRevenueRequired)],
+      ["Horas facturables al mes", formatQuantity(result.billableHoursMonthly)],
+      ["Horas facturables al año", formatQuantity(result.billableHoursAnnual)],
+      ["Mínimo sin ahorro", `${formatCurrency(result.minimumRateWithoutSavings)} / hora`],
+    ].map(([label, value]) => summary(label, value)).join("");
+
+    renderComparison(result.currentRateComparison);
+    renderWarnings(result.warnings);
+    renderBreakdown(input, result);
+    renderCalculation(input, result);
+    renderScenarios(result.scenarios);
+    copyText = buildCopyText(input, result);
+  }
+
+  function renderComparison(comparison) {
+    if (!comparison) {
+      comparisonCard.classList.add("hidden");
+      return;
+    }
+
+    const difference = formatCurrency(Math.abs(comparison.differenceAmount));
+    const percentage = formatPercent(Math.abs(comparison.differencePercentage));
+    comparisonCard.className = "mt-4 rounded-lg border p-4";
+
+    if (comparison.status === "below") {
+      comparisonCard.classList.add("border-red-400/40", "bg-red-400/10");
+      comparisonKicker.className = "text-xs font-semibold uppercase tracking-wide text-red-300";
+      comparisonText.className = "mt-2 text-sm leading-relaxed text-red-100";
+      comparisonKicker.textContent = "Por debajo de tu objetivo";
+      comparisonText.textContent = `Tu tarifa actual está ${difference} por hora (${percentage}) debajo del mínimo sostenible.`;
+    } else {
+      comparisonCard.classList.add("border-emerald-400/40", "bg-emerald-400/10");
+      comparisonKicker.className = "text-xs font-semibold uppercase tracking-wide text-emerald-300";
+      comparisonText.className = "mt-2 text-sm leading-relaxed text-emerald-100";
+      comparisonKicker.textContent = "Alcanza tu objetivo";
+      comparisonText.textContent = `Tu tarifa actual supera el mínimo sostenible por ${difference} por hora (${percentage}).`;
+    }
+
+    comparisonCard.classList.remove("hidden");
+  }
+
+  function renderWarnings(warnings) {
+    if (!warnings.length) {
+      warningsCard.classList.add("hidden");
+      return;
+    }
+
+    warningsList.innerHTML = warnings
+      .map((warning) => `<li>• ${escapeHtml(WARNING_MESSAGES[warning])}</li>`)
+      .join("");
+    warningsCard.classList.remove("hidden");
+  }
+
+  function renderBreakdown(input, result) {
+    breakdownGrid.innerHTML = [
+      ["Facturación necesaria", formatCurrency(result.monthlyRevenueRequired)],
+      ["Comisión sobre cobros", `−${formatCurrency(result.monthlyCollectionFee)}`],
+      ["Gastos del negocio", `−${formatCurrency(input.monthlyBusinessExpenses)}`],
+      ["Utilidad antes de impuestos", formatCurrency(result.preTaxProfitRequired)],
+      ["Reserva para impuestos", `−${formatCurrency(result.monthlyTaxReserve)}`],
+      ["Ingreso personal", formatCurrency(input.desiredNetMonthlyIncome)],
+      ["Ahorro o reserva", formatCurrency(input.monthlySavings)],
+    ].map(([label, value]) => compactSummary(label, value)).join("");
+    breakdownDetails.classList.remove("hidden");
+  }
+
+  function renderCalculation(input, result) {
+    const lines = [
+      `Semanas trabajadas = 52 − ${formatQuantity(input.weeksOffPerYear)} = ${formatQuantity(result.weeksWorkedPerYear)}`,
+      `Horas facturables mensuales = ${formatQuantity(input.weeklyWorkHours)} × ${formatQuantity(result.weeksWorkedPerYear)} × ${formatPercent(input.billablePercentage)} ÷ 12 = ${formatQuantity(result.billableHoursMonthly)}`,
+      `Utilidad antes de impuestos = ${formatCurrency(result.netAfterTaxesTarget)} ÷ (1 − ${formatPercent(input.taxReserveRate)}) = ${formatCurrency(result.preTaxProfitRequired)}`,
+      `Facturación necesaria = (${formatCurrency(input.monthlyBusinessExpenses)} + ${formatCurrency(result.preTaxProfitRequired)}) ÷ (1 − ${formatPercent(input.collectionFeeRate)}) = ${formatCurrency(result.monthlyRevenueRequired)}`,
+      `Tarifa mínima = ${formatCurrency(result.monthlyRevenueRequired)} ÷ ${formatQuantity(result.billableHoursMonthly)} horas = ${formatCurrency(result.minimumHourlyRate)} por hora`,
+    ];
+    calculationLines.innerHTML = lines.map((line) => `<p>${escapeHtml(line)}</p>`).join("");
+    calculationDetails.classList.remove("hidden");
+  }
+
+  function renderScenarios(scenarios) {
+    scenariosCards.innerHTML = scenarios.map((scenario) => `
+      <article class="rounded-lg border ${scenario.current ? "border-amber-400/60 bg-amber-400/10" : "border-gray-700 bg-gray-950"} p-4">
+        <p class="text-xs font-semibold uppercase tracking-wide ${scenario.current ? "text-amber-300" : "text-gray-400"}">
+          ${scenario.current ? "Tu capacidad actual" : "Escenario"} · ${escapeHtml(formatPercent(scenario.billablePercentage))}
+        </p>
+        <p class="mt-2 text-2xl font-bold text-white">${escapeHtml(formatCurrency(scenario.practicalHourlyRate))} / hora</p>
+        <div class="mt-4 grid grid-cols-2 gap-2 text-sm">
+          ${compactSummary("Mínimo exacto", formatCurrency(scenario.minimumHourlyRate))}
+          ${compactSummary("Horas al mes", formatQuantity(scenario.billableHoursMonthly))}
+        </div>
+      </article>
+    `).join("");
+    scenariosSection.classList.remove("hidden");
+  }
+
+  function buildCopyText(input, result) {
+    const lines = [
+      "Tarifa freelance estimada",
+      `Tarifa práctica sugerida: ${formatCurrency(result.practicalHourlyRate)} por hora`,
+      `Tarifa mínima sostenible: ${formatCurrency(result.minimumHourlyRate)} por hora`,
+      `Equivalente por jornada de ${formatQuantity(input.billableDayHours)} horas: ${formatCurrency(result.practicalDayRate)}`,
+      `Facturación mensual necesaria: ${formatCurrency(result.monthlyRevenueRequired)}`,
+      `Capacidad estimada: ${formatQuantity(result.billableHoursMonthly)} horas facturables al mes`,
+      `Supuestos: ${formatQuantity(input.weeklyWorkHours)} horas por semana, ${formatPercent(input.billablePercentage)} facturable, ${formatQuantity(input.weeksOffPerYear)} semanas libres, ${formatCurrency(input.monthlyBusinessExpenses)} de gastos, ${formatPercent(input.taxReserveRate)} para impuestos y ${formatPercent(input.collectionFeeRate)} de comisión.`,
+    ];
+
+    if (result.currentRateComparison) {
+      lines.push(`Tarifa actual: ${formatCurrency(result.currentRateComparison.currentHourlyRate)} por hora (${result.currentRateComparison.status === "below" ? "por debajo del objetivo" : "alcanza el objetivo"}).`);
+    }
+
+    lines.push("", "Estimación de planeación basada en los datos capturados.");
+    return lines.join("\n");
+  }
+
+  function fillExample() {
+    fields.desiredNetMonthlyIncome.value = "40000";
+    fields.weeklyWorkHours.value = "40";
+    fields.billablePercentage.value = "60";
+    fields.monthlyBusinessExpenses.value = "8000";
+    fields.monthlySavings.value = "3000";
+    fields.taxReserveRate.value = "25";
+    fields.collectionFeeRate.value = "3";
+    fields.weeksOffPerYear.value = "4";
+    fields.billableDayHours.value = "8";
+    fields.currentHourlyRate.value = "600";
+    roundingSelect.value = "50";
+    options.open = true;
+    updateOptionsSummary();
+    updateChips();
+    calculate();
+  }
+
+  function clearAll() {
+    const hasMeaningfulData = fields.desiredNetMonthlyIncome.value.trim() || hasResult;
+    if (hasMeaningfulData && !window.confirm("¿Limpiar los datos capturados?")) return;
+
+    fields.desiredNetMonthlyIncome.value = "";
+    fields.weeklyWorkHours.value = "40";
+    fields.billablePercentage.value = "60";
+    fields.monthlyBusinessExpenses.value = "0";
+    fields.monthlySavings.value = "0";
+    fields.taxReserveRate.value = "0";
+    fields.collectionFeeRate.value = "0";
+    fields.weeksOffPerYear.value = "4";
+    fields.billableDayHours.value = "8";
+    fields.currentHourlyRate.value = "";
+    roundingSelect.value = "50";
+    options.open = false;
+    hasResult = false;
+    clearErrors();
+    updateOptionsSummary();
+    updateChips();
+    setInitialState();
+  }
+
+  function parseRequired(field, parser, errors) {
+    const parsed = parser(fields[field].value);
+    if (!parsed.ok) {
+      errors[field] = parsed.error;
+      return undefined;
+    }
+    return parsed.value;
+  }
+
+  function parseOptional(field, parser, errors) {
+    if (!fields[field].value.trim()) return undefined;
+    return parseRequired(field, parser, errors);
+  }
+
+  function inRange(value, minimum, maximum) {
+    return value === undefined || (value >= minimum && value <= maximum);
+  }
+
+  function clearErrors() {
+    document.querySelectorAll("[data-error-for]").forEach((element) => { element.textContent = ""; });
+    errorSummary.textContent = "";
+    errorSummary.classList.add("hidden");
+  }
+
+  function showErrors(errors) {
+    Object.entries(errors).forEach(([field, error]) => {
+      const element = document.querySelector(`[data-error-for="${field}"]`);
+      if (element) element.textContent = ERROR_MESSAGES[error] ?? ERROR_MESSAGES.invalid;
+    });
+    const count = Object.keys(errors).length;
+    if (count) {
+      errorSummary.textContent = `Revisa ${count === 1 ? "el campo marcado" : `los ${count} campos marcados`} para calcular tu tarifa.`;
+      errorSummary.classList.remove("hidden");
+    }
+  }
+
+  function setInvalidState(errors) {
+    if (hasResult) {
+      staleNotice.classList.remove("hidden");
+      copyButton.classList.add("hidden");
+    } else {
+      resultKicker.textContent = "Revisa los campos";
+      mainResult.textContent = "No se puede calcular";
+      interpretation.textContent = "Corrige los valores marcados para continuar.";
+    }
+    const firstError = Object.keys(errors)[0];
+    if (firstError && fields[firstError]) fields[firstError].focus();
+  }
+
+  function markResultStale() {
+    updateOptionsSummary();
+    updateChips();
+    if (!hasResult) return;
+    staleNotice.classList.remove("hidden");
+    copyButton.classList.add("hidden");
+  }
+
+  function updateOptionsSummary() {
+    const expenses = parseMoneyInput(fields.monthlyBusinessExpenses.value);
+    const taxes = parsePercentInput(fields.taxReserveRate.value);
+    const weeks = parseQuantityInput(fields.weeksOffPerYear.value);
+    const expenseText = expenses.ok && expenses.value > 0 ? `${formatCurrency(expenses.value)} de gastos` : "sin gastos";
+    const taxText = taxes.ok && taxes.value > 0 ? `${formatPercent(taxes.value)} para impuestos` : "sin reserva fiscal";
+    const weeksText = weeks.ok ? `${formatQuantity(weeks.value)} semanas libres` : "semanas libres por revisar";
+    optionsSummary.textContent = `Ajustes: ${expenseText}, ${taxText} y ${weeksText}.`;
+  }
+
+  function updateChips() {
+    const current = fields.billablePercentage.value.trim();
+    billableChips.forEach((chip) => {
+      chip.setAttribute("aria-pressed", String(chip.dataset.billableChip === current));
+    });
+  }
+
+  function setInitialState() {
+    resultKicker.textContent = "Resultado";
+    mainResult.textContent = "Ingresa tu objetivo";
+    interpretation.textContent = "Verás una tarifa práctica y el mínimo exacto necesario para sostenerla.";
+    summaryGrid.innerHTML = `<div class="col-span-2 rounded-lg border border-gray-800 bg-gray-950/70 p-4 text-sm text-gray-400">Captura tu ingreso deseado, horas semanales y porcentaje facturable para comenzar.</div>`;
+    staleNotice.classList.add("hidden");
+    comparisonCard.classList.add("hidden");
+    warningsCard.classList.add("hidden");
+    breakdownDetails.classList.add("hidden");
+    calculationDetails.classList.add("hidden");
+    scenariosSection.classList.add("hidden");
+    copyButton.classList.add("hidden");
+    copyText = "";
+  }
+
+  async function copyResult() {
+    if (!copyText) return;
+    try {
+      await navigator.clipboard.writeText(copyText);
+      copyLabel.textContent = "Copiado";
+      copyStatus.textContent = "Resumen copiado.";
+      window.setTimeout(() => {
+        copyLabel.textContent = "Copiar resumen";
+        copyStatus.textContent = "";
+      }, 2000);
+    } catch {
+      copyStatus.textContent = "No se pudo copiar el resumen.";
+    }
+  }
+
+  function summary(label, value) {
+    return `<div class="rounded-lg border border-gray-800 bg-gray-950/70 p-3"><span class="block text-xs font-semibold uppercase tracking-wide text-gray-500">${escapeHtml(label)}</span><span class="mt-2 block break-words text-base font-semibold text-white">${escapeHtml(value)}</span></div>`;
+  }
+
+  function compactSummary(label, value) {
+    return `<div class="rounded-lg bg-gray-950/50 p-3"><span class="block text-xs uppercase tracking-wide text-gray-400">${escapeHtml(label)}</span><span class="mt-1 block break-words font-semibold text-white">${escapeHtml(value)}</span></div>`;
+  }
+
+  function escapeHtml(value) {
+    return String(value).replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;").replaceAll("'", "&#039;");
+  }
+
+  form.addEventListener("submit", (event) => {
+    event.preventDefault();
+    calculate();
+  });
+  form.addEventListener("input", markResultStale);
+  roundingSelect.addEventListener("change", markResultStale);
+  document.querySelector("[data-example]").addEventListener("click", fillExample);
+  document.querySelector("[data-clear]").addEventListener("click", clearAll);
+  copyButton.addEventListener("click", copyResult);
+  billableChips.forEach((chip) => {
+    chip.addEventListener("click", () => {
+      fields.billablePercentage.value = chip.dataset.billableChip;
+      markResultStale();
+    });
+  });
+  updateOptionsSummary();
+  updateChips();
+</script>

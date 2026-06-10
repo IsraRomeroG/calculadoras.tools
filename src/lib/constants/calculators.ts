@@ -107,6 +107,15 @@ export const CALCULATORS: CalculatorDirectoryItem[] = [
     order: 37.4,
   },
   {
+    id: "calculadora-de-tarifa-por-hora-freelance",
+    title: "Calculadora de tarifa por hora freelance",
+    description:
+      "Calcula una tarifa sostenible según ingreso deseado, gastos, impuestos, comisiones y horas facturables.",
+    href: "/finanzas/calculadora-de-tarifa-por-hora-freelance",
+    categorySlug: "finanzas",
+    order: 37.45,
+  },
+  {
     id: "calculadora-dca-costo-promedio",
     title: "Calculadora de precio promedio (DCA)",
     description:
