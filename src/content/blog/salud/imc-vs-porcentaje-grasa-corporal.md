@@ -10,8 +10,8 @@ tags:
   - composicion corporal
 readTime: "6 min"
 relatedCalculator:
-  label: "Calculadora de IMC"
-  href: "/salud/calculadora-de-imc"
+  label: "Calculadora de grasa corporal"
+  href: "/salud/calculadora-de-porcentaje-de-grasa-corporal"
 ---
 
 El IMC y el porcentaje de grasa corporal intentan responder preguntas relacionadas, pero no miden lo mismo.
@@ -39,6 +39,8 @@ El porcentaje de grasa corporal busca estimar qué proporción del peso total co
 Por ejemplo, si una persona pesa 70 kg y tiene 20% de grasa corporal, la estimación sería que alrededor de 14 kg corresponden a grasa.
 
 Este dato no se obtiene con la fórmula del IMC. Requiere métodos adicionales, como mediciones antropométricas, bioimpedancia, pliegues cutáneos o métodos clínicos más avanzados.
+
+La [calculadora de grasa corporal](/salud/calculadora-de-porcentaje-de-grasa-corporal) utiliza cuello, cintura, altura y cadera cuando corresponde para ofrecer una estimación orientativa por circunferencias.
 
 ## Diferencias clave
 

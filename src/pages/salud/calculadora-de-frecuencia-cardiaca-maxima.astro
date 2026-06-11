@@ -281,9 +281,16 @@ const faqJsonLd = buildFaqJsonLd(faqs);
                   ¿Buscas zonas 1 a 5 o el método Karvonen?
                 </p>
                 <p class="mt-1 text-xs leading-relaxed text-gray-500">
-                  La calculadora especializada en zonas de frecuencia cardíaca
-                  estará disponible próximamente.
+                  Calcula cinco zonas orientativas usando esta edad o una FCM
+                  conocida.
                 </p>
+                <a
+                  class="mt-3 inline-flex min-h-11 items-center rounded-lg border border-amber-400/50 px-3 py-2 text-sm font-semibold text-amber-200 transition hover:bg-amber-400/10 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/40"
+                  href="/salud/calculadora-de-zonas-de-frecuencia-cardiaca"
+                  data-zones-link
+                >
+                  Calcular zonas de frecuencia cardíaca
+                </a>
               </div>
             </div>
 
@@ -480,6 +487,7 @@ const faqJsonLd = buildFaqJsonLd(faqs);
   const tanakaFormula = document.querySelector("[data-tanaka-formula]");
   const classicFormula = document.querySelector("[data-classic-formula]");
   const resultStatus = document.querySelector("[data-result-status]");
+  const zonesLink = document.querySelector("[data-zones-link]");
 
   let currentResult = null;
   let copyResetTimeout;
@@ -517,6 +525,7 @@ const faqJsonLd = buildFaqJsonLd(faqs);
     classicFormula.textContent = `220 - ${result.age}`;
     resultDetails.classList.remove("hidden");
     copyButton.disabled = false;
+    zonesLink.href = `/salud/calculadora-de-zonas-de-frecuencia-cardiaca?edad=${result.age}`;
     resultStatus.textContent = `Tu frecuencia cardíaca máxima estimada es de aproximadamente ${result.tanakaBpm} latidos por minuto.`;
   }
 
@@ -533,6 +542,7 @@ const faqJsonLd = buildFaqJsonLd(faqs);
     classicFormula.textContent = "220 - edad";
     resultDetails.classList.add("hidden");
     copyButton.disabled = true;
+    zonesLink.href = "/salud/calculadora-de-zonas-de-frecuencia-cardiaca";
     copyStatus.textContent = "";
     resultStatus.textContent = "";
     resetCopyLabel();

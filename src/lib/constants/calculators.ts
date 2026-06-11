@@ -152,6 +152,15 @@ export const CALCULATORS: CalculatorDirectoryItem[] = [
     order: 40,
   },
   {
+    id: "calculadora-de-porcentaje-de-grasa-corporal",
+    title: "Calculadora de grasa corporal",
+    description:
+      "Estima tu porcentaje de grasa corporal con circunferencias y revisa la sensibilidad de la medición.",
+    href: "/salud/calculadora-de-porcentaje-de-grasa-corporal",
+    categorySlug: "salud",
+    order: 42,
+  },
+  {
     id: "calculadora-de-calorias-diarias-tdee",
     title: "Calculadora de calorías diarias (TDEE)",
     description:
@@ -204,6 +213,15 @@ export const CALCULATORS: CalculatorDirectoryItem[] = [
     href: "/salud/calculadora-de-frecuencia-cardiaca-maxima",
     categorySlug: "salud",
     order: 59,
+  },
+  {
+    id: "calculadora-de-zonas-de-frecuencia-cardiaca",
+    title: "Calculadora de zonas de frecuencia cardíaca",
+    description:
+      "Calcula cinco zonas orientativas por porcentaje de FCM o mediante reserva cardíaca con Karvonen.",
+    href: "/salud/calculadora-de-zonas-de-frecuencia-cardiaca",
+    categorySlug: "salud",
+    order: 59.5,
   },
   {
     id: "calculadora-de-edad",
