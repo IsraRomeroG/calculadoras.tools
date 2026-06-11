@@ -242,6 +242,15 @@ export const CALCULATORS: CalculatorDirectoryItem[] = [
     order: 59.7,
   },
   {
+    id: "calculadora-1rm-repeticion-maxima",
+    title: "Calculadora de 1RM",
+    description:
+      "Estima tu repetición máxima, compara Epley y Brzycki y calcula cargas prácticas.",
+    href: "/salud/calculadora-1rm-repeticion-maxima",
+    categorySlug: "salud",
+    order: 59.8,
+  },
+  {
     id: "calculadora-de-edad",
     title: "Calculadora de edad",
     description:
