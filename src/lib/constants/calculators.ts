@@ -179,6 +179,15 @@ export const CALCULATORS: CalculatorDirectoryItem[] = [
     order: 50,
   },
   {
+    id: "calculadora-de-proteina-diaria",
+    title: "Calculadora de proteína diaria",
+    description:
+      "Calcula un rango orientativo de proteína según peso, objetivo y tipo de entrenamiento.",
+    href: "/salud/calculadora-de-proteina-diaria",
+    categorySlug: "salud",
+    order: 52,
+  },
+  {
     id: "calculadora-deficit-calorico",
     title: "Calculadora de deficit calorico",
     description:
