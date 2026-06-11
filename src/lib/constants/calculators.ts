@@ -224,6 +224,15 @@ export const CALCULATORS: CalculatorDirectoryItem[] = [
     order: 59.5,
   },
   {
+    id: "calculadora-de-agua-diaria",
+    title: "Calculadora de agua diaria",
+    description:
+      "Estima un rango orientativo de líquidos para beber según peso, ejercicio, sudoración y calor.",
+    href: "/salud/calculadora-de-agua-diaria",
+    categorySlug: "salud",
+    order: 59.7,
+  },
+  {
     id: "calculadora-de-edad",
     title: "Calculadora de edad",
     description:

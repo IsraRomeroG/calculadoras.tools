@@ -1,0 +1,1575 @@
+---
+import BaseLayout from "@layouts/BaseLayout.astro";
+import Container from "@components/layout/Container.astro";
+import PageShell from "@components/layout/PageShell.astro";
+import FaqSection from "@components/shared/FaqSection.astro";
+import PageHero from "@components/shared/PageHero.astro";
+import SectionIntro from "@components/shared/SectionIntro.astro";
+import { buildFaqJsonLd } from "@lib/seo";
+
+const title = "Calculadora de Agua Diaria: Rango Orientativo de Líquidos";
+const description =
+  "Estima un rango orientativo de líquidos para beber según tu peso, ejercicio, sudoración y calor. Consulta litros, botellas y un plan flexible.";
+const canonical = "/salud/calculadora-de-agua-diaria";
+
+const faqs = [
+  {
+    question: "¿El resultado incluye agua de alimentos y otras bebidas?",
+    answer:
+      "La calculadora estima un rango orientativo de líquidos para beber. Otras bebidas y alimentos también aportan agua, pero la herramienta no intenta medir ni restar ese aporte. Por eso no necesitas forzar el extremo alto.",
+  },
+  {
+    question: "¿Debo alcanzar siempre el extremo alto del rango?",
+    answer:
+      "No. El rango representa una referencia flexible, no una meta rígida. La sed, las comidas, el clima, la actividad y las indicaciones médicas pueden cambiar lo apropiado para cada persona.",
+  },
+  {
+    question: "¿Cómo cambia la estimación si hago ejercicio?",
+    answer:
+      "La calculadora amplía el rango según la duración y la sudoración percibida. Es una clasificación aproximada; medir tu tasa de sudor ofrece una referencia más individual.",
+  },
+  {
+    question: "¿Qué ocurre si hago ejercicio con calor?",
+    answer:
+      "El calor y la sudoración pueden representar la misma pérdida de líquido. Para evitar contarla dos veces, la calculadora solo amplía el extremo superior del ajuste de ejercicio.",
+  },
+  {
+    question: "¿Qué pasa si tengo restricción médica de líquidos?",
+    answer:
+      "Una recomendación general podría contradecir tu plan médico. La calculadora no genera cifras cuando indicas restricción de líquidos o enfermedad renal o cardíaca.",
+  },
+  {
+    question: "¿Puedo beber toda el agua pendiente al final del día?",
+    answer:
+      "No conviene intentar alcanzar rápidamente una cifra pendiente. Distribuye los líquidos durante el día y sigue cualquier indicación médica individual.",
+  },
+  {
+    question: "¿Cuántos vasos o botellas son un litro?",
+    answer:
+      "Un litro equivale a cuatro vasos de 250 ml, dos botellas de 500 ml o aproximadamente 1.3 botellas de 750 ml.",
+  },
+];
+
+const faqJsonLd = buildFaqJsonLd(faqs);
+const sweatOptions = [
+  {
+    key: "low",
+    label: "Poca",
+    description: "Ropa casi seca y pocas gotas visibles.",
+  },
+  {
+    key: "moderate",
+    label: "Moderada",
+    description: "Sudor visible y ropa parcialmente húmeda.",
+  },
+  {
+    key: "high",
+    label: "Mucha",
+    description: "Ropa muy húmeda o sudor abundante.",
+  },
+];
+const containerOptions = [
+  { value: 250, label: "Vaso", detail: "250 ml" },
+  { value: 500, label: "Botella", detail: "500 ml" },
+  { value: 750, label: "Botella grande", detail: "750 ml" },
+];
+const planItems = [
+  { key: "morning", label: "Mañana", percentage: "30%" },
+  { key: "midday", label: "Mediodía y comida", percentage: "30%" },
+  { key: "afternoon", label: "Tarde", percentage: "25%" },
+  { key: "evening", label: "Noche", percentage: "15%" },
+];
+---
+
+<BaseLayout title={title} description={description} canonical={canonical}>
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={JSON.stringify(faqJsonLd)} />
+  </Fragment>
+
+  <PageShell>
+    <PageHero
+      title="Calculadora de agua diaria"
+      description="Estima un rango orientativo de líquidos para beber según tu peso y el contexto de hoy."
+      kicker="Salud"
+      collapseBreadcrumbOnMobile
+      containerClass="py-5 md:py-7"
+      breadcrumbs={[
+        { label: "Inicio", href: "/", ariaLabel: "Inicio" },
+        { label: "Salud", href: "/salud", optional: true },
+        { label: "Agua diaria", truncate: true },
+      ]}
+    />
+
+    <Container as="section" class="py-4 md:py-8">
+      <div
+        class="mb-4 rounded-lg border border-sky-400/30 bg-sky-400/10 p-4 text-sm leading-relaxed text-sky-100/85"
+      >
+        Esta herramienta ofrece una referencia educativa para adultos. No es una
+        necesidad exacta ni sustituye una indicación médica de líquidos.
+      </div>
+
+      <section
+        id="daily-water-calculator"
+        class="overflow-hidden rounded-lg border border-gray-700 bg-gray-950 shadow-xl shadow-gray-950/30"
+        aria-labelledby="calculator-heading"
+      >
+        <div
+          class="grid gap-0 xl:grid-cols-[minmax(0,0.92fr)_minmax(22rem,0.78fr)]"
+        >
+          <form class="p-4 sm:p-6" data-calculator-form novalidate>
+            <div>
+              <p
+                class="text-sm font-semibold uppercase tracking-wide text-amber-400"
+              >
+                Referencia para hoy
+              </p>
+              <h2 id="calculator-heading" class="mt-2 text-2xl font-semibold">
+                Describe tu contexto
+              </h2>
+              <p class="mt-2 text-sm leading-relaxed text-gray-400">
+                Mostraremos un rango y el origen de cada ajuste. No selecciones
+                actividad o calor si no corresponden a tu día.
+              </p>
+            </div>
+
+            <fieldset class="mt-6">
+              <legend class="text-sm font-semibold text-gray-200">
+                1. Antes de calcular
+              </legend>
+              <label
+                class="mt-3 flex min-h-12 cursor-pointer items-start gap-3 rounded-lg border border-gray-700 bg-gray-900 p-3"
+                data-wrapper-for="adultConfirmed"
+              >
+                <input
+                  class="mt-1 size-4 shrink-0 border-gray-600 bg-gray-950 text-amber-400 focus:ring-amber-400"
+                  type="checkbox"
+                  data-input="adultConfirmed"
+                  data-field="adultConfirmed"
+                  aria-describedby="daily-water-adult-error"
+                />
+                <span class="text-sm leading-relaxed text-gray-200">
+                  Confirmo que soy adulto.
+                </span>
+              </label>
+              <p
+                id="daily-water-adult-error"
+                class="mt-2 hidden text-sm font-medium text-red-300"
+                data-error-for="adultConfirmed"
+              >
+              </p>
+
+              <p class="mt-5 text-sm font-semibold text-gray-200">
+                Marca cualquier situación que aplique
+              </p>
+              <p class="mt-1 text-xs leading-relaxed text-gray-500">
+                Puedes marcar más de una. La restricción médica y las
+                enfermedades renal o cardíaca bloquean una meta genérica.
+              </p>
+              <div class="mt-3 grid gap-2 sm:grid-cols-2">
+                <label
+                  class="flex min-h-12 cursor-pointer items-start gap-3 rounded-lg border border-gray-800 bg-gray-900/70 p-3"
+                >
+                  <input
+                    class="mt-1 size-4 shrink-0 border-gray-600 bg-gray-950 text-amber-400 focus:ring-amber-400"
+                    type="checkbox"
+                    data-input="fluidRestriction"
+                  />
+                  <span class="text-sm leading-relaxed text-gray-300">
+                    Tengo indicación de limitar o controlar líquidos
+                  </span>
+                </label>
+                <label
+                  class="flex min-h-12 cursor-pointer items-start gap-3 rounded-lg border border-gray-800 bg-gray-900/70 p-3"
+                >
+                  <input
+                    class="mt-1 size-4 shrink-0 border-gray-600 bg-gray-950 text-amber-400 focus:ring-amber-400"
+                    type="checkbox"
+                    data-input="kidneyHeart"
+                  />
+                  <span class="text-sm leading-relaxed text-gray-300">
+                    Tengo enfermedad renal o cardíaca
+                  </span>
+                </label>
+                <label
+                  class="flex min-h-12 cursor-pointer items-start gap-3 rounded-lg border border-gray-800 bg-gray-900/70 p-3"
+                >
+                  <input
+                    class="mt-1 size-4 shrink-0 border-gray-600 bg-gray-950 text-amber-400 focus:ring-amber-400"
+                    type="checkbox"
+                    data-input="pregnant"
+                  />
+                  <span class="text-sm leading-relaxed text-gray-300">
+                    Estoy embarazada
+                  </span>
+                </label>
+                <label
+                  class="flex min-h-12 cursor-pointer items-start gap-3 rounded-lg border border-gray-800 bg-gray-900/70 p-3"
+                >
+                  <input
+                    class="mt-1 size-4 shrink-0 border-gray-600 bg-gray-950 text-amber-400 focus:ring-amber-400"
+                    type="checkbox"
+                    data-input="lactating"
+                  />
+                  <span class="text-sm leading-relaxed text-gray-300">
+                    Estoy en lactancia
+                  </span>
+                </label>
+              </div>
+            </fieldset>
+
+            <fieldset class="mt-7 border-t border-gray-800 pt-6">
+              <legend class="text-sm font-semibold text-gray-200">
+                2. Datos básicos
+              </legend>
+              <div
+                class="mt-3 grid grid-cols-2 gap-2 rounded-lg border border-gray-700 bg-gray-900 p-1"
+                role="group"
+                aria-label="Sistema de unidades"
+              >
+                <button
+                  class="min-h-12 rounded-md bg-amber-400 px-3 py-2 text-sm font-bold text-gray-950 transition focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-300/50"
+                  type="button"
+                  aria-pressed="true"
+                  data-unit-option="metric"
+                >
+                  Kilogramos
+                </button>
+                <button
+                  class="min-h-12 rounded-md px-3 py-2 text-sm font-semibold text-gray-300 transition hover:bg-gray-800 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/40"
+                  type="button"
+                  aria-pressed="false"
+                  data-unit-option="imperial"
+                >
+                  Libras
+                </button>
+              </div>
+            </fieldset>
+
+            <div class="mt-4" data-unit-panel="metric">
+              <label
+                for="daily-water-weight-kg"
+                class="block text-sm font-semibold text-gray-200"
+              >
+                Peso
+              </label>
+              <div
+                class="mt-2 flex rounded-lg border border-gray-700 bg-gray-900 transition focus-within:border-amber-400 focus-within:ring-3 focus-within:ring-amber-400/15"
+                data-wrapper-for="weightKg"
+              >
+                <input
+                  id="daily-water-weight-kg"
+                  class="min-h-12 w-full bg-transparent px-4 text-base text-white outline-none placeholder:text-gray-600"
+                  type="text"
+                  inputmode="decimal"
+                  autocomplete="off"
+                  placeholder="70"
+                  aria-describedby="daily-water-weight-help daily-water-weight-error"
+                  data-input="weightKg"
+                  data-field="weightKg"
+                />
+                <span class="flex items-center px-4 text-sm text-gray-500">
+                  kg
+                </span>
+              </div>
+            </div>
+
+            <div class="mt-4 hidden" data-unit-panel="imperial">
+              <label
+                for="daily-water-weight-lb"
+                class="block text-sm font-semibold text-gray-200"
+              >
+                Peso
+              </label>
+              <div
+                class="mt-2 flex rounded-lg border border-gray-700 bg-gray-900 transition focus-within:border-amber-400 focus-within:ring-3 focus-within:ring-amber-400/15"
+                data-wrapper-for="weightKg"
+              >
+                <input
+                  id="daily-water-weight-lb"
+                  class="min-h-12 w-full bg-transparent px-4 text-base text-white outline-none placeholder:text-gray-600"
+                  type="text"
+                  inputmode="decimal"
+                  autocomplete="off"
+                  placeholder="154"
+                  aria-describedby="daily-water-weight-help daily-water-weight-error"
+                  data-input="weightLb"
+                  data-field="weightKg"
+                />
+                <span class="flex items-center px-4 text-sm text-gray-500">
+                  lb
+                </span>
+              </div>
+            </div>
+            <p
+              id="daily-water-weight-help"
+              class="mt-2 text-xs leading-relaxed text-gray-500"
+            >
+              La estimación está diseñada para pesos entre 30 y 250 kg, o su
+              equivalente.
+            </p>
+            <p
+              id="daily-water-weight-error"
+              class="mt-2 hidden text-sm font-medium text-red-300"
+              data-error-for="weightKg"
+            >
+            </p>
+
+            <fieldset class="mt-7 border-t border-gray-800 pt-6">
+              <legend class="text-sm font-semibold text-gray-200">
+                3. Contexto de hoy
+              </legend>
+
+              <div class="mt-3">
+                <span class="block text-sm font-semibold text-gray-200">
+                  ¿Harás ejercicio hoy?
+                </span>
+                <div
+                  class="mt-2 grid grid-cols-2 gap-2 rounded-lg border border-gray-700 bg-gray-900 p-1"
+                  role="group"
+                  aria-label="Ejercicio de hoy"
+                  data-choice-group="exerciseToday"
+                >
+                  <button
+                    class="min-h-12 rounded-md px-3 py-2 text-sm font-semibold text-gray-300 transition hover:bg-gray-800 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/40"
+                    type="button"
+                    aria-pressed="false"
+                    data-exercise-option="true"
+                  >
+                    Sí
+                  </button>
+                  <button
+                    class="min-h-12 rounded-md px-3 py-2 text-sm font-semibold text-gray-300 transition hover:bg-gray-800 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/40"
+                    type="button"
+                    aria-pressed="false"
+                    data-exercise-option="false"
+                  >
+                    No
+                  </button>
+                </div>
+                <p
+                  class="mt-2 hidden text-sm font-medium text-red-300"
+                  data-error-for="exerciseToday"
+                >
+                </p>
+              </div>
+
+              <div
+                class="mt-5 hidden rounded-lg border border-gray-800 bg-gray-900/50 p-4"
+                data-exercise-panel
+              >
+                <div>
+                  <label
+                    for="daily-water-exercise-minutes"
+                    class="block text-sm font-semibold text-gray-200"
+                  >
+                    Duración aproximada
+                  </label>
+                  <div
+                    class="mt-2 flex rounded-lg border border-gray-700 bg-gray-900 transition focus-within:border-amber-400 focus-within:ring-3 focus-within:ring-amber-400/15"
+                    data-wrapper-for="exerciseMinutes"
+                  >
+                    <input
+                      id="daily-water-exercise-minutes"
+                      class="min-h-12 w-full bg-transparent px-4 text-base text-white outline-none placeholder:text-gray-600"
+                      type="text"
+                      inputmode="numeric"
+                      autocomplete="off"
+                      placeholder="60"
+                      aria-describedby="daily-water-exercise-error"
+                      data-input="exerciseMinutes"
+                      data-field="exerciseMinutes"
+                    />
+                    <span class="flex items-center px-4 text-sm text-gray-500">
+                      min
+                    </span>
+                  </div>
+                  <p
+                    id="daily-water-exercise-error"
+                    class="mt-2 hidden text-sm font-medium text-red-300"
+                    data-error-for="exerciseMinutes"
+                  >
+                  </p>
+                </div>
+
+                <div class="mt-5">
+                  <span class="block text-sm font-semibold text-gray-200">
+                    Sudoración percibida
+                  </span>
+                  <div
+                    class="mt-3 grid gap-2"
+                    data-choice-group="sweatLevel"
+                  >
+                    {
+                      sweatOptions.map((option) => (
+                        <button
+                          class="min-h-16 rounded-lg border border-gray-700 bg-gray-950 p-3 text-left transition hover:border-amber-400/60 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/40"
+                          type="button"
+                          aria-pressed="false"
+                          data-sweat-option={option.key}
+                        >
+                          <span class="block text-sm font-semibold text-white">
+                            {option.label}
+                          </span>
+                          <span class="mt-1 block text-xs leading-relaxed text-gray-500">
+                            {option.description}
+                          </span>
+                        </button>
+                      ))
+                    }
+                  </div>
+                  <p
+                    class="mt-2 hidden text-sm font-medium text-red-300"
+                    data-error-for="sweatLevel"
+                  >
+                  </p>
+                </div>
+              </div>
+
+              <div class="mt-5">
+                <span class="block text-sm font-semibold text-gray-200">
+                  ¿Tendrás exposición prolongada al calor?
+                </span>
+                <p class="mt-1 text-xs leading-relaxed text-gray-500">
+                  Varias horas en ambiente caluroso, especialmente al aire libre
+                  o realizando actividad.
+                </p>
+                <div
+                  class="mt-2 grid grid-cols-2 gap-2 rounded-lg border border-gray-700 bg-gray-900 p-1"
+                  role="group"
+                  aria-label="Exposición prolongada al calor"
+                  data-choice-group="heatExposure"
+                >
+                  <button
+                    class="min-h-12 rounded-md px-3 py-2 text-sm font-semibold text-gray-300 transition hover:bg-gray-800 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/40"
+                    type="button"
+                    aria-pressed="false"
+                    data-heat-option="true"
+                  >
+                    Sí
+                  </button>
+                  <button
+                    class="min-h-12 rounded-md px-3 py-2 text-sm font-semibold text-gray-300 transition hover:bg-gray-800 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/40"
+                    type="button"
+                    aria-pressed="false"
+                    data-heat-option="false"
+                  >
+                    No
+                  </button>
+                </div>
+                <p
+                  class="mt-2 hidden text-sm font-medium text-red-300"
+                  data-error-for="heatExposure"
+                >
+                </p>
+              </div>
+            </fieldset>
+
+            <fieldset class="mt-7 border-t border-gray-800 pt-6">
+              <legend class="text-sm font-semibold text-gray-200">
+                4. Tu recipiente habitual
+              </legend>
+              <p class="mt-2 text-xs leading-relaxed text-gray-500">
+                Solo cambia la equivalencia en vasos o botellas, no el rango.
+              </p>
+              <div class="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4">
+                {
+                  containerOptions.map((option) => (
+                    <button
+                      class:list={[
+                        "min-h-16 rounded-lg border p-3 text-left transition focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/40",
+                        option.value === 500
+                          ? "border-amber-400 bg-amber-400/10"
+                          : "border-gray-700 bg-gray-900 hover:border-amber-400/60",
+                      ]}
+                      type="button"
+                      aria-pressed={option.value === 500 ? "true" : "false"}
+                      data-container-option={option.value}
+                    >
+                      <span class="block text-sm font-semibold text-white">
+                        {option.label}
+                      </span>
+                      <span class="mt-1 block text-xs text-gray-500">
+                        {option.detail}
+                      </span>
+                    </button>
+                  ))
+                }
+                <button
+                  class="min-h-16 rounded-lg border border-gray-700 bg-gray-900 p-3 text-left transition hover:border-amber-400/60 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/40"
+                  type="button"
+                  aria-pressed="false"
+                  data-container-option="custom"
+                >
+                  <span class="block text-sm font-semibold text-white">
+                    Personalizado
+                  </span>
+                  <span class="mt-1 block text-xs text-gray-500">
+                    100 a 2,000 ml
+                  </span>
+                </button>
+              </div>
+
+              <div class="mt-4 hidden" data-custom-container-panel>
+                <label
+                  for="daily-water-container-ml"
+                  class="block text-sm font-semibold text-gray-200"
+                >
+                  Tamaño personalizado
+                </label>
+                <div
+                  class="mt-2 flex rounded-lg border border-gray-700 bg-gray-900 transition focus-within:border-amber-400 focus-within:ring-3 focus-within:ring-amber-400/15"
+                  data-wrapper-for="containerMl"
+                >
+                  <input
+                    id="daily-water-container-ml"
+                    class="min-h-12 w-full bg-transparent px-4 text-base text-white outline-none placeholder:text-gray-600"
+                    type="text"
+                    inputmode="numeric"
+                    autocomplete="off"
+                    placeholder="600"
+                    aria-describedby="daily-water-container-error"
+                    data-input="containerMl"
+                    data-field="containerMl"
+                  />
+                  <span class="flex items-center px-4 text-sm text-gray-500">
+                    ml
+                  </span>
+                </div>
+              </div>
+              <p
+                id="daily-water-container-error"
+                class="mt-2 hidden text-sm font-medium text-red-300"
+                data-error-for="containerMl"
+              >
+              </p>
+            </fieldset>
+
+            <p
+              class="mt-5 hidden rounded-lg border border-red-400/30 bg-red-400/10 p-3 text-sm font-medium leading-relaxed text-red-200"
+              role="alert"
+              data-calculation-error
+            >
+            </p>
+
+            <button
+              class="mt-6 min-h-12 w-full rounded-lg bg-amber-400 px-5 py-3 text-base font-bold text-gray-950 transition hover:bg-amber-300 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-300/50"
+              type="submit"
+            >
+              Calcular rango orientativo
+            </button>
+
+            <div class="mt-3 grid grid-cols-2 gap-3">
+              <button
+                class="min-h-12 rounded-lg border border-gray-700 bg-gray-900 px-3 py-3 text-sm font-semibold text-gray-200 transition hover:border-amber-400/60 hover:text-amber-200 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/30"
+                type="button"
+                data-fill-example
+              >
+                Probar ejemplo
+              </button>
+              <button
+                class="min-h-12 rounded-lg border border-gray-700 bg-gray-900 px-3 py-3 text-sm font-semibold text-gray-200 transition hover:border-gray-500 hover:bg-gray-800 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/30"
+                type="button"
+                data-clear-button
+              >
+                Limpiar
+              </button>
+            </div>
+          </form>
+
+          <section
+            class="border-t border-gray-800 bg-gray-900/60 p-4 sm:p-6 xl:border-l xl:border-t-0"
+            aria-labelledby="result-heading"
+            data-result-region
+          >
+            <p class="text-sm font-semibold uppercase tracking-wide text-sky-300">
+              Resultado
+            </p>
+            <h2
+              id="result-heading"
+              class="mt-2 text-xl font-semibold text-white outline-none"
+              tabindex="-1"
+              data-result-heading
+            >
+              Tu rango aparecerá aquí
+            </h2>
+
+            <div
+              class="mt-4 rounded-lg border border-gray-700 bg-gray-950 p-5"
+              data-result-placeholder
+            >
+              <p
+                class="text-sm leading-relaxed text-gray-400"
+                data-placeholder-text
+              >
+                Completa el formulario para ver un rango, sus ajustes y una
+                equivalencia aproximada en tu recipiente habitual.
+              </p>
+              <div class="mt-4 grid grid-cols-3 gap-2" aria-hidden="true">
+                <div class="h-16 rounded-lg bg-sky-400/10"></div>
+                <div class="h-16 rounded-lg bg-amber-400/10"></div>
+                <div class="h-16 rounded-lg bg-emerald-400/10"></div>
+              </div>
+            </div>
+
+            <div class="mt-4 hidden" data-result-content>
+              <div
+                class="rounded-lg border border-sky-400/35 bg-sky-400/10 p-5"
+              >
+                <p class="text-xs font-bold uppercase tracking-wide text-sky-200">
+                  Rango orientativo de líquidos para beber
+                </p>
+                <p
+                  class="mt-2 text-4xl font-bold tracking-tight text-white"
+                  data-main-result
+                >
+                --
+                </p>
+                <p class="mt-2 text-sm font-semibold text-sky-100" data-ml-result>
+                --
+                </p>
+                <p class="mt-3 text-xs leading-relaxed text-sky-100/75">
+                  Otras bebidas y alimentos también aportan agua; no necesitas
+                  forzar el extremo alto.
+                </p>
+              </div>
+
+              <div
+                class="mt-4 rounded-lg border border-amber-400/30 bg-amber-400/10 p-4"
+              >
+                <p class="text-xs font-bold uppercase tracking-wide text-amber-200">
+                  Equivalencia aproximada
+                </p>
+                <p class="mt-2 text-2xl font-bold text-white" data-container-result>
+                  --
+                </p>
+                <p class="mt-1 text-xs text-amber-100/75" data-container-detail>
+                  --
+                </p>
+              </div>
+
+              <div class="mt-5">
+                <h3 class="text-sm font-semibold text-white">
+                  Cómo se construyó el rango
+                </h3>
+                <div class="mt-3 grid gap-2">
+                  <article
+                    class="rounded-lg border border-gray-700 bg-gray-950 p-3"
+                  >
+                    <div class="flex items-start justify-between gap-3">
+                      <div>
+                        <p class="text-sm font-semibold text-white">
+                          Base por peso
+                        </p>
+                        <p class="mt-1 text-xs text-gray-500">
+                          Referencia editorial de 30 a 35 ml por kg.
+                        </p>
+                      </div>
+                      <p class="shrink-0 text-sm font-bold text-sky-200" data-base-result>
+                        --
+                      </p>
+                    </div>
+                  </article>
+                  <article
+                    class="hidden rounded-lg border border-gray-700 bg-gray-950 p-3"
+                    data-exercise-breakdown
+                  >
+                    <div class="flex items-start justify-between gap-3">
+                      <div>
+                        <p class="text-sm font-semibold text-white">
+                          Ajuste por ejercicio
+                        </p>
+                        <p class="mt-1 text-xs text-gray-500" data-exercise-detail>
+                          --
+                        </p>
+                      </div>
+                      <p class="shrink-0 text-sm font-bold text-amber-200" data-exercise-result>
+                        --
+                      </p>
+                    </div>
+                  </article>
+                  <article
+                    class="hidden rounded-lg border border-gray-700 bg-gray-950 p-3"
+                    data-heat-breakdown
+                  >
+                    <div class="flex items-start justify-between gap-3">
+                      <div>
+                        <p class="text-sm font-semibold text-white">
+                          Ajuste por calor
+                        </p>
+                        <p class="mt-1 text-xs text-gray-500" data-heat-detail>
+                          --
+                        </p>
+                      </div>
+                      <p class="shrink-0 text-sm font-bold text-orange-200" data-heat-result>
+                        --
+                      </p>
+                    </div>
+                  </article>
+                </div>
+              </div>
+
+              <div class="mt-5">
+                <h3 class="text-sm font-semibold text-white">
+                  Ejemplo de distribución flexible
+                </h3>
+                <p class="mt-1 text-xs leading-relaxed text-gray-500">
+                  Usa el punto medio solo para visualizar una distribución; no
+                  es una meta que debas completar.
+                </p>
+                <div class="mt-3 grid grid-cols-2 gap-2">
+                  {
+                    planItems.map((item) => (
+                      <article class="rounded-lg border border-gray-700 bg-gray-950 p-3">
+                        <p class="text-xs font-semibold text-gray-500">
+                          {item.label} · {item.percentage}
+                        </p>
+                        <p
+                          class="mt-1 text-lg font-bold text-white"
+                          data-plan-amount={item.key}
+                        >
+                          --
+                        </p>
+                      </article>
+                    ))
+                  }
+                </div>
+                <p
+                  class="mt-3 hidden text-xs leading-relaxed text-amber-200/80"
+                  data-exercise-plan-note
+                >
+                  Distribuye el ajuste de ejercicio alrededor de la actividad y
+                  evita beber grandes cantidades de golpe.
+                </p>
+              </div>
+
+              <div
+                class="mt-5 hidden rounded-lg border border-amber-400/30 bg-amber-400/10 p-4"
+                data-warning-panel
+              >
+                <p class="text-sm font-semibold text-amber-100">
+                  Considera también
+                </p>
+                <ul
+                  class="mt-2 grid gap-2 text-xs leading-relaxed text-amber-100/80"
+                  data-warning-list
+                >
+                </ul>
+              </div>
+
+              <div
+                class="mt-5 rounded-lg border border-gray-700 bg-gray-950 p-4"
+              >
+                <p class="text-sm font-semibold text-white">
+                  Orientación práctica
+                </p>
+                <ul
+                  class="mt-2 grid gap-2 text-xs leading-relaxed text-gray-400"
+                >
+                  <li>Distribuye los líquidos durante el día.</li>
+                  <li>
+                    Ajusta según sed, comidas, actividad, calor e indicaciones
+                    médicas.
+                  </li>
+                  <li>
+                    No intentes completar rápidamente una cantidad pendiente al
+                    final del día.
+                  </li>
+                </ul>
+              </div>
+
+              <button
+                class="mt-5 min-h-12 w-full rounded-lg border border-amber-400/50 px-4 py-3 text-sm font-semibold text-amber-200 transition hover:bg-amber-400/10 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/40"
+                type="button"
+                data-copy-button
+              >
+                <span data-copy-label>Copiar resultado</span>
+              </button>
+              <p class="sr-only" aria-live="polite" data-copy-status></p>
+            </div>
+
+            <p class="sr-only" aria-live="polite" data-result-status></p>
+          </section>
+        </div>
+      </section>
+    </Container>
+
+    <Container as="section" class="py-8 md:py-10">
+      <SectionIntro
+        title="Cómo interpretar tu resultado"
+        description="El rango sirve como punto de partida para conversar con tu propio contexto, no como una cuota exacta."
+      />
+      <div class="grid gap-4 md:grid-cols-3">
+        <article class="rounded-lg border border-gray-700 bg-gray-950 p-5">
+          <p class="text-sm font-semibold text-sky-300">Rango flexible</p>
+          <h3 class="mt-2 text-lg font-semibold text-white">
+            No persigas una cifra rígida
+          </h3>
+          <p class="mt-2 text-sm leading-relaxed text-gray-400">
+            La sed, las comidas, el clima y la actividad cambian de un día a
+            otro. El extremo alto no es una meta obligatoria.
+          </p>
+        </article>
+        <article class="rounded-lg border border-gray-700 bg-gray-950 p-5">
+          <p class="text-sm font-semibold text-amber-300">Recipientes</p>
+          <h3 class="mt-2 text-lg font-semibold text-white">
+            Convierte el rango a algo cotidiano
+          </h3>
+          <p class="mt-2 text-sm leading-relaxed text-gray-400">
+            Los vasos y botellas ayudan a visualizar el resultado, pero la
+            equivalencia sigue siendo aproximada.
+          </p>
+        </article>
+        <article class="rounded-lg border border-gray-700 bg-gray-950 p-5">
+          <p class="text-sm font-semibold text-emerald-300">Seguridad</p>
+          <h3 class="mt-2 text-lg font-semibold text-white">
+            Distribuye, no compenses de golpe
+          </h3>
+          <p class="mt-2 text-sm leading-relaxed text-gray-400">
+            Beber grandes cantidades rápidamente no es una forma segura de
+            alcanzar una cifra pendiente.
+          </p>
+        </article>
+      </div>
+    </Container>
+
+    <Container as="section" class="py-8 md:py-10">
+      <SectionIntro
+        title="Metodología y límites"
+        description="La calculadora usa una heurística editorial transparente y conserva un rango amplio para reflejar variabilidad."
+      />
+      <div class="grid gap-4 lg:grid-cols-2">
+        <article class="rounded-lg border border-gray-700 bg-gray-950 p-5">
+          <h3 class="text-lg font-semibold text-white">Base y contexto</h3>
+          <p class="mt-3 text-sm leading-relaxed text-gray-400">
+            La base usa de 30 a 35 ml por kg. Si hay ejercicio, se amplía según
+            duración y sudoración percibida. El calor sin ejercicio añade otro
+            rango editorial.
+          </p>
+          <div
+            class="mt-4 rounded-lg border border-gray-800 bg-gray-900 p-4 font-mono text-xs leading-relaxed text-gray-300"
+          >
+            base = peso × 30 a 35 ml<br />
+            total = base + ejercicio + calor
+          </div>
+        </article>
+        <article class="rounded-lg border border-gray-700 bg-gray-950 p-5">
+          <h3 class="text-lg font-semibold text-white">
+            Evitar contar dos veces
+          </h3>
+          <p class="mt-3 text-sm leading-relaxed text-gray-400">
+            Durante ejercicio con calor, la sudoración y el ambiente pueden
+            representar la misma pérdida. Por eso solo se amplía el extremo
+            superior del ajuste de ejercicio.
+          </p>
+          <p class="mt-3 text-sm leading-relaxed text-gray-400">
+            Una tasa de sudor medida de forma individual es más útil que estas
+            categorías percibidas.
+          </p>
+        </article>
+      </div>
+    </Container>
+
+    <Container as="section" class="py-8 md:py-10">
+      <SectionIntro
+        title="Fuentes y revisión editorial"
+        description="Estas fuentes explican por qué las necesidades varían y por qué la hidratación durante ejercicio debe individualizarse."
+      />
+      <div class="grid gap-3 sm:grid-cols-2">
+        <a
+          class="rounded-lg border border-gray-700 bg-gray-950 p-4 text-sm font-semibold text-amber-300 transition hover:border-amber-400/60 hover:text-amber-200"
+          href="https://www.nationalacademies.org/read/10925/chapter/6"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          National Academies: Dietary Reference Intakes for Water
+        </a>
+        <a
+          class="rounded-lg border border-gray-700 bg-gray-950 p-4 text-sm font-semibold text-amber-300 transition hover:border-amber-400/60 hover:text-amber-200"
+          href="https://www.cdc.gov/healthy-weight-growth/water-healthy-drinks/index.html"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          CDC: About Water and Healthier Drinks
+        </a>
+        <a
+          class="rounded-lg border border-gray-700 bg-gray-950 p-4 text-sm font-semibold text-amber-300 transition hover:border-amber-400/60 hover:text-amber-200"
+          href="https://www.cdc.gov/niosh/heat-stress/recommendations/index.html"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          CDC/NIOSH: Heat Stress Recommendations
+        </a>
+        <a
+          class="rounded-lg border border-gray-700 bg-gray-950 p-4 text-sm font-semibold text-amber-300 transition hover:border-amber-400/60 hover:text-amber-200"
+          href="https://pubmed.ncbi.nlm.nih.gov/17277604/"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          ACSM: Exercise and Fluid Replacement
+        </a>
+      </div>
+    </Container>
+
+    <FaqSection faqs={faqs} />
+  </PageShell>
+</BaseLayout>
+
+<script>
+  import {
+    buildDailyWaterCopyText,
+    calculateDailyWaterResult,
+    convertKgToLb,
+    convertLbToKg,
+    DailyWaterCalculationError,
+    formatContainerRange,
+    formatDailyWaterMlRange,
+    formatDailyWaterRange,
+    formatMl,
+    getSweatLevelLabel,
+    parseHealthInput,
+    roundTo,
+    validateDailyWaterInput,
+  } from "@lib/calculators/salud/calculadora-de-agua-diaria/dailyWater";
+
+  const form = document.querySelector("[data-calculator-form]");
+  const unitButtons = document.querySelectorAll("[data-unit-option]");
+  const unitPanels = document.querySelectorAll("[data-unit-panel]");
+  const exerciseButtons = document.querySelectorAll("[data-exercise-option]");
+  const heatButtons = document.querySelectorAll("[data-heat-option]");
+  const sweatButtons = document.querySelectorAll("[data-sweat-option]");
+  const containerButtons = document.querySelectorAll("[data-container-option]");
+  const exercisePanel = document.querySelector("[data-exercise-panel]");
+  const customContainerPanel = document.querySelector(
+    "[data-custom-container-panel]",
+  );
+  const calculationError = document.querySelector("[data-calculation-error]");
+  const resultHeading = document.querySelector("[data-result-heading]");
+  const resultPlaceholder = document.querySelector("[data-result-placeholder]");
+  const placeholderText = document.querySelector("[data-placeholder-text]");
+  const resultContent = document.querySelector("[data-result-content]");
+  const resultStatus = document.querySelector("[data-result-status]");
+  const mainResult = document.querySelector("[data-main-result]");
+  const mlResult = document.querySelector("[data-ml-result]");
+  const containerResult = document.querySelector("[data-container-result]");
+  const containerDetail = document.querySelector("[data-container-detail]");
+  const baseResult = document.querySelector("[data-base-result]");
+  const exerciseBreakdown = document.querySelector("[data-exercise-breakdown]");
+  const exerciseDetail = document.querySelector("[data-exercise-detail]");
+  const exerciseResult = document.querySelector("[data-exercise-result]");
+  const heatBreakdown = document.querySelector("[data-heat-breakdown]");
+  const heatDetail = document.querySelector("[data-heat-detail]");
+  const heatResult = document.querySelector("[data-heat-result]");
+  const exercisePlanNote = document.querySelector("[data-exercise-plan-note]");
+  const warningPanel = document.querySelector("[data-warning-panel]");
+  const warningList = document.querySelector("[data-warning-list]");
+  const fillExampleButton = document.querySelector("[data-fill-example]");
+  const clearButton = document.querySelector("[data-clear-button]");
+  const copyButton = document.querySelector("[data-copy-button]");
+  const copyLabel = document.querySelector("[data-copy-label]");
+  const copyStatus = document.querySelector("[data-copy-status]");
+  const inputs = {
+    adultConfirmed: document.querySelector('[data-input="adultConfirmed"]'),
+    fluidRestriction: document.querySelector('[data-input="fluidRestriction"]'),
+    kidneyHeart: document.querySelector('[data-input="kidneyHeart"]'),
+    pregnant: document.querySelector('[data-input="pregnant"]'),
+    lactating: document.querySelector('[data-input="lactating"]'),
+    weightKg: document.querySelector('[data-input="weightKg"]'),
+    weightLb: document.querySelector('[data-input="weightLb"]'),
+    exerciseMinutes: document.querySelector('[data-input="exerciseMinutes"]'),
+    containerMl: document.querySelector('[data-input="containerMl"]'),
+  };
+
+  const parseMessages = {
+    required: "Ingresa un valor.",
+    invalid: "Ingresa un número válido.",
+    negative: "Ingresa un valor positivo.",
+    too_many_decimals: "Usa como máximo dos decimales.",
+  };
+  const validationMessages = {
+    adultConfirmed: {
+      required: "Confirma que eres adulto para usar esta calculadora.",
+    },
+    weightKg: {
+      required: "Ingresa tu peso.",
+      out_of_range: "El peso debe estar entre 30 y 250 kg, o su equivalente.",
+    },
+    exerciseToday: {
+      required: "Indica si harás ejercicio hoy.",
+    },
+    exerciseMinutes: {
+      required: "Ingresa la duración aproximada.",
+      out_of_range: "La duración debe estar entre 1 y 300 minutos.",
+    },
+    sweatLevel: {
+      required: "Selecciona la sudoración percibida.",
+    },
+    heatExposure: {
+      required: "Indica si tendrás exposición prolongada al calor.",
+    },
+    containerMl: {
+      required: "Ingresa el tamaño de tu recipiente.",
+      out_of_range: "El recipiente debe estar entre 100 y 2,000 ml.",
+    },
+  };
+  const blockerMessages = {
+    not_adult:
+      "Esta calculadora está diseñada para adultos. Las necesidades de menores deben revisarse con una fuente o profesional apropiado.",
+    fluid_restriction:
+      "Una recomendación general podría contradecir tu indicación médica. Sigue el límite o plan indicado por tu profesional de salud.",
+    kidney_or_heart_condition:
+      "Una meta genérica puede no ser apropiada con enfermedad renal o cardíaca. Sigue la orientación de tu profesional de salud.",
+  };
+  const warningMessages = {
+    pregnancy:
+      "El embarazo puede cambiar las necesidades. Esta versión no aplica un ajuste específico.",
+    lactation:
+      "La lactancia puede cambiar las necesidades. Esta versión no aplica un ajuste específico.",
+    high_variability:
+      "El ajuste contextual es amplio frente a la base. Considera una estrategia individual o una medición de tasa de sudor.",
+    review_high_total:
+      "El resultado supera el umbral de revisión de esta herramienta.",
+  };
+
+  let currentUnit = "metric";
+  let exerciseToday;
+  let heatExposure;
+  let sweatLevel;
+  let selectedContainer = 500;
+  let usesCustomContainer = false;
+  let currentResult = null;
+  let copyResetTimeout = 0;
+
+  function updateChoiceButtons(buttons, dataKey, selectedValue) {
+    buttons.forEach((button) => {
+      const isSelected = String(button.dataset[dataKey]) === String(selectedValue);
+      const usesCardStyle = dataKey === "sweatOption";
+      button.setAttribute("aria-pressed", String(isSelected));
+      button.classList.toggle("border-amber-400", isSelected);
+      button.classList.toggle("border-gray-700", usesCardStyle && !isSelected);
+      button.classList.toggle("bg-amber-400/10", isSelected && usesCardStyle);
+      button.classList.toggle("bg-gray-950", usesCardStyle && !isSelected);
+      button.classList.toggle("bg-amber-400", isSelected && !usesCardStyle);
+      button.classList.toggle("text-gray-950", isSelected && !usesCardStyle);
+      button.classList.toggle("font-bold", isSelected);
+      button.classList.toggle("text-gray-300", !isSelected);
+      button.classList.toggle("hover:bg-gray-800", !isSelected);
+    });
+  }
+
+  function updateControls() {
+    updateChoiceButtons(unitButtons, "unitOption", currentUnit);
+    updateChoiceButtons(exerciseButtons, "exerciseOption", exerciseToday);
+    updateChoiceButtons(heatButtons, "heatOption", heatExposure);
+    updateChoiceButtons(sweatButtons, "sweatOption", sweatLevel);
+
+    unitPanels.forEach((panel) => {
+      panel.classList.toggle("hidden", panel.dataset.unitPanel !== currentUnit);
+    });
+    exercisePanel.classList.toggle("hidden", exerciseToday !== true);
+    customContainerPanel.classList.toggle("hidden", !usesCustomContainer);
+
+    containerButtons.forEach((button) => {
+      const value = button.dataset.containerOption;
+      const isSelected = usesCustomContainer
+        ? value === "custom"
+        : Number(value) === selectedContainer;
+      button.setAttribute("aria-pressed", String(isSelected));
+      button.classList.toggle("border-amber-400", isSelected);
+      button.classList.toggle("bg-amber-400/10", isSelected);
+      button.classList.toggle("border-gray-700", !isSelected);
+      button.classList.toggle("bg-gray-900", !isSelected);
+    });
+  }
+
+  function clearErrors() {
+    calculationError.textContent = "";
+    calculationError.classList.add("hidden");
+
+    document.querySelectorAll("[data-error-for]").forEach((element) => {
+      element.textContent = "";
+      element.classList.add("hidden");
+    });
+    document.querySelectorAll("[data-wrapper-for], [data-choice-group]").forEach((element) => {
+      element.classList.remove("border-red-400");
+    });
+    document.querySelectorAll("[data-field]").forEach((input) => {
+      input.removeAttribute("aria-invalid");
+    });
+  }
+
+  function clearFieldError(field) {
+    document.querySelectorAll(`[data-error-for="${field}"]`).forEach((element) => {
+      element.textContent = "";
+      element.classList.add("hidden");
+    });
+    document.querySelectorAll(`[data-wrapper-for="${field}"], [data-choice-group="${field}"]`).forEach((element) => {
+      element.classList.remove("border-red-400");
+    });
+    document.querySelectorAll(`[data-field="${field}"]`).forEach((input) => {
+      input.removeAttribute("aria-invalid");
+    });
+  }
+
+  function showFieldError(field, message) {
+    document.querySelectorAll(`[data-error-for="${field}"]`).forEach((element) => {
+      element.textContent = message;
+      element.classList.remove("hidden");
+    });
+    document.querySelectorAll(`[data-wrapper-for="${field}"], [data-choice-group="${field}"]`).forEach((element) => {
+      element.classList.add("border-red-400");
+    });
+    document.querySelectorAll(`[data-field="${field}"]`).forEach((input) => {
+      input.setAttribute("aria-invalid", "true");
+    });
+  }
+
+  function showCalculationError(message) {
+    calculationError.textContent = message;
+    calculationError.classList.remove("hidden");
+  }
+
+  function parseField(rawValue, field, options = {}) {
+    const parsed = parseHealthInput(rawValue, options);
+
+    if (!parsed.ok) {
+      showFieldError(field, parseMessages[parsed.error]);
+      return null;
+    }
+
+    return parsed.value;
+  }
+
+  function readInput() {
+    const weightRaw =
+      currentUnit === "metric" ? inputs.weightKg.value : inputs.weightLb.value;
+    const parsedWeight = parseField(weightRaw, "weightKg");
+    const weightKg =
+      parsedWeight === null
+        ? null
+        : currentUnit === "metric"
+          ? parsedWeight
+          : convertLbToKg(parsedWeight);
+    const exerciseMinutes =
+      exerciseToday === true
+        ? parseField(inputs.exerciseMinutes.value, "exerciseMinutes", {
+            maxDecimals: 0,
+          })
+        : undefined;
+    const containerMl = usesCustomContainer
+      ? parseField(inputs.containerMl.value, "containerMl", { maxDecimals: 0 })
+      : selectedContainer;
+
+    if (
+      weightKg === null ||
+      exerciseMinutes === null ||
+      containerMl === null
+    ) {
+      return null;
+    }
+
+    const input = {
+      adultConfirmed: inputs.adultConfirmed.checked,
+      hasFluidRestriction: inputs.fluidRestriction.checked,
+      hasKidneyOrHeartCondition: inputs.kidneyHeart.checked,
+      isPregnant: inputs.pregnant.checked,
+      isLactating: inputs.lactating.checked,
+      weightKg,
+      exerciseToday,
+      exerciseMinutes,
+      sweatLevel,
+      heatExposure,
+      containerMl,
+    };
+    const validation = validateDailyWaterInput(input);
+
+    Object.entries(validation.errors).forEach(([field, code]) => {
+      const message =
+        validationMessages[field]?.[code] ?? "Revisa este valor.";
+      showFieldError(field, message);
+    });
+
+    if (validation.blockers.length > 0) {
+      renderBlocked(validation.blockers);
+      return null;
+    }
+
+    return validation.isValid ? input : null;
+  }
+
+  function calculateAndRender({ focusResult = true } = {}) {
+    clearErrors();
+    const immediateBlockers = getImmediateBlockers();
+
+    if (immediateBlockers.length > 0) {
+      if (!inputs.adultConfirmed.checked) {
+        showFieldError(
+          "adultConfirmed",
+          validationMessages.adultConfirmed.required,
+        );
+      }
+      renderBlocked(immediateBlockers, focusResult);
+      return;
+    }
+
+    const input = readInput();
+
+    if (!input) {
+      if (!resultHeading.textContent.includes("No generamos")) {
+        setInvalidResult("Revisa los campos marcados para calcular.");
+      }
+      focusFirstError();
+      return;
+    }
+
+    try {
+      const result = calculateDailyWaterResult(input);
+
+      if (result.requiresReview) {
+        renderReview(result, focusResult);
+      } else {
+        renderResult(result, focusResult);
+      }
+    } catch (error) {
+      if (error instanceof DailyWaterCalculationError) {
+        setInvalidResult("Revisa los datos antes de calcular.");
+      } else {
+        setInvalidResult("No se pudo calcular el rango. Revisa los datos.");
+      }
+      showCalculationError("No se pudo calcular el rango. Revisa los datos.");
+    }
+  }
+
+  function getImmediateBlockers() {
+    const blockers = [];
+
+    if (!inputs.adultConfirmed.checked) {
+      blockers.push("not_adult");
+    }
+    if (inputs.fluidRestriction.checked) {
+      blockers.push("fluid_restriction");
+    }
+    if (inputs.kidneyHeart.checked) {
+      blockers.push("kidney_or_heart_condition");
+    }
+
+    return blockers;
+  }
+
+  function renderBlocked(blockers, focusResult = true) {
+    currentResult = null;
+    resultHeading.textContent = "No generamos una meta genérica";
+    placeholderText.textContent = blockers
+      .map((blocker) => blockerMessages[blocker])
+      .join(" ");
+    resultPlaceholder.classList.remove("hidden");
+    resultContent.classList.add("hidden");
+    resultStatus.textContent = "Cálculo bloqueado por una condición de seguridad.";
+    copyStatus.textContent = "";
+    resetCopyLabel();
+    focusResultHeading(focusResult);
+  }
+
+  function renderReview(result, focusResult = true) {
+    currentResult = null;
+    resultHeading.textContent = "Revisa los datos antes de usar una referencia";
+    placeholderText.textContent =
+      "El extremo alto supera 6 L al día. Esta herramienta no lo mostrará como una meta normal. Revisa peso, duración, sudoración y calor, y considera orientación individual.";
+    resultPlaceholder.classList.remove("hidden");
+    resultContent.classList.add("hidden");
+    resultStatus.textContent =
+      "El resultado superó el umbral de revisión de esta herramienta.";
+    copyStatus.textContent = "";
+    resetCopyLabel();
+    focusResultHeading(focusResult);
+  }
+
+  function renderResult(result, focusResult) {
+    currentResult = result;
+    resultHeading.textContent = "Tu rango orientativo para hoy";
+    resultPlaceholder.classList.add("hidden");
+    resultContent.classList.remove("hidden");
+    mainResult.textContent = formatDailyWaterRange(result.total);
+    mlResult.textContent = formatDailyWaterMlRange(result.total);
+    containerResult.textContent = `${formatContainerRange(result.containerRange)} recipientes`;
+    containerDetail.textContent = `Cada recipiente: ${formatMl(result.input.containerMl)}`;
+    baseResult.textContent = formatDailyWaterRange(result.base);
+
+    const hasExercise = result.input.exerciseToday;
+    exerciseBreakdown.classList.toggle("hidden", !hasExercise);
+    exercisePlanNote.classList.toggle("hidden", !hasExercise);
+
+    if (hasExercise) {
+      exerciseResult.textContent = formatDailyWaterRange(
+        result.exerciseAdjustment,
+      );
+      exerciseDetail.textContent =
+        `${result.input.exerciseMinutes} min · sudoración ${getSweatLevelLabel(result.input.sweatLevel).toLowerCase()}`;
+    }
+
+    const hasHeat = result.input.heatExposure;
+    heatBreakdown.classList.toggle("hidden", !hasHeat);
+
+    if (hasHeat) {
+      heatResult.textContent = formatDailyWaterRange(result.heatAdjustment);
+      heatDetail.textContent = hasExercise
+        ? "Solo amplía el extremo alto para evitar contar dos veces la sudoración."
+        : "Exposición prolongada al calor sin ejercicio.";
+    }
+
+    result.plan.forEach((item) => {
+      const element = document.querySelector(
+        `[data-plan-amount="${item.key}"]`,
+      );
+      element.textContent = formatMl(item.amountMl);
+    });
+
+    renderWarnings(result.warnings);
+    resultStatus.textContent =
+      `Cálculo completado. Rango orientativo: ${formatDailyWaterRange(result.total)}.`;
+    focusResultHeading(focusResult);
+  }
+
+  function renderWarnings(warnings) {
+    warningList.innerHTML = "";
+
+    warnings
+      .filter((warning) => warning !== "review_high_total")
+      .forEach((warning) => {
+        const item = document.createElement("li");
+        item.textContent = warningMessages[warning];
+        warningList.append(item);
+      });
+
+    warningPanel.classList.toggle("hidden", warningList.children.length === 0);
+  }
+
+  function setNeutralResult() {
+    currentResult = null;
+    resultHeading.textContent = "Tu rango aparecerá aquí";
+    placeholderText.textContent =
+      "Completa el formulario para ver un rango, sus ajustes y una equivalencia aproximada en tu recipiente habitual.";
+    resultPlaceholder.classList.remove("hidden");
+    resultContent.classList.add("hidden");
+    resultStatus.textContent = "";
+    copyStatus.textContent = "";
+    resetCopyLabel();
+  }
+
+  function setInvalidResult(message) {
+    currentResult = null;
+    resultHeading.textContent = "Revisa los datos";
+    placeholderText.textContent = message;
+    resultPlaceholder.classList.remove("hidden");
+    resultContent.classList.add("hidden");
+    resultStatus.textContent = message;
+    copyStatus.textContent = "";
+    resetCopyLabel();
+  }
+
+  function focusResultHeading(shouldFocus) {
+    if (!shouldFocus) {
+      return;
+    }
+
+    resultHeading.focus({ preventScroll: true });
+    const reduceMotion = window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    ).matches;
+    resultHeading.scrollIntoView({
+      behavior: reduceMotion ? "auto" : "smooth",
+      block: "start",
+    });
+  }
+
+  function focusFirstError() {
+    const firstInvalid = form.querySelector('[aria-invalid="true"]');
+
+    if (firstInvalid) {
+      firstInvalid.focus();
+      return;
+    }
+
+    const firstErrorGroup = form.querySelector(".border-red-400 button");
+    firstErrorGroup?.focus();
+  }
+
+  function setExercise(value) {
+    exerciseToday = value;
+
+    if (!value) {
+      sweatLevel = undefined;
+      clearFieldError("exerciseMinutes");
+      clearFieldError("sweatLevel");
+    }
+
+    updateControls();
+    clearFieldError("exerciseToday");
+    setNeutralResult();
+  }
+
+  function setHeat(value) {
+    heatExposure = value;
+    updateControls();
+    clearFieldError("heatExposure");
+    setNeutralResult();
+  }
+
+  function setSweat(value) {
+    sweatLevel = value;
+    updateControls();
+    clearFieldError("sweatLevel");
+    setNeutralResult();
+  }
+
+  function selectContainer(value) {
+    usesCustomContainer = value === "custom";
+
+    if (!usesCustomContainer) {
+      selectedContainer = Number(value);
+      clearFieldError("containerMl");
+    }
+
+    updateControls();
+    setNeutralResult();
+
+    if (usesCustomContainer) {
+      inputs.containerMl.focus();
+    }
+  }
+
+  function switchUnit(nextUnit) {
+    if (nextUnit === currentUnit) {
+      return;
+    }
+
+    if (currentUnit === "metric") {
+      const parsed = parseHealthInput(inputs.weightKg.value);
+      inputs.weightLb.value = parsed.ok
+        ? String(roundTo(convertKgToLb(parsed.value), 1))
+        : "";
+    } else {
+      const parsed = parseHealthInput(inputs.weightLb.value);
+      inputs.weightKg.value = parsed.ok
+        ? String(roundTo(convertLbToKg(parsed.value), 1))
+        : "";
+    }
+
+    currentUnit = nextUnit;
+    updateControls();
+    clearFieldError("weightKg");
+    setNeutralResult();
+  }
+
+  function fillExample() {
+    form.reset();
+    currentUnit = "metric";
+    exerciseToday = true;
+    heatExposure = false;
+    sweatLevel = "moderate";
+    selectedContainer = 500;
+    usesCustomContainer = false;
+    inputs.adultConfirmed.checked = true;
+    inputs.weightKg.value = "70";
+    inputs.weightLb.value = "";
+    inputs.exerciseMinutes.value = "60";
+    inputs.containerMl.value = "";
+    updateControls();
+    clearErrors();
+    calculateAndRender();
+  }
+
+  function clearCalculator() {
+    form.reset();
+    currentUnit = "metric";
+    exerciseToday = undefined;
+    heatExposure = undefined;
+    sweatLevel = undefined;
+    selectedContainer = 500;
+    usesCustomContainer = false;
+    updateControls();
+    clearErrors();
+    setNeutralResult();
+    inputs.adultConfirmed.focus();
+  }
+
+  function resetCopyLabel() {
+    window.clearTimeout(copyResetTimeout);
+    copyLabel.textContent = "Copiar resultado";
+  }
+
+  async function copyResult() {
+    if (!currentResult) {
+      return;
+    }
+
+    const text = buildDailyWaterCopyText(currentResult, currentUnit);
+
+    try {
+      if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(text);
+      } else {
+        const textArea = document.createElement("textarea");
+        textArea.value = text;
+        textArea.setAttribute("readonly", "");
+        textArea.style.position = "fixed";
+        textArea.style.opacity = "0";
+        document.body.append(textArea);
+        textArea.select();
+        document.execCommand("copy");
+        textArea.remove();
+      }
+
+      copyLabel.textContent = "Resultado copiado";
+      copyStatus.textContent = "Resultado copiado al portapapeles.";
+    } catch {
+      copyLabel.textContent = "No se pudo copiar";
+      copyStatus.textContent = "No se pudo copiar el resultado.";
+    }
+
+    window.clearTimeout(copyResetTimeout);
+    copyResetTimeout = window.setTimeout(resetCopyLabel, 2500);
+  }
+
+  form.addEventListener("submit", (event) => {
+    event.preventDefault();
+    calculateAndRender();
+  });
+
+  unitButtons.forEach((button) => {
+    button.addEventListener("click", () => switchUnit(button.dataset.unitOption));
+  });
+  exerciseButtons.forEach((button) => {
+    button.addEventListener("click", () =>
+      setExercise(button.dataset.exerciseOption === "true"),
+    );
+  });
+  heatButtons.forEach((button) => {
+    button.addEventListener("click", () =>
+      setHeat(button.dataset.heatOption === "true"),
+    );
+  });
+  sweatButtons.forEach((button) => {
+    button.addEventListener("click", () => setSweat(button.dataset.sweatOption));
+  });
+  containerButtons.forEach((button) => {
+    button.addEventListener("click", () =>
+      selectContainer(button.dataset.containerOption),
+    );
+  });
+  document.querySelectorAll("[data-input]").forEach((input) => {
+    input.addEventListener("input", () => {
+      if (input.dataset.field) {
+        clearFieldError(input.dataset.field);
+      }
+      setNeutralResult();
+    });
+    input.addEventListener("change", () => setNeutralResult());
+  });
+
+  fillExampleButton.addEventListener("click", fillExample);
+  clearButton.addEventListener("click", clearCalculator);
+  copyButton.addEventListener("click", copyResult);
+
+  updateControls();
+  setNeutralResult();
+</script>
