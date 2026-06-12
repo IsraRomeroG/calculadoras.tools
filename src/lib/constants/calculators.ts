@@ -278,6 +278,15 @@ export const CALCULATORS: CalculatorDirectoryItem[] = [
     order: 59.9,
   },
   {
+    id: "calculadora-prediccion-tiempo-carrera",
+    title: "Calculadora de predicción de tiempo de carrera",
+    description:
+      "Predice tiempos y ritmos para otras distancias desde una marca reciente y evalúa la calidad de la referencia.",
+    href: "/salud/calculadora-prediccion-tiempo-carrera",
+    categorySlug: "salud",
+    order: 59.95,
+  },
+  {
     id: "calculadora-de-edad",
     title: "Calculadora de edad",
     description:
