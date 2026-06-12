@@ -1,0 +1,579 @@
+---
+import BaseLayout from "@layouts/BaseLayout.astro";
+import Container from "@components/layout/Container.astro";
+import PageShell from "@components/layout/PageShell.astro";
+import FaqSection from "@components/shared/FaqSection.astro";
+import PageHero from "@components/shared/PageHero.astro";
+import SectionIntro from "@components/shared/SectionIntro.astro";
+import { buildFaqJsonLd } from "@lib/seo";
+
+const title = "Calculadora de VO2 Máx: Prueba Cooper y Rockport";
+const description =
+  "Estima tu VO2 máx con la prueba Cooper de 12 minutos o la caminata Rockport. Incluye protocolo, calidad del dato y comparación.";
+const canonical = "/salud/calculadora-vo2-max";
+const faqs = [
+  {
+    question: "¿Qué es VO2 máx?",
+    answer:
+      "Es una medida de la cantidad máxima de oxígeno que el cuerpo puede utilizar durante ejercicio intenso. Esta calculadora ofrece una estimación de campo en ml/kg/min.",
+  },
+  {
+    question: "¿Cuál es la diferencia entre Cooper y Rockport?",
+    answer:
+      "Cooper usa la distancia lograda durante 12 minutos de esfuerzo alto. Rockport usa una caminata rápida de una milla, junto con edad, peso, tiempo y pulso final.",
+  },
+  {
+    question: "¿Puedo correr durante Rockport?",
+    answer:
+      "No. La ecuación Rockport utilizada requiere caminar toda la milla. Si corres, el resultado deja de representar ese protocolo.",
+  },
+  {
+    question: "¿Por qué cambió mi resultado?",
+    answer:
+      "Clima, altitud, superficie, esfuerzo, medición del pulso y condiciones del día pueden mover la estimación. Compara el mismo método bajo condiciones similares.",
+  },
+  {
+    question: "¿Puedo comparar Cooper con Rockport?",
+    answer:
+      "No directamente. Son protocolos y ecuaciones diferentes. Para seguir una tendencia, repite siempre el mismo método.",
+  },
+  {
+    question: "¿Necesito un pulsómetro?",
+    answer:
+      "Solo para Rockport necesitas conocer el pulso al terminar. Puedes usar un monitor o contar los latidos inmediatamente después de la caminata.",
+  },
+];
+const faqJsonLd = buildFaqJsonLd(faqs);
+---
+
+<BaseLayout title={title} description={description} canonical={canonical}>
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={JSON.stringify(faqJsonLd)} />
+  </Fragment>
+
+  <PageShell>
+    <PageHero
+      title="Calculadora de VO2 máx estimado"
+      description="Elige una prueba de campo, sigue el protocolo y obtén una estimación útil para comparar futuras mediciones."
+      kicker="Salud"
+      collapseBreadcrumbOnMobile
+      containerClass="py-5 md:py-7"
+      breadcrumbs={[
+        { label: "Salud", href: "/salud" },
+        { label: "Calculadora de VO2 máx", truncate: true },
+      ]}
+    />
+
+    <Container as="section" class="py-6 md:py-10">
+      <section
+        class="overflow-hidden rounded-lg border border-gray-700 bg-gray-950 shadow-xl shadow-gray-950/30"
+        aria-labelledby="vo2-calculator-heading"
+      >
+        <div class="grid gap-0 xl:grid-cols-[minmax(0,0.98fr)_minmax(22rem,0.82fr)]">
+          <form class="p-4 sm:p-6" data-calculator-form novalidate>
+            <div>
+              <p class="text-sm font-semibold uppercase tracking-wide text-amber-400">Elige tu prueba</p>
+              <h2 id="vo2-calculator-heading" class="mt-2 text-2xl font-semibold text-white">
+                ¿Qué dato tienes?
+              </h2>
+              <div class="mt-4 grid grid-cols-2 gap-2" role="group" aria-label="Método de estimación">
+                <button class="min-h-12 rounded-lg border border-amber-400 bg-amber-400/10 px-3 py-3 text-sm font-semibold text-amber-200" type="button" data-method="cooper" aria-pressed="true">
+                  Cooper
+                </button>
+                <button class="min-h-12 rounded-lg border border-gray-700 px-3 py-3 text-sm font-semibold text-gray-300" type="button" data-method="rockport" aria-pressed="false">
+                  Rockport
+                </button>
+              </div>
+              <p class="mt-3 text-sm leading-relaxed text-gray-400" data-method-help>
+                Cooper sirve si puedes realizar una carrera o esfuerzo intenso durante 12 minutos.
+              </p>
+            </div>
+
+            <div class="mt-5 rounded-lg border border-red-400/40 bg-red-950/25 p-4">
+              <p class="font-semibold text-red-200">Antes de realizar la prueba</p>
+              <p class="mt-2 text-sm leading-relaxed text-red-100/80">
+                No la realices si tienes dolor de pecho, mareo, dificultad respiratoria inusual, una lesión que limite el esfuerzo o indicación médica de evitar ejercicio. Detente si aparecen síntomas.
+              </p>
+              <p class="mt-2 text-sm leading-relaxed text-red-100/80" data-cooper-safety>
+                Cooper exige un esfuerzo alto. Si no estás acostumbrado a correr o tienes dudas sobre tu salud, considera Rockport o consulta a un profesional.
+              </p>
+            </div>
+
+            <div class="mt-5 rounded-lg border border-gray-800 bg-gray-900/55 p-4" data-protocol="cooper">
+              <p class="font-semibold text-white">Cómo realizar Cooper</p>
+              <ol class="mt-3 list-decimal space-y-2 pl-5 text-sm leading-relaxed text-gray-400">
+                <li>Usa una ruta plana y medida, preferiblemente una pista.</li>
+                <li>Tras calentar, recorre la mayor distancia posible durante exactamente 12:00.</li>
+                <li>Registra la distancia total, incluyendo metros adicionales.</li>
+              </ol>
+            </div>
+
+            <div class="mt-5 hidden rounded-lg border border-gray-800 bg-gray-900/55 p-4" data-protocol="rockport">
+              <p class="font-semibold text-white">Cómo realizar Rockport</p>
+              <ol class="mt-3 list-decimal space-y-2 pl-5 text-sm leading-relaxed text-gray-400">
+                <li>Usa una ruta plana y medida de exactamente 1 milla o 1.609 km.</li>
+                <li>Camina toda la distancia lo más rápido posible sin correr.</li>
+                <li>Registra el tiempo y mide el pulso inmediatamente al terminar.</li>
+              </ol>
+            </div>
+
+            <div class="mt-6" data-fields="cooper">
+              <fieldset>
+                <legend class="text-sm font-semibold text-gray-200">Cómo registrar la distancia</legend>
+                <div class="mt-2 grid grid-cols-2 gap-2">
+                  <button class="min-h-12 rounded-lg border border-amber-400 bg-amber-400/10 px-3 py-3 text-sm font-semibold text-amber-200" type="button" data-distance-mode="total" aria-pressed="true">Distancia total</button>
+                  <button class="min-h-12 rounded-lg border border-gray-700 px-3 py-3 text-sm font-semibold text-gray-300" type="button" data-distance-mode="laps" aria-pressed="false">Vueltas de 400 m</button>
+                </div>
+              </fieldset>
+
+              <div class="mt-5" data-distance-fields="total" data-field-block="distance">
+                <label class="text-sm font-semibold text-gray-200" for="cooper-distance">Distancia recorrida</label>
+                <div class="mt-2 grid grid-cols-[minmax(0,1fr)_6.5rem] overflow-hidden rounded-lg border border-gray-700 bg-gray-900 focus-within:border-amber-400 focus-within:ring-3 focus-within:ring-amber-400/15" data-wrapper="distance">
+                  <input id="cooper-distance" class="min-w-0 bg-transparent px-4 py-3 text-base text-white outline-none" inputmode="decimal" autocomplete="off" data-input="distance" aria-describedby="distance-error" />
+                  <select class="border-l border-gray-700 bg-gray-900 px-3 text-sm text-white outline-none" data-input="distanceUnit" aria-label="Unidad de distancia">
+                    <option value="m">m</option><option value="km">km</option><option value="mi">mi</option>
+                  </select>
+                </div>
+                <p id="distance-error" class="mt-2 hidden text-sm text-red-300" data-error="distance"></p>
+              </div>
+
+              <div class="mt-5 hidden grid gap-4 sm:grid-cols-2" data-distance-fields="laps">
+                <div>
+                  <label class="text-sm font-semibold text-gray-200" for="cooper-laps">Vueltas completas</label>
+                  <input id="cooper-laps" class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-900 px-4 py-3 text-base text-white outline-none focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15" inputmode="numeric" data-input="laps" aria-describedby="laps-error" />
+                </div>
+                <div>
+                  <label class="text-sm font-semibold text-gray-200" for="cooper-extra">Metros adicionales</label>
+                  <input id="cooper-extra" class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-900 px-4 py-3 text-base text-white outline-none focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15" inputmode="numeric" data-input="extraMeters" aria-describedby="laps-error" />
+                </div>
+                <p id="laps-error" class="hidden text-sm text-red-300 sm:col-span-2" data-error="laps"></p>
+              </div>
+            </div>
+
+            <div class="mt-6 hidden space-y-5" data-fields="rockport">
+              <div class="grid gap-4 sm:grid-cols-2">
+                <div data-field-block="age">
+                  <label class="text-sm font-semibold text-gray-200" for="rockport-age">Edad</label>
+                  <input id="rockport-age" class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-900 px-4 py-3 text-base text-white outline-none focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15" inputmode="numeric" data-input="age" aria-describedby="age-error" />
+                  <p id="age-error" class="mt-2 hidden text-sm text-red-300" data-error="age"></p>
+                </div>
+                <div data-field-block="formulaSex">
+                  <label class="text-sm font-semibold text-gray-200" for="rockport-sex">Sexo utilizado por la fórmula</label>
+                  <select id="rockport-sex" class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-900 px-4 py-3 text-base text-white outline-none focus:border-amber-400" data-input="formulaSex" aria-describedby="sex-help formulaSex-error">
+                    <option value="">Selecciona</option><option value="male">Masculino</option><option value="female">Femenino</option>
+                  </select>
+                  <p id="sex-help" class="mt-2 text-xs leading-relaxed text-gray-500">Es una variable requerida por la ecuación original.</p>
+                  <p id="formulaSex-error" class="mt-2 hidden text-sm text-red-300" data-error="formulaSex"></p>
+                </div>
+              </div>
+
+              <div data-field-block="weight">
+                <label class="text-sm font-semibold text-gray-200" for="rockport-weight">Peso</label>
+                <div class="mt-2 grid grid-cols-[minmax(0,1fr)_6.5rem] overflow-hidden rounded-lg border border-gray-700 bg-gray-900 focus-within:border-amber-400 focus-within:ring-3 focus-within:ring-amber-400/15" data-wrapper="weight">
+                  <input id="rockport-weight" class="min-w-0 bg-transparent px-4 py-3 text-base text-white outline-none" inputmode="decimal" data-input="weight" aria-describedby="weight-error" />
+                  <select class="border-l border-gray-700 bg-gray-900 px-3 text-sm text-white outline-none" data-input="weightUnit" aria-label="Unidad de peso">
+                    <option value="kg">kg</option><option value="lb">lb</option>
+                  </select>
+                </div>
+                <p id="weight-error" class="mt-2 hidden text-sm text-red-300" data-error="weight"></p>
+              </div>
+
+              <fieldset>
+                <legend class="text-sm font-semibold text-gray-200">Tiempo de la milla</legend>
+                <div class="mt-2 grid grid-cols-2 gap-4">
+                  <div><label class="text-xs text-gray-400" for="rockport-minutes">Minutos</label><input id="rockport-minutes" class="mt-1 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-900 px-4 py-3 text-base text-white outline-none focus:border-amber-400" inputmode="numeric" data-input="minutes" aria-describedby="minutes-error" /></div>
+                  <div><label class="text-xs text-gray-400" for="rockport-seconds">Segundos</label><input id="rockport-seconds" class="mt-1 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-900 px-4 py-3 text-base text-white outline-none focus:border-amber-400" inputmode="numeric" data-input="seconds" aria-describedby="minutes-error" /></div>
+                </div>
+                <p id="minutes-error" class="mt-2 hidden text-sm text-red-300" data-error="minutes"></p>
+              </fieldset>
+
+              <div data-field-block="finalPulse">
+                <label class="text-sm font-semibold text-gray-200" for="rockport-pulse">Pulso al terminar</label>
+                <div class="mt-2 grid grid-cols-[minmax(0,1fr)_5rem] overflow-hidden rounded-lg border border-gray-700 bg-gray-900 focus-within:border-amber-400 focus-within:ring-3 focus-within:ring-amber-400/15" data-wrapper="finalPulse">
+                  <input id="rockport-pulse" class="min-w-0 bg-transparent px-4 py-3 text-base text-white outline-none" inputmode="numeric" data-input="finalPulse" aria-describedby="pulse-help finalPulse-error" />
+                  <span class="border-l border-gray-700 px-3 py-3 text-sm text-gray-400">bpm</span>
+                </div>
+                <p id="pulse-help" class="mt-2 text-xs leading-relaxed text-gray-500">Usa un monitor o cuenta los latidos inmediatamente al terminar.</p>
+                <p id="finalPulse-error" class="mt-2 hidden text-sm text-red-300" data-error="finalPulse"></p>
+              </div>
+
+              <label class="flex min-h-12 items-start gap-3 rounded-lg border border-gray-700 bg-gray-900 p-3 text-sm text-gray-200" data-walk-confirmation>
+                <input class="mt-1 size-4 accent-amber-400" type="checkbox" data-input="walkedEntireMile" aria-describedby="walkedEntireMile-error" />
+                <span>Caminé toda la milla sin correr.</span>
+              </label>
+              <p id="walkedEntireMile-error" class="hidden text-sm text-red-300" data-error="walkedEntireMile"></p>
+            </div>
+
+            <fieldset class="mt-6">
+              <legend class="text-sm font-semibold text-gray-200">Revisa cómo hiciste la prueba</legend>
+              <div class="mt-3 space-y-2">
+                <label class="flex min-h-12 items-start gap-3 rounded-lg border border-gray-800 bg-gray-900/55 p-3 text-sm text-gray-300"><input class="mt-1 size-4 accent-amber-400" type="checkbox" data-check="measuredRoute" /><span>La ruta fue plana y la distancia estaba medida.</span></label>
+                <label class="flex min-h-12 items-start gap-3 rounded-lg border border-gray-800 bg-gray-900/55 p-3 text-sm text-gray-300"><input class="mt-1 size-4 accent-amber-400" type="checkbox" data-check="timing" /><span data-timing-check>La prueba duró exactamente 12 minutos.</span></label>
+                <label class="flex min-h-12 items-start gap-3 rounded-lg border border-gray-800 bg-gray-900/55 p-3 text-sm text-gray-300"><input class="mt-1 size-4 accent-amber-400" type="checkbox" data-check="noSymptoms" /><span>No tuve que detenerme por dolor, mareo u otro síntoma.</span></label>
+              </div>
+            </fieldset>
+
+            <div class="mt-6 hidden rounded-lg border border-red-400/40 bg-red-950/25 p-4" tabindex="-1" data-error-summary>
+              <p class="font-semibold text-red-200">Revisa los campos indicados antes de calcular.</p>
+            </div>
+
+            <div class="mt-6 grid gap-3 sm:grid-cols-3">
+              <button class="min-h-12 rounded-lg bg-amber-400 px-5 py-3 text-sm font-bold text-gray-950 transition hover:bg-amber-300 sm:col-span-3" type="submit">Calcular VO2 máx</button>
+              <button class="min-h-12 rounded-lg border border-gray-700 px-4 py-3 text-sm font-semibold text-gray-200 transition hover:bg-gray-900 sm:col-span-2" type="button" data-example>Probar ejemplo</button>
+              <button class="min-h-12 rounded-lg border border-gray-700 px-4 py-3 text-sm font-semibold text-gray-300 transition hover:bg-gray-900" type="reset">Limpiar</button>
+            </div>
+          </form>
+
+          <aside class="border-t border-gray-800 bg-gray-900/45 p-4 sm:p-6 xl:border-l xl:border-t-0">
+            <div data-empty-result>
+              <p class="text-sm font-semibold uppercase tracking-wide text-amber-400">Resultado</p>
+              <h2 class="mt-2 text-2xl font-semibold text-white">Tu estimación aparecerá aquí</h2>
+              <p class="mt-3 text-sm leading-relaxed text-gray-400">
+                Verás el VO2 máx estimado, la calidad del dato, el ritmo medio y una comparación si repites el mismo método en esta pestaña.
+              </p>
+            </div>
+
+            <div class="hidden" aria-live="polite" data-result>
+              <p class="text-sm font-semibold uppercase tracking-wide text-amber-400">Tu VO2 máx estimado</p>
+              <h2 class="mt-2 text-4xl font-bold tracking-tight text-white outline-none sm:text-5xl" tabindex="-1" data-result-heading></h2>
+              <p class="mt-2 text-sm text-gray-400" data-result-method></p>
+              <div class="mt-4 flex flex-wrap gap-2"><span class="rounded-full border px-3 py-1 text-sm font-semibold" data-quality></span></div>
+              <p class="mt-3 text-sm leading-relaxed text-gray-400" data-quality-help></p>
+
+              <dl class="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-1 2xl:grid-cols-2">
+                <div class="rounded-lg border border-gray-700 bg-gray-950/70 p-4"><dt class="text-xs uppercase tracking-wide text-gray-500">Ritmo medio</dt><dd class="mt-1 font-semibold text-white" data-result-pace></dd></div>
+                <div class="rounded-lg border border-gray-700 bg-gray-950/70 p-4"><dt class="text-xs uppercase tracking-wide text-gray-500">Comparación</dt><dd class="mt-1 font-semibold text-white" data-comparison>Sin resultado anterior</dd></div>
+              </dl>
+
+              <div class="mt-5 rounded-lg border border-gray-800 bg-gray-950/55 p-4">
+                <p class="text-sm font-semibold text-gray-200">Datos utilizados</p>
+                <ul class="mt-2 space-y-1 text-sm text-gray-400" data-summary></ul>
+              </div>
+              <div class="mt-4 hidden rounded-lg border border-amber-400/40 bg-amber-950/20 p-4" data-warnings>
+                <p class="font-semibold text-amber-200">Revisa antes de interpretar</p>
+                <ul class="mt-2 list-disc space-y-1 pl-5 text-sm leading-relaxed text-amber-100/80" data-warning-list></ul>
+              </div>
+              <p class="mt-4 text-xs leading-relaxed text-gray-500">Estimación de campo orientativa; no sustituye una prueba de laboratorio ni evaluación profesional.</p>
+              <div class="mt-6 grid gap-2 sm:grid-cols-2">
+                <button class="min-h-12 rounded-lg border border-amber-400/50 px-4 py-3 text-sm font-semibold text-amber-200 hover:bg-amber-400/10" type="button" data-copy>Copiar resultado</button>
+                <button class="hidden min-h-12 rounded-lg border border-gray-700 px-4 py-3 text-sm font-semibold text-gray-300 hover:bg-gray-800" type="button" data-delete-previous>Borrar comparación</button>
+              </div>
+              <p class="sr-only" aria-live="polite" data-copy-status></p>
+            </div>
+          </aside>
+        </div>
+      </section>
+    </Container>
+
+    <Container as="section" class="py-8 md:py-12">
+      <SectionIntro title="Cómo interpretar el resultado" description="Úsalo para seguir una tendencia con el mismo método, no como diagnóstico ni como cifra exacta." />
+      <div class="mt-6 grid gap-4 md:grid-cols-3">
+        <article class="rounded-lg border border-gray-800 bg-gray-950/60 p-5"><h3 class="font-semibold text-white">Compara lo comparable</h3><p class="mt-2 text-sm leading-relaxed text-gray-400">Repite Cooper con Cooper o Rockport con Rockport, idealmente bajo clima, superficie y preparación similares.</p></article>
+        <article class="rounded-lg border border-gray-800 bg-gray-950/60 p-5"><h3 class="font-semibold text-white">La calidad da contexto</h3><p class="mt-2 text-sm leading-relaxed text-gray-400">El checklist ayuda a detectar cuándo una cifra puede estar más influida por el protocolo que por tu capacidad aeróbica.</p></article>
+        <article class="rounded-lg border border-gray-800 bg-gray-950/60 p-5"><h3 class="font-semibold text-white">Evita falsa precisión</h3><p class="mt-2 text-sm leading-relaxed text-gray-400">Una diferencia pequeña puede deberse a medición, esfuerzo o condiciones del día. Observa varias pruebas, no una sola.</p></article>
+      </div>
+    </Container>
+
+    <Container as="section" class="py-8 md:py-12">
+      <SectionIntro title="Fórmulas y límites" description="Ambos métodos convierten una prueba de campo en una estimación poblacional." />
+      <div class="mt-6 grid gap-4 lg:grid-cols-2">
+        <article class="rounded-lg border border-gray-800 bg-gray-950/60 p-5"><h3 class="font-semibold text-white">Cooper de 12 minutos</h3><p class="mt-3 text-sm leading-relaxed text-gray-400">VO2 máx = (distancia en metros - 504.9) ÷ 44.73. El resultado depende de completar exactamente 12 minutos con esfuerzo alto sobre una distancia bien medida.</p></article>
+        <article class="rounded-lg border border-gray-800 bg-gray-950/60 p-5"><h3 class="font-semibold text-white">Rockport de caminata</h3><p class="mt-3 text-sm leading-relaxed text-gray-400">Combina edad, sexo utilizado por la fórmula, peso, tiempo y pulso final. Fuera de 30-69 años se muestra una advertencia porque la ecuación puede ser menos representativa.</p></article>
+      </div>
+    </Container>
+
+    <FaqSection faqs={faqs} />
+  </PageShell>
+</BaseLayout>
+
+<script>
+  import {
+    QUALITY_LABELS,
+    Vo2CalculationError,
+    buildVo2CopyText,
+    calculateVo2Result,
+    distanceFromLaps,
+    formatPace,
+    formatSignedVo2,
+    formatVo2,
+    parseVo2Number,
+    type CooperInput,
+    type DataQuality,
+    type DistanceUnit,
+    type FormulaSex,
+    type RockportInput,
+    type Vo2Method,
+    type Vo2Result,
+    type Vo2Warning,
+    type WeightUnit,
+  } from "@lib/calculators/salud/calculadora-vo2-max/vo2Max";
+
+  const STORAGE_PREFIX = "vo2-max-last:";
+  const form = document.querySelector<HTMLFormElement>("[data-calculator-form]")!;
+  const query = <T extends Element>(selector: string) => document.querySelector<T>(selector)!;
+  const input = (name: string) => query<HTMLInputElement>(`[data-input="${name}"]`);
+  let method: Vo2Method = "cooper";
+  let distanceMode: "total" | "laps" = "total";
+  let currentResult: Vo2Result | undefined;
+  let currentComparison: number | undefined;
+
+  const errorMessages: Record<string, string> = {
+    distance: "Ingresa una distancia equivalente a 600-5000 m.",
+    laps: "Ingresa vueltas y metros que sumen entre 600 y 5000 m.",
+    age: "Usa una edad entera entre 18 y 100 años.",
+    formulaSex: "Selecciona el sexo utilizado por la fórmula.",
+    weight: "Usa un peso equivalente a 20-250 kg.",
+    minutes: "Ingresa un tiempo entre 8:00 y 30:00, con segundos entre 0 y 59.",
+    finalPulse: "Usa un pulso final entero entre 60 y 220 bpm.",
+    walkedEntireMile: "Confirma que caminaste toda la milla sin correr.",
+  };
+  const warningMessages: Record<Vo2Warning, string> = {
+    unusual_result: "El resultado es inusual; revisa los datos y cómo realizaste la prueba.",
+    rockport_fast: "Es un tiempo de caminata muy rápido. Confirma que no corriste y que la distancia fue exactamente una milla.",
+    rockport_age_extrapolated: "La ecuación puede ser menos representativa fuera de su rango principal de 30-69 años.",
+    protocol_incomplete: "Falta confirmar uno o más elementos opcionales del protocolo.",
+  };
+  const qualityHelp: Record<DataQuality, string> = {
+    good: "Los datos y elementos del protocolo declarados son consistentes.",
+    acceptable: "El cálculo es válido, pero faltan detalles opcionales del protocolo.",
+    review: "El cálculo es válido, pero incluye una condición que conviene revisar.",
+  };
+
+  function selectMethod(next: Vo2Method) {
+    method = next;
+    document.querySelectorAll<HTMLButtonElement>("[data-method]").forEach((button) => {
+      const selected = button.dataset.method === next;
+      button.setAttribute("aria-pressed", String(selected));
+      button.classList.toggle("border-amber-400", selected);
+      button.classList.toggle("bg-amber-400/10", selected);
+      button.classList.toggle("text-amber-200", selected);
+      button.classList.toggle("border-gray-700", !selected);
+      button.classList.toggle("text-gray-300", !selected);
+    });
+    document.querySelectorAll<HTMLElement>("[data-fields], [data-protocol]").forEach((element) => element.classList.toggle("hidden", element.dataset.fields !== next && element.dataset.protocol !== next));
+    query<HTMLElement>("[data-cooper-safety]").classList.toggle("hidden", next !== "cooper");
+    query<HTMLElement>("[data-method-help]").textContent = next === "cooper"
+      ? "Cooper sirve si puedes realizar una carrera o esfuerzo intenso durante 12 minutos."
+      : "Rockport sirve si prefieres una caminata rápida de 1 milla y puedes medir tu pulso al terminar.";
+    query<HTMLElement>("[data-timing-check]").textContent = next === "cooper"
+      ? "La prueba duró exactamente 12 minutos."
+      : "Medí el pulso inmediatamente al terminar.";
+    clearErrors();
+    hideResult();
+  }
+
+  function selectDistanceMode(next: "total" | "laps") {
+    distanceMode = next;
+    document.querySelectorAll<HTMLButtonElement>("[data-distance-mode]").forEach((button) => {
+      const selected = button.dataset.distanceMode === next;
+      button.setAttribute("aria-pressed", String(selected));
+      button.classList.toggle("border-amber-400", selected);
+      button.classList.toggle("bg-amber-400/10", selected);
+      button.classList.toggle("text-amber-200", selected);
+      button.classList.toggle("border-gray-700", !selected);
+      button.classList.toggle("text-gray-300", !selected);
+    });
+    document.querySelectorAll<HTMLElement>("[data-distance-fields]").forEach((element) => element.classList.toggle("hidden", element.dataset.distanceFields !== next));
+    clearErrors();
+    hideResult();
+  }
+
+  function readProtocol() {
+    return {
+      measuredRoute: query<HTMLInputElement>('[data-check="measuredRoute"]').checked,
+      exactDurationOrImmediatePulse: query<HTMLInputElement>('[data-check="timing"]').checked,
+      noSymptoms: query<HTMLInputElement>('[data-check="noSymptoms"]').checked,
+    };
+  }
+
+  function requiredNumber(name: string, integer = false): number {
+    return parseVo2Number(input(name).value, { integer }) ?? Number.NaN;
+  }
+
+  function readInput(): CooperInput | RockportInput {
+    if (method === "cooper") {
+      let distance = requiredNumber("distance");
+      if (distanceMode === "laps") {
+        const laps = input("laps").value.trim() ? requiredNumber("laps", true) : 0;
+        const extraMeters = input("extraMeters").value.trim() ? requiredNumber("extraMeters", true) : 0;
+        if (
+          !Number.isInteger(laps) ||
+          laps < 0 ||
+          laps > 12 ||
+          !Number.isInteger(extraMeters) ||
+          extraMeters < 0 ||
+          extraMeters > 399
+        ) {
+          throw new RangeError("Revisa las vueltas y metros adicionales.");
+        }
+        distance = distanceFromLaps(laps, extraMeters);
+      }
+      return {
+        method,
+        distance,
+        distanceUnit: distanceMode === "total" ? query<HTMLSelectElement>('[data-input="distanceUnit"]').value as DistanceUnit : "m",
+        protocol: readProtocol(),
+      };
+    }
+    return {
+      method,
+      age: requiredNumber("age", true),
+      formulaSex: query<HTMLSelectElement>('[data-input="formulaSex"]').value as FormulaSex,
+      weight: requiredNumber("weight"),
+      weightUnit: query<HTMLSelectElement>('[data-input="weightUnit"]').value as WeightUnit,
+      minutes: requiredNumber("minutes", true),
+      seconds: requiredNumber("seconds", true),
+      finalPulse: requiredNumber("finalPulse", true),
+      walkedEntireMile: input("walkedEntireMile").checked,
+      protocol: readProtocol(),
+    };
+  }
+
+  function clearErrors() {
+    document.querySelectorAll<HTMLElement>("[data-error]").forEach((element) => {
+      element.textContent = "";
+      element.classList.add("hidden");
+    });
+    query<HTMLElement>("[data-error-summary]").classList.add("hidden");
+  }
+
+  function showError(field: string) {
+    const target =
+      field === "seconds"
+        ? "minutes"
+        : field === "distance" && distanceMode === "laps"
+          ? "laps"
+          : field;
+    const element = document.querySelector<HTMLElement>(`[data-error="${target}"]`);
+    if (!element) return;
+    element.textContent = errorMessages[target] ?? "Revisa este campo.";
+    element.classList.remove("hidden");
+  }
+
+  function calculate(focusResult = true) {
+    clearErrors();
+    let result: Vo2Result;
+    try {
+      result = calculateVo2Result(readInput());
+    } catch (error) {
+      if (error instanceof Vo2CalculationError) {
+        Object.keys(error.validation.errors).forEach(showError);
+      } else if (method === "cooper" && distanceMode === "laps") {
+        showError("laps");
+      } else {
+        showError(method === "cooper" ? "distance" : "minutes");
+      }
+      const summary = query<HTMLElement>("[data-error-summary]");
+      summary.classList.remove("hidden");
+      summary.focus();
+      return;
+    }
+
+    const previous = readPrevious(result.method);
+    currentComparison = previous ? result.vo2Max - previous.vo2Max : undefined;
+    currentResult = result;
+    storeResult(result);
+    renderResult(result, focusResult);
+  }
+
+  function renderResult(result: Vo2Result, focusResult: boolean) {
+    query<HTMLElement>("[data-empty-result]").classList.add("hidden");
+    query<HTMLElement>("[data-result]").classList.remove("hidden");
+    query<HTMLElement>("[data-result-heading]").textContent = formatVo2(result.vo2Max);
+    query<HTMLElement>("[data-result-method]").textContent = `Método: ${result.method === "cooper" ? "Cooper de 12 minutos" : "Rockport de caminata"}`;
+    query<HTMLElement>("[data-result-pace]").textContent = formatPace(result.paceMinutesPerKm);
+    query<HTMLElement>("[data-comparison]").textContent = currentComparison === undefined ? "Sin resultado anterior" : formatSignedVo2(currentComparison);
+    query<HTMLButtonElement>("[data-delete-previous]").classList.toggle("hidden", currentComparison === undefined);
+    const quality = query<HTMLElement>("[data-quality]");
+    quality.textContent = `Calidad: ${QUALITY_LABELS[result.quality]}`;
+    quality.className = `rounded-full border px-3 py-1 text-sm font-semibold ${result.quality === "good" ? "border-emerald-400/50 text-emerald-300" : result.quality === "acceptable" ? "border-amber-400/50 text-amber-300" : "border-red-400/50 text-red-300"}`;
+    query<HTMLElement>("[data-quality-help]").textContent = qualityHelp[result.quality];
+    query<HTMLElement>("[data-summary]").innerHTML = result.summary.map((line) => `<li>${line}</li>`).join("");
+    const warnings = query<HTMLElement>("[data-warnings]");
+    warnings.classList.toggle("hidden", result.warnings.length === 0);
+    query<HTMLElement>("[data-warning-list]").innerHTML = result.warnings.map((warning) => `<li>${warningMessages[warning]}</li>`).join("");
+    if (focusResult) {
+      const heading = query<HTMLElement>("[data-result-heading]");
+      heading.focus({ preventScroll: true });
+      heading.scrollIntoView({ behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block: "start" });
+    }
+  }
+
+  function hideResult() {
+    currentResult = undefined;
+    currentComparison = undefined;
+    query<HTMLElement>("[data-result]").classList.add("hidden");
+    query<HTMLElement>("[data-empty-result]").classList.remove("hidden");
+    query<HTMLButtonElement>("[data-delete-previous]").classList.add("hidden");
+  }
+
+  function storageKey(targetMethod: Vo2Method) {
+    return `${STORAGE_PREFIX}${targetMethod}`;
+  }
+
+  function readPrevious(targetMethod: Vo2Method): { vo2Max: number } | undefined {
+    try {
+      const stored = sessionStorage.getItem(storageKey(targetMethod));
+      return stored ? JSON.parse(stored) : undefined;
+    } catch {
+      return undefined;
+    }
+  }
+
+  function storeResult(result: Vo2Result) {
+    try {
+      sessionStorage.setItem(storageKey(result.method), JSON.stringify({ vo2Max: result.vo2Max, savedAt: new Date().toISOString() }));
+    } catch {}
+  }
+
+  function clearCalculator() {
+    form.querySelectorAll<HTMLInputElement>("input").forEach((element) => {
+      if (element.type === "checkbox") element.checked = false;
+      else element.value = "";
+    });
+    form.querySelectorAll<HTMLSelectElement>("select").forEach((element) => element.selectedIndex = 0);
+    selectDistanceMode("total");
+    clearErrors();
+    hideResult();
+    if (method === "cooper") input("distance").focus();
+    else input("age").focus();
+  }
+
+  document.querySelectorAll<HTMLButtonElement>("[data-method]").forEach((button) => button.addEventListener("click", () => selectMethod(button.dataset.method as Vo2Method)));
+  document.querySelectorAll<HTMLButtonElement>("[data-distance-mode]").forEach((button) => button.addEventListener("click", () => selectDistanceMode(button.dataset.distanceMode as "total" | "laps")));
+  form.addEventListener("submit", (event) => { event.preventDefault(); calculate(); });
+  form.addEventListener("reset", (event) => { event.preventDefault(); clearCalculator(); });
+  query<HTMLButtonElement>("[data-example]").addEventListener("click", () => {
+    clearCalculator();
+    if (method === "cooper") {
+      input("distance").value = "2400";
+      query<HTMLSelectElement>('[data-input="distanceUnit"]').value = "m";
+    } else {
+      input("age").value = "30";
+      query<HTMLSelectElement>('[data-input="formulaSex"]').value = "male";
+      input("weight").value = "70";
+      input("minutes").value = "15";
+      input("seconds").value = "0";
+      input("finalPulse").value = "140";
+      input("walkedEntireMile").checked = true;
+    }
+    form.querySelectorAll<HTMLInputElement>("[data-check]").forEach((check) => check.checked = true);
+    calculate();
+  });
+  query<HTMLButtonElement>("[data-copy]").addEventListener("click", async () => {
+    if (!currentResult) return;
+    const status = query<HTMLElement>("[data-copy-status]");
+    try {
+      await navigator.clipboard.writeText(buildVo2CopyText(currentResult, currentComparison));
+      status.textContent = "Resultado copiado.";
+    } catch {
+      status.textContent = "No se pudo copiar el resultado.";
+    }
+  });
+  query<HTMLButtonElement>("[data-delete-previous]").addEventListener("click", () => {
+    sessionStorage.removeItem(storageKey(method));
+    currentComparison = undefined;
+    query<HTMLElement>("[data-comparison]").textContent = "Sin resultado anterior";
+    query<HTMLButtonElement>("[data-delete-previous]").classList.add("hidden");
+  });
+</script>

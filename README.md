@@ -37,6 +37,17 @@ npm.cmd run test:unit:run
 npm.cmd run coverage
 ```
 
+Durante una implementación, ejecuta primero el test localizado relacionado con
+el cambio y deja la suite completa para la validación final:
+
+```powershell
+# Mientras implementas
+npm.cmd run test:unit:run -- src/lib/calculators/.../calculator.test.ts
+
+# Al finalizar
+npm.cmd run test:unit:run
+```
+
 ## Estructura principal
 
 ```text

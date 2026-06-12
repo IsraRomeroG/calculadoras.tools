@@ -179,6 +179,15 @@ export const CALCULATORS: CalculatorDirectoryItem[] = [
     order: 50,
   },
   {
+    id: "calculadora-de-calorias-quemadas-por-ejercicio",
+    title: "Calculadora de calorías quemadas por ejercicio",
+    description:
+      "Estima calorías totales y activas según peso, duración, actividad y ritmo.",
+    href: "/salud/calculadora-de-calorias-quemadas-por-ejercicio",
+    categorySlug: "salud",
+    order: 47,
+  },
+  {
     id: "calculadora-de-proteina-diaria",
     title: "Calculadora de proteína diaria",
     description:
@@ -249,6 +258,24 @@ export const CALCULATORS: CalculatorDirectoryItem[] = [
     href: "/salud/calculadora-1rm-repeticion-maxima",
     categorySlug: "salud",
     order: 59.8,
+  },
+  {
+    id: "calculadora-vo2-max",
+    title: "Calculadora de VO2 máx",
+    description:
+      "Estima tu VO2 máx con las pruebas Cooper o Rockport y compara resultados del mismo método.",
+    href: "/salud/calculadora-vo2-max",
+    categorySlug: "salud",
+    order: 59.85,
+  },
+  {
+    id: "calculadora-de-pace-ritmo-de-carrera",
+    title: "Calculadora de pace y ritmo de carrera",
+    description:
+      "Calcula ritmo, tiempo o distancia y obtén equivalencias y splits acumulados para tu carrera.",
+    href: "/salud/calculadora-de-pace-ritmo-de-carrera",
+    categorySlug: "salud",
+    order: 59.9,
   },
   {
     id: "calculadora-de-edad",
