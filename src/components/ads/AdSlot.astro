@@ -1,0 +1,167 @@
+---
+import type { AdVariant } from "@lib/ads/config";
+import { hasConfiguredAds } from "@lib/ads/provider";
+
+interface Props {
+  placement: string;
+  variant?: Extract<AdVariant, "horizontal" | "rectangle">;
+  class?: string;
+}
+
+const {
+  placement,
+  variant = "horizontal",
+  class: className = "",
+} = Astro.props;
+const debug = import.meta.env.DEV;
+const shouldRender = debug || hasConfiguredAds();
+const slotId = `ad-${placement.replace(/[^a-z0-9_-]+/gi, "-").toLowerCase()}`;
+---
+
+{
+  shouldRender && (
+    <div
+      id={slotId}
+      class:list={["ad-slot", `ad-slot--${variant}`, className]}
+      data-ad-slot
+      data-ad-placement={placement}
+      data-ad-variant={variant}
+      data-ad-debug={String(debug)}
+      aria-label="Publicidad"
+    >
+      <div class="ad-slot__frame">
+        <span class="ad-slot__label">Publicidad</span>
+        <div class="ad-slot__content" data-ad-content>
+          {debug && <span class="ad-slot__debug">{variant}</span>}
+        </div>
+      </div>
+    </div>
+  )
+}
+
+<script>
+  import { initAdSlots } from "@lib/ads/client";
+
+  initAdSlots();
+</script>
+
+<style>
+  .ad-slot {
+    container: ad-slot / inline-size;
+    width: 100%;
+  }
+
+  .ad-slot__frame {
+    display: none;
+    margin: 1.5rem auto;
+  }
+
+  .ad-slot__label {
+    display: block;
+    margin-bottom: 0.25rem;
+    color: rgb(107 114 128);
+    font-size: 0.625rem;
+    line-height: 1rem;
+    text-align: center;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+
+  .ad-slot__content {
+    display: grid;
+    place-items: center;
+    overflow: hidden;
+  }
+
+  .ad-slot__debug {
+    color: rgb(107 114 128);
+    font-size: 0.75rem;
+  }
+
+  .ad-slot[data-ad-state="debug"] .ad-slot__content,
+  .ad-slot:not([data-ad-state]) .ad-slot__content {
+    border: 1px dashed rgb(75 85 99);
+    background: rgb(3 7 18 / 0.45);
+  }
+
+  @container ad-slot (min-width: 320px) {
+    .ad-slot--horizontal .ad-slot__frame {
+      display: block;
+      width: 320px;
+    }
+
+    .ad-slot--horizontal .ad-slot__content {
+      width: 320px;
+      height: 50px;
+    }
+  }
+
+  @container ad-slot (min-width: 468px) {
+    .ad-slot--horizontal .ad-slot__frame,
+    .ad-slot--horizontal .ad-slot__content {
+      width: 468px;
+    }
+
+    .ad-slot--horizontal .ad-slot__content {
+      height: 60px;
+    }
+  }
+
+  @container ad-slot (min-width: 728px) {
+    .ad-slot--horizontal .ad-slot__frame,
+    .ad-slot--horizontal .ad-slot__content {
+      width: 728px;
+    }
+
+    .ad-slot--horizontal .ad-slot__content {
+      height: 90px;
+    }
+  }
+
+  @container ad-slot (min-width: 300px) {
+    .ad-slot--rectangle .ad-slot__frame,
+    .ad-slot--rectangle .ad-slot__content {
+      width: 300px;
+    }
+
+    .ad-slot--rectangle .ad-slot__frame {
+      display: block;
+    }
+
+    .ad-slot--rectangle .ad-slot__content {
+      height: 250px;
+    }
+  }
+
+  .ad-slot[data-ad-format="320x50"] .ad-slot__frame,
+  .ad-slot[data-ad-format="320x50"] .ad-slot__content {
+    width: 320px;
+  }
+
+  .ad-slot[data-ad-format="320x50"] .ad-slot__content {
+    height: 50px;
+  }
+
+  .ad-slot[data-ad-format="468x60"] .ad-slot__frame,
+  .ad-slot[data-ad-format="468x60"] .ad-slot__content {
+    width: 468px;
+  }
+
+  .ad-slot[data-ad-format="468x60"] .ad-slot__content {
+    height: 60px;
+  }
+
+  .ad-slot[data-ad-format="728x90"] .ad-slot__frame,
+  .ad-slot[data-ad-format="728x90"] .ad-slot__content {
+    width: 728px;
+  }
+
+  .ad-slot[data-ad-format="728x90"] .ad-slot__content {
+    height: 90px;
+  }
+
+  .ad-slot[data-ad-state="unavailable"] .ad-slot__frame,
+  .ad-slot[data-ad-state="blocked"] .ad-slot__frame {
+    display: none;
+  }
+</style>

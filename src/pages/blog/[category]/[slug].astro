@@ -1,6 +1,7 @@
 ---
 import { render } from "astro:content";
 import BaseLayout from "@layouts/BaseLayout.astro";
+import AdSlot from "@components/ads/AdSlot.astro";
 import Container from "@components/layout/Container.astro";
 import PageShell from "@components/layout/PageShell.astro";
 import PageHero from "@components/shared/PageHero.astro";
@@ -110,9 +111,11 @@ const articleJsonLd = {
         </div>
       </PageHero>
 
+      <AdSlot placement="blog-post-after-header" />
+
       <Container
         size="4xl"
-        class="grid gap-8 py-8 md:py-10 lg:grid-cols-[minmax(0,1fr)_15rem]"
+        class="grid gap-8 py-8 md:py-10 lg:grid-cols-[minmax(0,1fr)_18.75rem]"
       >
         <div
           class="blog-content max-w-none text-base leading-7 text-gray-300"
@@ -149,6 +152,12 @@ const articleJsonLd = {
               </section>
             )
           }
+
+          <AdSlot
+            placement="blog-post-sidebar"
+            variant="rectangle"
+            class="lg:!px-0"
+          />
         </aside>
       </Container>
     </article>

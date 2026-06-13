@@ -98,6 +98,20 @@ El sitio usa `https://calculadoras.tools` como dominio canonico en `astro.config
 
 Para calculadoras con preguntas frecuentes, la utilidad `buildFaqJsonLd` en `src/lib/seo.ts` ayuda a generar marcado JSON-LD de FAQ.
 
+## Publicidad
+
+Los espacios publicitarios usan `src/components/ads/AdSlot.astro`. Para conectar
+un proveedor, pega cada snippet en el formato correspondiente dentro de
+`src/lib/ads/provider.ts`. Se pueden usar los tokens `{{PLACEMENT}}` y
+`{{SLOT_ID}}` para generar identificadores por ubicacion.
+
+Mientras no exista ningun snippet configurado, los espacios solo se muestran
+como placeholders durante desarrollo y no dejan huecos en produccion. Al
+configurar un proveedor, los anuncios esperan consentimiento, seleccionan un
+solo formato segun el ancho disponible y se cargan al acercarse al viewport.
+Completa tambien `public/ads.txt` con los vendedores autorizados entregados por
+el proveedor.
+
 ## Alias de imports
 
 El proyecto define alias en `tsconfig.json`:
