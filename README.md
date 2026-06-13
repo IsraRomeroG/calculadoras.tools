@@ -109,6 +109,16 @@ El interruptor central `ADS_ENABLED` vive en `src/lib/ads/config.ts`. Cambialo
 a `false` para ocultar todos los espacios, desactivar el consentimiento y evitar
 solicitudes al proveedor sin borrar los snippets configurados.
 
+El interruptor de tres estados `AD_CONSENT_MODE` controla el banner de
+consentimiento: usa `"all"` para solicitarlo a todos, `"europe"` para
+solicitarlo solo cuando la consulta IP identifica al visitante como europeo, u
+`"off"` para desactivarlo totalmente. Al ser un unico valor, dos modos no
+pueden quedar activos al mismo tiempo.
+
+La deteccion europea usa GeoJS, guarda durante 24 horas solo la decision
+regional y, si falla, muestra el consentimiento por precaucion. La URL,
+duracion de cache y timeout se configuran en `src/lib/ads/config.ts`.
+
 Mientras no exista ningun snippet configurado, los espacios solo se muestran
 como placeholders durante desarrollo y no dejan huecos en produccion. Al
 configurar un proveedor, los anuncios esperan consentimiento, seleccionan un

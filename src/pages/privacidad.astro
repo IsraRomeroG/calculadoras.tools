@@ -4,11 +4,19 @@ import Container from "@components/layout/Container.astro";
 import PageShell from "@components/layout/PageShell.astro";
 import PageHero from "@components/shared/PageHero.astro";
 import Panel from "@components/shared/Panel.astro";
+import { AD_CONSENT_MODE } from "@lib/ads/config";
 
 const description =
   "Consulta cómo calculadoras.tools maneja la información enviada por formularios y los datos necesarios para operar el sitio.";
 
 const canonical = "/privacidad";
+
+const adConsentDescription = {
+  all: "Solicitamos consentimiento a todos los visitantes antes de cargar anuncios de terceros que puedan usar cookies, seguimiento o personalización. Si rechazas, no cargamos esos anuncios y puedes seguir usando todo el sitio.",
+  europe:
+    "Para visitantes ubicados en Europa, solicitamos consentimiento antes de cargar anuncios de terceros que puedan usar cookies, seguimiento o personalización. Si rechazas, no cargamos esos anuncios y puedes seguir usando todo el sitio.",
+  off: "Los anuncios de terceros pueden usar cookies, seguimiento o personalización y actualmente se cargan sin solicitar consentimiento mediante un banner.",
+}[AD_CONSENT_MODE];
 
 const sections = [
   {
@@ -28,13 +36,21 @@ const sections = [
   },
   {
     title: "Cookies, publicidad y consentimiento",
-    content:
-      "No usamos cuentas de usuario ni cookies propias para iniciar sesión. Cuando un proveedor publicitario requiera cookies, seguimiento o personalización, solicitamos tu consentimiento antes de cargar sus anuncios. Guardamos tu elección localmente en el navegador y puedes cambiarla desde Preferencias de publicidad en el pie de página.",
+    content: `No usamos cuentas de usuario ni cookies propias para iniciar sesión. ${adConsentDescription} Cuando el banner está activo, guardamos tu elección localmente en el navegador y puedes cambiarla desde Preferencias de publicidad en el pie de página.`,
   },
+  ...(AD_CONSENT_MODE === "europe"
+    ? [
+        {
+          title: "Detección regional",
+          content:
+            "Antes de cargar publicidad consultamos GeoJS desde el navegador para determinar de forma aproximada si la dirección IP pertenece a Europa. GeoJS recibe la dirección IP al procesar esa solicitud. Calculadoras.tools guarda durante 24 horas únicamente la decisión requiere consentimiento o no requiere consentimiento, sin almacenar la IP, país o ciudad. Si la consulta falla, mostramos el consentimiento por precaución.",
+        },
+      ]
+    : []),
   {
     title: "Servicios de terceros",
     content:
-      "El sitio puede depender de proveedores técnicos para alojamiento, entrega del sitio, procesamiento del formulario y publicidad. Estos servicios pueden tratar datos técnicos necesarios para operar correctamente, como dirección IP, fecha, hora, información del dispositivo e interacciones con anuncios, de acuerdo con sus propias políticas.",
+      "El sitio puede depender de proveedores técnicos para alojamiento, entrega del sitio, detección regional, procesamiento del formulario y publicidad. Estos servicios pueden tratar datos técnicos necesarios para operar correctamente, como dirección IP, fecha, hora, información del dispositivo e interacciones con anuncios, de acuerdo con sus propias políticas.",
   },
   {
     title: "Conservación",

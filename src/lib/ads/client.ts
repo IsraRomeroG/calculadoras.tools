@@ -1,6 +1,6 @@
 import {
+  AD_CONSENT_MODE,
   AD_CONSENT_STORAGE_KEY,
-  ADS_REQUIRE_CONSENT,
   selectAdFormat,
   type AdFormat,
   type AdVariant,
@@ -10,6 +10,10 @@ import {
   hasConfiguredAds,
   mountProviderAd,
 } from "./provider";
+import {
+  resolveAdConsentRequirement,
+  type AdConsentRequirement,
+} from "./region";
 
 type AdConsent = "accepted" | "rejected" | null;
 type AdEventName = "ad_requested" | "ad_viewable";
@@ -21,15 +25,47 @@ interface AdEventDetail {
   path: string;
 }
 
+let consentRequirement: AdConsentRequirement | null = null;
+let consentRequirementPromise: Promise<AdConsentRequirement> | null = null;
+
 declare global {
   interface Window {
     dataLayer?: unknown[];
   }
 }
 
+function ensureConsentRequirement(): Promise<AdConsentRequirement> {
+  if (AD_CONSENT_MODE === "off") {
+    consentRequirement = "not-required";
+    return Promise.resolve("not-required");
+  }
+
+  if (AD_CONSENT_MODE === "all") {
+    consentRequirement = "required";
+    return Promise.resolve("required");
+  }
+
+  consentRequirementPromise ??= resolveAdConsentRequirement().then(
+    (requirement) => {
+      consentRequirement = requirement;
+      return requirement;
+    },
+  );
+
+  return consentRequirementPromise;
+}
+
 function getConsent(): AdConsent {
-  if (!ADS_REQUIRE_CONSENT) {
+  if (AD_CONSENT_MODE === "off") {
     return "accepted";
+  }
+
+  if (consentRequirement === "not-required") {
+    return "accepted";
+  }
+
+  if (consentRequirement === null) {
+    return null;
   }
 
   try {
@@ -183,6 +219,12 @@ export function initAdSlots(): void {
     );
 
     observer.observe(slot);
+    void ensureConsentRequirement().then(() => {
+      if (isNearViewport) {
+        load();
+      }
+    });
+
     document.addEventListener("calculadoras:ad-consent", (event) => {
       const consent = (event as CustomEvent<AdConsent>).detail;
 
@@ -204,18 +246,12 @@ export function initAdConsent(): void {
     document.querySelectorAll<HTMLElement>("[data-ad-consent-open]"),
   );
 
-  if (!banner || !hasConfiguredAds() || !ADS_REQUIRE_CONSENT) {
+  if (!banner || !hasConfiguredAds() || AD_CONSENT_MODE === "off") {
     return;
   }
 
-  preferencesButtons.forEach((button) => button.classList.remove("hidden"));
-
   const showBanner = () => banner.classList.remove("hidden");
   const hideBanner = () => banner.classList.add("hidden");
-
-  if (getConsent() === null) {
-    showBanner();
-  }
 
   preferencesButtons.forEach((button) => {
     button.addEventListener("click", showBanner);
@@ -234,4 +270,17 @@ export function initAdConsent(): void {
       setConsent("rejected");
       hideBanner();
     });
+
+  void ensureConsentRequirement().then((requirement) => {
+    if (requirement !== "required") {
+      hideBanner();
+      return;
+    }
+
+    preferencesButtons.forEach((button) => button.classList.remove("hidden"));
+
+    if (getConsent() === null) {
+      showBanner();
+    }
+  });
 }

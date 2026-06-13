@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  AD_CONSENT_MODE,
   ADS_ENABLED,
   AD_FORMATS,
   selectAdFormat,
@@ -11,6 +12,10 @@ const horizontalFormats: AdFormat[] = ["320x50", "468x60", "728x90"];
 describe("ad format selection", () => {
   it("exposes the central advertising switch", () => {
     expect(typeof ADS_ENABLED).toBe("boolean");
+  });
+
+  it("uses one exclusive consent mode", () => {
+    expect(["all", "europe", "off"]).toContain(AD_CONSENT_MODE);
   });
 
   it.each([

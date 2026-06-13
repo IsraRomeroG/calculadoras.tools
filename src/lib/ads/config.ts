@@ -9,10 +9,19 @@ export const AD_FORMATS = {
 
 export type AdFormat = keyof typeof AD_FORMATS;
 export type AdVariant = (typeof AD_FORMATS)[AdFormat]["variant"];
+export type AdConsentMode = "all" | "europe" | "off";
 
 export const ADS_ENABLED = true;
+
+("all"); // Banner para todos
+("europe"); // Banner sólo para Europa
+("off"); // Banner desactivado; anuncios cargan directamente
+export const AD_CONSENT_MODE: AdConsentMode = "off";
 export const AD_CONSENT_STORAGE_KEY = "calculadoras-ad-consent-v1";
-export const ADS_REQUIRE_CONSENT = true;
+export const AD_REGION_STORAGE_KEY = "calculadoras-ad-region-v1";
+export const AD_REGION_LOOKUP_URL = "https://get.geojs.io/v1/ip/geo.json";
+export const AD_REGION_CACHE_TTL_MS = 24 * 60 * 60 * 1000;
+export const AD_REGION_LOOKUP_TIMEOUT_MS = 3000;
 
 const HORIZONTAL_FORMATS: AdFormat[] = ["728x90", "468x60", "320x50"];
 const VERTICAL_FORMATS: AdFormat[] = ["160x600", "160x300"];
