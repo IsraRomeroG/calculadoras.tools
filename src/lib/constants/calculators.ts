@@ -305,6 +305,15 @@ export const CALCULATORS: CalculatorDirectoryItem[] = [
     order: 62,
   },
   {
+    id: "calculadora-fecha-limite-countdown",
+    title: "Calculadora de fecha límite",
+    description:
+      "Calcula cuánto falta para una fecha límite, sigue una cuenta regresiva y añade el evento a tu calendario.",
+    href: "/fecha-tiempo/calculadora-fecha-limite-countdown",
+    categorySlug: "fecha-tiempo",
+    order: 63,
+  },
+  {
     id: "conversor-de-temperatura",
     title: "Conversor de temperatura",
     description:

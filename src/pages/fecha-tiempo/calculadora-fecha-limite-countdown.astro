@@ -1,0 +1,911 @@
+---
+import AdSlot from "@components/ads/AdSlot.astro";
+import Container from "@components/layout/Container.astro";
+import PageShell from "@components/layout/PageShell.astro";
+import FaqSection from "@components/shared/FaqSection.astro";
+import PageHero from "@components/shared/PageHero.astro";
+import SectionIntro from "@components/shared/SectionIntro.astro";
+import BaseLayout from "@layouts/BaseLayout.astro";
+import { buildFaqJsonLd } from "@lib/seo";
+
+const title = "Calculadora de Fecha Límite y Cuenta Regresiva";
+const description =
+  "Calcula cuánto falta para una fecha límite o evento, crea una cuenta regresiva y añade la fecha a tu calendario.";
+const canonical = "/fecha-tiempo/calculadora-fecha-limite-countdown";
+
+const faqs = [
+  {
+    question: "¿La cuenta regresiva usa mi zona horaria?",
+    answer:
+      "Sí. Al crear una fecha con hora se usa la zona horaria local del navegador y se muestra junto al resultado. Un enlace compartido conserva el instante exacto aunque se abra desde otra zona.",
+  },
+  {
+    question: "¿Cuál es la diferencia entre días calendario y días de 24 horas?",
+    answer:
+      "Los días calendario cuentan cambios de fecha local. La duración exacta cuenta bloques completos de 24 horas, por lo que ambos valores pueden diferir durante cambios de horario.",
+  },
+  {
+    question: "¿Puedo calcular una fecha sin hora exacta?",
+    answer:
+      "Sí. Selecciona Solo fecha para contar días calendario. En ese modo la fecha es hoy durante todo ese día y no se muestra un contador de segundos.",
+  },
+  {
+    question: "¿Qué pasa si la fecha ya pasó?",
+    answer:
+      "La calculadora mantiene el resultado y muestra cuántos días calendario o cuánto tiempo exacto ha transcurrido desde la fecha límite.",
+  },
+  {
+    question: "¿El enlace compartido incluye el nombre del evento?",
+    answer:
+      "No por defecto. Puedes activar Incluir nombre del evento antes de compartir. Los datos se guardan en el fragmento de la URL y no se envían al servidor.",
+  },
+  {
+    question: "¿Puedo añadir la fecha límite a mi calendario?",
+    answer:
+      "Sí. La calculadora genera un archivo .ics en tu navegador. Las fechas sin hora se exportan como eventos de día completo.",
+  },
+];
+
+const faqJsonLd = buildFaqJsonLd(faqs);
+---
+
+<BaseLayout title={title} description={description} canonical={canonical}>
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={JSON.stringify(faqJsonLd)} />
+  </Fragment>
+
+  <PageShell>
+    <PageHero
+      title="Calculadora de fecha límite"
+      description="Descubre cuánto falta, sigue una cuenta regresiva exacta y añade el evento a tu calendario."
+      kicker="Fecha y tiempo"
+      collapseBreadcrumbOnMobile
+      containerClass="py-5 md:py-7"
+      breadcrumbs={[
+        { label: "Inicio", href: "/", ariaLabel: "Inicio" },
+        { label: "Fecha y tiempo", href: "/fecha-tiempo", optional: true },
+        { label: "Fecha límite", truncate: true },
+      ]}
+    />
+
+    <Container as="section" class="py-4 md:py-8">
+      <section
+        id="deadline-calculator"
+        class="overflow-hidden rounded-lg border border-gray-700 bg-gray-950 shadow-xl shadow-gray-950/30"
+        aria-labelledby="calculator-heading"
+      >
+        <div class="grid gap-0 lg:grid-cols-[minmax(0,0.92fr)_minmax(21rem,1.08fr)]">
+          <div class="p-4 sm:p-6">
+            <div>
+              <p class="text-sm font-semibold uppercase tracking-wide text-amber-400">
+                Crea tu fecha límite
+              </p>
+              <h2 id="calculator-heading" class="mt-2 text-2xl font-semibold">
+                ¿Cuánto falta?
+              </h2>
+              <p class="mt-2 text-sm leading-relaxed text-gray-400">
+                El nombre es opcional. Elige solo fecha o añade una hora para
+                activar la cuenta regresiva.
+              </p>
+            </div>
+
+            <div class="mt-5">
+              <label for="event-name" class="block text-sm font-semibold text-gray-200">
+                Nombre del evento <span class="font-normal text-gray-500">(opcional)</span>
+              </label>
+              <input
+                id="event-name"
+                class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-900 px-4 text-base text-white outline-none transition placeholder:text-gray-600 focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15"
+                type="text"
+                maxlength="80"
+                placeholder="Entrega del proyecto"
+                autocomplete="off"
+                data-event-name
+              />
+            </div>
+
+            <div class="mt-5 grid gap-4 sm:grid-cols-2">
+              <div>
+                <label for="target-date" class="block text-sm font-semibold text-gray-200">
+                  Fecha límite
+                </label>
+                <input
+                  id="target-date"
+                  class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-900 px-4 text-base text-white outline-none transition focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15"
+                  type="date"
+                  min="1900-01-01"
+                  max="2100-12-31"
+                  aria-describedby="deadline-error"
+                  data-target-date
+                />
+              </div>
+
+              <fieldset>
+                <legend class="text-sm font-semibold text-gray-200">Precisión</legend>
+                <div
+                  class="mt-2 grid grid-cols-2 gap-2 rounded-lg border border-gray-800 bg-gray-900/70 p-1"
+                  data-mode-group
+                >
+                  <label
+                    class="flex min-h-11 cursor-pointer items-center justify-center rounded-md px-3 py-2 text-center text-sm font-semibold text-gray-300 transition data-[active=true]:bg-amber-400 data-[active=true]:text-gray-950"
+                    data-mode-label="date-only"
+                  >
+                    <input class="sr-only" type="radio" name="countdown-mode" value="date-only" />
+                    Solo fecha
+                  </label>
+                  <label
+                    class="flex min-h-11 cursor-pointer items-center justify-center rounded-md px-3 py-2 text-center text-sm font-semibold text-gray-300 transition data-[active=true]:bg-amber-400 data-[active=true]:text-gray-950"
+                    data-mode-label="date-time"
+                    data-active="true"
+                  >
+                    <input
+                      class="sr-only"
+                      type="radio"
+                      name="countdown-mode"
+                      value="date-time"
+                      checked
+                    />
+                    Fecha y hora
+                  </label>
+                </div>
+              </fieldset>
+            </div>
+
+            <div class="mt-4" data-time-field>
+              <label for="target-time" class="block text-sm font-semibold text-gray-200">
+                Hora límite
+              </label>
+              <input
+                id="target-time"
+                class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-900 px-4 text-base text-white outline-none transition focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15 sm:max-w-xs"
+                type="time"
+                value="23:59"
+                aria-describedby="deadline-error timezone-note"
+                data-target-time
+              />
+              <p id="timezone-note" class="mt-2 text-xs leading-relaxed text-gray-500">
+                Zona detectada: <span data-timezone>Zona horaria local</span>
+              </p>
+            </div>
+
+            <div class="mt-5">
+              <p class="text-sm font-semibold text-gray-200">Accesos rápidos</p>
+              <div class="mt-2 flex flex-wrap gap-2">
+                <button
+                  class="min-h-11 rounded-lg border border-gray-700 px-3 py-2 text-sm font-semibold text-gray-200 transition hover:border-amber-400 hover:text-white focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/40"
+                  type="button"
+                  data-preset="today"
+                >
+                  Hoy 23:59
+                </button>
+                <button
+                  class="min-h-11 rounded-lg border border-gray-700 px-3 py-2 text-sm font-semibold text-gray-200 transition hover:border-amber-400 hover:text-white focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/40"
+                  type="button"
+                  data-preset="tomorrow"
+                >
+                  Mañana 23:59
+                </button>
+                <button
+                  class="min-h-11 rounded-lg border border-gray-700 px-3 py-2 text-sm font-semibold text-gray-200 transition hover:border-amber-400 hover:text-white focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/40"
+                  type="button"
+                  data-preset="seven"
+                >
+                  En 7 días
+                </button>
+                <button
+                  class="min-h-11 rounded-lg border border-gray-700 px-3 py-2 text-sm font-semibold text-gray-200 transition hover:border-amber-400 hover:text-white focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/40"
+                  type="button"
+                  data-preset="thirty"
+                >
+                  En 30 días
+                </button>
+              </div>
+            </div>
+
+            <p
+              id="deadline-error"
+              class="mt-4 hidden rounded-lg border border-red-400/30 bg-red-400/10 p-3 text-sm text-red-200"
+              data-error
+            >
+            </p>
+            <p
+              class="mt-4 hidden rounded-lg border border-amber-400/30 bg-amber-400/10 p-3 text-sm text-amber-100"
+              data-shared-notice
+            >
+            </p>
+          </div>
+
+          <aside class="border-t border-gray-800 bg-gray-900/70 p-4 sm:p-6 lg:border-l lg:border-t-0">
+            <p class="text-sm font-semibold text-amber-400" data-result-kicker>
+              Resultado
+            </p>
+            <p
+              class="mt-3 min-h-[2.5rem] break-words text-3xl font-bold leading-tight text-white md:text-4xl"
+              data-headline
+            >
+              Elige una fecha límite
+            </p>
+
+            <p
+              class="mt-4 hidden min-h-8 font-mono text-lg font-semibold tabular-nums text-amber-200 sm:text-xl"
+              aria-hidden="true"
+              data-clock
+            >
+            </p>
+            <p class="sr-only" aria-live="polite" data-announcement></p>
+
+            <p class="mt-4 text-sm leading-relaxed text-gray-300" data-target-display>
+              Completa la fecha para ver cuánto falta.
+            </p>
+            <p class="mt-2 hidden text-xs leading-relaxed text-gray-500" data-timezone-detail>
+            </p>
+
+            <dl class="mt-5 grid grid-cols-2 gap-3">
+              <div class="rounded-lg border border-gray-800 bg-gray-950/70 p-3">
+                <dt class="text-xs font-semibold uppercase tracking-wide text-gray-500">
+                  Días calendario
+                </dt>
+                <dd class="mt-2 text-lg font-semibold text-white" data-calendar-days>-</dd>
+              </div>
+              <div class="rounded-lg border border-gray-800 bg-gray-950/70 p-3">
+                <dt class="text-xs font-semibold uppercase tracking-wide text-gray-500">
+                  Tiempo exacto
+                </dt>
+                <dd class="mt-2 text-lg font-semibold text-white" data-exact-time>-</dd>
+              </div>
+            </dl>
+
+            <label
+              class="mt-5 flex min-h-11 items-center gap-3 rounded-lg border border-gray-800 bg-gray-950/60 px-3 py-2 text-sm text-gray-300"
+            >
+              <input class="size-4 accent-amber-400" type="checkbox" data-include-name />
+              Incluir nombre del evento al compartir
+            </label>
+
+            <div class="mt-4 grid gap-2 sm:grid-cols-2">
+              <button
+                class="min-h-11 rounded-lg bg-amber-400 px-4 py-2 text-sm font-semibold text-gray-950 transition hover:bg-amber-300 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/40 disabled:cursor-not-allowed disabled:opacity-40"
+                type="button"
+                disabled
+                data-calendar
+              >
+                Añadir al calendario
+              </button>
+              <button
+                class="min-h-11 rounded-lg border border-gray-700 px-4 py-2 text-sm font-semibold text-gray-200 transition hover:border-amber-400 hover:text-white focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/40 disabled:cursor-not-allowed disabled:opacity-40"
+                type="button"
+                disabled
+                data-share
+              >
+                Compartir
+              </button>
+              <button
+                class="min-h-11 rounded-lg border border-gray-700 px-4 py-2 text-sm font-semibold text-gray-200 transition hover:border-amber-400 hover:text-white focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/40 disabled:cursor-not-allowed disabled:opacity-40"
+                type="button"
+                disabled
+                data-copy
+              >
+                Copiar resumen
+              </button>
+              <button
+                class="min-h-11 rounded-lg border border-gray-700 px-4 py-2 text-sm font-semibold text-gray-200 transition hover:border-amber-400 hover:text-white focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/40"
+                type="button"
+                data-clear
+              >
+                Limpiar
+              </button>
+            </div>
+            <p class="mt-3 min-h-5 text-xs text-gray-400" aria-live="polite" data-action-status>
+            </p>
+          </aside>
+        </div>
+      </section>
+    </Container>
+
+    <AdSlot placement="calculator-after-tool" />
+
+    <Container as="section" class="py-6 md:py-8">
+      <SectionIntro
+        title="Días calendario y tiempo exacto"
+        description="Una fecha límite puede entenderse como un día completo o como un instante exacto. La calculadora muestra ambos criterios sin mezclarlos."
+      />
+      <div class="grid gap-4 md:grid-cols-3">
+        <div class="rounded-lg border border-gray-800 bg-gray-950 p-5">
+          <h3 class="text-lg font-semibold">Solo fecha</h3>
+          <p class="mt-3 text-sm leading-relaxed text-gray-400">
+            Cuenta cambios de fecha local. El evento se considera hoy durante
+            todo el día y se exporta como evento de día completo.
+          </p>
+        </div>
+        <div class="rounded-lg border border-gray-800 bg-gray-950 p-5">
+          <h3 class="text-lg font-semibold">Fecha y hora</h3>
+          <p class="mt-3 text-sm leading-relaxed text-gray-400">
+            Representa un instante exacto. Activa el contador en vivo y conserva
+            el mismo momento cuando compartes el enlace.
+          </p>
+        </div>
+        <div class="rounded-lg border border-gray-800 bg-gray-950 p-5">
+          <h3 class="text-lg font-semibold">Zona horaria</h3>
+          <p class="mt-3 text-sm leading-relaxed text-gray-400">
+            Se detecta en tu navegador. Al abrir un evento compartido desde otra
+            zona se muestra su equivalencia local.
+          </p>
+        </div>
+      </div>
+    </Container>
+
+    <Container as="section" class="py-6 md:py-8">
+      <div class="rounded-lg border border-gray-700 bg-gray-950 p-5">
+        <h2 class="text-xl font-semibold">Aviso sobre fechas importantes</h2>
+        <p class="mt-3 text-sm leading-relaxed text-gray-400">
+          Esta herramienta ayuda a seguir fechas, pero no sustituye reglas
+          legales, laborales, fiscales ni contractuales. Verifica siempre el
+          criterio aplicable a tu caso.
+        </p>
+      </div>
+    </Container>
+
+    <AdSlot placement="calculator-before-faq" />
+    <FaqSection faqs={faqs} />
+  </PageShell>
+</BaseLayout>
+
+<script>
+  import {
+    DEFAULT_TIME,
+    buildCalendarFile,
+    buildCopyText,
+    buildCountdownHeadline,
+    buildShareFragment,
+    calculateCountdown,
+    createLocalTarget,
+    formatCountdownClock,
+    formatDateInput,
+    formatDateTimeInTimeZone,
+    formatExactDuration,
+    formatLocalDateTime,
+    getCalendarFilename,
+    getDetectedTimeZone,
+    getLocalDateParts,
+    parseDateInput,
+    parseShareFragment,
+  } from "@lib/calculators/fecha-tiempo/calculadora-fecha-limite-countdown/countdown";
+  import {
+    addCalendarDays,
+    formatFullPlainDate,
+  } from "@lib/calculators/fecha-tiempo/diferencia-entre-fechas/date-difference";
+
+  const nameInput = document.querySelector("[data-event-name]");
+  const dateInput = document.querySelector("[data-target-date]");
+  const timeInput = document.querySelector("[data-target-time]");
+  const modeInputs = Array.from(
+    document.querySelectorAll('input[name="countdown-mode"]'),
+  );
+  const modeLabels = Array.from(document.querySelectorAll("[data-mode-label]"));
+  const timeField = document.querySelector("[data-time-field]");
+  const timeZoneDisplay = document.querySelector("[data-timezone]");
+  const errorDisplay = document.querySelector("[data-error]");
+  const sharedNotice = document.querySelector("[data-shared-notice]");
+  const resultKicker = document.querySelector("[data-result-kicker]");
+  const headline = document.querySelector("[data-headline]");
+  const clock = document.querySelector("[data-clock]");
+  const announcement = document.querySelector("[data-announcement]");
+  const targetDisplay = document.querySelector("[data-target-display]");
+  const timeZoneDetail = document.querySelector("[data-timezone-detail]");
+  const calendarDaysDisplay = document.querySelector("[data-calendar-days]");
+  const exactTimeDisplay = document.querySelector("[data-exact-time]");
+  const includeNameInput = document.querySelector("[data-include-name]");
+  const calendarButton = document.querySelector("[data-calendar]");
+  const shareButton = document.querySelector("[data-share]");
+  const copyButton = document.querySelector("[data-copy]");
+  const clearButton = document.querySelector("[data-clear]");
+  const actionStatus = document.querySelector("[data-action-status]");
+  const presetButtons = Array.from(document.querySelectorAll("[data-preset]"));
+
+  const localTimeZone = getDetectedTimeZone();
+  let creatorTimeZone = localTimeZone;
+  let sharedTargetMs = null;
+  let currentCalculation = null;
+  let intervalId = null;
+  let midnightTimeoutId = null;
+  let statusTimeoutId = null;
+  let lastAnnouncementKey = "";
+
+  timeZoneDisplay.textContent = localTimeZone;
+
+  function getMode() {
+    return (
+      modeInputs.find((input) => input.checked)?.value ??
+      "date-time"
+    );
+  }
+
+  function setMode(mode) {
+    modeInputs.forEach((input) => {
+      input.checked = input.value === mode;
+    });
+    updateModeUi();
+  }
+
+  function updateModeUi() {
+    const mode = getMode();
+    const usesTime = mode === "date-time";
+
+    timeField.classList.toggle("hidden", !usesTime);
+    modeLabels.forEach((label) => {
+      label.dataset.active = String(label.dataset.modeLabel === mode);
+    });
+  }
+
+  function readTime() {
+    const match = /^(\d{2}):(\d{2})$/.exec(timeInput.value);
+
+    return match
+      ? { hour: Number(match[1]), minute: Number(match[2]) }
+      : null;
+  }
+
+  function formatTimeInput(timestamp) {
+    const date = new Date(timestamp);
+
+    return `${String(date.getHours()).padStart(2, "0")}:${String(
+      date.getMinutes(),
+    ).padStart(2, "0")}`;
+  }
+
+  function clearError() {
+    errorDisplay.textContent = "";
+    errorDisplay.classList.add("hidden");
+  }
+
+  function showError(message) {
+    errorDisplay.textContent = message;
+    errorDisplay.classList.remove("hidden");
+  }
+
+  function showSharedNotice(message) {
+    sharedNotice.textContent = message;
+    sharedNotice.classList.toggle("hidden", !message);
+  }
+
+  function setActionStatus(message) {
+    window.clearTimeout(statusTimeoutId);
+    actionStatus.textContent = message;
+
+    if (message) {
+      statusTimeoutId = window.setTimeout(() => {
+        actionStatus.textContent = "";
+      }, 3000);
+    }
+  }
+
+  function setActionsEnabled(enabled) {
+    calendarButton.disabled = !enabled;
+    shareButton.disabled = !enabled;
+    copyButton.disabled = !enabled;
+    includeNameInput.disabled = !enabled || !nameInput.value.trim();
+  }
+
+  function resetResult(message = "Completa la fecha para ver cuánto falta.") {
+    currentCalculation = null;
+    resultKicker.textContent = "Resultado";
+    headline.textContent = "Elige una fecha límite";
+    clock.textContent = "";
+    clock.classList.add("hidden");
+    targetDisplay.textContent = message;
+    timeZoneDetail.textContent = "";
+    timeZoneDetail.classList.add("hidden");
+    calendarDaysDisplay.textContent = "-";
+    exactTimeDisplay.textContent = "-";
+    announcement.textContent = "";
+    lastAnnouncementKey = "";
+    setActionsEnabled(false);
+    stopInterval();
+  }
+
+  function getTargetData() {
+    const mode = getMode();
+    const targetDate = parseDateInput(dateInput.value);
+
+    if (!targetDate) {
+      return { ok: false, error: "Selecciona una fecha límite válida." };
+    }
+
+    if (mode === "date-only") {
+      return { ok: true, mode, targetDate };
+    }
+
+    if (Number.isFinite(sharedTargetMs)) {
+      return {
+        ok: true,
+        mode,
+        targetDate: getLocalDateParts(new Date(sharedTargetMs)),
+        targetMs: sharedTargetMs,
+      };
+    }
+
+    const time = readTime();
+
+    if (!time) {
+      return { ok: false, error: "Selecciona una hora válida." };
+    }
+
+    const localTarget = createLocalTarget(targetDate, time.hour, time.minute);
+
+    if (!localTarget.ok) {
+      const error =
+        localTarget.error === "local_time_invalid"
+          ? "Esa hora no existe en tu zona horaria debido al cambio de horario."
+          : "Selecciona una fecha y hora válidas.";
+
+      return { ok: false, error };
+    }
+
+    return {
+      ok: true,
+      mode,
+      targetDate,
+      targetMs: localTarget.targetMs,
+    };
+  }
+
+  function updateCalculator({ manageTimer = true } = {}) {
+    clearError();
+    updateModeUi();
+
+    if (!dateInput.value) {
+      resetResult();
+      return;
+    }
+
+    const target = getTargetData();
+
+    if (!target.ok) {
+      showError(target.error);
+      resetResult("Corrige los datos para continuar.");
+      return;
+    }
+
+    const result = calculateCountdown({
+      mode: target.mode,
+      targetDate: target.targetDate,
+      targetMs: target.targetMs,
+    });
+    const name = nameInput.value.trim();
+    const copyText = buildCopyText({
+      name,
+      mode: target.mode,
+      targetDate: target.targetDate,
+      targetMs: target.targetMs,
+      timeZone: target.mode === "date-time" ? creatorTimeZone : undefined,
+      result,
+    });
+
+    currentCalculation = { ...target, result, name, copyText };
+    renderResult(currentCalculation);
+
+    if (manageTimer) {
+      syncInterval();
+    }
+  }
+
+  function renderResult(calculation) {
+    const { mode, targetDate, targetMs, result, name } = calculation;
+    const absoluteCalendarDays = Math.abs(result.calendarDays);
+
+    resultKicker.textContent =
+      result.status.includes("past") ? "Tiempo transcurrido" : "Cuenta regresiva";
+    headline.textContent = buildCountdownHeadline(result, name);
+    calendarDaysDisplay.textContent =
+      result.calendarDays === 0
+        ? "Es hoy"
+        : `${absoluteCalendarDays} ${
+            absoluteCalendarDays === 1 ? "día" : "días"
+          }`;
+
+    if (mode === "date-only") {
+      clock.textContent = "";
+      clock.classList.add("hidden");
+      exactTimeDisplay.textContent = "No aplica";
+      targetDisplay.textContent = formatFullPlainDate(targetDate);
+      timeZoneDetail.textContent = "Fecha de calendario sin hora exacta.";
+      timeZoneDetail.classList.remove("hidden");
+    } else {
+      clock.textContent = formatCountdownClock(result.duration);
+      clock.classList.remove("hidden");
+      exactTimeDisplay.textContent = formatExactDuration(result.duration);
+      targetDisplay.textContent = formatLocalDateTime(targetMs);
+
+      if (creatorTimeZone !== localTimeZone) {
+        timeZoneDetail.textContent = `En tu zona se muestra arriba. Creado para: ${formatDateTimeInTimeZone(
+          targetMs,
+          creatorTimeZone,
+        )} · ${creatorTimeZone}`;
+      } else {
+        timeZoneDetail.textContent = `Zona horaria: ${localTimeZone}`;
+      }
+
+      timeZoneDetail.classList.remove("hidden");
+    }
+
+    const announcementKey = `${result.status}:${result.calendarDays}`;
+
+    if (announcementKey !== lastAnnouncementKey) {
+      announcement.textContent = `${headline.textContent} ${targetDisplay.textContent}`;
+      lastAnnouncementKey = announcementKey;
+    }
+
+    setActionsEnabled(true);
+  }
+
+  function stopInterval() {
+    if (intervalId !== null) {
+      window.clearInterval(intervalId);
+      intervalId = null;
+    }
+  }
+
+  function syncInterval() {
+    stopInterval();
+
+    if (
+      currentCalculation?.mode !== "date-time" ||
+      document.visibilityState !== "visible" ||
+      currentCalculation.result.status === "datetime-now" ||
+      currentCalculation.result.diffMs <= 0
+    ) {
+      return;
+    }
+
+    intervalId = window.setInterval(() => {
+      updateCalculator({ manageTimer: false });
+
+      if (
+        currentCalculation?.result.status === "datetime-now" ||
+        currentCalculation?.result.diffMs <= 0
+      ) {
+        stopInterval();
+      }
+    }, 1000);
+  }
+
+  function invalidateSharedTarget() {
+    sharedTargetMs = null;
+    creatorTimeZone = localTimeZone;
+    showSharedNotice("");
+  }
+
+  function applyPreset(preset) {
+    const today = getLocalDateParts();
+    const days =
+      preset === "tomorrow"
+        ? 1
+        : preset === "seven"
+          ? 7
+          : preset === "thirty"
+            ? 30
+            : 0;
+    const targetDate = addCalendarDays(today, days);
+
+    invalidateSharedTarget();
+    dateInput.value = formatDateInput(targetDate);
+
+    if (preset === "today" || preset === "tomorrow") {
+      setMode("date-time");
+      timeInput.value = DEFAULT_TIME;
+    } else {
+      setMode("date-only");
+    }
+
+    updateCalculator();
+  }
+
+  function clearHash() {
+    if (!window.location.hash) {
+      return;
+    }
+
+    window.history.replaceState(
+      null,
+      "",
+      `${window.location.pathname}${window.location.search}`,
+    );
+  }
+
+  function clearCalculator() {
+    nameInput.value = "";
+    dateInput.value = "";
+    timeInput.value = DEFAULT_TIME;
+    includeNameInput.checked = false;
+    setMode("date-time");
+    invalidateSharedTarget();
+    clearHash();
+    clearError();
+    setActionStatus("");
+    resetResult();
+  }
+
+  async function writeClipboard(value) {
+    if (navigator.clipboard?.writeText) {
+      await navigator.clipboard.writeText(value);
+      return;
+    }
+
+    const textArea = document.createElement("textarea");
+    textArea.value = value;
+    textArea.setAttribute("readonly", "");
+    textArea.style.position = "fixed";
+    textArea.style.opacity = "0";
+    document.body.append(textArea);
+    textArea.select();
+    document.execCommand("copy");
+    textArea.remove();
+  }
+
+  async function copyResult() {
+    if (!currentCalculation) {
+      return;
+    }
+
+    try {
+      await writeClipboard(currentCalculation.copyText);
+      setActionStatus("Resumen copiado.");
+    } catch {
+      setActionStatus("No se pudo copiar el resumen.");
+    }
+  }
+
+  async function shareResult() {
+    if (!currentCalculation) {
+      return;
+    }
+
+    const fragment = buildShareFragment(
+      {
+        mode: currentCalculation.mode,
+        date: currentCalculation.targetDate,
+        targetMs: currentCalculation.targetMs,
+        timeZone:
+          currentCalculation.mode === "date-time"
+            ? creatorTimeZone
+            : undefined,
+        name: currentCalculation.name,
+      },
+      includeNameInput.checked,
+    );
+    const shareUrl = `${window.location.origin}${window.location.pathname}${window.location.search}${fragment}`;
+
+    window.history.replaceState(null, "", shareUrl);
+
+    try {
+      if (navigator.share) {
+        await navigator.share({
+          title: currentCalculation.name || "Fecha límite",
+          text: currentCalculation.copyText,
+          url: shareUrl,
+        });
+        setActionStatus("Enlace compartido.");
+      } else {
+        await writeClipboard(shareUrl);
+        setActionStatus("Enlace copiado.");
+      }
+    } catch (error) {
+      if (error?.name !== "AbortError") {
+        setActionStatus("No se pudo compartir el enlace.");
+      }
+    }
+  }
+
+  function downloadCalendar() {
+    if (!currentCalculation) {
+      return;
+    }
+
+    const calendar = buildCalendarFile({
+      name: currentCalculation.name,
+      mode: currentCalculation.mode,
+      targetDate: currentCalculation.targetDate,
+      targetMs: currentCalculation.targetMs,
+    });
+    const url = URL.createObjectURL(
+      new Blob([calendar], { type: "text/calendar;charset=utf-8" }),
+    );
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = getCalendarFilename(currentCalculation.name);
+    document.body.append(link);
+    link.click();
+    link.remove();
+    URL.revokeObjectURL(url);
+    setActionStatus("Archivo de calendario descargado.");
+  }
+
+  function loadSharedDeadline() {
+    if (!window.location.hash) {
+      return;
+    }
+
+    const parsed = parseShareFragment(window.location.hash);
+
+    if (!parsed.ok) {
+      clearHash();
+      showSharedNotice("No pudimos abrir todos los datos del enlace compartido.");
+      return;
+    }
+
+    const payload = parsed.value;
+    nameInput.value = payload.name ?? "";
+    setMode(payload.mode);
+
+    if (payload.mode === "date-only") {
+      dateInput.value = formatDateInput(payload.date);
+      creatorTimeZone = localTimeZone;
+    } else {
+      sharedTargetMs = payload.targetMs;
+      creatorTimeZone = payload.timeZone;
+      dateInput.value = formatDateInput(getLocalDateParts(new Date(payload.targetMs)));
+      timeInput.value = formatTimeInput(payload.targetMs);
+    }
+
+    showSharedNotice(
+      payload.mode === "date-time" && creatorTimeZone !== localTimeZone
+        ? "Abriste una fecha límite creada en otra zona horaria. Se muestra la equivalencia en tu zona."
+        : "Fecha límite cargada desde un enlace compartido.",
+    );
+    updateCalculator();
+  }
+
+  function scheduleMidnightRefresh() {
+    window.clearTimeout(midnightTimeoutId);
+    const now = new Date();
+    const nextMidnight = new Date(now);
+    nextMidnight.setHours(24, 0, 1, 0);
+
+    midnightTimeoutId = window.setTimeout(() => {
+      updateCalculator();
+      scheduleMidnightRefresh();
+    }, nextMidnight.getTime() - now.getTime());
+  }
+
+  modeInputs.forEach((input) => {
+    input.addEventListener("change", () => {
+      invalidateSharedTarget();
+      updateCalculator();
+    });
+  });
+
+  dateInput.addEventListener("input", () => {
+    invalidateSharedTarget();
+    updateCalculator();
+  });
+  timeInput.addEventListener("input", () => {
+    invalidateSharedTarget();
+    updateCalculator();
+  });
+  nameInput.addEventListener("input", updateCalculator);
+
+  presetButtons.forEach((button) => {
+    button.addEventListener("click", () => applyPreset(button.dataset.preset));
+  });
+
+  calendarButton.addEventListener("click", downloadCalendar);
+  shareButton.addEventListener("click", shareResult);
+  copyButton.addEventListener("click", copyResult);
+  clearButton.addEventListener("click", clearCalculator);
+
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "visible") {
+      updateCalculator();
+    } else {
+      stopInterval();
+    }
+  });
+
+  window.addEventListener("pagehide", stopInterval);
+  window.addEventListener("pageshow", () => updateCalculator());
+
+  updateModeUi();
+  resetResult();
+  loadSharedDeadline();
+  scheduleMidnightRefresh();
+</script>
