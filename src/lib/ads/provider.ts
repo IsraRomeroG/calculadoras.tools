@@ -1,4 +1,4 @@
-import type { AdFormat } from "./config";
+import { ADS_ENABLED, type AdFormat } from "./config";
 
 /**
  * Paste each provider snippet in the matching entry.
@@ -80,6 +80,10 @@ const AD_SNIPPETS: Record<AdFormat, string> = {
 };
 
 export function getConfiguredAdFormats(): AdFormat[] {
+  if (!ADS_ENABLED) {
+    return [];
+  }
+
   return (Object.keys(AD_SNIPPETS) as AdFormat[]).filter(
     (format) => AD_SNIPPETS[format].trim().length > 0,
   );
@@ -119,6 +123,10 @@ export function mountProviderAd(
   placement: string,
   slotId: string,
 ): boolean {
+  if (!ADS_ENABLED) {
+    return false;
+  }
+
   const snippet = AD_SNIPPETS[format].trim();
 
   if (!snippet) {

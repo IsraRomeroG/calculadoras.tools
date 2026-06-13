@@ -1,5 +1,5 @@
 ---
-import type { AdVariant } from "@lib/ads/config";
+import { ADS_ENABLED, type AdVariant } from "@lib/ads/config";
 import { hasConfiguredAds } from "@lib/ads/provider";
 
 interface Props {
@@ -14,7 +14,7 @@ const {
   class: className = "",
 } = Astro.props;
 const debug = import.meta.env.DEV;
-const shouldRender = debug || hasConfiguredAds();
+const shouldRender = ADS_ENABLED && (debug || hasConfiguredAds());
 const slotId = `ad-${placement.replace(/[^a-z0-9_-]+/gi, "-").toLowerCase()}`;
 ---
 

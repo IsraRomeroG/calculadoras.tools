@@ -105,6 +105,10 @@ un proveedor, pega cada snippet en el formato correspondiente dentro de
 `src/lib/ads/provider.ts`. Se pueden usar los tokens `{{PLACEMENT}}` y
 `{{SLOT_ID}}` para generar identificadores por ubicacion.
 
+El interruptor central `ADS_ENABLED` vive en `src/lib/ads/config.ts`. Cambialo
+a `false` para ocultar todos los espacios, desactivar el consentimiento y evitar
+solicitudes al proveedor sin borrar los snippets configurados.
+
 Mientras no exista ningun snippet configurado, los espacios solo se muestran
 como placeholders durante desarrollo y no dejan huecos en produccion. Al
 configurar un proveedor, los anuncios esperan consentimiento, seleccionan un

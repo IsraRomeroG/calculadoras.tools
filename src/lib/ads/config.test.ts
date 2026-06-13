@@ -1,9 +1,18 @@
 import { describe, expect, it } from "vitest";
-import { AD_FORMATS, selectAdFormat, type AdFormat } from "./config";
+import {
+  ADS_ENABLED,
+  AD_FORMATS,
+  selectAdFormat,
+  type AdFormat,
+} from "./config";
 
 const horizontalFormats: AdFormat[] = ["320x50", "468x60", "728x90"];
 
 describe("ad format selection", () => {
+  it("exposes the central advertising switch", () => {
+    expect(typeof ADS_ENABLED).toBe("boolean");
+  });
+
   it.each([
     [319, null],
     [320, "320x50"],

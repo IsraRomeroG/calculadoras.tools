@@ -10,6 +10,7 @@ export const AD_FORMATS = {
 export type AdFormat = keyof typeof AD_FORMATS;
 export type AdVariant = (typeof AD_FORMATS)[AdFormat]["variant"];
 
+export const ADS_ENABLED = true;
 export const AD_CONSENT_STORAGE_KEY = "calculadoras-ad-consent-v1";
 export const ADS_REQUIRE_CONSENT = true;
 
