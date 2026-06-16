@@ -1,0 +1,767 @@
+---
+import AdSlot from "@components/ads/AdSlot.astro";
+import Container from "@components/layout/Container.astro";
+import PageShell from "@components/layout/PageShell.astro";
+import FaqSection from "@components/shared/FaqSection.astro";
+import PageHero from "@components/shared/PageHero.astro";
+import SectionIntro from "@components/shared/SectionIntro.astro";
+import BaseLayout from "@layouts/BaseLayout.astro";
+import { buildFaqJsonLd } from "@lib/seo";
+
+const title = "Calculadora de tiempo estimado de lectura";
+const description =
+  "Calcula cuanto tardas en leer un texto segun palabras y velocidad de lectura. Estima rango, hora de finalizacion y metricas sin enviar el texto a servidores.";
+const canonical = "/fecha-tiempo/calculadora-tiempo-de-lectura";
+
+const faqs = [
+  {
+    question: "Cuantas palabras por minuto lee una persona?",
+    answer:
+      "Como referencia simple, esta calculadora usa 150 palabras por minuto para lectura lenta, 220 para promedio y 300 para lectura rapida. Puedes editar la velocidad si conoces tu ritmo.",
+  },
+  {
+    question: "El texto se guarda o se envia?",
+    answer:
+      "No. El conteo se calcula en tu navegador. La herramienta no envia el texto a servidores ni lo guarda en almacenamiento local.",
+  },
+  {
+    question: "Puedo calcular tiempo de lectura en voz alta?",
+    answer:
+      "El MVP esta orientado a lectura silenciosa. Para voz alta conviene usar una velocidad menor o una version futura con modo de presentacion.",
+  },
+  {
+    question: "Como se cuentan las palabras?",
+    answer:
+      "La calculadora usa segmentacion de palabras del navegador cuando esta disponible y un patron Unicode como respaldo para letras, numeros y palabras con guion o apostrofo.",
+  },
+  {
+    question: "Por que cambia el tiempo con lectura lenta o rapida?",
+    answer:
+      "El tiempo se obtiene dividiendo palabras entre palabras por minuto. Una velocidad menor aumenta el tiempo; una velocidad mayor lo reduce.",
+  },
+  {
+    question: "Como saber a que hora terminare de leer?",
+    answer:
+      "La herramienta suma el tiempo estimado a la hora actual de tu dispositivo y redondea hacia el siguiente minuto para mostrar una hora practica de finalizacion.",
+  },
+];
+
+const faqJsonLd = buildFaqJsonLd(faqs);
+---
+
+<BaseLayout title={title} description={description} canonical={canonical}>
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={JSON.stringify(faqJsonLd)} />
+  </Fragment>
+
+  <PageShell>
+    <PageHero
+      title="Calculadora de tiempo de lectura"
+      description="Pega un texto o ingresa palabras para estimar duracion, rango y hora aproximada de finalizacion."
+      kicker="Fecha y tiempo"
+      collapseBreadcrumbOnMobile
+      containerClass="py-5 md:py-7"
+      breadcrumbs={[
+        { label: "Inicio", href: "/", ariaLabel: "Inicio" },
+        { label: "Fecha y tiempo", href: "/fecha-tiempo", optional: true },
+        { label: "Tiempo de lectura", truncate: true },
+      ]}
+    />
+
+    <Container as="section" class="py-4 md:py-8">
+      <section
+        id="reading-time-calculator"
+        class="overflow-hidden rounded-lg border border-gray-700 bg-gray-950 shadow-xl shadow-gray-950/30"
+        aria-labelledby="calculator-heading"
+      >
+        <div class="grid gap-0 lg:grid-cols-[minmax(0,1fr)_minmax(22rem,0.9fr)]">
+          <form class="p-4 sm:p-6" novalidate data-reading-form>
+            <div>
+              <p class="text-sm font-semibold uppercase tracking-wide text-amber-400">
+                Lectura y planificacion
+              </p>
+              <h2 id="calculator-heading" class="mt-2 text-2xl font-semibold">
+                Ingresa tu texto
+              </h2>
+              <p class="mt-2 text-sm leading-relaxed text-gray-400">
+                El contenido se procesa localmente en tu navegador. No se guarda
+                el texto pegado.
+              </p>
+            </div>
+
+            <fieldset class="mt-5">
+              <legend class="reading-field-label">Modo de entrada</legend>
+              <div class="mt-2 grid grid-cols-2 gap-2 rounded-lg border border-gray-800 bg-gray-900/70 p-1">
+                <label class="reading-segmented-option" data-mode-label="text" data-active="true">
+                  <input class="sr-only" type="radio" name="reading-mode" value="text" checked />
+                  Texto
+                </label>
+                <label class="reading-segmented-option" data-mode-label="words">
+                  <input class="sr-only" type="radio" name="reading-mode" value="words" />
+                  Palabras
+                </label>
+              </div>
+            </fieldset>
+
+            <div class="mt-5" data-text-field-group>
+              <label class="reading-field-label" for="reading-text">Texto</label>
+              <textarea
+                id="reading-text"
+                class="reading-textarea"
+                rows="8"
+                placeholder="Pega aqui un articulo, ensayo, guion o documento..."
+                data-field="text"
+              ></textarea>
+              <p class="mt-2 text-xs leading-relaxed text-gray-500">
+                Hasta 100,000 caracteres sin advertencia. Puedes pegar textos
+                mas largos si tu navegador responde bien.
+              </p>
+            </div>
+
+            <div class="mt-5 hidden" data-word-field-group>
+              <label class="reading-field-label" for="manual-words">Numero de palabras</label>
+              <div class="reading-field-shell">
+                <input
+                  id="manual-words"
+                  class="reading-field-input reading-field-input-leading"
+                  type="text"
+                  inputmode="numeric"
+                  autocomplete="off"
+                  placeholder="1,200"
+                  data-field="manualWords"
+                />
+                <span class="reading-field-affix">palabras</span>
+              </div>
+              <p class="mt-2 text-xs leading-relaxed text-gray-500">
+                Acepta enteros con separadores, por ejemplo 1,200 o 1.200.
+              </p>
+            </div>
+
+            <fieldset class="mt-5">
+              <legend class="reading-field-label">Velocidad</legend>
+              <div class="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-4">
+                <button class="reading-preset" type="button" data-preset="slow" aria-pressed="false">
+                  Lento
+                </button>
+                <button class="reading-preset" type="button" data-preset="average" aria-pressed="true">
+                  Promedio
+                </button>
+                <button class="reading-preset" type="button" data-preset="fast" aria-pressed="false">
+                  Rapido
+                </button>
+                <button class="reading-preset" type="button" data-preset="custom" aria-pressed="false">
+                  Personal
+                </button>
+              </div>
+            </fieldset>
+
+            <div class="mt-5 grid gap-4 sm:grid-cols-[minmax(0,16rem)_1fr] sm:items-end">
+              <div>
+                <label class="reading-field-label" for="words-per-minute">Palabras por minuto</label>
+                <div class="reading-field-shell">
+                  <input
+                    id="words-per-minute"
+                    class="reading-field-input reading-field-input-leading"
+                    type="text"
+                    inputmode="numeric"
+                    autocomplete="off"
+                    value="220"
+                    data-field="wordsPerMinute"
+                  />
+                  <span class="reading-field-affix">ppm</span>
+                </div>
+              </div>
+              <div>
+                <label class="sr-only" for="words-per-minute-range">Ajustar palabras por minuto</label>
+                <input
+                  id="words-per-minute-range"
+                  class="reading-range"
+                  type="range"
+                  min="50"
+                  max="1000"
+                  step="10"
+                  value="220"
+                  data-field="wordsPerMinuteRange"
+                />
+              </div>
+            </div>
+
+            <label class="mt-5 flex items-start gap-3 rounded-lg border border-gray-800 bg-gray-900/60 p-3 text-sm leading-relaxed text-gray-300">
+              <input
+                class="mt-1 h-4 w-4 rounded border-gray-600 bg-gray-950 text-amber-400"
+                type="checkbox"
+                data-remember-velocity
+              />
+              <span>
+                Recordar solo mi velocidad preferida en este navegador. El texto
+                nunca se guarda.
+              </span>
+            </label>
+
+            <div
+              class="mt-5 hidden rounded-lg border border-red-400/40 bg-red-400/10 p-3 text-sm leading-relaxed text-red-100"
+              role="alert"
+              tabindex="-1"
+              data-errors
+            ></div>
+
+            <textarea
+              class="mt-5 hidden min-h-28 w-full rounded-lg border border-amber-400/40 bg-amber-400/10 p-3 text-sm text-amber-50"
+              readonly
+              data-copy-fallback
+            ></textarea>
+
+            <div class="mt-6 flex flex-col gap-3 border-t border-gray-800 pt-5 sm:flex-row sm:flex-wrap">
+              <button class="reading-primary-button w-full sm:w-auto sm:min-w-44" type="button" data-copy-result disabled>
+                <span data-copy-label>Copiar resumen</span>
+              </button>
+              <button class="reading-secondary-button" type="button" data-clear>
+                Limpiar
+              </button>
+              <p class="sr-only" aria-live="polite" data-copy-status></p>
+            </div>
+          </form>
+
+          <aside
+            class="order-first border-b border-gray-800 bg-gray-900/70 p-4 sm:p-6 lg:order-last lg:border-b-0 lg:border-l"
+            aria-live="polite"
+            tabindex="-1"
+            data-result-region
+          >
+            <p class="text-xs font-semibold uppercase tracking-wide text-amber-400" data-result-kicker>
+              Tiempo estimado
+            </p>
+            <p class="mt-3 min-h-[3rem] break-words text-4xl font-bold leading-tight text-white" data-main-result>
+              Listo para calcular
+            </p>
+            <p class="mt-2 text-sm font-semibold text-amber-100" data-result-subtitle>
+              Pega texto o ingresa palabras.
+            </p>
+            <p class="mt-3 text-sm leading-relaxed text-gray-400" data-result-note>
+              Veras duracion, rango y hora aproximada de finalizacion.
+            </p>
+
+            <div class="mt-5 grid grid-cols-2 gap-3" data-summary-grid></div>
+
+            <div
+              class="mt-4 hidden rounded-lg border border-amber-400/40 bg-amber-400/10 p-4 text-sm leading-relaxed text-amber-100"
+              data-warning-panel
+            ></div>
+
+            <section
+              class="mt-5 rounded-lg border border-gray-800 bg-gray-950/70 p-4"
+              aria-labelledby="preset-comparison-heading"
+            >
+              <h3 id="preset-comparison-heading" class="text-sm font-semibold text-white">
+                Comparacion por ritmo
+              </h3>
+              <div class="mt-3 space-y-2 text-sm" data-preset-comparison></div>
+            </section>
+          </aside>
+        </div>
+      </section>
+    </Container>
+
+    <AdSlot placement="calculator-after-tool" />
+
+    <Container as="section" class="py-6 md:py-8">
+      <SectionIntro
+        title="Para planear mejor"
+        description="La duracion exacta ayuda, pero el rango y la hora de fin son lo que vuelve util la estimacion en una agenda real."
+        class="mb-5"
+      />
+      <div class="grid gap-4 md:grid-cols-3">
+        <article class="reading-info-card">
+          <h2 class="font-semibold text-white">Lectura rapida</h2>
+          <p class="mt-2 text-sm leading-relaxed text-gray-400">
+            Usa el preset rapido para revisar cuanto tardaria una pasada ligera
+            o una lectura de reconocimiento.
+          </p>
+        </article>
+        <article class="reading-info-card">
+          <h2 class="font-semibold text-white">Estudio y notas</h2>
+          <p class="mt-2 text-sm leading-relaxed text-gray-400">
+            Baja la velocidad cuando necesitas subrayar, tomar notas o revisar
+            conceptos densos.
+          </p>
+        </article>
+        <article class="reading-info-card">
+          <h2 class="font-semibold text-white">Resumen copiable</h2>
+          <p class="mt-2 text-sm leading-relaxed text-gray-400">
+            Copia palabras, tiempo, rango y hora de fin para pegarlo en una
+            nota, CMS o plan de trabajo.
+          </p>
+        </article>
+      </div>
+    </Container>
+
+    <Container as="section" class="py-6 md:py-8">
+      <section class="rounded-lg border border-gray-700 bg-gray-950 p-5 sm:p-6">
+        <h2 class="text-2xl font-semibold">Privacidad por diseno</h2>
+        <div class="mt-4 grid gap-4 text-sm leading-relaxed text-gray-400 md:grid-cols-2">
+          <p>
+            El texto se cuenta en el cliente. No se manda a una API, no se
+            conserva como borrador y no se guarda automaticamente.
+          </p>
+          <p>
+            Si activas recordar velocidad, solo se almacena el numero de
+            palabras por minuto para reutilizarlo en visitas futuras.
+          </p>
+        </div>
+      </section>
+    </Container>
+
+    <AdSlot placement="calculator-before-faq" />
+    <FaqSection faqs={faqs} />
+  </PageShell>
+</BaseLayout>
+
+<style is:global>
+  .reading-field-label { display: block; font-size: .875rem; font-weight: 600; color: rgb(229 231 235); }
+  .reading-field-shell { margin-top: .5rem; display: flex; min-height: 3rem; min-width: 0; width: 100%; align-items: center; border-radius: .5rem; border: 1px solid rgb(55 65 81); background: rgb(17 24 39); color: white; outline: none; }
+  .reading-field-input { min-height: 2.875rem; min-width: 0; width: 100%; background: transparent; padding: 0 .25rem; color: white; outline: none; }
+  .reading-field-input-leading { padding-left: .75rem; }
+  .reading-field-affix { flex: none; padding: 0 .75rem; font-size: .875rem; color: rgb(156 163 175); }
+  .reading-field-shell:focus-within { border-color: rgb(251 191 36); box-shadow: 0 0 0 3px rgb(251 191 36 / .15); }
+  .reading-field-shell:has(.reading-field-input[aria-invalid="true"]) { border-color: rgb(248 113 113); }
+  .reading-textarea { margin-top: .5rem; min-height: 10rem; max-height: 22rem; width: 100%; resize: vertical; border-radius: .5rem; border: 1px solid rgb(55 65 81); background: rgb(17 24 39); padding: .875rem 1rem; color: white; outline: none; }
+  .reading-textarea:focus { border-color: rgb(251 191 36); box-shadow: 0 0 0 3px rgb(251 191 36 / .15); }
+  .reading-textarea[aria-invalid="true"] { border-color: rgb(248 113 113); }
+  .reading-range { min-height: 3rem; width: 100%; accent-color: rgb(251 191 36); }
+  .reading-segmented-option, .reading-preset, .reading-primary-button, .reading-secondary-button { display: inline-flex; min-height: 2.75rem; align-items: center; justify-content: center; border-radius: .5rem; padding: .5rem .75rem; text-align: center; font-size: .875rem; font-weight: 700; transition: border-color .15s, background-color .15s, color .15s; }
+  .reading-segmented-option { cursor: pointer; color: rgb(209 213 219); }
+  .reading-segmented-option[data-active="true"] { background: rgb(251 191 36); color: rgb(3 7 18); }
+  .reading-preset, .reading-secondary-button { border: 1px solid rgb(55 65 81); color: rgb(229 231 235); }
+  .reading-preset:hover, .reading-secondary-button:hover { border-color: rgb(251 191 36 / .7); color: white; }
+  .reading-preset[aria-pressed="true"] { border-color: rgb(251 191 36); background: rgb(251 191 36 / .15); color: rgb(253 230 138); }
+  .reading-primary-button { background: rgb(251 191 36); color: rgb(3 7 18); }
+  .reading-primary-button:hover { background: rgb(252 211 77); }
+  .reading-primary-button:disabled, .reading-secondary-button:disabled { cursor: not-allowed; opacity: .5; }
+  .reading-info-card { border-radius: .5rem; border: 1px solid rgb(55 65 81); background: rgb(3 7 18); padding: 1.25rem; }
+  @media (min-width: 640px) {
+    .reading-textarea { min-height: 13rem; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+  }
+</style>
+
+<script>
+  import {
+    DEFAULT_WORDS_PER_MINUTE,
+    MAX_MANUAL_WORDS,
+    MAX_TEXT_CHARACTERS,
+    MAX_WORDS_PER_MINUTE,
+    MIN_WORDS_PER_MINUTE,
+    READING_PRESETS,
+    ReadingTimeValidationError,
+    buildReadingSummary,
+    calculateReadingTime,
+    formatReadingNumber,
+    parseReadingInteger,
+  } from "@lib/calculators/fecha-tiempo/calculadora-tiempo-de-lectura/readingTime";
+
+  const STORAGE_KEY = "calculadoras.tools.reading-time.velocity.v1";
+
+  const form = document.querySelector("[data-reading-form]");
+  const modeInputs = Array.from(document.querySelectorAll('input[name="reading-mode"]'));
+  const modeLabels = Array.from(document.querySelectorAll("[data-mode-label]"));
+  const presetButtons = Array.from(document.querySelectorAll("[data-preset]"));
+  const textGroup = document.querySelector("[data-text-field-group]");
+  const wordGroup = document.querySelector("[data-word-field-group]");
+  const errorBox = document.querySelector("[data-errors]");
+  const warningPanel = document.querySelector("[data-warning-panel]");
+  const copyButton = document.querySelector("[data-copy-result]");
+  const copyLabel = document.querySelector("[data-copy-label]");
+  const copyStatus = document.querySelector("[data-copy-status]");
+  const copyFallback = document.querySelector("[data-copy-fallback]");
+  const rememberVelocity = document.querySelector("[data-remember-velocity]");
+
+  let currentSummary = "";
+
+  function get(selector) {
+    return document.querySelector(selector);
+  }
+
+  function getField(name) {
+    return get(`[data-field="${name}"]`);
+  }
+
+  function getMode() {
+    return modeInputs.find((input) => input.checked)?.value ?? "text";
+  }
+
+  function updateModeUi() {
+    const mode = getMode();
+
+    modeLabels.forEach((label) => {
+      label.dataset.active = String(label.dataset.modeLabel === mode);
+    });
+    textGroup.classList.toggle("hidden", mode !== "text");
+    wordGroup.classList.toggle("hidden", mode !== "words");
+    calculate();
+  }
+
+  function readInput() {
+    clearValidation();
+    const errors = [];
+    const mode = getMode();
+    const wordsPerMinute = readWordsPerMinute(errors);
+    const input = {
+      mode,
+      text: getField("text").value,
+      wordsPerMinute,
+      now: new Date(),
+    };
+    let empty = false;
+
+    if (mode === "text") {
+      empty = input.text.trim().length === 0;
+    } else {
+      const rawManualWords = getField("manualWords").value;
+
+      if (!rawManualWords.trim()) {
+        empty = true;
+      } else {
+        const parsedWords = parseReadingInteger(rawManualWords);
+
+        if (!parsedWords.ok) {
+          setFieldInvalid("manualWords", true);
+          errors.push("Ingresa un numero de palabras entero, por ejemplo 1,200.");
+        } else if (parsedWords.value > MAX_MANUAL_WORDS) {
+          setFieldInvalid("manualWords", true);
+          errors.push(`El numero de palabras debe ser menor o igual a ${formatReadingNumber(MAX_MANUAL_WORDS)}.`);
+        } else {
+          input.manualWords = parsedWords.value;
+          empty = parsedWords.value === 0;
+        }
+      }
+    }
+
+    return { input, errors, empty };
+  }
+
+  function readWordsPerMinute(errors) {
+    const input = getField("wordsPerMinute");
+    const parsed = parseReadingInteger(input.value);
+
+    if (!parsed.ok) {
+      setFieldInvalid("wordsPerMinute", true);
+      errors.push("La velocidad debe ser un numero entero.");
+      return DEFAULT_WORDS_PER_MINUTE;
+    }
+
+    if (parsed.value < MIN_WORDS_PER_MINUTE || parsed.value > MAX_WORDS_PER_MINUTE) {
+      setFieldInvalid("wordsPerMinute", true);
+      errors.push(`La velocidad debe estar entre ${MIN_WORDS_PER_MINUTE} y ${MAX_WORDS_PER_MINUTE} ppm.`);
+      return DEFAULT_WORDS_PER_MINUTE;
+    }
+
+    setFieldInvalid("wordsPerMinute", false);
+    return parsed.value;
+  }
+
+  function calculate() {
+    const parsed = readInput();
+
+    if (parsed.errors.length) {
+      showErrors(parsed.errors);
+      renderEmpty("Revisa los datos marcados.");
+      setCopyEnabled(false);
+      return;
+    }
+
+    if (parsed.empty) {
+      showErrors([]);
+      renderEmpty("Pega texto o ingresa palabras.");
+      setCopyEnabled(false);
+      persistVelocityPreference();
+      return;
+    }
+
+    try {
+      const result = calculateReadingTime(parsed.input);
+      currentSummary = buildReadingSummary(result);
+
+      showErrors([]);
+      renderResult(result);
+      setCopyEnabled(result.words > 0);
+      persistVelocityPreference();
+    } catch (error) {
+      const message =
+        error instanceof ReadingTimeValidationError
+          ? error.message
+          : "No se pudo calcular. Revisa los datos.";
+
+      showErrors([message]);
+      renderEmpty("No se pudo calcular.");
+      setCopyEnabled(false);
+    }
+  }
+
+  function renderResult(result) {
+    get("[data-result-kicker]").textContent =
+      result.mode === "words" ? "Tiempo por palabras" : "Tiempo por texto";
+    get("[data-main-result]").textContent = result.formattedDuration;
+    get("[data-result-subtitle]").textContent =
+      `${formatReadingNumber(result.words)} palabras | ${result.wordsPerMinute} ppm`;
+    get("[data-result-note]").textContent =
+      `Terminas aprox. a las ${result.finishTime}. Rango: ${result.formattedRange}.`;
+    get("[data-summary-grid]").innerHTML = [
+      ["Rango", result.formattedRange],
+      ["Fin estimado", result.finishTime],
+      ["Caracteres", characterLabel(result)],
+      ["Frases", sentenceLabel(result)],
+    ].map(([label, value]) => summaryCard(label, value)).join("");
+    get("[data-preset-comparison]").innerHTML = result.presetEstimates
+      .map((estimate) => definitionRow(
+        `${estimate.preset.label} (${estimate.preset.wordsPerMinute} ppm)`,
+        estimate.formattedDuration,
+      ))
+      .join("");
+
+    const warnings = [];
+
+    if (result.warnings.includes("text_too_long")) {
+      warnings.push(
+        `El texto supera ${formatReadingNumber(MAX_TEXT_CHARACTERS)} caracteres. El calculo se hizo en tu navegador, pero puede sentirse mas lento en algunos equipos.`,
+      );
+    }
+
+    warningPanel.innerHTML = warnings.map((message) => `<p>${escapeHtml(message)}</p>`).join("");
+    warningPanel.classList.toggle("hidden", warnings.length === 0);
+    copyFallback.classList.add("hidden");
+  }
+
+  function renderEmpty(note) {
+    currentSummary = "";
+    get("[data-result-kicker]").textContent = "Tiempo estimado";
+    get("[data-main-result]").textContent = "Listo para calcular";
+    get("[data-result-subtitle]").textContent = note;
+    get("[data-result-note]").textContent =
+      "Veras duracion, rango y hora aproximada de finalizacion.";
+    get("[data-summary-grid]").innerHTML = [
+      ["Palabras", "0"],
+      ["Rango", "0 s"],
+      ["Fin estimado", "-"],
+      ["Privacidad", "Local"],
+    ].map(([label, value]) => summaryCard(label, value)).join("");
+    get("[data-preset-comparison]").innerHTML = READING_PRESETS
+      .map((preset) => definitionRow(`${preset.label} (${preset.wordsPerMinute} ppm)`, "0 s"))
+      .join("");
+    warningPanel.classList.add("hidden");
+    copyFallback.classList.add("hidden");
+  }
+
+  function characterLabel(result) {
+    if (result.mode === "words") return "Sin texto";
+
+    return `${formatReadingNumber(result.metrics.charactersWithSpaces)} con espacios`;
+  }
+
+  function sentenceLabel(result) {
+    if (result.metrics.sentences === 0) return "Sin texto";
+
+    const average =
+      result.metrics.wordsPerSentence === null
+        ? ""
+        : ` | ${formatReadingNumber(result.metrics.wordsPerSentence)} palabras/frase`;
+
+    return `${formatReadingNumber(result.metrics.sentences)}${average}`;
+  }
+
+  function setPreset(presetId) {
+    if (presetId !== "custom") {
+      const preset = READING_PRESETS.find((item) => item.id === presetId);
+
+      if (preset) {
+        setWordsPerMinute(preset.wordsPerMinute);
+      }
+    }
+
+    setPresetState(presetId);
+    calculate();
+  }
+
+  function setPresetFromWordsPerMinute() {
+    const parsed = parseReadingInteger(getField("wordsPerMinute").value);
+    const preset = parsed.ok
+      ? READING_PRESETS.find((item) => item.wordsPerMinute === parsed.value)
+      : undefined;
+
+    setPresetState(preset?.id ?? "custom");
+  }
+
+  function setPresetState(activePreset) {
+    presetButtons.forEach((button) => {
+      button.setAttribute("aria-pressed", String(button.dataset.preset === activePreset));
+    });
+  }
+
+  function setWordsPerMinute(value) {
+    getField("wordsPerMinute").value = String(value);
+    getField("wordsPerMinuteRange").value = String(value);
+  }
+
+  function clearValidation() {
+    document.querySelectorAll('[aria-invalid="true"]').forEach((input) => {
+      input.removeAttribute("aria-invalid");
+    });
+  }
+
+  function setFieldInvalid(field, invalid) {
+    const element = getField(field);
+
+    if (invalid) {
+      element.setAttribute("aria-invalid", "true");
+    } else {
+      element.removeAttribute("aria-invalid");
+    }
+  }
+
+  function showErrors(messages) {
+    errorBox.innerHTML = messages.map((message) => `<p>${escapeHtml(message)}</p>`).join("");
+    errorBox.classList.toggle("hidden", messages.length === 0);
+
+    if (messages.length) {
+      errorBox.focus();
+    }
+  }
+
+  function setCopyEnabled(enabled) {
+    copyButton.disabled = !enabled;
+  }
+
+  async function copyResult() {
+    if (!currentSummary) return;
+
+    try {
+      if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(currentSummary);
+      } else {
+        const textArea = document.createElement("textarea");
+        textArea.value = currentSummary;
+        textArea.setAttribute("readonly", "");
+        textArea.style.position = "fixed";
+        textArea.style.opacity = "0";
+        document.body.append(textArea);
+        textArea.select();
+        document.execCommand("copy");
+        textArea.remove();
+      }
+
+      copyLabel.textContent = "Copiado";
+      copyStatus.textContent = "Resumen copiado.";
+      copyFallback.classList.add("hidden");
+      window.setTimeout(() => {
+        copyLabel.textContent = "Copiar resumen";
+        copyStatus.textContent = "";
+      }, 2000);
+    } catch {
+      copyFallback.value = currentSummary;
+      copyFallback.classList.remove("hidden");
+      copyFallback.focus();
+      copyFallback.select();
+      copyStatus.textContent = "No se pudo copiar automaticamente. El resumen quedo seleccionado.";
+    }
+  }
+
+  function clearForm() {
+    getField("text").value = "";
+    getField("manualWords").value = "";
+    showErrors([]);
+    renderEmpty("Pega texto o ingresa palabras.");
+    setCopyEnabled(false);
+    getMode() === "text" ? getField("text").focus() : getField("manualWords").focus();
+  }
+
+  function loadVelocityPreference() {
+    try {
+      const raw = window.localStorage.getItem(STORAGE_KEY);
+      if (!raw) return;
+
+      const data = JSON.parse(raw);
+      const parsed = parseReadingInteger(String(data.wordsPerMinute ?? ""));
+
+      if (
+        parsed.ok &&
+        parsed.value >= MIN_WORDS_PER_MINUTE &&
+        parsed.value <= MAX_WORDS_PER_MINUTE
+      ) {
+        setWordsPerMinute(parsed.value);
+        rememberVelocity.checked = true;
+        setPresetFromWordsPerMinute();
+      }
+    } catch {
+      window.localStorage.removeItem(STORAGE_KEY);
+    }
+  }
+
+  function persistVelocityPreference() {
+    if (!rememberVelocity.checked) {
+      window.localStorage.removeItem(STORAGE_KEY);
+      return;
+    }
+
+    const parsed = parseReadingInteger(getField("wordsPerMinute").value);
+
+    if (
+      parsed.ok &&
+      parsed.value >= MIN_WORDS_PER_MINUTE &&
+      parsed.value <= MAX_WORDS_PER_MINUTE
+    ) {
+      window.localStorage.setItem(
+        STORAGE_KEY,
+        JSON.stringify({ wordsPerMinute: parsed.value }),
+      );
+    }
+  }
+
+  function summaryCard(label, value) {
+    return `<div class="rounded-lg border border-gray-800 bg-gray-950/70 p-3"><span class="block text-xs font-semibold uppercase tracking-wide text-gray-500">${escapeHtml(label)}</span><span class="mt-2 block break-words text-base font-semibold text-white">${escapeHtml(value)}</span></div>`;
+  }
+
+  function definitionRow(label, value) {
+    return `<div class="flex items-start justify-between gap-3"><span class="text-gray-400">${escapeHtml(label)}</span><strong class="shrink-0 text-right text-white">${escapeHtml(value)}</strong></div>`;
+  }
+
+  function escapeHtml(value) {
+    return String(value)
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;")
+      .replaceAll("'", "&#039;");
+  }
+
+  modeInputs.forEach((input) => {
+    input.addEventListener("change", updateModeUi);
+  });
+  presetButtons.forEach((button) => {
+    button.addEventListener("click", () => setPreset(button.dataset.preset));
+  });
+  getField("wordsPerMinute").addEventListener("input", () => {
+    getField("wordsPerMinuteRange").value = getField("wordsPerMinute").value;
+    setPresetFromWordsPerMinute();
+    calculate();
+  });
+  getField("wordsPerMinuteRange").addEventListener("input", () => {
+    setWordsPerMinute(getField("wordsPerMinuteRange").value);
+    setPresetFromWordsPerMinute();
+    calculate();
+  });
+  form.addEventListener("input", (event) => {
+    if (event.target.matches('[data-field="text"], [data-field="manualWords"]')) {
+      calculate();
+    }
+  });
+  rememberVelocity.addEventListener("change", () => {
+    persistVelocityPreference();
+  });
+  copyButton.addEventListener("click", copyResult);
+  get("[data-clear]").addEventListener("click", clearForm);
+
+  loadVelocityPreference();
+  updateModeUi();
+  calculate();
+</script>

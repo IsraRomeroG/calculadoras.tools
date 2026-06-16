@@ -341,6 +341,15 @@ export const CALCULATORS: CalculatorDirectoryItem[] = [
     order: 64.7,
   },
   {
+    id: "calculadora-tiempo-de-lectura",
+    title: "Calculadora de tiempo de lectura",
+    description:
+      "Calcula tiempo estimado, rango de lectura, hora de finalizacion y metricas de palabras sin enviar el texto a servidores.",
+    href: "/fecha-tiempo/calculadora-tiempo-de-lectura",
+    categorySlug: "fecha-tiempo",
+    order: 64.8,
+  },
+  {
     id: "conversor-de-temperatura",
     title: "Conversor de temperatura",
     description:
