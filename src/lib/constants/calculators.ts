@@ -314,6 +314,15 @@ export const CALCULATORS: CalculatorDirectoryItem[] = [
     order: 63,
   },
   {
+    id: "calculadora-de-horas-trabajadas",
+    title: "Calculadora de horas trabajadas",
+    description:
+      "Suma turnos, resta descansos y estima horas normales, horas extra y pago por hora.",
+    href: "/fecha-tiempo/calculadora-de-horas-trabajadas",
+    categorySlug: "fecha-tiempo",
+    order: 64,
+  },
+  {
     id: "conversor-de-temperatura",
     title: "Conversor de temperatura",
     description:
