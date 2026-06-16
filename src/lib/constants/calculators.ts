@@ -323,6 +323,15 @@ export const CALCULATORS: CalculatorDirectoryItem[] = [
     order: 64,
   },
   {
+    id: "calculadora-pomodoro",
+    title: "Calculadora Pomodoro",
+    description:
+      "Planifica pomodoros con descansos, hora de finalizacion y bloques posibles en tu tiempo disponible.",
+    href: "/fecha-tiempo/calculadora-pomodoro",
+    categorySlug: "fecha-tiempo",
+    order: 64.5,
+  },
+  {
     id: "conversor-de-temperatura",
     title: "Conversor de temperatura",
     description:

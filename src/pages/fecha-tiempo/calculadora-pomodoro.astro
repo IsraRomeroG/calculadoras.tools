@@ -1,0 +1,756 @@
+---
+import AdSlot from "@components/ads/AdSlot.astro";
+import Container from "@components/layout/Container.astro";
+import PageShell from "@components/layout/PageShell.astro";
+import FaqSection from "@components/shared/FaqSection.astro";
+import PageHero from "@components/shared/PageHero.astro";
+import SectionIntro from "@components/shared/SectionIntro.astro";
+import BaseLayout from "@layouts/BaseLayout.astro";
+import { buildFaqJsonLd } from "@lib/seo";
+
+const title = "Calculadora Pomodoro";
+const description =
+  "Planifica sesiones Pomodoro con foco, descansos cortos, descansos largos, duración total, hora de finalización y pomodoros posibles en tu tiempo disponible.";
+const canonical = "/fecha-tiempo/calculadora-pomodoro";
+
+const faqs = [
+  {
+    question: "¿Cuánto dura un Pomodoro?",
+    answer:
+      "La técnica clásica usa 25 minutos de foco y 5 minutos de descanso corto. Después de varios pomodoros suele agregarse un descanso largo de 15 a 30 minutos.",
+  },
+  {
+    question: "¿La calculadora incluye descansos largos?",
+    answer:
+      "Sí. Puedes configurar cada cuántos pomodoros aparece el descanso largo y cuánto dura. La calculadora nunca agrega descanso después del último bloque de foco.",
+  },
+  {
+    question: "¿Puedo cambiar la duración de foco?",
+    answer:
+      "Sí. Puedes usar presets de 25, 50 o 90 minutos, o capturar valores personalizados para foco, descanso corto y descanso largo.",
+  },
+  {
+    question: "¿Cuántos pomodoros caben en 2 horas?",
+    answer:
+      "Con el preset clásico de 25 minutos de foco, 5 de descanso corto y 20 de descanso largo cada 4 pomodoros, caben 4 pomodoros completos en 2 horas y quedan 5 minutos libres.",
+  },
+  {
+    question: "¿Qué pasa si quiero terminar antes de una hora específica?",
+    answer:
+      "Agrega una hora de inicio y una hora límite. Si la hora límite es menor que la hora de inicio, se interpreta como el día siguiente.",
+  },
+  {
+    question: "¿Es mejor hacer pomodoros de 25, 50 o 90 minutos?",
+    answer:
+      "Depende del tipo de trabajo y tu energía. Los bloques de 25 minutos son útiles para iniciar rápido; 50 o 90 minutos pueden funcionar mejor para trabajo profundo con menos cambios de contexto.",
+  },
+];
+
+const faqJsonLd = buildFaqJsonLd(faqs);
+---
+
+<BaseLayout title={title} description={description} canonical={canonical}>
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={JSON.stringify(faqJsonLd)} />
+  </Fragment>
+
+  <PageShell>
+    <PageHero
+      title="Calculadora Pomodoro"
+      description="Arma un plan de foco con descansos, hora de fin y agenda de bloques lista para seguir."
+      kicker="Fecha y tiempo"
+      collapseBreadcrumbOnMobile
+      containerClass="py-5 md:py-7"
+      breadcrumbs={[
+        { label: "Inicio", href: "/", ariaLabel: "Inicio" },
+        { label: "Fecha y tiempo", href: "/fecha-tiempo", optional: true },
+        { label: "Pomodoro", truncate: true },
+      ]}
+    />
+
+    <Container as="section" class="py-4 md:py-8">
+      <section
+        id="pomodoro-calculator"
+        class="overflow-hidden rounded-lg border border-gray-700 bg-gray-950 shadow-xl shadow-gray-950/30"
+        aria-labelledby="calculator-heading"
+      >
+        <div class="grid gap-0 lg:grid-cols-[minmax(0,1fr)_minmax(22rem,0.9fr)]">
+          <form class="p-4 sm:p-6" novalidate data-pomodoro-form>
+            <div>
+              <p class="text-sm font-semibold uppercase tracking-wide text-amber-400">
+                Planificador Pomodoro
+              </p>
+              <h2 id="calculator-heading" class="mt-2 text-2xl font-semibold">
+                Configura tu bloque
+              </h2>
+            </div>
+
+            <fieldset class="mt-5">
+              <legend class="field-label">Modo</legend>
+              <div class="mt-2 grid grid-cols-2 gap-2 rounded-lg border border-gray-800 bg-gray-900/70 p-1">
+                <label class="segmented-option" data-mode-label="pomodoros" data-active="true">
+                  <input class="sr-only" type="radio" name="pomodoro-mode" value="pomodoros" checked />
+                  N pomodoros
+                </label>
+                <label class="segmented-option" data-mode-label="time">
+                  <input class="sr-only" type="radio" name="pomodoro-mode" value="time" />
+                  Tengo tiempo
+                </label>
+              </div>
+            </fieldset>
+
+            <fieldset class="mt-5">
+              <legend class="field-label">Preset</legend>
+              <div class="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-4">
+                <button class="preset-button" type="button" data-preset="classic" aria-pressed="true">
+                  25 / 5 / 20
+                </button>
+                <button class="preset-button" type="button" data-preset="long" aria-pressed="false">
+                  50 / 10 / 30
+                </button>
+                <button class="preset-button" type="button" data-preset="deep" aria-pressed="false">
+                  90 / 15 / 30
+                </button>
+                <button class="preset-button" type="button" data-preset="custom" aria-pressed="false">
+                  Personal
+                </button>
+              </div>
+            </fieldset>
+
+            <div class="mt-5 grid gap-4 sm:grid-cols-2" data-pomodoro-count-field>
+              <div>
+                <label class="field-label" for="pomodoro-count">Pomodoros</label>
+                <div class="field-shell">
+                  <input
+                    id="pomodoro-count"
+                    class="field-input field-input-leading"
+                    type="text"
+                    inputmode="numeric"
+                    autocomplete="off"
+                    value="4"
+                    data-field="pomodoros"
+                  />
+                  <span class="field-affix">bloques</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="mt-5 hidden grid gap-4 sm:grid-cols-2" data-available-time-field>
+              <div>
+                <label class="field-label" for="available-hours">Horas disponibles</label>
+                <div class="field-shell">
+                  <input
+                    id="available-hours"
+                    class="field-input field-input-leading"
+                    type="text"
+                    inputmode="numeric"
+                    autocomplete="off"
+                    value="2"
+                    data-field="availableHours"
+                  />
+                  <span class="field-affix">h</span>
+                </div>
+              </div>
+              <div>
+                <label class="field-label" for="available-minutes">Minutos</label>
+                <div class="field-shell">
+                  <input
+                    id="available-minutes"
+                    class="field-input field-input-leading"
+                    type="text"
+                    inputmode="numeric"
+                    autocomplete="off"
+                    value="0"
+                    data-field="availableMinutes"
+                  />
+                  <span class="field-affix">min</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="mt-5 grid gap-4 sm:grid-cols-2">
+              <div>
+                <label class="field-label" for="focus-minutes">Foco</label>
+                <div class="field-shell">
+                  <input
+                    id="focus-minutes"
+                    class="field-input field-input-leading"
+                    type="text"
+                    inputmode="numeric"
+                    autocomplete="off"
+                    value="25"
+                    data-field="focusMinutes"
+                  />
+                  <span class="field-affix">min</span>
+                </div>
+              </div>
+              <div>
+                <label class="field-label" for="short-break">Descanso corto</label>
+                <div class="field-shell">
+                  <input
+                    id="short-break"
+                    class="field-input field-input-leading"
+                    type="text"
+                    inputmode="numeric"
+                    autocomplete="off"
+                    value="5"
+                    data-field="shortBreakMinutes"
+                  />
+                  <span class="field-affix">min</span>
+                </div>
+              </div>
+              <div>
+                <label class="field-label" for="long-break">Descanso largo</label>
+                <div class="field-shell">
+                  <input
+                    id="long-break"
+                    class="field-input field-input-leading"
+                    type="text"
+                    inputmode="numeric"
+                    autocomplete="off"
+                    value="20"
+                    data-field="longBreakMinutes"
+                  />
+                  <span class="field-affix">min</span>
+                </div>
+              </div>
+              <div>
+                <label class="field-label" for="long-break-every">Descanso largo cada</label>
+                <div class="field-shell">
+                  <input
+                    id="long-break-every"
+                    class="field-input field-input-leading"
+                    type="text"
+                    inputmode="numeric"
+                    autocomplete="off"
+                    value="4"
+                    data-field="longBreakEvery"
+                  />
+                  <span class="field-affix">pomodoros</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="mt-5 grid gap-4 sm:grid-cols-2">
+              <div>
+                <label class="field-label" for="start-time">Hora de inicio</label>
+                <input id="start-time" class="field" type="time" data-field="startTime" />
+              </div>
+              <div>
+                <label class="field-label" for="deadline-time">
+                  Hora límite <span class="font-normal text-gray-500">(opcional)</span>
+                </label>
+                <input id="deadline-time" class="field" type="time" data-field="deadlineTime" />
+              </div>
+            </div>
+
+            <div
+              class="mt-5 hidden rounded-lg border border-red-400/40 bg-red-400/10 p-3 text-sm leading-relaxed text-red-100"
+              role="alert"
+              tabindex="-1"
+              data-errors
+            ></div>
+
+            <div class="mt-6 flex flex-col gap-3 border-t border-gray-800 pt-5 sm:flex-row sm:flex-wrap">
+              <button class="primary-button w-full sm:w-auto sm:min-w-44" type="submit">
+                Calcular plan
+              </button>
+              <button class="secondary-button" type="button" data-copy-result>
+                <span data-copy-label>Copiar resumen</span>
+              </button>
+              <button class="secondary-button" type="button" data-clear>
+                Limpiar
+              </button>
+              <p class="sr-only" aria-live="polite" data-copy-status></p>
+            </div>
+          </form>
+
+          <aside
+            class="order-first border-b border-gray-800 bg-gray-900/70 p-4 sm:p-6 lg:order-last lg:border-b-0 lg:border-l"
+            aria-live="polite"
+            tabindex="-1"
+            data-result-region
+          >
+            <p class="text-xs font-semibold uppercase tracking-wide text-amber-400" data-result-kicker>
+              Plan estimado
+            </p>
+            <p class="mt-3 min-h-[3rem] break-words text-4xl font-bold leading-tight text-white" data-main-result>
+              Tu plan
+            </p>
+            <p class="mt-2 text-sm font-semibold text-amber-100" data-result-subtitle>
+              Configura una sesión para calcularla.
+            </p>
+            <p class="mt-3 text-sm leading-relaxed text-gray-400" data-result-note>
+              Verás duración, hora de fin, descansos y agenda.
+            </p>
+
+            <div class="mt-5 grid grid-cols-2 gap-3" data-summary-grid></div>
+
+            <div
+              class="mt-4 hidden rounded-lg border border-amber-400/40 bg-amber-400/10 p-4 text-sm leading-relaxed text-amber-100"
+              data-warning-panel
+            ></div>
+
+            <details class="mt-5 rounded-lg border border-gray-800 bg-gray-950/70 p-4" data-agenda-details>
+              <summary class="cursor-pointer text-sm font-semibold text-white">
+                Agenda de bloques
+              </summary>
+              <ol class="mt-4 space-y-2" data-agenda-list></ol>
+            </details>
+          </aside>
+        </div>
+      </section>
+
+      <div class="sticky bottom-3 z-20 mt-4 lg:hidden">
+        <button class="primary-button w-full shadow-lg shadow-gray-950/50" type="button" data-mobile-calculate>
+          Calcular plan
+        </button>
+      </div>
+    </Container>
+
+    <AdSlot placement="calculator-after-tool" />
+
+    <Container as="section" class="py-6 md:py-8">
+      <SectionIntro
+        title="Tres formas de planear"
+        description="Elige cantidad de bloques, parte de un hueco libre o usa una hora límite cuando tu agenda ya tiene una frontera clara."
+        class="mb-5"
+      />
+      <div class="grid gap-4 md:grid-cols-3">
+        <article class="info-card">
+          <h2 class="font-semibold text-white">Bloques exactos</h2>
+          <p class="mt-2 text-sm leading-relaxed text-gray-400">
+            Calcula cuánto toma una sesión definida y revisa la hora estimada
+            de cierre antes de empezar.
+          </p>
+        </article>
+        <article class="info-card">
+          <h2 class="font-semibold text-white">Tiempo disponible</h2>
+          <p class="mt-2 text-sm leading-relaxed text-gray-400">
+            Convierte un hueco de 30 minutos, 2 horas o una mañana completa en
+            pomodoros completos.
+          </p>
+        </article>
+        <article class="info-card">
+          <h2 class="font-semibold text-white">Agenda copiable</h2>
+          <p class="mt-2 text-sm leading-relaxed text-gray-400">
+            El resumen incluye duración, inicio, fin y descansos para pegarlo
+            en una nota o compartirlo con tu equipo.
+          </p>
+        </article>
+      </div>
+    </Container>
+
+    <Container as="section" class="py-6 md:py-8">
+      <section class="rounded-lg border border-gray-700 bg-gray-950 p-5 sm:p-6">
+        <h2 class="text-2xl font-semibold">Descansos que sí entran en el plan</h2>
+        <div class="mt-4 grid gap-4 text-sm leading-relaxed text-gray-400 md:grid-cols-2">
+          <p>
+            La agenda solo agrega descansos entre bloques de foco. Si ya no cabe
+            otro pomodoro después de un descanso, ese descanso final no se suma.
+          </p>
+          <p>
+            Cuando el plan supera varias horas, la calculadora muestra avisos
+            para que puedas dividirlo en sesiones más sostenibles.
+          </p>
+        </div>
+      </section>
+    </Container>
+
+    <AdSlot placement="calculator-before-faq" />
+    <FaqSection faqs={faqs} />
+  </PageShell>
+</BaseLayout>
+
+<style is:global>
+  .field-label { display: block; font-size: .875rem; font-weight: 600; color: rgb(229 231 235); }
+  .field, .field-shell { margin-top: .5rem; min-height: 3rem; min-width: 0; width: 100%; border-radius: .5rem; border: 1px solid rgb(55 65 81); background: rgb(17 24 39); color: white; outline: none; }
+  .field { padding: 0 1rem; }
+  .field-shell { display: flex; align-items: center; }
+  .field-input { min-height: 2.875rem; min-width: 0; width: 100%; background: transparent; padding: 0 .25rem; color: white; outline: none; }
+  .field-input-leading { padding-left: .75rem; }
+  .field-affix { flex: none; padding: 0 .75rem; font-size: .875rem; color: rgb(156 163 175); }
+  .field:focus, .field-shell:focus-within { border-color: rgb(251 191 36); box-shadow: 0 0 0 3px rgb(251 191 36 / .15); }
+  .field[aria-invalid="true"], .field-shell:has(.field-input[aria-invalid="true"]) { border-color: rgb(248 113 113); }
+  .segmented-option, .preset-button, .primary-button, .secondary-button { display: inline-flex; min-height: 2.75rem; align-items: center; justify-content: center; border-radius: .5rem; padding: .5rem .75rem; text-align: center; font-size: .875rem; font-weight: 700; transition: border-color .15s, background-color .15s, color .15s; }
+  .segmented-option { cursor: pointer; color: rgb(209 213 219); }
+  .segmented-option[data-active="true"] { background: rgb(251 191 36); color: rgb(3 7 18); }
+  .preset-button, .secondary-button { border: 1px solid rgb(55 65 81); color: rgb(229 231 235); }
+  .preset-button:hover, .secondary-button:hover { border-color: rgb(251 191 36 / .7); color: white; }
+  .preset-button[aria-pressed="true"] { border-color: rgb(251 191 36); background: rgb(251 191 36 / .15); color: rgb(253 230 138); }
+  .primary-button { background: rgb(251 191 36); color: rgb(3 7 18); }
+  .primary-button:hover { background: rgb(252 211 77); }
+  .primary-button:disabled, .secondary-button:disabled { cursor: not-allowed; opacity: .5; }
+  .info-card { border-radius: .5rem; border: 1px solid rgb(55 65 81); background: rgb(3 7 18); padding: 1.25rem; }
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+  }
+</style>
+
+<script>
+  import {
+    POMODORO_PRESETS,
+    PomodoroValidationError,
+    buildPomodoroSummary,
+    calculatePomodoroPlan,
+    formatPomodoroDuration,
+    parsePomodoroNumber,
+  } from "@lib/calculators/fecha-tiempo/calculadora-pomodoro/pomodoro";
+
+  const form = document.querySelector("[data-pomodoro-form]");
+  const resultRegion = document.querySelector("[data-result-region]");
+  const modeLabels = Array.from(document.querySelectorAll("[data-mode-label]"));
+  const modeInputs = Array.from(document.querySelectorAll('input[name="pomodoro-mode"]'));
+  const countField = document.querySelector("[data-pomodoro-count-field]");
+  const availableField = document.querySelector("[data-available-time-field]");
+  const errorBox = document.querySelector("[data-errors]");
+  const warningPanel = document.querySelector("[data-warning-panel]");
+  const agendaDetails = document.querySelector("[data-agenda-details]");
+  const copyButton = document.querySelector("[data-copy-result]");
+  const copyLabel = document.querySelector("[data-copy-label]");
+  const copyStatus = document.querySelector("[data-copy-status]");
+  const mobileCalculate = document.querySelector("[data-mobile-calculate]");
+  const presetButtons = Array.from(document.querySelectorAll("[data-preset]"));
+
+  const warningMessages = {
+    long_session: "El plan supera 4 horas. Considera dividirlo en bloques con una pausa real entre sesiones.",
+    very_long_session: "El plan supera 8 horas. Es una sesión larga para un solo tramo de foco.",
+    unrealistic_session: "El plan supera 12 horas. Revisa si conviene partirlo en varios días o ajustar descansos.",
+    no_complete_pomodoro: "No cabe un bloque completo de foco con esta configuración.",
+  };
+  const blockStyles = {
+    focus: "border-amber-400/35 bg-amber-400/10 text-amber-50",
+    "short-break": "border-sky-400/30 bg-sky-400/10 text-sky-50",
+    "long-break": "border-emerald-400/30 bg-emerald-400/10 text-emerald-50",
+  };
+  let currentResult = null;
+  let copyText = "";
+
+  function getField(name) {
+    return document.querySelector(`[data-field="${name}"]`);
+  }
+
+  function getMode() {
+    return modeInputs.find((input) => input.checked)?.value ?? "pomodoros";
+  }
+
+  function updateModeUi() {
+    const mode = getMode();
+
+    modeLabels.forEach((label) => {
+      label.dataset.active = String(label.dataset.modeLabel === mode);
+    });
+    countField.classList.toggle("hidden", mode !== "pomodoros");
+    availableField.classList.toggle("hidden", mode !== "time");
+  }
+
+  function setMode(mode) {
+    modeInputs.forEach((input) => {
+      input.checked = input.value === mode;
+    });
+    updateModeUi();
+  }
+
+  function readIntegerField(name, label, min, max, errors) {
+    const input = getField(name);
+    const parsed = parsePomodoroNumber(input.value);
+
+    if (!parsed.ok || parsed.value < min || parsed.value > max) {
+      input.setAttribute("aria-invalid", "true");
+      errors.push(`${label} debe estar entre ${min} y ${max}.`);
+      return 0;
+    }
+
+    input.removeAttribute("aria-invalid");
+    return parsed.value;
+  }
+
+  function readInput() {
+    const errors = [];
+    const mode = getMode();
+    const deadlineTime = getField("deadlineTime").value || undefined;
+    const startTime = getField("startTime").value || undefined;
+    const focusMinutes = readIntegerField("focusMinutes", "Foco", 1, 120, errors);
+    const shortBreakMinutes = readIntegerField("shortBreakMinutes", "Descanso corto", 0, 60, errors);
+    const longBreakMinutes = readIntegerField("longBreakMinutes", "Descanso largo", 0, 120, errors);
+    const longBreakEvery = readIntegerField("longBreakEvery", "Descanso largo cada", 1, 20, errors);
+    const input = {
+      mode,
+      focusMinutes,
+      shortBreakMinutes,
+      longBreakMinutes,
+      longBreakEvery,
+      startTime,
+      deadlineTime,
+    };
+
+    getField("pomodoros").removeAttribute("aria-invalid");
+    getField("availableHours").removeAttribute("aria-invalid");
+    getField("availableMinutes").removeAttribute("aria-invalid");
+
+    if (mode === "pomodoros") {
+      input.pomodoros = readIntegerField("pomodoros", "Pomodoros", 1, 50, errors);
+    } else if (!deadlineTime) {
+      const hours = readIntegerField("availableHours", "Horas disponibles", 0, 12, errors);
+      const minutes = readIntegerField("availableMinutes", "Minutos disponibles", 0, 59, errors);
+      const availableMinutes = hours * 60 + minutes;
+
+      if (availableMinutes < 1 || availableMinutes > 720) {
+        errors.push("El tiempo disponible debe estar entre 1 minuto y 12 horas.");
+        getField("availableHours").setAttribute("aria-invalid", "true");
+        getField("availableMinutes").setAttribute("aria-invalid", "true");
+      }
+
+      input.availableMinutes = availableMinutes;
+    }
+
+    return { input, errors };
+  }
+
+  function calculate({ scroll = false } = {}) {
+    const parsed = readInput();
+
+    if (parsed.errors.length) {
+      showErrors(parsed.errors);
+      setCopyEnabled(false);
+      return;
+    }
+
+    try {
+      currentResult = calculatePomodoroPlan(parsed.input);
+      copyText = buildPomodoroSummary(currentResult);
+      showErrors([]);
+      renderResult(currentResult);
+      setCopyEnabled(true);
+
+      if (scroll) {
+        resultRegion.focus({ preventScroll: true });
+        resultRegion.scrollIntoView({
+          behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth",
+          block: "start",
+        });
+      }
+    } catch (error) {
+      const message =
+        error instanceof PomodoroValidationError
+          ? error.message
+          : "No se pudo calcular. Revisa los datos.";
+
+      showErrors([message]);
+      setCopyEnabled(false);
+    }
+  }
+
+  function renderResult(result) {
+    const hasPomodoros = result.pomodoros > 0;
+
+    document.querySelector("[data-result-kicker]").textContent =
+      result.mode === "time" ? "Pomodoros posibles" : "Plan estimado";
+    document.querySelector("[data-main-result]").textContent = hasPomodoros
+      ? formatPomodoroDuration(result.totalMinutes)
+      : "Sin bloque completo";
+    document.querySelector("[data-result-subtitle]").textContent = subtitleFor(result);
+    document.querySelector("[data-result-note]").textContent = noteFor(result);
+    document.querySelector("[data-summary-grid]").innerHTML = [
+      ["Pomodoros", String(result.pomodoros)],
+      ["Foco total", formatPomodoroDuration(result.focusTotalMinutes)],
+      ["Descansos", formatPomodoroDuration(result.breakTotalMinutes)],
+      [
+        result.mode === "time" ? "Tiempo libre" : "Hora límite",
+        result.mode === "time"
+          ? formatPomodoroDuration(result.unusedMinutes ?? 0)
+          : deadlineLabel(result),
+      ],
+    ].map(([label, value]) => summaryCard(label, value)).join("");
+
+    const warnings = result.warnings.map((warning) => warningMessages[warning.code]);
+    warningPanel.innerHTML = warnings.map((message) => `<p>${escapeHtml(message)}</p>`).join("");
+    warningPanel.classList.toggle("hidden", warnings.length === 0);
+
+    renderAgenda(result);
+  }
+
+  function subtitleFor(result) {
+    if (result.pomodoros === 0) {
+      return `El foco configurado es de ${result.focusMinutes} min.`;
+    }
+
+    if (result.deadline) {
+      return deadlineLabel(result);
+    }
+
+    if (result.endTime) {
+      return `Termina a las ${result.endTime}.`;
+    }
+
+    return `${result.pomodoros} ${result.pomodoros === 1 ? "pomodoro completo" : "pomodoros completos"}.`;
+  }
+
+  function noteFor(result) {
+    const parts = [
+      `${formatPomodoroDuration(result.focusTotalMinutes)} de foco`,
+      `${result.shortBreaks} descansos cortos`,
+      `${result.longBreaks} largos`,
+    ];
+
+    if (result.mode === "time" && result.availableMinutes !== undefined) {
+      parts.push(`${formatPomodoroDuration(result.availableMinutes)} disponibles`);
+    }
+
+    return parts.join(" · ");
+  }
+
+  function deadlineLabel(result) {
+    if (!result.deadline) return "Sin límite";
+
+    if (result.deadline.status === "on_time") {
+      return `Termina a tiempo · sobran ${formatPomodoroDuration(result.deadline.differenceMinutes)}`;
+    }
+
+    return `Se pasa por ${formatPomodoroDuration(Math.abs(result.deadline.differenceMinutes))}`;
+  }
+
+  function renderAgenda(result) {
+    const list = document.querySelector("[data-agenda-list]");
+
+    agendaDetails.open = result.blocks.length <= 10;
+    list.innerHTML = result.blocks.length
+      ? result.blocks.map((block) => `
+          <li class="rounded-lg border p-3 ${blockStyles[block.type]}">
+            <div class="flex items-start justify-between gap-3">
+              <span class="font-semibold">${escapeHtml(block.label)}</span>
+              <span class="shrink-0 text-sm">${escapeHtml(formatPomodoroDuration(block.durationMinutes))}</span>
+            </div>
+            <p class="mt-1 text-xs opacity-80">
+              ${block.startTime && block.endTime
+                ? `${escapeHtml(block.startTime)}-${escapeHtml(block.endTime)}`
+                : `${escapeHtml(formatPomodoroDuration(block.elapsedStartMinutes))}-${escapeHtml(formatPomodoroDuration(block.elapsedEndMinutes))}`}
+            </p>
+          </li>
+        `).join("")
+      : '<li class="rounded-lg border border-gray-800 bg-gray-950 p-3 text-sm text-gray-400">Ajusta el tiempo disponible o reduce la duración de foco.</li>';
+  }
+
+  function showErrors(messages) {
+    errorBox.innerHTML = messages.map((message) => `<p>${escapeHtml(message)}</p>`).join("");
+    errorBox.classList.toggle("hidden", messages.length === 0);
+
+    if (messages.length) {
+      errorBox.focus();
+    }
+  }
+
+  function setCopyEnabled(enabled) {
+    copyButton.disabled = !enabled;
+  }
+
+  async function copyResult() {
+    if (!copyText) return;
+
+    try {
+      if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(copyText);
+      } else {
+        const textArea = document.createElement("textarea");
+        textArea.value = copyText;
+        textArea.setAttribute("readonly", "");
+        textArea.style.position = "fixed";
+        textArea.style.opacity = "0";
+        document.body.append(textArea);
+        textArea.select();
+        document.execCommand("copy");
+        textArea.remove();
+      }
+
+      copyLabel.textContent = "Copiado";
+      copyStatus.textContent = "Resumen copiado.";
+      window.setTimeout(() => {
+        copyLabel.textContent = "Copiar resumen";
+        copyStatus.textContent = "";
+      }, 2000);
+    } catch {
+      copyStatus.textContent = "No se pudo copiar el resumen.";
+    }
+  }
+
+  function setPreset(name) {
+    if (name !== "custom") {
+      const preset = POMODORO_PRESETS[name];
+
+      getField("focusMinutes").value = String(preset.focusMinutes);
+      getField("shortBreakMinutes").value = String(preset.shortBreakMinutes);
+      getField("longBreakMinutes").value = String(preset.longBreakMinutes);
+      getField("longBreakEvery").value = String(preset.longBreakEvery);
+    }
+
+    presetButtons.forEach((button) => {
+      button.setAttribute("aria-pressed", String(button.dataset.preset === name));
+    });
+    calculate();
+  }
+
+  function markCustomPreset() {
+    presetButtons.forEach((button) => {
+      button.setAttribute("aria-pressed", String(button.dataset.preset === "custom"));
+    });
+  }
+
+  function setCurrentStartTime() {
+    const now = new Date();
+    getField("startTime").value = `${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`;
+  }
+
+  function clearForm() {
+    setMode("pomodoros");
+    getField("pomodoros").value = "4";
+    getField("availableHours").value = "2";
+    getField("availableMinutes").value = "0";
+    getField("deadlineTime").value = "";
+    setCurrentStartTime();
+    setPreset("classic");
+    showErrors([]);
+  }
+
+  function summaryCard(label, value) {
+    return `<div class="rounded-lg border border-gray-800 bg-gray-950/70 p-3"><span class="block text-xs font-semibold uppercase tracking-wide text-gray-500">${escapeHtml(label)}</span><span class="mt-2 block break-words text-base font-semibold text-white">${escapeHtml(value)}</span></div>`;
+  }
+
+  function escapeHtml(value) {
+    return String(value)
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;")
+      .replaceAll("'", "&#039;");
+  }
+
+  modeInputs.forEach((input) => {
+    input.addEventListener("change", () => {
+      updateModeUi();
+      calculate();
+    });
+  });
+  presetButtons.forEach((button) => {
+    button.addEventListener("click", () => setPreset(button.dataset.preset));
+  });
+  ["focusMinutes", "shortBreakMinutes", "longBreakMinutes", "longBreakEvery"].forEach((field) => {
+    getField(field).addEventListener("input", () => {
+      markCustomPreset();
+      calculate();
+    });
+  });
+  form.addEventListener("input", (event) => {
+    if (event.target.matches("[data-field]")) calculate();
+  });
+  form.addEventListener("submit", (event) => {
+    event.preventDefault();
+    calculate({ scroll: true });
+  });
+  copyButton.addEventListener("click", copyResult);
+  mobileCalculate.addEventListener("click", () => calculate({ scroll: true }));
+  document.querySelector("[data-clear]").addEventListener("click", clearForm);
+
+  updateModeUi();
+  setCurrentStartTime();
+  calculate();
+</script>
