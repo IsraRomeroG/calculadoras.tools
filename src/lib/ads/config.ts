@@ -16,7 +16,7 @@ export const ADS_ENABLED = true;
 ("all"); // Banner para todos
 ("europe"); // Banner sólo para Europa
 ("off"); // Banner desactivado; anuncios cargan directamente
-export const AD_CONSENT_MODE: AdConsentMode = "off";
+export const AD_CONSENT_MODE: AdConsentMode = "all";
 export const AD_CONSENT_STORAGE_KEY = "calculadoras-ad-consent-v1";
 export const AD_REGION_STORAGE_KEY = "calculadoras-ad-region-v1";
 export const AD_REGION_LOOKUP_URL = "https://get.geojs.io/v1/ip/geo.json";
