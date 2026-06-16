@@ -1,0 +1,996 @@
+---
+import AdSlot from "@components/ads/AdSlot.astro";
+import Container from "@components/layout/Container.astro";
+import PageShell from "@components/layout/PageShell.astro";
+import FaqSection from "@components/shared/FaqSection.astro";
+import PageHero from "@components/shared/PageHero.astro";
+import SectionIntro from "@components/shared/SectionIntro.astro";
+import BaseLayout from "@layouts/BaseLayout.astro";
+import { buildFaqJsonLd } from "@lib/seo";
+
+const title = "Calculadora de costo real de una reunión";
+const description =
+  "Calcula cuánto cuesta una reunión según duración, participantes, tarifa por hora y frecuencia. Estima horas-persona, costo recurrente y ahorro potencial.";
+const canonical = "/fecha-tiempo/calculadora-costo-reunion";
+
+const faqs = [
+  {
+    question: "¿Cómo calculo el costo de una reunión?",
+    answer:
+      "Multiplica la duración total de la reunión por la cantidad de personas y por su costo por hora. Si hay roles con tarifas diferentes, calcula cada rol por separado y suma los resultados.",
+  },
+  {
+    question: "¿Qué son horas-persona?",
+    answer:
+      "Las horas-persona miden tiempo total invertido por todas las personas. Una reunión de 1 hora con 5 personas equivale a 5 horas-persona.",
+  },
+  {
+    question: "¿Cómo se calcula el costo por minuto de una reunión?",
+    answer:
+      "Divide el costo total entre los minutos usados para el cálculo. Si agregas preparación o seguimiento, esos minutos también entran en el costo por minuto.",
+  },
+  {
+    question: "¿La calculadora incluye preparación y seguimiento?",
+    answer:
+      "Sí. Puedes agregar minutos opcionales de preparación previa y seguimiento posterior para estimar el tiempo completo que consume la reunión.",
+  },
+  {
+    question: "¿La calculadora incluye costos indirectos?",
+    answer:
+      "No. La estimación se basa solo en tiempo y costo por hora ingresados. No incluye renta de oficina, herramientas, impuestos, prestaciones ni costo de oportunidad adicional.",
+  },
+  {
+    question: "¿Cómo puedo reducir el costo de una reunión recurrente?",
+    answer:
+      "La calculadora muestra ahorro potencial por reducir minutos, quitar una persona del rol con mayor costo por persona o reducir una repetición del periodo.",
+  },
+];
+
+const faqJsonLd = buildFaqJsonLd(faqs);
+---
+
+<BaseLayout title={title} description={description} canonical={canonical}>
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={JSON.stringify(faqJsonLd)} />
+  </Fragment>
+
+  <PageShell>
+    <PageHero
+      title="Calculadora de costo de reunión"
+      description="Estima costo, horas-persona, recurrencia y ahorro potencial con roles y tarifas distintas."
+      kicker="Fecha y tiempo"
+      collapseBreadcrumbOnMobile
+      containerClass="py-5 md:py-7"
+      breadcrumbs={[
+        { label: "Inicio", href: "/", ariaLabel: "Inicio" },
+        { label: "Fecha y tiempo", href: "/fecha-tiempo", optional: true },
+        { label: "Costo de reunión", truncate: true },
+      ]}
+    />
+
+    <Container as="section" class="py-4 md:py-8">
+      <section
+        id="meeting-cost-calculator"
+        class="overflow-hidden rounded-lg border border-gray-700 bg-gray-950 shadow-xl shadow-gray-950/30"
+        aria-labelledby="calculator-heading"
+      >
+        <div class="grid gap-0 lg:grid-cols-[minmax(0,1fr)_minmax(22rem,0.9fr)]">
+          <form class="p-4 sm:p-6" novalidate data-meeting-form>
+            <div>
+              <p class="text-sm font-semibold uppercase tracking-wide text-amber-400">
+                Costo y tiempo invertido
+              </p>
+              <h2 id="calculator-heading" class="mt-2 text-2xl font-semibold">
+                Configura la reunión
+              </h2>
+            </div>
+
+            <fieldset class="mt-5">
+              <legend class="meeting-field-label">Duración</legend>
+              <div class="mt-2 grid grid-cols-4 gap-2">
+                <button class="meeting-preset" type="button" data-duration-preset="15" aria-pressed="false">
+                  15 min
+                </button>
+                <button class="meeting-preset" type="button" data-duration-preset="30" aria-pressed="false">
+                  30 min
+                </button>
+                <button class="meeting-preset" type="button" data-duration-preset="45" aria-pressed="false">
+                  45 min
+                </button>
+                <button class="meeting-preset" type="button" data-duration-preset="60" aria-pressed="true">
+                  60 min
+                </button>
+              </div>
+              <div class="mt-4">
+                <label class="sr-only" for="meeting-duration">Duración personalizada</label>
+                <div class="meeting-field-shell">
+                  <input
+                    id="meeting-duration"
+                    class="meeting-field-input meeting-field-input-leading"
+                    type="text"
+                    inputmode="numeric"
+                    autocomplete="off"
+                    value="60"
+                    data-field="durationMinutes"
+                    aria-describedby="meeting-duration-error"
+                  />
+                  <span class="meeting-field-affix">min</span>
+                </div>
+                <p id="meeting-duration-error" class="meeting-field-error" data-field-error="durationMinutes"></p>
+              </div>
+            </fieldset>
+
+            <details class="mt-5 rounded-lg border border-gray-800 bg-gray-900/60 p-4">
+              <summary class="cursor-pointer font-semibold text-white">
+                Tiempo adicional
+              </summary>
+              <div class="mt-4 grid gap-4 sm:grid-cols-2">
+                <div>
+                  <label class="meeting-field-label" for="meeting-preparation">Preparación previa</label>
+                  <div class="meeting-field-shell">
+                    <input
+                      id="meeting-preparation"
+                      class="meeting-field-input meeting-field-input-leading"
+                      type="text"
+                      inputmode="numeric"
+                      autocomplete="off"
+                      value="0"
+                      data-field="preparationMinutes"
+                      aria-describedby="meeting-preparation-error"
+                    />
+                    <span class="meeting-field-affix">min</span>
+                  </div>
+                  <p id="meeting-preparation-error" class="meeting-field-error" data-field-error="preparationMinutes"></p>
+                </div>
+                <div>
+                  <label class="meeting-field-label" for="meeting-follow-up">Seguimiento posterior</label>
+                  <div class="meeting-field-shell">
+                    <input
+                      id="meeting-follow-up"
+                      class="meeting-field-input meeting-field-input-leading"
+                      type="text"
+                      inputmode="numeric"
+                      autocomplete="off"
+                      value="0"
+                      data-field="followUpMinutes"
+                      aria-describedby="meeting-follow-up-error"
+                    />
+                    <span class="meeting-field-affix">min</span>
+                  </div>
+                  <p id="meeting-follow-up-error" class="meeting-field-error" data-field-error="followUpMinutes"></p>
+                </div>
+              </div>
+            </details>
+
+            <div class="mt-6 flex flex-wrap items-center justify-between gap-3">
+              <div>
+                <h3 class="text-lg font-semibold text-white">Participantes</h3>
+                <p class="mt-1 text-sm text-gray-500" data-role-count></p>
+              </div>
+              <button class="meeting-secondary-button" type="button" data-add-role>
+                Agregar rol
+              </button>
+            </div>
+
+            <div class="mt-4 space-y-4" data-role-list></div>
+
+            <fieldset class="mt-6">
+              <legend class="meeting-field-label">Frecuencia</legend>
+              <div class="mt-2 grid grid-cols-2 gap-2 rounded-lg border border-gray-800 bg-gray-900/70 p-1 sm:grid-cols-4">
+                <label class="meeting-segmented-option" data-frequency-label="once" data-active="true">
+                  <input class="sr-only" type="radio" name="meeting-frequency" value="once" checked />
+                  Una vez
+                </label>
+                <label class="meeting-segmented-option" data-frequency-label="weekly">
+                  <input class="sr-only" type="radio" name="meeting-frequency" value="weekly" />
+                  Semanal
+                </label>
+                <label class="meeting-segmented-option" data-frequency-label="biweekly">
+                  <input class="sr-only" type="radio" name="meeting-frequency" value="biweekly" />
+                  Quincenal
+                </label>
+                <label class="meeting-segmented-option" data-frequency-label="monthly">
+                  <input class="sr-only" type="radio" name="meeting-frequency" value="monthly" />
+                  Mensual
+                </label>
+              </div>
+
+              <div class="mt-4 hidden" data-weekly-settings>
+                <label class="meeting-field-label" for="meeting-weekly-count">Veces por semana</label>
+                <div class="meeting-field-shell max-w-xs">
+                  <input
+                    id="meeting-weekly-count"
+                    class="meeting-field-input meeting-field-input-leading"
+                    type="text"
+                    inputmode="numeric"
+                    autocomplete="off"
+                    value="1"
+                    data-field="occurrencesPerWeek"
+                    aria-describedby="meeting-weekly-error"
+                  />
+                  <span class="meeting-field-affix">veces</span>
+                </div>
+                <p id="meeting-weekly-error" class="meeting-field-error" data-field-error="occurrencesPerWeek"></p>
+              </div>
+
+              <div class="mt-4 hidden" data-monthly-settings>
+                <label class="meeting-field-label" for="meeting-monthly-count">Veces por mes</label>
+                <div class="meeting-field-shell max-w-xs">
+                  <input
+                    id="meeting-monthly-count"
+                    class="meeting-field-input meeting-field-input-leading"
+                    type="text"
+                    inputmode="numeric"
+                    autocomplete="off"
+                    value="1"
+                    data-field="occurrencesPerMonth"
+                    aria-describedby="meeting-monthly-error"
+                  />
+                  <span class="meeting-field-affix">veces</span>
+                </div>
+                <p id="meeting-monthly-error" class="meeting-field-error" data-field-error="occurrencesPerMonth"></p>
+              </div>
+            </fieldset>
+
+            <div
+              class="mt-5 hidden rounded-lg border border-red-400/40 bg-red-400/10 p-3 text-sm leading-relaxed text-red-100"
+              role="alert"
+              tabindex="-1"
+              data-errors
+            ></div>
+
+            <div class="mt-6 flex flex-col gap-3 border-t border-gray-800 pt-5 sm:flex-row sm:flex-wrap">
+              <button class="meeting-primary-button w-full sm:w-auto sm:min-w-44" type="button" data-copy-result>
+                <span data-copy-label>Copiar resumen</span>
+              </button>
+              <button class="meeting-secondary-button" type="button" data-export-csv>
+                Exportar CSV
+              </button>
+              <button class="meeting-secondary-button" type="button" data-example>
+                Probar ejemplo
+              </button>
+              <button class="meeting-secondary-button" type="button" data-clear>
+                Limpiar
+              </button>
+              <p class="sr-only" aria-live="polite" data-copy-status></p>
+            </div>
+          </form>
+
+          <aside
+            class="order-first border-b border-gray-800 bg-gray-900/70 p-4 sm:p-6 lg:order-last lg:border-b-0 lg:border-l"
+            aria-live="polite"
+            tabindex="-1"
+            data-result-region
+          >
+            <p class="text-xs font-semibold uppercase tracking-wide text-amber-400" data-result-kicker>
+              Costo estimado
+            </p>
+            <p class="mt-3 min-h-[3rem] break-words text-4xl font-bold leading-tight text-white" data-main-result>
+              $0.00
+            </p>
+            <p class="mt-2 text-sm font-semibold text-amber-100" data-result-subtitle>
+              Agrega costo por hora para estimar dinero.
+            </p>
+            <p class="mt-3 text-sm leading-relaxed text-gray-400" data-result-note>
+              Las horas-persona se calculan aunque el costo monetario sea cero.
+            </p>
+
+            <div class="mt-5 grid grid-cols-2 gap-3" data-summary-grid></div>
+
+            <section
+              class="mt-4 hidden rounded-lg border border-sky-400/30 bg-sky-400/10 p-4"
+              aria-labelledby="recurrence-heading"
+              data-recurrence-panel
+            >
+              <p class="text-xs font-semibold uppercase tracking-wide text-sky-200">
+                Impacto recurrente
+              </p>
+              <h3 id="recurrence-heading" class="mt-2 text-lg font-semibold text-white" data-recurrence-label></h3>
+              <dl class="mt-3 space-y-2 text-sm" data-recurrence-list></dl>
+            </section>
+
+            <section
+              class="mt-4 rounded-lg border border-emerald-400/30 bg-emerald-400/10 p-4"
+              aria-labelledby="insights-heading"
+            >
+              <p class="text-xs font-semibold uppercase tracking-wide text-emerald-200">
+                Ahorro potencial
+              </p>
+              <h3 id="insights-heading" class="sr-only">Ahorro potencial</h3>
+              <div class="mt-3 space-y-2 text-sm text-emerald-50" data-insights-list></div>
+            </section>
+
+            <details class="mt-4 rounded-lg border border-gray-800 bg-gray-950/70 p-4" open>
+              <summary class="cursor-pointer text-sm font-semibold text-white">
+                Desglose por rol
+              </summary>
+              <div class="mt-4 space-y-3" data-role-breakdown></div>
+            </details>
+          </aside>
+        </div>
+      </section>
+    </Container>
+
+    <AdSlot placement="calculator-after-tool" />
+
+    <Container as="section" class="py-6 md:py-8">
+      <SectionIntro
+        title="Lo que conviene mirar"
+        description="El costo por reunión explica el momento; el costo recurrente muestra el hábito."
+        class="mb-5"
+      />
+      <div class="grid gap-4 md:grid-cols-3">
+        <article class="meeting-info-card">
+          <h2 class="font-semibold text-white">Horas-persona</h2>
+          <p class="mt-2 text-sm leading-relaxed text-gray-400">
+            Una hora con cinco asistentes consume cinco horas de trabajo aunque
+            el calendario solo muestre un bloque.
+          </p>
+        </article>
+        <article class="meeting-info-card">
+          <h2 class="font-semibold text-white">Recurrencia</h2>
+          <p class="mt-2 text-sm leading-relaxed text-gray-400">
+            Una reunión semanal parece pequeña hasta verla mensual y anualizada.
+          </p>
+        </article>
+        <article class="meeting-info-card">
+          <h2 class="font-semibold text-white">Ahorro directo</h2>
+          <p class="mt-2 text-sm leading-relaxed text-gray-400">
+            Reducir minutos o asistentes suele tener un efecto más claro que
+            discutir el costo total después.
+          </p>
+        </article>
+      </div>
+    </Container>
+
+    <Container as="section" class="py-6 md:py-8">
+      <section class="rounded-lg border border-gray-700 bg-gray-950 p-5 sm:p-6">
+        <h2 class="text-2xl font-semibold">Una estimación para decidir mejor</h2>
+        <div class="mt-4 grid gap-4 text-sm leading-relaxed text-gray-400 md:grid-cols-2">
+          <p>
+            El cálculo usa las tarifas capturadas por el usuario y no intenta
+            inferir salarios, prestaciones, impuestos ni costos indirectos.
+          </p>
+          <p>
+            Si no agregas costo por hora, el resultado prioriza horas-persona
+            para mostrar el tiempo total invertido por el equipo.
+          </p>
+        </div>
+        <div class="mt-5 flex flex-wrap gap-3">
+          <a class="meeting-secondary-button" href="/fecha-tiempo/calculadora-de-horas-trabajadas">
+            Calcular horas trabajadas
+          </a>
+          <a class="meeting-secondary-button" href="/fecha-tiempo/calculadora-pomodoro">
+            Planear bloques Pomodoro
+          </a>
+        </div>
+      </section>
+    </Container>
+
+    <AdSlot placement="calculator-before-faq" />
+    <FaqSection faqs={faqs} />
+  </PageShell>
+</BaseLayout>
+
+<style is:global>
+  .meeting-field-label { display: block; font-size: .875rem; font-weight: 600; color: rgb(229 231 235); }
+  .meeting-field, .meeting-field-shell { margin-top: .5rem; min-height: 3rem; min-width: 0; width: 100%; border-radius: .5rem; border: 1px solid rgb(55 65 81); background: rgb(17 24 39); color: white; outline: none; }
+  .meeting-field { padding: 0 1rem; }
+  .meeting-field-shell { display: flex; align-items: center; }
+  .meeting-field-input { min-height: 2.875rem; min-width: 0; width: 100%; background: transparent; padding: 0 .25rem; color: white; outline: none; }
+  .meeting-field-input-leading { padding-left: .75rem; }
+  .meeting-field-affix { flex: none; padding: 0 .75rem; font-size: .875rem; color: rgb(156 163 175); }
+  .meeting-field:focus, .meeting-field-shell:focus-within { border-color: rgb(251 191 36); box-shadow: 0 0 0 3px rgb(251 191 36 / .15); }
+  .meeting-field[aria-invalid="true"], .meeting-field-shell:has(.meeting-field-input[aria-invalid="true"]) { border-color: rgb(248 113 113); }
+  .meeting-field-error { min-height: 1.1rem; margin-top: .25rem; font-size: .75rem; line-height: 1.35; color: rgb(252 165 165); }
+  .meeting-segmented-option, .meeting-preset, .meeting-primary-button, .meeting-secondary-button, .meeting-stepper-button, .meeting-role-action { display: inline-flex; min-height: 2.75rem; align-items: center; justify-content: center; border-radius: .5rem; padding: .5rem .75rem; text-align: center; font-size: .875rem; font-weight: 700; transition: border-color .15s, background-color .15s, color .15s; }
+  .meeting-segmented-option { cursor: pointer; color: rgb(209 213 219); }
+  .meeting-segmented-option[data-active="true"] { background: rgb(251 191 36); color: rgb(3 7 18); }
+  .meeting-preset, .meeting-secondary-button, .meeting-stepper-button, .meeting-role-action { border: 1px solid rgb(55 65 81); color: rgb(229 231 235); }
+  .meeting-preset:hover, .meeting-secondary-button:hover, .meeting-stepper-button:hover, .meeting-role-action:hover { border-color: rgb(251 191 36 / .7); color: white; }
+  .meeting-preset[aria-pressed="true"] { border-color: rgb(251 191 36); background: rgb(251 191 36 / .15); color: rgb(253 230 138); }
+  .meeting-primary-button { background: rgb(251 191 36); color: rgb(3 7 18); }
+  .meeting-primary-button:hover { background: rgb(252 211 77); }
+  .meeting-primary-button:disabled, .meeting-secondary-button:disabled { cursor: not-allowed; opacity: .5; }
+  .meeting-stepper-button { min-height: 3rem; width: 3rem; padding: .25rem; font-size: 1.2rem; }
+  .meeting-role-action { min-height: 2.25rem; padding: .35rem .75rem; font-size: .75rem; }
+  .meeting-role-action-danger { border-color: rgb(248 113 113 / .4); color: rgb(254 202 202); }
+  .meeting-info-card { border-radius: .5rem; border: 1px solid rgb(55 65 81); background: rgb(3 7 18); padding: 1.25rem; }
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+  }
+</style>
+
+<script>
+  import {
+    MAX_ROLES,
+    MeetingCostValidationError,
+    buildMeetingCsv,
+    buildMeetingSummary,
+    calculateMeetingCost,
+    formatMeetingCurrency,
+    formatMeetingDuration,
+    formatMeetingNumber,
+    getFrequencyLabel,
+    parseMeetingNumber,
+  } from "@lib/calculators/fecha-tiempo/calculadora-costo-reunion/meetingCost";
+
+  const get = (selector) => document.querySelector(selector);
+  const form = get("[data-meeting-form]");
+  const roleList = get("[data-role-list]");
+  const resultRegion = get("[data-result-region]");
+  const errorBox = get("[data-errors]");
+  const frequencyInputs = Array.from(document.querySelectorAll('input[name="meeting-frequency"]'));
+  const frequencyLabels = Array.from(document.querySelectorAll("[data-frequency-label]"));
+  const durationPresets = Array.from(document.querySelectorAll("[data-duration-preset]"));
+  let sequence = 0;
+  let roles = [newRole()];
+  let currentResult = null;
+  let copyText = "";
+  let csvText = "";
+
+  function newRole(values = {}) {
+    sequence += 1;
+
+    return {
+      id: `meeting-role-${sequence}`,
+      name: values.name ?? (sequence === 1 ? "Participante" : `Rol ${sequence}`),
+      people: values.people ?? "1",
+      hourlyRate: values.hourlyRate ?? "",
+      open: values.open ?? true,
+    };
+  }
+
+  function renderRoles(focusLast = false) {
+    get("[data-role-count]").textContent = `${roles.length} ${roles.length === 1 ? "rol" : "roles"}`;
+    roleList.innerHTML = roles.map((role, index) => `
+      <details
+        class="rounded-lg border border-gray-800 bg-gray-900/60 p-4"
+        data-role-card="${role.id}"
+        ${role.open ? "open" : ""}
+      >
+        <summary class="cursor-pointer list-none">
+          <div class="flex items-start justify-between gap-3">
+            <div class="min-w-0">
+              <span class="block truncate text-sm font-semibold text-white" data-role-title="${role.id}">
+                ${escapeHtml(role.name || `Rol ${index + 1}`)}
+              </span>
+              <span class="mt-1 block text-xs text-gray-400" data-role-preview="${role.id}">
+                Pendiente de cálculo
+              </span>
+            </div>
+            <span class="text-xs font-semibold text-amber-300">Editar</span>
+          </div>
+        </summary>
+
+        <div class="mt-4 grid gap-4 sm:grid-cols-2">
+          <div class="sm:col-span-2">
+            <label class="meeting-field-label" for="${role.id}-name">Nombre de rol</label>
+            <input
+              id="${role.id}-name"
+              class="meeting-field"
+              type="text"
+              maxlength="50"
+              value="${escapeHtml(role.name)}"
+              data-role-field="name"
+              data-id="${role.id}"
+              aria-describedby="${role.id}-error"
+            />
+          </div>
+
+          <div>
+            <label class="meeting-field-label" for="${role.id}-people">Personas</label>
+            <div class="mt-2 flex items-stretch gap-2">
+              <button class="meeting-stepper-button" type="button" data-role-adjust="-1" data-id="${role.id}" aria-label="Restar persona">-</button>
+              <input
+                id="${role.id}-people"
+                class="meeting-field mt-0 text-center"
+                type="text"
+                inputmode="numeric"
+                autocomplete="off"
+                value="${escapeHtml(role.people)}"
+                data-role-field="people"
+                data-id="${role.id}"
+                aria-describedby="${role.id}-error"
+              />
+              <button class="meeting-stepper-button" type="button" data-role-adjust="1" data-id="${role.id}" aria-label="Sumar persona">+</button>
+            </div>
+          </div>
+
+          <div>
+            <label class="meeting-field-label" for="${role.id}-rate">Costo por hora</label>
+            <div class="meeting-field-shell">
+              <span class="meeting-field-affix">$</span>
+              <input
+                id="${role.id}-rate"
+                class="meeting-field-input"
+                type="text"
+                inputmode="decimal"
+                autocomplete="off"
+                placeholder="500"
+                value="${escapeHtml(role.hourlyRate)}"
+                data-role-field="hourlyRate"
+                data-id="${role.id}"
+                aria-describedby="${role.id}-error"
+              />
+              <span class="meeting-field-affix">/h</span>
+            </div>
+          </div>
+        </div>
+
+        <p id="${role.id}-error" class="mt-3 hidden text-sm leading-relaxed text-red-200" data-role-error="${role.id}"></p>
+
+        <div class="mt-4 flex justify-end">
+          <button class="meeting-role-action meeting-role-action-danger" type="button" data-role-action="remove" data-id="${role.id}">
+            ${roles.length === 1 ? "Limpiar rol" : "Eliminar"}
+          </button>
+        </div>
+      </details>
+    `).join("");
+
+    if (focusLast) {
+      roleList.querySelector("details:last-child [data-role-field='name']")?.focus();
+    }
+  }
+
+  function readInput() {
+    clearValidation();
+    const errors = [];
+    const durationMinutes = readFieldNumber("durationMinutes", 1, 480, errors, false);
+    const preparationMinutes = readFieldNumber("preparationMinutes", 0, 480, errors, true);
+    const followUpMinutes = readFieldNumber("followUpMinutes", 0, 480, errors, true);
+    const frequency = getFrequency();
+    const parsedRoles = [];
+
+    roles.forEach((role, index) => {
+      const roleErrors = [];
+      const name = role.name.trim();
+      const people = parseMeetingNumber(role.people, { integer: true });
+      const hourlyRate = parseMeetingNumber(role.hourlyRate, { optional: true });
+
+      if (!name || name.length > 50) {
+        roleErrors.push("usa un nombre de 1 a 50 caracteres");
+      }
+      if (!people.ok || people.value < 1 || people.value > 100) {
+        roleErrors.push("personas debe estar entre 1 y 100");
+      }
+      if (!hourlyRate.ok || hourlyRate.value < 0) {
+        roleErrors.push("costo por hora debe ser 0 o mayor");
+      }
+
+      setRoleError(role.id, roleErrors.join(". "));
+
+      if (roleErrors.length) {
+        errors.push(`Rol ${index + 1}: ${roleErrors.join("; ")}.`);
+      } else {
+        parsedRoles.push({
+          name,
+          people: people.value,
+          hourlyRate: hourlyRate.value,
+        });
+      }
+    });
+
+    const input = {
+      durationMinutes,
+      preparationMinutes,
+      followUpMinutes,
+      roles: parsedRoles,
+      frequency,
+    };
+
+    if (frequency === "weekly") {
+      input.occurrencesPerWeek = readFieldNumber("occurrencesPerWeek", 1, 7, errors, false);
+    }
+    if (frequency === "monthly") {
+      input.occurrencesPerMonth = readFieldNumber("occurrencesPerMonth", 1, 31, errors, false);
+    }
+
+    return { input, errors };
+  }
+
+  function readFieldNumber(field, min, max, errors, optional) {
+    const input = get(`[data-field="${field}"]`);
+    const parsed = parseMeetingNumber(input.value, { integer: true, optional });
+    const message = fieldMessage(field, min, max);
+
+    if (!parsed.ok || parsed.value < min || parsed.value > max) {
+      input.setAttribute("aria-invalid", "true");
+      setFieldError(field, message);
+      errors.push(message);
+      return min;
+    }
+
+    input.removeAttribute("aria-invalid");
+    setFieldError(field);
+    return parsed.value;
+  }
+
+  function fieldMessage(field, min, max) {
+    const labels = {
+      durationMinutes: "La duración debe estar entre 1 y 480 minutos.",
+      preparationMinutes: "La preparación debe estar entre 0 y 480 minutos.",
+      followUpMinutes: "El seguimiento debe estar entre 0 y 480 minutos.",
+      occurrencesPerWeek: "Las veces por semana deben estar entre 1 y 7.",
+      occurrencesPerMonth: "Las veces por mes deben estar entre 1 y 31.",
+    };
+
+    return labels[field] ?? `El valor debe estar entre ${min} y ${max}.`;
+  }
+
+  function calculate() {
+    const parsed = readInput();
+
+    if (parsed.errors.length) {
+      showErrors(parsed.errors);
+      setActionsEnabled(false);
+      return;
+    }
+
+    try {
+      currentResult = calculateMeetingCost(parsed.input);
+      copyText = buildMeetingSummary(currentResult);
+      csvText = buildMeetingCsv(currentResult);
+      showErrors([]);
+      renderResult(currentResult);
+      setActionsEnabled(true);
+    } catch (error) {
+      const message =
+        error instanceof MeetingCostValidationError
+          ? error.message
+          : "No se pudo calcular. Revisa los datos.";
+      showErrors([message]);
+      setActionsEnabled(false);
+    }
+  }
+
+  function renderResult(result) {
+    get("[data-result-kicker]").textContent = result.isZeroCost
+      ? "Tiempo invertido"
+      : "Costo estimado por reunión";
+    get("[data-main-result]").textContent = result.isZeroCost
+      ? `${formatMeetingNumber(result.personHours)} h-persona`
+      : formatMeetingCurrency(result.totalCost);
+    get("[data-result-subtitle]").textContent = result.isZeroCost
+      ? `${result.totalPeople} ${result.totalPeople === 1 ? "persona" : "personas"} · ${formatMeetingDuration(result.totalDurationMinutes)}`
+      : `${formatMeetingNumber(result.personHours)} h-persona · ${formatMeetingCurrency(result.costPerMinute)}/min`;
+    get("[data-result-note]").textContent = result.isZeroCost
+      ? "El costo monetario es cero con las tarifas ingresadas."
+      : recurrenceNote(result);
+
+    get("[data-summary-grid]").innerHTML = [
+      ["Duración total", formatMeetingDuration(result.totalDurationMinutes)],
+      ["Personas", String(result.totalPeople)],
+      ["Costo/min", formatMeetingCurrency(result.costPerMinute)],
+      ["Horas-persona", `${formatMeetingNumber(result.personHours)} h`],
+    ].map(([label, value]) => summaryCard(label, value)).join("");
+
+    renderRecurrence(result);
+    renderInsights(result);
+    renderRoleBreakdown(result);
+    updateRolePreviews(result);
+  }
+
+  function recurrenceNote(result) {
+    if (result.recurrence.annualCost === undefined) {
+      return "Costo estimado para una sola reunión.";
+    }
+
+    return `Impacto anual estimado: ${formatMeetingCurrency(result.recurrence.annualCost)}.`;
+  }
+
+  function renderRecurrence(result) {
+    const panel = get("[data-recurrence-panel]");
+    const items = [];
+
+    panel.classList.toggle("hidden", result.recurrence.annualCost === undefined);
+
+    if (result.recurrence.annualCost === undefined) return;
+
+    get("[data-recurrence-label]").textContent = result.recurrence.occurrencesLabel;
+
+    if (result.recurrence.weeklyCost !== undefined) {
+      items.push(["Semanal promedio", formatMeetingCurrency(result.recurrence.weeklyCost)]);
+    }
+    if (result.recurrence.monthlyCost !== undefined) {
+      items.push(["Mensual estimado", formatMeetingCurrency(result.recurrence.monthlyCost)]);
+    }
+    if (result.recurrence.annualCost !== undefined) {
+      items.push(["Anual estimado", formatMeetingCurrency(result.recurrence.annualCost)]);
+    }
+
+    get("[data-recurrence-list]").innerHTML = items.map(([label, value]) => definitionRow(label, value)).join("");
+  }
+
+  function renderInsights(result) {
+    get("[data-insights-list]").innerHTML = result.insights.map((insight) => {
+      if (insight.amount === undefined) {
+        return `<p>${escapeHtml(insight.label)}.</p>`;
+      }
+
+      return `
+        <div class="flex items-start justify-between gap-3">
+          <span>${escapeHtml(insight.label)}</span>
+          <strong class="shrink-0 text-white">${escapeHtml(formatMeetingCurrency(insight.amount))}</strong>
+        </div>
+      `;
+    }).join("");
+  }
+
+  function renderRoleBreakdown(result) {
+    get("[data-role-breakdown]").innerHTML = result.roles.map((role) => `
+      <article class="rounded-lg border border-gray-800 bg-gray-950 p-3">
+        <div class="flex items-start justify-between gap-3">
+          <div class="min-w-0">
+            <h4 class="truncate text-sm font-semibold text-white">${escapeHtml(role.name)}</h4>
+            <p class="mt-1 text-xs text-gray-500">${role.people} ${role.people === 1 ? "persona" : "personas"} · ${formatMeetingCurrency(role.hourlyRate)}/h</p>
+          </div>
+          <strong class="shrink-0 text-sm text-amber-100">${escapeHtml(formatMeetingCurrency(role.cost))}</strong>
+        </div>
+        <dl class="mt-3 space-y-2 text-xs">
+          ${definitionRow("Horas-persona", `${formatMeetingNumber(role.personHours)} h`)}
+          ${definitionRow("Costo por persona", formatMeetingCurrency(role.costPerPerson))}
+        </dl>
+      </article>
+    `).join("");
+  }
+
+  function updateRolePreviews(result) {
+    result.roles.forEach((role, index) => {
+      const state = roles[index];
+      const title = get(`[data-role-title="${state.id}"]`);
+      const preview = get(`[data-role-preview="${state.id}"]`);
+
+      if (title) title.textContent = role.name;
+      if (preview) {
+        preview.textContent = `${role.people} ${role.people === 1 ? "persona" : "personas"} · ${formatMeetingCurrency(role.cost)}`;
+      }
+    });
+  }
+
+  function updateFrequencyUi() {
+    const frequency = getFrequency();
+
+    frequencyLabels.forEach((label) => {
+      label.dataset.active = String(label.dataset.frequencyLabel === frequency);
+    });
+    get("[data-weekly-settings]").classList.toggle("hidden", frequency !== "weekly");
+    get("[data-monthly-settings]").classList.toggle("hidden", frequency !== "monthly");
+  }
+
+  function getFrequency() {
+    return frequencyInputs.find((input) => input.checked)?.value ?? "once";
+  }
+
+  function updateDurationPresetState() {
+    const value = get('[data-field="durationMinutes"]').value.trim();
+
+    durationPresets.forEach((button) => {
+      button.setAttribute("aria-pressed", String(button.dataset.durationPreset === value));
+    });
+  }
+
+  function fillExample() {
+    sequence = 0;
+    roles = [newRole({ name: "Participante", people: "5", hourlyRate: "500" })];
+    setFieldValue("durationMinutes", "60");
+    setFieldValue("preparationMinutes", "0");
+    setFieldValue("followUpMinutes", "0");
+    setFrequency("weekly");
+    setFieldValue("occurrencesPerWeek", "1");
+    setFieldValue("occurrencesPerMonth", "1");
+    renderRoles();
+    updateDurationPresetState();
+    updateFrequencyUi();
+    calculate();
+    resultRegion.focus({ preventScroll: true });
+  }
+
+  function clearAll() {
+    sequence = 0;
+    roles = [newRole()];
+    setFieldValue("durationMinutes", "60");
+    setFieldValue("preparationMinutes", "0");
+    setFieldValue("followUpMinutes", "0");
+    setFieldValue("occurrencesPerWeek", "1");
+    setFieldValue("occurrencesPerMonth", "1");
+    setFrequency("once");
+    renderRoles();
+    updateDurationPresetState();
+    updateFrequencyUi();
+    calculate();
+    roleList.querySelector("[data-role-field='hourlyRate']")?.focus();
+  }
+
+  function setFrequency(frequency) {
+    frequencyInputs.forEach((input) => {
+      input.checked = input.value === frequency;
+    });
+  }
+
+  function setFieldValue(field, value) {
+    get(`[data-field="${field}"]`).value = value;
+  }
+
+  function setFieldError(field, message = "") {
+    const error = get(`[data-field-error="${field}"]`);
+    if (error) error.textContent = message;
+  }
+
+  function setRoleError(id, message = "") {
+    const error = get(`[data-role-error="${id}"]`);
+    error.textContent = message;
+    error.classList.toggle("hidden", !message);
+    roleList.querySelectorAll(`[data-role-field][data-id="${id}"]`).forEach((input) => {
+      input.setAttribute("aria-invalid", String(Boolean(message)));
+    });
+  }
+
+  function clearValidation() {
+    document.querySelectorAll("[data-field-error]").forEach((error) => {
+      error.textContent = "";
+    });
+    document.querySelectorAll('[aria-invalid="true"]').forEach((input) => {
+      input.removeAttribute("aria-invalid");
+    });
+    roles.forEach((role) => setRoleError(role.id));
+  }
+
+  function showErrors(messages) {
+    errorBox.innerHTML = messages.map((message) => `<p>${escapeHtml(message)}</p>`).join("");
+    errorBox.classList.toggle("hidden", messages.length === 0);
+  }
+
+  function setActionsEnabled(enabled) {
+    document.querySelectorAll("[data-copy-result], [data-export-csv]").forEach((button) => {
+      button.disabled = !enabled;
+    });
+  }
+
+  async function copyResult() {
+    if (!copyText) return;
+
+    try {
+      if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(copyText);
+      } else {
+        const textArea = document.createElement("textarea");
+        textArea.value = copyText;
+        textArea.setAttribute("readonly", "");
+        textArea.style.position = "fixed";
+        textArea.style.opacity = "0";
+        document.body.append(textArea);
+        textArea.select();
+        document.execCommand("copy");
+        textArea.remove();
+      }
+
+      get("[data-copy-label]").textContent = "Copiado";
+      get("[data-copy-status]").textContent = "Resumen copiado.";
+      window.setTimeout(() => {
+        get("[data-copy-label]").textContent = "Copiar resumen";
+        get("[data-copy-status]").textContent = "";
+      }, 2000);
+    } catch {
+      get("[data-copy-status]").textContent = "No se pudo copiar el resumen.";
+    }
+  }
+
+  function exportCsv() {
+    if (!csvText) return;
+
+    const blob = new Blob([csvText], { type: "text/csv;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const anchor = document.createElement("a");
+
+    anchor.href = url;
+    anchor.download = "costo-reunion.csv";
+    anchor.click();
+    URL.revokeObjectURL(url);
+  }
+
+  function summaryCard(label, value) {
+    return `<div class="rounded-lg border border-gray-800 bg-gray-950/70 p-3"><span class="block text-xs font-semibold uppercase tracking-wide text-gray-500">${escapeHtml(label)}</span><span class="mt-2 block break-words text-base font-semibold text-white">${escapeHtml(value)}</span></div>`;
+  }
+
+  function definitionRow(label, value) {
+    return `<div class="flex items-start justify-between gap-3"><dt class="text-gray-500">${escapeHtml(label)}</dt><dd class="break-words text-right font-semibold text-gray-200">${escapeHtml(value)}</dd></div>`;
+  }
+
+  function escapeHtml(value) {
+    return String(value)
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;")
+      .replaceAll("'", "&#039;");
+  }
+
+  roleList.addEventListener("input", (event) => {
+    const input = event.target.closest("[data-role-field]");
+    if (!input) return;
+    const role = roles.find((item) => item.id === input.dataset.id);
+    if (!role) return;
+    role[input.dataset.roleField] = input.value;
+    calculate();
+  });
+
+  roleList.addEventListener("toggle", (event) => {
+    const card = event.target.closest("[data-role-card]");
+    if (!card) return;
+    const role = roles.find((item) => item.id === card.dataset.roleCard);
+    if (role) role.open = card.open;
+  }, true);
+
+  roleList.addEventListener("click", (event) => {
+    const adjust = event.target.closest("[data-role-adjust]");
+
+    if (adjust) {
+      const role = roles.find((item) => item.id === adjust.dataset.id);
+      if (!role) return;
+      const parsed = parseMeetingNumber(role.people, { integer: true });
+      const next = Math.min(100, Math.max(1, (parsed.ok ? parsed.value : 1) + Number(adjust.dataset.roleAdjust)));
+      role.people = String(next);
+      roleList.querySelector(`[data-role-field="people"][data-id="${role.id}"]`).value = role.people;
+      calculate();
+      return;
+    }
+
+    const action = event.target.closest("[data-role-action]");
+    if (!action) return;
+    const index = roles.findIndex((role) => role.id === action.dataset.id);
+
+    if (action.dataset.roleAction === "remove") {
+      if (roles.length === 1) {
+        roles.splice(0, 1, newRole());
+      } else {
+        roles.splice(index, 1);
+      }
+      renderRoles();
+      calculate();
+    }
+  });
+
+  get("[data-add-role]").addEventListener("click", () => {
+    if (roles.length >= MAX_ROLES) {
+      showErrors([`La reunión admite un máximo de ${MAX_ROLES} roles.`]);
+      return;
+    }
+
+    roles.push(newRole());
+    renderRoles(true);
+    calculate();
+  });
+
+  durationPresets.forEach((button) => {
+    button.addEventListener("click", () => {
+      setFieldValue("durationMinutes", button.dataset.durationPreset);
+      updateDurationPresetState();
+      calculate();
+    });
+  });
+
+  frequencyInputs.forEach((input) => {
+    input.addEventListener("change", () => {
+      updateFrequencyUi();
+      calculate();
+    });
+  });
+
+  form.addEventListener("input", (event) => {
+    if (event.target.matches("[data-field]")) {
+      updateDurationPresetState();
+      calculate();
+    }
+  });
+
+  get("[data-copy-result]").addEventListener("click", copyResult);
+  get("[data-export-csv]").addEventListener("click", exportCsv);
+  get("[data-example]").addEventListener("click", fillExample);
+  get("[data-clear]").addEventListener("click", clearAll);
+
+  renderRoles();
+  updateFrequencyUi();
+  updateDurationPresetState();
+  calculate();
+</script>

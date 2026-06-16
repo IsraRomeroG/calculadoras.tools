@@ -332,6 +332,15 @@ export const CALCULATORS: CalculatorDirectoryItem[] = [
     order: 64.5,
   },
   {
+    id: "calculadora-costo-reunion",
+    title: "Calculadora de costo de reunion",
+    description:
+      "Estima costo, horas-persona, recurrencia y ahorro potencial de una reunion segun asistentes, duracion y tarifa por hora.",
+    href: "/fecha-tiempo/calculadora-costo-reunion",
+    categorySlug: "fecha-tiempo",
+    order: 64.7,
+  },
+  {
     id: "conversor-de-temperatura",
     title: "Conversor de temperatura",
     description:
