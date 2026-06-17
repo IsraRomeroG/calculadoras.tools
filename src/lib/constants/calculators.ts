@@ -440,6 +440,15 @@ export const CALCULATORS: CalculatorDirectoryItem[] = [
     order: 77.4,
   },
   {
+    id: "calculadora-porcentaje-asistencia-escolar",
+    title: "Calculadora de asistencia escolar",
+    description:
+      "Calcula porcentaje de asistencia, faltas disponibles y clases necesarias para cumplir un minimo requerido.",
+    href: "/matematicas/calculadora-porcentaje-asistencia-escolar",
+    categorySlug: "matematicas",
+    order: 77.5,
+  },
+  {
     id: "conversor-de-medidas-culinarias",
     title: "Conversor de medidas culinarias",
     description:
