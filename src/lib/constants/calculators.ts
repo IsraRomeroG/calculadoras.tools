@@ -404,6 +404,15 @@ export const CALCULATORS: CalculatorDirectoryItem[] = [
     order: 76,
   },
   {
+    id: "calculadora-promedio-escolar-gpa",
+    title: "Calculadora de promedio escolar y GPA",
+    description:
+      "Calcula promedio simple, promedio ponderado, GPA aproximado y calificacion necesaria para una meta.",
+    href: "/matematicas/calculadora-promedio-escolar-gpa",
+    categorySlug: "matematicas",
+    order: 77,
+  },
+  {
     id: "conversor-de-medidas-culinarias",
     title: "Conversor de medidas culinarias",
     description:

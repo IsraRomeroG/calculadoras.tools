@@ -1,0 +1,1112 @@
+---
+import BaseLayout from "@layouts/BaseLayout.astro";
+import AdSlot from "@components/ads/AdSlot.astro";
+import Container from "@components/layout/Container.astro";
+import PageShell from "@components/layout/PageShell.astro";
+import FaqSection from "@components/shared/FaqSection.astro";
+import PageHero from "@components/shared/PageHero.astro";
+import SectionIntro from "@components/shared/SectionIntro.astro";
+import { GPA_EXAMPLES } from "@lib/calculators/matematicas/calculadora-promedio-escolar-gpa/gpa";
+import { buildFaqJsonLd } from "@lib/seo";
+
+const title = "Calculadora de promedio escolar y GPA";
+const description =
+  "Calcula promedio simple, promedio ponderado y GPA aproximado con materias, calificaciones y creditos.";
+const canonical = "/matematicas/calculadora-promedio-escolar-gpa";
+
+const faqs = [
+  {
+    question: "Como se calcula el promedio ponderado?",
+    answer:
+      "Multiplica cada calificacion por sus creditos o peso, suma esos resultados y divide entre el total de creditos.",
+  },
+  {
+    question: "Que son creditos o pesos?",
+    answer:
+      "Son la importancia relativa de cada materia. Pueden ser creditos academicos, horas o porcentaje, siempre que uses la misma unidad en todas las materias.",
+  },
+  {
+    question: "La conversion a GPA es exacta?",
+    answer:
+      "No. Esta calculadora usa una conversion lineal a escala 4.0. La equivalencia oficial puede variar por escuela o pais.",
+  },
+  {
+    question: "Puedo usar escala de 0 a 100?",
+    answer:
+      "Si. Cambia la escala a 0-100 y captura las calificaciones en esa escala. Tambien puedes usar 0-10, 0-4 o una escala personalizada.",
+  },
+  {
+    question: "Que calificacion necesito para llegar a mi promedio meta?",
+    answer:
+      "Captura un promedio meta y los creditos restantes. La calculadora estima el promedio necesario en lo que falta.",
+  },
+  {
+    question: "Por que mi promedio ponderado es diferente al simple?",
+    answer:
+      "Porque las materias con mas creditos influyen mas. Si tus materias de mayor peso tienen calificaciones distintas al resto, el ponderado se separa del promedio simple.",
+  },
+];
+
+const faqJsonLd = buildFaqJsonLd(faqs);
+---
+
+<BaseLayout title={title} description={description} canonical={canonical}>
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={JSON.stringify(faqJsonLd)} />
+  </Fragment>
+
+  <PageShell>
+    <PageHero
+      title="Calculadora de promedio escolar"
+      description="Calcula promedio simple, promedio ponderado, GPA aproximado y la calificacion que necesitas para llegar a una meta."
+      kicker="Matematicas"
+      collapseBreadcrumbOnMobile
+      containerClass="py-6 md:py-8"
+      breadcrumbs={[
+        { label: "Inicio", href: "/", ariaLabel: "Inicio" },
+        { label: "Matematicas", href: "/matematicas", optional: true },
+        { label: "Promedio escolar y GPA", truncate: true },
+      ]}
+    />
+
+    <Container as="section" class="py-6 md:py-8">
+      <div
+        id="gpa-calculator"
+        class="overflow-hidden rounded-lg border border-gray-700 bg-gray-950 shadow-xl shadow-gray-950/30"
+      >
+        <div class="grid gap-0 lg:grid-cols-[minmax(0,1fr)_minmax(20rem,0.74fr)]">
+          <aside
+            class="border-b border-gray-800 bg-gray-900/60 p-4 sm:p-6 lg:order-2 lg:border-b-0 lg:border-l"
+            aria-live="polite"
+          >
+            <p class="text-sm font-semibold uppercase text-amber-400">
+              Resultado
+            </p>
+
+            <div class="mt-4 rounded-lg border border-gray-700 bg-gray-950 p-5">
+              <p class="text-xs font-semibold uppercase text-gray-400">
+                Promedio ponderado
+              </p>
+              <p
+                class="mt-2 break-words text-4xl font-bold leading-tight text-white"
+                data-result-weighted
+              >
+                -
+              </p>
+              <p
+                class="mt-2 text-sm leading-relaxed text-gray-400"
+                data-result-mode-note
+              >
+                Agrega tus materias para calcular.
+              </p>
+            </div>
+
+            <div class="mt-3 grid grid-cols-2 gap-3">
+              <div class="rounded-lg border border-gray-800 bg-gray-950 p-4">
+                <p class="text-xs font-semibold uppercase text-gray-500">
+                  GPA aprox.
+                </p>
+                <p class="mt-2 break-words text-2xl font-semibold text-white" data-result-gpa>
+                  -
+                </p>
+              </div>
+              <div class="rounded-lg border border-gray-800 bg-gray-950 p-4">
+                <p class="text-xs font-semibold uppercase text-gray-500">
+                  Promedio simple
+                </p>
+                <p class="mt-2 break-words text-2xl font-semibold text-white" data-result-simple>
+                  -
+                </p>
+              </div>
+              <div class="rounded-lg border border-gray-800 bg-gray-950 p-4">
+                <p class="text-xs font-semibold uppercase text-gray-500">
+                  Creditos
+                </p>
+                <p class="mt-2 break-words text-2xl font-semibold text-white" data-result-credits>
+                  -
+                </p>
+              </div>
+              <div class="rounded-lg border border-gray-800 bg-gray-950 p-4">
+                <p class="text-xs font-semibold uppercase text-gray-500">
+                  Aprobacion
+                </p>
+                <p class="mt-2 break-words text-2xl font-semibold text-white" data-result-pass>
+                  -
+                </p>
+              </div>
+            </div>
+
+            <div class="mt-3 rounded-lg border border-gray-800 bg-gray-950 p-4">
+              <p class="text-xs font-semibold uppercase text-gray-500">Meta</p>
+              <p class="mt-2 text-lg font-semibold text-white" data-result-target>
+                Sin meta
+              </p>
+              <p class="mt-2 text-sm leading-relaxed text-gray-400" data-result-target-detail>
+                Captura una meta para estimar la brecha.
+              </p>
+            </div>
+
+            <div class="mt-3 rounded-lg border border-gray-800 bg-gray-950 p-4">
+              <p class="text-xs font-semibold uppercase text-gray-500">
+                Lectura rapida
+              </p>
+              <div class="mt-3 grid gap-2 text-sm leading-relaxed text-gray-300" data-result-insights>
+                <p>Los insights apareceran con un calculo valido.</p>
+              </div>
+            </div>
+
+            <div
+              class="mt-3 hidden rounded-lg border border-sky-400/30 bg-sky-400/10 p-4 text-sm leading-relaxed text-sky-100"
+              data-result-messages
+            >
+            </div>
+          </aside>
+
+          <section class="p-4 sm:p-6 lg:order-1" aria-labelledby="calculator-heading">
+            <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+              <div>
+                <h2 id="calculator-heading" class="text-xl font-semibold">
+                  Materias
+                </h2>
+                <p class="mt-2 text-sm leading-relaxed text-gray-400">
+                  Captura calificaciones y creditos solo si tus materias tienen
+                  distinto peso.
+                </p>
+              </div>
+              <button
+                class="inline-flex min-h-11 items-center justify-center rounded-lg bg-amber-400 px-4 py-2 text-sm font-semibold text-gray-950 transition hover:bg-amber-300 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/40"
+                type="button"
+                data-add-course
+              >
+                + Materia
+              </button>
+            </div>
+
+            <div class="mt-5 grid gap-4 sm:grid-cols-2">
+              <div>
+                <label for="gpa-scale" class="block text-sm font-medium text-gray-200">
+                  Escala
+                </label>
+                <select
+                  id="gpa-scale"
+                  class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-900 px-3 text-base text-white outline-none transition focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15"
+                  data-scale
+                >
+                  <option value="0-10">0-10</option>
+                  <option value="0-100">0-100</option>
+                  <option value="0-4">0-4</option>
+                  <option value="custom">Personalizada</option>
+                </select>
+              </div>
+
+              <div class="hidden" data-custom-scale-wrapper>
+                <label
+                  for="gpa-custom-scale"
+                  class="block text-sm font-medium text-gray-200"
+                >
+                  Maximo personalizado
+                </label>
+                <input
+                  id="gpa-custom-scale"
+                  class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-900 px-4 text-base text-white outline-none transition placeholder:text-gray-600 focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15"
+                  type="text"
+                  inputmode="decimal"
+                  autocomplete="off"
+                  placeholder="20"
+                  data-custom-scale
+                />
+                <p class="mt-2 hidden text-sm text-red-300" data-option-error="customScale"></p>
+              </div>
+            </div>
+
+            <details class="mt-4 rounded-lg border border-gray-800 bg-gray-900/70 p-4">
+              <summary class="cursor-pointer text-sm font-semibold text-gray-100">
+                Opciones de meta y GPA
+              </summary>
+
+              <div class="mt-4 grid gap-4 sm:grid-cols-2">
+                <div>
+                  <label
+                    for="gpa-passing-grade"
+                    class="block text-sm font-medium text-gray-200"
+                  >
+                    Nota minima aprobatoria
+                  </label>
+                  <input
+                    id="gpa-passing-grade"
+                    class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-950 px-4 text-base text-white outline-none transition placeholder:text-gray-600 focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15"
+                    type="text"
+                    inputmode="decimal"
+                    autocomplete="off"
+                    placeholder="6"
+                    data-passing-grade
+                  />
+                  <p class="mt-2 hidden text-sm text-red-300" data-option-error="passingGrade"></p>
+                </div>
+
+                <div>
+                  <label
+                    for="gpa-method"
+                    class="block text-sm font-medium text-gray-200"
+                  >
+                    GPA
+                  </label>
+                  <select
+                    id="gpa-method"
+                    class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-950 px-3 text-base text-white outline-none transition focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15"
+                    data-gpa-method
+                  >
+                    <option value="linear">Lineal aproximado</option>
+                    <option value="none">Sin GPA</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label
+                    for="gpa-target-average"
+                    class="block text-sm font-medium text-gray-200"
+                  >
+                    Promedio meta
+                  </label>
+                  <input
+                    id="gpa-target-average"
+                    class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-950 px-4 text-base text-white outline-none transition placeholder:text-gray-600 focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15"
+                    type="text"
+                    inputmode="decimal"
+                    autocomplete="off"
+                    placeholder="9"
+                    data-target-average
+                  />
+                  <p class="mt-2 hidden text-sm text-red-300" data-option-error="targetAverage"></p>
+                </div>
+
+                <div>
+                  <label
+                    for="gpa-remaining-credits"
+                    class="block text-sm font-medium text-gray-200"
+                  >
+                    Creditos restantes
+                  </label>
+                  <input
+                    id="gpa-remaining-credits"
+                    class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-950 px-4 text-base text-white outline-none transition placeholder:text-gray-600 focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15"
+                    type="text"
+                    inputmode="decimal"
+                    autocomplete="off"
+                    placeholder="5"
+                    data-remaining-credits
+                  />
+                  <p class="mt-2 hidden text-sm text-red-300" data-option-error="remainingCredits"></p>
+                </div>
+              </div>
+            </details>
+
+            <div class="mt-5 grid gap-3" data-course-list></div>
+
+            <div class="mt-5 flex flex-wrap gap-3">
+              <button
+                class="inline-flex min-h-11 items-center justify-center rounded-lg border border-gray-700 px-4 py-2 text-sm font-semibold text-gray-200 transition hover:border-amber-400 hover:text-white focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/40"
+                type="button"
+                data-copy-summary
+              >
+                Copiar resumen
+              </button>
+              <button
+                class="inline-flex min-h-11 items-center justify-center rounded-lg border border-gray-700 px-4 py-2 text-sm font-semibold text-gray-200 transition hover:border-amber-400 hover:text-white focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/40"
+                type="button"
+                data-export-csv
+              >
+                Exportar CSV
+              </button>
+              <button
+                class="inline-flex min-h-11 items-center justify-center rounded-lg border border-gray-700 px-4 py-2 text-sm font-semibold text-gray-200 transition hover:border-amber-400 hover:text-white focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/40"
+                type="button"
+                data-clear
+              >
+                Limpiar
+              </button>
+            </div>
+            <p class="mt-3 min-h-5 text-sm text-emerald-300" data-action-status></p>
+
+            <div class="mt-5">
+              <p class="text-sm font-medium text-gray-200">Ejemplos</p>
+              <div class="mt-2 flex flex-wrap gap-2">
+                {
+                  GPA_EXAMPLES.map((example) => (
+                    <button
+                      class="min-h-11 rounded-lg border border-gray-700 px-3 py-2 text-sm font-semibold text-gray-200 transition hover:border-amber-400 hover:text-white focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/40"
+                      type="button"
+                      data-example-id={example.id}
+                    >
+                      {example.label}
+                    </button>
+                  ))
+                }
+              </div>
+            </div>
+          </section>
+        </div>
+
+        <div class="border-t border-gray-800 p-4 sm:p-6">
+          <h2 class="text-lg font-semibold">Detalle de materias</h2>
+          <div class="mt-4 grid gap-3 md:grid-cols-2" data-course-results>
+            <p class="text-sm text-gray-400">El detalle aparecera con un calculo valido.</p>
+          </div>
+        </div>
+      </div>
+    </Container>
+
+    <AdSlot placement="calculator-after-tool" />
+
+    <Container as="section" class="py-6 md:py-8">
+      <SectionIntro
+        title="Como leer el resultado"
+        description="La diferencia importante suele estar entre el promedio simple y el ponderado."
+      />
+
+      <div class="grid gap-4 md:grid-cols-3">
+        <article class="rounded-lg border border-gray-700 bg-gray-950 p-5">
+          <h3 class="text-lg font-semibold text-white">Promedio simple</h3>
+          <p class="mt-3 text-sm leading-relaxed text-gray-400">
+            Trata todas las materias con el mismo peso.
+          </p>
+        </article>
+        <article class="rounded-lg border border-gray-700 bg-gray-950 p-5">
+          <h3 class="text-lg font-semibold text-white">Promedio ponderado</h3>
+          <p class="mt-3 text-sm leading-relaxed text-gray-400">
+            Da mas importancia a materias con mas creditos.
+          </p>
+        </article>
+        <article class="rounded-lg border border-gray-700 bg-gray-950 p-5">
+          <h3 class="text-lg font-semibold text-white">GPA aproximado</h3>
+          <p class="mt-3 text-sm leading-relaxed text-gray-400">
+            Convierte linealmente tu promedio a una escala de 4.0.
+          </p>
+        </article>
+      </div>
+    </Container>
+
+    <AdSlot placement="calculator-before-faq" />
+
+    <FaqSection faqs={faqs} />
+  </PageShell>
+</BaseLayout>
+
+<script>
+  import {
+    GPA_EXAMPLES,
+    buildGpaCsv,
+    buildGpaSummary,
+    calculateGpa,
+    formatFlexibleGpaNumber,
+    formatGpaNumber,
+    formatPercent,
+    formatSignedNumber,
+    getScaleMaxFromPreset,
+    parseGpaNumber,
+  } from "@lib/calculators/matematicas/calculadora-promedio-escolar-gpa/gpa";
+
+  const ERROR_MESSAGES = {
+    required: "Campo obligatorio.",
+    invalid: "Ingresa un numero valido.",
+    negative: "Usa un numero igual o mayor a cero.",
+    zero: "Debe ser mayor que cero.",
+    too_many_decimals: "Usa maximo 4 decimales.",
+    scale: "Debe estar dentro de la escala seleccionada.",
+  };
+
+  const defaultCourses = [
+    { id: "course-1", name: "Matematicas", grade: "8.5", credits: "" },
+    { id: "course-2", name: "Historia", grade: "9", credits: "" },
+    { id: "course-3", name: "Biologia", grade: "10", credits: "" },
+  ];
+
+  const courseList = document.querySelector("[data-course-list]");
+  const scaleSelect = document.querySelector("[data-scale]");
+  const customScaleWrapper = document.querySelector("[data-custom-scale-wrapper]");
+  const customScaleInput = document.querySelector("[data-custom-scale]");
+  const passingGradeInput = document.querySelector("[data-passing-grade]");
+  const targetAverageInput = document.querySelector("[data-target-average]");
+  const remainingCreditsInput = document.querySelector("[data-remaining-credits]");
+  const gpaMethodSelect = document.querySelector("[data-gpa-method]");
+  const addCourseButton = document.querySelector("[data-add-course]");
+  const copySummaryButton = document.querySelector("[data-copy-summary]");
+  const exportCsvButton = document.querySelector("[data-export-csv]");
+  const clearButton = document.querySelector("[data-clear]");
+  const actionStatus = document.querySelector("[data-action-status]");
+  const resultWeighted = document.querySelector("[data-result-weighted]");
+  const resultModeNote = document.querySelector("[data-result-mode-note]");
+  const resultGpa = document.querySelector("[data-result-gpa]");
+  const resultSimple = document.querySelector("[data-result-simple]");
+  const resultCredits = document.querySelector("[data-result-credits]");
+  const resultPass = document.querySelector("[data-result-pass]");
+  const resultTarget = document.querySelector("[data-result-target]");
+  const resultTargetDetail = document.querySelector("[data-result-target-detail]");
+  const resultInsights = document.querySelector("[data-result-insights]");
+  const resultMessages = document.querySelector("[data-result-messages]");
+  const courseResults = document.querySelector("[data-course-results]");
+  const exampleButtons = Array.from(document.querySelectorAll("[data-example-id]"));
+
+  let courses = [...defaultCourses];
+  let courseCounter = courses.length;
+  let currentSummary = "";
+  let currentCsv = "";
+  let statusTimeout = 0;
+
+  function renderCourseInputs() {
+    if (!courseList) {
+      return;
+    }
+
+    courseList.innerHTML = "";
+
+    courses.forEach((course, index) => {
+      const card = document.createElement("article");
+      card.className = "rounded-lg border border-gray-800 bg-gray-900/70 p-4";
+      card.dataset.courseId = course.id;
+      card.innerHTML = `
+        <div class="flex items-start justify-between gap-3">
+          <div>
+            <p class="text-sm font-semibold text-white">Materia ${index + 1}</p>
+          </div>
+          <div class="flex shrink-0 gap-2">
+            <button class="min-h-10 rounded-lg border border-gray-700 px-3 text-sm font-semibold text-gray-200 transition hover:border-amber-400 hover:text-white focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/40" type="button" data-duplicate-course="${escapeHtml(course.id)}">Duplicar</button>
+            <button class="min-h-10 rounded-lg border border-gray-700 px-3 text-sm font-semibold text-gray-200 transition hover:border-red-300 hover:text-red-200 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-red-300/30" type="button" data-remove-course="${escapeHtml(course.id)}">Eliminar</button>
+          </div>
+        </div>
+        <div class="mt-4 grid gap-4 sm:grid-cols-[minmax(0,1.2fr)_minmax(0,0.7fr)_minmax(0,0.7fr)]">
+          <div>
+            <label class="block text-sm font-medium text-gray-200" for="${course.id}-name">Nombre</label>
+            <input id="${course.id}-name" class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-950 px-4 text-base text-white outline-none transition placeholder:text-gray-600 focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15" type="text" maxlength="60" autocomplete="off" placeholder="Materia ${index + 1}" value="${escapeHtml(course.name)}" data-course-field="name" />
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-200" for="${course.id}-grade">Calificacion</label>
+            <input id="${course.id}-grade" class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-950 px-4 text-base text-white outline-none transition placeholder:text-gray-600 focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15" type="text" inputmode="decimal" autocomplete="off" placeholder="9" value="${escapeHtml(course.grade)}" data-course-field="grade" />
+            <p class="mt-2 hidden text-sm text-red-300" data-course-error="grade"></p>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-200" for="${course.id}-credits">Creditos</label>
+            <input id="${course.id}-credits" class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-950 px-4 text-base text-white outline-none transition placeholder:text-gray-600 focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15" type="text" inputmode="decimal" autocomplete="off" placeholder="1" value="${escapeHtml(course.credits)}" data-course-field="credits" />
+            <p class="mt-2 hidden text-sm text-red-300" data-course-error="credits"></p>
+          </div>
+        </div>
+      `;
+      courseList.append(card);
+    });
+  }
+
+  function syncCourseState() {
+    if (!courseList) {
+      return;
+    }
+
+    courses = Array.from(courseList.querySelectorAll("[data-course-id]")).map((card) => ({
+      id: card.dataset.courseId,
+      name: getCourseFieldValue(card, "name"),
+      grade: getCourseFieldValue(card, "grade"),
+      credits: getCourseFieldValue(card, "credits"),
+    }));
+  }
+
+  function readOptions() {
+    clearOptionErrors();
+    const errors = [];
+    const scalePreset = scaleSelect?.value ?? "0-10";
+    let customMax = null;
+
+    if (customScaleWrapper) {
+      customScaleWrapper.classList.toggle("hidden", scalePreset !== "custom");
+    }
+
+    if (scalePreset === "custom") {
+      const parsedCustom = parseGpaNumber(customScaleInput?.value ?? "", {
+        allowZero: false,
+      });
+
+      if (!parsedCustom.ok) {
+        setOptionError("customScale", getErrorMessage(parsedCustom.error));
+        errors.push("customScale");
+      } else {
+        customMax = parsedCustom.value;
+      }
+    }
+
+    let scaleMax = 10;
+
+    if (errors.length === 0) {
+      scaleMax = getScaleMaxFromPreset(scalePreset, customMax);
+    }
+
+    const passingGrade = readOptionalOption("passingGrade", passingGradeInput, scaleMax);
+    const targetAverage = readOptionalOption("targetAverage", targetAverageInput, scaleMax);
+    const remainingCredits = readOptionalOption(
+      "remainingCredits",
+      remainingCreditsInput,
+      scaleMax,
+      { allowZero: false, skipScaleCheck: true },
+    );
+
+    if (!passingGrade.ok) {
+      errors.push("passingGrade");
+    }
+
+    if (!targetAverage.ok) {
+      errors.push("targetAverage");
+    }
+
+    if (!remainingCredits.ok) {
+      errors.push("remainingCredits");
+    }
+
+    return {
+      ok: errors.length === 0,
+      scaleMax,
+      passingGrade: passingGrade.value,
+      targetAverage: targetAverage.value,
+      remainingCredits: remainingCredits.value,
+      gpaMethod: gpaMethodSelect?.value === "none" ? "none" : "linear",
+    };
+  }
+
+  function readOptionalOption(field, input, scaleMax, options = {}) {
+    const rawValue = input?.value ?? "";
+    const parsed = parseGpaNumber(rawValue, {
+      required: false,
+      allowZero: options.allowZero ?? true,
+    });
+
+    if (!parsed.ok) {
+      setOptionError(field, getErrorMessage(parsed.error));
+      return { ok: false, value: null };
+    }
+
+    if (Number.isNaN(parsed.value)) {
+      return { ok: true, value: null };
+    }
+
+    if (!options.skipScaleCheck && parsed.value > scaleMax) {
+      setOptionError(field, ERROR_MESSAGES.scale);
+      return { ok: false, value: null };
+    }
+
+    return { ok: true, value: parsed.value };
+  }
+
+  function readCourses(scaleMax) {
+    if (!courseList) {
+      return { ok: false, courses: [] };
+    }
+
+    let hasErrors = false;
+    const parsedCourses = [];
+
+    Array.from(courseList.querySelectorAll("[data-course-id]")).forEach((card) => {
+      clearCourseErrors(card);
+      const name = getCourseFieldValue(card, "name");
+      const rawGrade = getCourseFieldValue(card, "grade");
+      const rawCredits = getCourseFieldValue(card, "credits");
+      const hasAnyValue = Boolean(name.trim() || rawGrade.trim() || rawCredits.trim());
+
+      if (!hasAnyValue) {
+        return;
+      }
+
+      const parsedGrade = parseGpaNumber(rawGrade);
+
+      if (!parsedGrade.ok) {
+        setCourseError(card, "grade", getErrorMessage(parsedGrade.error));
+        hasErrors = true;
+        return;
+      }
+
+      if (parsedGrade.value > scaleMax) {
+        setCourseError(card, "grade", ERROR_MESSAGES.scale);
+        hasErrors = true;
+        return;
+      }
+
+      const parsedCredits = parseGpaNumber(rawCredits, {
+        required: false,
+        allowZero: false,
+      });
+
+      if (!parsedCredits.ok) {
+        setCourseError(card, "credits", getErrorMessage(parsedCredits.error));
+        hasErrors = true;
+        return;
+      }
+
+      parsedCourses.push({
+        name,
+        grade: parsedGrade.value,
+        credits: Number.isNaN(parsedCredits.value) ? null : parsedCredits.value,
+      });
+    });
+
+    return {
+      ok: !hasErrors && parsedCourses.length > 0,
+      courses: parsedCourses,
+      hasErrors,
+    };
+  }
+
+  function updateCalculator() {
+    syncCourseState();
+    const options = readOptions();
+    const parsedCourses = readCourses(options.scaleMax);
+
+    if (!options.ok || parsedCourses.hasErrors) {
+      renderInvalidState("Revisa los campos marcados para continuar.");
+      return;
+    }
+
+    if (!parsedCourses.ok) {
+      renderInvalidState("Agrega al menos una materia con calificacion.");
+      return;
+    }
+
+    try {
+      const result = calculateGpa({
+        scaleMax: options.scaleMax,
+        passingGrade: options.passingGrade,
+        targetAverage: options.targetAverage,
+        remainingCredits: options.remainingCredits,
+        gpaMethod: options.gpaMethod,
+        courses: parsedCourses.courses,
+      });
+
+      currentSummary = buildGpaSummary(result);
+      currentCsv = buildGpaCsv(result);
+      renderResult(result);
+    } catch (error) {
+      renderInvalidState(error instanceof Error ? error.message : "No se pudo calcular.");
+    }
+  }
+
+  function renderResult(result) {
+    setText(resultWeighted, formatGpaNumber(result.weightedAverage));
+    setText(
+      resultModeNote,
+      result.hasExplicitCredits
+        ? "Promedio ponderado con creditos capturados."
+        : "Sin creditos capturados; coincide con el promedio simple.",
+    );
+    setText(resultGpa, result.gpa === null ? "No aplica" : formatGpaNumber(result.gpa));
+    setText(resultSimple, formatGpaNumber(result.simpleAverage));
+    setText(resultCredits, formatFlexibleGpaNumber(result.totalCredits));
+    setText(
+      resultPass,
+      result.passedCount === null || result.failedCount === null
+        ? "Sin nota"
+        : `${result.passedCount}/${result.courseCount}`,
+    );
+
+    renderTarget(result);
+    renderInsights(result);
+    renderMessages(result.messages);
+    renderCourseResults(result);
+    setActionButtonsEnabled(true);
+  }
+
+  function renderTarget(result) {
+    const target = result.target;
+
+    if (!target) {
+      setText(resultTarget, "Sin meta");
+      setText(resultTargetDetail, "Captura una meta para estimar la brecha.");
+      return;
+    }
+
+    if (target.status === "met") {
+      setText(resultTarget, "Meta alcanzada");
+      setText(
+        resultTargetDetail,
+        `Estas ${formatGpaNumber(Math.abs(target.gap))} puntos por encima de la meta.`,
+      );
+      return;
+    }
+
+    if (target.status === "needs_remaining_credits") {
+      setText(resultTarget, `Faltan ${formatGpaNumber(target.gap)} puntos`);
+      setText(
+        resultTargetDetail,
+        "Agrega creditos restantes para estimar la calificacion necesaria.",
+      );
+      return;
+    }
+
+    setText(
+      resultTarget,
+      target.status === "reachable" ? "Meta alcanzable" : "Meta no alcanzable",
+    );
+    setText(
+      resultTargetDetail,
+      `Necesitas promediar ${formatGpaNumber(
+        target.requiredAverage,
+      )} en los creditos restantes.`,
+    );
+  }
+
+  function renderInsights(result) {
+    if (!resultInsights) {
+      return;
+    }
+
+    resultInsights.innerHTML = "";
+    const items = [
+      `Mejor materia: ${result.bestCourse.name} (${formatFlexibleGpaNumber(
+        result.bestCourse.grade,
+      )}).`,
+      `Peor materia: ${result.worstCourse.name} (${formatFlexibleGpaNumber(
+        result.worstCourse.grade,
+      )}).`,
+      `Mayor impacto: ${result.impactCourses
+        .map((course) => `${course.name} ${formatPercent(course.weightPercent)}`)
+        .join(", ")}.`,
+    ];
+
+    if (result.target?.gap > 0) {
+      items.push(`Brecha contra meta: ${formatSignedNumber(result.target.gap)}.`);
+    }
+
+    items.forEach((item) => {
+      const paragraph = document.createElement("p");
+      paragraph.textContent = item;
+      resultInsights.append(paragraph);
+    });
+  }
+
+  function renderMessages(messages) {
+    if (!resultMessages) {
+      return;
+    }
+
+    resultMessages.classList.toggle("hidden", messages.length === 0);
+    resultMessages.innerHTML = messages.map((message) => `<p>${escapeHtml(message)}</p>`).join("");
+  }
+
+  function renderCourseResults(result) {
+    if (!courseResults) {
+      return;
+    }
+
+    courseResults.innerHTML = "";
+
+    result.courses.forEach((course) => {
+      const card = document.createElement("article");
+      const status =
+        course.passed === null ? "Sin nota minima" : course.passed ? "Aprobada" : "Reprobada";
+      const statusClass =
+        course.passed === null
+          ? "border-gray-700 text-gray-300"
+          : course.passed
+            ? "border-emerald-400/40 text-emerald-200"
+            : "border-red-400/40 text-red-200";
+
+      card.className = "rounded-lg border border-gray-800 bg-gray-900/70 p-4";
+      card.innerHTML = `
+        <div class="flex items-start justify-between gap-3">
+          <div>
+            <h3 class="break-words text-base font-semibold text-white">${escapeHtml(course.name)}</h3>
+            <p class="mt-1 text-sm text-gray-400">Calificacion ${formatFlexibleGpaNumber(course.grade)} - ${formatFlexibleGpaNumber(course.credits)} creditos</p>
+          </div>
+          <span class="shrink-0 rounded-lg border px-2 py-1 text-xs font-semibold ${statusClass}">${status}</span>
+        </div>
+        <dl class="mt-4 grid grid-cols-2 gap-3 text-sm">
+          <div>
+            <dt class="text-gray-500">Impacto</dt>
+            <dd class="font-semibold text-gray-100">${formatPercent(course.weightPercent)}</dd>
+          </div>
+          <div>
+            <dt class="text-gray-500">Aporte</dt>
+            <dd class="font-semibold text-gray-100">${formatGpaNumber(course.contribution)}</dd>
+          </div>
+        </dl>
+      `;
+      courseResults.append(card);
+    });
+  }
+
+  function renderInvalidState(message) {
+    setText(resultWeighted, "-");
+    setText(resultModeNote, message);
+    setText(resultGpa, "-");
+    setText(resultSimple, "-");
+    setText(resultCredits, "-");
+    setText(resultPass, "-");
+    setText(resultTarget, "Sin calculo");
+    setText(resultTargetDetail, "Corrige los datos para continuar.");
+    if (resultInsights) {
+      resultInsights.innerHTML = `<p>${escapeHtml(message)}</p>`;
+    }
+    renderMessages([]);
+    if (courseResults) {
+      courseResults.innerHTML = `<p class="text-sm text-gray-400">${escapeHtml(message)}</p>`;
+    }
+    currentSummary = "";
+    currentCsv = "";
+    setActionButtonsEnabled(false);
+  }
+
+  function setActionButtonsEnabled(isEnabled) {
+    [copySummaryButton, exportCsvButton].forEach((button) => {
+      button?.toggleAttribute("disabled", !isEnabled);
+      button?.classList.toggle("opacity-50", !isEnabled);
+      button?.classList.toggle("cursor-not-allowed", !isEnabled);
+    });
+  }
+
+  function addCourse(course = null) {
+    syncCourseState();
+    courseCounter += 1;
+    courses.push(
+      course ?? {
+        id: `course-${courseCounter}`,
+        name: "",
+        grade: "",
+        credits: "",
+      },
+    );
+    renderCourseInputs();
+    updateCalculator();
+  }
+
+  function duplicateCourse(courseId) {
+    syncCourseState();
+    const source = courses.find((course) => course.id === courseId);
+
+    if (!source) {
+      return;
+    }
+
+    courseCounter += 1;
+    courses.push({
+      ...source,
+      id: `course-${courseCounter}`,
+      name: source.name ? `${source.name} copia` : "",
+    });
+    renderCourseInputs();
+    updateCalculator();
+  }
+
+  function removeCourse(courseId) {
+    syncCourseState();
+    courses = courses.filter((course) => course.id !== courseId);
+
+    if (courses.length === 0) {
+      courses = [{ id: "course-1", name: "", grade: "", credits: "" }];
+      courseCounter = 1;
+      renderCourseInputs();
+      updateCalculator();
+      return;
+    }
+
+    renderCourseInputs();
+    updateCalculator();
+  }
+
+  function loadExample(exampleId) {
+    const example = GPA_EXAMPLES.find((item) => item.id === exampleId);
+
+    if (!example) {
+      return;
+    }
+
+    if (scaleSelect) {
+      scaleSelect.value = example.scale;
+    }
+
+    if (passingGradeInput) {
+      passingGradeInput.value = example.passingGrade;
+    }
+
+    if (targetAverageInput) {
+      targetAverageInput.value = example.targetAverage;
+    }
+
+    if (remainingCreditsInput) {
+      remainingCreditsInput.value = example.remainingCredits;
+    }
+
+    courseCounter = example.courses.length;
+    courses = example.courses.map((course, index) => ({
+      id: `course-${index + 1}`,
+      ...course,
+    }));
+    renderCourseInputs();
+    updateCalculator();
+  }
+
+  function clearCalculator() {
+    courses = [{ id: "course-1", name: "", grade: "", credits: "" }];
+    courseCounter = 1;
+
+    if (scaleSelect) {
+      scaleSelect.value = "0-10";
+    }
+
+    [customScaleInput, passingGradeInput, targetAverageInput, remainingCreditsInput].forEach(
+      (input) => {
+        if (input) {
+          input.value = "";
+        }
+      },
+    );
+
+    if (gpaMethodSelect) {
+      gpaMethodSelect.value = "linear";
+    }
+
+    renderCourseInputs();
+    updateCalculator();
+  }
+
+  async function copySummary() {
+    if (!currentSummary) {
+      setStatus("No hay resumen para copiar.");
+      return;
+    }
+
+    await copyText(currentSummary, "Resumen copiado.");
+  }
+
+  function exportCsv() {
+    if (!currentCsv) {
+      setStatus("No hay CSV para exportar.");
+      return;
+    }
+
+    const blob = new Blob([currentCsv], { type: "text/csv;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "promedio-escolar-gpa.csv";
+    document.body.append(link);
+    link.click();
+    link.remove();
+    URL.revokeObjectURL(url);
+    setStatus("CSV generado.");
+  }
+
+  async function copyText(text, successMessage) {
+    try {
+      if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(text);
+      } else {
+        const textArea = document.createElement("textarea");
+        textArea.value = text;
+        textArea.setAttribute("readonly", "");
+        textArea.style.position = "fixed";
+        textArea.style.opacity = "0";
+        document.body.append(textArea);
+        textArea.select();
+        document.execCommand("copy");
+        textArea.remove();
+      }
+
+      setStatus(successMessage);
+    } catch {
+      setStatus("No se pudo copiar.");
+    }
+  }
+
+  function setStatus(message) {
+    setText(actionStatus, message);
+    window.clearTimeout(statusTimeout);
+    statusTimeout = window.setTimeout(() => setText(actionStatus, ""), 2500);
+  }
+
+  function getCourseFieldValue(card, field) {
+    return card.querySelector(`[data-course-field="${field}"]`)?.value ?? "";
+  }
+
+  function setCourseError(card, field, message) {
+    const error = card.querySelector(`[data-course-error="${field}"]`);
+
+    if (error) {
+      error.textContent = message;
+      error.classList.remove("hidden");
+    }
+  }
+
+  function clearCourseErrors(card) {
+    card.querySelectorAll("[data-course-error]").forEach((error) => {
+      error.textContent = "";
+      error.classList.add("hidden");
+    });
+  }
+
+  function setOptionError(field, message) {
+    const error = document.querySelector(`[data-option-error="${field}"]`);
+
+    if (error) {
+      error.textContent = message;
+      error.classList.remove("hidden");
+    }
+  }
+
+  function clearOptionErrors() {
+    document.querySelectorAll("[data-option-error]").forEach((error) => {
+      error.textContent = "";
+      error.classList.add("hidden");
+    });
+  }
+
+  function getErrorMessage(error) {
+    return ERROR_MESSAGES[error] ?? ERROR_MESSAGES.invalid;
+  }
+
+  function setText(element, value) {
+    if (element) {
+      element.textContent = value;
+    }
+  }
+
+  function escapeHtml(value) {
+    return String(value)
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;")
+      .replaceAll("'", "&#039;");
+  }
+
+  courseList?.addEventListener("input", updateCalculator);
+  courseList?.addEventListener("click", (event) => {
+    const target = event.target;
+
+    if (!(target instanceof Element)) {
+      return;
+    }
+
+    const button = target.closest("button");
+
+    if (!button) {
+      return;
+    }
+
+    if (button.dataset.duplicateCourse) {
+      duplicateCourse(button.dataset.duplicateCourse);
+    }
+
+    if (button.dataset.removeCourse) {
+      removeCourse(button.dataset.removeCourse);
+    }
+  });
+
+  [scaleSelect, customScaleInput, passingGradeInput, targetAverageInput, remainingCreditsInput, gpaMethodSelect].forEach(
+    (input) => input?.addEventListener("input", updateCalculator),
+  );
+  scaleSelect?.addEventListener("change", updateCalculator);
+  gpaMethodSelect?.addEventListener("change", updateCalculator);
+  addCourseButton?.addEventListener("click", () => addCourse());
+  copySummaryButton?.addEventListener("click", copySummary);
+  exportCsvButton?.addEventListener("click", exportCsv);
+  clearButton?.addEventListener("click", clearCalculator);
+  exampleButtons.forEach((button) => {
+    button.addEventListener("click", () => loadExample(button.dataset.exampleId));
+  });
+
+  renderCourseInputs();
+  updateCalculator();
+</script>
