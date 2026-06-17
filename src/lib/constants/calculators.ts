@@ -27,6 +27,15 @@ export const CALCULATORS: CalculatorDirectoryItem[] = [
     order: 16,
   },
   {
+    id: "calculadora-ecuaciones-cuadraticas",
+    title: "Calculadora de ecuaciones cuadráticas",
+    description:
+      "Resuelve ecuaciones cuadráticas con discriminante, raíces reales o complejas, vértice y procedimiento paso a paso.",
+    href: "/matematicas/calculadora-ecuaciones-cuadraticas",
+    categorySlug: "matematicas",
+    order: 17,
+  },
+  {
     id: "calculadora-de-iva",
     title: "Calculadora de IVA",
     description: "Agrega o desglosa IVA con tasa editable y presets por país.",

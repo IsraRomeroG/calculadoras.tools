@@ -46,6 +46,7 @@ const faqs = [
 ];
 
 const faqJsonLd = buildFaqJsonLd(faqs);
+const DEFAULT_STUDY_WEEKDAY_VALUES = new Set([1, 2, 3, 4, 5]);
 ---
 
 <BaseLayout title={title} description={description} canonical={canonical}>
@@ -231,7 +232,9 @@ const faqJsonLd = buildFaqJsonLd(faqs);
               >
                 {
                   STUDY_WEEKDAYS.map((weekday) => {
-                    const isDefault = weekday.value >= 1 && weekday.value <= 5;
+                    const isDefault = DEFAULT_STUDY_WEEKDAY_VALUES.has(
+                      weekday.value,
+                    );
 
                     return (
                       <button
