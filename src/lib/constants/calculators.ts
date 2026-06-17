@@ -18,6 +18,15 @@ export const CALCULATORS: CalculatorDirectoryItem[] = [
     order: 15,
   },
   {
+    id: "calculadora-mcd-mcm",
+    title: "Calculadora de MCD y MCM",
+    description:
+      "Calcula máximo común divisor y mínimo común múltiplo con procedimiento, comprobación y factores primos.",
+    href: "/matematicas/calculadora-mcd-mcm",
+    categorySlug: "matematicas",
+    order: 16,
+  },
+  {
     id: "calculadora-de-iva",
     title: "Calculadora de IVA",
     description: "Agrega o desglosa IVA con tasa editable y presets por país.",
