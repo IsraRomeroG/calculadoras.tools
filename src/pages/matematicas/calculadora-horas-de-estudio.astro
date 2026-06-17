@@ -1,0 +1,814 @@
+---
+import BaseLayout from "@layouts/BaseLayout.astro";
+import AdSlot from "@components/ads/AdSlot.astro";
+import Container from "@components/layout/Container.astro";
+import PageShell from "@components/layout/PageShell.astro";
+import FaqSection from "@components/shared/FaqSection.astro";
+import PageHero from "@components/shared/PageHero.astro";
+import SectionIntro from "@components/shared/SectionIntro.astro";
+import {
+  STUDY_HOURS_CANONICAL_PATH,
+  STUDY_WEEKDAYS,
+} from "@lib/calculators/matematicas/calculadora-horas-de-estudio/studyHours";
+import { buildFaqJsonLd } from "@lib/seo";
+
+const title = "Calculadora de horas de estudio necesarias";
+const description =
+  "Calcula cuantas horas estudiar al dia, cuantas sesiones hacer y como repartir tu plan semanal antes de una fecha limite.";
+const canonical = STUDY_HOURS_CANONICAL_PATH;
+
+const faqs = [
+  {
+    question: "Cuantas horas debo estudiar al dia?",
+    answer:
+      "Depende de las horas pendientes, la fecha limite y los dias reales que puedes estudiar. La calculadora divide las horas pendientes entre los dias efectivos seleccionados.",
+  },
+  {
+    question: "Como distribuir horas de estudio?",
+    answer:
+      "El plan semanal reparte la misma carga en los dias seleccionados y muestra cuantos bloques o sesiones necesitas por dia.",
+  },
+  {
+    question: "La calculadora considera descansos?",
+    answer:
+      "El MVP no suma descansos al calendario, pero usa la duracion de sesion para sugerir bloques de estudio manejables.",
+  },
+  {
+    question: "Puedo estudiar menos dias por semana?",
+    answer:
+      "Si. Desactiva los dias que no puedes estudiar. El resultado subira o bajara segun los dias efectivos disponibles.",
+  },
+  {
+    question: "Como hago un plan de estudio antes de un examen?",
+    answer:
+      "Define las horas pendientes, elige tu fecha limite, marca los dias disponibles y revisa si la carga resultante es sostenible.",
+  },
+];
+
+const faqJsonLd = buildFaqJsonLd(faqs);
+---
+
+<BaseLayout title={title} description={description} canonical={canonical}>
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={JSON.stringify(faqJsonLd)} />
+  </Fragment>
+
+  <PageShell>
+    <PageHero
+      title="Calculadora de horas de estudio"
+      description="Calcula cuanto estudiar por dia o cuando terminaras con tu ritmo actual."
+      kicker="Matematicas"
+      collapseBreadcrumbOnMobile
+      containerClass="py-6 md:py-8"
+      breadcrumbs={[
+        { label: "Inicio", href: "/", ariaLabel: "Inicio" },
+        { label: "Matematicas", href: "/matematicas", optional: true },
+        { label: "Horas de estudio", truncate: true },
+      ]}
+    />
+
+    <Container as="section" class="py-6 md:py-8">
+      <div
+        id="study-hours-calculator"
+        class="overflow-hidden rounded-lg border border-gray-700 bg-gray-950 shadow-xl shadow-gray-950/30"
+      >
+        <div class="grid gap-0 lg:grid-cols-[minmax(0,1fr)_minmax(20rem,0.78fr)]">
+          <aside
+            class="border-b border-gray-800 bg-gray-900/60 p-4 sm:p-6 lg:order-2 lg:border-b-0 lg:border-l"
+            aria-live="polite"
+          >
+            <p class="text-sm font-semibold uppercase text-amber-400">
+              Resultado
+            </p>
+
+            <div class="mt-4 rounded-lg border border-gray-700 bg-gray-950 p-5">
+              <p class="text-xs font-semibold uppercase text-gray-400" data-main-label>
+                Horas por dia
+              </p>
+              <p
+                class="mt-2 break-words text-4xl font-bold leading-tight text-white"
+                data-main-result
+              >
+                -
+              </p>
+              <p class="mt-3 text-sm leading-relaxed text-gray-400" data-result-note>
+                Completa tus datos para armar el plan.
+              </p>
+            </div>
+
+            <div class="mt-3 grid grid-cols-2 gap-3">
+              <div class="rounded-lg border border-gray-800 bg-gray-950 p-4">
+                <p class="text-xs font-semibold uppercase text-gray-500">
+                  Dias efectivos
+                </p>
+                <p class="mt-2 break-words text-2xl font-semibold text-white" data-result-days>
+                  -
+                </p>
+              </div>
+              <div class="rounded-lg border border-gray-800 bg-gray-950 p-4">
+                <p class="text-xs font-semibold uppercase text-gray-500">
+                  Sesiones
+                </p>
+                <p class="mt-2 break-words text-2xl font-semibold text-white" data-result-sessions>
+                  -
+                </p>
+              </div>
+              <div class="rounded-lg border border-gray-800 bg-gray-950 p-4">
+                <p class="text-xs font-semibold uppercase text-gray-500">
+                  Semana
+                </p>
+                <p class="mt-2 break-words text-2xl font-semibold text-white" data-result-weekly>
+                  -
+                </p>
+              </div>
+              <div class="rounded-lg border border-gray-800 bg-gray-950 p-4">
+                <p class="text-xs font-semibold uppercase text-gray-500">
+                  Carga
+                </p>
+                <p class="mt-2 break-words text-2xl font-semibold text-white" data-result-load>
+                  -
+                </p>
+              </div>
+            </div>
+
+            <div class="mt-5">
+              <h2 class="text-base font-semibold text-white">Plan semanal</h2>
+              <div class="mt-3 grid gap-2" data-weekly-plan>
+                <p class="text-sm text-gray-400">
+                  El plan aparecera con un calculo valido.
+                </p>
+              </div>
+            </div>
+          </aside>
+
+          <section class="p-4 sm:p-6 lg:order-1" aria-labelledby="calculator-heading">
+            <h2 id="calculator-heading" class="text-xl font-semibold">
+              Datos del plan
+            </h2>
+
+            <div class="mt-5">
+              <span class="block text-sm font-medium text-gray-200">Modo</span>
+              <div
+                class="mt-2 inline-flex rounded-lg border border-gray-700 bg-gray-900 p-1"
+                role="group"
+                aria-label="Modo de calculo"
+              >
+                <button
+                  class="min-h-11 rounded-md px-4 py-2 text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/40"
+                  type="button"
+                  data-mode-button="hoursPerDay"
+                  aria-pressed="true"
+                >
+                  Horas/dia
+                </button>
+                <button
+                  class="min-h-11 rounded-md px-4 py-2 text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/40"
+                  type="button"
+                  data-mode-button="estimatedDate"
+                  aria-pressed="false"
+                >
+                  Fecha estimada
+                </button>
+              </div>
+            </div>
+
+            <div class="mt-5 grid gap-4 sm:grid-cols-2">
+              <div>
+                <label for="study-total-hours" class="block text-sm font-medium text-gray-200">
+                  Horas objetivo
+                </label>
+                <input
+                  id="study-total-hours"
+                  class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-900 px-4 text-base text-white outline-none transition placeholder:text-gray-600 focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15"
+                  type="text"
+                  inputmode="decimal"
+                  autocomplete="off"
+                  placeholder="60"
+                  data-field="totalHours"
+                />
+                <p class="mt-2 hidden text-sm text-red-300" data-error-for="totalHours"></p>
+              </div>
+
+              <div data-deadline-wrapper>
+                <label for="study-deadline" class="block text-sm font-medium text-gray-200">
+                  Fecha limite
+                </label>
+                <input
+                  id="study-deadline"
+                  class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-900 px-4 text-base text-white outline-none transition focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15"
+                  type="date"
+                  data-field="deadlineDate"
+                />
+                <p class="mt-2 hidden text-sm text-red-300" data-error-for="deadlineDate"></p>
+              </div>
+
+              <div class="hidden" data-daily-hours-wrapper>
+                <label for="study-daily-hours" class="block text-sm font-medium text-gray-200">
+                  Horas por dia
+                </label>
+                <input
+                  id="study-daily-hours"
+                  class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-900 px-4 text-base text-white outline-none transition placeholder:text-gray-600 focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15"
+                  type="text"
+                  inputmode="decimal"
+                  autocomplete="off"
+                  placeholder="2"
+                  data-field="dailyHours"
+                />
+                <p class="mt-2 hidden text-sm text-red-300" data-error-for="dailyHours"></p>
+              </div>
+            </div>
+
+            <div class="mt-5">
+              <span class="block text-sm font-medium text-gray-200">
+                Dias de estudio
+              </span>
+              <div
+                class="mt-2 grid grid-cols-7 gap-1 rounded-lg border border-gray-700 bg-gray-900 p-1"
+                role="group"
+                aria-label="Dias de estudio"
+                data-weekday-group
+              >
+                {
+                  STUDY_WEEKDAYS.map((weekday) => {
+                    const isDefault = weekday.value >= 1 && weekday.value <= 5;
+
+                    return (
+                      <button
+                        class="min-h-11 rounded-md text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/40"
+                        type="button"
+                        data-weekday={weekday.value}
+                        aria-pressed={String(isDefault)}
+                        title={weekday.label}
+                      >
+                        {weekday.shortLabel}
+                      </button>
+                    );
+                  })
+                }
+              </div>
+              <p class="mt-2 hidden text-sm text-red-300" data-error-for="selectedWeekdays"></p>
+            </div>
+
+            <details class="mt-5 rounded-lg border border-gray-800 bg-gray-900/70 p-4">
+              <summary class="cursor-pointer text-sm font-semibold text-gray-100">
+                Opciones
+              </summary>
+
+              <div class="mt-4 grid gap-4 sm:grid-cols-3">
+                <div>
+                  <label for="study-completed-hours" class="block text-sm font-medium text-gray-200">
+                    Horas ya estudiadas
+                  </label>
+                  <input
+                    id="study-completed-hours"
+                    class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-950 px-4 text-base text-white outline-none transition placeholder:text-gray-600 focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15"
+                    type="text"
+                    inputmode="decimal"
+                    autocomplete="off"
+                    value="0"
+                    data-field="completedHours"
+                  />
+                  <p class="mt-2 hidden text-sm text-red-300" data-error-for="completedHours"></p>
+                </div>
+
+                <div>
+                  <label for="study-start-date" class="block text-sm font-medium text-gray-200">
+                    Fecha de inicio
+                  </label>
+                  <input
+                    id="study-start-date"
+                    class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-950 px-4 text-base text-white outline-none transition focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15"
+                    type="date"
+                    data-field="startDate"
+                  />
+                  <p class="mt-2 hidden text-sm text-red-300" data-error-for="startDate"></p>
+                </div>
+
+                <div>
+                  <label for="study-session-minutes" class="block text-sm font-medium text-gray-200">
+                    Minutos por sesion
+                  </label>
+                  <input
+                    id="study-session-minutes"
+                    class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-950 px-4 text-base text-white outline-none transition placeholder:text-gray-600 focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15"
+                    type="text"
+                    inputmode="numeric"
+                    autocomplete="off"
+                    value="50"
+                    data-field="sessionMinutes"
+                  />
+                  <p class="mt-2 hidden text-sm text-red-300" data-error-for="sessionMinutes"></p>
+                </div>
+              </div>
+            </details>
+
+            <div class="mt-5 flex flex-wrap gap-3">
+              <button
+                class="inline-flex min-h-11 items-center justify-center rounded-lg bg-amber-400 px-4 py-2 text-sm font-semibold text-gray-950 transition hover:bg-amber-300 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/40"
+                type="button"
+                data-copy-summary
+                disabled
+              >
+                Copiar resumen
+              </button>
+              <button
+                class="inline-flex min-h-11 items-center justify-center rounded-lg border border-gray-700 px-4 py-2 text-sm font-semibold text-gray-200 transition hover:border-amber-400 hover:text-white focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/40"
+                type="button"
+                data-clear
+              >
+                Limpiar
+              </button>
+            </div>
+            <p class="mt-3 min-h-5 text-sm text-emerald-300" data-action-status></p>
+          </section>
+        </div>
+      </div>
+    </Container>
+
+    <AdSlot placement="calculator-after-tool" />
+
+    <Container as="section" class="py-6 md:py-8">
+      <SectionIntro
+        title="Como ajustar tu plan"
+        description="La carga diaria cambia mucho con pequenos ajustes de calendario."
+      />
+
+      <div class="grid gap-4 md:grid-cols-3">
+        <article class="rounded-lg border border-gray-700 bg-gray-950 p-5">
+          <h3 class="text-lg font-semibold text-white">Mas dias</h3>
+          <p class="mt-3 text-sm leading-relaxed text-gray-400">
+            Activar un dia adicional puede bajar la carga diaria sin mover la
+            fecha limite.
+          </p>
+        </article>
+        <article class="rounded-lg border border-gray-700 bg-gray-950 p-5">
+          <h3 class="text-lg font-semibold text-white">Mas plazo</h3>
+          <p class="mt-3 text-sm leading-relaxed text-gray-400">
+            Una fecha limite mas lejana reparte las horas pendientes en mas
+            sesiones.
+          </p>
+        </article>
+        <article class="rounded-lg border border-gray-700 bg-gray-950 p-5">
+          <h3 class="text-lg font-semibold text-white">Sesiones claras</h3>
+          <p class="mt-3 text-sm leading-relaxed text-gray-400">
+            Cambiar los minutos por sesion ayuda a convertir horas en bloques
+            concretos.
+          </p>
+        </article>
+      </div>
+    </Container>
+
+    <AdSlot placement="calculator-before-faq" />
+
+    <FaqSection faqs={faqs} />
+  </PageShell>
+</BaseLayout>
+
+<script>
+  import {
+    buildStudyHoursSummary,
+    calculateStudyHours,
+    formatStudyDate,
+    formatStudyDuration,
+    getTodayIsoDate,
+    parseStudyHoursNumber,
+  } from "@lib/calculators/matematicas/calculadora-horas-de-estudio/studyHours";
+
+  const ERROR_MESSAGES = {
+    required: "Campo obligatorio.",
+    invalid: "Ingresa un numero valido.",
+    negative: "Usa un numero igual o mayor a cero.",
+    zero: "Debe ser mayor que cero.",
+    too_many_decimals: "Usa maximo 4 decimales.",
+    date: "Elige una fecha valida.",
+    weekdays: "Selecciona al menos un dia.",
+    completed: "No puede superar las horas objetivo.",
+    session: "Usa entre 15 y 240 minutos.",
+  };
+
+  const modeButtons = Array.from(document.querySelectorAll("[data-mode-button]"));
+  const weekdayButtons = Array.from(document.querySelectorAll("[data-weekday]"));
+  const deadlineWrapper = document.querySelector("[data-deadline-wrapper]");
+  const dailyHoursWrapper = document.querySelector("[data-daily-hours-wrapper]");
+  const copyButton = document.querySelector("[data-copy-summary]");
+  const clearButton = document.querySelector("[data-clear]");
+  const actionStatus = document.querySelector("[data-action-status]");
+  const mainLabel = document.querySelector("[data-main-label]");
+  const mainResult = document.querySelector("[data-main-result]");
+  const resultNote = document.querySelector("[data-result-note]");
+  const resultDays = document.querySelector("[data-result-days]");
+  const resultSessions = document.querySelector("[data-result-sessions]");
+  const resultWeekly = document.querySelector("[data-result-weekly]");
+  const resultLoad = document.querySelector("[data-result-load]");
+  const weeklyPlan = document.querySelector("[data-weekly-plan]");
+
+  let mode = "hoursPerDay";
+  let currentSummary = "";
+  let statusTimeout = 0;
+
+  function getField(field) {
+    return document.querySelector(`[data-field="${field}"]`);
+  }
+
+  function getFieldValue(field) {
+    return getField(field)?.value ?? "";
+  }
+
+  function setFieldValue(field, value) {
+    const input = getField(field);
+
+    if (input) {
+      input.value = value;
+    }
+  }
+
+  function readNumberField(field, options = {}) {
+    const input = getField(field);
+    const parsed = parseStudyHoursNumber(input?.value ?? "", {
+      required: options.required ?? true,
+      allowZero: options.allowZero ?? true,
+    });
+
+    if (!parsed.ok) {
+      setFieldError(field, ERROR_MESSAGES[parsed.error], shouldShowError(input));
+      return { ok: false, value: null, missing: parsed.error === "required" };
+    }
+
+    if (Number.isNaN(parsed.value)) {
+      return { ok: true, value: null, missing: true };
+    }
+
+    return { ok: true, value: parsed.value, missing: false };
+  }
+
+  function readSelectedWeekdays() {
+    return weekdayButtons
+      .filter((button) => button.getAttribute("aria-pressed") === "true")
+      .map((button) => Number(button.dataset.weekday));
+  }
+
+  function readCalculatorInput() {
+    clearErrors();
+
+    const total = readNumberField("totalHours", { allowZero: false });
+
+    if (!total.ok || total.value === null) {
+      return { ok: false, reason: "Agrega las horas objetivo." };
+    }
+
+    const completed = readNumberField("completedHours", {
+      required: false,
+      allowZero: true,
+    });
+
+    if (!completed.ok) {
+      return { ok: false, reason: "Revisa las horas ya estudiadas." };
+    }
+
+    const completedValue = completed.value ?? 0;
+
+    if (completedValue > total.value) {
+      setFieldError("completedHours", ERROR_MESSAGES.completed, true);
+      return { ok: false, reason: "Las horas ya estudiadas superan la meta." };
+    }
+
+    const session = readNumberField("sessionMinutes", { allowZero: false });
+
+    if (!session.ok || session.value === null) {
+      return { ok: false, reason: "Agrega la duracion de cada sesion." };
+    }
+
+    if (session.value < 15 || session.value > 240) {
+      setFieldError("sessionMinutes", ERROR_MESSAGES.session, true);
+      return { ok: false, reason: "La sesion debe durar entre 15 y 240 minutos." };
+    }
+
+    const selectedWeekdays = readSelectedWeekdays();
+
+    if (selectedWeekdays.length === 0) {
+      setFieldError("selectedWeekdays", ERROR_MESSAGES.weekdays, true);
+      return { ok: false, reason: "Selecciona al menos un dia de estudio." };
+    }
+
+    const startDate = getFieldValue("startDate");
+
+    if (!isDateValue(startDate)) {
+      setFieldError("startDate", ERROR_MESSAGES.date, shouldShowError(getField("startDate")));
+      return { ok: false, reason: "Elige una fecha de inicio valida." };
+    }
+
+    if (mode === "hoursPerDay") {
+      const deadlineDate = getFieldValue("deadlineDate");
+
+      if (!isDateValue(deadlineDate)) {
+        setFieldError("deadlineDate", ERROR_MESSAGES.date, shouldShowError(getField("deadlineDate")));
+        return { ok: false, reason: "Elige la fecha limite." };
+      }
+
+      return {
+        ok: true,
+        value: {
+          mode,
+          totalHours: total.value,
+          completedHours: completedValue,
+          startDate,
+          deadlineDate,
+          selectedWeekdays,
+          sessionMinutes: session.value,
+        },
+      };
+    }
+
+    const daily = readNumberField("dailyHours", { allowZero: false });
+
+    if (!daily.ok || daily.value === null) {
+      return { ok: false, reason: "Agrega cuantas horas puedes estudiar por dia." };
+    }
+
+    return {
+      ok: true,
+      value: {
+        mode,
+        totalHours: total.value,
+        completedHours: completedValue,
+        startDate,
+        dailyHours: daily.value,
+        selectedWeekdays,
+        sessionMinutes: session.value,
+      },
+    };
+  }
+
+  function updateCalculator() {
+    updateModeUi();
+    updateWeekdayUi();
+
+    const input = readCalculatorInput();
+
+    if (!input.ok) {
+      renderEmptyState(input.reason);
+      return;
+    }
+
+    try {
+      const result = calculateStudyHours(input.value);
+      currentSummary = buildStudyHoursSummary(result);
+      renderResult(result);
+    } catch (error) {
+      renderEmptyState(error instanceof Error ? error.message : "No se pudo calcular.");
+    }
+  }
+
+  function renderResult(result) {
+    mainResult?.classList.remove("text-red-300", "text-emerald-300", "text-white");
+
+    if (result.pendingHours === 0) {
+      setText(mainLabel, "Estado");
+      setText(mainResult, "Completado");
+      mainResult?.classList.add("text-emerald-300");
+    } else if (result.mode === "estimatedDate") {
+      setText(mainLabel, "Fecha estimada");
+      setText(mainResult, formatStudyDate(result.estimatedDate ?? result.startDate));
+      mainResult?.classList.add("text-white");
+    } else {
+      setText(mainLabel, "Horas por dia");
+      setText(mainResult, formatStudyDuration(result.hoursPerDay));
+      mainResult?.classList.add("text-white");
+    }
+
+    setText(resultNote, result.recommendation);
+    setText(resultDays, String(result.effectiveStudyDays));
+    setText(
+      resultSessions,
+      result.sessionsPerDay === 0
+        ? "-"
+        : `${result.sessionsPerDay} x ${result.sessionMinutes} min`,
+    );
+    setText(resultWeekly, formatStudyDuration(result.hoursPerWeek));
+    setText(resultLoad, result.load.label);
+    renderWeeklyPlan(result.weeklyPlan);
+    setCopyEnabled(true);
+  }
+
+  function renderWeeklyPlan(plan) {
+    if (!weeklyPlan) {
+      return;
+    }
+
+    weeklyPlan.innerHTML = "";
+
+    plan.forEach((item) => {
+      const row = document.createElement("div");
+      row.className =
+        "flex items-center justify-between gap-3 rounded-lg border border-gray-800 bg-gray-950 px-3 py-2";
+      row.innerHTML = `
+        <div class="flex min-w-0 items-center gap-3">
+          <span class="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-md border border-gray-700 text-sm font-semibold text-gray-100">${escapeHtml(item.shortLabel)}</span>
+          <span class="min-w-0 truncate text-sm font-medium text-gray-200">${escapeHtml(item.label)}</span>
+        </div>
+        <span class="shrink-0 text-right text-sm text-gray-400">${
+          item.isStudyDay
+            ? `${escapeHtml(item.hoursLabel)} - ${item.sessions} sesiones`
+            : "Descanso"
+        }</span>
+      `;
+      weeklyPlan.append(row);
+    });
+  }
+
+  function renderEmptyState(message) {
+    currentSummary = "";
+    setText(mainLabel, mode === "estimatedDate" ? "Fecha estimada" : "Horas por dia");
+    mainResult?.classList.remove("text-red-300", "text-emerald-300");
+    mainResult?.classList.add("text-white");
+    setText(mainResult, "-");
+    setText(resultNote, message);
+    setText(resultDays, "-");
+    setText(resultSessions, "-");
+    setText(resultWeekly, "-");
+    setText(resultLoad, "-");
+
+    if (weeklyPlan) {
+      weeklyPlan.innerHTML = `<p class="text-sm text-gray-400">${escapeHtml(message)}</p>`;
+    }
+
+    setCopyEnabled(false);
+  }
+
+  function setMode(nextMode) {
+    mode = nextMode === "estimatedDate" ? "estimatedDate" : "hoursPerDay";
+    updateCalculator();
+  }
+
+  function updateModeUi() {
+    modeButtons.forEach((button) => {
+      const isActive = button.dataset.modeButton === mode;
+      button.setAttribute("aria-pressed", String(isActive));
+      button.classList.toggle("bg-amber-400", isActive);
+      button.classList.toggle("text-gray-950", isActive);
+      button.classList.toggle("text-gray-300", !isActive);
+      button.classList.toggle("hover:bg-gray-800", !isActive);
+    });
+
+    deadlineWrapper?.classList.toggle("hidden", mode !== "hoursPerDay");
+    dailyHoursWrapper?.classList.toggle("hidden", mode !== "estimatedDate");
+  }
+
+  function updateWeekdayUi() {
+    weekdayButtons.forEach((button) => {
+      const isActive = button.getAttribute("aria-pressed") === "true";
+      button.classList.toggle("bg-amber-400", isActive);
+      button.classList.toggle("text-gray-950", isActive);
+      button.classList.toggle("text-gray-300", !isActive);
+      button.classList.toggle("hover:bg-gray-800", !isActive);
+    });
+  }
+
+  function toggleWeekday(button) {
+    const isActive = button.getAttribute("aria-pressed") === "true";
+    button.setAttribute("aria-pressed", String(!isActive));
+    updateCalculator();
+  }
+
+  function clearCalculator() {
+    mode = "hoursPerDay";
+    setFieldValue("totalHours", "");
+    setFieldValue("completedHours", "0");
+    setFieldValue("deadlineDate", "");
+    setFieldValue("dailyHours", "");
+    setFieldValue("startDate", getTodayIsoDate());
+    setFieldValue("sessionMinutes", "50");
+
+    weekdayButtons.forEach((button) => {
+      const value = Number(button.dataset.weekday);
+      button.setAttribute("aria-pressed", String(value >= 1 && value <= 5));
+    });
+
+    clearErrors();
+    updateCalculator();
+  }
+
+  async function copySummary() {
+    if (!currentSummary) {
+      setStatus("No hay resumen para copiar.");
+      return;
+    }
+
+    try {
+      if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(currentSummary);
+      } else {
+        const textArea = document.createElement("textarea");
+        textArea.value = currentSummary;
+        textArea.setAttribute("readonly", "");
+        textArea.style.position = "fixed";
+        textArea.style.opacity = "0";
+        document.body.append(textArea);
+        textArea.select();
+        document.execCommand("copy");
+        textArea.remove();
+      }
+
+      setStatus("Resumen copiado.");
+    } catch {
+      setStatus("No se pudo copiar.");
+    }
+  }
+
+  function setInitialDates() {
+    const today = getTodayIsoDate();
+    const tomorrow = new Date(Date.parse(`${today}T00:00:00Z`) + 86400000)
+      .toISOString()
+      .slice(0, 10);
+    const startDate = getField("startDate");
+    const deadlineDate = getField("deadlineDate");
+
+    if (startDate && !startDate.value) {
+      startDate.value = today;
+    }
+
+    startDate?.setAttribute("min", today);
+    deadlineDate?.setAttribute("min", tomorrow);
+  }
+
+  function isDateValue(value) {
+    return /^\d{4}-\d{2}-\d{2}$/.test(value);
+  }
+
+  function setCopyEnabled(isEnabled) {
+    copyButton?.toggleAttribute("disabled", !isEnabled);
+    copyButton?.classList.toggle("opacity-50", !isEnabled);
+    copyButton?.classList.toggle("cursor-not-allowed", !isEnabled);
+  }
+
+  function clearErrors() {
+    document.querySelectorAll("[data-error-for]").forEach((errorElement) => {
+      errorElement.textContent = "";
+      errorElement.classList.add("hidden");
+    });
+  }
+
+  function setFieldError(field, message, shouldShow = true) {
+    const error = document.querySelector(`[data-error-for="${field}"]`);
+
+    if (!error || !shouldShow) {
+      return;
+    }
+
+    error.textContent = message;
+    error.classList.remove("hidden");
+  }
+
+  function shouldShowError(input) {
+    return input?.dataset.touched === "true";
+  }
+
+  function setText(element, value) {
+    if (element) {
+      element.textContent = value ?? "-";
+    }
+  }
+
+  function setStatus(message) {
+    setText(actionStatus, message);
+    window.clearTimeout(statusTimeout);
+    statusTimeout = window.setTimeout(() => setText(actionStatus, ""), 2500);
+  }
+
+  function escapeHtml(value) {
+    return String(value)
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;")
+      .replaceAll("'", "&#039;");
+  }
+
+  document.querySelectorAll("[data-field]").forEach((input) => {
+    input.addEventListener("input", () => {
+      input.dataset.touched = "true";
+      updateCalculator();
+    });
+    input.addEventListener("change", () => {
+      input.dataset.touched = "true";
+      updateCalculator();
+    });
+    input.addEventListener("blur", () => {
+      input.dataset.touched = "true";
+      updateCalculator();
+    });
+  });
+
+  modeButtons.forEach((button) => {
+    button.addEventListener("click", () => setMode(button.dataset.modeButton));
+  });
+  weekdayButtons.forEach((button) => {
+    button.addEventListener("click", () => toggleWeekday(button));
+  });
+  copyButton?.addEventListener("click", copySummary);
+  clearButton?.addEventListener("click", clearCalculator);
+
+  setInitialDates();
+  updateCalculator();
+</script>

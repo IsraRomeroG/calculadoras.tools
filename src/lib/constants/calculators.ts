@@ -422,6 +422,24 @@ export const CALCULATORS: CalculatorDirectoryItem[] = [
     order: 77.2,
   },
   {
+    id: "calculadora-calificacion-ponderada",
+    title: "Calculadora de calificacion ponderada",
+    description:
+      "Calcula calificacion acumulada, peso pendiente y nota necesaria con evaluaciones ponderadas.",
+    href: "/matematicas/calculadora-calificacion-ponderada",
+    categorySlug: "matematicas",
+    order: 77.3,
+  },
+  {
+    id: "calculadora-horas-de-estudio",
+    title: "Calculadora de horas de estudio",
+    description:
+      "Calcula horas por dia, sesiones y un plan semanal segun tu fecha limite o ritmo disponible.",
+    href: "/matematicas/calculadora-horas-de-estudio",
+    categorySlug: "matematicas",
+    order: 77.4,
+  },
+  {
     id: "conversor-de-medidas-culinarias",
     title: "Conversor de medidas culinarias",
     description:
