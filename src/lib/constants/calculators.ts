@@ -413,6 +413,15 @@ export const CALCULATORS: CalculatorDirectoryItem[] = [
     order: 77,
   },
   {
+    id: "calculadora-nota-minima-para-aprobar",
+    title: "Calculadora de nota minima para aprobar",
+    description:
+      "Calcula la nota que necesitas en una evaluacion pendiente y revisa si tu objetivo es alcanzable.",
+    href: "/matematicas/calculadora-nota-minima-para-aprobar",
+    categorySlug: "matematicas",
+    order: 77.2,
+  },
+  {
     id: "conversor-de-medidas-culinarias",
     title: "Conversor de medidas culinarias",
     description:

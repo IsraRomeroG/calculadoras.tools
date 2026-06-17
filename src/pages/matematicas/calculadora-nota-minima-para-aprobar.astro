@@ -1,0 +1,1003 @@
+---
+import BaseLayout from "@layouts/BaseLayout.astro";
+import AdSlot from "@components/ads/AdSlot.astro";
+import Container from "@components/layout/Container.astro";
+import PageShell from "@components/layout/PageShell.astro";
+import FaqSection from "@components/shared/FaqSection.astro";
+import PageHero from "@components/shared/PageHero.astro";
+import SectionIntro from "@components/shared/SectionIntro.astro";
+import { MINIMUM_GRADE_CANONICAL_PATH } from "@lib/calculators/matematicas/calculadora-nota-minima-para-aprobar/minimumGrade";
+import { buildFaqJsonLd } from "@lib/seo";
+
+const title = "Calculadora de nota mínima para aprobar";
+const description =
+  "Calcula qué nota necesitas en el examen final o evaluación pendiente para aprobar o alcanzar tu objetivo.";
+const canonical = MINIMUM_GRADE_CANONICAL_PATH;
+
+const faqs = [
+  {
+    question: "¿Cómo se calcula la nota mínima?",
+    answer:
+      "Se resta al objetivo lo que ya aporta tu calificación actual y se divide entre el peso pendiente. La fórmula es: nota necesaria = (objetivo - calificación actual por peso evaluado) / peso pendiente.",
+  },
+  {
+    question: "¿Qué significa calificación actual?",
+    answer:
+      "Es el promedio de las evaluaciones que ya están calificadas, sin incluir el examen, proyecto o evaluación pendiente.",
+  },
+  {
+    question: "¿Qué diferencia hay entre peso evaluado y peso pendiente?",
+    answer:
+      "Peso evaluado es lo que ya cuenta en tu curso, por ejemplo 70%. Peso pendiente es lo que falta por calificar, por ejemplo un examen final que vale 30%.",
+  },
+  {
+    question: "¿Qué pasa si el resultado supera la nota máxima?",
+    answer:
+      "La meta no es alcanzable con la escala capturada. La calculadora muestra a qué calificación final llegarías aunque obtuvieras la nota máxima.",
+  },
+  {
+    question: "¿Puedo usar escala de 0 a 100?",
+    answer:
+      "Sí. También puedes usar escala 0-10 o una escala personalizada, por ejemplo 0-5 o 1-7.",
+  },
+  {
+    question: "¿Qué pasa si mi escuela redondea a décimas o enteros?",
+    answer:
+      "Puedes cambiar el redondeo. La calculadora redondea hacia arriba para evitar recomendar una nota que quede corta.",
+  },
+  {
+    question: "¿Sirve para varias evaluaciones pendientes?",
+    answer:
+      "Este MVP calcula una evaluación pendiente o el bloque restante completo. Para varias evaluaciones, conviene usar una calculadora ponderada.",
+    relatedHref: "/matematicas/calculadora-promedio-escolar-gpa",
+    relatedLabel: "Ver calculadora de promedio escolar",
+  },
+];
+
+const faqJsonLd = buildFaqJsonLd(faqs);
+---
+
+<BaseLayout title={title} description={description} canonical={canonical}>
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={JSON.stringify(faqJsonLd)} />
+  </Fragment>
+
+  <PageShell>
+    <PageHero
+      title="Calculadora de nota mínima"
+      description="Calcula qué nota necesitas en una evaluación pendiente y revisa si tu objetivo todavía es alcanzable."
+      kicker="Matemáticas"
+      collapseBreadcrumbOnMobile
+      containerClass="py-6 md:py-8"
+      breadcrumbs={[
+        { label: "Inicio", href: "/", ariaLabel: "Inicio" },
+        { label: "Matemáticas", href: "/matematicas", optional: true },
+        { label: "Nota mínima", truncate: true },
+      ]}
+    />
+
+    <Container as="section" class="py-6 md:py-8">
+      <div
+        id="minimum-grade-calculator"
+        class="overflow-hidden rounded-lg border border-gray-700 bg-gray-950 shadow-xl shadow-gray-950/30"
+      >
+        <div class="grid gap-0 lg:grid-cols-[minmax(0,1fr)_minmax(20rem,0.76fr)]">
+          <section class="p-4 sm:p-6" aria-labelledby="calculator-heading">
+            <h2 id="calculator-heading" class="text-xl font-semibold">
+              Datos de tu curso
+            </h2>
+            <p class="mt-2 text-sm leading-relaxed text-gray-400">
+              Usa tu promedio de lo ya calificado y el peso de lo que falta.
+            </p>
+
+            <div class="mt-5 grid gap-4 sm:grid-cols-2">
+              <div>
+                <label for="minimum-grade-scale" class="block text-sm font-medium text-gray-200">
+                  Escala
+                </label>
+                <select
+                  id="minimum-grade-scale"
+                  class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-900 px-3 text-base text-white outline-none transition focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15"
+                  data-scale
+                >
+                  <option value="0-10">0-10</option>
+                  <option value="0-100">0-100</option>
+                  <option value="custom">Personalizada</option>
+                </select>
+              </div>
+
+              <div>
+                <label for="minimum-grade-rounding" class="block text-sm font-medium text-gray-200">
+                  Redondeo
+                </label>
+                <select
+                  id="minimum-grade-rounding"
+                  class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-900 px-3 text-base text-white outline-none transition focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15"
+                  data-rounding
+                >
+                  <option value="exact">Exacto</option>
+                  <option value="tenths">A décimas</option>
+                  <option value="integers">A enteros</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="mt-4 hidden rounded-lg border border-gray-800 bg-gray-900/70 p-4" data-custom-scale-wrapper>
+              <div class="grid gap-4 sm:grid-cols-2">
+                <div>
+                  <label for="minimum-grade-scale-min" class="block text-sm font-medium text-gray-200">
+                    Mínimo personalizado
+                  </label>
+                  <input
+                    id="minimum-grade-scale-min"
+                    class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-950 px-4 text-base text-white outline-none transition placeholder:text-gray-600 focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15"
+                    type="text"
+                    inputmode="decimal"
+                    autocomplete="off"
+                    value="0"
+                    data-field="scaleMin"
+                  />
+                  <p class="mt-2 hidden text-sm text-red-300" data-error-for="scaleMin"></p>
+                </div>
+
+                <div>
+                  <label for="minimum-grade-scale-max" class="block text-sm font-medium text-gray-200">
+                    Máximo personalizado
+                  </label>
+                  <input
+                    id="minimum-grade-scale-max"
+                    class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-950 px-4 text-base text-white outline-none transition placeholder:text-gray-600 focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15"
+                    type="text"
+                    inputmode="decimal"
+                    autocomplete="off"
+                    placeholder="20"
+                    data-field="scaleMax"
+                  />
+                  <p class="mt-2 hidden text-sm text-red-300" data-error-for="scaleMax"></p>
+                </div>
+              </div>
+            </div>
+
+            <div class="mt-5">
+              <span class="block text-sm font-medium text-gray-200">
+                ¿Qué peso vas a capturar?
+              </span>
+              <div
+                class="mt-2 inline-flex rounded-lg border border-gray-700 bg-gray-900 p-1"
+                role="group"
+                aria-label="Modo de peso"
+              >
+                <button
+                  class="min-h-11 rounded-md px-4 py-2 text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/40"
+                  type="button"
+                  data-weight-mode="evaluated"
+                  aria-pressed="true"
+                >
+                  Ya evaluado
+                </button>
+                <button
+                  class="min-h-11 rounded-md px-4 py-2 text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/40"
+                  type="button"
+                  data-weight-mode="pending"
+                  aria-pressed="false"
+                >
+                  Pendiente
+                </button>
+              </div>
+            </div>
+
+            <div class="mt-5 grid gap-4 sm:grid-cols-2">
+              <div>
+                <label for="minimum-grade-current" class="block text-sm font-medium text-gray-200">
+                  Calificación actual
+                </label>
+                <input
+                  id="minimum-grade-current"
+                  class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-900 px-4 text-base text-white outline-none transition placeholder:text-gray-600 focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15"
+                  type="text"
+                  inputmode="decimal"
+                  autocomplete="off"
+                  placeholder="7.5"
+                  aria-describedby="minimum-grade-current-help minimum-grade-current-error"
+                  data-field="currentGrade"
+                />
+                <p id="minimum-grade-current-help" class="mt-2 text-sm leading-relaxed text-gray-500">
+                  Promedio de lo ya calificado, sin incluir la evaluación pendiente.
+                </p>
+                <p id="minimum-grade-current-error" class="mt-2 hidden text-sm text-red-300" data-error-for="currentGrade"></p>
+              </div>
+
+              <div>
+                <label
+                  id="minimum-grade-weight-label"
+                  for="minimum-grade-weight"
+                  class="block text-sm font-medium text-gray-200"
+                  data-weight-label
+                >
+                  Peso ya evaluado (%)
+                </label>
+                <input
+                  id="minimum-grade-weight"
+                  class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-900 px-4 text-base text-white outline-none transition placeholder:text-gray-600 focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15"
+                  type="text"
+                  inputmode="decimal"
+                  autocomplete="off"
+                  value="70"
+                  aria-describedby="minimum-grade-weight-help minimum-grade-weight-error"
+                  data-field="weightPercent"
+                />
+                <p id="minimum-grade-weight-help" class="mt-2 text-sm leading-relaxed text-gray-500" data-weight-help>
+                  Si el examen final vale 30%, aquí va 70%.
+                </p>
+                <p id="minimum-grade-weight-error" class="mt-2 hidden text-sm text-red-300" data-error-for="weightPercent"></p>
+              </div>
+            </div>
+
+            <div class="mt-5">
+              <label for="minimum-grade-target" class="block text-sm font-medium text-gray-200">
+                Calificación objetivo
+              </label>
+              <div class="mt-2 flex flex-wrap gap-2">
+                <button class="min-h-10 rounded-lg border border-gray-700 px-3 py-2 text-sm font-semibold text-gray-200 transition hover:border-amber-400 hover:text-white focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/40" type="button" data-target-preset="pass">
+                  Aprobar
+                </button>
+                <button class="min-h-10 rounded-lg border border-gray-700 px-3 py-2 text-sm font-semibold text-gray-200 transition hover:border-amber-400 hover:text-white focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/40" type="button" data-target-preset="70">
+                  7
+                </button>
+                <button class="min-h-10 rounded-lg border border-gray-700 px-3 py-2 text-sm font-semibold text-gray-200 transition hover:border-amber-400 hover:text-white focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/40" type="button" data-target-preset="80">
+                  8
+                </button>
+                <button class="min-h-10 rounded-lg border border-gray-700 px-3 py-2 text-sm font-semibold text-gray-200 transition hover:border-amber-400 hover:text-white focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/40" type="button" data-target-preset="90">
+                  9
+                </button>
+              </div>
+              <input
+                id="minimum-grade-target"
+                class="mt-3 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-900 px-4 text-base text-white outline-none transition placeholder:text-gray-600 focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15"
+                type="text"
+                inputmode="decimal"
+                autocomplete="off"
+                value="6"
+                data-field="targetGrade"
+              />
+              <p class="mt-2 hidden text-sm text-red-300" data-error-for="targetGrade"></p>
+            </div>
+
+            <details class="mt-5 rounded-lg border border-gray-800 bg-gray-900/70 p-4">
+              <summary class="cursor-pointer text-sm font-semibold text-gray-100">
+                Escenario opcional
+              </summary>
+              <div class="mt-4">
+                <label for="minimum-grade-scenario" class="block text-sm font-medium text-gray-200">
+                  Probar una nota específica
+                </label>
+                <input
+                  id="minimum-grade-scenario"
+                  class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-950 px-4 text-base text-white outline-none transition placeholder:text-gray-600 focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15"
+                  type="text"
+                  inputmode="decimal"
+                  autocomplete="off"
+                  placeholder="8.5"
+                  data-field="scenarioGrade"
+                />
+                <p class="mt-2 hidden text-sm text-red-300" data-error-for="scenarioGrade"></p>
+              </div>
+            </details>
+
+            <div class="mt-5 flex flex-wrap gap-3">
+              <button
+                class="inline-flex min-h-11 items-center justify-center rounded-lg bg-amber-400 px-4 py-2 text-sm font-semibold text-gray-950 transition hover:bg-amber-300 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/40"
+                type="button"
+                data-copy-summary
+                disabled
+              >
+                Copiar resultado
+              </button>
+              <button
+                class="inline-flex min-h-11 items-center justify-center rounded-lg border border-gray-700 px-4 py-2 text-sm font-semibold text-gray-200 transition hover:border-amber-400 hover:text-white focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/40"
+                type="button"
+                data-clear-calculator
+              >
+                Limpiar
+              </button>
+            </div>
+            <p class="mt-3 min-h-5 text-sm text-emerald-300" data-action-status></p>
+          </section>
+
+          <aside
+            class="border-t border-gray-800 bg-gray-900/60 p-4 sm:p-6 lg:border-l lg:border-t-0"
+            aria-live="polite"
+          >
+            <div data-result-region>
+              <p class="text-sm font-semibold uppercase text-amber-400">
+                Resultado
+              </p>
+              <p
+                class="mt-3 break-words text-3xl font-semibold leading-tight text-white"
+                data-main-result
+              >
+                Completa tus datos
+              </p>
+              <p class="mt-2 text-sm leading-relaxed text-gray-400" data-result-note>
+                Captura tu calificación actual para calcular la nota necesaria.
+              </p>
+
+              <div class="mt-5 grid grid-cols-2 gap-3">
+                <div class="rounded-lg border border-gray-800 bg-gray-950 p-4">
+                  <p class="text-xs font-semibold uppercase text-gray-500">
+                    Exacto
+                  </p>
+                  <p class="mt-2 break-words text-2xl font-semibold text-white" data-result-exact>
+                    -
+                  </p>
+                </div>
+                <div class="rounded-lg border border-gray-800 bg-gray-950 p-4">
+                  <p class="text-xs font-semibold uppercase text-gray-500">
+                    Peso restante
+                  </p>
+                  <p class="mt-2 break-words text-2xl font-semibold text-white" data-result-pending>
+                    30%
+                  </p>
+                </div>
+                <div class="rounded-lg border border-gray-800 bg-gray-950 p-4">
+                  <p class="text-xs font-semibold uppercase text-gray-500">
+                    Con mínimo
+                  </p>
+                  <p class="mt-2 break-words text-2xl font-semibold text-white" data-result-min-final>
+                    -
+                  </p>
+                </div>
+                <div class="rounded-lg border border-gray-800 bg-gray-950 p-4">
+                  <p class="text-xs font-semibold uppercase text-gray-500">
+                    Con máximo
+                  </p>
+                  <p class="mt-2 break-words text-2xl font-semibold text-white" data-result-max-final>
+                    -
+                  </p>
+                </div>
+              </div>
+
+              <div class="mt-5">
+                <h3 class="text-base font-semibold text-white">Escenarios</h3>
+                <div class="mt-3 grid gap-3" data-scenario-list>
+                  <p class="text-sm text-gray-400">
+                    Los escenarios aparecerán con un cálculo válido.
+                  </p>
+                </div>
+              </div>
+
+              <details class="mt-5 rounded-lg border border-gray-800 bg-gray-950 p-4">
+                <summary class="cursor-pointer text-sm font-semibold text-gray-100">
+                  Ver cálculo
+                </summary>
+                <p class="mt-3 break-words text-sm leading-relaxed text-gray-300" data-formula>
+                  nota_necesaria = (objetivo - actual × peso_evaluado) / peso_pendiente
+                </p>
+                <p class="mt-2 break-words text-sm leading-relaxed text-gray-400" data-substitution></p>
+              </details>
+            </div>
+          </aside>
+        </div>
+      </div>
+    </Container>
+
+    <AdSlot placement="calculator-after-tool" />
+
+    <Container as="section" class="py-6 md:py-8">
+      <SectionIntro
+        title="Cómo leer el resultado"
+        description="El resultado más útil no es solo la nota necesaria: también importa el margen que tienes."
+      />
+
+      <div class="grid gap-4 md:grid-cols-3">
+        <article class="rounded-lg border border-gray-700 bg-gray-950 p-5">
+          <h3 class="text-lg font-semibold text-white">Alcanzable</h3>
+          <p class="mt-3 text-sm leading-relaxed text-gray-400">
+            La nota necesaria cabe dentro de tu escala. Si tu escuela redondea,
+            usa la recomendación redondeada hacia arriba.
+          </p>
+        </article>
+        <article class="rounded-lg border border-gray-700 bg-gray-950 p-5">
+          <h3 class="text-lg font-semibold text-white">Imposible</h3>
+          <p class="mt-3 text-sm leading-relaxed text-gray-400">
+            Aunque obtengas la nota máxima, no alcanzas el objetivo capturado.
+            Revisa el objetivo o el peso restante.
+          </p>
+        </article>
+        <article class="rounded-lg border border-gray-700 bg-gray-950 p-5">
+          <h3 class="text-lg font-semibold text-white">Ya asegurado</h3>
+          <p class="mt-3 text-sm leading-relaxed text-gray-400">
+            Tu promedio actual ya aporta lo suficiente para llegar al objetivo,
+            incluso con la nota mínima en lo pendiente.
+          </p>
+        </article>
+      </div>
+    </Container>
+
+    <Container as="section" class="py-6 md:py-8">
+      <SectionIntro
+        title="Calculadoras relacionadas"
+        description="Si tu curso tiene varias evaluaciones pendientes, una calculadora ponderada suele ser el siguiente paso."
+      />
+
+      <div class="grid gap-4 md:grid-cols-2">
+        <a
+          class="rounded-lg border border-gray-700 bg-gray-950 p-5 transition hover:border-amber-400/70"
+          href="/matematicas/calculadora-promedio-escolar-gpa"
+        >
+          <h3 class="text-lg font-semibold text-white">
+            Promedio escolar y GPA
+          </h3>
+          <p class="mt-3 text-sm leading-relaxed text-gray-400">
+            Calcula promedio simple, ponderado y meta por créditos.
+          </p>
+        </a>
+        <a
+          class="rounded-lg border border-gray-700 bg-gray-950 p-5 transition hover:border-amber-400/70"
+          href="/matematicas/calculadora-de-porcentajes"
+        >
+          <h3 class="text-lg font-semibold text-white">
+            Calculadora de porcentajes
+          </h3>
+          <p class="mt-3 text-sm leading-relaxed text-gray-400">
+            Revisa pesos, equivalencias y porcentajes de calificaciones.
+          </p>
+        </a>
+      </div>
+    </Container>
+
+    <AdSlot placement="calculator-before-faq" />
+
+    <FaqSection faqs={faqs} />
+  </PageShell>
+</BaseLayout>
+
+<script>
+  import {
+    buildMinimumGradeSummary,
+    calculateMinimumGrade,
+    formatFlexibleGradeNumber,
+    formatGradeNumber,
+    formatGradePercent,
+    getScaleFromPreset,
+    getStatusLabel,
+    getTargetPresetValue,
+    parseMinimumGradeNumber,
+  } from "@lib/calculators/matematicas/calculadora-nota-minima-para-aprobar/minimumGrade";
+
+  const ERROR_MESSAGES = {
+    required: "Este campo es obligatorio.",
+    invalid: "Ingresa un número válido.",
+    negative: "Usa un número igual o mayor a cero.",
+    zero: "Debe ser mayor que cero.",
+    too_many_decimals: "Usa máximo 4 decimales.",
+    scale: "Debe estar dentro de la escala seleccionada.",
+    custom_scale: "El mínimo debe ser menor que el máximo.",
+    evaluated_weight: "Debe ser mayor o igual que 0 y menor que 100.",
+    pending_weight: "Debe ser mayor que 0 y menor o igual que 100.",
+  };
+
+  const scaleSelect = document.querySelector("[data-scale]");
+  const roundingSelect = document.querySelector("[data-rounding]");
+  const customScaleWrapper = document.querySelector("[data-custom-scale-wrapper]");
+  const weightButtons = Array.from(document.querySelectorAll("[data-weight-mode]"));
+  const targetPresetButtons = Array.from(document.querySelectorAll("[data-target-preset]"));
+  const copyButton = document.querySelector("[data-copy-summary]");
+  const clearButton = document.querySelector("[data-clear-calculator]");
+  const actionStatus = document.querySelector("[data-action-status]");
+  const weightLabel = document.querySelector("[data-weight-label]");
+  const weightHelp = document.querySelector("[data-weight-help]");
+  const mainResult = document.querySelector("[data-main-result]");
+  const resultNote = document.querySelector("[data-result-note]");
+  const resultExact = document.querySelector("[data-result-exact]");
+  const resultPending = document.querySelector("[data-result-pending]");
+  const resultMinFinal = document.querySelector("[data-result-min-final]");
+  const resultMaxFinal = document.querySelector("[data-result-max-final]");
+  const scenarioList = document.querySelector("[data-scenario-list]");
+  const formula = document.querySelector("[data-formula]");
+  const substitution = document.querySelector("[data-substitution]");
+
+  let weightMode = "evaluated";
+  let activeTargetPreset = "pass";
+  let currentSummary = "";
+  let statusTimeout = 0;
+
+  function getField(field) {
+    return document.querySelector(`[data-field="${field}"]`);
+  }
+
+  function getFieldValue(field) {
+    return getField(field)?.value ?? "";
+  }
+
+  function setFieldValue(field, value) {
+    const input = getField(field);
+
+    if (input) {
+      input.value = value;
+    }
+  }
+
+  function readScale({ showErrors = true } = {}) {
+    const preset = scaleSelect?.value ?? "0-10";
+
+    customScaleWrapper?.classList.toggle("hidden", preset !== "custom");
+
+    if (preset !== "custom") {
+      return getScaleFromPreset(preset);
+    }
+
+    const minParsed = parseMinimumGradeNumber(getFieldValue("scaleMin"), {
+      required: false,
+    });
+    const maxParsed = parseMinimumGradeNumber(getFieldValue("scaleMax"));
+
+    let hasError = false;
+    const minValue = minParsed.ok && !Number.isNaN(minParsed.value) ? minParsed.value : 0;
+
+    if (!minParsed.ok) {
+      setFieldError("scaleMin", ERROR_MESSAGES[minParsed.error], showErrors);
+      hasError = true;
+    }
+
+    if (!maxParsed.ok) {
+      setFieldError("scaleMax", ERROR_MESSAGES[maxParsed.error], showErrors);
+      hasError = true;
+    }
+
+    if (hasError || !maxParsed.ok) {
+      return null;
+    }
+
+    if (minValue >= maxParsed.value) {
+      setFieldError("scaleMax", ERROR_MESSAGES.custom_scale, showErrors);
+      return null;
+    }
+
+    return {
+      min: minValue,
+      max: maxParsed.value,
+    };
+  }
+
+  function readNumberField(field, options = {}) {
+    const input = getField(field);
+    const parsed = parseMinimumGradeNumber(input?.value ?? "", {
+      required: options.required ?? true,
+      allowZero: options.allowZero ?? true,
+    });
+
+    if (!parsed.ok) {
+      setFieldError(field, ERROR_MESSAGES[parsed.error], shouldShowError(input));
+      return { ok: false, value: null, missing: parsed.error === "required" };
+    }
+
+    if (Number.isNaN(parsed.value)) {
+      return { ok: true, value: null, missing: true };
+    }
+
+    return { ok: true, value: parsed.value, missing: false };
+  }
+
+  function readCalculatorInput() {
+    clearErrors();
+    const scale = readScale();
+
+    if (!scale) {
+      return { ok: false, reason: "Revisa la escala personalizada." };
+    }
+
+    const weight = readNumberField("weightPercent");
+
+    if (!weight.ok || weight.value === null) {
+      return { ok: false, reason: "Completa el peso para calcular." };
+    }
+
+    if (weightMode === "evaluated" && weight.value >= 100) {
+      setFieldError("weightPercent", ERROR_MESSAGES.evaluated_weight, true);
+      return { ok: false, reason: "El peso ya evaluado debe ser menor que 100%." };
+    }
+
+    if (weightMode === "pending" && (weight.value <= 0 || weight.value > 100)) {
+      setFieldError("weightPercent", ERROR_MESSAGES.pending_weight, true);
+      return { ok: false, reason: "El peso pendiente debe estar entre 0 y 100%." };
+    }
+
+    const evaluatedWeight = weightMode === "evaluated" ? weight.value : 100 - weight.value;
+    const currentRequired = evaluatedWeight > 0.000001;
+    const current = readNumberField("currentGrade", { required: currentRequired });
+    const target = readNumberField("targetGrade");
+    const scenario = readNumberField("scenarioGrade", { required: false });
+
+    if (!current.ok || (currentRequired && current.value === null)) {
+      return { ok: false, reason: "Completa la calificación actual." };
+    }
+
+    if (!target.ok || target.value === null) {
+      return { ok: false, reason: "Completa la calificación objetivo." };
+    }
+
+    if (!scenario.ok) {
+      return { ok: false, reason: "Revisa la nota de escenario." };
+    }
+
+    const gradeFields = [
+      ["currentGrade", current.value],
+      ["targetGrade", target.value],
+      ["scenarioGrade", scenario.value],
+    ];
+
+    for (const [field, value] of gradeFields) {
+      if (value === null || Number.isNaN(value)) {
+        continue;
+      }
+
+      if (value < scale.min || value > scale.max) {
+        setFieldError(field, ERROR_MESSAGES.scale, true);
+        return { ok: false, reason: "Revisa las calificaciones fuera de escala." };
+      }
+    }
+
+    return {
+      ok: true,
+      value: {
+        scaleMin: scale.min,
+        scaleMax: scale.max,
+        currentGrade: current.value,
+        weightMode,
+        weightPercent: weight.value,
+        targetGrade: target.value,
+        roundingMode: roundingSelect?.value ?? "exact",
+        scenarioGrade: scenario.value,
+      },
+    };
+  }
+
+  function updateCalculator() {
+    updateTargetPresetLabels();
+    updateWeightModeUi();
+
+    const input = readCalculatorInput();
+
+    if (!input.ok) {
+      renderEmptyState(input.reason);
+      return;
+    }
+
+    try {
+      const result = calculateMinimumGrade(input.value);
+      currentSummary = buildMinimumGradeSummary(result);
+      renderResult(result);
+    } catch (error) {
+      renderEmptyState(error instanceof Error ? error.message : "No se pudo calcular.");
+    }
+  }
+
+  function renderResult(result) {
+    const statusLabel = getStatusLabel(result.status);
+    const pendingText = formatGradePercent(result.weightPendingPercent);
+    const targetText = formatGradeNumber(result.targetGrade);
+    const exactText = formatGradeNumber(result.requiredGradeExact);
+
+    mainResult.classList.remove("text-red-300", "text-emerald-300", "text-white");
+
+    if (result.status === "reachable" && result.recommendedGrade !== null) {
+      const recommendation = formatGradeNumber(result.recommendedGrade);
+      mainResult.textContent = `Necesitas ${recommendation}`;
+      mainResult.classList.add("text-white");
+      resultNote.textContent = `Necesitas ${recommendation} en el ${pendingText} restante para llegar a ${targetText}.`;
+    } else if (result.status === "impossible") {
+      mainResult.textContent = "Objetivo imposible";
+      mainResult.classList.add("text-red-300");
+      resultNote.textContent = `Aunque obtengas ${formatGradeNumber(result.scaleMax)}, llegarías a ${formatGradeNumber(result.maximumFinalGrade)}.`;
+    } else {
+      mainResult.textContent = "Ya asegurado";
+      mainResult.classList.add("text-emerald-300");
+      resultNote.textContent = `Incluso con ${formatGradeNumber(result.scaleMin)}, mantendrías ${formatGradeNumber(result.minimumFinalGrade)}.`;
+    }
+
+    setText(resultExact, result.status === "secured" ? statusLabel : exactText);
+    setText(resultPending, pendingText);
+    setText(resultMinFinal, formatGradeNumber(result.minimumFinalGrade));
+    setText(resultMaxFinal, formatGradeNumber(result.maximumFinalGrade));
+    renderScenarios(result);
+    renderFormula(result);
+    setCopyEnabled(true);
+  }
+
+  function renderScenarios(result) {
+    if (!scenarioList) {
+      return;
+    }
+
+    scenarioList.innerHTML = "";
+
+    result.scenarios.forEach((scenario) => {
+      const card = document.createElement("article");
+      card.className = "rounded-lg border border-gray-800 bg-gray-950 p-4";
+      card.innerHTML = `
+        <p class="text-sm text-gray-400">Si obtienes</p>
+        <p class="mt-1 text-xl font-semibold text-white">${formatGradeNumber(scenario.grade)}</p>
+        <p class="mt-2 text-sm leading-relaxed text-gray-300">Terminas con ${formatGradeNumber(scenario.finalGrade)}</p>
+      `;
+      scenarioList.append(card);
+    });
+  }
+
+  function renderFormula(result) {
+    setText(
+      formula,
+      "nota_necesaria = (objetivo - calificación_actual × peso_evaluado) / peso_pendiente",
+    );
+    setText(
+      substitution,
+      `(${formatFlexibleGradeNumber(result.targetGrade)} - ${formatFlexibleGradeNumber(result.currentGrade)} × ${(result.weightEvaluatedPercent / 100).toFixed(4)}) / ${(result.weightPendingPercent / 100).toFixed(4)} = ${formatGradeNumber(result.requiredGradeExact)}`,
+    );
+  }
+
+  function renderEmptyState(message) {
+    currentSummary = "";
+    mainResult?.classList.remove("text-red-300", "text-emerald-300");
+    mainResult?.classList.add("text-white");
+    setText(mainResult, "Completa tus datos");
+    setText(resultNote, message);
+    setText(resultExact, "-");
+    setText(resultMinFinal, "-");
+    setText(resultMaxFinal, "-");
+
+    const scale = readScale({ showErrors: false }) ?? { min: 0, max: 10 };
+    const weight = parseMinimumGradeNumber(getFieldValue("weightPercent"), {
+      required: false,
+    });
+
+    if (weight.ok && !Number.isNaN(weight.value)) {
+      const pending = weightMode === "evaluated" ? 100 - weight.value : weight.value;
+      setText(resultPending, pending > 0 && pending <= 100 ? formatGradePercent(pending) : "-");
+    } else {
+      setText(resultPending, "-");
+    }
+
+    if (scenarioList) {
+      scenarioList.innerHTML = `<p class="text-sm text-gray-400">${escapeHtml(message)}</p>`;
+    }
+
+    setText(
+      formula,
+      "nota_necesaria = (objetivo - calificación_actual × peso_evaluado) / peso_pendiente",
+    );
+    setText(
+      substitution,
+      `Escala activa: ${formatFlexibleGradeNumber(scale.min)} a ${formatFlexibleGradeNumber(scale.max)}.`,
+    );
+    setCopyEnabled(false);
+  }
+
+  function updateTargetPresetLabels() {
+    const scale = readScale({ showErrors: false }) ?? { min: 0, max: 10 };
+
+    targetPresetButtons.forEach((button) => {
+      const preset = button.dataset.targetPreset;
+
+      if (!preset) {
+        return;
+      }
+
+      const value = getTargetPresetValue(preset, scale);
+      button.textContent =
+        preset === "pass" ? `Aprobar (${formatFlexibleGradeNumber(value)})` : formatFlexibleGradeNumber(value);
+      const isActive = activeTargetPreset === preset;
+      button.setAttribute("aria-pressed", String(isActive));
+      button.classList.toggle("bg-amber-400", isActive);
+      button.classList.toggle("text-gray-950", isActive);
+      button.classList.toggle("border-amber-400", isActive);
+      button.classList.toggle("text-gray-200", !isActive);
+    });
+  }
+
+  function applyTargetPreset(preset) {
+    const scale = readScale({ showErrors: false });
+
+    if (!scale) {
+      return;
+    }
+
+    activeTargetPreset = preset;
+    setFieldValue("targetGrade", formatFlexibleGradeNumber(getTargetPresetValue(preset, scale)));
+    updateCalculator();
+  }
+
+  function updateWeightModeUi() {
+    weightButtons.forEach((button) => {
+      const isActive = button.dataset.weightMode === weightMode;
+      button.setAttribute("aria-pressed", String(isActive));
+      button.classList.toggle("bg-amber-400", isActive);
+      button.classList.toggle("text-gray-950", isActive);
+      button.classList.toggle("text-gray-300", !isActive);
+      button.classList.toggle("hover:bg-gray-800", !isActive);
+    });
+
+    if (weightMode === "evaluated") {
+      setText(weightLabel, "Peso ya evaluado (%)");
+      setText(weightHelp, "Si el examen final vale 30%, aquí va 70%.");
+      return;
+    }
+
+    setText(weightLabel, "Peso pendiente (%)");
+    setText(weightHelp, "Si el examen final vale 30%, aquí va 30%.");
+  }
+
+  function setWeightMode(nextMode) {
+    if (nextMode === weightMode) {
+      return;
+    }
+
+    const parsedWeight = parseMinimumGradeNumber(getFieldValue("weightPercent"), {
+      required: false,
+    });
+
+    if (parsedWeight.ok && !Number.isNaN(parsedWeight.value) && parsedWeight.value >= 0 && parsedWeight.value <= 100) {
+      setFieldValue("weightPercent", formatFlexibleGradeNumber(100 - parsedWeight.value));
+    }
+
+    weightMode = nextMode;
+    updateCalculator();
+  }
+
+  function clearCalculator() {
+    weightMode = "evaluated";
+    activeTargetPreset = "pass";
+
+    setFieldValue("scaleMin", "0");
+    setFieldValue("scaleMax", "");
+    setFieldValue("currentGrade", "");
+    setFieldValue("weightPercent", "70");
+    setFieldValue("scenarioGrade", "");
+
+    if (scaleSelect) {
+      scaleSelect.value = "0-10";
+    }
+
+    if (roundingSelect) {
+      roundingSelect.value = "exact";
+    }
+
+    applyTargetPreset("pass");
+  }
+
+  async function copySummary() {
+    if (!currentSummary) {
+      setStatus("No hay resultado para copiar.");
+      return;
+    }
+
+    try {
+      if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(currentSummary);
+      } else {
+        const textArea = document.createElement("textarea");
+        textArea.value = currentSummary;
+        textArea.setAttribute("readonly", "");
+        textArea.style.position = "fixed";
+        textArea.style.opacity = "0";
+        document.body.append(textArea);
+        textArea.select();
+        document.execCommand("copy");
+        textArea.remove();
+      }
+
+      setStatus("Resultado copiado.");
+    } catch {
+      setStatus("No se pudo copiar.");
+    }
+  }
+
+  function setCopyEnabled(isEnabled) {
+    copyButton?.toggleAttribute("disabled", !isEnabled);
+    copyButton?.classList.toggle("opacity-50", !isEnabled);
+    copyButton?.classList.toggle("cursor-not-allowed", !isEnabled);
+  }
+
+  function clearErrors() {
+    document.querySelectorAll("[data-error-for]").forEach((errorElement) => {
+      errorElement.textContent = "";
+      errorElement.classList.add("hidden");
+    });
+  }
+
+  function setFieldError(field, message, shouldShow = true) {
+    const error = document.querySelector(`[data-error-for="${field}"]`);
+
+    if (!error || !shouldShow) {
+      return;
+    }
+
+    error.textContent = message;
+    error.classList.remove("hidden");
+  }
+
+  function shouldShowError(input) {
+    return input?.dataset.touched === "true";
+  }
+
+  function setText(element, value) {
+    if (element) {
+      element.textContent = value;
+    }
+  }
+
+  function setStatus(message) {
+    setText(actionStatus, message);
+    window.clearTimeout(statusTimeout);
+    statusTimeout = window.setTimeout(() => setText(actionStatus, ""), 2500);
+  }
+
+  function escapeHtml(value) {
+    return String(value)
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;")
+      .replaceAll("'", "&#039;");
+  }
+
+  document.querySelectorAll("[data-field]").forEach((input) => {
+    input.addEventListener("input", () => {
+      input.dataset.touched = "true";
+
+      if (input.dataset.field === "targetGrade") {
+        activeTargetPreset = "custom";
+      }
+
+      updateCalculator();
+    });
+
+    input.addEventListener("blur", () => {
+      input.dataset.touched = "true";
+      updateCalculator();
+    });
+  });
+
+  [scaleSelect, roundingSelect].forEach((control) => {
+    control?.addEventListener("input", () => {
+      if (control === scaleSelect && activeTargetPreset !== "custom") {
+        const scale = readScale({ showErrors: false });
+
+        if (scale) {
+          setFieldValue(
+            "targetGrade",
+            formatFlexibleGradeNumber(getTargetPresetValue(activeTargetPreset, scale)),
+          );
+        }
+      }
+
+      updateCalculator();
+    });
+    control?.addEventListener("change", () => {
+      if (control === scaleSelect && activeTargetPreset !== "custom") {
+        const scale = readScale({ showErrors: false });
+
+        if (scale) {
+          setFieldValue(
+            "targetGrade",
+            formatFlexibleGradeNumber(getTargetPresetValue(activeTargetPreset, scale)),
+          );
+        }
+      }
+
+      updateCalculator();
+    });
+  });
+
+  weightButtons.forEach((button) => {
+    button.addEventListener("click", () => setWeightMode(button.dataset.weightMode));
+  });
+
+  targetPresetButtons.forEach((button) => {
+    button.addEventListener("click", () => applyTargetPreset(button.dataset.targetPreset));
+  });
+
+  copyButton?.addEventListener("click", copySummary);
+  clearButton?.addEventListener("click", clearCalculator);
+
+  updateCalculator();
+</script>
