@@ -45,6 +45,33 @@ export const CALCULATORS: CalculatorDirectoryItem[] = [
     order: 18,
   },
   {
+    id: "calculadora-probabilidad-basica",
+    title: "Calculadora de probabilidad",
+    description:
+      "Calcula probabilidades simples, complementos, uniones, intersecciones y probabilidades condicionales con fórmula y explicación.",
+    href: "/probabilidad-estadistica/calculadora-probabilidad-basica",
+    categorySlug: "probabilidad-estadistica",
+    order: 18.5,
+  },
+  {
+    id: "calculadora-combinaciones-permutaciones",
+    title: "Calculadora de combinaciones y permutaciones",
+    description:
+      "Calcula combinaciones y arreglos con o sin repetición, resultado exacto y explicación de la fórmula.",
+    href: "/probabilidad-estadistica/calculadora-combinaciones-permutaciones",
+    categorySlug: "probabilidad-estadistica",
+    order: 19,
+  },
+  {
+    id: "calculadora-distribucion-normal-z-score",
+    title: "Calculadora de distribución normal y Z-score",
+    description:
+      "Calcula Z-score, percentiles, probabilidades y valores críticos con gráfica y procedimiento.",
+    href: "/probabilidad-estadistica/calculadora-distribucion-normal-z-score",
+    categorySlug: "probabilidad-estadistica",
+    order: 19.5,
+  },
+  {
     id: "calculadora-de-iva",
     title: "Calculadora de IVA",
     description: "Agrega o desglosa IVA con tasa editable y presets por país.",

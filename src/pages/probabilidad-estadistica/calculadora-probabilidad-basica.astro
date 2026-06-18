@@ -1,0 +1,1106 @@
+---
+import AdSlot from "@components/ads/AdSlot.astro";
+import Container from "@components/layout/Container.astro";
+import PageShell from "@components/layout/PageShell.astro";
+import FaqSection from "@components/shared/FaqSection.astro";
+import PageHero from "@components/shared/PageHero.astro";
+import SectionIntro from "@components/shared/SectionIntro.astro";
+import BaseLayout from "@layouts/BaseLayout.astro";
+import {
+  BASIC_PROBABILITY_CANONICAL_PATH,
+  PROBABILITY_EXAMPLES,
+} from "@lib/calculators/probabilidad-estadistica/calculadora-probabilidad-basica/basicProbability";
+import { buildFaqJsonLd } from "@lib/seo";
+
+const title = "Calculadora de probabilidad: simple, unión y condicional";
+const description =
+  "Calcula probabilidades simples, complementos, uniones, intersecciones y probabilidades condicionales con fórmula, fracción, decimal y porcentaje.";
+
+const modes = [
+  {
+    value: "simple",
+    label: "Simple",
+    description:
+      "Divide casos favorables entre casos posibles cuando todos son igualmente probables.",
+  },
+  {
+    value: "complement",
+    label: "Complemento",
+    description: "Calcula la probabilidad de que un evento no ocurra.",
+  },
+  {
+    value: "union",
+    label: "Unión",
+    description: "Calcula la probabilidad de que ocurra A, B o ambos.",
+  },
+  {
+    value: "intersection",
+    label: "Intersección",
+    description: "Calcula la probabilidad de que A y B ocurran.",
+  },
+  {
+    value: "conditional",
+    label: "Condicional",
+    description: "Calcula P(A | B), sabiendo que B ya ocurrió.",
+  },
+];
+
+const fields = [
+  {
+    key: "favorableCases",
+    id: "probability-favorable-cases",
+    label: "Casos favorables",
+    help: "Resultados que cumplen el evento A.",
+    inputmode: "numeric",
+  },
+  {
+    key: "possibleCases",
+    id: "probability-possible-cases",
+    label: "Casos posibles",
+    help: "Total de resultados igualmente probables.",
+    inputmode: "numeric",
+  },
+  {
+    key: "probabilityA",
+    id: "probability-a",
+    label: "P(A)",
+    help: "Probabilidad del evento A.",
+    inputmode: "decimal",
+  },
+  {
+    key: "probabilityB",
+    id: "probability-b",
+    label: "P(B)",
+    help: "Probabilidad del evento B.",
+    inputmode: "decimal",
+  },
+  {
+    key: "intersection",
+    id: "probability-intersection",
+    label: "P(A y B)",
+    help: "Probabilidad de que ambos eventos ocurran.",
+    inputmode: "decimal",
+  },
+  {
+    key: "conditionalA",
+    id: "probability-conditional-a",
+    label: "P(A | B)",
+    help: "Probabilidad de A sabiendo que B ocurrió.",
+    inputmode: "decimal",
+  },
+];
+
+const faqs = [
+  {
+    question: "¿Cómo se calcula una probabilidad simple?",
+    answer:
+      "Cuando todos los resultados son igualmente probables, divide los casos favorables entre los casos posibles. Por ejemplo, obtener un número par en un dado tiene 3 casos favorables de 6 posibles: 3/6 = 1/2 = 50%.",
+  },
+  {
+    question:
+      "¿Cuándo puedo dividir casos favorables entre casos posibles?",
+    answer:
+      "Solo cuando los resultados elementales tienen la misma probabilidad. Funciona con una moneda o un dado equilibrados, pero no basta con contar resultados si algunos tienen pesos distintos.",
+  },
+  {
+    question: "¿Qué significa P(A o B)?",
+    answer:
+      "Es la unión: ocurre A, ocurre B o ocurren ambos. Si pueden coincidir, la intersección se resta para no contarla dos veces.",
+  },
+  {
+    question: "¿Qué significa P(A y B)?",
+    answer:
+      "Es la intersección: ambos eventos ocurren. Si son independientes se multiplican P(A) y P(B); si son dependientes necesitas información condicional.",
+  },
+  {
+    question:
+      "¿Cuál es la diferencia entre eventos independientes y mutuamente excluyentes?",
+    answer:
+      "Los eventos independientes no cambian mutuamente sus probabilidades y sí pueden coincidir. Los mutuamente excluyentes no pueden ocurrir juntos, por lo que su intersección es cero.",
+  },
+  {
+    question: "¿Qué es una probabilidad condicional?",
+    answer:
+      "P(A | B) mide la probabilidad de A dentro de los casos donde B ya ocurrió. Se calcula dividiendo P(A y B) entre P(B), siempre que P(B) sea mayor que cero.",
+  },
+  {
+    question: "¿Cómo convierto entre fracción, decimal y porcentaje?",
+    answer:
+      "Una fracción se divide para obtener el decimal; el decimal se multiplica por 100 para obtener el porcentaje. Por ejemplo, 1/4 = 0.25 = 25%.",
+  },
+];
+
+const faqJsonLd = buildFaqJsonLd(faqs);
+---
+
+<BaseLayout
+  title={title}
+  description={description}
+  canonical={BASIC_PROBABILITY_CANONICAL_PATH}
+>
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={JSON.stringify(faqJsonLd)} />
+  </Fragment>
+
+  <PageShell>
+    <PageHero
+      title="Calculadora de probabilidad"
+      description="Calcula una probabilidad y entiende qué significa, cómo se obtuvo y si los datos ingresados son coherentes."
+      kicker="Probabilidad y estadística"
+      kickerHref="/probabilidad-estadistica"
+      collapseBreadcrumbOnMobile
+      containerClass="py-6 md:py-8"
+      breadcrumbs={[
+        { label: "Inicio", href: "/", ariaLabel: "Inicio" },
+        {
+          label: "Probabilidad y estadística",
+          href: "/probabilidad-estadistica",
+          optional: true,
+        },
+        { label: "Probabilidad básica", truncate: true },
+      ]}
+    />
+
+    <Container as="section" class="py-6 md:py-8">
+      <div
+        id="basic-probability-calculator"
+        class="overflow-hidden rounded-lg border border-gray-700 bg-gray-950 shadow-xl shadow-gray-950/30"
+      >
+        <div
+          class="grid gap-0 lg:grid-cols-[minmax(0,1fr)_minmax(20rem,0.8fr)]"
+        >
+          <section class="p-4 sm:p-6" aria-labelledby="calculator-heading">
+            <h2 id="calculator-heading" class="text-xl font-semibold">
+              ¿Qué quieres calcular?
+            </h2>
+            <p class="mt-2 text-sm leading-relaxed text-gray-400">
+              Elige un modo. Solo aparecerán los datos necesarios para esa
+              operación.
+            </p>
+
+            <form class="mt-5" novalidate data-probability-form>
+              <fieldset>
+                <legend class="sr-only">Tipo de probabilidad</legend>
+                <div class="grid grid-cols-2 gap-2 sm:grid-cols-5">
+                  {
+                    modes.map((mode, index) => (
+                      <label
+                        class:list={[
+                          "relative",
+                          index === modes.length - 1 &&
+                            "col-span-2 sm:col-span-1",
+                        ]}
+                      >
+                        <input
+                          class="peer sr-only"
+                          type="radio"
+                          name="probability-mode"
+                          value={mode.value}
+                          checked={index === 0}
+                        />
+                        <span
+                          class="flex min-h-11 cursor-pointer items-center justify-center rounded-lg border border-gray-700 bg-gray-900 px-2 py-2 text-center text-sm font-semibold text-gray-200 transition hover:border-amber-400/70 peer-checked:border-amber-400 peer-checked:bg-amber-400 peer-checked:text-gray-950 peer-focus-visible:ring-3 peer-focus-visible:ring-amber-400/40"
+                        >
+                          {mode.label}
+                        </span>
+                      </label>
+                    ))
+                  }
+                </div>
+              </fieldset>
+
+              <div
+                class="mt-4 rounded-lg border border-sky-400/25 bg-sky-400/10 px-4 py-3"
+              >
+                <p class="text-xs font-semibold uppercase text-sky-300">
+                  Modo seleccionado
+                </p>
+                <p
+                  class="mt-1 text-sm leading-relaxed text-sky-100"
+                  data-mode-description
+                >
+                  Divide casos favorables entre casos posibles cuando todos son
+                  igualmente probables.
+                </p>
+              </div>
+
+              <fieldset class="mt-5 hidden" data-format-section>
+                <legend class="text-sm font-semibold text-gray-100">
+                  Formato de entrada
+                </legend>
+                <div class="mt-2 grid grid-cols-2 gap-2">
+                  <label class="relative">
+                    <input
+                      class="peer sr-only"
+                      type="radio"
+                      name="probability-format"
+                      value="percent"
+                      checked
+                    />
+                    <span
+                      class="flex min-h-11 cursor-pointer items-center justify-center rounded-lg border border-gray-700 bg-gray-900 px-3 py-2 text-sm font-semibold text-gray-200 transition hover:border-amber-400/70 peer-checked:border-amber-400 peer-checked:bg-amber-400 peer-checked:text-gray-950 peer-focus-visible:ring-3 peer-focus-visible:ring-amber-400/40"
+                    >
+                      Porcentaje
+                    </span>
+                  </label>
+                  <label class="relative">
+                    <input
+                      class="peer sr-only"
+                      type="radio"
+                      name="probability-format"
+                      value="decimal"
+                    />
+                    <span
+                      class="flex min-h-11 cursor-pointer items-center justify-center rounded-lg border border-gray-700 bg-gray-900 px-3 py-2 text-sm font-semibold text-gray-200 transition hover:border-amber-400/70 peer-checked:border-amber-400 peer-checked:bg-amber-400 peer-checked:text-gray-950 peer-focus-visible:ring-3 peer-focus-visible:ring-amber-400/40"
+                    >
+                      Decimal
+                    </span>
+                  </label>
+                </div>
+              </fieldset>
+
+              <fieldset class="mt-5 hidden" data-union-relation-section>
+                <legend class="text-sm font-semibold text-gray-100">
+                  Relación entre los eventos
+                </legend>
+                <div class="mt-2 grid gap-2 sm:grid-cols-2">
+                  <label class="relative">
+                    <input
+                      class="peer sr-only"
+                      type="radio"
+                      name="union-relation"
+                      value="general"
+                      checked
+                    />
+                    <span
+                      class="flex min-h-11 cursor-pointer items-center justify-center rounded-lg border border-gray-700 bg-gray-900 px-3 py-2 text-center text-sm font-semibold text-gray-200 transition hover:border-amber-400/70 peer-checked:border-amber-400 peer-checked:bg-amber-400 peer-checked:text-gray-950 peer-focus-visible:ring-3 peer-focus-visible:ring-amber-400/40"
+                    >
+                      Pueden ocurrir juntos
+                    </span>
+                  </label>
+                  <label class="relative">
+                    <input
+                      class="peer sr-only"
+                      type="radio"
+                      name="union-relation"
+                      value="exclusive"
+                    />
+                    <span
+                      class="flex min-h-11 cursor-pointer items-center justify-center rounded-lg border border-gray-700 bg-gray-900 px-3 py-2 text-center text-sm font-semibold text-gray-200 transition hover:border-amber-400/70 peer-checked:border-amber-400 peer-checked:bg-amber-400 peer-checked:text-gray-950 peer-focus-visible:ring-3 peer-focus-visible:ring-amber-400/40"
+                    >
+                      No pueden ocurrir juntos
+                    </span>
+                  </label>
+                </div>
+              </fieldset>
+
+              <fieldset class="mt-5 hidden" data-intersection-method-section>
+                <legend class="text-sm font-semibold text-gray-100">
+                  ¿Qué información conoces?
+                </legend>
+                <div class="mt-2 grid gap-2 sm:grid-cols-2">
+                  <label class="relative">
+                    <input
+                      class="peer sr-only"
+                      type="radio"
+                      name="intersection-method"
+                      value="independent"
+                      checked
+                    />
+                    <span
+                      class="flex min-h-11 cursor-pointer items-center justify-center rounded-lg border border-gray-700 bg-gray-900 px-3 py-2 text-center text-sm font-semibold text-gray-200 transition hover:border-amber-400/70 peer-checked:border-amber-400 peer-checked:bg-amber-400 peer-checked:text-gray-950 peer-focus-visible:ring-3 peer-focus-visible:ring-amber-400/40"
+                    >
+                      Son independientes
+                    </span>
+                  </label>
+                  <label class="relative">
+                    <input
+                      class="peer sr-only"
+                      type="radio"
+                      name="intersection-method"
+                      value="conditional"
+                    />
+                    <span
+                      class="flex min-h-11 cursor-pointer items-center justify-center rounded-lg border border-gray-700 bg-gray-900 px-3 py-2 text-center text-sm font-semibold text-gray-200 transition hover:border-amber-400/70 peer-checked:border-amber-400 peer-checked:bg-amber-400 peer-checked:text-gray-950 peer-focus-visible:ring-3 peer-focus-visible:ring-amber-400/40"
+                    >
+                      Conozco P(A | B)
+                    </span>
+                  </label>
+                </div>
+              </fieldset>
+
+              <div
+                class="mt-5 hidden rounded-lg border border-red-400/30 bg-red-400/10 px-4 py-3"
+                tabindex="-1"
+                data-error-summary
+              >
+                <p class="font-semibold text-red-100">
+                  Revisa los campos marcados
+                </p>
+                <ul
+                  class="mt-2 list-disc space-y-1 pl-5 text-sm text-red-200"
+                  data-error-list
+                ></ul>
+              </div>
+
+              <div class="mt-5 grid gap-4 sm:grid-cols-2">
+                {
+                  fields.map((field) => (
+                    <div class="hidden" data-field-container={field.key}>
+                      <label
+                        for={field.id}
+                        class="block text-sm font-semibold text-gray-100"
+                        data-field-label={field.key}
+                      >
+                        {field.label}
+                      </label>
+                      <div class="relative mt-2">
+                        <input
+                          id={field.id}
+                          class="min-h-12 w-full rounded-lg border border-gray-700 bg-gray-900 px-4 pr-11 text-base text-white outline-none transition placeholder:text-gray-600 focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15"
+                          type="text"
+                          inputmode={field.inputmode}
+                          autocomplete="off"
+                          maxlength="20"
+                          aria-describedby={`${field.id}-help ${field.id}-error`}
+                          data-field={field.key}
+                        />
+                        <span
+                          class="pointer-events-none absolute inset-y-0 right-4 hidden items-center text-sm font-semibold text-gray-400"
+                          data-unit={field.key}
+                          aria-hidden="true"
+                        >
+                          %
+                        </span>
+                      </div>
+                      <p
+                        id={`${field.id}-help`}
+                        class="mt-2 text-sm leading-relaxed text-gray-400"
+                        data-field-help={field.key}
+                      >
+                        {field.help}
+                      </p>
+                      <p
+                        id={`${field.id}-error`}
+                        class="mt-2 hidden rounded-lg border border-red-400/30 bg-red-400/10 px-3 py-2 text-sm text-red-200"
+                        data-field-error={field.key}
+                      ></p>
+                    </div>
+                  ))
+                }
+              </div>
+
+              <p
+                class="mt-4 rounded-lg border border-amber-400/25 bg-amber-400/10 px-4 py-3 text-sm leading-relaxed text-amber-100"
+                data-context-note
+              >
+                Usa este modo cuando todos los resultados posibles tengan la
+                misma probabilidad.
+              </p>
+
+              <div class="mt-5">
+                <p class="text-sm font-semibold text-gray-100">
+                  Ejemplos rápidos
+                </p>
+                <div
+                  class="mt-2 flex gap-2 overflow-x-auto pb-2"
+                  role="group"
+                  aria-label="Cargar un ejemplo"
+                >
+                  {
+                    PROBABILITY_EXAMPLES.map((example) => (
+                      <button
+                        class="min-h-11 shrink-0 rounded-lg border border-gray-700 px-3 py-2 text-sm font-semibold text-gray-200 transition hover:border-amber-400 hover:text-white focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/40"
+                        type="button"
+                        data-example
+                        data-example-value={JSON.stringify(example)}
+                        title={example.description}
+                      >
+                        {example.label}
+                      </button>
+                    ))
+                  }
+                </div>
+              </div>
+
+              <div class="mt-5 flex flex-col gap-3 sm:flex-row">
+                <button
+                  class="inline-flex min-h-11 w-full items-center justify-center rounded-lg bg-amber-400 px-4 py-2 text-sm font-bold text-gray-950 transition hover:bg-amber-300 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/40 sm:w-auto sm:min-w-52"
+                  type="submit"
+                >
+                  Calcular probabilidad
+                </button>
+                <button
+                  class="inline-flex min-h-11 items-center justify-center rounded-lg border border-gray-700 px-4 py-2 text-sm font-semibold text-gray-200 transition hover:border-amber-400 hover:text-white focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/40"
+                  type="button"
+                  data-clear
+                >
+                  Limpiar
+                </button>
+              </div>
+            </form>
+          </section>
+
+          <aside
+            class="border-t border-gray-800 bg-gray-900/60 p-4 sm:p-6 lg:border-l lg:border-t-0"
+            aria-labelledby="result-heading"
+          >
+            <div
+              class="rounded-lg border border-gray-700 bg-gray-950 p-5"
+              data-result-card
+            >
+              <p
+                class="text-xs font-semibold uppercase text-amber-400"
+                data-result-kicker
+              >
+                Resultado
+              </p>
+              <h2
+                id="result-heading"
+                class="mt-2 text-lg font-semibold text-white outline-none"
+                tabindex="-1"
+                data-result-title
+              >
+                Completa los datos
+              </h2>
+              <p
+                class="mt-4 break-words text-4xl font-bold leading-tight text-white sm:text-5xl"
+                data-result-percentage
+              >
+                —
+              </p>
+
+              <div class="mt-5 grid grid-cols-2 gap-3">
+                <div class="rounded-lg border border-gray-800 bg-gray-900 p-3">
+                  <p class="text-xs uppercase text-gray-500">Decimal</p>
+                  <p
+                    class="mt-1 break-words font-semibold text-white"
+                    data-result-decimal
+                  >
+                    —
+                  </p>
+                </div>
+                <div class="rounded-lg border border-gray-800 bg-gray-900 p-3">
+                  <p class="text-xs uppercase text-gray-500">Fracción</p>
+                  <p
+                    class="mt-1 break-words font-semibold text-white"
+                    data-result-fraction
+                  >
+                    —
+                  </p>
+                </div>
+              </div>
+
+              <p
+                class="mt-4 rounded-lg border border-gray-800 bg-gray-900 px-4 py-3 text-sm leading-relaxed text-gray-300"
+                data-result-interpretation
+              >
+                El resultado incluirá porcentaje, decimal, fracción e
+                interpretación.
+              </p>
+
+              <div
+                class="mt-4 hidden rounded-lg border border-amber-400/25 bg-amber-400/10 px-4 py-3"
+                data-warning-box
+              >
+                <p class="text-xs font-semibold uppercase text-amber-300">
+                  Ten en cuenta
+                </p>
+                <ul
+                  class="mt-2 list-disc space-y-1 pl-5 text-sm text-amber-100"
+                  data-warning-list
+                ></ul>
+              </div>
+
+              <div class="mt-5 hidden" data-result-actions>
+                <button
+                  class="inline-flex min-h-11 w-full items-center justify-center rounded-lg bg-amber-400 px-4 py-2 text-sm font-bold text-gray-950 transition hover:bg-amber-300 disabled:cursor-not-allowed disabled:bg-gray-700 disabled:text-gray-400 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/40"
+                  type="button"
+                  data-copy
+                >
+                  Copiar resultado
+                </button>
+                <p
+                  class="mt-2 min-h-5 text-sm text-emerald-300"
+                  aria-live="polite"
+                  data-copy-status
+                ></p>
+              </div>
+            </div>
+
+            <div class="mt-4 rounded-lg border border-gray-800 bg-gray-950 p-4">
+              <h3 class="text-sm font-semibold text-white">
+                Fórmula y sustitución
+              </h3>
+              <p
+                class="mt-3 rounded-lg border border-gray-800 bg-gray-900 px-3 py-2 font-mono text-sm leading-relaxed text-amber-200"
+                data-formula
+              >
+                P(A) = casos favorables / casos posibles
+              </p>
+              <p
+                class="mt-3 break-words text-sm leading-relaxed text-gray-300"
+                data-substitution
+              >
+                La sustitución aparecerá con un cálculo válido.
+              </p>
+              <p
+                class="mt-3 text-sm leading-relaxed text-gray-400"
+                data-result-note
+              >
+                Este cálculo supone resultados igualmente probables.
+              </p>
+            </div>
+          </aside>
+        </div>
+
+        <p class="sr-only" aria-live="polite" data-live-status></p>
+      </div>
+    </Container>
+
+    <AdSlot placement="calculator-after-tool" />
+
+    <Container as="section" class="py-6 md:py-8">
+      <SectionIntro
+        title="Qué calcula cada modo"
+        description="Las palabras “o”, “y” y “dado que” representan operaciones diferentes."
+      />
+      <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <article class="rounded-lg border border-gray-700 bg-gray-950 p-5">
+          <p class="text-xs font-semibold uppercase text-amber-400">
+            Casos equiprobables
+          </p>
+          <h3 class="mt-2 text-lg font-semibold text-white">
+            Probabilidad simple
+          </h3>
+          <p class="mt-2 text-sm leading-relaxed text-gray-400">
+            Divide los casos favorables entre todos los posibles. Antes de
+            usarla, confirma que cada resultado tenga la misma probabilidad.
+          </p>
+        </article>
+        <article class="rounded-lg border border-gray-700 bg-gray-950 p-5">
+          <p class="text-xs font-semibold uppercase text-amber-400">A o B</p>
+          <h3 class="mt-2 text-lg font-semibold text-white">Unión</h3>
+          <p class="mt-2 text-sm leading-relaxed text-gray-400">
+            Suma P(A) y P(B), pero resta la parte donde coinciden para no
+            contarla dos veces.
+          </p>
+        </article>
+        <article class="rounded-lg border border-gray-700 bg-gray-950 p-5">
+          <p class="text-xs font-semibold uppercase text-amber-400">A y B</p>
+          <h3 class="mt-2 text-lg font-semibold text-white">Intersección</h3>
+          <p class="mt-2 text-sm leading-relaxed text-gray-400">
+            Si los eventos son independientes, multiplica sus probabilidades.
+            Si no lo son, necesitas una probabilidad condicional.
+          </p>
+        </article>
+        <article class="rounded-lg border border-gray-700 bg-gray-950 p-5">
+          <p class="text-xs font-semibold uppercase text-amber-400">No A</p>
+          <h3 class="mt-2 text-lg font-semibold text-white">Complemento</h3>
+          <p class="mt-2 text-sm leading-relaxed text-gray-400">
+            Resta P(A) de 1. El resultado reúne todos los casos donde A no
+            ocurre.
+          </p>
+        </article>
+        <article class="rounded-lg border border-gray-700 bg-gray-950 p-5">
+          <p class="text-xs font-semibold uppercase text-amber-400">
+            A dado B
+          </p>
+          <h3 class="mt-2 text-lg font-semibold text-white">Condicional</h3>
+          <p class="mt-2 text-sm leading-relaxed text-gray-400">
+            Reduce el espacio de referencia a los casos donde B ya ocurrió.
+          </p>
+        </article>
+        <article class="rounded-lg border border-sky-400/25 bg-sky-400/10 p-5">
+          <p class="text-xs font-semibold uppercase text-sky-300">
+            Diferencia clave
+          </p>
+          <h3 class="mt-2 text-lg font-semibold text-white">
+            Independientes no significa excluyentes
+          </h3>
+          <p class="mt-2 text-sm leading-relaxed text-sky-100">
+            Los independientes pueden ocurrir juntos. Los mutuamente
+            excluyentes tienen una intersección igual a cero.
+          </p>
+        </article>
+      </div>
+    </Container>
+
+    <Container as="section" class="py-6 md:py-8">
+      <div class="grid gap-4 lg:grid-cols-2">
+        <article class="rounded-lg border border-gray-700 bg-gray-950 p-5 sm:p-6">
+          <h2 class="text-xl font-semibold text-white">
+            Fracción, decimal y porcentaje
+          </h2>
+          <p class="mt-3 text-sm leading-relaxed text-gray-400">
+            Las tres formas expresan la misma proporción. Por ejemplo,
+            <strong class="text-gray-200">1/4</strong> es
+            <strong class="text-gray-200">0.25</strong> y también
+            <strong class="text-gray-200">25%</strong>. La calculadora conserva
+            precisión interna y redondea solo la presentación.
+          </p>
+        </article>
+        <article class="rounded-lg border border-gray-700 bg-gray-950 p-5 sm:p-6">
+          <h2 class="text-xl font-semibold text-white">
+            Calculadoras relacionadas
+          </h2>
+          <div class="mt-4 flex flex-wrap gap-3">
+            <a
+              class="inline-flex min-h-11 items-center rounded-lg border border-gray-700 px-4 py-2 text-sm font-semibold text-gray-200 transition hover:border-amber-400 hover:text-white"
+              href="/probabilidad-estadistica/calculadora-combinaciones-permutaciones"
+            >
+              Combinaciones y permutaciones
+            </a>
+            <a
+              class="inline-flex min-h-11 items-center rounded-lg border border-gray-700 px-4 py-2 text-sm font-semibold text-gray-200 transition hover:border-amber-400 hover:text-white"
+              href="/matematicas/calculadora-de-estadistica-basica"
+            >
+              Estadística básica
+            </a>
+          </div>
+        </article>
+      </div>
+    </Container>
+
+    <FaqSection faqs={faqs} />
+  </PageShell>
+</BaseLayout>
+
+<script>
+  import {
+    calculateBasicProbabilityFromInput,
+  } from "@lib/calculators/probabilidad-estadistica/calculadora-probabilidad-basica/basicProbability";
+
+  const form = document.querySelector("[data-probability-form]");
+  const formatSection = document.querySelector("[data-format-section]");
+  const unionRelationSection = document.querySelector(
+    "[data-union-relation-section]",
+  );
+  const intersectionMethodSection = document.querySelector(
+    "[data-intersection-method-section]",
+  );
+  const modeDescription = document.querySelector("[data-mode-description]");
+  const contextNote = document.querySelector("[data-context-note]");
+  const errorSummary = document.querySelector("[data-error-summary]");
+  const errorList = document.querySelector("[data-error-list]");
+  const resultCard = document.querySelector("[data-result-card]");
+  const resultKicker = document.querySelector("[data-result-kicker]");
+  const resultTitle = document.querySelector("[data-result-title]");
+  const resultPercentage = document.querySelector("[data-result-percentage]");
+  const resultDecimal = document.querySelector("[data-result-decimal]");
+  const resultFraction = document.querySelector("[data-result-fraction]");
+  const resultInterpretation = document.querySelector(
+    "[data-result-interpretation]",
+  );
+  const warningBox = document.querySelector("[data-warning-box]");
+  const warningList = document.querySelector("[data-warning-list]");
+  const resultActions = document.querySelector("[data-result-actions]");
+  const copyButton = document.querySelector("[data-copy]");
+  const copyStatus = document.querySelector("[data-copy-status]");
+  const formula = document.querySelector("[data-formula]");
+  const substitution = document.querySelector("[data-substitution]");
+  const resultNote = document.querySelector("[data-result-note]");
+  const liveStatus = document.querySelector("[data-live-status]");
+  const clearButton = document.querySelector("[data-clear]");
+  const exampleButtons = document.querySelectorAll("[data-example]");
+
+  const fieldKeys = [
+    "favorableCases",
+    "possibleCases",
+    "probabilityA",
+    "probabilityB",
+    "intersection",
+    "conditionalA",
+  ];
+
+  const fieldInputs = Object.fromEntries(
+    fieldKeys.map((key) => [
+      key,
+      document.querySelector(`[data-field="${key}"]`),
+    ]),
+  );
+
+  const fieldContainers = Object.fromEntries(
+    fieldKeys.map((key) => [
+      key,
+      document.querySelector(`[data-field-container="${key}"]`),
+    ]),
+  );
+
+  const fieldErrors = Object.fromEntries(
+    fieldKeys.map((key) => [
+      key,
+      document.querySelector(`[data-field-error="${key}"]`),
+    ]),
+  );
+
+  const fieldUnits = Object.fromEntries(
+    fieldKeys.map((key) => [
+      key,
+      document.querySelector(`[data-unit="${key}"]`),
+    ]),
+  );
+
+  const modeMetadata = {
+    simple: {
+      description:
+        "Divide casos favorables entre casos posibles cuando todos son igualmente probables.",
+      note:
+        "Usa este modo cuando todos los resultados posibles tengan la misma probabilidad.",
+      fields: ["favorableCases", "possibleCases"],
+      formula: "P(A) = casos favorables / casos posibles",
+    },
+    complement: {
+      description: "Calcula la probabilidad de que un evento no ocurra.",
+      note: "El complemento de A contiene todos los resultados donde A no ocurre.",
+      fields: ["probabilityA"],
+      formula: "P(no A) = 1 − P(A)",
+    },
+    union: {
+      description: "Calcula la probabilidad de que ocurra A, B o ambos.",
+      note:
+        "Si pueden ocurrir juntos, necesitas indicar la probabilidad de la intersección.",
+      fields: ["probabilityA", "probabilityB", "intersection"],
+      formula: "P(A o B) = P(A) + P(B) − P(A y B)",
+    },
+    intersection: {
+      description: "Calcula la probabilidad de que A y B ocurran.",
+      note:
+        "La multiplicación P(A) × P(B) solo es válida si los eventos son independientes.",
+      fields: ["probabilityA", "probabilityB"],
+      formula: "P(A y B) = P(A) × P(B)",
+    },
+    conditional: {
+      description: "Calcula P(A | B), sabiendo que B ya ocurrió.",
+      note: "P(B) debe ser mayor que cero y P(A y B) no puede superar P(B).",
+      fields: ["intersection", "probabilityB"],
+      formula: "P(A | B) = P(A y B) / P(B)",
+    },
+  };
+
+  let currentCopyText = "";
+  let hasValidResult = false;
+  let resultIsStale = false;
+
+  function readRadio(name) {
+    return document.querySelector(`input[name="${name}"]:checked`)?.value;
+  }
+
+  function selectRadio(name, value) {
+    const radio = document.querySelector(
+      `input[name="${name}"][value="${value}"]`,
+    );
+
+    if (radio) radio.checked = true;
+  }
+
+  function getMode() {
+    return readRadio("probability-mode") ?? "simple";
+  }
+
+  function getFormat() {
+    return readRadio("probability-format") ?? "percent";
+  }
+
+  function getUnionRelation() {
+    return readRadio("union-relation") ?? "general";
+  }
+
+  function getIntersectionMethod() {
+    return readRadio("intersection-method") ?? "independent";
+  }
+
+  function getVisibleFields() {
+    const mode = getMode();
+    const fields = [...modeMetadata[mode].fields];
+
+    if (mode === "union" && getUnionRelation() === "exclusive") {
+      return fields.filter((field) => field !== "intersection");
+    }
+
+    if (
+      mode === "intersection" &&
+      getIntersectionMethod() === "conditional"
+    ) {
+      return ["probabilityB", "conditionalA"];
+    }
+
+    return fields;
+  }
+
+  function clearFieldError(key) {
+    fieldInputs[key].removeAttribute("aria-invalid");
+    fieldErrors[key].textContent = "";
+    fieldErrors[key].classList.add("hidden");
+  }
+
+  function clearErrors() {
+    fieldKeys.forEach(clearFieldError);
+    errorList.replaceChildren();
+    errorSummary.classList.add("hidden");
+  }
+
+  function renderErrors(errors) {
+    clearErrors();
+
+    errors.forEach((error) => {
+      fieldInputs[error.field].setAttribute("aria-invalid", "true");
+      fieldErrors[error.field].textContent = error.message;
+      fieldErrors[error.field].classList.remove("hidden");
+      const item = document.createElement("li");
+      item.textContent = error.message;
+      errorList.append(item);
+    });
+
+    errorSummary.classList.remove("hidden");
+    errorSummary.focus();
+    liveStatus.textContent =
+      "No se pudo calcular. Revisa los campos marcados.";
+  }
+
+  function markResultStale() {
+    if (!hasValidResult || resultIsStale) return;
+
+    resultIsStale = true;
+    resultKicker.textContent = "Resultado anterior";
+    resultCard.classList.add("opacity-75");
+    copyButton.disabled = true;
+    copyStatus.textContent =
+      "Recalcula para copiar un resultado correspondiente a los datos actuales.";
+  }
+
+  function resetResult() {
+    currentCopyText = "";
+    hasValidResult = false;
+    resultIsStale = false;
+    resultKicker.textContent = "Resultado";
+    resultCard.classList.remove("opacity-75");
+    resultTitle.textContent = "Completa los datos";
+    resultPercentage.textContent = "—";
+    resultDecimal.textContent = "—";
+    resultFraction.textContent = "—";
+    resultInterpretation.textContent =
+      "El resultado incluirá porcentaje, decimal, fracción e interpretación.";
+    warningList.replaceChildren();
+    warningBox.classList.add("hidden");
+    resultActions.classList.add("hidden");
+    copyButton.disabled = false;
+    copyStatus.textContent = "";
+    substitution.textContent =
+      "La sustitución aparecerá con un cálculo válido.";
+    liveStatus.textContent = "";
+  }
+
+  function updateFieldPresentation() {
+    const visibleFields = new Set(getVisibleFields());
+    const percentMode = getFormat() === "percent";
+
+    fieldKeys.forEach((key) => {
+      fieldContainers[key].classList.toggle("hidden", !visibleFields.has(key));
+      const isProbabilityField =
+        key !== "favorableCases" && key !== "possibleCases";
+      fieldUnits[key].classList.toggle(
+        "hidden",
+        !isProbabilityField || !percentMode,
+      );
+      fieldUnits[key].classList.toggle(
+        "flex",
+        isProbabilityField && percentMode,
+      );
+      fieldInputs[key].placeholder = isProbabilityField
+        ? percentMode
+          ? "Ejemplo: 25"
+          : "Ejemplo: 0.25"
+        : key === "favorableCases"
+          ? "Ejemplo: 3"
+          : "Ejemplo: 12";
+    });
+  }
+
+  function updateInterface({ preserveResult = false } = {}) {
+    const mode = getMode();
+    const metadata = modeMetadata[mode];
+    let previewFormula = metadata.formula;
+    modeDescription.textContent = metadata.description;
+    contextNote.textContent = metadata.note;
+
+    formatSection.classList.toggle("hidden", mode === "simple");
+    unionRelationSection.classList.toggle("hidden", mode !== "union");
+    intersectionMethodSection.classList.toggle(
+      "hidden",
+      mode !== "intersection",
+    );
+
+    if (mode === "union" && getUnionRelation() === "exclusive") {
+      previewFormula = "P(A o B) = P(A) + P(B)";
+      contextNote.textContent =
+        "Los eventos mutuamente excluyentes no pueden ocurrir juntos: P(A y B) = 0.";
+    }
+
+    if (
+      mode === "intersection" &&
+      getIntersectionMethod() === "conditional"
+    ) {
+      previewFormula = "P(A y B) = P(A | B) × P(B)";
+      contextNote.textContent =
+        "P(B) debe ser mayor que cero para interpretar P(A | B).";
+    }
+
+    if (!hasValidResult) {
+      formula.textContent = previewFormula;
+      resultNote.textContent = metadata.note;
+    }
+
+    clearErrors();
+    updateFieldPresentation();
+
+    if (!preserveResult) markResultStale();
+  }
+
+  function readInput() {
+    return {
+      mode: getMode(),
+      format: getFormat(),
+      unionRelation: getUnionRelation(),
+      intersectionMethod: getIntersectionMethod(),
+      favorableCases: fieldInputs.favorableCases.value,
+      possibleCases: fieldInputs.possibleCases.value,
+      probabilityA: fieldInputs.probabilityA.value,
+      probabilityB: fieldInputs.probabilityB.value,
+      intersection: fieldInputs.intersection.value,
+      conditionalA: fieldInputs.conditionalA.value,
+    };
+  }
+
+  function renderCalculation(calculation) {
+    currentCopyText = calculation.copyText;
+    hasValidResult = true;
+    resultIsStale = false;
+    resultKicker.textContent = "Resultado";
+    resultCard.classList.remove("opacity-75");
+    resultTitle.textContent = calculation.title;
+    resultPercentage.textContent = calculation.percentage;
+    resultDecimal.textContent = calculation.decimal;
+    resultFraction.textContent = calculation.fraction;
+    resultInterpretation.textContent = calculation.interpretation;
+    formula.textContent = calculation.formula;
+    substitution.textContent = calculation.substitution;
+    resultNote.textContent = calculation.note;
+    resultActions.classList.remove("hidden");
+    copyButton.disabled = false;
+    copyStatus.textContent = "";
+
+    warningList.replaceChildren();
+    calculation.warnings.forEach((warning) => {
+      const item = document.createElement("li");
+      item.textContent = warning;
+      warningList.append(item);
+    });
+    warningBox.classList.toggle(
+      "hidden",
+      calculation.warnings.length === 0,
+    );
+
+    liveStatus.textContent = `${calculation.title}: ${calculation.percentage}.`;
+    resultTitle.focus({ preventScroll: true });
+    resultCard.scrollIntoView({
+      behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches
+        ? "auto"
+        : "smooth",
+      block: "nearest",
+    });
+  }
+
+  function calculate() {
+    clearErrors();
+    const result = calculateBasicProbabilityFromInput(readInput());
+
+    if (!result.ok) {
+      renderErrors(result.errors);
+      return;
+    }
+
+    renderCalculation(result.calculation);
+  }
+
+  async function copyText(text) {
+    if (navigator.clipboard?.writeText) {
+      await navigator.clipboard.writeText(text);
+      return;
+    }
+
+    const textarea = document.createElement("textarea");
+    textarea.value = text;
+    textarea.setAttribute("readonly", "");
+    textarea.style.position = "fixed";
+    textarea.style.opacity = "0";
+    document.body.append(textarea);
+    textarea.select();
+    document.execCommand("copy");
+    textarea.remove();
+  }
+
+  form.addEventListener("submit", (event) => {
+    event.preventDefault();
+    calculate();
+  });
+
+  document
+    .querySelectorAll(
+      'input[name="probability-mode"], input[name="probability-format"], input[name="union-relation"], input[name="intersection-method"]',
+    )
+    .forEach((radio) => {
+      radio.addEventListener("change", () => updateInterface());
+    });
+
+  fieldKeys.forEach((key) => {
+    fieldInputs[key].addEventListener("input", () => {
+      clearFieldError(key);
+      errorSummary.classList.add("hidden");
+      markResultStale();
+    });
+  });
+
+  exampleButtons.forEach((button) => {
+    button.addEventListener("click", () => {
+      const example = JSON.parse(button.dataset.exampleValue);
+      selectRadio("probability-mode", example.mode);
+      selectRadio("probability-format", example.format);
+      selectRadio("union-relation", example.unionRelation);
+      selectRadio("intersection-method", example.intersectionMethod);
+
+      fieldKeys.forEach((key) => {
+        fieldInputs[key].value = example[key] ?? "";
+      });
+
+      resetResult();
+      updateInterface({ preserveResult: true });
+      calculate();
+    });
+  });
+
+  clearButton.addEventListener("click", () => {
+    form.reset();
+    fieldKeys.forEach((key) => {
+      fieldInputs[key].value = "";
+    });
+    clearErrors();
+    resetResult();
+    updateInterface({ preserveResult: true });
+    fieldInputs.favorableCases.focus();
+  });
+
+  copyButton.addEventListener("click", async () => {
+    if (!currentCopyText || resultIsStale) return;
+
+    try {
+      await copyText(currentCopyText);
+      copyStatus.textContent = "Resultado copiado.";
+    } catch {
+      copyStatus.textContent =
+        "No fue posible copiar automáticamente. Selecciona el resultado manualmente.";
+    }
+  });
+
+  updateInterface({ preserveResult: true });
+</script>

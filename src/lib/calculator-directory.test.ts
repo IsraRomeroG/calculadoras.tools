@@ -18,6 +18,9 @@ describe("calculator category directory", () => {
       "/legal-impuestos",
     );
     expect(getCalculatorCategoryUrl("fecha-tiempo")).toBe("/fecha-tiempo");
+    expect(getCalculatorCategoryUrl("probabilidad-estadistica")).toBe(
+      "/probabilidad-estadistica",
+    );
   });
 
   it("keeps display labels separate from canonical slugs", () => {
@@ -32,6 +35,10 @@ describe("calculator category directory", () => {
         expect.objectContaining({
           slug: "fecha-tiempo",
           label: "Fecha y tiempo",
+        }),
+        expect.objectContaining({
+          slug: "probabilidad-estadistica",
+          label: "Probabilidad y estadística",
         }),
       ]),
     );
@@ -97,6 +104,9 @@ describe("calculator category directory", () => {
     );
     expect(getCategoryByLabel("Fecha y tiempo")?.slug).toBe("fecha-tiempo");
     expect(getCategoryByLabel("Restaurantes")?.slug).toBe("restaurantes");
+    expect(getCategoryByLabel("Probabilidad y estadística")?.slug).toBe(
+      "probabilidad-estadistica",
+    );
     expect(getCategoryBySlugOrLegacySlug("legal-e-impuestos")?.slug).toBe(
       "legal-impuestos",
     );

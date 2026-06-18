@@ -1,0 +1,1118 @@
+---
+import AdSlot from "@components/ads/AdSlot.astro";
+import Container from "@components/layout/Container.astro";
+import PageShell from "@components/layout/PageShell.astro";
+import FaqSection from "@components/shared/FaqSection.astro";
+import PageHero from "@components/shared/PageHero.astro";
+import SectionIntro from "@components/shared/SectionIntro.astro";
+import BaseLayout from "@layouts/BaseLayout.astro";
+import {
+  NORMAL_DISTRIBUTION_CANONICAL_PATH,
+  NORMAL_EXAMPLES,
+} from "@lib/calculators/probabilidad-estadistica/calculadora-distribucion-normal-z-score/normalDistribution";
+import { buildFaqJsonLd } from "@lib/seo";
+
+const title = "Calculadora de distribución normal y Z-score";
+const description =
+  "Calcula Z-score, percentiles, probabilidades y valores críticos de una distribución normal con media y desviación estándar.";
+
+const faqs = [
+  {
+    question: "¿Qué es un Z-score?",
+    answer:
+      "Un Z-score indica cuántas desviaciones estándar separan un valor de la media. Un Z positivo está por encima de la media y uno negativo está por debajo.",
+  },
+  {
+    question: "¿Cómo se interpreta un Z-score positivo o negativo?",
+    answer:
+      "El signo indica el lado de la media. La magnitud indica la distancia: Z = 1.5 significa 1.5 desviaciones estándar por encima; Z = -1.5 significa la misma distancia por debajo.",
+  },
+  {
+    question: "¿Qué significa el percentil?",
+    answer:
+      "El percentil aproxima el porcentaje de la distribución que queda a la izquierda de un valor. El percentil 90 deja aproximadamente 90% de los valores por debajo.",
+  },
+  {
+    question: "¿Cómo calculo una probabilidad menor o mayor que un valor?",
+    answer:
+      "Elige Calcular probabilidad, selecciona Menor que o Mayor que e ingresa el límite. Si trabajas con valores X, añade media y desviación estándar.",
+  },
+  {
+    question: "¿Cómo calculo la probabilidad entre dos valores?",
+    answer:
+      "Selecciona Entre e ingresa un límite inferior y uno superior. La calculadora resta las probabilidades acumuladas de ambos límites.",
+  },
+  {
+    question: "¿Cómo encuentro un valor a partir de un percentil?",
+    answer:
+      "Elige Encontrar un valor, ingresa el percentil y, si trabajas con X, la media y desviación estándar. Se calcula primero el Z crítico y después se convierte a la escala original.",
+  },
+  {
+    question: "¿Qué diferencia hay entre menor que y menor o igual?",
+    answer:
+      "En una distribución continua, la probabilidad de un valor exacto es cero. Por eso usar menor que o menor o igual produce la misma probabilidad.",
+  },
+  {
+    question: "¿La calculadora comprueba que mis datos siguen una distribución normal?",
+    answer:
+      "No. La herramienta calcula resultados bajo el supuesto de una distribución normal, pero no realiza una prueba de normalidad sobre tus datos.",
+  },
+];
+
+const faqJsonLd = buildFaqJsonLd(faqs);
+---
+
+<BaseLayout
+  title={title}
+  description={description}
+  canonical={NORMAL_DISTRIBUTION_CANONICAL_PATH}
+>
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={JSON.stringify(faqJsonLd)} />
+  </Fragment>
+
+  <PageShell>
+    <PageHero
+      title="Calculadora de distribución normal y Z-score"
+      description="Ubica valores, calcula áreas bajo la campana normal o encuentra el valor correspondiente a un percentil."
+      kicker="Probabilidad y estadística"
+      kickerHref="/probabilidad-estadistica"
+      collapseBreadcrumbOnMobile
+      containerClass="py-6 md:py-8"
+      breadcrumbs={[
+        { label: "Inicio", href: "/", ariaLabel: "Inicio" },
+        {
+          label: "Probabilidad y estadística",
+          href: "/probabilidad-estadistica",
+          optional: true,
+        },
+        { label: "Distribución normal y Z-score", truncate: true },
+      ]}
+    />
+
+    <Container as="section" class="py-6 md:py-8">
+      <div
+        id="normal-distribution-calculator"
+        class="overflow-hidden rounded-lg border border-gray-700 bg-gray-950 shadow-xl shadow-gray-950/30"
+      >
+        <div class="grid lg:grid-cols-[minmax(0,1fr)_minmax(20rem,0.9fr)]">
+          <section class="p-4 sm:p-6" aria-labelledby="calculator-heading">
+            <h2 id="calculator-heading" class="text-xl font-semibold text-white">
+              ¿Qué quieres calcular?
+            </h2>
+            <p class="mt-2 text-sm leading-relaxed text-gray-400">
+              Elige la pregunta y trabaja con valores originales X o directamente
+              con Z.
+            </p>
+
+            <form class="mt-5" novalidate data-normal-form>
+              <fieldset>
+                <legend class="sr-only">Pregunta principal</legend>
+                <div class="grid grid-cols-3 rounded-lg border border-gray-700 bg-gray-900 p-1">
+                  <label>
+                    <input class="peer sr-only" type="radio" name="normal-mode" value="locate" checked />
+                    <span class="mode-option">
+                      <span class="sm:hidden">Valor</span>
+                      <span class="hidden sm:inline">Ubicar un valor</span>
+                    </span>
+                  </label>
+                  <label>
+                    <input class="peer sr-only" type="radio" name="normal-mode" value="probability" />
+                    <span class="mode-option">Probabilidad</span>
+                  </label>
+                  <label>
+                    <input class="peer sr-only" type="radio" name="normal-mode" value="inverse" />
+                    <span class="mode-option">
+                      <span class="sm:hidden">Percentil</span>
+                      <span class="hidden sm:inline">Encontrar valor</span>
+                    </span>
+                  </label>
+                </div>
+              </fieldset>
+
+              <fieldset class="mt-5">
+                <legend class="text-sm font-semibold text-gray-100">
+                  Tipo de valores
+                </legend>
+                <div class="mt-2 grid grid-cols-2 gap-2">
+                  <label>
+                    <input class="peer sr-only" type="radio" name="normal-scale" value="x" checked />
+                    <span class="scale-option">Valores X</span>
+                  </label>
+                  <label>
+                    <input class="peer sr-only" type="radio" name="normal-scale" value="z" />
+                    <span class="scale-option">Valores Z</span>
+                  </label>
+                </div>
+              </fieldset>
+
+              <div
+                class="mt-5 hidden rounded-lg border border-red-400/30 bg-red-400/10 px-4 py-3"
+                tabindex="-1"
+                data-error-summary
+              >
+                <p class="font-semibold text-red-100">Revisa los campos marcados</p>
+                <ul class="mt-2 list-disc space-y-1 pl-5 text-sm text-red-200" data-error-list></ul>
+              </div>
+
+              <div class="mt-5 grid gap-4 sm:grid-cols-2" data-distribution-fields>
+                <div>
+                  <label class="field-label" for="normal-mean">Media (μ)</label>
+                  <input
+                    id="normal-mean"
+                    class="field-input"
+                    type="text"
+                    inputmode="decimal"
+                    autocomplete="off"
+                    maxlength="30"
+                    placeholder="Ejemplo: 70"
+                    aria-describedby="normal-mean-help normal-mean-error"
+                    data-field="mean"
+                  />
+                  <p id="normal-mean-help" class="field-help">Centro de la distribución.</p>
+                  <p id="normal-mean-error" class="field-error" data-error-for="mean"></p>
+                </div>
+                <div>
+                  <label class="field-label" for="normal-standard-deviation">Desviación estándar (σ)</label>
+                  <input
+                    id="normal-standard-deviation"
+                    class="field-input"
+                    type="text"
+                    inputmode="decimal"
+                    autocomplete="off"
+                    maxlength="30"
+                    placeholder="Ejemplo: 10"
+                    aria-describedby="normal-standard-deviation-help normal-standard-deviation-error"
+                    data-field="standardDeviation"
+                  />
+                  <p id="normal-standard-deviation-help" class="field-help">Debe ser mayor que cero.</p>
+                  <p id="normal-standard-deviation-error" class="field-error" data-error-for="standardDeviation"></p>
+                </div>
+              </div>
+
+              <div class="mt-5" data-probability-type-section>
+                <label class="field-label" for="normal-probability-type">
+                  Región de probabilidad
+                </label>
+                <select id="normal-probability-type" class="field-input" data-probability-type>
+                  <option value="less">Menor que</option>
+                  <option value="greater">Mayor que</option>
+                  <option value="between">Entre dos valores</option>
+                  <option value="outside">Fuera de un intervalo</option>
+                </select>
+              </div>
+
+              <div class="mt-5" data-single-value-section>
+                <label class="field-label" for="normal-value" data-value-label>Valor X</label>
+                <input
+                  id="normal-value"
+                  class="field-input"
+                  type="text"
+                  inputmode="decimal"
+                  autocomplete="off"
+                  maxlength="30"
+                  placeholder="Ejemplo: 85"
+                  aria-describedby="normal-value-help normal-value-error"
+                  data-field="value"
+                />
+                <p id="normal-value-help" class="field-help" data-value-help>
+                  Valor que quieres ubicar en la distribución.
+                </p>
+                <p id="normal-value-error" class="field-error" data-error-for="value"></p>
+              </div>
+
+              <div class="mt-5 hidden grid gap-4 sm:grid-cols-2" data-interval-section>
+                <div>
+                  <label class="field-label" for="normal-lower">Límite inferior</label>
+                  <input
+                    id="normal-lower"
+                    class="field-input"
+                    type="text"
+                    inputmode="decimal"
+                    autocomplete="off"
+                    maxlength="30"
+                    placeholder="Ejemplo: 60"
+                    aria-describedby="normal-lower-error"
+                    data-field="lower"
+                  />
+                  <p id="normal-lower-error" class="field-error" data-error-for="lower"></p>
+                </div>
+                <div>
+                  <label class="field-label" for="normal-upper">Límite superior</label>
+                  <input
+                    id="normal-upper"
+                    class="field-input"
+                    type="text"
+                    inputmode="decimal"
+                    autocomplete="off"
+                    maxlength="30"
+                    placeholder="Ejemplo: 80"
+                    aria-describedby="normal-upper-error"
+                    data-field="upper"
+                  />
+                  <p id="normal-upper-error" class="field-error" data-error-for="upper"></p>
+                </div>
+              </div>
+
+              <div class="mt-5 hidden" data-percentile-section>
+                <label class="field-label" for="normal-percentile">Percentil</label>
+                <div class="relative">
+                  <input
+                    id="normal-percentile"
+                    class="field-input pr-12"
+                    type="text"
+                    inputmode="decimal"
+                    autocomplete="off"
+                    maxlength="20"
+                    placeholder="Ejemplo: 90"
+                    aria-describedby="normal-percentile-help normal-percentile-error"
+                    data-field="percentile"
+                  />
+                  <span class="pointer-events-none absolute inset-y-0 right-4 flex items-center text-gray-400">%</span>
+                </div>
+                <p id="normal-percentile-help" class="field-help">Debe ser mayor que 0% y menor que 100%.</p>
+                <p id="normal-percentile-error" class="field-error" data-error-for="percentile"></p>
+                <div class="mt-3 flex gap-2 overflow-x-auto pb-1" aria-label="Percentiles frecuentes">
+                  {[80, 90, 95, 97.5, 99].map((percentile) => (
+                    <button
+                      class="preset-button"
+                      type="button"
+                      data-percentile-preset={percentile}
+                    >
+                      {percentile}%
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div class="mt-5 grid gap-4 sm:grid-cols-[minmax(0,1fr)_10rem] sm:items-end">
+                <div>
+                  <p class="field-label">Ejemplos rápidos</p>
+                  <div class="mt-2 flex gap-2 overflow-x-auto pb-1" aria-label="Cargar ejemplo">
+                    {NORMAL_EXAMPLES.map((example) => (
+                      <button
+                        class="preset-button"
+                        type="button"
+                        data-example={JSON.stringify(example.input)}
+                        title={example.description}
+                      >
+                        {example.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                <div>
+                  <label class="field-label" for="normal-decimals">Decimales</label>
+                  <select id="normal-decimals" class="field-input" data-decimals>
+                    {[2, 3, 4, 5, 6].map((decimals) => (
+                      <option value={decimals} selected={decimals === 4}>{decimals}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              <div class="mt-6 flex flex-col gap-3 border-t border-gray-800 pt-5 sm:flex-row sm:flex-wrap">
+                <button class="primary-button sm:min-w-48" type="submit">Calcular</button>
+                <button class="secondary-button" type="button" data-clear>Limpiar</button>
+              </div>
+            </form>
+          </section>
+
+          <aside
+            class="border-t border-gray-800 bg-gray-900/60 p-4 sm:p-6 lg:border-l lg:border-t-0"
+            aria-labelledby="normal-result-heading"
+          >
+            <div class="rounded-lg border border-gray-700 bg-gray-950 p-5" data-result-card>
+              <p class="text-xs font-semibold uppercase tracking-wide text-amber-400" data-result-kicker>
+                Resultado
+              </p>
+              <h2
+                id="normal-result-heading"
+                class="mt-2 text-lg font-semibold text-white outline-none"
+                tabindex="-1"
+                data-result-title
+              >
+                Completa los datos
+              </h2>
+              <p class="mt-3 break-words text-4xl font-bold leading-tight text-white sm:text-5xl" data-primary-result>
+                —
+              </p>
+              <p class="mt-3 font-mono text-sm text-amber-200" data-notation>
+                La notación aparecerá con el resultado.
+              </p>
+              <p class="mt-4 rounded-lg border border-gray-800 bg-gray-900 px-4 py-3 text-sm leading-relaxed text-gray-300" data-interpretation>
+                El resultado incluirá probabilidad, Z-score, percentil e interpretación.
+              </p>
+
+              <div class="mt-4 grid grid-cols-2 gap-3" data-summary-grid>
+                <div class="col-span-2 rounded-lg border border-gray-800 bg-gray-900 p-4 text-sm text-gray-500">
+                  Calcula un ejemplo para ver el desglose.
+                </div>
+              </div>
+
+              <figure class="mt-5 rounded-lg border border-gray-800 bg-gray-900/70 p-3">
+                <svg
+                  class="block h-auto w-full"
+                  viewBox="0 0 640 250"
+                  role="img"
+                  aria-labelledby="normal-graph-title normal-graph-description"
+                  data-normal-graph
+                >
+                  <title id="normal-graph-title" data-graph-title>Distribución normal</title>
+                  <desc id="normal-graph-description" data-graph-description>
+                    La región calculada aparecerá sombreada.
+                  </desc>
+                  <line x1="28" y1="205" x2="612" y2="205" stroke="#6b7280" stroke-width="2" />
+                  <g data-graph-areas></g>
+                  <path data-graph-curve fill="none" stroke="#f9fafb" stroke-width="3" stroke-linecap="round"></path>
+                  <g data-graph-markers></g>
+                  <g data-graph-ticks></g>
+                </svg>
+                <figcaption class="mt-2 text-xs leading-relaxed text-gray-400" data-graph-caption>
+                  La gráfica mostrará la región de probabilidad.
+                </figcaption>
+              </figure>
+
+              <details class="mt-4 rounded-lg border border-gray-800 p-4" data-calculation-details>
+                <summary class="cursor-pointer text-sm font-semibold text-white">Cómo se calculó</summary>
+                <p class="mt-3 font-mono text-sm text-amber-200" data-formula>
+                  z = (x − μ) / σ
+                </p>
+                <p class="mt-3 text-sm leading-relaxed text-gray-300" data-substitution>
+                  La sustitución aparecerá con un cálculo válido.
+                </p>
+                <ol class="mt-3 list-decimal space-y-2 pl-5 text-sm leading-relaxed text-gray-400" data-steps>
+                  <li>Completa los campos y presiona Calcular.</li>
+                </ol>
+              </details>
+
+              <div class="mt-5 hidden flex-wrap gap-3" data-result-actions>
+                <button class="primary-button" type="button" data-copy-result>Copiar resultado</button>
+                <button class="secondary-button" type="button" data-copy-link>Copiar enlace</button>
+              </div>
+              <p class="mt-3 min-h-5 text-sm text-emerald-300" data-copy-status></p>
+            </div>
+          </aside>
+        </div>
+        <p class="sr-only" aria-live="polite" data-live-status></p>
+      </div>
+    </Container>
+
+    <AdSlot placement="calculator-after-tool" />
+
+    <Container as="section" class="py-6 md:py-8">
+      <SectionIntro
+        title="Cómo leer la campana normal"
+        description="La misma distribución puede responder preguntas distintas según el área que se sombrea."
+      />
+      <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <article class="info-card">
+          <p class="info-kicker">Cola izquierda</p>
+          <h3 class="info-title">Menor que</h3>
+          <p class="info-text">Suma toda la probabilidad situada a la izquierda de un límite.</p>
+        </article>
+        <article class="info-card">
+          <p class="info-kicker">Cola derecha</p>
+          <h3 class="info-title">Mayor que</h3>
+          <p class="info-text">Mide la proporción que queda por encima de un límite.</p>
+        </article>
+        <article class="info-card">
+          <p class="info-kicker">Área central</p>
+          <h3 class="info-title">Entre dos valores</h3>
+          <p class="info-text">Resta las probabilidades acumuladas de los límites superior e inferior.</p>
+        </article>
+        <article class="info-card">
+          <p class="info-kicker">Dos colas</p>
+          <h3 class="info-title">Fuera del intervalo</h3>
+          <p class="info-text">Suma las regiones situadas por debajo y por encima de ambos límites.</p>
+        </article>
+      </div>
+    </Container>
+
+    <Container as="section" class="py-6 md:py-8">
+      <div class="grid gap-4 lg:grid-cols-2">
+        <article class="rounded-lg border border-gray-700 bg-gray-950 p-5 sm:p-6">
+          <h2 class="text-xl font-semibold text-white">Qué representa el Z-score</h2>
+          <p class="mt-3 text-sm leading-relaxed text-gray-400">
+            El Z-score convierte cualquier distribución normal a una escala con media 0 y desviación estándar 1. Así puedes comparar valores medidos en unidades diferentes.
+          </p>
+          <p class="mt-3 rounded-lg border border-gray-800 bg-gray-900 px-4 py-3 font-mono text-sm text-amber-200">
+            z = (x − media) / desviación estándar
+          </p>
+        </article>
+        <article class="rounded-lg border border-sky-400/25 bg-sky-400/10 p-5 sm:p-6">
+          <h2 class="text-xl font-semibold text-white">Supuesto importante</h2>
+          <p class="mt-3 text-sm leading-relaxed text-sky-100">
+            La calculadora supone que la variable sigue una distribución normal. No comprueba normalidad ni determina si un resultado es bueno, malo o clínicamente relevante.
+          </p>
+          <div class="mt-4 flex flex-wrap gap-3">
+            <a class="related-link" href="/probabilidad-estadistica/calculadora-probabilidad-basica">Probabilidad básica</a>
+            <a class="related-link" href="/matematicas/calculadora-de-estadistica-basica">Estadística básica</a>
+          </div>
+        </article>
+      </div>
+    </Container>
+
+    <FaqSection faqs={faqs} />
+  </PageShell>
+</BaseLayout>
+
+<style is:global>
+  .mode-option,
+  .scale-option {
+    display: flex;
+    min-height: 2.75rem;
+    cursor: pointer;
+    align-items: center;
+    justify-content: center;
+    border-radius: 0.4rem;
+    padding: 0.5rem 0.35rem;
+    text-align: center;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: rgb(209 213 219);
+    transition: 150ms;
+  }
+  .scale-option {
+    min-height: 3rem;
+    border: 1px solid rgb(55 65 81);
+    border-radius: 0.5rem;
+    background: rgb(17 24 39);
+    font-size: 0.875rem;
+  }
+  input:checked + .mode-option,
+  input:checked + .scale-option {
+    border-color: rgb(251 191 36);
+    background: rgb(251 191 36);
+    color: rgb(3 7 18);
+  }
+  input:focus-visible + .mode-option,
+  input:focus-visible + .scale-option {
+    box-shadow: 0 0 0 3px rgb(251 191 36 / 0.35);
+  }
+  .field-label {
+    display: block;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: rgb(243 244 246);
+  }
+  .field-input {
+    margin-top: 0.5rem;
+    min-height: 3rem;
+    width: 100%;
+    border-radius: 0.5rem;
+    border: 1px solid rgb(55 65 81);
+    background: rgb(17 24 39);
+    padding: 0 1rem;
+    font-size: 1rem;
+    color: white;
+    outline: none;
+  }
+  .field-input:focus {
+    border-color: rgb(251 191 36);
+    box-shadow: 0 0 0 3px rgb(251 191 36 / 0.15);
+  }
+  .field-input[aria-invalid="true"] {
+    border-color: rgb(248 113 113);
+  }
+  .field-help {
+    margin-top: 0.45rem;
+    font-size: 0.75rem;
+    line-height: 1.45;
+    color: rgb(107 114 128);
+  }
+  .field-error {
+    display: none;
+    margin-top: 0.5rem;
+    border-radius: 0.5rem;
+    border: 1px solid rgb(248 113 113 / 0.3);
+    background: rgb(248 113 113 / 0.1);
+    padding: 0.5rem 0.75rem;
+    font-size: 0.8rem;
+    color: rgb(254 202 202);
+  }
+  .field-error:not(:empty) {
+    display: block;
+  }
+  .primary-button,
+  .secondary-button,
+  .preset-button,
+  .related-link {
+    display: inline-flex;
+    min-height: 2.75rem;
+    align-items: center;
+    justify-content: center;
+    border-radius: 0.5rem;
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+    font-weight: 700;
+    transition: 150ms;
+  }
+  .primary-button {
+    background: rgb(251 191 36);
+    color: rgb(3 7 18);
+  }
+  .secondary-button,
+  .preset-button,
+  .related-link {
+    border: 1px solid rgb(55 65 81);
+    color: rgb(229 231 235);
+  }
+  .preset-button {
+    flex: none;
+    min-height: 2.75rem;
+    padding-inline: 0.75rem;
+  }
+  .primary-button:hover { background: rgb(252 211 77); }
+  .secondary-button:hover,
+  .preset-button:hover,
+  .related-link:hover { border-color: rgb(251 191 36); color: white; }
+  .primary-button:focus-visible,
+  .secondary-button:focus-visible,
+  .preset-button:focus-visible,
+  .related-link:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 3px rgb(251 191 36 / 0.35);
+  }
+  .info-card {
+    border-radius: 0.5rem;
+    border: 1px solid rgb(55 65 81);
+    background: rgb(3 7 18);
+    padding: 1.25rem;
+  }
+  .info-kicker {
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: rgb(251 191 36);
+  }
+  .info-title {
+    margin-top: 0.5rem;
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: white;
+  }
+  .info-text {
+    margin-top: 0.5rem;
+    font-size: 0.875rem;
+    line-height: 1.6;
+    color: rgb(156 163 175);
+  }
+  @media (min-width: 640px) {
+    .mode-option { font-size: 0.875rem; }
+  }
+</style>
+
+<script>
+  import {
+    NORMAL_DISTRIBUTION_CANONICAL_PATH,
+    calculateNormalDistribution,
+    standardNormalPdf,
+  } from "@lib/calculators/probabilidad-estadistica/calculadora-distribucion-normal-z-score/normalDistribution";
+
+  const form = document.querySelector("[data-normal-form]");
+  const distributionFields = document.querySelector("[data-distribution-fields]");
+  const probabilityTypeSection = document.querySelector("[data-probability-type-section]");
+  const probabilityTypeSelect = document.querySelector("[data-probability-type]");
+  const singleValueSection = document.querySelector("[data-single-value-section]");
+  const intervalSection = document.querySelector("[data-interval-section]");
+  const percentileSection = document.querySelector("[data-percentile-section]");
+  const valueLabel = document.querySelector("[data-value-label]");
+  const valueHelp = document.querySelector("[data-value-help]");
+  const decimalsSelect = document.querySelector("[data-decimals]");
+  const errorSummary = document.querySelector("[data-error-summary]");
+  const errorList = document.querySelector("[data-error-list]");
+  const resultCard = document.querySelector("[data-result-card]");
+  const resultKicker = document.querySelector("[data-result-kicker]");
+  const resultTitle = document.querySelector("[data-result-title]");
+  const primaryResult = document.querySelector("[data-primary-result]");
+  const notation = document.querySelector("[data-notation]");
+  const interpretation = document.querySelector("[data-interpretation]");
+  const summaryGrid = document.querySelector("[data-summary-grid]");
+  const formula = document.querySelector("[data-formula]");
+  const substitution = document.querySelector("[data-substitution]");
+  const stepsList = document.querySelector("[data-steps]");
+  const resultActions = document.querySelector("[data-result-actions]");
+  const copyResultButton = document.querySelector("[data-copy-result]");
+  const copyLinkButton = document.querySelector("[data-copy-link]");
+  const copyStatus = document.querySelector("[data-copy-status]");
+  const liveStatus = document.querySelector("[data-live-status]");
+  const clearButton = document.querySelector("[data-clear]");
+  const graphCurve = document.querySelector("[data-graph-curve]");
+  const graphAreas = document.querySelector("[data-graph-areas]");
+  const graphMarkers = document.querySelector("[data-graph-markers]");
+  const graphTicks = document.querySelector("[data-graph-ticks]");
+  const graphDescription = document.querySelector("[data-graph-description]");
+  const graphCaption = document.querySelector("[data-graph-caption]");
+  const exampleButtons = document.querySelectorAll("[data-example]");
+  const percentilePresetButtons = document.querySelectorAll("[data-percentile-preset]");
+
+  const fieldNames = ["value", "mean", "standardDeviation", "lower", "upper", "percentile"];
+  const fields = Object.fromEntries(
+    fieldNames.map((name) => [name, document.querySelector(`[data-field="${name}"]`)]),
+  );
+  const fieldErrors = Object.fromEntries(
+    fieldNames.map((name) => [name, document.querySelector(`[data-error-for="${name}"]`)]),
+  );
+
+  let currentCalculation = null;
+  let currentSharePath = "";
+  let copyStatusTimeout = 0;
+
+  function readRadio(name) {
+    return document.querySelector(`input[name="${name}"]:checked`)?.value;
+  }
+
+  function selectRadio(name, value) {
+    const radio = document.querySelector(`input[name="${name}"][value="${value}"]`);
+    if (radio) radio.checked = true;
+  }
+
+  function getMode() {
+    return readRadio("normal-mode") ?? "locate";
+  }
+
+  function getScale() {
+    return readRadio("normal-scale") ?? "x";
+  }
+
+  function getProbabilityType() {
+    return probabilityTypeSelect?.value ?? "less";
+  }
+
+  function readInput() {
+    return {
+      mode: getMode(),
+      scale: getScale(),
+      probabilityType: getProbabilityType(),
+      value: fields.value?.value ?? "",
+      mean: fields.mean?.value ?? "",
+      standardDeviation: fields.standardDeviation?.value ?? "",
+      lower: fields.lower?.value ?? "",
+      upper: fields.upper?.value ?? "",
+      percentile: fields.percentile?.value ?? "",
+      decimals: Number(decimalsSelect?.value ?? "4"),
+    };
+  }
+
+  function updateInterface({ preserveResult = false } = {}) {
+    const mode = getMode();
+    const scale = getScale();
+    const probabilityType = getProbabilityType();
+    const interval = probabilityType === "between" || probabilityType === "outside";
+
+    distributionFields?.classList.toggle("hidden", scale === "z");
+    probabilityTypeSection?.classList.toggle("hidden", mode !== "probability");
+    percentileSection?.classList.toggle("hidden", mode !== "inverse");
+    intervalSection?.classList.toggle("hidden", mode !== "probability" || !interval);
+    singleValueSection?.classList.toggle(
+      "hidden",
+      mode === "inverse" || (mode === "probability" && interval),
+    );
+
+    if (valueLabel) {
+      valueLabel.textContent =
+        mode === "locate"
+          ? scale === "x"
+            ? "Valor X"
+            : "Z-score"
+          : scale === "x"
+            ? "Límite X"
+            : "Límite Z";
+    }
+
+    if (valueHelp) {
+      valueHelp.textContent =
+        mode === "locate"
+          ? "Valor que quieres ubicar en la distribución."
+          : probabilityType === "greater"
+            ? "La probabilidad se calculará a la derecha de este límite."
+            : "La probabilidad se calculará a la izquierda de este límite.";
+    }
+
+    fields.value.placeholder = scale === "x" ? "Ejemplo: 85" : "Ejemplo: 1.96";
+    fields.lower.placeholder = scale === "x" ? "Ejemplo: 60" : "Ejemplo: -1";
+    fields.upper.placeholder = scale === "x" ? "Ejemplo: 80" : "Ejemplo: 1";
+    clearErrors();
+
+    if (!preserveResult && currentCalculation) markResultStale();
+  }
+
+  function clearErrors() {
+    fieldNames.forEach((name) => {
+      fields[name]?.removeAttribute("aria-invalid");
+      if (fieldErrors[name]) fieldErrors[name].textContent = "";
+    });
+    errorList?.replaceChildren();
+    errorSummary?.classList.add("hidden");
+  }
+
+  function renderErrors(errors) {
+    clearErrors();
+    errors.forEach((error) => {
+      fields[error.field]?.setAttribute("aria-invalid", "true");
+      if (fieldErrors[error.field]) fieldErrors[error.field].textContent = error.message;
+      const item = document.createElement("li");
+      item.textContent = error.message;
+      errorList?.append(item);
+    });
+    errorSummary?.classList.remove("hidden");
+    errorSummary?.focus();
+    liveStatus.textContent = "No se pudo calcular. Revisa los campos marcados.";
+  }
+
+  function markResultStale() {
+    if (!currentCalculation) return;
+    resultKicker.textContent = "Resultado anterior";
+    resultCard?.classList.add("opacity-70");
+    resultActions?.classList.add("hidden");
+    currentSharePath = "";
+  }
+
+  function renderCalculation(calculation) {
+    currentCalculation = calculation;
+    resultKicker.textContent = "Resultado";
+    resultCard?.classList.remove("opacity-70");
+    resultTitle.textContent = calculation.title;
+    primaryResult.textContent = calculation.primary;
+    notation.textContent = calculation.notation;
+    interpretation.textContent = calculation.interpretation;
+    formula.textContent = calculation.formula;
+    substitution.textContent = calculation.substitution;
+
+    const summaryFragment = document.createDocumentFragment();
+    calculation.summary.forEach((item) => {
+      const card = document.createElement("div");
+      card.className = "rounded-lg border border-gray-800 bg-gray-900 p-3";
+      const label = document.createElement("p");
+      label.className = "text-xs font-semibold uppercase tracking-wide text-gray-500";
+      label.textContent = item.label;
+      const value = document.createElement("p");
+      value.className = "mt-2 break-words text-base font-semibold text-white";
+      value.textContent = item.value;
+      card.append(label, value);
+      summaryFragment.append(card);
+    });
+    summaryGrid?.replaceChildren(summaryFragment);
+
+    const stepsFragment = document.createDocumentFragment();
+    calculation.steps.forEach((step) => {
+      const item = document.createElement("li");
+      item.textContent = step;
+      stepsFragment.append(item);
+    });
+    stepsList?.replaceChildren(stepsFragment);
+
+    renderGraph(calculation.graph);
+    resultActions?.classList.remove("hidden");
+    resultActions?.classList.add("flex");
+    copyStatus.textContent = "";
+    currentSharePath = buildSharePath(readInput());
+    replaceUrl(currentSharePath);
+    liveStatus.textContent = `${calculation.title}: ${calculation.primary}.`;
+    resultTitle.focus({ preventScroll: true });
+    resultCard?.scrollIntoView({
+      behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth",
+      block: "nearest",
+    });
+  }
+
+  function calculate() {
+    clearErrors();
+    const result = calculateNormalDistribution(readInput());
+
+    if (!result.ok) {
+      renderErrors(result.errors);
+      markResultStale();
+      return false;
+    }
+
+    renderCalculation(result.calculation);
+    return true;
+  }
+
+  function buildSharePath(input) {
+    const params = new URLSearchParams();
+    params.set("modo", input.mode);
+    params.set("entrada", input.scale);
+    if (input.mode === "probability") params.set("tipo", input.probabilityType);
+    if (input.scale === "x") {
+      params.set("media", input.mean);
+      params.set("desviacion", input.standardDeviation);
+    }
+    if (input.mode === "inverse") {
+      params.set("percentil", input.percentile);
+    } else if (
+      input.mode === "probability" &&
+      (input.probabilityType === "between" || input.probabilityType === "outside")
+    ) {
+      params.set("inferior", input.lower);
+      params.set("superior", input.upper);
+    } else {
+      params.set(input.scale === "x" ? "valor" : "z", input.value);
+    }
+    params.set("decimales", String(input.decimals));
+    return `${NORMAL_DISTRIBUTION_CANONICAL_PATH}?${params.toString()}`;
+  }
+
+  function replaceUrl(path = NORMAL_DISTRIBUTION_CANONICAL_PATH) {
+    if (`${window.location.pathname}${window.location.search}` !== path) {
+      window.history.replaceState(null, "", path);
+    }
+  }
+
+  function hydrateFromUrl() {
+    const params = new URLSearchParams(window.location.search);
+    if (!params.size) {
+      renderEmptyGraph();
+      return;
+    }
+
+    const mode = params.get("modo");
+    const scale = params.get("entrada");
+    const probabilityType = params.get("tipo");
+    if (["locate", "probability", "inverse"].includes(mode)) selectRadio("normal-mode", mode);
+    if (["x", "z"].includes(scale)) selectRadio("normal-scale", scale);
+    if (["less", "greater", "between", "outside"].includes(probabilityType)) {
+      probabilityTypeSelect.value = probabilityType;
+    }
+    fields.mean.value = params.get("media") ?? "";
+    fields.standardDeviation.value = params.get("desviacion") ?? "";
+    fields.value.value = params.get("valor") ?? params.get("z") ?? "";
+    fields.lower.value = params.get("inferior") ?? "";
+    fields.upper.value = params.get("superior") ?? "";
+    fields.percentile.value = params.get("percentil") ?? "";
+    const decimals = params.get("decimales");
+    if (["2", "3", "4", "5", "6"].includes(decimals)) decimalsSelect.value = decimals;
+    updateInterface({ preserveResult: true });
+
+    if (!calculate()) replaceUrl();
+  }
+
+  function renderEmptyGraph() {
+    graphCurve?.setAttribute("d", curvePath());
+    renderTicks({ scale: "z", mean: 0, standardDeviation: 1 });
+  }
+
+  function renderGraph(graph) {
+    graphCurve?.setAttribute("d", curvePath());
+    graphAreas?.replaceChildren();
+    graphMarkers?.replaceChildren();
+
+    const segments =
+      graph.region === "less"
+        ? [[-4, graph.rightZ]]
+        : graph.region === "greater"
+          ? [[graph.leftZ, 4]]
+          : graph.region === "between"
+            ? [[graph.leftZ, graph.rightZ]]
+            : [[-4, graph.leftZ], [graph.rightZ, 4]];
+
+    segments.forEach(([start, end]) => {
+      const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+      path.setAttribute("d", areaPath(start, end));
+      path.setAttribute("fill", "#fbbf24");
+      path.setAttribute("fill-opacity", "0.42");
+      graphAreas?.append(path);
+    });
+
+    const markers = [graph.leftZ, graph.rightZ, graph.markerZ]
+      .filter((value, index, values) => Number.isFinite(value) && values.indexOf(value) === index);
+    markers.forEach((z) => {
+      const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+      const x = xForZ(z);
+      line.setAttribute("x1", String(x));
+      line.setAttribute("x2", String(x));
+      line.setAttribute("y1", "36");
+      line.setAttribute("y2", "205");
+      line.setAttribute("stroke", "#38bdf8");
+      line.setAttribute("stroke-width", "2");
+      line.setAttribute("stroke-dasharray", "6 5");
+      graphMarkers?.append(line);
+    });
+
+    renderTicks(graph);
+    graphDescription.textContent = graph.description;
+    graphCaption.textContent = graph.description;
+  }
+
+  function renderTicks(graph) {
+    graphTicks?.replaceChildren();
+    [-3, -2, -1, 0, 1, 2, 3].forEach((z) => {
+      const tick = document.createElementNS("http://www.w3.org/2000/svg", "line");
+      const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+      const x = xForZ(z);
+      tick.setAttribute("x1", String(x));
+      tick.setAttribute("x2", String(x));
+      tick.setAttribute("y1", "205");
+      tick.setAttribute("y2", "211");
+      tick.setAttribute("stroke", "#9ca3af");
+      text.setAttribute("x", String(x));
+      text.setAttribute("y", "231");
+      text.setAttribute("text-anchor", "middle");
+      text.setAttribute("fill", "#9ca3af");
+      text.setAttribute("font-size", graph.scale === "x" ? "11" : "13");
+      const value = graph.scale === "x" ? graph.mean + z * graph.standardDeviation : z;
+      text.textContent = formatTick(value);
+      graphTicks?.append(tick, text);
+    });
+  }
+
+  function curvePath() {
+    const points = [];
+    for (let index = 0; index <= 160; index += 1) {
+      const z = -4 + (8 * index) / 160;
+      points.push(`${index === 0 ? "M" : "L"} ${xForZ(z).toFixed(2)} ${yForZ(z).toFixed(2)}`);
+    }
+    return points.join(" ");
+  }
+
+  function areaPath(start, end) {
+    const lower = Math.max(-4, Math.min(4, Number(start)));
+    const upper = Math.max(-4, Math.min(4, Number(end)));
+    if (!Number.isFinite(lower) || !Number.isFinite(upper) || lower >= upper) return "";
+    const points = [`M ${xForZ(lower).toFixed(2)} 205`, `L ${xForZ(lower).toFixed(2)} ${yForZ(lower).toFixed(2)}`];
+    const steps = Math.max(2, Math.ceil((upper - lower) * 24));
+    for (let index = 1; index <= steps; index += 1) {
+      const z = lower + ((upper - lower) * index) / steps;
+      points.push(`L ${xForZ(z).toFixed(2)} ${yForZ(z).toFixed(2)}`);
+    }
+    points.push(`L ${xForZ(upper).toFixed(2)} 205 Z`);
+    return points.join(" ");
+  }
+
+  function xForZ(z) {
+    const clamped = Math.max(-4, Math.min(4, Number(z)));
+    return 28 + ((clamped + 4) / 8) * 584;
+  }
+
+  function yForZ(z) {
+    return 205 - (standardNormalPdf(z) / standardNormalPdf(0)) * 150;
+  }
+
+  function formatTick(value) {
+    return new Intl.NumberFormat("es-MX", {
+      useGrouping: false,
+      maximumFractionDigits: 2,
+    }).format(value);
+  }
+
+  async function copyText(text) {
+    if (navigator.clipboard?.writeText) {
+      await navigator.clipboard.writeText(text);
+      return;
+    }
+    const textarea = document.createElement("textarea");
+    textarea.value = text;
+    textarea.setAttribute("readonly", "");
+    textarea.style.position = "fixed";
+    textarea.style.opacity = "0";
+    document.body.append(textarea);
+    textarea.select();
+    document.execCommand("copy");
+    textarea.remove();
+  }
+
+  function setCopyStatus(message) {
+    copyStatus.textContent = message;
+    window.clearTimeout(copyStatusTimeout);
+    copyStatusTimeout = window.setTimeout(() => {
+      copyStatus.textContent = "";
+    }, 2500);
+  }
+
+  function resetCalculator() {
+    form?.reset();
+    fieldNames.forEach((name) => {
+      fields[name].value = "";
+    });
+    decimalsSelect.value = "4";
+    currentCalculation = null;
+    currentSharePath = "";
+    clearErrors();
+    resultKicker.textContent = "Resultado";
+    resultCard?.classList.remove("opacity-70");
+    resultTitle.textContent = "Completa los datos";
+    primaryResult.textContent = "—";
+    notation.textContent = "La notación aparecerá con el resultado.";
+    interpretation.textContent = "El resultado incluirá probabilidad, Z-score, percentil e interpretación.";
+    summaryGrid.innerHTML = '<div class="col-span-2 rounded-lg border border-gray-800 bg-gray-900 p-4 text-sm text-gray-500">Calcula un ejemplo para ver el desglose.</div>';
+    formula.textContent = "z = (x − μ) / σ";
+    substitution.textContent = "La sustitución aparecerá con un cálculo válido.";
+    stepsList.innerHTML = "<li>Completa los campos y presiona Calcular.</li>";
+    resultActions?.classList.add("hidden");
+    resultActions?.classList.remove("flex");
+    copyStatus.textContent = "";
+    graphAreas?.replaceChildren();
+    graphMarkers?.replaceChildren();
+    graphDescription.textContent = "La región calculada aparecerá sombreada.";
+    graphCaption.textContent = "La gráfica mostrará la región de probabilidad.";
+    updateInterface({ preserveResult: true });
+    renderEmptyGraph();
+    replaceUrl();
+    fields.value?.focus();
+  }
+
+  form?.addEventListener("submit", (event) => {
+    event.preventDefault();
+    calculate();
+  });
+  document.querySelectorAll('input[name="normal-mode"], input[name="normal-scale"]').forEach((radio) => {
+    radio.addEventListener("change", () => updateInterface());
+  });
+  probabilityTypeSelect?.addEventListener("change", () => updateInterface());
+  decimalsSelect?.addEventListener("change", () => {
+    if (currentCalculation) calculate();
+  });
+  fieldNames.forEach((name) => {
+    fields[name]?.addEventListener("input", () => {
+      fields[name].removeAttribute("aria-invalid");
+      fieldErrors[name].textContent = "";
+      errorSummary?.classList.add("hidden");
+      if (currentCalculation) markResultStale();
+    });
+  });
+  percentilePresetButtons.forEach((button) => {
+    button.addEventListener("click", () => {
+      fields.percentile.value = button.dataset.percentilePreset ?? "";
+      calculate();
+    });
+  });
+  exampleButtons.forEach((button) => {
+    button.addEventListener("click", () => {
+      const input = JSON.parse(button.dataset.example);
+      selectRadio("normal-mode", input.mode);
+      selectRadio("normal-scale", input.scale);
+      probabilityTypeSelect.value = input.probabilityType;
+      fieldNames.forEach((name) => {
+        fields[name].value = input[name] ?? "";
+      });
+      decimalsSelect.value = String(input.decimals ?? 4);
+      currentCalculation = null;
+      updateInterface({ preserveResult: true });
+      calculate();
+    });
+  });
+  clearButton?.addEventListener("click", resetCalculator);
+  copyResultButton?.addEventListener("click", async () => {
+    if (!currentCalculation) return;
+    try {
+      await copyText(currentCalculation.copyText);
+      setCopyStatus("Resultado copiado.");
+    } catch {
+      setCopyStatus("No se pudo copiar el resultado.");
+    }
+  });
+  copyLinkButton?.addEventListener("click", async () => {
+    if (!currentSharePath) return;
+    try {
+      await copyText(`${window.location.origin}${currentSharePath}`);
+      setCopyStatus("Enlace copiado.");
+    } catch {
+      setCopyStatus("No se pudo copiar el enlace.");
+    }
+  });
+
+  updateInterface({ preserveResult: true });
+  hydrateFromUrl();
+</script>

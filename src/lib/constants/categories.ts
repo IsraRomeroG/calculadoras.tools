@@ -10,6 +10,7 @@ export const CATEGORY_SLUGS = [
   "inmuebles",
   "legal-impuestos",
   "matematicas",
+  "probabilidad-estadistica",
   "geometria",
   "salud",
   "fecha-tiempo",
@@ -48,6 +49,12 @@ export const CATEGORIES = {
     label: "Matemáticas",
     description:
       "Calculadoras para porcentajes, proporciones y reglas de tres, con resultados directos para tareas, compras y trabajo.",
+  },
+  "probabilidad-estadistica": {
+    slug: "probabilidad-estadistica",
+    label: "Probabilidad y estadística",
+    description:
+      "Calculadoras para resolver problemas de probabilidad, conteo y estadística con fórmulas claras, resultados exactos y explicaciones paso a paso.",
   },
   geometria: {
     slug: "geometria",
