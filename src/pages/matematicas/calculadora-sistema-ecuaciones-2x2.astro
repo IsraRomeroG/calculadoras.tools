@@ -1,0 +1,837 @@
+---
+import AdSlot from "@components/ads/AdSlot.astro";
+import Container from "@components/layout/Container.astro";
+import PageShell from "@components/layout/PageShell.astro";
+import FaqSection from "@components/shared/FaqSection.astro";
+import PageHero from "@components/shared/PageHero.astro";
+import SectionIntro from "@components/shared/SectionIntro.astro";
+import BaseLayout from "@layouts/BaseLayout.astro";
+import { LINEAR_SYSTEM_2X2_EXAMPLES } from "@lib/calculators/matematicas/calculadora-sistema-ecuaciones-2x2/linearSystem2x2";
+import { buildFaqJsonLd } from "@lib/seo";
+
+const title = "Calculadora de sistema de ecuaciones 2x2";
+const description =
+  "Resuelve sistemas de dos ecuaciones con dos incognitas usando determinantes, regla de Cramer, procedimiento y comprobacion paso a paso.";
+const canonical = "/matematicas/calculadora-sistema-ecuaciones-2x2";
+
+const faqs = [
+  {
+    question: "Que es un sistema 2x2?",
+    answer:
+      "Es un sistema con dos ecuaciones lineales y dos incognitas, normalmente x e y. La solucion es el par de valores que cumple ambas ecuaciones al mismo tiempo.",
+  },
+  {
+    question: "Que significa que el determinante sea cero?",
+    answer:
+      "Si el determinante principal D es cero, las rectas no se cruzan en un punto unico. El sistema puede no tener solucion o puede tener infinitas soluciones.",
+  },
+  {
+    question: "Que es la regla de Cramer?",
+    answer:
+      "Es un metodo que usa determinantes. Para un sistema 2x2, se calcula D, Dx y Dy; si D no es cero, entonces x = Dx / D y y = Dy / D.",
+  },
+  {
+    question: "Puede haber infinitas soluciones?",
+    answer:
+      "Si. Ocurre cuando las dos ecuaciones representan la misma recta, o cuando una ecuacion no agrega ninguna restriccion porque es 0 = 0.",
+  },
+  {
+    question: "Como se comprueba la solucion?",
+    answer:
+      "Se sustituyen los valores encontrados de x e y en ambas ecuaciones. Si las dos igualdades se cumplen, el resultado es consistente.",
+  },
+  {
+    question: "Que pasa si una ecuacion es 0 = 5?",
+    answer:
+      "Esa ecuacion es imposible. Como ninguna pareja de valores puede cumplirla, el sistema completo no tiene solucion.",
+  },
+];
+
+const faqJsonLd = buildFaqJsonLd(faqs);
+---
+
+<BaseLayout title={title} description={description} canonical={canonical}>
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={JSON.stringify(faqJsonLd)} />
+  </Fragment>
+
+  <PageShell>
+    <PageHero
+      title="Calculadora de sistema 2x2"
+      description="Captura dos ecuaciones lineales y obtén la solución con regla de Cramer, determinantes, interpretación y comprobación."
+      kicker="Matemáticas"
+      collapseBreadcrumbOnMobile
+      containerClass="py-6 md:py-8"
+      breadcrumbs={[
+        { label: "Inicio", href: "/", ariaLabel: "Inicio" },
+        { label: "Matemáticas", href: "/matematicas", optional: true },
+        { label: "Calculadora de sistema 2x2", truncate: true },
+      ]}
+    />
+
+    <Container as="section" class="py-6 md:py-8">
+      <div
+        id="linear-system-2x2-calculator"
+        class="overflow-hidden rounded-lg border border-gray-700 bg-gray-950 shadow-xl shadow-gray-950/30"
+      >
+        <div class="grid gap-0 lg:grid-cols-[minmax(0,1fr)_minmax(21rem,0.76fr)]">
+          <section class="p-4 sm:p-6" aria-labelledby="calculator-heading">
+            <h2 id="calculator-heading" class="text-xl font-semibold">
+              Sistema de ecuaciones
+            </h2>
+            <p class="mt-2 text-sm leading-relaxed text-gray-400">
+              Escribe los coeficientes de cada ecuación en la forma ax + by = c.
+            </p>
+
+            <div class="mt-5 grid gap-4">
+              <fieldset class="rounded-lg border border-gray-800 bg-gray-900/70 p-3 sm:p-4">
+                <legend class="px-1 text-sm font-semibold text-gray-200">
+                  Primera ecuación
+                </legend>
+                <div class="mt-3 grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)_auto_minmax(0,1fr)] items-start gap-2">
+                  <div>
+                    <label for="coefficient-a1" class="sr-only">
+                      Coeficiente de x en la primera ecuación
+                    </label>
+                    <input
+                      id="coefficient-a1"
+                      class="min-h-12 w-full rounded-lg border border-gray-700 bg-gray-950 px-3 text-base text-white outline-none transition placeholder:text-gray-600 focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15"
+                      type="text"
+                      inputmode="decimal"
+                      autocomplete="off"
+                      placeholder="a1"
+                      aria-describedby="coefficient-a1-error"
+                      data-coefficient-input="a1"
+                    />
+                    <p
+                      id="coefficient-a1-error"
+                      class="mt-2 hidden text-sm text-red-300"
+                      data-error-for="a1"
+                    >
+                    </p>
+                  </div>
+                  <span class="flex min-h-12 items-center text-sm font-semibold text-gray-400">
+                    x +
+                  </span>
+                  <div>
+                    <label for="coefficient-b1" class="sr-only">
+                      Coeficiente de y en la primera ecuación
+                    </label>
+                    <input
+                      id="coefficient-b1"
+                      class="min-h-12 w-full rounded-lg border border-gray-700 bg-gray-950 px-3 text-base text-white outline-none transition placeholder:text-gray-600 focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15"
+                      type="text"
+                      inputmode="decimal"
+                      autocomplete="off"
+                      placeholder="b1"
+                      aria-describedby="coefficient-b1-error"
+                      data-coefficient-input="b1"
+                    />
+                    <p
+                      id="coefficient-b1-error"
+                      class="mt-2 hidden text-sm text-red-300"
+                      data-error-for="b1"
+                    >
+                    </p>
+                  </div>
+                  <span class="flex min-h-12 items-center text-sm font-semibold text-gray-400">
+                    y =
+                  </span>
+                  <div>
+                    <label for="coefficient-c1" class="sr-only">
+                      Término independiente de la primera ecuación
+                    </label>
+                    <input
+                      id="coefficient-c1"
+                      class="min-h-12 w-full rounded-lg border border-gray-700 bg-gray-950 px-3 text-base text-white outline-none transition placeholder:text-gray-600 focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15"
+                      type="text"
+                      inputmode="decimal"
+                      autocomplete="off"
+                      placeholder="c1"
+                      aria-describedby="coefficient-c1-error"
+                      data-coefficient-input="c1"
+                    />
+                    <p
+                      id="coefficient-c1-error"
+                      class="mt-2 hidden text-sm text-red-300"
+                      data-error-for="c1"
+                    >
+                    </p>
+                  </div>
+                </div>
+              </fieldset>
+
+              <fieldset class="rounded-lg border border-gray-800 bg-gray-900/70 p-3 sm:p-4">
+                <legend class="px-1 text-sm font-semibold text-gray-200">
+                  Segunda ecuación
+                </legend>
+                <div class="mt-3 grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)_auto_minmax(0,1fr)] items-start gap-2">
+                  <div>
+                    <label for="coefficient-a2" class="sr-only">
+                      Coeficiente de x en la segunda ecuación
+                    </label>
+                    <input
+                      id="coefficient-a2"
+                      class="min-h-12 w-full rounded-lg border border-gray-700 bg-gray-950 px-3 text-base text-white outline-none transition placeholder:text-gray-600 focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15"
+                      type="text"
+                      inputmode="decimal"
+                      autocomplete="off"
+                      placeholder="a2"
+                      aria-describedby="coefficient-a2-error"
+                      data-coefficient-input="a2"
+                    />
+                    <p
+                      id="coefficient-a2-error"
+                      class="mt-2 hidden text-sm text-red-300"
+                      data-error-for="a2"
+                    >
+                    </p>
+                  </div>
+                  <span class="flex min-h-12 items-center text-sm font-semibold text-gray-400">
+                    x +
+                  </span>
+                  <div>
+                    <label for="coefficient-b2" class="sr-only">
+                      Coeficiente de y en la segunda ecuación
+                    </label>
+                    <input
+                      id="coefficient-b2"
+                      class="min-h-12 w-full rounded-lg border border-gray-700 bg-gray-950 px-3 text-base text-white outline-none transition placeholder:text-gray-600 focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15"
+                      type="text"
+                      inputmode="decimal"
+                      autocomplete="off"
+                      placeholder="b2"
+                      aria-describedby="coefficient-b2-error"
+                      data-coefficient-input="b2"
+                    />
+                    <p
+                      id="coefficient-b2-error"
+                      class="mt-2 hidden text-sm text-red-300"
+                      data-error-for="b2"
+                    >
+                    </p>
+                  </div>
+                  <span class="flex min-h-12 items-center text-sm font-semibold text-gray-400">
+                    y =
+                  </span>
+                  <div>
+                    <label for="coefficient-c2" class="sr-only">
+                      Término independiente de la segunda ecuación
+                    </label>
+                    <input
+                      id="coefficient-c2"
+                      class="min-h-12 w-full rounded-lg border border-gray-700 bg-gray-950 px-3 text-base text-white outline-none transition placeholder:text-gray-600 focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15"
+                      type="text"
+                      inputmode="decimal"
+                      autocomplete="off"
+                      placeholder="c2"
+                      aria-describedby="coefficient-c2-error"
+                      data-coefficient-input="c2"
+                    />
+                    <p
+                      id="coefficient-c2-error"
+                      class="mt-2 hidden text-sm text-red-300"
+                      data-error-for="c2"
+                    >
+                    </p>
+                  </div>
+                </div>
+              </fieldset>
+            </div>
+
+            <p
+              class="mt-4 hidden rounded-lg border border-red-400/30 bg-red-400/10 px-4 py-3 text-sm text-red-200"
+              data-error-summary
+            >
+            </p>
+
+            <div class="mt-5 rounded-lg border border-gray-800 bg-gray-900 px-4 py-3">
+              <p class="text-xs font-semibold uppercase text-gray-500">
+                Sistema normalizado
+              </p>
+              <div class="mt-2 space-y-1 text-lg font-semibold text-white">
+                <p data-equation-preview="first">a1x + b1y = c1</p>
+                <p data-equation-preview="second">a2x + b2y = c2</p>
+              </div>
+            </div>
+
+            <div class="mt-5">
+              <p class="text-sm font-medium text-gray-200">Ejemplos</p>
+              <div
+                class="mt-2 flex gap-2 overflow-x-auto pb-1"
+                role="group"
+                aria-label="Cargar ejemplo"
+              >
+                {
+                  LINEAR_SYSTEM_2X2_EXAMPLES.map((example) => (
+                    <button
+                      class="min-h-11 shrink-0 rounded-lg border border-gray-700 px-3 py-2 text-sm font-semibold text-gray-200 transition hover:border-amber-400 hover:text-white focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/40"
+                      type="button"
+                      data-example-a1={example.a1}
+                      data-example-b1={example.b1}
+                      data-example-c1={example.c1}
+                      data-example-a2={example.a2}
+                      data-example-b2={example.b2}
+                      data-example-c2={example.c2}
+                    >
+                      {example.label}
+                    </button>
+                  ))
+                }
+              </div>
+            </div>
+
+            <div class="mt-5 grid gap-4 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-end">
+              <div>
+                <label
+                  for="linear-system-decimals"
+                  class="block text-sm font-medium text-gray-200"
+                >
+                  Decimales
+                </label>
+                <select
+                  id="linear-system-decimals"
+                  class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-900 px-4 text-base text-white outline-none transition focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15"
+                  data-decimals
+                >
+                  {
+                    Array.from({ length: 9 }, (_, decimals) => (
+                      <option value={String(decimals)} selected={decimals === 4}>
+                        {decimals} {decimals === 1 ? "decimal" : "decimales"}
+                      </option>
+                    ))
+                  }
+                </select>
+              </div>
+
+              <button
+                class="inline-flex min-h-11 items-center justify-center rounded-lg border border-gray-700 px-4 py-2 text-sm font-semibold text-gray-200 transition hover:border-amber-400 hover:text-white focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/40"
+                type="button"
+                data-clear-calculator
+              >
+                Limpiar
+              </button>
+            </div>
+          </section>
+
+          <aside
+            class="border-t border-gray-800 bg-gray-900/60 p-4 sm:p-6 lg:border-l lg:border-t-0"
+          >
+            <div
+              class="rounded-lg border border-gray-700 bg-gray-950 p-5"
+              aria-live="polite"
+              data-result-region
+            >
+              <p class="text-sm font-semibold uppercase text-amber-400">
+                Resultado
+              </p>
+              <p
+                class="mt-3 break-words text-3xl font-semibold text-white"
+                data-status-label
+              >
+                Ingresa el sistema
+              </p>
+              <p
+                class="mt-3 rounded-lg border border-gray-800 bg-gray-900 px-3 py-2 text-sm leading-relaxed text-gray-300"
+                data-interpretation
+              >
+                La solución y el tipo de sistema aparecerán cuando completes los
+                coeficientes.
+              </p>
+
+              <div class="mt-4 grid gap-3" data-solution-values>
+                <div class="rounded-lg border border-gray-800 bg-gray-900 p-4">
+                  <p class="text-xs font-semibold uppercase text-gray-500">
+                    Valores
+                  </p>
+                  <p class="mt-2 text-sm text-gray-400">Sin cálculo todavía.</p>
+                </div>
+              </div>
+
+              <div class="mt-4 grid grid-cols-3 gap-2">
+                <div class="rounded-lg border border-gray-800 bg-gray-900 p-3">
+                  <p class="text-xs font-semibold uppercase text-gray-500">D</p>
+                  <p class="mt-1 break-words text-lg font-semibold text-white" data-determinant="d">
+                    -
+                  </p>
+                </div>
+                <div class="rounded-lg border border-gray-800 bg-gray-900 p-3">
+                  <p class="text-xs font-semibold uppercase text-gray-500">Dx</p>
+                  <p class="mt-1 break-words text-lg font-semibold text-white" data-determinant="dx">
+                    -
+                  </p>
+                </div>
+                <div class="rounded-lg border border-gray-800 bg-gray-900 p-3">
+                  <p class="text-xs font-semibold uppercase text-gray-500">Dy</p>
+                  <p class="mt-1 break-words text-lg font-semibold text-white" data-determinant="dy">
+                    -
+                  </p>
+                </div>
+              </div>
+
+              <div class="mt-4 divide-y divide-gray-800 rounded-lg border border-gray-800 bg-gray-900">
+                <details class="group p-4">
+                  <summary class="cursor-pointer list-none text-sm font-semibold text-white">
+                    Procedimiento
+                  </summary>
+                  <ol
+                    class="mt-3 list-decimal space-y-2 pl-5 text-sm leading-relaxed text-gray-300"
+                    data-steps-list
+                  >
+                    <li>Completa los coeficientes para ver el procedimiento.</li>
+                  </ol>
+                </details>
+
+                <details class="group p-4">
+                  <summary class="cursor-pointer list-none text-sm font-semibold text-white">
+                    Comprobación
+                  </summary>
+                  <ul
+                    class="mt-3 space-y-2 text-sm leading-relaxed text-gray-300"
+                    data-verification-list
+                  >
+                    <li>Disponible cuando el sistema tenga solución única.</li>
+                  </ul>
+                </details>
+              </div>
+
+              <div class="mt-5 flex flex-wrap gap-3">
+                <button
+                  class="hidden min-h-11 items-center justify-center rounded-lg bg-amber-400 px-4 py-2 text-sm font-semibold text-gray-950 transition hover:bg-amber-300 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/40"
+                  type="button"
+                  data-copy-result
+                >
+                  Copiar resultado
+                </button>
+              </div>
+              <p class="mt-3 min-h-5 text-sm text-emerald-300" data-copy-status>
+              </p>
+            </div>
+          </aside>
+        </div>
+      </div>
+    </Container>
+
+    <AdSlot placement="calculator-after-tool" />
+
+    <Container as="section" class="py-6 md:py-8">
+      <SectionIntro
+        title="Cómo interpretar el resultado"
+        description="El determinante principal indica si las rectas se cruzan, son paralelas o representan la misma recta."
+      />
+
+      <div class="grid gap-4 md:grid-cols-3">
+        <article class="rounded-lg border border-gray-700 bg-gray-950 p-5">
+          <h2 class="text-lg font-semibold text-white">D distinto de 0</h2>
+          <p class="mt-3 text-sm leading-relaxed text-gray-400">
+            Hay solución única. Las dos rectas se cruzan en un punto y ese punto
+            tiene coordenadas x e y.
+          </p>
+        </article>
+        <article class="rounded-lg border border-gray-700 bg-gray-950 p-5">
+          <h2 class="text-lg font-semibold text-white">D = 0 y cambia c</h2>
+          <p class="mt-3 text-sm leading-relaxed text-gray-400">
+            No hay solución. Las rectas tienen la misma pendiente, pero pasan
+            por lugares distintos.
+          </p>
+        </article>
+        <article class="rounded-lg border border-gray-700 bg-gray-950 p-5">
+          <h2 class="text-lg font-semibold text-white">D = Dx = Dy = 0</h2>
+          <p class="mt-3 text-sm leading-relaxed text-gray-400">
+            Hay infinitas soluciones. Las dos ecuaciones describen la misma
+            recta, o una ecuación no agrega restricciones.
+          </p>
+        </article>
+      </div>
+    </Container>
+
+    <FaqSection faqs={faqs} />
+  </PageShell>
+</BaseLayout>
+
+<script>
+  import {
+    calculateLinearSystem2x2,
+    formatFlexibleLinearSystemNumber,
+    formatLinearEquation,
+    parseLinearSystemInput,
+  } from "@lib/calculators/matematicas/calculadora-sistema-ecuaciones-2x2/linearSystem2x2";
+
+  const FIELD_LABELS = {
+    a1: "a1",
+    b1: "b1",
+    c1: "c1",
+    a2: "a2",
+    b2: "b2",
+    c2: "c2",
+  };
+
+  const ERROR_MESSAGES = {
+    required: "Este campo es obligatorio.",
+    incomplete: "Completa el numero.",
+    invalid: "Ingresa un numero valido.",
+  };
+
+  const coefficientInputs = Array.from(
+    document.querySelectorAll("[data-coefficient-input]"),
+  );
+  const decimalsSelect = document.querySelector("[data-decimals]");
+  const firstEquationPreview = document.querySelector(
+    '[data-equation-preview="first"]',
+  );
+  const secondEquationPreview = document.querySelector(
+    '[data-equation-preview="second"]',
+  );
+  const errorSummary = document.querySelector("[data-error-summary]");
+  const statusLabel = document.querySelector("[data-status-label]");
+  const interpretation = document.querySelector("[data-interpretation]");
+  const solutionValues = document.querySelector("[data-solution-values]");
+  const determinantD = document.querySelector('[data-determinant="d"]');
+  const determinantDx = document.querySelector('[data-determinant="dx"]');
+  const determinantDy = document.querySelector('[data-determinant="dy"]');
+  const stepsList = document.querySelector("[data-steps-list]");
+  const verificationList = document.querySelector("[data-verification-list]");
+  const copyButton = document.querySelector("[data-copy-result]");
+  const copyStatus = document.querySelector("[data-copy-status]");
+  const clearButton = document.querySelector("[data-clear-calculator]");
+  const exampleButtons = Array.from(document.querySelectorAll("[data-example-a1]"));
+
+  let currentCopyText = "";
+  let copyStatusTimeout = 0;
+
+  function getInput(name) {
+    return document.querySelector(`[data-coefficient-input="${name}"]`);
+  }
+
+  function getDecimals() {
+    return Number(decimalsSelect?.value ?? "4");
+  }
+
+  function hasAnyValue() {
+    return coefficientInputs.some((input) => input.value.trim() !== "");
+  }
+
+  function parseInputs() {
+    const values = {};
+    const errors = {};
+
+    coefficientInputs.forEach((input) => {
+      const field = input.dataset.coefficientInput;
+      const parsed = parseLinearSystemInput(input.value);
+
+      if (parsed.ok) {
+        values[field] = parsed.value;
+      } else {
+        errors[field] = parsed.error;
+      }
+    });
+
+    return { values, errors };
+  }
+
+  function clearErrors() {
+    document.querySelectorAll("[data-error-for]").forEach((errorElement) => {
+      errorElement.textContent = "";
+      errorElement.classList.add("hidden");
+    });
+
+    errorSummary.textContent = "";
+    errorSummary.classList.add("hidden");
+  }
+
+  function showErrors(errors) {
+    clearErrors();
+
+    const entries = Object.entries(errors);
+
+    if (entries.length > 0 && hasAnyValue()) {
+      errorSummary.textContent =
+        "Completa los seis coeficientes con numeros validos para resolver el sistema.";
+      errorSummary.classList.remove("hidden");
+    }
+
+    entries.forEach(([field, error]) => {
+      const input = getInput(field);
+      const errorElement = document.querySelector(`[data-error-for="${field}"]`);
+      const shouldShow =
+        input?.dataset.touched === "true" || (hasAnyValue() && error !== "required");
+
+      if (!errorElement || !shouldShow) {
+        return;
+      }
+
+      errorElement.textContent = ERROR_MESSAGES[error] ?? ERROR_MESSAGES.invalid;
+      errorElement.classList.remove("hidden");
+    });
+  }
+
+  function updateEquationPreview(values, errors) {
+    const hasValidFirst = ["a1", "b1", "c1"].every(
+      (field) => typeof values[field] === "number" && !errors[field],
+    );
+    const hasValidSecond = ["a2", "b2", "c2"].every(
+      (field) => typeof values[field] === "number" && !errors[field],
+    );
+
+    firstEquationPreview.textContent = hasValidFirst
+      ? formatLinearEquation(values.a1, values.b1, values.c1)
+      : "a1x + b1y = c1";
+    secondEquationPreview.textContent = hasValidSecond
+      ? formatLinearEquation(values.a2, values.b2, values.c2)
+      : "a2x + b2y = c2";
+  }
+
+  function renderEmptyState() {
+    currentCopyText = "";
+    statusLabel.textContent = "Ingresa el sistema";
+    statusLabel.classList.remove("text-red-300");
+    statusLabel.classList.add("text-white");
+    interpretation.textContent =
+      "La solucion y el tipo de sistema apareceran cuando completes los coeficientes.";
+    renderEmptySolution("Sin calculo todavia.");
+    renderDeterminants();
+    renderSteps(["Completa los coeficientes para ver el procedimiento."]);
+    renderVerification(["Disponible cuando el sistema tenga solucion unica."]);
+    setCopyVisible(false);
+  }
+
+  function renderInvalidState() {
+    currentCopyText = "";
+    statusLabel.textContent = "Revisa los campos";
+    statusLabel.classList.remove("text-white");
+    statusLabel.classList.add("text-red-300");
+    interpretation.textContent =
+      "Corrige los coeficientes marcados para continuar.";
+    renderEmptySolution("Hay valores pendientes o invalidos.");
+    renderDeterminants();
+    renderSteps(["Corrige los campos marcados para ver el procedimiento."]);
+    renderVerification(["Disponible cuando el sistema tenga solucion unica."]);
+    setCopyVisible(false);
+  }
+
+  function renderResult(result) {
+    currentCopyText = result.copyText;
+    statusLabel.textContent = result.statusLabel;
+    statusLabel.classList.remove("text-red-300");
+    statusLabel.classList.add("text-white");
+    interpretation.textContent = result.interpretation;
+    renderSolution(result);
+    renderDeterminants(result.determinants);
+    renderSteps(result.steps);
+    renderVerification(
+      result.verification.length > 0
+        ? result.verification
+        : ["Este sistema no tiene un par unico de valores para comprobar."],
+    );
+    setCopyVisible(true);
+  }
+
+  function renderSolution(result) {
+    if (!result.solution) {
+      renderEmptySolution(result.statusLabel);
+      return;
+    }
+
+    const fragment = document.createDocumentFragment();
+    fragment.append(
+      createSolutionCard("x", result.solution.xDisplay, result.solution.xExact),
+      createSolutionCard("y", result.solution.yDisplay, result.solution.yExact),
+    );
+    solutionValues.replaceChildren(fragment);
+  }
+
+  function createSolutionCard(labelText, display, exact) {
+    const item = document.createElement("div");
+    item.className = "rounded-lg border border-gray-800 bg-gray-900 p-4";
+
+    const label = document.createElement("p");
+    label.className = "text-xs font-semibold uppercase text-gray-500";
+    label.textContent = labelText;
+
+    const value = document.createElement("p");
+    value.className = "mt-2 break-words text-2xl font-semibold text-white";
+    value.textContent = display;
+
+    item.append(label, value);
+
+    if (exact) {
+      const exactText = document.createElement("p");
+      exactText.className = "mt-2 break-words text-sm text-gray-400";
+      exactText.textContent = `Fraccion exacta: ${exact}`;
+      item.append(exactText);
+    }
+
+    return item;
+  }
+
+  function renderEmptySolution(message) {
+    const item = document.createElement("div");
+    item.className = "rounded-lg border border-gray-800 bg-gray-900 p-4";
+
+    const label = document.createElement("p");
+    label.className = "text-xs font-semibold uppercase text-gray-500";
+    label.textContent = "Valores";
+
+    const text = document.createElement("p");
+    text.className = "mt-2 text-sm text-gray-400";
+    text.textContent = message;
+
+    item.append(label, text);
+    solutionValues.replaceChildren(item);
+  }
+
+  function renderDeterminants(determinants = null) {
+    determinantD.textContent = determinants
+      ? formatFlexibleLinearSystemNumber(determinants.d)
+      : "-";
+    determinantDx.textContent = determinants
+      ? formatFlexibleLinearSystemNumber(determinants.dx)
+      : "-";
+    determinantDy.textContent = determinants
+      ? formatFlexibleLinearSystemNumber(determinants.dy)
+      : "-";
+  }
+
+  function renderSteps(steps) {
+    const fragment = document.createDocumentFragment();
+
+    steps.forEach((step) => {
+      const item = document.createElement("li");
+      item.textContent = step;
+      fragment.append(item);
+    });
+
+    stepsList.replaceChildren(fragment);
+  }
+
+  function renderVerification(lines) {
+    const fragment = document.createDocumentFragment();
+
+    lines.forEach((line) => {
+      const item = document.createElement("li");
+      item.textContent = line;
+      fragment.append(item);
+    });
+
+    verificationList.replaceChildren(fragment);
+  }
+
+  function updateCalculator() {
+    const { values, errors } = parseInputs();
+
+    updateEquationPreview(values, errors);
+
+    if (!hasAnyValue()) {
+      clearErrors();
+      renderEmptyState();
+      return;
+    }
+
+    if (Object.keys(errors).length > 0) {
+      showErrors(errors);
+      renderInvalidState();
+      return;
+    }
+
+    clearErrors();
+    renderResult(
+      calculateLinearSystem2x2({
+        a1: values.a1,
+        b1: values.b1,
+        c1: values.c1,
+        a2: values.a2,
+        b2: values.b2,
+        c2: values.c2,
+        decimals: getDecimals(),
+      }),
+    );
+  }
+
+  function setCopyVisible(isVisible) {
+    copyButton?.classList.toggle("hidden", !isVisible);
+    copyButton?.classList.toggle("inline-flex", isVisible);
+  }
+
+  async function copyResult() {
+    if (!currentCopyText) {
+      return;
+    }
+
+    try {
+      if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(currentCopyText);
+      } else {
+        const textArea = document.createElement("textarea");
+        textArea.value = currentCopyText;
+        textArea.setAttribute("readonly", "");
+        textArea.style.position = "fixed";
+        textArea.style.opacity = "0";
+        document.body.append(textArea);
+        textArea.select();
+        document.execCommand("copy");
+        textArea.remove();
+      }
+
+      setCopyStatus("Resultado copiado.");
+    } catch {
+      setCopyStatus("No se pudo copiar el resultado.");
+    }
+  }
+
+  function setCopyStatus(message) {
+    copyStatus.textContent = message;
+    window.clearTimeout(copyStatusTimeout);
+    copyStatusTimeout = window.setTimeout(() => {
+      copyStatus.textContent = "";
+    }, 2500);
+  }
+
+  function clearCalculator() {
+    coefficientInputs.forEach((input) => {
+      input.value = "";
+      delete input.dataset.touched;
+    });
+
+    if (decimalsSelect) {
+      decimalsSelect.value = "4";
+    }
+
+    updateCalculator();
+    getInput("a1")?.focus();
+  }
+
+  function loadExample(button) {
+    Object.keys(FIELD_LABELS).forEach((field) => {
+      const input = getInput(field);
+      const datasetKey = `example${field.charAt(0).toUpperCase()}${field.slice(1)}`;
+
+      if (input) {
+        input.value = button.dataset[datasetKey] ?? "";
+        input.dataset.touched = "true";
+      }
+    });
+
+    updateCalculator();
+  }
+
+  coefficientInputs.forEach((input) => {
+    input.addEventListener("input", () => {
+      input.dataset.touched = "true";
+      updateCalculator();
+    });
+
+    input.addEventListener("blur", () => {
+      input.dataset.touched = "true";
+      updateCalculator();
+    });
+  });
+
+  decimalsSelect?.addEventListener("change", updateCalculator);
+  copyButton?.addEventListener("click", copyResult);
+  clearButton?.addEventListener("click", clearCalculator);
+  exampleButtons.forEach((button) => {
+    button.addEventListener("click", () => loadExample(button));
+  });
+
+  updateCalculator();
+</script>

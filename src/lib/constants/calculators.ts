@@ -36,6 +36,15 @@ export const CALCULATORS: CalculatorDirectoryItem[] = [
     order: 17,
   },
   {
+    id: "calculadora-sistema-ecuaciones-2x2",
+    title: "Calculadora de sistema de ecuaciones 2x2",
+    description:
+      "Resuelve sistemas lineales 2x2 con regla de Cramer, determinantes, comprobacion e interpretacion.",
+    href: "/matematicas/calculadora-sistema-ecuaciones-2x2",
+    categorySlug: "matematicas",
+    order: 18,
+  },
+  {
     id: "calculadora-de-iva",
     title: "Calculadora de IVA",
     description: "Agrega o desglosa IVA con tasa editable y presets por país.",
