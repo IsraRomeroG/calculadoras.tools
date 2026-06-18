@@ -2,7 +2,7 @@
 title: "Hipoteca de $1,500,000: cuánto pago al mes"
 seoTitle: "Hipoteca de 1.5 millones: mensualidad, intereses y plazo"
 description: "Simula cuánto podrías pagar al mes por una hipoteca de $1,500,000 con distintos plazos y tasas."
-pubDate: 2027-06-16
+pubDate: 2026-06-19
 categorySlug: "inmuebles"
 tags:
   - hipoteca 1500000

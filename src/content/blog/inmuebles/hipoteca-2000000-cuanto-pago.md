@@ -2,7 +2,7 @@
 title: "Hipoteca de $2,000,000: cuánto pago al mes"
 seoTitle: "Hipoteca de 2 millones: mensualidad, intereses y amortización"
 description: "Simula cuánto podrías pagar al mes por una hipoteca de $2,000,000 según la tasa, el plazo y los pagos extra."
-pubDate: 2027-06-20
+pubDate: 2026-06-20
 categorySlug: "inmuebles"
 tags:
   - hipoteca 2000000

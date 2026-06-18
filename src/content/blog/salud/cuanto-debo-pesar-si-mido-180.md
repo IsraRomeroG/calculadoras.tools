@@ -2,7 +2,7 @@
 title: "Cuánto debo pesar si mido 1.80 m"
 seoTitle: "Cuánto debo pesar si mido 1.80 m: rango saludable"
 description: "Conoce el rango de peso saludable de referencia para una estatura de 1.80 m según el IMC adulto."
-pubDate: 2027-06-26
+pubDate: 2026-06-26
 categorySlug: "salud"
 tags:
   - peso saludable
