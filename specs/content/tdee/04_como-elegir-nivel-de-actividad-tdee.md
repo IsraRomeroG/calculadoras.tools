@@ -3,7 +3,7 @@
 ## Archivo objetivo
 
 - Ruta futura: `src/content/blog/salud/como-elegir-nivel-de-actividad-tdee.md`
-- URL publica: `/blog/como-elegir-nivel-de-actividad-tdee`
+- URL publica: `/blog/salud/como-elegir-nivel-de-actividad-tdee`
 - Categoria: `Salud`
 - Prioridad: P1
 - Rol en el cluster: reducir el error mas comun al usar la calculadora
@@ -68,10 +68,10 @@ factor, errores comunes y como ajustar el resultado despues.
 ## Enlaces internos
 
 - `/salud/calculadora-de-calorias-diarias-tdee`
-- `/blog/que-es-tdee-calorias-diarias`
-- `/blog/cuantas-calorias-necesito-al-dia`
-- `/blog/calorias-de-mantenimiento`
-- `/blog/por-que-mi-peso-no-cambia-si-como-mi-tdee`
+- `/blog/salud/que-es-tdee-calorias-diarias`
+- `/blog/salud/cuantas-calorias-necesito-al-dia`
+- `/blog/salud/calorias-de-mantenimiento`
+- `/blog/salud/por-que-mi-peso-no-cambia-si-como-mi-tdee`
 
 ## FAQ sugeridas
 

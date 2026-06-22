@@ -3,7 +3,7 @@
 ## Archivo objetivo
 
 - Ruta futura: `src/content/blog/salud/tdee-y-macros-como-se-relacionan.md`
-- URL publica: `/blog/tdee-y-macros-como-se-relacionan`
+- URL publica: `/blog/salud/tdee-y-macros-como-se-relacionan`
 - Categoria: `Salud`
 - Prioridad: P2
 - Rol en el cluster: puente entre calculadora TDEE y calculadora de macros
@@ -62,11 +62,11 @@ preferencias.
 ## Enlaces internos
 
 - `/salud/calculadora-de-calorias-diarias-tdee`
-- `/blog/que-es-tdee-calorias-diarias`
-- `/blog/cuantas-calorias-necesito-al-dia`
-- `/blog/calorias-de-mantenimiento`
+- `/blog/salud/que-es-tdee-calorias-diarias`
+- `/blog/salud/cuantas-calorias-necesito-al-dia`
+- `/blog/salud/calorias-de-mantenimiento`
 - Futuro: `/salud/calculadora-de-macros`
-- Futuro: `/blog/cuantas-calorias-para-bajar-de-peso`
+- Futuro: `/blog/salud/cuantas-calorias-para-bajar-de-peso`
 
 ## FAQ sugeridas
 

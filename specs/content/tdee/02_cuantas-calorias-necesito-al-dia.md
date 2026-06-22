@@ -3,7 +3,7 @@
 ## Archivo objetivo
 
 - Ruta futura: `src/content/blog/salud/cuantas-calorias-necesito-al-dia.md`
-- URL publica: `/blog/cuantas-calorias-necesito-al-dia`
+- URL publica: `/blog/salud/cuantas-calorias-necesito-al-dia`
 - Categoria: `Salud`
 - Prioridad: P0
 - Rol en el cluster: articulo de mayor intencion practica hacia la calculadora
@@ -68,11 +68,11 @@ Comparar dos personas con mismo peso y altura, pero distinto nivel de actividad:
 ## Enlaces internos
 
 - `/salud/calculadora-de-calorias-diarias-tdee`
-- `/blog/que-es-tdee-calorias-diarias`
-- `/blog/calorias-de-mantenimiento`
-- `/blog/como-elegir-nivel-de-actividad-tdee`
-- `/blog/cuantas-calorias-para-bajar-de-peso`
-- `/blog/cuantas-calorias-para-subir-de-peso`
+- `/blog/salud/que-es-tdee-calorias-diarias`
+- `/blog/salud/calorias-de-mantenimiento`
+- `/blog/salud/como-elegir-nivel-de-actividad-tdee`
+- `/blog/salud/cuantas-calorias-para-bajar-de-peso`
+- `/blog/salud/cuantas-calorias-para-subir-de-peso`
 
 ## FAQ sugeridas
 

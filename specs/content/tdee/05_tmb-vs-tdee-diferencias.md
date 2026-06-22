@@ -3,7 +3,7 @@
 ## Archivo objetivo
 
 - Ruta futura: `src/content/blog/salud/tmb-vs-tdee-diferencias.md`
-- URL publica: `/blog/tmb-vs-tdee-diferencias`
+- URL publica: `/blog/salud/tmb-vs-tdee-diferencias`
 - Categoria: `Salud`
 - Prioridad: P1
 - Rol en el cluster: diferenciacion conceptual y soporte a la calculadora
@@ -65,9 +65,9 @@ suele usar TDEE, no TMB aislada.
 ## Enlaces internos
 
 - `/salud/calculadora-de-calorias-diarias-tdee`
-- `/blog/que-es-tdee-calorias-diarias`
-- `/blog/formula-mifflin-st-jeor`
-- `/blog/calorias-de-mantenimiento`
+- `/blog/salud/que-es-tdee-calorias-diarias`
+- `/blog/salud/formula-mifflin-st-jeor`
+- `/blog/salud/calorias-de-mantenimiento`
 
 ## FAQ sugeridas
 

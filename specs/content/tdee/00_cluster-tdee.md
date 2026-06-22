@@ -35,16 +35,16 @@ calorico sin prometer resultados exactos ni planes nutricionales medicos.
 
 | Archivo spec | URL futura | Prioridad | Rol |
 |--------------|------------|-----------|-----|
-| `01_que-es-tdee-calorias-diarias.md` | `/blog/que-es-tdee-calorias-diarias` | P0 | Pilar informacional |
-| `02_cuantas-calorias-necesito-al-dia.md` | `/blog/cuantas-calorias-necesito-al-dia` | P0 | Intencion principal de busqueda |
-| `03_calorias-de-mantenimiento.md` | `/blog/calorias-de-mantenimiento` | P1 | Uso de TDEE para mantener peso |
-| `04_como-elegir-nivel-de-actividad-tdee.md` | `/blog/como-elegir-nivel-de-actividad-tdee` | P1 | Reducir error comun del calculo |
-| `05_tmb-vs-tdee-diferencias.md` | `/blog/tmb-vs-tdee-diferencias` | P1 | Diferenciacion conceptual |
-| `06_formula-mifflin-st-jeor.md` | `/blog/formula-mifflin-st-jeor` | P2 | Soporte tecnico y confianza |
-| `07_cuantas-calorias-para-bajar-de-peso.md` | `/blog/cuantas-calorias-para-bajar-de-peso` | P1 | Objetivo de deficit, sensible |
-| `08_cuantas-calorias-para-subir-de-peso.md` | `/blog/cuantas-calorias-para-subir-de-peso` | P2 | Objetivo de superavit |
-| `09_por-que-mi-peso-no-cambia-si-como-mi-tdee.md` | `/blog/por-que-mi-peso-no-cambia-si-como-mi-tdee` | P2 | Troubleshooting y retencion |
-| `10_tdee-y-macros-como-se-relacionan.md` | `/blog/tdee-y-macros-como-se-relacionan` | P2 | Puente hacia macros |
+| `01_que-es-tdee-calorias-diarias.md` | `/blog/salud/que-es-tdee-calorias-diarias` | P0 | Pilar informacional |
+| `02_cuantas-calorias-necesito-al-dia.md` | `/blog/salud/cuantas-calorias-necesito-al-dia` | P0 | Intencion principal de busqueda |
+| `03_calorias-de-mantenimiento.md` | `/blog/salud/calorias-de-mantenimiento` | P1 | Uso de TDEE para mantener peso |
+| `04_como-elegir-nivel-de-actividad-tdee.md` | `/blog/salud/como-elegir-nivel-de-actividad-tdee` | P1 | Reducir error comun del calculo |
+| `05_tmb-vs-tdee-diferencias.md` | `/blog/salud/tmb-vs-tdee-diferencias` | P1 | Diferenciacion conceptual |
+| `06_formula-mifflin-st-jeor.md` | `/blog/salud/formula-mifflin-st-jeor` | P2 | Soporte tecnico y confianza |
+| `07_cuantas-calorias-para-bajar-de-peso.md` | `/blog/salud/cuantas-calorias-para-bajar-de-peso` | P1 | Objetivo de deficit, sensible |
+| `08_cuantas-calorias-para-subir-de-peso.md` | `/blog/salud/cuantas-calorias-para-subir-de-peso` | P2 | Objetivo de superavit |
+| `09_por-que-mi-peso-no-cambia-si-como-mi-tdee.md` | `/blog/salud/por-que-mi-peso-no-cambia-si-como-mi-tdee` | P2 | Troubleshooting y retencion |
+| `10_tdee-y-macros-como-se-relacionan.md` | `/blog/salud/tdee-y-macros-como-se-relacionan` | P2 | Puente hacia macros |
 
 ## Reglas editoriales globales
 
@@ -79,27 +79,27 @@ calorico sin prometer resultados exactos ni planes nutricionales medicos.
 ## Enlaces internos centrales
 
 - `/salud/calculadora-de-calorias-diarias-tdee`
-- `/blog/que-es-tdee-calorias-diarias`
-- `/blog/cuantas-calorias-necesito-al-dia`
-- `/blog/calorias-de-mantenimiento`
-- `/blog/como-elegir-nivel-de-actividad-tdee`
-- `/blog/tmb-vs-tdee-diferencias`
-- `/blog/calorias-diarias-e-imc`
+- `/blog/salud/que-es-tdee-calorias-diarias`
+- `/blog/salud/cuantas-calorias-necesito-al-dia`
+- `/blog/salud/calorias-de-mantenimiento`
+- `/blog/salud/como-elegir-nivel-de-actividad-tdee`
+- `/blog/salud/tmb-vs-tdee-diferencias`
+- `/blog/salud/calorias-diarias-e-imc`
 - Futuro: `/salud/calculadora-de-macros`
-- Futuro: `/salud/calculadora-de-deficit-calorico`
+- Futuro: `/salud/calculadora-deficit-calorico`
 
 ## Enlaces desde el cluster IMC
 
 Reforzar articulos ya existentes con enlaces contextuales hacia TDEE:
 
-- `/blog/calorias-diarias-e-imc`
-- `/blog/bajar-subir-peso-segun-imc`
-- `/blog/sobrepeso-segun-imc-25-29-9`
-- `/blog/bajo-peso-segun-imc-menor-18-5`
-- `/blog/imc-menor-a-16-que-significa`
-- `/blog/limitaciones-del-imc`
-- `/blog/imc-masa-muscular-ejercicio`
-- `/blog/peso-saludable-segun-estatura`
+- `/blog/salud/calorias-diarias-e-imc`
+- `/blog/salud/bajar-subir-peso-segun-imc`
+- `/blog/salud/sobrepeso-segun-imc-25-29-9`
+- `/blog/salud/bajo-peso-segun-imc-menor-18-5`
+- `/blog/salud/imc-menor-a-16-que-significa`
+- `/blog/salud/limitaciones-del-imc`
+- `/blog/salud/imc-masa-muscular-ejercicio`
+- `/blog/salud/peso-saludable-segun-estatura`
 
 ## Orden de publicacion recomendado
 

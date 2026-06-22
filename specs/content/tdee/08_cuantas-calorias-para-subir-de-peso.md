@@ -3,7 +3,7 @@
 ## Archivo objetivo
 
 - Ruta futura: `src/content/blog/salud/cuantas-calorias-para-subir-de-peso.md`
-- URL publica: `/blog/cuantas-calorias-para-subir-de-peso`
+- URL publica: `/blog/salud/cuantas-calorias-para-subir-de-peso`
 - Categoria: `Salud`
 - Prioridad: P2
 - Rol en el cluster: articulo de objetivo de superavit conectado con TDEE y macros
@@ -68,10 +68,10 @@ seguimiento. No debe prometer ganancia muscular solo por comer mas.
 ## Enlaces internos
 
 - `/salud/calculadora-de-calorias-diarias-tdee`
-- `/blog/bajo-peso-segun-imc-menor-18-5`
-- `/blog/calorias-de-mantenimiento`
-- `/blog/tdee-y-macros-como-se-relacionan`
-- `/blog/que-es-tdee-calorias-diarias`
+- `/blog/salud/bajo-peso-segun-imc-menor-18-5`
+- `/blog/salud/calorias-de-mantenimiento`
+- `/blog/salud/tdee-y-macros-como-se-relacionan`
+- `/blog/salud/que-es-tdee-calorias-diarias`
 - Futuro: `/salud/calculadora-de-macros`
 
 ## FAQ sugeridas

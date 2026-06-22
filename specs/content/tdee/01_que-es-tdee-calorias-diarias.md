@@ -3,7 +3,7 @@
 ## Archivo objetivo
 
 - Ruta futura: `src/content/blog/salud/que-es-tdee-calorias-diarias.md`
-- URL publica: `/blog/que-es-tdee-calorias-diarias`
+- URL publica: `/blog/salud/que-es-tdee-calorias-diarias`
 - Categoria: `Salud`
 - Prioridad: P0
 - Rol en el cluster: articulo pilar informacional del cluster TDEE
@@ -72,10 +72,10 @@ Donde:
 ## Enlaces internos
 
 - `/salud/calculadora-de-calorias-diarias-tdee`
-- `/blog/cuantas-calorias-necesito-al-dia`
-- `/blog/como-elegir-nivel-de-actividad-tdee`
-- `/blog/tmb-vs-tdee-diferencias`
-- `/blog/calorias-diarias-e-imc`
+- `/blog/salud/cuantas-calorias-necesito-al-dia`
+- `/blog/salud/como-elegir-nivel-de-actividad-tdee`
+- `/blog/salud/tmb-vs-tdee-diferencias`
+- `/blog/salud/calorias-diarias-e-imc`
 
 ## FAQ sugeridas
 

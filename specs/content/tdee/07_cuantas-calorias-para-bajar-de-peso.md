@@ -3,7 +3,7 @@
 ## Archivo objetivo
 
 - Ruta futura: `src/content/blog/salud/cuantas-calorias-para-bajar-de-peso.md`
-- URL publica: `/blog/cuantas-calorias-para-bajar-de-peso`
+- URL publica: `/blog/salud/cuantas-calorias-para-bajar-de-peso`
 - Categoria: `Salud`
 - Prioridad: P1
 - Rol en el cluster: articulo de objetivo sensible conectado con deficit calorico
@@ -68,11 +68,11 @@ orientativo y evitar promesas de perdida exacta.
 ## Enlaces internos
 
 - `/salud/calculadora-de-calorias-diarias-tdee`
-- `/blog/calorias-de-mantenimiento`
-- `/blog/que-es-tdee-calorias-diarias`
-- `/blog/como-elegir-nivel-de-actividad-tdee`
-- `/blog/por-que-mi-peso-no-cambia-si-como-mi-tdee`
-- Futuro: `/salud/calculadora-de-deficit-calorico`
+- `/blog/salud/calorias-de-mantenimiento`
+- `/blog/salud/que-es-tdee-calorias-diarias`
+- `/blog/salud/como-elegir-nivel-de-actividad-tdee`
+- `/blog/salud/por-que-mi-peso-no-cambia-si-como-mi-tdee`
+- Futuro: `/salud/calculadora-deficit-calorico`
 
 ## FAQ sugeridas
 

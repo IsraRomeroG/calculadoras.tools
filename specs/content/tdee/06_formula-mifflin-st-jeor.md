@@ -3,7 +3,7 @@
 ## Archivo objetivo
 
 - Ruta futura: `src/content/blog/salud/formula-mifflin-st-jeor.md`
-- URL publica: `/blog/formula-mifflin-st-jeor`
+- URL publica: `/blog/salud/formula-mifflin-st-jeor`
 - Categoria: `Salud`
 - Prioridad: P2
 - Rol en el cluster: soporte tecnico y fuente de confianza para la calculadora
@@ -75,9 +75,9 @@ TDEE = TMB x factor de actividad
 ## Enlaces internos
 
 - `/salud/calculadora-de-calorias-diarias-tdee`
-- `/blog/tmb-vs-tdee-diferencias`
-- `/blog/que-es-tdee-calorias-diarias`
-- `/blog/como-elegir-nivel-de-actividad-tdee`
+- `/blog/salud/tmb-vs-tdee-diferencias`
+- `/blog/salud/que-es-tdee-calorias-diarias`
+- `/blog/salud/como-elegir-nivel-de-actividad-tdee`
 
 ## FAQ sugeridas
 

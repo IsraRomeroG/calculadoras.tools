@@ -3,7 +3,7 @@
 ## Archivo objetivo
 
 - Ruta futura: `src/content/blog/salud/calorias-de-mantenimiento.md`
-- URL publica: `/blog/calorias-de-mantenimiento`
+- URL publica: `/blog/salud/calorias-de-mantenimiento`
 - Categoria: `Salud`
 - Prioridad: P1
 - Rol en el cluster: explicar el uso mas seguro y base del TDEE
@@ -57,10 +57,10 @@ actual y que se usan como base antes de decidir deficit, superavit o macros.
 ## Enlaces internos
 
 - `/salud/calculadora-de-calorias-diarias-tdee`
-- `/blog/que-es-tdee-calorias-diarias`
-- `/blog/cuantas-calorias-necesito-al-dia`
-- `/blog/por-que-mi-peso-no-cambia-si-como-mi-tdee`
-- `/blog/tdee-y-macros-como-se-relacionan`
+- `/blog/salud/que-es-tdee-calorias-diarias`
+- `/blog/salud/cuantas-calorias-necesito-al-dia`
+- `/blog/salud/por-que-mi-peso-no-cambia-si-como-mi-tdee`
+- `/blog/salud/tdee-y-macros-como-se-relacionan`
 
 ## FAQ sugeridas
 

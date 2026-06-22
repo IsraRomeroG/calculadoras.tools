@@ -3,7 +3,7 @@
 ## Archivo objetivo
 
 - Ruta futura: `src/content/blog/salud/por-que-mi-peso-no-cambia-si-como-mi-tdee.md`
-- URL publica: `/blog/por-que-mi-peso-no-cambia-si-como-mi-tdee`
+- URL publica: `/blog/salud/por-que-mi-peso-no-cambia-si-como-mi-tdee`
 - Categoria: `Salud`
 - Prioridad: P2
 - Rol en el cluster: troubleshooting y retencion para usuarios que ya calcularon TDEE
@@ -59,10 +59,10 @@ ajuste debe hacerse con promedios y paciencia, no con cambios drasticos.
 ## Enlaces internos
 
 - `/salud/calculadora-de-calorias-diarias-tdee`
-- `/blog/calorias-de-mantenimiento`
-- `/blog/como-elegir-nivel-de-actividad-tdee`
-- `/blog/cuantas-calorias-para-bajar-de-peso`
-- `/blog/tmb-vs-tdee-diferencias`
+- `/blog/salud/calorias-de-mantenimiento`
+- `/blog/salud/como-elegir-nivel-de-actividad-tdee`
+- `/blog/salud/cuantas-calorias-para-bajar-de-peso`
+- `/blog/salud/tmb-vs-tdee-diferencias`
 
 ## FAQ sugeridas
 
