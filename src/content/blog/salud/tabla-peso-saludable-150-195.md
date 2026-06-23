@@ -2,7 +2,7 @@
 title: "Tabla de peso saludable de 1.50 m a 1.95 m"
 seoTitle: "Tabla de peso saludable por estatura de 1.50 m a 1.95 m"
 description: "Consulta rangos de peso saludable por estatura, calculados con IMC adulto de 18.5 a 24.9."
-pubDate: 2026-06-28
+pubDate: 2027-06-28
 categorySlug: "salud"
 tags:
   - peso saludable
@@ -21,17 +21,17 @@ Si quieres un resultado con tu dato exacto, usa la [calculadora de IMC](/salud/c
 ## Tabla de peso saludable por estatura
 
 | Estatura | Peso mínimo por IMC 18.5 | Peso máximo por IMC 24.9 |
-|----------|--------------------------|--------------------------|
-| 1.50 m | 41.6 kg | 56.0 kg |
-| 1.55 m | 44.4 kg | 59.8 kg |
-| 1.60 m | 47.4 kg | 63.7 kg |
-| 1.65 m | 50.4 kg | 67.8 kg |
-| 1.70 m | 53.5 kg | 72.0 kg |
-| 1.75 m | 56.7 kg | 76.3 kg |
-| 1.80 m | 59.9 kg | 80.7 kg |
-| 1.85 m | 63.3 kg | 85.2 kg |
-| 1.90 m | 66.8 kg | 89.9 kg |
-| 1.95 m | 70.4 kg | 94.7 kg |
+| -------- | ------------------------ | ------------------------ |
+| 1.50 m   | 41.6 kg                  | 56.0 kg                  |
+| 1.55 m   | 44.4 kg                  | 59.8 kg                  |
+| 1.60 m   | 47.4 kg                  | 63.7 kg                  |
+| 1.65 m   | 50.4 kg                  | 67.8 kg                  |
+| 1.70 m   | 53.5 kg                  | 72.0 kg                  |
+| 1.75 m   | 56.7 kg                  | 76.3 kg                  |
+| 1.80 m   | 59.9 kg                  | 80.7 kg                  |
+| 1.85 m   | 63.3 kg                  | 85.2 kg                  |
+| 1.90 m   | 66.8 kg                  | 89.9 kg                  |
+| 1.95 m   | 70.4 kg                  | 94.7 kg                  |
 
 Los valores están redondeados a una decimal.
 
@@ -106,4 +106,3 @@ No. En menores de edad se usan percentiles por edad y sexo.
 
 - [CDC: Adult BMI Categories](https://www.cdc.gov/bmi/adult-calculator/bmi-categories.html)
 - [CDC: BMI Frequently Asked Questions](https://www.cdc.gov/bmi/faq/index.html)
-

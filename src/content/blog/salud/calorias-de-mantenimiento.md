@@ -2,7 +2,7 @@
 title: "Calorías de mantenimiento: qué son y cómo calcularlas"
 seoTitle: "Calorías de mantenimiento: calcula tu TDEE para mantener peso"
 description: "Aprende qué son las calorías de mantenimiento, cómo se relacionan con el TDEE y cómo usarlas como punto de partida."
-pubDate: 2026-07-03
+pubDate: 2027-07-03
 categorySlug: "salud"
 tags:
   - calorías
@@ -135,4 +135,3 @@ Sí. Puede variar temporalmente por líquidos, glucógeno, sal, digestión, entr
 - [National Academies: Dietary Reference Intakes for Energy](https://www.nationalacademies.org/read/26818/chapter/2)
 - [NIDDK: Body Weight Planner](https://www.niddk.nih.gov/bwp)
 - [MedlinePlus: Weight Control](https://medlineplus.gov/weightcontrol.html)
-

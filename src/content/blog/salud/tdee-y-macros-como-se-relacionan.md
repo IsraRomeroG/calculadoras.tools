@@ -2,7 +2,7 @@
 title: "TDEE y macros: cómo se relacionan"
 seoTitle: "TDEE y macros: de calorías diarias a proteína, grasas y carbohidratos"
 description: "Aprende cómo el TDEE ayuda a estimar calorías diarias y cómo esas calorías se pueden distribuir en macros."
-pubDate: 2026-07-09
+pubDate: 2027-07-09
 categorySlug: "salud"
 tags:
   - tdee
@@ -20,11 +20,11 @@ TDEE y macros no son lo mismo, y una distribución en gramos no convierte una es
 
 ## Diferencia rápida entre TDEE y macros
 
-| Concepto | Qué responde |
-|----------|--------------|
-| TDEE | ¿Cuántas calorías gasto aproximadamente al día? |
-| Meta calórica | ¿Quiero mantener, reducir o aumentar respecto al TDEE? |
-| Macros | ¿Cómo se reparten esas calorías entre proteína, grasa y carbohidratos? |
+| Concepto      | Qué responde                                                           |
+| ------------- | ---------------------------------------------------------------------- |
+| TDEE          | ¿Cuántas calorías gasto aproximadamente al día?                        |
+| Meta calórica | ¿Quiero mantener, reducir o aumentar respecto al TDEE?                 |
+| Macros        | ¿Cómo se reparten esas calorías entre proteína, grasa y carbohidratos? |
 
 El TDEE define el tamaño aproximado del “presupuesto” energético. Los macros describen cómo se compone.
 
@@ -48,11 +48,11 @@ No pases todavía a los macros si el nivel de actividad es una suposición poco 
 
 El mismo TDEE puede conducir a metas distintas:
 
-| Objetivo | Relación orientativa |
-|----------|----------------------|
-| Mantenimiento | Cerca del TDEE |
-| Pérdida de peso | Déficit prudente |
-| Aumento de peso | Superávit prudente |
+| Objetivo        | Relación orientativa |
+| --------------- | -------------------- |
+| Mantenimiento   | Cerca del TDEE       |
+| Pérdida de peso | Déficit prudente     |
+| Aumento de peso | Superávit prudente   |
 
 Conviene confirmar primero las [calorías de mantenimiento](/blog/salud/calorias-de-mantenimiento). Después se puede ajustar el total y distribuir esa nueva meta.
 
@@ -122,12 +122,12 @@ Usaremos solo como ejemplo:
 
 Redondeado, el reparto sería:
 
-| Macro | Gramos | Calorías aproximadas |
-|-------|--------|-----------------------|
-| Proteína | 120 g | 480 kcal |
-| Grasas | 70 g | 630 kcal |
-| Carbohidratos | 273 g | 1,092 kcal |
-| Total | — | 2,202 kcal |
+| Macro         | Gramos | Calorías aproximadas |
+| ------------- | ------ | -------------------- |
+| Proteína      | 120 g  | 480 kcal             |
+| Grasas        | 70 g   | 630 kcal             |
+| Carbohidratos | 273 g  | 1,092 kcal           |
+| Total         | —      | 2,202 kcal           |
 
 La diferencia de `2 kcal` aparece por redondear los carbohidratos. No hace falta corregirla: los alimentos y las etiquetas tampoco ofrecen precisión absoluta.
 

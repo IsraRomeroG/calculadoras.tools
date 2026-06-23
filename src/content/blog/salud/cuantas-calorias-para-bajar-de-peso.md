@@ -2,7 +2,7 @@
 title: "Cuántas calorías comer para bajar de peso"
 seoTitle: "Cuántas calorías comer para bajar de peso: empieza con tu TDEE"
 description: "Aprende por qué el primer paso para estimar calorías para bajar de peso es conocer tu TDEE y aplicar un déficit prudente."
-pubDate: 2026-07-05
+pubDate: 2027-07-05
 categorySlug: "salud"
 tags:
   - calorías
@@ -62,11 +62,11 @@ Por eso la báscula puede permanecer igual algunos días y cambiar después, aun
 
 No hay fronteras idénticas para todas las personas, pero esta comparación ayuda a entender el enfoque:
 
-| Tipo orientativo | Ejemplo de ajuste | Consideración |
-|------------------|-------------------|---------------|
-| Suave | Cerca de `-250 kcal/día` | Menor impacto y más margen para observar |
-| Moderado | Cerca de `-500 kcal/día` | Puede ser apropiado para algunas personas, no para todas |
-| Agresivo | Recorte grande respecto al TDEE | Mayor riesgo de hambre, fatiga y baja adherencia |
+| Tipo orientativo | Ejemplo de ajuste               | Consideración                                            |
+| ---------------- | ------------------------------- | -------------------------------------------------------- |
+| Suave            | Cerca de `-250 kcal/día`        | Menor impacto y más margen para observar                 |
+| Moderado         | Cerca de `-500 kcal/día`        | Puede ser apropiado para algunas personas, no para todas |
+| Agresivo         | Recorte grande respecto al TDEE | Mayor riesgo de hambre, fatiga y baja adherencia         |
 
 Un mismo recorte representa porcentajes distintos. Restar `500 kcal` a un TDEE de `3,000` no tiene el mismo impacto relativo que restarlas a uno de `1,600`.
 
@@ -175,4 +175,3 @@ No necesariamente. También se puede modificar la ingesta y actividad mediante h
 - [NIDDK: Body Weight Planner](https://www.niddk.nih.gov/bwp)
 - [MedlinePlus: Weight Control](https://medlineplus.gov/weightcontrol.html)
 - [National Academies: Dietary Reference Intakes for Energy](https://www.nationalacademies.org/read/26818/chapter/2)
-

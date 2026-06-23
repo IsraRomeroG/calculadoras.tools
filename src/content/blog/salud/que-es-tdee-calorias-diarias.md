@@ -2,7 +2,7 @@
 title: "Qué es TDEE y cómo se calculan tus calorías diarias"
 seoTitle: "Qué es TDEE: fórmula, ejemplo y calculadora de calorías diarias"
 description: "Aprende qué significa TDEE, cómo se calcula el gasto energético diario y cómo usarlo como punto de partida para tus calorías."
-pubDate: 2026-06-30
+pubDate: 2027-06-30
 categorySlug: "salud"
 tags:
   - tdee
@@ -14,7 +14,7 @@ relatedCalculator:
   href: "/salud/calculadora-de-calorias-diarias-tdee"
 ---
 
-El TDEE es una estimación de cuántas calorías gasta tu cuerpo durante un día completo. Sus siglas vienen de *Total Daily Energy Expenditure*, o gasto energético total diario, e incluyen tanto la energía necesaria para mantenerte con vida como la que utilizas al caminar, trabajar, entrenar y realizar otras actividades.
+El TDEE es una estimación de cuántas calorías gasta tu cuerpo durante un día completo. Sus siglas vienen de _Total Daily Energy Expenditure_, o gasto energético total diario, e incluyen tanto la energía necesaria para mantenerte con vida como la que utilizas al caminar, trabajar, entrenar y realizar otras actividades.
 
 Conocerlo sirve para obtener un punto de partida razonable para mantener el peso o plantear después un déficit o un superávit. No es una medición exacta ni una cantidad que permanezca igual todos los días.
 
@@ -35,11 +35,11 @@ El TDEE suele utilizarse como una primera estimación de las **calorías de mant
 
 A partir de ahí se pueden explorar tres escenarios:
 
-| Objetivo orientativo | Relación con el TDEE |
-|----------------------|----------------------|
-| Mantener peso | Ingesta cercana al TDEE |
-| Bajar peso | Ingesta por debajo del TDEE |
-| Subir peso | Ingesta por encima del TDEE |
+| Objetivo orientativo | Relación con el TDEE        |
+| -------------------- | --------------------------- |
+| Mantener peso        | Ingesta cercana al TDEE     |
+| Bajar peso           | Ingesta por debajo del TDEE |
+| Subir peso           | Ingesta por encima del TDEE |
 
 La dirección parece sencilla, pero el resultado real también depende de la actividad, la constancia, los cambios corporales y el margen de error de la estimación. Por eso conviene conocer primero el mantenimiento y ajustar después.
 
@@ -139,4 +139,3 @@ La TMB estima energía en reposo. El TDEE añade la actividad diaria y se acerca
 - [Mifflin-St Jeor: ecuación para estimar el gasto energético en reposo](https://pubmed.ncbi.nlm.nih.gov/2305711/)
 - [National Academies: Dietary Reference Intakes for Energy](https://www.nationalacademies.org/read/26818/chapter/2)
 - [NIDDK: Body Weight Planner](https://www.niddk.nih.gov/bwp)
-

@@ -2,7 +2,7 @@
 title: "Por qué mi peso no cambia si como según mi TDEE"
 seoTitle: "Por qué mi peso no cambia con mi TDEE: errores y ajustes"
 description: "Conoce por qué tu peso puede no cambiar como esperas aunque uses tu TDEE y cómo ajustar tus calorías con calma."
-pubDate: 2026-07-07
+pubDate: 2027-07-07
 categorySlug: "salud"
 tags:
   - tdee
@@ -172,4 +172,3 @@ Sí. Un entrenamiento nuevo o más intenso puede aumentar temporalmente el agua 
 - [NIDDK: Body Weight Planner](https://www.niddk.nih.gov/bwp)
 - [CDC: Factors Affecting Weight and Health](https://www.cdc.gov/healthy-weight-growth/about/index.html)
 - [MedlinePlus: Weight Control](https://medlineplus.gov/weightcontrol.html)
-

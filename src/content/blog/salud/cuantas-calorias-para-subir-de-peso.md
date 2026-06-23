@@ -2,7 +2,7 @@
 title: "Cuántas calorías comer para subir de peso"
 seoTitle: "Cuántas calorías comer para subir de peso: calcula tu superávit"
 description: "Aprende cómo estimar calorías para subir de peso partiendo de tu TDEE y usando un superávit prudente."
-pubDate: 2026-07-06
+pubDate: 2027-07-06
 categorySlug: "salud"
 tags:
   - calorías
@@ -64,9 +64,9 @@ Un superávit pequeño tiene dos ventajas: permite observar la respuesta sin ele
 
 Como ejemplos orientativos:
 
-| Ajuste inicial | Cuándo puede ser útil |
-|----------------|-----------------------|
-| `+150 kcal/día` | Inicio conservador o apetito limitado |
+| Ajuste inicial  | Cuándo puede ser útil                                  |
+| --------------- | ------------------------------------------------------ |
+| `+150 kcal/día` | Inicio conservador o apetito limitado                  |
 | `+300 kcal/día` | Ajuste moderado si el mantenimiento está bien estimado |
 
 La misma suma no tiene el mismo impacto para todos. `300 kcal` representan un porcentaje mayor sobre un TDEE de `1,700` que sobre uno de `3,000`.
@@ -180,4 +180,3 @@ Cuando hay bajo peso, pérdida involuntaria, síntomas, enfermedad, embarazo, la
 - [National Academies: Dietary Reference Intakes for Energy](https://www.nationalacademies.org/read/26818/chapter/2)
 - [NIDDK: Body Weight Planner](https://www.niddk.nih.gov/bwp)
 - [MedlinePlus: Weight Control](https://medlineplus.gov/weightcontrol.html)
-

@@ -2,7 +2,7 @@
 title: "TMB vs TDEE: diferencias y para qué sirve cada dato"
 seoTitle: "TMB vs TDEE: diferencia entre metabolismo basal y calorías diarias"
 description: "Conoce la diferencia entre TMB y TDEE, cómo se calculan y por qué el TDEE suele usarse para estimar calorías diarias."
-pubDate: 2026-07-04
+pubDate: 2027-07-04
 categorySlug: "salud"
 tags:
   - tmb
@@ -20,10 +20,10 @@ Ambos datos están conectados, pero responden preguntas diferentes.
 
 ## Diferencia rápida entre TMB y TDEE
 
-| Concepto | Qué estima | Uso principal |
-|----------|------------|---------------|
-| TMB | Energía en reposo | Base del cálculo |
-| TDEE | Energía total diaria | Calorías de mantenimiento aproximadas |
+| Concepto | Qué estima           | Uso principal                         |
+| -------- | -------------------- | ------------------------------------- |
+| TMB      | Energía en reposo    | Base del cálculo                      |
+| TDEE     | Energía total diaria | Calorías de mantenimiento aproximadas |
 
 La TMB es menor porque representa una situación de reposo. El TDEE incluye movimiento cotidiano, ejercicio y otros componentes del gasto diario.
 
@@ -139,4 +139,3 @@ Una de las más utilizadas en adultos es Mifflin-St Jeor. Otras ecuaciones puede
 - [Mifflin-St Jeor: ecuación para estimar el gasto energético en reposo](https://pubmed.ncbi.nlm.nih.gov/2305711/)
 - [National Academies: Dietary Reference Intakes for Energy](https://www.nationalacademies.org/read/26818/chapter/2)
 - [NCBI Bookshelf: Factors Affecting Energy Expenditure](https://www.ncbi.nlm.nih.gov/books/NBK591031/)
-

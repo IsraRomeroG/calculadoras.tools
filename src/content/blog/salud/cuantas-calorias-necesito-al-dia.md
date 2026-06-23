@@ -2,7 +2,7 @@
 title: "Cuántas calorías necesito al día"
 seoTitle: "Cuántas calorías necesito al día: cómo estimarlas con TDEE"
 description: "Conoce de qué dependen tus calorías diarias y cómo estimarlas con edad, sexo, peso, estatura y nivel de actividad."
-pubDate: 2026-07-01
+pubDate: 2027-07-01
 categorySlug: "salud"
 tags:
   - calorías
@@ -54,11 +54,11 @@ Si quieres conocer la lógica completa, consulta [qué es TDEE y cómo se calcul
 
 Antes de cambiar calorías conviene identificar el mantenimiento:
 
-| Objetivo | Punto de partida |
-|----------|------------------|
-| Mantener peso | Cerca del TDEE estimado |
-| Bajar peso | Déficit prudente respecto al TDEE |
-| Subir peso | Superávit prudente respecto al TDEE |
+| Objetivo      | Punto de partida                    |
+| ------------- | ----------------------------------- |
+| Mantener peso | Cerca del TDEE estimado             |
+| Bajar peso    | Déficit prudente respecto al TDEE   |
+| Subir peso    | Superávit prudente respecto al TDEE |
 
 Empezar por el mantenimiento permite saber qué estás modificando. Restar o sumar calorías a una cifra mal estimada puede producir un ajuste mayor o menor del que pretendías.
 
@@ -77,10 +77,10 @@ TMB = 1,592.5 kcal/día
 
 Ahora cambia solo la actividad:
 
-| Caso | Factor | TDEE aproximado |
-|------|--------|-----------------|
-| Persona A, sedentaria | 1.2 | 1,911 kcal/día |
-| Persona B, actividad moderada | 1.55 | 2,468 kcal/día |
+| Caso                          | Factor | TDEE aproximado |
+| ----------------------------- | ------ | --------------- |
+| Persona A, sedentaria         | 1.2    | 1,911 kcal/día  |
+| Persona B, actividad moderada | 1.55   | 2,468 kcal/día  |
 
 La diferencia es de unas `557 kcal/día`, aunque peso, estatura y edad sean iguales. El ejemplo muestra por qué una tabla genérica por sexo o edad puede quedar muy lejos de una persona concreta.
 
@@ -141,4 +141,3 @@ Normalmente conviene observar 2 a 3 semanas antes de cambiar, salvo que haya sí
 - [National Academies: Dietary Reference Intakes for Energy](https://www.nationalacademies.org/read/26818/chapter/2)
 - [NIDDK: Body Weight Planner](https://www.niddk.nih.gov/bwp)
 - [Mifflin-St Jeor: ecuación para estimar el gasto energético en reposo](https://pubmed.ncbi.nlm.nih.gov/2305711/)
-

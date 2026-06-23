@@ -2,7 +2,7 @@
 title: "Cómo elegir tu nivel de actividad para calcular TDEE"
 seoTitle: "Nivel de actividad en TDEE: sedentario, ligero, moderado o alto"
 description: "Aprende cómo elegir el factor de actividad para calcular tus calorías diarias sin sobreestimar tu gasto energético."
-pubDate: 2026-07-02
+pubDate: 2027-07-02
 categorySlug: "salud"
 tags:
   - tdee
@@ -41,13 +41,13 @@ Por eso el factor de actividad suele ser una fuente de error mayor que el redond
 
 Estos factores son categorías orientativas, no mediciones directas:
 
-| Nivel | Factor orientativo | Cuándo usarlo |
-|-------|--------------------|---------------|
-| Sedentario | `1.2` | Trabajo sentado y poco movimiento diario |
-| Ligero | `1.375` | Algo de caminata o ejercicio ligero 1 a 3 días por semana |
-| Moderado | `1.55` | Entrenamiento regular 3 a 5 días por semana y vida activa |
-| Alto | `1.725` | Entrenamiento intenso o trabajo físico frecuente |
-| Muy alto | `1.9` | Actividad muy exigente, doble sesión o trabajo físico pesado |
+| Nivel      | Factor orientativo | Cuándo usarlo                                                |
+| ---------- | ------------------ | ------------------------------------------------------------ |
+| Sedentario | `1.2`              | Trabajo sentado y poco movimiento diario                     |
+| Ligero     | `1.375`            | Algo de caminata o ejercicio ligero 1 a 3 días por semana    |
+| Moderado   | `1.55`             | Entrenamiento regular 3 a 5 días por semana y vida activa    |
+| Alto       | `1.725`            | Entrenamiento intenso o trabajo físico frecuente             |
+| Muy alto   | `1.9`              | Actividad muy exigente, doble sesión o trabajo físico pesado |
 
 No basta con cumplir una descripción parcial. “Entreno 4 días” no conduce automáticamente a actividad moderada si el resto de la semana contiene muy poco movimiento. Del mismo modo, alguien que no va al gimnasio puede tener una actividad alta por su trabajo y desplazamientos.
 
@@ -80,7 +80,7 @@ Es una categoría poco común. Puede tener sentido en atletas con doble sesión 
 
 ## Ejercicio no es lo mismo que actividad diaria
 
-El movimiento fuera del entrenamiento se conoce a menudo como **NEAT**, por *non-exercise activity thermogenesis*. Incluye acciones como:
+El movimiento fuera del entrenamiento se conoce a menudo como **NEAT**, por _non-exercise activity thermogenesis_. Incluye acciones como:
 
 - Caminar al transporte o al trabajo.
 - Subir escaleras.
@@ -159,4 +159,3 @@ Cuando cambie de manera sostenida tu trabajo, número de pasos, entrenamiento o 
 - [National Academies: Dietary Reference Intakes for Energy](https://www.nationalacademies.org/read/26818/chapter/2)
 - [NIDDK: Body Weight Planner](https://www.niddk.nih.gov/bwp)
 - [NCBI Bookshelf: Factors Affecting Energy Expenditure](https://www.ncbi.nlm.nih.gov/books/NBK591031/)
-

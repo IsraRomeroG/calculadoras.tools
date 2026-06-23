@@ -2,7 +2,7 @@
 title: "Fórmula Mifflin-St Jeor: cómo calcula la TMB"
 seoTitle: "Fórmula Mifflin-St Jeor para TMB: ecuaciones y ejemplo"
 description: "Conoce la fórmula Mifflin-St Jeor para estimar la tasa metabólica basal y cómo se usa después para calcular TDEE."
-pubDate: 2026-07-08
+pubDate: 2027-07-08
 categorySlug: "salud"
 tags:
   - mifflin st jeor
@@ -160,4 +160,3 @@ Mifflin-St Jeor no utiliza ese dato. Existen fórmulas basadas en masa magra, pe
 - [Mifflin-St Jeor: A new predictive equation for resting energy expenditure in healthy individuals](https://pubmed.ncbi.nlm.nih.gov/2305711/)
 - [National Academies: Dietary Reference Intakes for Energy](https://www.nationalacademies.org/read/26818/chapter/2)
 - [NCBI Bookshelf: Factors Affecting Energy Expenditure](https://www.ncbi.nlm.nih.gov/books/NBK591031/)
-
