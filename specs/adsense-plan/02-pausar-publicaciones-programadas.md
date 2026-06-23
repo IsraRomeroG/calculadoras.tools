@@ -18,13 +18,17 @@ Lógica de publicación:
 - `astro.config.mjs`
 - `src/content.config.ts`
 
-## Estado actual observado
+## Inventario inicial
 
-El plan base menciona 17 artículos programados. Con fecha local 23 de junio de
-2026, se detectaron 16 archivos con `pubDate` posterior a esa fecha:
+Con fecha local 23 de junio de 2026, el repositorio contiene estos archivos con
+`pubDate` posterior a esa fecha:
 
 | Archivo                                                               | Fecha      |
 | --------------------------------------------------------------------- | ---------- |
+| `src/content/blog/salud/cuanto-debo-pesar-si-mido-150.md`             | 2027-06-20 |
+| `src/content/blog/salud/cuanto-debo-pesar-si-mido-155.md`             | 2027-06-21 |
+| `src/content/blog/salud/cuanto-debo-pesar-si-mido-160.md`             | 2027-06-22 |
+| `src/content/blog/salud/cuanto-debo-pesar-si-mido-165.md`             | 2027-06-23 |
 | `src/content/blog/salud/cuanto-debo-pesar-si-mido-170.md`             | 2027-06-24 |
 | `src/content/blog/salud/cuanto-debo-pesar-si-mido-175.md`             | 2027-06-25 |
 | `src/content/blog/salud/cuanto-debo-pesar-si-mido-180.md`             | 2027-06-26 |
@@ -42,8 +46,9 @@ El plan base menciona 17 artículos programados. Con fecha local 23 de junio de
 | `src/content/blog/salud/formula-mifflin-st-jeor.md`                   | 2027-07-08 |
 | `src/content/blog/salud/tdee-y-macros-como-se-relacionan.md`          | 2027-07-09 |
 
-Antes de ejecutar cambios, reconciliar este inventario contra el conteo de 17
-del plan base.
+Antes de ejecutar cambios, volver a contar los posts futuros desde el
+frontmatter local y pausar todos los que sigan teniendo `pubDate` posterior a
+la fecha editorial de ejecución.
 
 ## Decisión editorial
 
@@ -76,7 +81,19 @@ queda fuera de:
 - Páginas de artículo.
 - Sitemap.
 
-Si la regla no existe, implementarla antes de marcar borradores.
+Reglas existentes que deben preservarse:
+
+- `src/content.config.ts` ya admite `draft` con valor por defecto `false`.
+- `src/lib/blog-publication.ts` ya excluye `draft: true` y fechas futuras con
+  `isBlogPostPublishable`.
+- Las rutas de blog usan `getPublishedBlogPosts()`, por lo que índice,
+  categorías, paginaciones y páginas de artículo quedan cubiertos por la regla.
+- `astro.config.mjs` filtra el sitemap leyendo frontmatter manualmente. Validar
+  que excluya slugs no publicables exactos y no solo rutas de categorías con
+  algún post publicado.
+
+Si alguna de estas reglas cambia o falta al momento de ejecutar, implementarla
+antes de marcar borradores.
 
 ### 2. Marcar programados como borrador
 
@@ -93,6 +110,9 @@ pubDate: YYYY-MM-DD
 ```
 
 Esto permite auditar el calendario original sin publicar.
+
+La acción debe aplicarse al inventario local completo de posts futuros, no solo
+a la tabla de esta spec si el conteo cambia.
 
 ### 3. Crear checklist de revisión por artículo
 
@@ -137,9 +157,14 @@ Agregar o actualizar pruebas para asegurar:
 
 - Los posts con `draft: true` no salen de `getPublishedBlogPosts`.
 - Los posts futuros no salen antes de su fecha.
-- El filtro de sitemap de `astro.config.mjs` excluye drafts y futuros.
+- El filtro de sitemap de `astro.config.mjs` excluye drafts y futuros por slug
+  exacto.
+- Las rutas de blog generadas por `getStaticPaths()` no incluyen artículos
+  pausados ni futuros.
 
-Si ya existe cobertura en `src/lib/blog-publication.test.ts`, extenderla.
+Mantener la cobertura existente de `src/lib/blog-publication.test.ts` para
+borradores y fechas futuras. Agregar cobertura separada para sitemap si se
+modifica `astro.config.mjs`.
 
 ## Criterios de aceptación
 
@@ -148,8 +173,8 @@ Si ya existe cobertura en `src/lib/blog-publication.test.ts`, extenderla.
 - No aparecen artículos futuros en listados, rutas generadas ni sitemap.
 - Existe una tabla de decisión editorial para cada artículo pausado.
 - No se publican nuevas series antes de completar la consolidación.
-- El inventario local queda reconciliado con la auditoría base de 17
-  programados.
+- El inventario local se contó al momento de ejecución y todos los posts con
+  `pubDate` futura quedaron pausados.
 
 ## Riesgos y mitigaciones
 
@@ -161,6 +186,9 @@ Riesgo: dejar enlaces internos hacia rutas pausadas.
 
 Mitigación: buscar enlaces internos a cada slug programado antes de desplegar y
 eliminarlos si la URL no será pública.
+
+Antes de desplegar, verificar que no existan enlaces desde contenido publicado
+hacia slugs que queden pausados.
 
 Riesgo: confundir `draft` con rechazo editorial permanente.
 

@@ -84,9 +84,20 @@ Durante la revisión del repositorio se observó:
   calculadoras y exactamente dos anuncios en posts.
 - `public/.htaccess` ya contiene reglas 301 para URLs legacy de blog y
   calculadoras.
-- Con fecha local 23 de junio de 2026 se detectaron 16 artículos con `pubDate`
-  posterior a esa fecha; el plan base menciona 17 programados, por lo que debe
-  reconciliarse el inventario antes de cambiar fechas o estados.
+- `src/content.config.ts` ya admite `draft` en posts de blog y
+  `src/lib/blog-publication.ts` ya excluye borradores y posts futuros mediante
+  `isBlogPostPublishable`.
+- Las rutas de blog revisadas usan `getPublishedBlogPosts()`, por lo que la
+  regla de publicación cubre índice, categorías, paginaciones y páginas de
+  artículo.
+- `astro.config.mjs` replica la lógica de publicación para el sitemap leyendo
+  frontmatter manualmente; si se toca la spec 02, conviene probar y endurecer
+  que el sitemap excluya slugs no publicables exactos, no solo categorías con
+  algún post publicado.
+- Con fecha local 23 de junio de 2026, el inventario inicial de publicaciones
+  programadas contiene 20 artículos con `pubDate` posterior a esa fecha. Antes
+  de ejecutar la spec 02 debe volver a contarse el inventario local y pausarse
+  todo post que siga teniendo fecha futura.
 - Con fecha local 23 de junio de 2026, el conteo de paginación del plan base
   sigue cuadrando: 9 páginas extra de `/blog/pagina/*` y 7 páginas extra de
   categorías, 16 páginas de paginación en total sin contar las primeras páginas
