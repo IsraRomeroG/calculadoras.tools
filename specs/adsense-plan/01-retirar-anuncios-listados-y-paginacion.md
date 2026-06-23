@@ -69,6 +69,8 @@ La página debe quedar como hub navegacional sin monetización directa.
 Regla específica:
 
 - Categorías con una sola calculadora nunca deben mostrar anuncios.
+- En el inventario actual, las categorías con una sola herramienta publicada
+  son `inmuebles`, `legal-impuestos`, `programacion` y `construccion`.
 - Si una categoría se convierte más adelante en hub editorial completo, su
   elegibilidad publicitaria debe evaluarse de nuevo con la spec 06.
 
@@ -109,8 +111,11 @@ Regla sugerida para la primera pasada:
 
 - Conservar `placement="calculator-after-tool"` cuando aparece después de la
   herramienta y antes de contenido explicativo.
-- Retirar `placement="calculator-before-faq"` de calculadoras que no tengan
-  explicación completa de fórmula, supuestos, límites y fuentes.
+- Retirar temporalmente todos los `placement="calculator-before-faq"` mientras
+  no exista una marca explícita de revisión editorial suficiente.
+- La decisión de reintroducir un segundo anuncio no debe depender de una
+  apreciación manual durante esta fase; debe esperar a la spec 05, donde se
+  revisarán fórmula, supuestos, límites y fuentes.
 
 Para calculadoras sensibles, aplicar la spec 05 antes de permitir un segundo
 anuncio.
@@ -133,6 +138,14 @@ proveedor configurado:
 
 El modo debug de desarrollo puede seguir mostrando el marco si ayuda a validar
 formatos.
+
+Nota de implementación:
+
+- El estado actual de `src/lib/ads/provider.ts` sí tiene snippets configurados,
+  por lo que `hasConfiguredAds()` devuelve `true`.
+- Para comprobar el caso "sin proveedor configurado", usar una prueba con mock
+  o validar manualmente después de vaciar los snippets en una rama/control
+  temporal; no asumir este caso desde el estado actual del repo.
 
 ### 7. Configuración
 
@@ -163,10 +176,16 @@ Actualizar `src/lib/ads/placements.test.ts` para comprobar:
 - La plantilla de artículo contiene como máximo un `<AdSlot`.
 - Las calculadoras contienen como máximo un `<AdSlot` hasta que exista una
   marca explícita de revisión editorial.
+- Si una calculadora conserva un anuncio, ese anuncio debe ser
+  `placement="calculator-after-tool"` durante esta fase.
 - No se exige publicidad en todas las calculadoras.
 
 Si la prueba sigue detectando calculadoras por `@lib/calculators/`, cambiar la
 expectativa de “1 o 2 anuncios” a “0 o 1 anuncio” en la fase temporal.
+Preferir, si el cambio no se vuelve grande, detectar calculadoras desde
+`src/lib/constants/calculators.ts` y validar las rutas declaradas allí; la
+búsqueda por `@lib/calculators/` es útil hoy, pero frágil frente a futuras
+plantillas que no importen helpers desde esa carpeta.
 
 ## Criterios de aceptación
 

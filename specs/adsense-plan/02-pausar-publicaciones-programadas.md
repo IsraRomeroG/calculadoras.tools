@@ -23,24 +23,24 @@ Lógica de publicación:
 El plan base menciona 17 artículos programados. Con fecha local 23 de junio de
 2026, se detectaron 16 archivos con `pubDate` posterior a esa fecha:
 
-| Archivo | Fecha |
-| --- | --- |
-| `src/content/blog/salud/cuanto-debo-pesar-si-mido-170.md` | 2026-06-24 |
-| `src/content/blog/salud/cuanto-debo-pesar-si-mido-175.md` | 2026-06-25 |
-| `src/content/blog/salud/cuanto-debo-pesar-si-mido-180.md` | 2026-06-26 |
-| `src/content/blog/salud/cuanto-debo-pesar-si-mido-185.md` | 2026-06-27 |
-| `src/content/blog/salud/tabla-peso-saludable-150-195.md` | 2026-06-28 |
-| `src/content/blog/salud/imc-18-20-22-25-27-30-35-40.md` | 2026-06-29 |
-| `src/content/blog/salud/que-es-tdee-calorias-diarias.md` | 2026-06-30 |
-| `src/content/blog/salud/cuantas-calorias-necesito-al-dia.md` | 2026-07-01 |
-| `src/content/blog/salud/como-elegir-nivel-de-actividad-tdee.md` | 2026-07-02 |
-| `src/content/blog/salud/calorias-de-mantenimiento.md` | 2026-07-03 |
-| `src/content/blog/salud/tmb-vs-tdee-diferencias.md` | 2026-07-04 |
-| `src/content/blog/salud/cuantas-calorias-para-bajar-de-peso.md` | 2026-07-05 |
-| `src/content/blog/salud/cuantas-calorias-para-subir-de-peso.md` | 2026-07-06 |
-| `src/content/blog/salud/por-que-mi-peso-no-cambia-si-como-mi-tdee.md` | 2026-07-07 |
-| `src/content/blog/salud/formula-mifflin-st-jeor.md` | 2026-07-08 |
-| `src/content/blog/salud/tdee-y-macros-como-se-relacionan.md` | 2026-07-09 |
+| Archivo                                                               | Fecha      |
+| --------------------------------------------------------------------- | ---------- |
+| `src/content/blog/salud/cuanto-debo-pesar-si-mido-170.md`             | 2027-06-24 |
+| `src/content/blog/salud/cuanto-debo-pesar-si-mido-175.md`             | 2027-06-25 |
+| `src/content/blog/salud/cuanto-debo-pesar-si-mido-180.md`             | 2027-06-26 |
+| `src/content/blog/salud/cuanto-debo-pesar-si-mido-185.md`             | 2027-06-27 |
+| `src/content/blog/salud/tabla-peso-saludable-150-195.md`              | 2027-06-28 |
+| `src/content/blog/salud/imc-18-20-22-25-27-30-35-40.md`               | 2027-06-29 |
+| `src/content/blog/salud/que-es-tdee-calorias-diarias.md`              | 2027-06-30 |
+| `src/content/blog/salud/cuantas-calorias-necesito-al-dia.md`          | 2027-07-01 |
+| `src/content/blog/salud/como-elegir-nivel-de-actividad-tdee.md`       | 2027-07-02 |
+| `src/content/blog/salud/calorias-de-mantenimiento.md`                 | 2027-07-03 |
+| `src/content/blog/salud/tmb-vs-tdee-diferencias.md`                   | 2027-07-04 |
+| `src/content/blog/salud/cuantas-calorias-para-bajar-de-peso.md`       | 2027-07-05 |
+| `src/content/blog/salud/cuantas-calorias-para-subir-de-peso.md`       | 2027-07-06 |
+| `src/content/blog/salud/por-que-mi-peso-no-cambia-si-como-mi-tdee.md` | 2027-07-07 |
+| `src/content/blog/salud/formula-mifflin-st-jeor.md`                   | 2027-07-08 |
+| `src/content/blog/salud/tdee-y-macros-como-se-relacionan.md`          | 2027-07-09 |
 
 Antes de ejecutar cambios, reconciliar este inventario contra el conteo de 17
 del plan base.
@@ -98,12 +98,12 @@ Esto permite auditar el calendario original sin publicar.
 
 Cada artículo pausado debe clasificarse antes de volver a publicarse:
 
-| Estado | Uso |
-| --- | --- |
-| `consolidar` | La pieza se fusionará con una guía o tabla principal |
+| Estado       | Uso                                                               |
+| ------------ | ----------------------------------------------------------------- |
+| `consolidar` | La pieza se fusionará con una guía o tabla principal              |
 | `reescribir` | Tiene intención válida, pero necesita fuentes, ejemplos o límites |
-| `mantener` | Puede publicarse tras completar la spec 04 y 05 |
-| `retirar` | No aporta valor independiente |
+| `mantener`   | Puede publicarse tras completar la spec 04 y 05                   |
+| `retirar`    | No aporta valor independiente                                     |
 
 La clasificación puede vivir en una spec de seguimiento o en una tabla dentro
 de esta carpeta. No tiene que formar parte del frontmatter público.

@@ -87,6 +87,17 @@ Durante la revisión del repositorio se observó:
 - Con fecha local 23 de junio de 2026 se detectaron 16 artículos con `pubDate`
   posterior a esa fecha; el plan base menciona 17 programados, por lo que debe
   reconciliarse el inventario antes de cambiar fechas o estados.
+- Con fecha local 23 de junio de 2026, el conteo de paginación del plan base
+  sigue cuadrando: 9 páginas extra de `/blog/pagina/*` y 7 páginas extra de
+  categorías, 16 páginas de paginación en total sin contar las primeras páginas
+  canónicas.
+- Las categorías de calculadoras con una sola herramienta publicada son
+  `inmuebles`, `legal-impuestos`, `programacion` y `construccion`; estas
+  categorías deben tratarse como hubs navegacionales sin anuncios.
+- La prueba de placements detecta calculadoras buscando `@lib/calculators/` en
+  archivos `.astro`; funciona con el estado actual, pero es una heurística y
+  puede reemplazarse por una lectura basada en `src/lib/constants/calculators.ts`
+  si se actualiza la prueba.
 
 ## Entregable final esperado
 
