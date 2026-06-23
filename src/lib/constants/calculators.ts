@@ -431,6 +431,15 @@ export const CALCULATORS: CalculatorDirectoryItem[] = [
     order: 70,
   },
   {
+    id: "conversor-de-bases-numericas",
+    title: "Conversor de bases numéricas",
+    description:
+      "Convierte enteros exactos entre binario, octal, decimal, hexadecimal y bases de 2 a 36.",
+    href: "/programacion/conversor-de-bases-numericas",
+    categorySlug: "programacion",
+    order: 71,
+  },
+  {
     id: "calculadora-de-area-y-perimetro",
     title: "Calculadora de área y perímetro",
     description:

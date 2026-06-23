@@ -11,6 +11,7 @@ export const CATEGORY_SLUGS = [
   "legal-impuestos",
   "matematicas",
   "probabilidad-estadistica",
+  "programacion",
   "geometria",
   "salud",
   "fecha-tiempo",
@@ -55,6 +56,12 @@ export const CATEGORIES = {
     label: "Probabilidad y estadística",
     description:
       "Calculadoras para resolver problemas de probabilidad, conteo y estadística con fórmulas claras, resultados exactos y explicaciones paso a paso.",
+  },
+  programacion: {
+    slug: "programacion",
+    label: "Programación",
+    description:
+      "Calculadoras y conversores para sistemas numéricos, datos y tareas habituales de programación y desarrollo de software.",
   },
   geometria: {
     slug: "geometria",

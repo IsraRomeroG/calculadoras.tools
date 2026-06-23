@@ -1,0 +1,903 @@
+---
+import AdSlot from "@components/ads/AdSlot.astro";
+import Container from "@components/layout/Container.astro";
+import PageShell from "@components/layout/PageShell.astro";
+import FaqSection from "@components/shared/FaqSection.astro";
+import PageHero from "@components/shared/PageHero.astro";
+import SectionIntro from "@components/shared/SectionIntro.astro";
+import BaseLayout from "@layouts/BaseLayout.astro";
+import {
+  COMMON_NUMBER_BASE_METADATA,
+  COMMON_NUMBER_BASES,
+  MAX_NUMBER_BASE,
+  MIN_NUMBER_BASE,
+  getNumberBaseLabel,
+} from "@lib/calculators/programacion/conversor-de-bases-numericas/numberBase";
+import { buildFaqJsonLd } from "@lib/seo";
+
+const title =
+  "Conversor de bases numéricas: binario, decimal y hexadecimal";
+const description =
+  "Convierte números enteros exactos entre binario, octal, decimal, hexadecimal y bases de 2 a 36. Incluye validación y explicación posicional.";
+const canonical = "/programacion/conversor-de-bases-numericas";
+
+const baseOptions = Array.from(
+  { length: MAX_NUMBER_BASE - MIN_NUMBER_BASE + 1 },
+  (_, index) => index + MIN_NUMBER_BASE,
+);
+
+const examples = [
+  {
+    label: "Binario a decimal",
+    value: "1010",
+    origin: 2,
+    destination: 10,
+    result: "10",
+  },
+  {
+    label: "Decimal a hexadecimal",
+    value: "255",
+    origin: 10,
+    destination: 16,
+    result: "FF",
+  },
+  {
+    label: "Hexadecimal a decimal",
+    value: "FF",
+    origin: 16,
+    destination: 10,
+    result: "255",
+  },
+  {
+    label: "Base 36 a decimal",
+    value: "Z",
+    origin: 36,
+    destination: 10,
+    result: "35",
+  },
+];
+
+const faqs = [
+  {
+    question: "¿Qué es una base numérica?",
+    answer:
+      "Es un sistema para representar cantidades mediante un conjunto de dígitos. La base 2 usa 0 y 1; la base 10 usa del 0 al 9; y la base 16 añade las letras A a F.",
+  },
+  {
+    question: "¿Cómo convertir de binario a decimal?",
+    answer:
+      "Multiplica cada bit por una potencia de 2 según su posición y suma los resultados. La calculadora puede mostrar este desglose para entradas cortas.",
+  },
+  {
+    question: "¿Cómo convertir de hexadecimal a decimal?",
+    answer:
+      "Interpreta A a F como los valores 10 a 15, multiplica cada dígito por su potencia de 16 y suma los términos.",
+  },
+  {
+    question: "¿Qué letras se usan en bases mayores que 10?",
+    answer:
+      "Se usan las letras A a Z para representar los valores 10 a 35. Por ejemplo, F vale 15 y Z vale 35.",
+  },
+  {
+    question: "¿La calculadora admite números negativos?",
+    answer:
+      "Sí. Puedes escribir un signo menos al inicio. El valor convertido conservará el signo en todas las bases.",
+  },
+  {
+    question: "¿Puedo convertir números enteros muy grandes?",
+    answer:
+      "Sí. La herramienta usa BigInt para mantener resultados exactos y admite hasta 10,000 dígitos normalizados por entrada.",
+  },
+  {
+    question: "¿Puedo usar prefijos como 0b o 0x?",
+    answer:
+      "Sí. Se aceptan 0b para binario, 0o para octal y 0x para hexadecimal cuando coinciden con la base origen seleccionada.",
+  },
+  {
+    question: "¿Por qué no se admiten fracciones?",
+    answer:
+      "Este MVP está diseñado para enteros exactos. Las fracciones requieren definir precisión, redondeo y representación periódica entre bases.",
+  },
+];
+
+const faqJsonLd = buildFaqJsonLd(faqs);
+---
+
+<BaseLayout title={title} description={description} canonical={canonical}>
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={JSON.stringify(faqJsonLd)} />
+  </Fragment>
+
+  <PageShell>
+    <PageHero
+      title="Conversor de bases numéricas"
+      description="Convierte enteros entre bases 2 y 36 sin perder precisión. Compara binario, octal, decimal y hexadecimal y revisa el valor posicional."
+      kicker="Programación"
+      kickerHref="/programacion"
+      collapseBreadcrumbOnMobile
+      containerClass="py-6 md:py-8"
+      breadcrumbs={[
+        { label: "Inicio", href: "/", ariaLabel: "Inicio" },
+        { label: "Programación", href: "/programacion", optional: true },
+        { label: "Conversor de bases", truncate: true },
+      ]}
+    />
+
+    <Container as="section" class="py-6 md:py-8">
+      <section
+        id="number-base-converter"
+        class="overflow-hidden rounded-lg border border-gray-700 bg-gray-950 shadow-xl shadow-gray-950/30"
+        aria-labelledby="calculator-heading"
+      >
+        <div class="grid lg:grid-cols-[minmax(0,1.08fr)_minmax(18rem,0.92fr)]">
+          <div class="p-4 sm:p-6">
+            <p class="text-sm font-semibold text-amber-300">
+              Conversión exacta
+            </p>
+            <h2 id="calculator-heading" class="mt-2 text-2xl font-semibold">
+              ¿Qué número quieres convertir?
+            </h2>
+            <p class="mt-2 text-sm leading-relaxed text-gray-400">
+              Puedes usar letras, signo negativo, espacios, guiones bajos y
+              prefijos compatibles como <span class="text-gray-200">0b</span>,
+              <span class="text-gray-200">0o</span> o
+              <span class="text-gray-200">0x</span>.
+            </p>
+
+            <div class="mt-6">
+              <div class="flex items-end justify-between gap-3">
+                <label
+                  for="number-base-value"
+                  class="block text-sm font-semibold text-gray-200"
+                >
+                  Número
+                </label>
+                <span
+                  class="text-xs text-gray-500"
+                  aria-live="off"
+                  data-digit-count
+                >
+                  0 / 10,000 dígitos
+                </span>
+              </div>
+              <textarea
+                id="number-base-value"
+                class="mt-2 min-h-24 w-full resize-y rounded-lg border border-gray-700 bg-gray-900 px-4 py-3 font-mono text-lg leading-relaxed text-white outline-none transition placeholder:text-gray-600 focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15"
+                rows="2"
+                inputmode="text"
+                autocomplete="off"
+                autocapitalize="off"
+                autocorrect="off"
+                spellcheck="false"
+                placeholder="Ej. FF, 1010 1100 o -0x2A"
+                aria-describedby="number-base-help number-base-error"
+                data-number-input
+              ></textarea>
+              <p
+                id="number-base-help"
+                class="mt-2 text-xs leading-relaxed text-gray-500"
+              >
+                No se admiten decimales ni notación científica. Las letras no
+                distinguen mayúsculas de minúsculas.
+              </p>
+              <p
+                id="number-base-error"
+                class="mt-2 hidden text-sm leading-relaxed text-red-300"
+                role="alert"
+                data-number-error
+              ></p>
+            </div>
+
+            <div
+              class="mt-5 grid gap-4 sm:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] sm:items-start"
+            >
+              <div>
+                <label
+                  for="number-base-origin"
+                  class="block text-sm font-semibold text-gray-200"
+                >
+                  Base origen
+                </label>
+                <select
+                  id="number-base-origin"
+                  class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-900 px-4 text-base text-white outline-none transition focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15"
+                  data-origin-base
+                >
+                  {
+                    baseOptions.map((base) => (
+                      <option value={base} selected={base === 10}>
+                        {getNumberBaseLabel(base)} ({base})
+                      </option>
+                    ))
+                  }
+                </select>
+                <div
+                  class="mt-2 grid grid-cols-4 gap-1"
+                  aria-label="Bases de origen frecuentes"
+                >
+                  {
+                    COMMON_NUMBER_BASES.map((base) => (
+                      <button
+                        class="min-h-11 rounded-md border border-gray-700 bg-gray-900 px-2 text-xs font-semibold text-gray-300 transition hover:border-amber-400/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400/40"
+                        type="button"
+                        aria-pressed={base === 10 ? "true" : "false"}
+                        data-quick-base={base}
+                        data-base-target="origin"
+                      >
+                        {COMMON_NUMBER_BASE_METADATA[base].shortLabel}
+                      </button>
+                    ))
+                  }
+                </div>
+              </div>
+
+              <button
+                class="min-h-12 rounded-lg border border-gray-700 bg-gray-900 px-4 text-lg font-semibold text-amber-300 transition hover:border-amber-400 hover:bg-gray-800 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/30 sm:mt-7"
+                type="button"
+                aria-label="Intercambiar base origen y base destino"
+                title="Intercambiar bases"
+                data-swap-bases
+              >
+                ⇄
+              </button>
+
+              <div>
+                <label
+                  for="number-base-destination"
+                  class="block text-sm font-semibold text-gray-200"
+                >
+                  Base destino
+                </label>
+                <select
+                  id="number-base-destination"
+                  class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-900 px-4 text-base text-white outline-none transition focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15"
+                  data-destination-base
+                >
+                  {
+                    baseOptions.map((base) => (
+                      <option value={base} selected={base === 2}>
+                        {getNumberBaseLabel(base)} ({base})
+                      </option>
+                    ))
+                  }
+                </select>
+                <div
+                  class="mt-2 grid grid-cols-4 gap-1"
+                  aria-label="Bases de destino frecuentes"
+                >
+                  {
+                    COMMON_NUMBER_BASES.map((base) => (
+                      <button
+                        class="min-h-11 rounded-md border border-gray-700 bg-gray-900 px-2 text-xs font-semibold text-gray-300 transition hover:border-amber-400/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400/40"
+                        type="button"
+                        aria-pressed={base === 2 ? "true" : "false"}
+                        data-quick-base={base}
+                        data-base-target="destination"
+                      >
+                        {COMMON_NUMBER_BASE_METADATA[base].shortLabel}
+                      </button>
+                    ))
+                  }
+                </div>
+              </div>
+            </div>
+
+            <div
+              class="mt-5 rounded-lg border border-blue-400/20 bg-blue-400/10 p-3 text-sm leading-relaxed text-blue-100"
+            >
+              <span class="font-semibold">Caracteres válidos:</span>
+              <span class="ml-1 break-words font-mono" data-valid-digits>
+                0 1 2 3 4 5 6 7 8 9
+              </span>
+            </div>
+
+            <div
+              class="mt-5 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center"
+            >
+              <label
+                class="flex min-h-11 cursor-pointer items-center gap-3 rounded-lg border border-gray-700 bg-gray-900 px-4 py-2 text-sm text-gray-200"
+              >
+                <input
+                  class="size-4 accent-amber-400"
+                  type="checkbox"
+                  checked
+                  data-group-binary
+                />
+                Agrupar binario en bloques de 4
+              </label>
+              <button
+                class="min-h-11 rounded-lg border border-gray-700 px-4 py-2 text-sm font-semibold text-gray-200 transition hover:border-gray-500 hover:bg-gray-900 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-gray-400/30"
+                type="button"
+                data-clear-calculator
+              >
+                Limpiar
+              </button>
+            </div>
+          </div>
+
+          <aside
+            class="border-t border-gray-800 bg-gray-900/65 p-4 sm:p-6 lg:border-l lg:border-t-0"
+          >
+            <p class="text-xs font-semibold uppercase tracking-wide text-gray-500">
+              Resultado principal
+            </p>
+            <p class="mt-2 text-sm font-semibold text-amber-300" data-result-base>
+              Binario (base 2)
+            </p>
+            <div
+              class="mt-3 min-h-20 overflow-x-auto rounded-lg border border-gray-800 bg-gray-950 p-4"
+            >
+              <p
+                class="whitespace-nowrap font-mono text-2xl font-semibold text-amber-100"
+                data-main-result
+              >
+                Esperando un número
+              </p>
+            </div>
+            <p
+              class="mt-3 min-h-10 text-sm leading-relaxed text-gray-400"
+              data-result-note
+            >
+              El resultado aparecerá mientras escribes.
+            </p>
+            <div class="mt-4 flex flex-col gap-2 sm:flex-row sm:flex-wrap">
+              <button
+                class="hidden min-h-11 rounded-lg bg-amber-400 px-4 py-2 text-sm font-semibold text-gray-950 transition hover:bg-amber-300 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-300/40"
+                type="button"
+                data-copy-main
+              >
+                Copiar resultado
+              </button>
+              <button
+                class="hidden min-h-11 rounded-lg border border-amber-400/60 px-4 py-2 text-sm font-semibold text-amber-200 transition hover:bg-amber-400/10 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-300/40"
+                type="button"
+                data-copy-equivalence
+              >
+                Copiar equivalencia
+              </button>
+            </div>
+            <p
+              class="sr-only"
+              role="status"
+              aria-live="polite"
+              data-live-status
+            ></p>
+            <p
+              class="mt-3 min-h-5 text-sm text-emerald-300"
+              role="status"
+              aria-live="polite"
+              data-copy-status
+            ></p>
+          </aside>
+        </div>
+
+        <div class="border-t border-gray-800 p-4 sm:p-6">
+          <div class="grid gap-6 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,0.8fr)]">
+            <div>
+              <h3 class="text-lg font-semibold">Equivalencias comunes</h3>
+              <p class="mt-1 text-sm leading-relaxed text-gray-500">
+                El agrupado binario es solo visual; al copiar se usa el valor
+                continuo.
+              </p>
+              <div class="mt-4 grid gap-3 sm:grid-cols-2">
+                {
+                  COMMON_NUMBER_BASES.map((base) => (
+                    <article
+                      class="min-w-0 rounded-lg border border-gray-800 bg-gray-900/60 p-4"
+                      data-equivalence-card={base}
+                    >
+                      <div class="flex items-start justify-between gap-3">
+                        <div>
+                          <p class="text-sm font-semibold text-gray-200">
+                            {COMMON_NUMBER_BASE_METADATA[base].label}
+                          </p>
+                          <p class="mt-1 text-xs text-gray-500">Base {base}</p>
+                        </div>
+                        <span
+                          class="hidden rounded-full bg-amber-400/10 px-2 py-1 text-xs font-semibold text-amber-300"
+                          data-result-badge={base}
+                        >
+                          Resultado
+                        </span>
+                      </div>
+                      <div class="mt-3 overflow-x-auto">
+                        <p
+                          class="whitespace-nowrap font-mono text-lg font-semibold text-white"
+                          data-common-output={base}
+                        >
+                          —
+                        </p>
+                      </div>
+                      <button
+                        class="mt-3 hidden min-h-11 rounded-md border border-gray-700 px-3 py-2 text-sm font-semibold text-amber-300 transition hover:border-amber-400 hover:bg-amber-400/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400/40"
+                        type="button"
+                        data-copy-base={base}
+                      >
+                        Copiar
+                      </button>
+                    </article>
+                  ))
+                }
+              </div>
+            </div>
+
+            <div>
+              <h3 class="text-lg font-semibold">Valor posicional</h3>
+              <details
+                class="mt-4 hidden rounded-lg border border-gray-800 bg-gray-900/60"
+                data-explanation-panel
+              >
+                <summary
+                  class="flex min-h-12 cursor-pointer items-center px-4 py-3 text-sm font-semibold text-amber-300"
+                >
+                  Ver cómo se obtiene el valor
+                </summary>
+                <div class="border-t border-gray-800 p-4">
+                  <p
+                    class="overflow-x-auto font-mono text-sm leading-relaxed text-gray-200"
+                    data-explanation
+                  ></p>
+                </div>
+              </details>
+              <p
+                class="mt-4 rounded-lg border border-gray-800 bg-gray-900/60 p-4 text-sm leading-relaxed text-gray-500"
+                data-explanation-empty
+              >
+                El desglose aparecerá cuando ingreses un número válido.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+    </Container>
+
+    <AdSlot placement="calculator-after-tool" />
+
+    <Container as="section" class="py-6 md:py-8">
+      <SectionIntro
+        title="Ejemplos rápidos"
+        description="Carga una conversión habitual y úsala como punto de partida."
+      />
+      <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        {
+          examples.map((example) => (
+            <button
+              class="min-h-24 rounded-lg border border-gray-800 bg-gray-950 p-4 text-left transition hover:border-amber-400/60 hover:bg-gray-900 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/30"
+              type="button"
+              data-example-value={example.value}
+              data-example-origin={example.origin}
+              data-example-destination={example.destination}
+            >
+              <span class="block text-sm font-semibold text-white">
+                {example.label}
+              </span>
+              <span class="mt-2 block font-mono text-sm text-amber-300">
+                {example.value} → {example.result}
+              </span>
+            </button>
+          ))
+        }
+      </div>
+    </Container>
+
+    <Container as="section" class="py-6 md:py-8">
+      <SectionIntro
+        title="Cómo funcionan las bases numéricas"
+        description="El valor no cambia: cambia la forma de representarlo."
+      />
+      <div class="grid gap-4 md:grid-cols-2">
+        <article class="rounded-lg border border-gray-800 bg-gray-950 p-5">
+          <h3 class="text-lg font-semibold">Dígitos disponibles</h3>
+          <p class="mt-3 text-sm leading-relaxed text-gray-400">
+            Una base usa tantos símbolos como indica su número. Binario emplea
+            <span class="font-mono text-gray-200">0–1</span>, decimal
+            <span class="font-mono text-gray-200">0–9</span> y hexadecimal
+            añade <span class="font-mono text-gray-200">A–F</span>. La base 36
+            llega hasta <span class="font-mono text-gray-200">Z</span>.
+          </p>
+        </article>
+        <article class="rounded-lg border border-gray-800 bg-gray-950 p-5">
+          <h3 class="text-lg font-semibold">Valor posicional</h3>
+          <p class="mt-3 text-sm leading-relaxed text-gray-400">
+            Cada posición representa una potencia de la base. Por ejemplo,
+            <span class="font-mono text-gray-200">FF₁₆</span> equivale a
+            <span class="font-mono text-gray-200">
+              15 × 16¹ + 15 × 16⁰ = 255
+            </span>.
+          </p>
+        </article>
+        <article class="rounded-lg border border-gray-800 bg-gray-950 p-5">
+          <h3 class="text-lg font-semibold">Binario y programación</h3>
+          <p class="mt-3 text-sm leading-relaxed text-gray-400">
+            El binario representa información con bits. Agruparlos de cuatro en
+            cuatro facilita compararlos con hexadecimal, porque cada grupo
+            corresponde exactamente a un dígito hexadecimal.
+          </p>
+        </article>
+        <article class="rounded-lg border border-gray-800 bg-gray-950 p-5">
+          <h3 class="text-lg font-semibold">Resultados exactos</h3>
+          <p class="mt-3 text-sm leading-relaxed text-gray-400">
+            Esta herramienta usa enteros <span class="font-mono text-gray-200">
+              BigInt
+            </span>, por lo que no redondea números grandes al convertirlos
+            entre bases.
+          </p>
+        </article>
+      </div>
+    </Container>
+
+    <FaqSection faqs={faqs} />
+  </PageShell>
+</BaseLayout>
+
+<script>
+  import {
+    COMMON_NUMBER_BASES,
+    MAX_NUMBER_BASE_INPUT_DIGITS,
+    buildPositionalExplanation,
+    convertToCommonNumberBases,
+    formatBigIntInBase,
+    getNumberBaseErrorMessage,
+    getNumberBaseLabel,
+    getValidDigitsForBase,
+    groupNumberBaseDigits,
+    isCommonNumberBase,
+    isValidNumberBase,
+    parseNumberBaseInput,
+    toSubscript,
+  } from "@lib/calculators/programacion/conversor-de-bases-numericas/numberBase";
+
+  function query(selector) {
+    const element = document.querySelector(selector);
+
+    if (!element) {
+      throw new Error(`No se encontró el elemento ${selector}.`);
+    }
+
+    return element;
+  }
+
+  const input = query("[data-number-input]");
+  const originSelect = query("[data-origin-base]");
+  const destinationSelect = query("[data-destination-base]");
+  const binaryGrouping = query("[data-group-binary]");
+  const errorElement = query("[data-number-error]");
+  const digitCount = query("[data-digit-count]");
+  const validDigits = query("[data-valid-digits]");
+  const resultBase = query("[data-result-base]");
+  const mainResult = query("[data-main-result]");
+  const resultNote = query("[data-result-note]");
+  const copyMainButton = query("[data-copy-main]");
+  const copyEquivalenceButton = query("[data-copy-equivalence]");
+  const copyStatus = query("[data-copy-status]");
+  const liveStatus = query("[data-live-status]");
+  const explanationPanel = query("[data-explanation-panel]");
+  const explanation = query("[data-explanation]");
+  const explanationEmpty = query("[data-explanation-empty]");
+  const clearButton = query("[data-clear-calculator]");
+  const swapButton = query("[data-swap-bases]");
+
+  const commonOutputElements = new Map(
+    COMMON_NUMBER_BASES.map((base) => [
+      base,
+      query(`[data-common-output="${base}"]`),
+    ]),
+  );
+
+  let currentMainResult = "";
+  let currentEquivalence = "";
+  let currentCommonResults = null;
+  let copyTimer = 0;
+  let liveTimer = 0;
+
+  function getSelectedBase(select) {
+    const base = Number(select.value);
+
+    return isValidNumberBase(base) ? base : 10;
+  }
+
+  function shouldGroupBinary() {
+    return binaryGrouping.checked;
+  }
+
+  function formatVisibleResult(value, base) {
+    return base === 2 && shouldGroupBinary()
+      ? groupNumberBaseDigits(value)
+      : value;
+  }
+
+  function countCandidateDigits(rawValue) {
+    return rawValue
+      .trim()
+      .replace(/^[+-]/, "")
+      .replace(/^0[bxo]/i, "")
+      .replace(/[\s_]/g, "").length;
+  }
+
+  function updateControls() {
+    const origin = getSelectedBase(originSelect);
+    const destination = getSelectedBase(destinationSelect);
+    const count = countCandidateDigits(input.value);
+
+    digitCount.textContent = `${count.toLocaleString("es-MX")} / ${MAX_NUMBER_BASE_INPUT_DIGITS.toLocaleString("es-MX")} dígitos`;
+    digitCount.classList.toggle(
+      "text-red-300",
+      count > MAX_NUMBER_BASE_INPUT_DIGITS,
+    );
+    digitCount.classList.toggle(
+      "text-gray-500",
+      count <= MAX_NUMBER_BASE_INPUT_DIGITS,
+    );
+    validDigits.textContent = getValidDigitsForBase(origin)
+      .split("")
+      .join(" ");
+    resultBase.textContent = `${getNumberBaseLabel(destination)} (base ${destination})`;
+
+    document
+      .querySelectorAll("[data-quick-base][data-base-target]")
+      .forEach((button) => {
+        const target = button.dataset.baseTarget;
+        const selectedBase =
+          target === "origin" ? origin : destination;
+        const active = Number(button.dataset.quickBase) === selectedBase;
+
+        button.setAttribute("aria-pressed", active ? "true" : "false");
+        button.classList.toggle("border-amber-400", active);
+        button.classList.toggle("bg-amber-400/10", active);
+        button.classList.toggle("text-amber-200", active);
+        button.classList.toggle("border-gray-700", !active);
+        button.classList.toggle("bg-gray-900", !active);
+        button.classList.toggle("text-gray-300", !active);
+      });
+  }
+
+  function setError(message = "") {
+    errorElement.textContent = message;
+    errorElement.classList.toggle("hidden", !message);
+    input.setAttribute("aria-invalid", message ? "true" : "false");
+  }
+
+  function clearOutputs(
+    note = "El resultado aparecerá mientras escribes.",
+  ) {
+    currentMainResult = "";
+    currentEquivalence = "";
+    currentCommonResults = null;
+    mainResult.textContent = "Esperando un número";
+    resultNote.textContent = note;
+    copyMainButton.classList.add("hidden");
+    copyEquivalenceButton.classList.add("hidden");
+    explanationPanel.classList.add("hidden");
+    explanation.textContent = "";
+    explanationEmpty.classList.remove("hidden");
+    explanationEmpty.textContent =
+      "El desglose aparecerá cuando ingreses un número válido.";
+
+    COMMON_NUMBER_BASES.forEach((base) => {
+      commonOutputElements.get(base).textContent = "—";
+      query(`[data-copy-base="${base}"]`).classList.add("hidden");
+      query(`[data-result-badge="${base}"]`).classList.add("hidden");
+      query(`[data-equivalence-card="${base}"]`).classList.remove(
+        "border-amber-400/50",
+      );
+    });
+  }
+
+  function scheduleAnnouncement(message) {
+    window.clearTimeout(liveTimer);
+    liveTimer = window.setTimeout(() => {
+      liveStatus.textContent = message;
+    }, 400);
+  }
+
+  function showCopyStatus(message) {
+    copyStatus.textContent = message;
+    window.clearTimeout(copyTimer);
+    copyTimer = window.setTimeout(() => {
+      copyStatus.textContent = "";
+    }, 2000);
+  }
+
+  function render() {
+    updateControls();
+
+    const origin = getSelectedBase(originSelect);
+    const destination = getSelectedBase(destinationSelect);
+    const parsed = parseNumberBaseInput(input.value, origin);
+
+    if (!parsed.ok) {
+      if (parsed.error === "empty") {
+        setError();
+        clearOutputs();
+      } else {
+        setError(getNumberBaseErrorMessage(parsed));
+        clearOutputs("Corrige la entrada para obtener la conversión.");
+      }
+
+      return;
+    }
+
+    const destinationResult = formatBigIntInBase(
+      parsed.value,
+      destination,
+    );
+    const commonResults = convertToCommonNumberBases(parsed.value);
+    const positional = buildPositionalExplanation(parsed);
+
+    setError();
+    currentMainResult = destinationResult;
+    currentEquivalence =
+      `${parsed.normalized}${toSubscript(origin)} = ` +
+      `${destinationResult}${toSubscript(destination)}`;
+    currentCommonResults = commonResults;
+    mainResult.textContent = formatVisibleResult(
+      destinationResult,
+      destination,
+    );
+    resultNote.textContent =
+      `${parsed.normalized} en ${getNumberBaseLabel(origin).toLowerCase()} ` +
+      `equivale al resultado mostrado en base ${destination}.`;
+    copyMainButton.classList.remove("hidden");
+    copyEquivalenceButton.classList.remove("hidden");
+
+    COMMON_NUMBER_BASES.forEach((base) => {
+      commonOutputElements.get(base).textContent = formatVisibleResult(
+        commonResults[base],
+        base,
+      );
+      query(`[data-copy-base="${base}"]`).classList.remove("hidden");
+
+      const isDestination = base === destination;
+
+      query(`[data-result-badge="${base}"]`).classList.toggle(
+        "hidden",
+        !isDestination,
+      );
+      query(`[data-equivalence-card="${base}"]`).classList.toggle(
+        "border-amber-400/50",
+        isDestination,
+      );
+    });
+
+    explanationPanel.classList.remove("hidden");
+    explanationEmpty.classList.add("hidden");
+    explanation.textContent =
+      positional.formula ??
+      positional.reason ??
+      "No hay un desglose disponible para esta entrada.";
+
+    scheduleAnnouncement(
+      `Resultado en base ${destination}: ${destinationResult}`,
+    );
+  }
+
+  async function copyText(text, successMessage) {
+    if (!text) {
+      return;
+    }
+
+    try {
+      await navigator.clipboard.writeText(text);
+      showCopyStatus(successMessage);
+    } catch {
+      showCopyStatus("No fue posible copiar automáticamente.");
+    }
+  }
+
+  input.addEventListener("input", render);
+  originSelect.addEventListener("change", render);
+  destinationSelect.addEventListener("change", render);
+  binaryGrouping.addEventListener("change", render);
+
+  swapButton.addEventListener("click", () => {
+    const previousOrigin = getSelectedBase(originSelect);
+    const previousDestination = getSelectedBase(destinationSelect);
+    const parsed = parseNumberBaseInput(input.value, previousOrigin);
+
+    originSelect.value = String(previousDestination);
+    destinationSelect.value = String(previousOrigin);
+
+    if (parsed.ok) {
+      input.value = formatBigIntInBase(parsed.value, previousDestination);
+    }
+
+    render();
+  });
+
+  clearButton.addEventListener("click", () => {
+    input.value = "";
+    originSelect.value = "10";
+    destinationSelect.value = "2";
+    binaryGrouping.checked = true;
+    setError();
+    render();
+    input.focus();
+  });
+
+  copyMainButton.addEventListener("click", () => {
+    copyText(currentMainResult, "Resultado copiado.");
+  });
+
+  copyEquivalenceButton.addEventListener("click", () => {
+    copyText(currentEquivalence, "Equivalencia copiada.");
+  });
+
+  document.addEventListener("click", (event) => {
+    if (!(event.target instanceof Element)) {
+      return;
+    }
+
+    const quickBaseButton = event.target.closest(
+      "[data-quick-base][data-base-target]",
+    );
+
+    if (quickBaseButton) {
+      const base = Number(quickBaseButton.dataset.quickBase);
+      const target = quickBaseButton.dataset.baseTarget;
+
+      if (!isCommonNumberBase(base)) {
+        return;
+      }
+
+      if (target === "origin") {
+        originSelect.value = String(base);
+      } else if (target === "destination") {
+        destinationSelect.value = String(base);
+      }
+
+      render();
+
+      return;
+    }
+
+    const copyBaseButton = event.target.closest("[data-copy-base]");
+
+    if (copyBaseButton) {
+      const base = Number(copyBaseButton.dataset.copyBase);
+
+      if (
+        currentCommonResults &&
+        isCommonNumberBase(base)
+      ) {
+        copyText(
+          currentCommonResults[base],
+          `${getNumberBaseLabel(base)} copiado.`,
+        );
+      }
+
+      return;
+    }
+
+    const exampleButton = event.target.closest("[data-example-value]");
+
+    if (!exampleButton) {
+      return;
+    }
+
+    const value = exampleButton.dataset.exampleValue;
+    const origin = Number(exampleButton.dataset.exampleOrigin);
+    const destination = Number(exampleButton.dataset.exampleDestination);
+
+    if (
+      typeof value !== "string" ||
+      !isValidNumberBase(origin) ||
+      !isValidNumberBase(destination)
+    ) {
+      return;
+    }
+
+    input.value = value;
+    originSelect.value = String(origin);
+    destinationSelect.value = String(destination);
+    render();
+    input.focus();
+    document.querySelector("#number-base-converter")?.scrollIntoView({
+      behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches
+        ? "auto"
+        : "smooth",
+      block: "start",
+    });
+  });
+
+  render();
+</script>

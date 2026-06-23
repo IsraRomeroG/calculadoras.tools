@@ -40,6 +40,10 @@ describe("calculator category directory", () => {
           slug: "probabilidad-estadistica",
           label: "Probabilidad y estadística",
         }),
+        expect.objectContaining({
+          slug: "programacion",
+          label: "Programación",
+        }),
       ]),
     );
     expect(categories.map((category) => category.slug)).not.toContain(
@@ -107,6 +111,7 @@ describe("calculator category directory", () => {
     expect(getCategoryByLabel("Probabilidad y estadística")?.slug).toBe(
       "probabilidad-estadistica",
     );
+    expect(getCategoryByLabel("Programación")?.slug).toBe("programacion");
     expect(getCategoryBySlugOrLegacySlug("legal-e-impuestos")?.slug).toBe(
       "legal-impuestos",
     );
