@@ -3,6 +3,7 @@ title: "TDEE y macros: cómo se relacionan"
 seoTitle: "TDEE y macros: de calorías diarias a proteína, grasas y carbohidratos"
 description: "Aprende cómo el TDEE ayuda a estimar calorías diarias y cómo esas calorías se pueden distribuir en macros."
 pubDate: 2027-07-09
+draft: true
 categorySlug: "salud"
 tags:
   - tdee

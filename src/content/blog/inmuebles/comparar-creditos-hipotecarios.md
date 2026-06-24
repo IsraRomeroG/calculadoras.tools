@@ -54,6 +54,19 @@ La tasa afecta los intereses. El CAT ayuda a revisar el costo anual total bajo u
 
 Ninguno de estos datos debe verse aislado. Un crédito con menor tasa puede no ser el mejor si tiene mayores cargos. Un crédito con menor mensualidad puede costar más si el plazo es más largo.
 
+## Escenarios por monto con los mismos supuestos
+
+Para comparar montos sin mezclar variables, usa los mismos supuestos en todos los casos. Esta tabla estima solo capital e intereses con tasa anual de `9%`, plazo de `20 años`, sin enganche, sin comisiones, sin seguros y con pagos mensuales fijos.
+
+| Monto financiado | Mensualidad base | Total pagado | Intereses estimados |
+| ----------------: | ---------------: | -----------: | ------------------: |
+|       $1,000,000 |        $8,997.26 | $2,159,342.29 |       $1,159,342.29 |
+|       $1,500,000 |       $13,495.89 | $3,239,013.44 |       $1,739,013.44 |
+|       $2,000,000 |       $17,994.52 | $4,318,684.59 |       $2,318,684.59 |
+|       $3,000,000 |       $26,991.78 | $6,478,026.88 |       $3,478,026.88 |
+
+Duplicar el monto no cambia solo la cuota: también duplica la exposición a tasa, plazo e intereses. Por eso conviene comparar el monto financiado junto con el enganche disponible y el pago mensual total que realmente cobrará la institución.
+
 ## Revisa seguros, comisiones y pagos anticipados
 
 Pregunta:

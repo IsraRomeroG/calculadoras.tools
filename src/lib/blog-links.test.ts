@@ -6,6 +6,23 @@ const blogContentDir = join(process.cwd(), "src", "content", "blog");
 const markdownExtension = ".md";
 const articleLinkPattern = /\/blog\/([a-z0-9-]+)\/?(?=([)#?\s"']))/g;
 const categorySlugPattern = /^categorySlug:\s*["']?([^"'\r\n]+)["']?\s*$/m;
+const retiredArticleSlugs = [
+  "cuanto-debo-pesar-si-mido-150",
+  "cuanto-debo-pesar-si-mido-155",
+  "cuanto-debo-pesar-si-mido-160",
+  "cuanto-debo-pesar-si-mido-165",
+  "cuanto-debo-pesar-si-mido-170",
+  "cuanto-debo-pesar-si-mido-175",
+  "cuanto-debo-pesar-si-mido-180",
+  "cuanto-debo-pesar-si-mido-185",
+  "tabla-peso-saludable-150-195",
+  "hipoteca-1000000-cuanto-pago",
+  "hipoteca-1500000-cuanto-pago",
+  "hipoteca-2000000-cuanto-pago",
+  "hipoteca-3000000-cuanto-pago",
+  "prestamo-50000-cuanto-pago",
+  "prestamo-100000-cuanto-pago",
+];
 
 const getMarkdownFiles = (directory: string): string[] =>
   readdirSync(directory, { withFileTypes: true }).flatMap((entry) => {
@@ -69,5 +86,26 @@ describe("blog content links", () => {
     });
 
     expect(legacyLinks).toEqual([]);
+  });
+
+  it("does not link to consolidated article URLs", () => {
+    const markdownFiles = getMarkdownFiles(blogContentDir);
+    const retiredLinks = markdownFiles.flatMap((filePath) => {
+      const relativePath = relative(process.cwd(), filePath);
+      const content = readFileSync(filePath, "utf8");
+
+      return retiredArticleSlugs.flatMap((slug) => {
+        const retiredLinkPattern = new RegExp(
+          `/blog/(?:[a-z0-9-]+/)?${slug}/?(?=([)#?\\s"']))`,
+          "g",
+        );
+
+        return Array.from(content.matchAll(retiredLinkPattern)).map(
+          (match) => `${relativePath}: replace retired link ${match[0]}`,
+        );
+      });
+    });
+
+    expect(retiredLinks).toEqual([]);
   });
 });

@@ -18,6 +18,8 @@ El peso saludable según estatura se puede estimar usando el rango de IMC adulto
 
 Hablar de rango es importante porque dos personas con la misma estatura pueden tener composiciones corporales distintas.
 
+Esta guía concentra las consultas por altura de 1.50 m a 1.95 m para que puedas comparar rangos en una sola tabla y, si lo necesitas, calcular tu dato exacto con la [calculadora de IMC](/salud/calculadora-de-imc).
+
 ## Cómo se calcula el peso saludable según estatura
 
 La fórmula del IMC es:

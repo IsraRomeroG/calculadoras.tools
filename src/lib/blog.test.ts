@@ -1,4 +1,5 @@
-import { describe, expect, it, vi } from "vitest";
+import { getCollection } from "astro:content";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { BlogPost } from "./blog";
 import {
   getBlogPostCategory,
@@ -6,6 +7,7 @@ import {
   getBlogRouteConflicts,
   getCategoryPageUrl,
   getCategoryUrl,
+  getPublishedBlogPosts,
 } from "./blog";
 
 vi.mock("astro:content", () => ({
@@ -20,6 +22,32 @@ const blogPost = (
     id,
     data: { categorySlug },
   }) as Pick<BlogPost, "id" | "data">;
+
+const publishableBlogPost = ({
+  categorySlug,
+  draft,
+  id,
+  pubDate,
+}: {
+  categorySlug: BlogPost["data"]["categorySlug"];
+  draft?: boolean;
+  id: string;
+  pubDate: string;
+}): BlogPost =>
+  ({
+    id,
+    data: {
+      categorySlug,
+      draft,
+      pubDate: new Date(pubDate),
+    },
+  }) as BlogPost;
+
+const mockedGetCollection = vi.mocked(getCollection);
+
+beforeEach(() => {
+  mockedGetCollection.mockReset();
+});
 
 describe("blog route helpers", () => {
   it("builds category URLs without the categoria segment", () => {
@@ -94,5 +122,39 @@ describe("blog route helpers", () => {
     expect(conflicts.map((conflict) => conflict.route)).toContain(
       "/blog/legal-e-impuestos",
     );
+  });
+
+  it("uses publication filtering before blog routes are generated", async () => {
+    const entries = [
+      publishableBlogPost({
+        categorySlug: "salud",
+        id: "salud/publicado",
+        pubDate: "2026-06-20",
+      }),
+      publishableBlogPost({
+        categorySlug: "salud",
+        draft: true,
+        id: "salud/borrador",
+        pubDate: "2026-06-20",
+      }),
+      publishableBlogPost({
+        categorySlug: "salud",
+        id: "salud/futuro",
+        pubDate: "2026-06-24",
+      }),
+    ];
+
+    mockedGetCollection.mockImplementationOnce(
+      async (_collection, filter) =>
+        entries.filter((entry) =>
+          filter?.({ data: entry.data, id: entry.id } as BlogPost),
+        ),
+    );
+
+    const posts = await getPublishedBlogPosts(
+      new Date("2026-06-23T18:00:00.000Z"),
+    );
+
+    expect(posts.map(getBlogPostUrl)).toEqual(["/blog/salud/publicado"]);
   });
 });

@@ -26,6 +26,17 @@ Un préstamo de `$50,000` puede tener una cuota de `$2,643.55` a 24 meses, o una
 
 La CONDUSEF recomienda comparar pago total, CAT, tasa de interés y comisiones antes de contratar un crédito.
 
+## Escenarios de $50,000 y $100,000
+
+Cuando solo cambia el monto, la comparación debe mantener iguales tasa y plazo. Esta tabla usa tasa anual de `24%`, plazo de `36 meses`, pagos mensuales fijos y no incluye comisión ni seguro.
+
+| Monto solicitado | Mensualidad base | Intereses estimados | Total pagado |
+| ---------------: | ---------------: | ------------------: | -----------: |
+|          $50,000 |        $1,961.64 |          $20,619.14 |   $70,619.14 |
+|         $100,000 |        $3,923.29 |          $41,238.27 |  $141,238.27 |
+
+Si el préstamo de `$50,000` se paga a `24 meses` con la misma tasa, la cuota sube a `$2,643.55` y los intereses bajan a `$13,445.32`. El monto, la tasa y el plazo deben revisarse juntos: una mensualidad menor puede venir de un plazo más largo y un costo total mayor.
+
 ## Reúne los mismos datos de cada oferta
 
 Para cada préstamo, pide o identifica:

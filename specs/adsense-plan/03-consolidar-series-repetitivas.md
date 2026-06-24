@@ -28,11 +28,20 @@ Series mencionadas en el plan base:
   - `src/content/blog/finanzas/prestamo-50000-cuanto-pago.md`
   - `src/content/blog/finanzas/prestamo-100000-cuanto-pago.md`
 
+Destinos y piezas relacionadas:
+
+- `src/content/blog/salud/peso-saludable-segun-estatura.md`
+- `src/content/blog/salud/tabla-peso-saludable-150-195.md`
+- `src/content/blog/inmuebles/comparar-creditos-hipotecarios.md`
+- `src/content/blog/finanzas/comparar-dos-prestamos.md`
+
 Archivos de soporte:
 
 - `public/.htaccess`
 - `astro.config.mjs`
 - `src/lib/blog.ts`
+- `src/lib/blog-sitemap.mjs`
+- `src/lib/blog-sitemap.test.ts`
 - `src/lib/blog-links.test.ts`
 - `src/lib/internal-links.test.ts`
 - Sitemap generado por `@astrojs/sitemap`
@@ -50,13 +59,29 @@ Una URL numérica independiente solo se conserva si aporta al menos uno:
 
 Cambiar solo monto, peso, estatura, tasa, plazo o unidad no es suficiente.
 
+## Regla de destino publicado
+
+Toda URL destino de un 301 debe existir, ser publicable en la fecha de
+despliegue (`draft: true` ausente y `pubDate` no futura) y quedar incluida en
+el sitemap final. No crear redirects hacia borradores, rutas futuras o archivos
+retirados.
+
+Si una pieza fuente nunca estuvo publicada por ser borrador o futura, fusionar
+el contenido útil en el destino canónico y retirar el archivo. Aun así, si el
+slug aparece en reglas legacy existentes de `.htaccess`, esas reglas deben
+apuntar directo al destino final para evitar 301 intermedios o 404.
+
 ## Destinos recomendados
 
 ### Estatura
 
 Destino principal recomendado:
 
-`/blog/salud/tabla-peso-saludable-150-195`
+`/blog/salud/peso-saludable-segun-estatura`
+
+No publicar `/blog/salud/tabla-peso-saludable-150-195` como segunda URL si
+solapa la misma intención. Ese borrador debe fusionarse en
+`src/content/blog/salud/peso-saludable-segun-estatura.md` o retirarse.
 
 Condición: la guía debe convertirse en una pieza fuerte, no solo una tabla. Debe
 incluir:
@@ -73,21 +98,21 @@ incluir:
 URLs a redirigir:
 
 ```apache
-RewriteRule ^blog/salud/cuanto-debo-pesar-si-mido-150/?$ /blog/salud/tabla-peso-saludable-150-195 [R=301,L]
-RewriteRule ^blog/salud/cuanto-debo-pesar-si-mido-155/?$ /blog/salud/tabla-peso-saludable-150-195 [R=301,L]
-RewriteRule ^blog/salud/cuanto-debo-pesar-si-mido-160/?$ /blog/salud/tabla-peso-saludable-150-195 [R=301,L]
-RewriteRule ^blog/salud/cuanto-debo-pesar-si-mido-165/?$ /blog/salud/tabla-peso-saludable-150-195 [R=301,L]
-RewriteRule ^blog/salud/cuanto-debo-pesar-si-mido-170/?$ /blog/salud/tabla-peso-saludable-150-195 [R=301,L]
-RewriteRule ^blog/salud/cuanto-debo-pesar-si-mido-175/?$ /blog/salud/tabla-peso-saludable-150-195 [R=301,L]
-RewriteRule ^blog/salud/cuanto-debo-pesar-si-mido-180/?$ /blog/salud/tabla-peso-saludable-150-195 [R=301,L]
-RewriteRule ^blog/salud/cuanto-debo-pesar-si-mido-185/?$ /blog/salud/tabla-peso-saludable-150-195 [R=301,L]
+RewriteRule ^blog/salud/cuanto-debo-pesar-si-mido-150/?$ /blog/salud/peso-saludable-segun-estatura [R=301,L]
+RewriteRule ^blog/salud/cuanto-debo-pesar-si-mido-155/?$ /blog/salud/peso-saludable-segun-estatura [R=301,L]
+RewriteRule ^blog/salud/cuanto-debo-pesar-si-mido-160/?$ /blog/salud/peso-saludable-segun-estatura [R=301,L]
+RewriteRule ^blog/salud/cuanto-debo-pesar-si-mido-165/?$ /blog/salud/peso-saludable-segun-estatura [R=301,L]
+RewriteRule ^blog/salud/cuanto-debo-pesar-si-mido-170/?$ /blog/salud/peso-saludable-segun-estatura [R=301,L]
+RewriteRule ^blog/salud/cuanto-debo-pesar-si-mido-175/?$ /blog/salud/peso-saludable-segun-estatura [R=301,L]
+RewriteRule ^blog/salud/cuanto-debo-pesar-si-mido-180/?$ /blog/salud/peso-saludable-segun-estatura [R=301,L]
+RewriteRule ^blog/salud/cuanto-debo-pesar-si-mido-185/?$ /blog/salud/peso-saludable-segun-estatura [R=301,L]
 ```
 
 También mantener o actualizar las reglas legacy de una sola ruta si siguen
 existiendo:
 
 ```apache
-RewriteRule ^blog/(cuanto-debo-pesar-si-mido-150|cuanto-debo-pesar-si-mido-155|cuanto-debo-pesar-si-mido-160|cuanto-debo-pesar-si-mido-165|cuanto-debo-pesar-si-mido-170|cuanto-debo-pesar-si-mido-175|cuanto-debo-pesar-si-mido-180|cuanto-debo-pesar-si-mido-185)/?$ /blog/salud/tabla-peso-saludable-150-195 [R=301,L]
+RewriteRule ^blog/(cuanto-debo-pesar-si-mido-150|cuanto-debo-pesar-si-mido-155|cuanto-debo-pesar-si-mido-160|cuanto-debo-pesar-si-mido-165|cuanto-debo-pesar-si-mido-170|cuanto-debo-pesar-si-mido-175|cuanto-debo-pesar-si-mido-180|cuanto-debo-pesar-si-mido-185)/?$ /blog/salud/peso-saludable-segun-estatura [R=301,L]
 ```
 
 ### Hipotecas por monto
@@ -156,7 +181,8 @@ Antes de borrar cualquier archivo:
 - Revisar Search Console si hay datos disponibles.
 - Confirmar si alguna URL tiene enlaces externos.
 - Confirmar si alguna pieza responde una intención distinta.
-- Documentar decisión por URL: conservar, fusionar, retirar.
+- Documentar decisión por URL: estado actual, conservar, fusionar, retirar,
+  destino final y si necesita 301.
 
 Si no hay datos externos, aplicar la regla editorial de esta spec.
 
@@ -171,11 +197,24 @@ No redirigir hacia una página débil. Primero mejorar el destino:
 - Enlaces internos útiles.
 - `updatedDate` solo si se revisó de verdad.
 
+Los destinos deben absorber explícitamente las variantes retiradas:
+
+- Salud: alturas de 1.50 m a 1.95 m en
+  `peso-saludable-segun-estatura.md`; no conservar una segunda tabla pública
+  con la misma intención.
+- Hipotecas: escenarios de 1,000,000; 1,500,000; 2,000,000 y 3,000,000 en
+  `comparar-creditos-hipotecarios.md` o en el destino alternativo elegido.
+- Préstamos: escenarios de 50,000 y 100,000 en
+  `comparar-dos-prestamos.md` o en el destino alternativo elegido.
+
 ### 3. Retirar rutas fuente
 
 Después de agregar redirects:
 
 - Eliminar los archivos Markdown fuente que se retiran.
+- Fusionar o retirar `src/content/blog/salud/tabla-peso-saludable-150-195.md`;
+  no publicarlo como URL paralela si su intención queda cubierta por
+  `peso-saludable-segun-estatura.md`.
 - Eliminar enlaces internos hacia URLs retiradas.
 - Confirmar que el sitemap ya no las incluye.
 - No dejar páginas vacías con `noindex`.
@@ -201,6 +240,7 @@ hipoteca-2000000-cuanto-pago
 hipoteca-3000000-cuanto-pago
 prestamo-50000-cuanto-pago
 prestamo-100000-cuanto-pago
+tabla-peso-saludable-150-195
 ```
 
 ### 5. Actualizar redirects legacy
@@ -208,19 +248,27 @@ prestamo-100000-cuanto-pago
 `public/.htaccess` ya contiene reglas que redirigen slugs legacy de una sola
 ruta hacia `/blog/{categoria}/{slug}`. Cuando una URL se retire, esas reglas
 deben apuntar directamente al destino final para evitar cadenas de redirects.
+Esto implica retirar esos slugs de las reglas legacy amplias o colocar reglas
+específicas antes de ellas.
 
 Ejemplo:
 
 ```apache
+RewriteRule ^blog/(cuanto-debo-pesar-si-mido-150|cuanto-debo-pesar-si-mido-155|cuanto-debo-pesar-si-mido-160|cuanto-debo-pesar-si-mido-165|cuanto-debo-pesar-si-mido-170|cuanto-debo-pesar-si-mido-175|cuanto-debo-pesar-si-mido-180|cuanto-debo-pesar-si-mido-185)/?$ /blog/salud/peso-saludable-segun-estatura [R=301,L]
+RewriteRule ^blog/(hipoteca-1000000-cuanto-pago|hipoteca-1500000-cuanto-pago|hipoteca-2000000-cuanto-pago|hipoteca-3000000-cuanto-pago)/?$ /blog/inmuebles/comparar-creditos-hipotecarios [R=301,L]
 RewriteRule ^blog/(prestamo-50000-cuanto-pago|prestamo-100000-cuanto-pago)/?$ /blog/finanzas/comparar-dos-prestamos [R=301,L]
 ```
 
 ## Pruebas requeridas
 
-- Prueba de enlaces internos: ningún Markdown apunta a slugs retirados.
-- Prueba de sitemap o snapshot: URLs retiradas no aparecen en sitemap.
+- Prueba de enlaces internos: ningún Markdown apunta a slugs retirados. Si las
+  pruebas actuales solo validan trailing slash o rutas legacy, agregar una lista
+  explícita de slugs retirados.
+- Prueba en `src/lib/blog-sitemap.test.ts` o snapshot equivalente: URLs
+  retiradas y destinos no publicables no aparecen en sitemap.
 - Prueba de redirects, si existe harness para `.htaccess`, o checklist manual
-  documentado.
+  documentado. Debe cubrir `/blog/{slug}` y `/blog/{categoria}/{slug}` y
+  confirmar que ambos saltan directo al destino final, sin cadena.
 - Prueba de conflictos de rutas en `src/lib/blog.ts` sigue pasando.
 
 No ejecutar `npm run build` salvo solicitud explícita. Para esta fase basta con
@@ -230,9 +278,13 @@ pruebas unitarias relevantes si se modifican tests.
 
 - No quedan series publicadas cuya diferencia principal sea sustituir una cifra.
 - Cada URL retirada responde con 301 al destino más relevante.
+- Ningún 301 apunta a una URL borrador, futura, retirada o ausente del sitemap.
 - No hay cadenas de redirects desde URLs legacy.
 - El sitemap solo incluye las URLs consolidadas.
 - No existen enlaces internos hacia URLs retiradas.
+- La serie de estatura queda consolidada en
+  `/blog/salud/peso-saludable-segun-estatura`; no se publica
+  `/blog/salud/tabla-peso-saludable-150-195` como segunda tabla solapada.
 - Los destinos consolidados tienen suficiente explicación, tabla, fuentes y
   límites.
 
@@ -250,3 +302,16 @@ Riesgo: crear redirects duplicados o en orden incorrecto.
 
 Mitigación: colocar reglas específicas antes de reglas amplias y evitar saltos
 intermedios.
+
+Riesgo: redirigir hacia una URL que no se genera por estar en `draft`, tener
+`pubDate` futura o haber sido retirada.
+
+Mitigación: verificar estado publicable y sitemap del destino antes de agregar
+el 301.
+
+Riesgo: crear una segunda URL de tabla de peso que compita con la guía ya
+publicada de peso saludable por estatura.
+
+Mitigación: consolidar la serie de estatura en
+`/blog/salud/peso-saludable-segun-estatura` y fusionar o retirar
+`tabla-peso-saludable-150-195`.

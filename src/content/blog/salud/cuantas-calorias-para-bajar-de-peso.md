@@ -3,6 +3,7 @@ title: "Cuántas calorías comer para bajar de peso"
 seoTitle: "Cuántas calorías comer para bajar de peso: empieza con tu TDEE"
 description: "Aprende por qué el primer paso para estimar calorías para bajar de peso es conocer tu TDEE y aplicar un déficit prudente."
 pubDate: 2027-07-05
+draft: true
 categorySlug: "salud"
 tags:
   - calorías

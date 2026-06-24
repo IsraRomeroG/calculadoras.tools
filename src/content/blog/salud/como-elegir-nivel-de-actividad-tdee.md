@@ -3,6 +3,7 @@ title: "Cómo elegir tu nivel de actividad para calcular TDEE"
 seoTitle: "Nivel de actividad en TDEE: sedentario, ligero, moderado o alto"
 description: "Aprende cómo elegir el factor de actividad para calcular tus calorías diarias sin sobreestimar tu gasto energético."
 pubDate: 2027-07-02
+draft: true
 categorySlug: "salud"
 tags:
   - tdee

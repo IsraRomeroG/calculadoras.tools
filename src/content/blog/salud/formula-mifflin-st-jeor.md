@@ -3,6 +3,7 @@ title: "Fórmula Mifflin-St Jeor: cómo calcula la TMB"
 seoTitle: "Fórmula Mifflin-St Jeor para TMB: ecuaciones y ejemplo"
 description: "Conoce la fórmula Mifflin-St Jeor para estimar la tasa metabólica basal y cómo se usa después para calcular TDEE."
 pubDate: 2027-07-08
+draft: true
 categorySlug: "salud"
 tags:
   - mifflin st jeor
