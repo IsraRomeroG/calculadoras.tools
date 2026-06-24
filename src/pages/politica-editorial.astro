@@ -1,0 +1,80 @@
+---
+import BaseLayout from "@layouts/BaseLayout.astro";
+import Container from "@components/layout/Container.astro";
+import PageShell from "@components/layout/PageShell.astro";
+import PageHero from "@components/shared/PageHero.astro";
+import Panel from "@components/shared/Panel.astro";
+
+const description =
+  "Revisa la política editorial de calculadoras.tools: selección de temas, fuentes, actualizaciones, publicidad y uso responsable de herramientas de apoyo.";
+const canonical = "/politica-editorial";
+
+const sections = [
+  {
+    title: "Selección de temas",
+    content:
+      "Se priorizan calculadoras y guías que respondan una tarea clara. Una página debe aportar explicación, método, límites o ejemplos propios; no basta con repetir una respuesta breve que otra URL cubre mejor.",
+  },
+  {
+    title: "Fuentes",
+    content:
+      "En temas sensibles se prefieren fuentes primarias: organismos públicos, reguladores, documentación técnica, instituciones profesionales o publicaciones con metodología clara. Las fuentes se revisan para confirmar que respaldan la afirmación donde se citan.",
+  },
+  {
+    title: "Autoría y revisión",
+    content:
+      "Cada artículo debe mostrar un autor o responsable editorial. Los revisores solo se mencionan cuando la revisión ocurrió realmente; no se inventan cargos, experiencia profesional ni credenciales.",
+  },
+  {
+    title: "Uso de herramientas de apoyo",
+    content:
+      "Pueden usarse herramientas de apoyo para estructurar borradores, detectar inconsistencias o mejorar redacción, pero la publicación requiere revisión humana. Las herramientas de apoyo no sustituyen fuentes ni experiencia profesional.",
+  },
+  {
+    title: "Actualizaciones",
+    content:
+      "La fecha de actualización solo debe cambiar cuando exista una revisión o modificación editorial sustancial. Las correcciones menores de estilo no justifican presentar una página como revisada en profundidad.",
+  },
+  {
+    title: "Publicidad",
+    content:
+      "La publicidad debe estar separada del contenido editorial. Los anuncios no deben dictar temas, resultados de calculadoras, fuentes citadas ni conclusiones.",
+  },
+];
+---
+
+<BaseLayout
+  title="Política editorial"
+  description={description}
+  canonical={canonical}
+>
+  <PageShell>
+    <PageHero
+      title="Política editorial"
+      description="Estas reglas explican cómo se selecciona, revisa y actualiza el contenido de calculadoras.tools, y qué compromisos editoriales se aplican antes de publicar."
+      breadcrumbs={[
+        { label: "Inicio", href: "/", ariaLabel: "Inicio" },
+        { label: "Política editorial" },
+      ]}
+      containerClass="px-6 py-10"
+      breadcrumbClass="mb-8"
+      titleClass="text-4xl font-bold tracking-tight md:text-6xl"
+      descriptionClass="mt-6 text-lg leading-relaxed text-gray-400"
+    />
+
+    <Container as="section" class="px-6 py-14">
+      <div class="grid gap-6">
+        {
+          sections.map((section) => (
+            <Panel as="section" padding="lg">
+              <h2 class="text-xl font-semibold">{section.title}</h2>
+              <p class="mt-3 leading-relaxed text-gray-400">
+                {section.content}
+              </p>
+            </Panel>
+          ))
+        }
+      </div>
+    </Container>
+  </PageShell>
+</BaseLayout>

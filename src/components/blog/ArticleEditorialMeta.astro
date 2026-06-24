@@ -1,0 +1,86 @@
+---
+import { formatBlogDate } from "@lib/blog";
+import { getEditorialAuthor } from "@lib/editorial";
+import type { BlogFrontmatter } from "@lib/blog-schema";
+
+interface Props {
+  data: BlogFrontmatter;
+}
+
+const { data } = Astro.props;
+const author = getEditorialAuthor(data.author);
+const publishedDate = data.pubDate.toISOString();
+---
+
+<div class="mt-6 space-y-3 text-sm text-gray-500">
+  <div class="flex flex-wrap items-center gap-x-3 gap-y-2">
+    <span>
+      Por{" "}
+      {
+        author.url ? (
+          <a href={author.url} class="font-medium text-gray-300 hover:text-white">
+            {author.name}
+          </a>
+        ) : (
+          <span class="font-medium text-gray-300">{author.name}</span>
+        )
+      }
+    </span>
+    <span aria-hidden="true">·</span>
+    <span>
+      Publicado{" "}
+      <time datetime={publishedDate}>{formatBlogDate(data.pubDate)}</time>
+    </span>
+    {
+      data.updatedDate && (
+        <>
+          <span aria-hidden="true">·</span>
+          <span>
+            Actualizado{" "}
+            <time datetime={data.updatedDate.toISOString()}>
+              {formatBlogDate(data.updatedDate)}
+            </time>
+          </span>
+        </>
+      )
+    }
+    {
+      data.readTime && (
+        <>
+          <span aria-hidden="true">·</span>
+          <span>{data.readTime}</span>
+        </>
+      )
+    }
+  </div>
+
+  {
+    data.reviewer && data.reviewedDate && (
+      <p>
+        Revisado por{" "}
+        {data.reviewer.url ? (
+          <a
+            href={data.reviewer.url}
+            class="font-medium text-gray-300 hover:text-white"
+          >
+            {data.reviewer.name}
+          </a>
+        ) : (
+          <span class="font-medium text-gray-300">{data.reviewer.name}</span>
+        )}
+        {data.reviewer.role && `, ${data.reviewer.role}`} ·{" "}
+        <time datetime={data.reviewedDate.toISOString()}>
+          {formatBlogDate(data.reviewedDate)}
+        </time>
+      </p>
+    )
+  }
+
+  {
+    data.reviewNote && (
+      <p class="max-w-2xl leading-relaxed text-gray-400">
+        Revisión editorial: {data.reviewNote}
+      </p>
+    )
+  }
+</div>

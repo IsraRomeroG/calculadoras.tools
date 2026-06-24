@@ -1,13 +1,16 @@
 ---
 import { render } from "astro:content";
+import ArticleEditorialMeta from "@components/blog/ArticleEditorialMeta.astro";
+import ArticleSources from "@components/blog/ArticleSources.astro";
 import BaseLayout from "@layouts/BaseLayout.astro";
 import AdSlot from "@components/ads/AdSlot.astro";
 import Container from "@components/layout/Container.astro";
 import PageShell from "@components/layout/PageShell.astro";
 import PageHero from "@components/shared/PageHero.astro";
+import Panel from "@components/shared/Panel.astro";
+import { buildBlogArticleJsonLd } from "@lib/blog-article-jsonld";
 import {
   assertNoBlogRouteConflicts,
-  formatBlogDate,
   getBlogPostCategory,
   getBlogPostCategorySlug,
   getBlogPostSlug,
@@ -39,32 +42,20 @@ const category = getBlogPostCategory(post);
 const { Content } = await render(post);
 const title = post.data.seoTitle ?? post.data.title;
 const description = post.data.description;
+const siteUrl = Astro.site ?? Astro.url;
 const canonical = new URL(
   getBlogPostUrl(post),
-  Astro.site ?? Astro.url,
+  siteUrl,
 ).toString();
-const publishedDate = post.data.pubDate.toISOString();
-const modifiedDate = (post.data.updatedDate ?? post.data.pubDate).toISOString();
-const articleJsonLd = {
-  "@context": "https://schema.org",
-  "@type": "Article",
-  headline: post.data.title,
+const articleJsonLd = buildBlogArticleJsonLd({
+  author: post.data.author,
+  canonical,
   description,
-  datePublished: publishedDate,
-  dateModified: modifiedDate,
-  author: {
-    "@type": "Organization",
-    name: "Calculadoras.Tools",
-  },
-  publisher: {
-    "@type": "Organization",
-    name: "Calculadoras.Tools",
-  },
-  mainEntityOfPage: {
-    "@type": "WebPage",
-    "@id": canonical,
-  },
-};
+  headline: post.data.title,
+  pubDate: post.data.pubDate,
+  siteUrl,
+  updatedDate: post.data.updatedDate,
+});
 ---
 
 <BaseLayout title={title} description={description} canonical={canonical}>
@@ -96,19 +87,7 @@ const articleJsonLd = {
           },
         ]}
       >
-        <div class="mt-6 flex flex-wrap items-center gap-x-3 gap-y-2 text-sm text-gray-500">
-          <time datetime={publishedDate}>
-            {formatBlogDate(post.data.pubDate)}
-          </time>
-          {
-            post.data.readTime && (
-              <>
-                <span aria-hidden="true">·</span>
-                <span>{post.data.readTime}</span>
-              </>
-            )
-          }
-        </div>
+        <ArticleEditorialMeta data={post.data} />
       </PageHero>
 
       <Container
@@ -118,7 +97,20 @@ const articleJsonLd = {
         <div
           class="blog-content max-w-none text-base leading-7 text-gray-300"
         >
+          {
+            post.data.methodologyNote && (
+              <Panel as="aside" class="mb-8 border-amber-400/40 bg-amber-400/5">
+                <h2 class="text-base font-semibold text-white">
+                  Nota metodológica
+                </h2>
+                <p class="mt-2 text-sm leading-relaxed text-gray-300">
+                  {post.data.methodologyNote}
+                </p>
+              </Panel>
+            )
+          }
           <Content />
+          <ArticleSources sources={post.data.sources} />
         </div>
 
         <aside class="space-y-5 text-sm lg:sticky lg:top-8 lg:self-start">

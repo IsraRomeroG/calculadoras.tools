@@ -65,9 +65,21 @@ describe("advertising placements", () => {
     expect(postTemplate).toContain('variant="rectangle"');
   });
 
-  it("keeps ads off utility pages", () => {
-    ["privacidad.astro", "contacto.astro", "404.astro"].forEach((page) => {
-      expect(read(join(PAGES_DIR, page)), page).not.toContain("<AdSlot");
+  it("keeps ads off utility and trust pages", () => {
+    [
+      ["privacidad.astro"],
+      ["contacto.astro"],
+      ["404.astro"],
+      ["acerca-de.astro"],
+      ["metodologia.astro"],
+      ["politica-editorial.astro"],
+      ["correcciones.astro"],
+      ["avisos", "salud.astro"],
+      ["avisos", "financiero-fiscal.astro"],
+    ].forEach((pageSegments) => {
+      const page = join(PAGES_DIR, ...pageSegments);
+
+      expect(read(page), pageSegments.join("/")).not.toContain("<AdSlot");
     });
   });
 });

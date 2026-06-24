@@ -1,0 +1,67 @@
+---
+import BaseLayout from "@layouts/BaseLayout.astro";
+import Container from "@components/layout/Container.astro";
+import PageShell from "@components/layout/PageShell.astro";
+import PageHero from "@components/shared/PageHero.astro";
+import Panel from "@components/shared/Panel.astro";
+
+const description =
+  "Aviso de salud de calculadoras.tools: las calculadoras y guías son educativas, estimativas y no sustituyen atención médica.";
+const canonical = "/avisos/salud";
+
+const sections = [
+  {
+    title: "Uso educativo",
+    content:
+      "Las calculadoras y guías de salud publicadas en calculadoras.tools tienen finalidad educativa. Ayudan a entender rangos, fórmulas o estimaciones, pero no evalúan tu situación clínica completa.",
+  },
+  {
+    title: "No sustituye atención médica",
+    content:
+      "El contenido no reemplaza diagnóstico, tratamiento, seguimiento ni criterio de un profesional de la salud. Si tienes síntomas, dudas sobre medicación o cambios recientes importantes, consulta con un profesional.",
+  },
+  {
+    title: "Casos que requieren especial cuidado",
+    content:
+      "Embarazo, menores, enfermedad, síntomas persistentes, medicación, trastornos alimentarios, condiciones crónicas o antecedentes médicos relevantes requieren orientación profesional antes de tomar decisiones.",
+  },
+  {
+    title: "Fuentes y límites",
+    content:
+      "Las fuentes respaldan información general y fórmulas de referencia. No convierten una estimación en diagnóstico individual ni garantizan que un resultado aplique a todos los casos.",
+  },
+];
+---
+
+<BaseLayout title="Aviso de salud" description={description} canonical={canonical}>
+  <PageShell>
+    <PageHero
+      title="Aviso de salud"
+      description="Los resultados relacionados con salud deben leerse como información general y estimativa. No uses una calculadora como diagnóstico ni como sustituto de atención médica."
+      breadcrumbs={[
+        { label: "Inicio", href: "/", ariaLabel: "Inicio" },
+        { label: "Metodología", href: "/metodologia", optional: true },
+        { label: "Aviso de salud" },
+      ]}
+      containerClass="px-6 py-10"
+      breadcrumbClass="mb-8"
+      titleClass="text-4xl font-bold tracking-tight md:text-6xl"
+      descriptionClass="mt-6 text-lg leading-relaxed text-gray-400"
+    />
+
+    <Container as="section" class="px-6 py-14">
+      <div class="grid gap-6">
+        {
+          sections.map((section) => (
+            <Panel as="section" padding="lg">
+              <h2 class="text-xl font-semibold">{section.title}</h2>
+              <p class="mt-3 leading-relaxed text-gray-400">
+                {section.content}
+              </p>
+            </Panel>
+          ))
+        }
+      </div>
+    </Container>
+  </PageShell>
+</BaseLayout>

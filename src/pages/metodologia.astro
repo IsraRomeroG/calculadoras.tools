@@ -1,0 +1,110 @@
+---
+import BaseLayout from "@layouts/BaseLayout.astro";
+import Container from "@components/layout/Container.astro";
+import PageShell from "@components/layout/PageShell.astro";
+import PageHero from "@components/shared/PageHero.astro";
+import Panel from "@components/shared/Panel.astro";
+
+const description =
+  "Consulta cómo calculadoras.tools selecciona calculadoras, revisa fórmulas, usa fuentes y maneja contenido sensible.";
+const canonical = "/metodologia";
+
+const sections = [
+  {
+    title: "Selección de calculadoras",
+    content:
+      "Una calculadora merece existir cuando resuelve una tarea concreta, puede explicarse con entradas claras y aporta utilidad propia. No se crean URLs solo para cambiar una cifra, una unidad o un país sin valor editorial verificable.",
+  },
+  {
+    title: "Fórmulas, unidades y ejemplos",
+    content:
+      "Cuando una herramienta depende de una fórmula, se documentan variables, unidades y supuestos. Los ejemplos se escriben con números reproducibles para que el usuario pueda comparar el resultado con la calculadora.",
+  },
+  {
+    title: "Fuentes",
+    content:
+      "Se priorizan fuentes primarias, organismos públicos, documentación técnica y referencias con autoría o metodología visible. Las fuentes deben respaldar afirmaciones concretas, no funcionar como enlaces decorativos.",
+  },
+  {
+    title: "Pruebas de resultados",
+    content:
+      "Las calculadoras se prueban con escenarios conocidos, casos límite y validaciones de entrada. Cuando el resultado es una estimación, la página debe decirlo de forma visible.",
+  },
+  {
+    title: "Contenido sensible",
+    content:
+      "En salud, finanzas, inmuebles e impuestos se usan advertencias más claras, fuentes más estrictas y límites explícitos. El contenido educativo no reemplaza diagnóstico, asesoría financiera, fiscal, legal o hipotecaria.",
+  },
+];
+
+const representativeLinks = [
+  { href: "/salud/calculadora-de-imc", label: "Calculadora de IMC" },
+  { href: "/finanzas/calculadora-de-prestamo", label: "Calculadora de préstamo" },
+  { href: "/inmuebles/calculadora-de-hipoteca", label: "Calculadora de hipoteca" },
+  { href: "/legal-impuestos/calculadora-de-iva", label: "Calculadora de IVA" },
+];
+---
+
+<BaseLayout title="Metodología" description={description} canonical={canonical}>
+  <PageShell>
+    <PageHero
+      title="Metodología"
+      description="Esta página resume cómo se decide qué publicar, cómo se revisan fórmulas y fuentes, y qué límites se comunican cuando un cálculo puede influir en decisiones importantes."
+      breadcrumbs={[
+        { label: "Inicio", href: "/", ariaLabel: "Inicio" },
+        { label: "Metodología" },
+      ]}
+      containerClass="px-6 py-10"
+      breadcrumbClass="mb-8"
+      titleClass="text-4xl font-bold tracking-tight md:text-6xl"
+      descriptionClass="mt-6 text-lg leading-relaxed text-gray-400"
+    />
+
+    <Container as="section" class="px-6 py-14">
+      <div class="grid gap-6">
+        {
+          sections.map((section) => (
+            <Panel as="section" padding="lg">
+              <h2 class="text-xl font-semibold">{section.title}</h2>
+              <p class="mt-3 leading-relaxed text-gray-400">
+                {section.content}
+              </p>
+            </Panel>
+          ))
+        }
+
+        <Panel as="section" padding="lg">
+          <h2 class="text-xl font-semibold">Ejemplos representativos</h2>
+          <ul class="mt-4 grid gap-3 text-sm text-gray-400 sm:grid-cols-2">
+            {
+              representativeLinks.map((link) => (
+                <li>
+                  <a class="text-amber-400 hover:text-amber-300" href={link.href}>
+                    {link.label}
+                  </a>
+                </li>
+              ))
+            }
+          </ul>
+        </Panel>
+
+        <Panel as="section" padding="lg">
+          <h2 class="text-xl font-semibold">Avisos generales</h2>
+          <p class="mt-3 leading-relaxed text-gray-400">
+            Antes de usar resultados en decisiones personales, revisa el{" "}
+            <a class="text-amber-400 hover:text-amber-300" href="/avisos/salud">
+              aviso de salud
+            </a>{" "}
+            y el{" "}
+            <a
+              class="text-amber-400 hover:text-amber-300"
+              href="/avisos/financiero-fiscal"
+            >
+              aviso financiero y fiscal
+            </a>.
+          </p>
+        </Panel>
+      </div>
+    </Container>
+  </PageShell>
+</BaseLayout>

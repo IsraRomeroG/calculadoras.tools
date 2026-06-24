@@ -1,0 +1,41 @@
+---
+import { formatBlogDate } from "@lib/blog";
+import type { BlogSource } from "@lib/blog-schema";
+
+interface Props {
+  sources: BlogSource[];
+}
+
+const { sources } = Astro.props;
+---
+
+{
+  sources.length > 0 && (
+    <section class="mt-12 border-t border-gray-800 pt-8">
+      <h2 class="text-xl font-semibold text-white">Fuentes</h2>
+      <ol class="mt-4 space-y-4 text-sm leading-relaxed text-gray-400">
+        {sources.map((source) => (
+          <li>
+            <a
+              href={source.url}
+              class="font-medium text-amber-400 hover:text-amber-300"
+              rel="noopener noreferrer"
+              target="_blank"
+            >
+              {source.label}
+            </a>
+            {source.publisher && (
+              <span class="text-gray-500"> · {source.publisher}</span>
+            )}
+            {source.accessedDate && (
+              <span class="text-gray-500">
+                {" "}
+                · Consultado el {formatBlogDate(source.accessedDate)}
+              </span>
+            )}
+          </li>
+        ))}
+      </ol>
+    </section>
+  )
+}

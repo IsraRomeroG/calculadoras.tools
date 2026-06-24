@@ -1,0 +1,74 @@
+---
+import BaseLayout from "@layouts/BaseLayout.astro";
+import Container from "@components/layout/Container.astro";
+import PageShell from "@components/layout/PageShell.astro";
+import PageHero from "@components/shared/PageHero.astro";
+import Panel from "@components/shared/Panel.astro";
+
+const description =
+  "Consulta cómo reportar errores, qué información enviar y cómo calculadoras.tools evalúa correcciones editoriales o de cálculo.";
+const canonical = "/correcciones";
+
+const steps = [
+  {
+    title: "Cómo reportar un error",
+    content:
+      "Usa el formulario de contacto e incluye la URL afectada, el resultado observado, el resultado esperado y los datos de entrada que usaste si se trata de una calculadora.",
+  },
+  {
+    title: "Qué revisamos",
+    content:
+      "Se revisa si el problema está en la fórmula, los supuestos, la redacción, una fuente, una tasa vigente, un enlace o una interpretación que pueda confundir al usuario.",
+  },
+  {
+    title: "Cuándo cambia una fecha",
+    content:
+      "La fecha de actualización o revisión cambia solo cuando hay una corrección sustancial, verificación de fuentes o ajuste editorial relevante. Las correcciones menores pueden resolverse sin cambiar esas fechas.",
+  },
+  {
+    title: "Correcciones importantes",
+    content:
+      "Si una corrección cambia el sentido de una explicación, una fórmula, una advertencia o una fuente importante, debe quedar documentada en la pieza o en el registro editorial interno.",
+  },
+];
+---
+
+<BaseLayout title="Correcciones" description={description} canonical={canonical}>
+  <PageShell>
+    <PageHero
+      title="Correcciones"
+      description="Si encuentras un error de cálculo, una fuente desactualizada o una explicación confusa, puedes reportarlo para que el contenido sea revisado."
+      breadcrumbs={[
+        { label: "Inicio", href: "/", ariaLabel: "Inicio" },
+        { label: "Correcciones" },
+      ]}
+      containerClass="px-6 py-10"
+      breadcrumbClass="mb-8"
+      titleClass="text-4xl font-bold tracking-tight md:text-6xl"
+      descriptionClass="mt-6 text-lg leading-relaxed text-gray-400"
+    />
+
+    <Container as="section" class="px-6 py-14">
+      <div class="grid gap-6">
+        {
+          steps.map((step) => (
+            <Panel as="section" padding="lg">
+              <h2 class="text-xl font-semibold">{step.title}</h2>
+              <p class="mt-3 leading-relaxed text-gray-400">{step.content}</p>
+            </Panel>
+          ))
+        }
+
+        <Panel as="section" padding="lg">
+          <h2 class="text-xl font-semibold">Enviar reporte</h2>
+          <p class="mt-3 leading-relaxed text-gray-400">
+            Puedes enviar el reporte desde{" "}
+            <a class="text-amber-400 hover:text-amber-300" href="/contacto">
+              contacto
+            </a>.
+          </p>
+        </Panel>
+      </div>
+    </Container>
+  </PageShell>
+</BaseLayout>
