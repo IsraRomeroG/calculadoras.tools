@@ -1,0 +1,1009 @@
+---
+import AdSlot from "@components/ads/AdSlot.astro";
+import Container from "@components/layout/Container.astro";
+import PageShell from "@components/layout/PageShell.astro";
+import FaqSection from "@components/shared/FaqSection.astro";
+import PageHero from "@components/shared/PageHero.astro";
+import SectionIntro from "@components/shared/SectionIntro.astro";
+import BaseLayout from "@layouts/BaseLayout.astro";
+import {
+  COMMON_SPEED_PRESETS,
+  DEFAULT_EFFICIENCY_PERCENT,
+  EFFICIENCY_PRESETS,
+  FILE_SIZE_PRESETS,
+  SIZE_UNITS,
+  SPEED_UNITS,
+} from "@lib/calculators/programacion/calculadora-velocidad-descarga/downloadSpeed";
+import { buildFaqJsonLd } from "@lib/seo";
+
+const title = "Calculadora de tiempo de descarga: Mbps, MB/s y GB";
+const description =
+  "Estima cuánto tarda en descargarse un archivo según su tamaño, velocidad y eficiencia. Convierte Mbps a MB/s y calcula la velocidad necesaria.";
+const canonical = "/programacion/calculadora-velocidad-descarga";
+const outputUnits = ["Mbps", "Gbps", "MB/s", "MiB/s"] as const;
+
+const faqs = [
+  {
+    question: "¿Cuál es la diferencia entre Mbps y MB/s?",
+    answer:
+      "Mbps significa megabits por segundo y MB/s significa megabytes por segundo. Como 1 byte son 8 bits, 100 Mbps equivalen a 12.5 MB/s antes de pérdidas.",
+  },
+  {
+    question: "¿Por qué 100 Mbps no significa 100 MB/s?",
+    answer:
+      "Porque las conexiones de red suelen anunciarse en bits por segundo. Para convertir de Mbps a MB/s se divide entre 8.",
+  },
+  {
+    question: "¿Cuál es la diferencia entre GB y GiB?",
+    answer:
+      "GB usa base decimal: 1 GB son 1,000,000,000 bytes. GiB usa base binaria: 1 GiB son 1,073,741,824 bytes.",
+  },
+  {
+    question: "¿Por qué la descarga real tarda más?",
+    answer:
+      "El Wi-Fi, el servidor, la congestión, la VPN, la latencia y los límites del proveedor pueden reducir la velocidad efectiva.",
+  },
+  {
+    question: "¿La calculadora mide mi internet?",
+    answer:
+      "No. Solo estima tiempos con los datos que escribes. No hace pruebas de velocidad ni llama a servicios externos.",
+  },
+  {
+    question: "¿Qué significa eficiencia de conexión?",
+    answer:
+      "Es el porcentaje de la velocidad nominal que realmente aprovechas. Una conexión de 100 Mbps con 90% de eficiencia se calcula como 90 Mbps efectivos.",
+  },
+  {
+    question: "¿Qué velocidad necesito para descargar un archivo grande en una hora?",
+    answer:
+      "Usa el modo Velocidad necesaria, escribe el tamaño del archivo y pon una hora como objetivo. La herramienta devuelve la velocidad nominal aproximada.",
+  },
+  {
+    question: "¿Sirve para imágenes Docker, backups o datasets?",
+    answer:
+      "Sí. Los presets incluyen casos habituales de programación como artefactos de build, imágenes Docker, backups de base de datos, datasets e ISOs.",
+  },
+];
+
+const faqJsonLd = buildFaqJsonLd(faqs);
+---
+
+<BaseLayout title={title} description={description} canonical={canonical}>
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={JSON.stringify(faqJsonLd)} />
+  </Fragment>
+
+  <PageShell>
+    <PageHero
+      title="Calculadora de tiempo de descarga"
+      description="Estima cuánto tarda un artefacto, backup, dataset o imagen Docker según tamaño, velocidad y eficiencia real de la conexión."
+      kicker="Programación"
+      kickerHref="/programacion"
+      collapseBreadcrumbOnMobile
+      containerClass="py-6 md:py-8"
+      breadcrumbs={[
+        { label: "Inicio", href: "/", ariaLabel: "Inicio" },
+        { label: "Programación", href: "/programacion", optional: true },
+        { label: "Velocidad de descarga", truncate: true },
+      ]}
+    />
+
+    <Container as="section" class="py-6 md:py-8">
+      <section
+        id="download-speed-tool"
+        class="overflow-hidden rounded-lg border border-gray-700 bg-gray-950 shadow-xl shadow-gray-950/30"
+        aria-labelledby="calculator-heading"
+      >
+        <div class="grid lg:grid-cols-[minmax(0,1.05fr)_minmax(19rem,0.95fr)]">
+          <div class="p-4 sm:p-6">
+            <p class="text-sm font-semibold text-cyan-300">
+              Estimación local
+            </p>
+            <h2 id="calculator-heading" class="mt-2 text-2xl font-semibold">
+              Calcula tiempos para archivos grandes
+            </h2>
+
+            <div
+              class="mt-5 grid grid-cols-2 rounded-lg border border-gray-700 bg-gray-900 p-1"
+              role="group"
+              aria-label="Modo de cálculo"
+            >
+              <button
+                class="min-h-11 rounded-md bg-cyan-400 px-3 py-2 text-sm font-semibold text-gray-950 transition focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-cyan-300/40"
+                type="button"
+                aria-pressed="true"
+                data-mode-button="time"
+              >
+                Tiempo de descarga
+              </button>
+              <button
+                class="min-h-11 rounded-md px-3 py-2 text-sm font-semibold text-gray-300 transition hover:bg-gray-800 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-cyan-300/30"
+                type="button"
+                aria-pressed="false"
+                data-mode-button="required"
+              >
+                Velocidad necesaria
+              </button>
+            </div>
+
+            <div class="mt-5">
+              <p class="text-sm font-semibold text-gray-200">
+                Presets de archivo
+              </p>
+              <div class="mt-2 grid gap-2 sm:grid-cols-2">
+                {
+                  FILE_SIZE_PRESETS.map((preset) => (
+                    <button
+                      class="min-h-11 rounded-lg border border-gray-700 bg-gray-900 px-3 py-2 text-left text-sm text-gray-200 transition hover:border-cyan-400/60 hover:bg-gray-800 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-cyan-300/30"
+                      type="button"
+                      data-file-preset={preset.id}
+                      data-file-value={preset.value}
+                      data-file-unit={preset.unit}
+                    >
+                      <span class="block font-semibold">{preset.label}</span>
+                      <span class="mt-1 block font-mono text-xs text-cyan-200">
+                        {preset.value} {preset.unit}
+                      </span>
+                    </button>
+                  ))
+                }
+              </div>
+            </div>
+
+            <div class="mt-5 grid gap-4 sm:grid-cols-[minmax(0,1fr)_9rem]">
+              <div>
+                <label
+                  for="download-size-value"
+                  class="block text-sm font-semibold text-gray-200"
+                >
+                  Tamaño del archivo
+                </label>
+                <input
+                  id="download-size-value"
+                  class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-900 px-4 font-mono text-base text-white outline-none transition placeholder:text-gray-600 focus:border-cyan-400 focus:ring-3 focus:ring-cyan-400/15"
+                  type="text"
+                  inputmode="decimal"
+                  autocomplete="off"
+                  placeholder="Ej. 5"
+                  aria-describedby="download-calculator-error"
+                  data-size-value
+                />
+              </div>
+              <div>
+                <label
+                  for="download-size-unit"
+                  class="block text-sm font-semibold text-gray-200"
+                >
+                  Unidad
+                </label>
+                <select
+                  id="download-size-unit"
+                  class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-900 px-3 text-base text-white outline-none transition focus:border-cyan-400 focus:ring-3 focus:ring-cyan-400/15"
+                  data-size-unit
+                >
+                  {
+                    SIZE_UNITS.map((unit) => (
+                      <option value={unit} selected={unit === "GB"}>
+                        {unit}
+                      </option>
+                    ))
+                  }
+                </select>
+              </div>
+            </div>
+
+            <div class="mt-5" data-time-fields>
+              <div class="grid gap-4 sm:grid-cols-[minmax(0,1fr)_9rem]">
+                <div>
+                  <label
+                    for="download-speed-value"
+                    class="block text-sm font-semibold text-gray-200"
+                  >
+                    Velocidad de conexión
+                  </label>
+                  <input
+                    id="download-speed-value"
+                    class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-900 px-4 font-mono text-base text-white outline-none transition placeholder:text-gray-600 focus:border-cyan-400 focus:ring-3 focus:ring-cyan-400/15"
+                    type="text"
+                    inputmode="decimal"
+                    autocomplete="off"
+                    placeholder="Ej. 100"
+                    aria-describedby="download-calculator-error"
+                    data-speed-value
+                  />
+                </div>
+                <div>
+                  <label
+                    for="download-speed-unit"
+                    class="block text-sm font-semibold text-gray-200"
+                  >
+                    Unidad
+                  </label>
+                  <select
+                    id="download-speed-unit"
+                    class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-900 px-3 text-base text-white outline-none transition focus:border-cyan-400 focus:ring-3 focus:ring-cyan-400/15"
+                    data-speed-unit
+                  >
+                    {
+                      SPEED_UNITS.map((unit) => (
+                        <option value={unit} selected={unit === "Mbps"}>
+                          {unit}
+                        </option>
+                      ))
+                    }
+                  </select>
+                </div>
+              </div>
+
+              <div class="mt-3 grid grid-cols-3 gap-2 sm:grid-cols-6">
+                {
+                  COMMON_SPEED_PRESETS.map((preset) => (
+                    <button
+                      class="min-h-10 rounded-md border border-gray-700 bg-gray-900 px-2 text-xs font-semibold text-gray-300 transition hover:border-cyan-400/60 hover:bg-gray-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300/30"
+                      type="button"
+                      data-speed-preset={preset.id}
+                      data-speed-preset-value={preset.value}
+                      data-speed-preset-unit={preset.unit}
+                    >
+                      {preset.label}
+                    </button>
+                  ))
+                }
+              </div>
+            </div>
+
+            <div class="mt-5 hidden" data-required-fields>
+              <p class="text-sm font-semibold text-gray-200">Tiempo objetivo</p>
+              <div class="mt-2 grid grid-cols-3 gap-2">
+                <label class="block">
+                  <span class="text-xs font-semibold text-gray-500">Horas</span>
+                  <input
+                    class="mt-1 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-900 px-3 font-mono text-base text-white outline-none transition placeholder:text-gray-600 focus:border-cyan-400 focus:ring-3 focus:ring-cyan-400/15"
+                    type="text"
+                    inputmode="numeric"
+                    autocomplete="off"
+                    placeholder="0"
+                    aria-describedby="download-calculator-error"
+                    data-target-hours
+                  />
+                </label>
+                <label class="block">
+                  <span class="text-xs font-semibold text-gray-500">Min</span>
+                  <input
+                    class="mt-1 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-900 px-3 font-mono text-base text-white outline-none transition placeholder:text-gray-600 focus:border-cyan-400 focus:ring-3 focus:ring-cyan-400/15"
+                    type="text"
+                    inputmode="numeric"
+                    autocomplete="off"
+                    placeholder="30"
+                    aria-describedby="download-calculator-error"
+                    data-target-minutes
+                  />
+                </label>
+                <label class="block">
+                  <span class="text-xs font-semibold text-gray-500">Seg</span>
+                  <input
+                    class="mt-1 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-900 px-3 font-mono text-base text-white outline-none transition placeholder:text-gray-600 focus:border-cyan-400 focus:ring-3 focus:ring-cyan-400/15"
+                    type="text"
+                    inputmode="numeric"
+                    autocomplete="off"
+                    placeholder="0"
+                    aria-describedby="download-calculator-error"
+                    data-target-seconds
+                  />
+                </label>
+              </div>
+
+              <label
+                for="download-output-unit"
+                class="mt-4 block text-sm font-semibold text-gray-200"
+              >
+                Unidad de salida
+              </label>
+              <select
+                id="download-output-unit"
+                class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-900 px-4 text-base text-white outline-none transition focus:border-cyan-400 focus:ring-3 focus:ring-cyan-400/15"
+                data-output-unit
+              >
+                {
+                  outputUnits.map((unit) => (
+                    <option value={unit} selected={unit === "Mbps"}>
+                      {unit}
+                    </option>
+                  ))
+                }
+              </select>
+            </div>
+
+            <div class="mt-5">
+              <div class="flex items-end justify-between gap-3">
+                <label
+                  for="download-efficiency"
+                  class="block text-sm font-semibold text-gray-200"
+                >
+                  Eficiencia de conexión
+                </label>
+                <span class="font-mono text-sm text-cyan-200" data-efficiency-label>
+                  {DEFAULT_EFFICIENCY_PERCENT}%
+                </span>
+              </div>
+              <div class="mt-2 grid gap-3 sm:grid-cols-[minmax(0,1fr)_6rem]">
+                <input
+                  id="download-efficiency-range"
+                  class="h-12 w-full accent-cyan-400"
+                  type="range"
+                  min="1"
+                  max="100"
+                  step="1"
+                  value={DEFAULT_EFFICIENCY_PERCENT}
+                  data-efficiency-range
+                />
+                <input
+                  id="download-efficiency"
+                  class="min-h-12 w-full rounded-lg border border-gray-700 bg-gray-900 px-3 font-mono text-base text-white outline-none transition focus:border-cyan-400 focus:ring-3 focus:ring-cyan-400/15"
+                  type="text"
+                  inputmode="decimal"
+                  autocomplete="off"
+                  value={DEFAULT_EFFICIENCY_PERCENT}
+                  aria-describedby="download-calculator-error"
+                  data-efficiency-value
+                />
+              </div>
+              <div class="mt-3 grid gap-2 sm:grid-cols-4">
+                {
+                  EFFICIENCY_PRESETS.map((preset) => (
+                    <button
+                      class="min-h-10 rounded-md border border-gray-700 bg-gray-900 px-2 text-xs font-semibold text-gray-300 transition hover:border-cyan-400/60 hover:bg-gray-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300/30"
+                      type="button"
+                      data-efficiency-preset={preset.id}
+                      data-efficiency-preset-value={preset.value}
+                    >
+                      {preset.label}
+                    </button>
+                  ))
+                }
+              </div>
+            </div>
+
+            <p
+              id="download-calculator-error"
+              class="mt-4 hidden rounded-lg border border-red-400/25 bg-red-400/10 p-3 text-sm leading-relaxed text-red-200"
+              role="alert"
+              data-error-message
+            ></p>
+
+            <div
+              class="mt-5 rounded-lg border border-blue-400/20 bg-blue-400/10 p-3 text-sm leading-relaxed text-blue-100"
+            >
+              <span class="font-semibold">Referencia:</span>
+              <span>1 byte = 8 bits. Esta herramienta estima; no mide tu conexión real.</span>
+            </div>
+
+            <div class="mt-5 flex flex-col gap-3 sm:flex-row">
+              <button
+                class="min-h-11 rounded-lg border border-gray-700 px-4 py-2 text-sm font-semibold text-gray-200 transition hover:border-gray-500 hover:bg-gray-900 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-gray-400/30"
+                type="button"
+                data-clear-calculator
+              >
+                Limpiar
+              </button>
+            </div>
+          </div>
+
+          <aside
+            class="border-t border-gray-800 bg-gray-900/65 p-4 sm:p-6 lg:border-l lg:border-t-0"
+          >
+            <p class="text-xs font-semibold uppercase tracking-wide text-gray-500">
+              Resultado principal
+            </p>
+            <p class="mt-2 text-sm font-semibold text-cyan-300" data-result-kicker>
+              Tiempo estimado
+            </p>
+            <div class="mt-3 rounded-lg border border-gray-800 bg-gray-950 p-4">
+              <p
+                class="break-words text-3xl font-semibold text-cyan-100"
+                data-main-result
+              >
+                Sin cálculo
+              </p>
+              <p
+                class="mt-3 min-h-10 text-sm leading-relaxed text-gray-400"
+                data-result-context
+              >
+                Ingresa tamaño y velocidad para estimar el tiempo.
+              </p>
+            </div>
+
+            <dl class="mt-4 grid grid-cols-2 gap-2">
+              <div class="rounded-lg border border-gray-800 bg-gray-950 p-3">
+                <dt class="text-xs font-semibold uppercase text-gray-500">
+                  Velocidad efectiva
+                </dt>
+                <dd class="mt-1 font-mono text-base font-semibold text-white" data-effective-speed>
+                  -
+                </dd>
+              </div>
+              <div class="rounded-lg border border-gray-800 bg-gray-950 p-3">
+                <dt class="text-xs font-semibold uppercase text-gray-500" data-secondary-label>
+                  Tiempo ideal
+                </dt>
+                <dd class="mt-1 font-mono text-base font-semibold text-white" data-secondary-result>
+                  -
+                </dd>
+              </div>
+              <div class="rounded-lg border border-gray-800 bg-gray-950 p-3">
+                <dt class="text-xs font-semibold uppercase text-gray-500">
+                  Decimal
+                </dt>
+                <dd class="mt-1 font-mono text-base font-semibold text-white" data-size-decimal>
+                  -
+                </dd>
+              </div>
+              <div class="rounded-lg border border-gray-800 bg-gray-950 p-3">
+                <dt class="text-xs font-semibold uppercase text-gray-500">
+                  Binario
+                </dt>
+                <dd class="mt-1 font-mono text-base font-semibold text-white" data-size-binary>
+                  -
+                </dd>
+              </div>
+            </dl>
+
+            <p
+              class="mt-4 min-h-12 rounded-lg border border-gray-800 bg-gray-950 p-3 text-sm leading-relaxed text-gray-400"
+              data-result-note
+            >
+              Los resultados usan la eficiencia configurada.
+            </p>
+
+            <button
+              class="mt-4 hidden min-h-11 w-full rounded-lg bg-cyan-400 px-4 py-2 text-sm font-semibold text-gray-950 transition hover:bg-cyan-300 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-cyan-300/40"
+              type="button"
+              data-copy-result
+            >
+              Copiar resultado
+            </button>
+            <p
+              class="mt-3 min-h-5 text-sm text-emerald-300"
+              role="status"
+              aria-live="polite"
+              data-copy-status
+            ></p>
+            <p class="sr-only" role="status" aria-live="polite" data-live-status>
+            </p>
+          </aside>
+        </div>
+
+        <div class="border-t border-gray-800 p-4 sm:p-6">
+          <div class="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,0.8fr)]">
+            <section aria-labelledby="comparison-heading">
+              <h3 id="comparison-heading" class="text-lg font-semibold">
+                Comparador de velocidades
+              </h3>
+              <p class="mt-1 text-sm leading-relaxed text-gray-500">
+                Usa el tamaño y la eficiencia actuales.
+              </p>
+              <div class="mt-4 overflow-x-auto rounded-lg border border-gray-800">
+                <table class="min-w-full divide-y divide-gray-800 text-sm">
+                  <thead class="bg-gray-900/70 text-left text-xs uppercase text-gray-500">
+                    <tr>
+                      <th class="px-4 py-3 font-semibold">Velocidad</th>
+                      <th class="px-4 py-3 font-semibold">Tiempo estimado</th>
+                    </tr>
+                  </thead>
+                  <tbody class="divide-y divide-gray-800 bg-gray-950" data-comparison-body>
+                    <tr>
+                      <td class="px-4 py-4 text-gray-400" colspan="2">
+                        Ingresa un tamaño para comparar velocidades.
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </section>
+
+            <section aria-labelledby="conversion-heading">
+              <h3 id="conversion-heading" class="text-lg font-semibold">
+                Equivalencias rápidas
+              </h3>
+              <div class="mt-4 grid gap-3">
+                <article class="rounded-lg border border-gray-800 bg-gray-900/60 p-4">
+                  <p class="font-mono text-lg font-semibold text-cyan-200">
+                    100 Mbps = 12.5 MB/s
+                  </p>
+                  <p class="mt-2 text-sm leading-relaxed text-gray-400">
+                    Divide Mbps entre 8 para aproximar MB/s antes de eficiencia.
+                  </p>
+                </article>
+                <article class="rounded-lg border border-gray-800 bg-gray-900/60 p-4">
+                  <p class="font-mono text-lg font-semibold text-amber-200">
+                    1 GiB > 1 GB
+                  </p>
+                  <p class="mt-2 text-sm leading-relaxed text-gray-400">
+                    GiB usa base 1024; GB usa base 1000.
+                  </p>
+                </article>
+              </div>
+            </section>
+          </div>
+        </div>
+      </section>
+    </Container>
+
+    <AdSlot placement="calculator-after-tool" />
+
+    <Container as="section" class="py-6 md:py-8">
+      <SectionIntro
+        title="Cuándo usar esta calculadora"
+        description="La estimación ayuda a dimensionar descargas, transferencias y tiempos de espera antes de mover archivos grandes."
+      />
+      <div class="grid gap-4 md:grid-cols-3">
+        <article class="rounded-lg border border-gray-800 bg-gray-950 p-5">
+          <h3 class="text-lg font-semibold">Artefactos y despliegues</h3>
+          <p class="mt-3 text-sm leading-relaxed text-gray-400">
+            Estima cuánto puede tardar bajar un build, una release o una imagen
+            Docker desde un registry o pipeline.
+          </p>
+        </article>
+        <article class="rounded-lg border border-gray-800 bg-gray-950 p-5">
+          <h3 class="text-lg font-semibold">Backups y datasets</h3>
+          <p class="mt-3 text-sm leading-relaxed text-gray-400">
+            Compara escenarios para bases de datos, dumps, archivos de datos e
+            ISOs de máquinas virtuales.
+          </p>
+        </article>
+        <article class="rounded-lg border border-gray-800 bg-gray-950 p-5">
+          <h3 class="text-lg font-semibold">Planes y objetivos</h3>
+          <p class="mt-3 text-sm leading-relaxed text-gray-400">
+            Calcula si una conexión nominal alcanza para completar una descarga
+            dentro de una ventana de tiempo.
+          </p>
+        </article>
+      </div>
+    </Container>
+
+    <FaqSection faqs={faqs} />
+  </PageShell>
+</BaseLayout>
+
+<script>
+  import {
+    DEFAULT_EFFICIENCY_PERCENT,
+    buildCopyText,
+    buildSpeedComparison,
+    estimateDownloadTime,
+    estimateRequiredSpeed,
+    formatBytes,
+    formatDuration,
+    formatSizeFromBytes,
+    formatSpeed,
+    getRequiredSpeedSuggestion,
+    parseLocalizedNumber,
+  } from "@lib/calculators/programacion/calculadora-velocidad-descarga/downloadSpeed";
+
+  function query(selector) {
+    const element = document.querySelector(selector);
+
+    if (!element) {
+      throw new Error(`No se encontro el elemento ${selector}.`);
+    }
+
+    return element;
+  }
+
+  const modeButtons = Array.from(document.querySelectorAll("[data-mode-button]"));
+  const timeFields = query("[data-time-fields]");
+  const requiredFields = query("[data-required-fields]");
+  const sizeValue = query("[data-size-value]");
+  const sizeUnit = query("[data-size-unit]");
+  const speedValue = query("[data-speed-value]");
+  const speedUnit = query("[data-speed-unit]");
+  const targetHours = query("[data-target-hours]");
+  const targetMinutes = query("[data-target-minutes]");
+  const targetSeconds = query("[data-target-seconds]");
+  const outputUnit = query("[data-output-unit]");
+  const efficiencyValue = query("[data-efficiency-value]");
+  const efficiencyRange = query("[data-efficiency-range]");
+  const efficiencyLabel = query("[data-efficiency-label]");
+  const errorMessage = query("[data-error-message]");
+  const resultKicker = query("[data-result-kicker]");
+  const mainResult = query("[data-main-result]");
+  const resultContext = query("[data-result-context]");
+  const effectiveSpeed = query("[data-effective-speed]");
+  const secondaryLabel = query("[data-secondary-label]");
+  const secondaryResult = query("[data-secondary-result]");
+  const sizeDecimal = query("[data-size-decimal]");
+  const sizeBinary = query("[data-size-binary]");
+  const resultNote = query("[data-result-note]");
+  const comparisonBody = query("[data-comparison-body]");
+  const copyButton = query("[data-copy-result]");
+  const copyStatus = query("[data-copy-status]");
+  const liveStatus = query("[data-live-status]");
+  const clearButton = query("[data-clear-calculator]");
+
+  let currentMode = "time";
+  let currentCopyText = "";
+  let copyTimer = 0;
+  let liveTimer = 0;
+
+  function getPositiveInput(input, label) {
+    const rawValue = input.value.trim();
+
+    if (!rawValue) {
+      return null;
+    }
+
+    const parsed = parseLocalizedNumber(rawValue);
+
+    if (parsed === null || parsed <= 0) {
+      throw new Error(`${label} debe ser mayor que cero.`);
+    }
+
+    return parsed;
+  }
+
+  function getEfficiency() {
+    const parsed = parseLocalizedNumber(efficiencyValue.value);
+
+    if (parsed === null || parsed < 1 || parsed > 100) {
+      throw new Error("La eficiencia debe estar entre 1 y 100.");
+    }
+
+    return parsed;
+  }
+
+  function getTargetSeconds() {
+    const fields = [targetHours, targetMinutes, targetSeconds];
+    const hasAnyValue = fields.some((field) => field.value.trim() !== "");
+
+    if (!hasAnyValue) {
+      return null;
+    }
+
+    const [hours, minutes, seconds] = fields.map((field) => {
+      if (!field.value.trim()) {
+        return 0;
+      }
+
+      const parsed = parseLocalizedNumber(field.value);
+
+      if (parsed === null || parsed < 0) {
+        throw new Error("El tiempo objetivo debe usar valores positivos.");
+      }
+
+      return parsed;
+    });
+    const totalSeconds = hours * 3600 + minutes * 60 + seconds;
+
+    if (totalSeconds <= 0) {
+      throw new Error("El tiempo objetivo debe ser mayor que cero.");
+    }
+
+    return totalSeconds;
+  }
+
+  function setMode(mode) {
+    currentMode = mode;
+    timeFields.classList.toggle("hidden", mode !== "time");
+    requiredFields.classList.toggle("hidden", mode !== "required");
+
+    modeButtons.forEach((button) => {
+      const active = button.dataset.modeButton === mode;
+
+      button.setAttribute("aria-pressed", active ? "true" : "false");
+      button.classList.toggle("bg-cyan-400", active);
+      button.classList.toggle("text-gray-950", active);
+      button.classList.toggle("text-gray-300", !active);
+      button.classList.toggle("hover:bg-gray-800", !active);
+    });
+
+    render();
+  }
+
+  function setError(message = "") {
+    errorMessage.textContent = message;
+    errorMessage.classList.toggle("hidden", !message);
+  }
+
+  function showEmpty(message) {
+    currentCopyText = "";
+    resultKicker.textContent =
+      currentMode === "time" ? "Tiempo estimado" : "Velocidad necesaria";
+    mainResult.textContent = "Sin cálculo";
+    resultContext.textContent = message;
+    effectiveSpeed.textContent = "-";
+    secondaryLabel.textContent =
+      currentMode === "time" ? "Tiempo ideal" : "Sugerencia";
+    secondaryResult.textContent = "-";
+    sizeDecimal.textContent = "-";
+    sizeBinary.textContent = "-";
+    resultNote.textContent = "Los resultados usan la eficiencia configurada.";
+    copyButton.classList.add("hidden");
+    renderEmptyComparison();
+    scheduleAnnouncement("Sin calculo");
+  }
+
+  function renderEmptyComparison() {
+    comparisonBody.textContent = "";
+    const row = document.createElement("tr");
+    const cell = document.createElement("td");
+
+    cell.className = "px-4 py-4 text-gray-400";
+    cell.colSpan = 2;
+    cell.textContent = "Ingresa un tamaño para comparar velocidades.";
+    row.append(cell);
+    comparisonBody.append(row);
+  }
+
+  function renderComparison(sizeInputValue, selectedSizeUnit, efficiencyPercent) {
+    comparisonBody.textContent = "";
+
+    buildSpeedComparison({
+      sizeValue: sizeInputValue,
+      sizeUnit: selectedSizeUnit,
+      efficiencyPercent,
+    }).forEach((item) => {
+      const row = document.createElement("tr");
+      const speedCell = document.createElement("td");
+      const timeCell = document.createElement("td");
+
+      speedCell.className = "px-4 py-3 font-mono text-cyan-100";
+      speedCell.textContent = item.label;
+      timeCell.className = "px-4 py-3 font-semibold text-gray-200";
+      timeCell.textContent = formatDuration(item.secondsEstimated);
+      row.append(speedCell, timeCell);
+      comparisonBody.append(row);
+    });
+  }
+
+  function renderDownloadTime(sizeInputValue, selectedSizeUnit, efficiencyPercent) {
+    const enteredSpeed = getPositiveInput(speedValue, "La velocidad");
+
+    if (enteredSpeed === null) {
+      showEmpty("Ingresa tamaño y velocidad para estimar el tiempo.");
+      return;
+    }
+
+    const result = estimateDownloadTime({
+      sizeValue: sizeInputValue,
+      sizeUnit: selectedSizeUnit,
+      speedValue: enteredSpeed,
+      speedUnit: speedUnit.value,
+      efficiencyPercent,
+    });
+
+    resultKicker.textContent = "Tiempo estimado";
+    mainResult.textContent = formatDuration(result.secondsEstimated);
+    resultContext.textContent =
+      `${formatInputNumber(result.sizeValue)} ${result.sizeUnit} a ` +
+      `${formatInputNumber(result.speedValue)} ${result.speedUnit} con ` +
+      `${formatInputNumber(result.efficiencyPercent)}% de eficiencia.`;
+    effectiveSpeed.textContent =
+      `${formatSpeed(result.effectiveSpeedBps, "Mbps")} / ` +
+      `${formatSpeed(result.effectiveSpeedBps, "MB/s")}`;
+    secondaryLabel.textContent = "Tiempo ideal";
+    secondaryResult.textContent = formatDuration(result.secondsIdeal);
+    sizeDecimal.textContent = formatSizeFromBytes(result.sizeBytes, "decimal");
+    sizeBinary.textContent = formatSizeFromBytes(result.sizeBytes, "binary");
+    resultNote.textContent =
+      `Tamaño exacto: ${formatBytes(result.sizeBytes)}. Wi-Fi, servidor, VPN o congestión pueden cambiar el tiempo real.`;
+    currentCopyText = buildCopyText(result);
+    copyButton.classList.remove("hidden");
+    renderComparison(sizeInputValue, selectedSizeUnit, efficiencyPercent);
+    scheduleAnnouncement(`Tiempo estimado: ${mainResult.textContent}`);
+  }
+
+  function renderRequiredSpeed(sizeInputValue, selectedSizeUnit, efficiencyPercent) {
+    const seconds = getTargetSeconds();
+
+    if (seconds === null) {
+      showEmpty("Ingresa tamaño y tiempo objetivo para calcular la velocidad.");
+      return;
+    }
+
+    const result = estimateRequiredSpeed({
+      sizeValue: sizeInputValue,
+      sizeUnit: selectedSizeUnit,
+      targetSeconds: seconds,
+      efficiencyPercent,
+      outputUnit: outputUnit.value,
+    });
+    const suggestion = getRequiredSpeedSuggestion(result);
+
+    resultKicker.textContent = "Velocidad nominal requerida";
+    mainResult.textContent = formatSpeed(result.nominalRequiredBps, result.outputUnit);
+    resultContext.textContent =
+      `${formatInputNumber(result.sizeValue)} ${result.sizeUnit} en ` +
+      `${formatDuration(result.targetSeconds)} con ` +
+      `${formatInputNumber(result.efficiencyPercent)}% de eficiencia.`;
+    effectiveSpeed.textContent =
+      `${formatSpeed(result.effectiveRequiredBps, "Mbps")} / ` +
+      `${formatSpeed(result.effectiveRequiredBps, "MB/s")}`;
+    secondaryLabel.textContent = "Sugerencia";
+    secondaryResult.textContent = result.suggestedPlan?.label ?? "> 1 Gbps";
+    sizeDecimal.textContent = formatSizeFromBytes(result.sizeBytes, "decimal");
+    sizeBinary.textContent = formatSizeFromBytes(result.sizeBytes, "binary");
+    resultNote.textContent = suggestion;
+    currentCopyText = buildCopyText(result);
+    copyButton.classList.remove("hidden");
+    renderComparison(sizeInputValue, selectedSizeUnit, efficiencyPercent);
+    scheduleAnnouncement(`Velocidad necesaria: ${mainResult.textContent}`);
+  }
+
+  function render() {
+    try {
+      const enteredSize = getPositiveInput(sizeValue, "El tamaño");
+      const efficiencyPercent = getEfficiency();
+
+      setError();
+      syncEfficiencyControls(efficiencyPercent);
+      updatePresetStates(efficiencyPercent);
+
+      if (enteredSize === null) {
+        showEmpty(
+          currentMode === "time"
+            ? "Ingresa tamaño y velocidad para estimar el tiempo."
+            : "Ingresa tamaño y tiempo objetivo para calcular la velocidad.",
+        );
+        return;
+      }
+
+      if (currentMode === "time") {
+        renderDownloadTime(enteredSize, sizeUnit.value, efficiencyPercent);
+      } else {
+        renderRequiredSpeed(enteredSize, sizeUnit.value, efficiencyPercent);
+      }
+    } catch (error) {
+      setError(error instanceof Error ? error.message : "Revisa los datos.");
+      showEmpty("Corrige los datos marcados para obtener el cálculo.");
+    }
+  }
+
+  function syncEfficiencyControls(efficiencyPercent) {
+    efficiencyLabel.textContent = `${formatInputNumber(efficiencyPercent)}%`;
+
+    if (efficiencyPercent >= 1 && efficiencyPercent <= 100) {
+      efficiencyRange.value = String(Math.round(efficiencyPercent));
+    }
+  }
+
+  function updatePresetStates(efficiencyPercent) {
+    document.querySelectorAll("[data-file-preset]").forEach((button) => {
+      const active =
+        sizeValue.value.trim() === button.dataset.fileValue &&
+        sizeUnit.value === button.dataset.fileUnit;
+
+      setPresetButtonActive(button, active);
+    });
+
+    document.querySelectorAll("[data-speed-preset]").forEach((button) => {
+      const active =
+        speedValue.value.trim() === button.dataset.speedPresetValue &&
+        speedUnit.value === button.dataset.speedPresetUnit;
+
+      setPresetButtonActive(button, active);
+    });
+
+    document.querySelectorAll("[data-efficiency-preset]").forEach((button) => {
+      const active =
+        Number(button.dataset.efficiencyPresetValue) ===
+        Math.round(efficiencyPercent);
+
+      setPresetButtonActive(button, active);
+    });
+  }
+
+  function setPresetButtonActive(button, active) {
+    button.classList.toggle("border-cyan-400", active);
+    button.classList.toggle("bg-cyan-400/10", active);
+    button.classList.toggle("text-cyan-100", active);
+    button.classList.toggle("border-gray-700", !active);
+    button.classList.toggle("bg-gray-900", !active);
+    button.classList.toggle("text-gray-300", !active);
+  }
+
+  function scheduleAnnouncement(message) {
+    window.clearTimeout(liveTimer);
+    liveTimer = window.setTimeout(() => {
+      liveStatus.textContent = message;
+    }, 350);
+  }
+
+  function showCopyStatus(message) {
+    copyStatus.textContent = message;
+    window.clearTimeout(copyTimer);
+    copyTimer = window.setTimeout(() => {
+      copyStatus.textContent = "";
+    }, 2000);
+  }
+
+  function formatInputNumber(value) {
+    return new Intl.NumberFormat("es-MX", {
+      maximumFractionDigits: 2,
+    }).format(value);
+  }
+
+  [sizeValue, speedValue, targetHours, targetMinutes, targetSeconds].forEach(
+    (input) => {
+      input.addEventListener("input", render);
+    },
+  );
+
+  [sizeUnit, speedUnit, outputUnit].forEach((select) => {
+    select.addEventListener("change", render);
+  });
+
+  modeButtons.forEach((button) => {
+    button.addEventListener("click", () => {
+      setMode(button.dataset.modeButton);
+    });
+  });
+
+  efficiencyRange.addEventListener("input", () => {
+    efficiencyValue.value = efficiencyRange.value;
+    render();
+  });
+
+  efficiencyValue.addEventListener("input", render);
+
+  document.addEventListener("click", (event) => {
+    if (!(event.target instanceof Element)) {
+      return;
+    }
+
+    const fileButton = event.target.closest("[data-file-preset]");
+
+    if (fileButton) {
+      sizeValue.value = fileButton.dataset.fileValue;
+      sizeUnit.value = fileButton.dataset.fileUnit;
+      render();
+      return;
+    }
+
+    const speedButton = event.target.closest("[data-speed-preset]");
+
+    if (speedButton) {
+      speedValue.value = speedButton.dataset.speedPresetValue;
+      speedUnit.value = speedButton.dataset.speedPresetUnit;
+      render();
+      return;
+    }
+
+    const efficiencyButton = event.target.closest("[data-efficiency-preset]");
+
+    if (efficiencyButton) {
+      efficiencyValue.value = efficiencyButton.dataset.efficiencyPresetValue;
+      efficiencyRange.value = efficiencyButton.dataset.efficiencyPresetValue;
+      render();
+    }
+  });
+
+  clearButton.addEventListener("click", () => {
+    sizeValue.value = "";
+    sizeUnit.value = "GB";
+    speedValue.value = "";
+    speedUnit.value = "Mbps";
+    targetHours.value = "";
+    targetMinutes.value = "";
+    targetSeconds.value = "";
+    outputUnit.value = "Mbps";
+    efficiencyValue.value = String(DEFAULT_EFFICIENCY_PERCENT);
+    efficiencyRange.value = String(DEFAULT_EFFICIENCY_PERCENT);
+    setMode("time");
+    sizeValue.focus();
+  });
+
+  copyButton.addEventListener("click", async () => {
+    if (!currentCopyText) {
+      return;
+    }
+
+    try {
+      await navigator.clipboard.writeText(currentCopyText);
+      showCopyStatus("Resultado copiado.");
+    } catch {
+      showCopyStatus("No fue posible copiar automáticamente.");
+    }
+  });
+
+  render();
+</script>

@@ -440,6 +440,42 @@ export const CALCULATORS: CalculatorDirectoryItem[] = [
     order: 71,
   },
   {
+    id: "paleta-hex-rgb-hsl",
+    title: "Paleta HEX, RGB y HSL",
+    description:
+      "Convierte colores para CSS, genera una escala 50-900 y revisa contraste WCAG.",
+    href: "/programacion/paleta-hex-rgb-hsl",
+    categorySlug: "programacion",
+    order: 71.5,
+  },
+  {
+    id: "calculadora-entropia-contrasena",
+    title: "Calculadora de entropía de contraseña",
+    description:
+      "Estima entropía, patrones, espacio de búsqueda y tiempo aproximado de ataque sin enviar la contraseña.",
+    href: "/programacion/calculadora-entropia-contrasena",
+    categorySlug: "programacion",
+    order: 71.7,
+  },
+  {
+    id: "calculadora-velocidad-descarga",
+    title: "Calculadora de tiempo de descarga",
+    description:
+      "Estima tiempos de descarga, convierte Mbps a MB/s y calcula la velocidad necesaria para archivos grandes.",
+    href: "/programacion/calculadora-velocidad-descarga",
+    categorySlug: "programacion",
+    order: 71.9,
+  },
+  {
+    id: "calculadora-precio-por-metro-cuadrado",
+    title: "Calculadora de precio por metro cuadrado",
+    description:
+      "Calcula precio base, precio efectivo y compara opciones por superficie con costos adicionales.",
+    href: "/inmuebles/calculadora-precio-por-metro-cuadrado",
+    categorySlug: "inmuebles",
+    order: 38.5,
+  },
+  {
     id: "calculadora-de-area-y-perimetro",
     title: "Calculadora de área y perímetro",
     description:

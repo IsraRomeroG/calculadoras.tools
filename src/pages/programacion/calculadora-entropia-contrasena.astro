@@ -1,0 +1,721 @@
+---
+import AdSlot from "@components/ads/AdSlot.astro";
+import Container from "@components/layout/Container.astro";
+import PageShell from "@components/layout/PageShell.astro";
+import FaqSection from "@components/shared/FaqSection.astro";
+import PageHero from "@components/shared/PageHero.astro";
+import SectionIntro from "@components/shared/SectionIntro.astro";
+import BaseLayout from "@layouts/BaseLayout.astro";
+import {
+  ATTACK_SCENARIOS,
+  DEFAULT_ATTACK_SCENARIO_ID,
+  MAX_PASSWORD_LENGTH,
+  getAttackScenario,
+} from "@lib/calculators/programacion/calculadora-entropia-contrasena/passwordEntropy";
+import { buildFaqJsonLd } from "@lib/seo";
+
+const title = "Calculadora de entropía de contraseña";
+const description =
+  "Estima bits de entropía, espacio de búsqueda, patrones y tiempo aproximado de ataque de una contraseña procesada localmente en tu navegador.";
+const canonical = "/programacion/calculadora-entropia-contrasena";
+const defaultScenario = getAttackScenario(DEFAULT_ATTACK_SCENARIO_ID);
+
+const faqs = [
+  {
+    question: "¿La contraseña se envía a algún servidor?",
+    answer:
+      "No. El cálculo se ejecuta en el navegador y la herramienta no guarda, envía ni añade la contraseña a la URL.",
+  },
+  {
+    question: "¿Qué son bits de entropía?",
+    answer:
+      "Son una forma de estimar el tamaño del espacio de búsqueda. Más bits suelen implicar más combinaciones posibles, aunque no garantizan seguridad real.",
+  },
+  {
+    question: "¿Por qué una contraseña larga puede ser débil?",
+    answer:
+      "Porque puede incluir palabras comunes, secuencias, fechas o repeticiones que un atacante probaría antes que una búsqueda totalmente aleatoria.",
+  },
+  {
+    question: "¿Una frase larga puede ser mejor que una clave corta con símbolos?",
+    answer:
+      "Sí, si es única y no usa una frase popular. La longitud aporta mucho y suele ser más fácil de recordar que sustituciones obvias.",
+  },
+  {
+    question: "¿La entropía garantiza seguridad?",
+    answer:
+      "No. El riesgo también depende de filtraciones, phishing, malware, reutilización de contraseñas, MFA y políticas del servicio.",
+  },
+  {
+    question: "¿Qué diferencia hay entre ataque online y offline?",
+    answer:
+      "Un ataque online suele tener límites de intentos. Un ataque offline ocurre cuando un hash se filtró y puede probarse muchas veces por segundo.",
+  },
+  {
+    question: "¿Conviene usar gestor de contraseñas, MFA o passkeys?",
+    answer:
+      "Sí. Un gestor ayuda a crear claves largas y únicas, y MFA o passkeys reducen el riesgo si una contraseña se filtra.",
+  },
+];
+
+const faqJsonLd = buildFaqJsonLd(faqs);
+---
+
+<BaseLayout title={title} description={description} canonical={canonical}>
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={JSON.stringify(faqJsonLd)} />
+  </Fragment>
+
+  <PageShell>
+    <PageHero
+      title="Calculadora de entropía de contraseña"
+      description="Estima la entropía teórica, detecta patrones predecibles y compara tiempos de ataque sin enviar tu contraseña fuera del navegador."
+      kicker="Programación"
+      kickerHref="/programacion"
+      collapseBreadcrumbOnMobile
+      containerClass="py-6 md:py-8"
+      breadcrumbs={[
+        { label: "Inicio", href: "/", ariaLabel: "Inicio" },
+        { label: "Programación", href: "/programacion", optional: true },
+        { label: "Entropía de contraseña", truncate: true },
+      ]}
+    />
+
+    <Container as="section" class="py-6 md:py-8">
+      <section
+        id="password-entropy-tool"
+        class="overflow-hidden rounded-lg border border-gray-700 bg-gray-950 shadow-xl shadow-gray-950/30"
+        aria-labelledby="calculator-heading"
+      >
+        <div class="grid lg:grid-cols-[minmax(0,1.02fr)_minmax(19rem,0.98fr)]">
+          <div class="p-4 sm:p-6">
+            <p class="text-sm font-semibold text-emerald-300">
+              Evaluación local
+            </p>
+            <h2 id="calculator-heading" class="mt-2 text-2xl font-semibold">
+              Revisa fortaleza, entropía y patrones
+            </h2>
+
+            <div
+              class="mt-5 rounded-lg border border-emerald-400/20 bg-emerald-400/10 p-3 text-sm leading-relaxed text-emerald-100"
+            >
+              La contraseña se procesa solo en este navegador. No se guarda, no
+              se envía y no se escribe en la URL.
+            </div>
+
+            <div class="mt-5">
+              <div class="flex items-end justify-between gap-3">
+                <label
+                  for="password-entropy-input"
+                  class="block text-sm font-semibold text-gray-200"
+                >
+                  Contraseña
+                </label>
+                <span
+                  class="text-xs text-gray-500"
+                  aria-live="off"
+                  data-password-count
+                >
+                  0 / {MAX_PASSWORD_LENGTH} caracteres
+                </span>
+              </div>
+              <div class="mt-2 flex rounded-lg border border-gray-700 bg-gray-900 focus-within:border-emerald-400 focus-within:ring-3 focus-within:ring-emerald-400/15">
+                <input
+                  id="password-entropy-input"
+                  class="min-h-12 min-w-0 flex-1 rounded-l-lg bg-transparent px-4 font-mono text-base text-white outline-none placeholder:text-gray-600"
+                  type="password"
+                  inputmode="text"
+                  autocomplete="off"
+                  autocapitalize="off"
+                  autocorrect="off"
+                  spellcheck="false"
+                  placeholder="Escribe o pega una contraseña"
+                  aria-describedby="password-entropy-help password-entropy-limit"
+                  data-password-input
+                />
+                <button
+                  class="min-h-12 shrink-0 rounded-r-lg border-l border-gray-700 px-4 text-sm font-semibold text-emerald-200 transition hover:bg-gray-800 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-emerald-400/30"
+                  type="button"
+                  aria-pressed="false"
+                  data-toggle-password
+                >
+                  Mostrar
+                </button>
+              </div>
+              <p
+                id="password-entropy-help"
+                class="mt-2 text-xs leading-relaxed text-gray-500"
+              >
+                Límite de interfaz: {MAX_PASSWORD_LENGTH} puntos de código
+                Unicode. No uses esta herramienta como verificador de cuentas
+                reales de alto riesgo.
+              </p>
+              <p
+                id="password-entropy-limit"
+                class="mt-2 hidden text-sm leading-relaxed text-amber-300"
+                role="alert"
+                data-limit-message
+              ></p>
+            </div>
+
+            <div class="mt-5 grid gap-4 sm:grid-cols-2">
+              <div>
+                <label
+                  for="password-attack-scenario"
+                  class="block text-sm font-semibold text-gray-200"
+                >
+                  Escenario de ataque
+                </label>
+                <select
+                  id="password-attack-scenario"
+                  class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-900 px-4 text-base text-white outline-none transition focus:border-emerald-400 focus:ring-3 focus:ring-emerald-400/15"
+                  data-scenario-select
+                >
+                  {
+                    ATTACK_SCENARIOS.map((scenario) => (
+                      <option
+                        value={scenario.id}
+                        selected={scenario.id === DEFAULT_ATTACK_SCENARIO_ID}
+                      >
+                        {scenario.label}
+                      </option>
+                    ))
+                  }
+                  <option value="custom">Personalizado</option>
+                </select>
+                <p class="mt-2 text-xs leading-relaxed text-gray-500" data-scenario-help>
+                  {defaultScenario.description}
+                </p>
+              </div>
+
+              <div class="hidden" data-custom-speed-wrap>
+                <label
+                  for="password-custom-speed"
+                  class="block text-sm font-semibold text-gray-200"
+                >
+                  Intentos por segundo
+                </label>
+                <input
+                  id="password-custom-speed"
+                  class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-900 px-4 font-mono text-base text-white outline-none transition placeholder:text-gray-600 focus:border-emerald-400 focus:ring-3 focus:ring-emerald-400/15"
+                  type="text"
+                  inputmode="decimal"
+                  autocomplete="off"
+                  placeholder="Ej. 1e9"
+                  aria-describedby="password-custom-speed-error"
+                  data-custom-speed
+                />
+                <p
+                  id="password-custom-speed-error"
+                  class="mt-2 hidden text-sm leading-relaxed text-red-300"
+                  role="alert"
+                  data-custom-speed-error
+                ></p>
+              </div>
+            </div>
+
+            <div class="mt-5 flex flex-col gap-3 sm:flex-row sm:items-center">
+              <button
+                class="min-h-11 rounded-lg border border-gray-700 px-4 py-2 text-sm font-semibold text-gray-200 transition hover:border-gray-500 hover:bg-gray-900 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-gray-400/30"
+                type="button"
+                data-clear-password
+              >
+                Limpiar
+              </button>
+              <p
+                class="min-h-11 rounded-lg border border-gray-800 bg-gray-900 px-4 py-3 text-sm text-gray-400 sm:flex-1"
+                data-speed-summary
+              >
+                {defaultScenario.label}: {defaultScenario.attemptsPerSecond}
+                intentos/s
+              </p>
+            </div>
+          </div>
+
+          <aside
+            class="border-t border-gray-800 bg-gray-900/65 p-4 sm:p-6 lg:border-l lg:border-t-0"
+          >
+            <p class="text-xs font-semibold uppercase tracking-wide text-gray-500">
+              Resultado principal
+            </p>
+            <div class="mt-3 rounded-lg border border-gray-800 bg-gray-950 p-4">
+              <p class="text-sm font-semibold text-gray-400">Fortaleza práctica</p>
+              <p
+                class="mt-2 text-3xl font-semibold text-gray-300"
+                data-strength-label
+              >
+                Sin cálculo
+              </p>
+              <div class="mt-4 h-2 overflow-hidden rounded-full bg-gray-800">
+                <div
+                  class="h-full w-0 rounded-full bg-gray-600 transition-all"
+                  data-score-bar
+                ></div>
+              </div>
+              <p class="mt-3 min-h-10 text-sm leading-relaxed text-gray-400" data-strength-summary>
+                Escribe una contraseña para estimar su fortaleza.
+              </p>
+            </div>
+
+            <div class="mt-4 grid grid-cols-2 gap-2">
+              <div class="rounded-lg border border-gray-800 bg-gray-950 p-3">
+                <span class="block text-xs font-semibold uppercase text-gray-500">
+                  Entropía
+                </span>
+                <span class="mt-1 block font-mono text-lg font-semibold text-white" data-entropy-bits>
+                  0 bits
+                </span>
+              </div>
+              <div class="rounded-lg border border-gray-800 bg-gray-950 p-3">
+                <span class="block text-xs font-semibold uppercase text-gray-500">
+                  Conjunto
+                </span>
+                <span class="mt-1 block font-mono text-lg font-semibold text-white" data-charset-size>
+                  0
+                </span>
+              </div>
+              <div class="rounded-lg border border-gray-800 bg-gray-950 p-3">
+                <span class="block text-xs font-semibold uppercase text-gray-500">
+                  Espacio
+                </span>
+                <span class="mt-1 block font-mono text-base font-semibold text-white" data-search-space>
+                  1
+                </span>
+              </div>
+              <div class="rounded-lg border border-gray-800 bg-gray-950 p-3">
+                <span class="block text-xs font-semibold uppercase text-gray-500">
+                  Longitud
+                </span>
+                <span class="mt-1 block font-mono text-lg font-semibold text-white" data-password-length>
+                  0
+                </span>
+              </div>
+            </div>
+
+            <div class="mt-4 rounded-lg border border-gray-800 bg-gray-950 p-4">
+              <p class="text-sm font-semibold text-gray-200">
+                Tiempo estimado
+              </p>
+              <dl class="mt-3 grid gap-3 text-sm">
+                <div>
+                  <dt class="text-gray-500">Promedio</dt>
+                  <dd class="mt-1 font-semibold text-emerald-200" data-average-time>
+                    Sin cálculo
+                  </dd>
+                </div>
+                <div>
+                  <dt class="text-gray-500">Peor caso</dt>
+                  <dd class="mt-1 font-semibold text-gray-200" data-worst-time>
+                    Sin cálculo
+                  </dd>
+                </div>
+              </dl>
+            </div>
+
+            <button
+              class="mt-4 hidden min-h-11 w-full rounded-lg bg-emerald-400 px-4 py-2 text-sm font-semibold text-gray-950 transition hover:bg-emerald-300 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-emerald-300/40"
+              type="button"
+              data-copy-summary
+            >
+              Copiar resumen sin contraseña
+            </button>
+            <p
+              class="mt-3 min-h-5 text-sm text-emerald-300"
+              role="status"
+              aria-live="polite"
+              data-copy-status
+            ></p>
+            <p class="sr-only" role="status" aria-live="polite" data-live-status>
+            </p>
+          </aside>
+        </div>
+
+        <div class="border-t border-gray-800 p-4 sm:p-6">
+          <div class="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
+            <section aria-labelledby="signals-heading">
+              <h3 id="signals-heading" class="text-lg font-semibold">
+                Señales detectadas
+              </h3>
+              <ul class="mt-4 grid gap-3" data-signals-list>
+                <li class="rounded-lg border border-gray-800 bg-gray-900/60 p-4 text-sm text-gray-400">
+                  Las señales aparecerán mientras escribes.
+                </li>
+              </ul>
+            </section>
+
+            <section aria-labelledby="recommendations-heading">
+              <h3 id="recommendations-heading" class="text-lg font-semibold">
+                Recomendaciones
+              </h3>
+              <ul class="mt-4 grid gap-3" data-recommendations-list>
+                <li class="rounded-lg border border-gray-800 bg-gray-900/60 p-4 text-sm text-gray-400">
+                  Usa una contraseña larga y única, o una frase de varias
+                  palabras.
+                </li>
+              </ul>
+            </section>
+          </div>
+
+          <details class="mt-6 rounded-lg border border-gray-800 bg-gray-900/60">
+            <summary class="flex min-h-12 cursor-pointer items-center px-4 py-3 text-sm font-semibold text-emerald-300">
+              Ver cálculo
+            </summary>
+            <div class="border-t border-gray-800 p-4 text-sm leading-relaxed text-gray-400">
+              <p>
+                Entropía teórica = longitud × log2(tamaño del conjunto). El
+                diagnóstico práctico puede bajar la clasificación si detecta
+                palabras, secuencias, repeticiones, fechas o sustituciones
+                obvias.
+              </p>
+              <p class="mt-3 font-mono text-gray-200" data-formula-output>
+                0 × log2(0) = 0 bits
+              </p>
+            </div>
+          </details>
+        </div>
+      </section>
+    </Container>
+
+    <AdSlot placement="calculator-after-tool" />
+
+    <Container as="section" class="py-6 md:py-8">
+      <SectionIntro
+        title="Cómo interpretar el resultado"
+        description="La entropía ayuda a estimar combinaciones, pero la facilidad real de adivinar depende de patrones y contexto."
+      />
+      <div class="grid gap-4 md:grid-cols-3">
+        <article class="rounded-lg border border-gray-800 bg-gray-950 p-5">
+          <h3 class="text-lg font-semibold">Entropía teórica</h3>
+          <p class="mt-3 text-sm leading-relaxed text-gray-400">
+            El cálculo usa longitud y conjuntos de caracteres. Es transparente,
+            pero puede sobreestimar claves con palabras o patrones conocidos.
+          </p>
+        </article>
+        <article class="rounded-lg border border-gray-800 bg-gray-950 p-5">
+          <h3 class="text-lg font-semibold">Riesgo práctico</h3>
+          <p class="mt-3 text-sm leading-relaxed text-gray-400">
+            La herramienta penaliza contraseñas comunes, secuencias, fechas,
+            repeticiones y sustituciones obvias como cambiar letras por números.
+          </p>
+        </article>
+        <article class="rounded-lg border border-gray-800 bg-gray-950 p-5">
+          <h3 class="text-lg font-semibold">Contexto de ataque</h3>
+          <p class="mt-3 text-sm leading-relaxed text-gray-400">
+            Un servicio con límite de intentos no se comporta igual que un hash
+            filtrado probado offline con hardware especializado.
+          </p>
+        </article>
+      </div>
+    </Container>
+
+    <FaqSection faqs={faqs} />
+  </PageShell>
+</BaseLayout>
+
+<script>
+  import {
+    ATTACK_SCENARIOS,
+    DEFAULT_ATTACK_SCENARIO_ID,
+    MAX_PASSWORD_LENGTH,
+    analyzePassword,
+    formatAttemptsPerSecond,
+    getAttackScenario,
+    parseAttemptsPerSecond,
+  } from "@lib/calculators/programacion/calculadora-entropia-contrasena/passwordEntropy";
+
+  function query(selector) {
+    const element = document.querySelector(selector);
+
+    if (!element) {
+      throw new Error(`No se encontro el elemento ${selector}.`);
+    }
+
+    return element;
+  }
+
+  const passwordInput = query("[data-password-input]");
+  const togglePassword = query("[data-toggle-password]");
+  const passwordCount = query("[data-password-count]");
+  const limitMessage = query("[data-limit-message]");
+  const scenarioSelect = query("[data-scenario-select]");
+  const scenarioHelp = query("[data-scenario-help]");
+  const customSpeedWrap = query("[data-custom-speed-wrap]");
+  const customSpeedInput = query("[data-custom-speed]");
+  const customSpeedError = query("[data-custom-speed-error]");
+  const speedSummary = query("[data-speed-summary]");
+  const clearButton = query("[data-clear-password]");
+  const strengthLabel = query("[data-strength-label]");
+  const strengthSummary = query("[data-strength-summary]");
+  const scoreBar = query("[data-score-bar]");
+  const entropyBits = query("[data-entropy-bits]");
+  const charsetSize = query("[data-charset-size]");
+  const searchSpace = query("[data-search-space]");
+  const passwordLength = query("[data-password-length]");
+  const averageTime = query("[data-average-time]");
+  const worstTime = query("[data-worst-time]");
+  const signalsList = query("[data-signals-list]");
+  const recommendationsList = query("[data-recommendations-list]");
+  const formulaOutput = query("[data-formula-output]");
+  const copySummaryButton = query("[data-copy-summary]");
+  const copyStatus = query("[data-copy-status]");
+  const liveStatus = query("[data-live-status]");
+
+  let lastValidAttemptsPerSecond =
+    getAttackScenario(DEFAULT_ATTACK_SCENARIO_ID).attemptsPerSecond;
+  let lastSummary = "";
+  let copyTimer = 0;
+  let liveTimer = 0;
+
+  const levelClasses = {
+    empty: ["text-gray-300", "bg-gray-600"],
+    "very-weak": ["text-red-300", "bg-red-400"],
+    weak: ["text-orange-300", "bg-orange-400"],
+    acceptable: ["text-amber-300", "bg-amber-400"],
+    strong: ["text-emerald-300", "bg-emerald-400"],
+    "very-strong": ["text-cyan-300", "bg-cyan-400"],
+  };
+
+  const signalClasses = {
+    danger: "border-red-400/25 bg-red-400/10 text-red-100",
+    warning: "border-amber-400/25 bg-amber-400/10 text-amber-100",
+    info: "border-blue-400/20 bg-blue-400/10 text-blue-100",
+    positive: "border-emerald-400/25 bg-emerald-400/10 text-emerald-100",
+  };
+
+  function getCodePointLength(value) {
+    return Array.from(value).length;
+  }
+
+  function enforceLengthLimit() {
+    const codePoints = Array.from(passwordInput.value);
+
+    if (codePoints.length <= MAX_PASSWORD_LENGTH) {
+      limitMessage.classList.add("hidden");
+      limitMessage.textContent = "";
+      return;
+    }
+
+    passwordInput.value = codePoints.slice(0, MAX_PASSWORD_LENGTH).join("");
+    limitMessage.textContent =
+      `Se recorto al limite de ${MAX_PASSWORD_LENGTH} caracteres para la interfaz.`;
+    limitMessage.classList.remove("hidden");
+  }
+
+  function getSelectedAttackSpeed() {
+    const selected = scenarioSelect.value;
+
+    if (selected !== "custom") {
+      const scenario = getAttackScenario(selected);
+
+      lastValidAttemptsPerSecond = scenario.attemptsPerSecond;
+      scenarioHelp.textContent = scenario.description;
+      speedSummary.textContent =
+        `${scenario.label}: ${formatAttemptsPerSecond(scenario.attemptsPerSecond)}`;
+      customSpeedWrap.classList.add("hidden");
+      customSpeedError.classList.add("hidden");
+      customSpeedError.textContent = "";
+
+      return {
+        attemptsPerSecond: scenario.attemptsPerSecond,
+        label: scenario.label,
+      };
+    }
+
+    customSpeedWrap.classList.remove("hidden");
+    scenarioHelp.textContent =
+      "Usa un valor manual mayor que 0. Se acepta notacion como 1e9.";
+
+    const parsed = parseAttemptsPerSecond(customSpeedInput.value);
+
+    if (parsed === null) {
+      customSpeedError.textContent =
+        "Escribe una velocidad mayor que 0, por ejemplo 1e9.";
+      customSpeedError.classList.remove("hidden");
+      speedSummary.textContent =
+        `Personalizado invalido; usando ${formatAttemptsPerSecond(lastValidAttemptsPerSecond)}.`;
+
+      return {
+        attemptsPerSecond: lastValidAttemptsPerSecond,
+        label: "Personalizado anterior",
+      };
+    }
+
+    lastValidAttemptsPerSecond = parsed;
+    customSpeedError.classList.add("hidden");
+    customSpeedError.textContent = "";
+    speedSummary.textContent = `Personalizado: ${formatAttemptsPerSecond(parsed)}`;
+
+    return {
+      attemptsPerSecond: parsed,
+      label: "Personalizado",
+    };
+  }
+
+  function setStrengthClasses(level) {
+    Object.values(levelClasses).flat().forEach((className) => {
+      strengthLabel.classList.remove(className);
+      scoreBar.classList.remove(className);
+    });
+
+    const [textClass, barClass] = levelClasses[level] ?? levelClasses.empty;
+
+    strengthLabel.classList.add(textClass);
+    scoreBar.classList.add(barClass);
+  }
+
+  function renderList(list, items, renderItem) {
+    list.textContent = "";
+
+    items.forEach((item) => {
+      list.append(renderItem(item));
+    });
+  }
+
+  function createSignalItem(signal) {
+    const item = document.createElement("li");
+    const title = document.createElement("p");
+    const detail = document.createElement("p");
+
+    item.className =
+      `rounded-lg border p-4 text-sm ${signalClasses[signal.severity]}`;
+    title.className = "font-semibold";
+    title.textContent = signal.label;
+    detail.className = "mt-1 leading-relaxed opacity-85";
+    detail.textContent = signal.detail;
+    item.append(title, detail);
+
+    return item;
+  }
+
+  function createRecommendationItem(text) {
+    const item = document.createElement("li");
+
+    item.className =
+      "rounded-lg border border-gray-800 bg-gray-900/60 p-4 text-sm leading-relaxed text-gray-200";
+    item.textContent = text;
+
+    return item;
+  }
+
+  function buildSummary(result, attackLabel) {
+    return [
+      `Fortaleza practica: ${result.strengthLabel}`,
+      `Entropia teorica: ${result.entropyLabel}`,
+      `Longitud: ${result.length} caracteres`,
+      `Conjunto estimado: ${result.characterSetSize}`,
+      `Espacio de busqueda: ${result.searchSpaceLabel}`,
+      `Escenario: ${attackLabel}`,
+      `Tiempo promedio: ${result.attack.averageLabel}`,
+      `Peor caso: ${result.attack.worstCaseLabel}`,
+      `Senales: ${result.signals.map((signal) => signal.label).join(", ")}`,
+      `Recomendaciones: ${result.recommendations.join(" ")}`,
+    ].join("\n");
+  }
+
+  function scheduleAnnouncement(message) {
+    window.clearTimeout(liveTimer);
+    liveTimer = window.setTimeout(() => {
+      liveStatus.textContent = message;
+    }, 350);
+  }
+
+  function showCopyStatus(message) {
+    copyStatus.textContent = message;
+    window.clearTimeout(copyTimer);
+    copyTimer = window.setTimeout(() => {
+      copyStatus.textContent = "";
+    }, 2000);
+  }
+
+  function render() {
+    enforceLengthLimit();
+
+    const attack = getSelectedAttackSpeed();
+    const result = analyzePassword(passwordInput.value, {
+      attemptsPerSecond: attack.attemptsPerSecond,
+    });
+
+    passwordCount.textContent =
+      `${getCodePointLength(passwordInput.value)} / ${MAX_PASSWORD_LENGTH} caracteres`;
+    passwordCount.classList.toggle(
+      "text-amber-300",
+      getCodePointLength(passwordInput.value) >= MAX_PASSWORD_LENGTH,
+    );
+    passwordCount.classList.toggle(
+      "text-gray-500",
+      getCodePointLength(passwordInput.value) < MAX_PASSWORD_LENGTH,
+    );
+
+    setStrengthClasses(result.strengthLevel);
+    strengthLabel.textContent = result.strengthLabel;
+    strengthSummary.textContent = result.strengthSummary;
+    scoreBar.style.width = `${Math.max(0, result.score) * 20}%`;
+    entropyBits.textContent = result.entropyLabel;
+    charsetSize.textContent = String(result.characterSetSize);
+    searchSpace.textContent = result.searchSpaceLabel;
+    passwordLength.textContent = String(result.length);
+    averageTime.textContent =
+      result.strengthLevel === "empty" ? "Sin calculo" : result.attack.averageLabel;
+    worstTime.textContent =
+      result.strengthLevel === "empty" ? "Sin calculo" : result.attack.worstCaseLabel;
+    formulaOutput.textContent =
+      `${result.length} × log2(${result.characterSetSize}) = ${result.entropyLabel}`;
+
+    renderList(signalsList, result.signals, createSignalItem);
+    renderList(
+      recommendationsList,
+      result.recommendations,
+      createRecommendationItem,
+    );
+
+    lastSummary = buildSummary(result, attack.label);
+    copySummaryButton.classList.toggle("hidden", result.strengthLevel === "empty");
+
+    scheduleAnnouncement(
+      result.strengthLevel === "empty"
+        ? "Sin calculo"
+        : `Fortaleza ${result.strengthLabel}, ${result.entropyLabel}`,
+    );
+  }
+
+  passwordInput.addEventListener("input", render);
+  scenarioSelect.addEventListener("change", render);
+  customSpeedInput.addEventListener("input", render);
+
+  togglePassword.addEventListener("click", () => {
+    const visible = passwordInput.type === "text";
+
+    passwordInput.type = visible ? "password" : "text";
+    togglePassword.textContent = visible ? "Mostrar" : "Ocultar";
+    togglePassword.setAttribute("aria-pressed", visible ? "false" : "true");
+    passwordInput.focus();
+  });
+
+  clearButton.addEventListener("click", () => {
+    passwordInput.value = "";
+    passwordInput.type = "password";
+    togglePassword.textContent = "Mostrar";
+    togglePassword.setAttribute("aria-pressed", "false");
+    scenarioSelect.value = DEFAULT_ATTACK_SCENARIO_ID;
+    customSpeedInput.value = "";
+    lastValidAttemptsPerSecond =
+      getAttackScenario(DEFAULT_ATTACK_SCENARIO_ID).attemptsPerSecond;
+    render();
+    passwordInput.focus();
+  });
+
+  copySummaryButton.addEventListener("click", async () => {
+    if (!lastSummary) {
+      return;
+    }
+
+    try {
+      await navigator.clipboard.writeText(lastSummary);
+      showCopyStatus("Resumen copiado sin incluir la contraseña.");
+    } catch {
+      showCopyStatus("No fue posible copiar automáticamente.");
+    }
+  });
+
+  render();
+</script>
