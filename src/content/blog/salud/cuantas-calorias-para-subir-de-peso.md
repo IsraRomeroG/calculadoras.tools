@@ -2,7 +2,7 @@
 title: "Cuántas calorías comer para subir de peso"
 seoTitle: "Cuántas calorías comer para subir de peso: calcula tu superávit"
 description: "Aprende cómo estimar calorías para subir de peso partiendo de tu TDEE y usando un superávit prudente."
-pubDate: 2027-07-06
+pubDate: 2026-07-20
 draft: true
 categorySlug: "salud"
 tags:

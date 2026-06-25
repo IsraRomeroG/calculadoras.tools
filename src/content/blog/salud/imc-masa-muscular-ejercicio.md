@@ -2,7 +2,7 @@
 title: "El IMC sirve si hago ejercicio o tengo mucha masa muscular?"
 seoTitle: "IMC y masa muscular: por qué puede salir alto en deportistas"
 description: "Aprende por qué el IMC puede ser alto en personas con mucha masa muscular y qué otros indicadores pueden ayudar."
-pubDate: 2026-06-17
+pubDate: 2026-07-03
 categorySlug: "salud"
 tags:
   - imc

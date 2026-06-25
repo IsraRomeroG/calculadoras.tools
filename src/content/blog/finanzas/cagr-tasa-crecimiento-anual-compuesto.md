@@ -1,7 +1,7 @@
 ---
 title: "CAGR: que es la tasa de crecimiento anual compuesto"
 description: "Aprende que es el CAGR, como se calcula y por que no es lo mismo que un promedio anual simple."
-pubDate: 2026-05-19
+pubDate: 2026-03-26
 categorySlug: "finanzas"
 tags:
   - CAGR

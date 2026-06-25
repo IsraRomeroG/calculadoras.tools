@@ -2,7 +2,7 @@
 title: "Cómo convertir fracciones y decimales a porcentajes"
 seoTitle: "Convertir fracciones y decimales a porcentajes"
 description: "Aprende cómo pasar de decimal a porcentaje, de fracción a porcentaje y de porcentaje a decimal con ejemplos simples."
-pubDate: 2026-05-26
+pubDate: 2026-04-14
 categorySlug: "matematicas"
 tags:
   - porcentajes

@@ -2,7 +2,7 @@
 title: "Préstamo a 12, 24, 36 o 48 meses: qué plazo conviene"
 seoTitle: "Préstamo a 12, 24, 36 o 48 meses: mensualidad vs intereses"
 description: "Compara cómo cambia la mensualidad y el costo total de un préstamo cuando eliges 12, 24, 36 o 48 meses."
-pubDate: 2026-06-03
+pubDate: 2026-05-20
 categorySlug: "finanzas"
 tags:
   - plazo de préstamo

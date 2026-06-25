@@ -1,7 +1,7 @@
 ---
 title: "Regla del 72: cuánto tarda en duplicarse tu dinero"
 description: "Aprende a usar la regla del 72 para estimar en cuántos años se duplica una inversión con interés compuesto."
-pubDate: 2026-05-16
+pubDate: 2026-03-20
 categorySlug: "finanzas"
 tags:
   - regla del 72

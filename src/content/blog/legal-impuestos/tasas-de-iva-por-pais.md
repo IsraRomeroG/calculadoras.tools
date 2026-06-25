@@ -1,7 +1,7 @@
 ---
 title: "Tabla de tasas de IVA por país"
 description: "Consulta una tabla orientativa de tasas de IVA, IGV o impuestos equivalentes por país y aprende cuándo verificar la fuente oficial."
-pubDate: 2026-05-08
+pubDate: 2026-03-09
 categorySlug: "legal-impuestos"
 tags:
   - tasas de iva

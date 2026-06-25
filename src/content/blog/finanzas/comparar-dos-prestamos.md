@@ -2,7 +2,7 @@
 title: "Cómo comparar dos préstamos: tasa, CAT, plazo y comisiones"
 seoTitle: "Cómo comparar préstamos: mensualidad, CAT, intereses y costo total"
 description: "Aprende a comparar dos préstamos revisando tasa, CAT, comisión, seguro, plazo, mensualidad y costo total."
-pubDate: 2026-06-01
+pubDate: 2026-05-12
 categorySlug: "finanzas"
 tags:
   - comparar préstamos

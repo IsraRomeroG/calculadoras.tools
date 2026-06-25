@@ -2,7 +2,7 @@
 title: "Cómo hacer una tabla de amortización en Excel"
 seoTitle: "Tabla de amortización en Excel: fórmulas de pago, interés y capital"
 description: "Aprende a crear una tabla de amortización en Excel o Google Sheets con fórmulas para pago, intereses, capital y saldo."
-pubDate: 2026-06-01
+pubDate: 2026-05-13
 categorySlug: "finanzas"
 tags:
   - tabla de amortización

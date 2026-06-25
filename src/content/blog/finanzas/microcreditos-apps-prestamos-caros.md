@@ -2,7 +2,7 @@
 title: "Microcréditos y apps de préstamos: cómo saber si son caros"
 seoTitle: "Microcréditos y apps de préstamos: CAT, comisiones y costo real"
 description: "Aprende a revisar si un microcrédito o app de préstamos es caro comparando tasa, CAT, plazo, comisiones y pago total."
-pubDate: 2026-06-13
+pubDate: 2026-06-19
 categorySlug: "finanzas"
 tags:
   - microcréditos

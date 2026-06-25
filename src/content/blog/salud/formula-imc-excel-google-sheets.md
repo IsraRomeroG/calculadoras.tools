@@ -2,7 +2,7 @@
 title: "Fórmula del IMC en Excel y Google Sheets"
 seoTitle: "Cómo calcular el IMC en Excel y Google Sheets"
 description: "Aprende fórmulas para calcular el IMC en Excel o Google Sheets con peso en kg, altura en metros o centímetros."
-pubDate: 2026-06-12
+pubDate: 2026-06-18
 categorySlug: "salud"
 tags:
   - imc

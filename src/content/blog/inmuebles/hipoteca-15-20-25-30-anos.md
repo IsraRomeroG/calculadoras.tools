@@ -2,7 +2,7 @@
 title: "Hipoteca a 15, 20, 25 o 30 años: qué plazo conviene"
 seoTitle: "Hipoteca a 15, 20, 25 o 30 años: mensualidad vs intereses"
 description: "Compara cómo cambia la mensualidad y el costo total de una hipoteca cuando eliges 15, 20, 25 o 30 años."
-pubDate: 2026-06-14
+pubDate: 2026-06-26
 categorySlug: "inmuebles"
 tags:
   - plazo hipotecario

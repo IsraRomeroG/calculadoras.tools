@@ -1,7 +1,7 @@
 ---
 title: "IVA en Colombia: tarifa general y tarifa reducida"
 description: "Aprende cómo funciona el IVA en Colombia, cómo calcular la tarifa general del 19% y qué cuidados tener con tarifas reducidas o bienes excluidos."
-pubDate: 2026-05-10
+pubDate: 2026-03-11
 categorySlug: "legal-impuestos"
 tags:
   - iva colombia

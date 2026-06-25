@@ -2,7 +2,7 @@
 title: "Préstamo personal vs tarjeta de crédito: cuál cuesta menos"
 seoTitle: "Préstamo personal vs tarjeta de crédito: CAT, intereses y pagos"
 description: "Compara un préstamo personal contra una tarjeta de crédito considerando tasa, CAT, pagos fijos, plazo y costo total."
-pubDate: 2026-06-06
+pubDate: 2026-05-30
 categorySlug: "finanzas"
 tags:
   - préstamo personal

@@ -1,7 +1,7 @@
 ---
 title: "Errores comunes al calcular IVA"
 description: "Evita errores frecuentes al sumar o desglosar IVA: restar mal el impuesto, confundir tasa 0% y redondear antes de tiempo."
-pubDate: 2026-05-07
+pubDate: 2026-03-06
 categorySlug: "legal-impuestos"
 tags:
   - errores iva

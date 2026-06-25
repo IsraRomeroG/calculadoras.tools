@@ -1,7 +1,7 @@
 ---
 title: "Inflación e interés compuesto: calcula el valor real"
 description: "Aprende cómo la inflación reduce el poder adquisitivo de tus ahorros y cómo estimar el valor real de una inversión."
-pubDate: 2026-05-21
+pubDate: 2026-04-10
 categorySlug: "finanzas"
 tags:
   - inflación

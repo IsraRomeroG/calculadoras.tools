@@ -2,7 +2,7 @@
 title: "Cómo calcular la cuota mensual de una hipoteca"
 seoTitle: "Cómo calcular la cuota mensual de una hipoteca: fórmula y ejemplo"
 description: "Aprende cómo se calcula la mensualidad de una hipoteca con monto, tasa anual y plazo, y revisa un ejemplo paso a paso."
-pubDate: 2026-05-27
+pubDate: 2026-04-23
 categorySlug: "inmuebles"
 tags:
   - hipoteca

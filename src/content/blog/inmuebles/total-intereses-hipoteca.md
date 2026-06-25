@@ -2,7 +2,7 @@
 title: "Cómo calcular el total de intereses de una hipoteca"
 seoTitle: "Total de intereses de una hipoteca: fórmula, ejemplo y ahorro"
 description: "Aprende cómo estimar cuánto pagarás de intereses en una hipoteca y cómo influyen la tasa, el plazo y los pagos extra."
-pubDate: 2026-06-05
+pubDate: 2026-05-28
 categorySlug: "inmuebles"
 tags:
   - intereses hipotecarios

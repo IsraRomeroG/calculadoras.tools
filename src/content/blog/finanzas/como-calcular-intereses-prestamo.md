@@ -2,7 +2,7 @@
 title: "Cómo calcular los intereses de un préstamo"
 seoTitle: "Cómo calcular intereses de un préstamo: fórmula y ejemplo"
 description: "Aprende cómo se calculan los intereses de un préstamo sobre saldo pendiente y cómo estimar el interés total a pagar."
-pubDate: 2026-05-30
+pubDate: 2026-05-06
 categorySlug: "finanzas"
 tags:
   - intereses

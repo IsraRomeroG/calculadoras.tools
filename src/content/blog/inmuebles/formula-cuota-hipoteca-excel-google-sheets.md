@@ -2,7 +2,7 @@
 title: "Fórmula de cuota de hipoteca en Excel y Google Sheets"
 seoTitle: "Fórmula para calcular hipoteca en Excel y Google Sheets"
 description: "Aprende qué fórmula usar para estimar la cuota mensual de una hipoteca en Excel o Google Sheets y cómo validar el resultado."
-pubDate: 2026-06-19
+pubDate: 2026-07-07
 categorySlug: "inmuebles"
 tags:
   - fórmula hipoteca

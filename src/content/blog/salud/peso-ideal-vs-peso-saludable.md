@@ -2,7 +2,7 @@
 title: "Peso ideal vs peso saludable: no son lo mismo"
 seoTitle: "Peso ideal vs peso saludable: diferencias y cómo calcular un rango"
 description: "Conoce la diferencia entre peso ideal y peso saludable, y por qué conviene hablar de rangos de referencia."
-pubDate: 2026-06-16
+pubDate: 2026-07-02
 categorySlug: "salud"
 tags:
   - peso ideal

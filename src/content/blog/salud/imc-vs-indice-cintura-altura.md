@@ -2,7 +2,7 @@
 title: "IMC vs índice cintura-altura"
 seoTitle: "IMC vs índice cintura-altura: diferencias y cómo interpretarlos"
 description: "Conoce la diferencia entre el IMC y el índice cintura-altura, y por qué pueden complementarse."
-pubDate: 2026-06-11
+pubDate: 2026-06-15
 categorySlug: "salud"
 tags:
   - imc

@@ -1,7 +1,7 @@
 ---
 title: "Regla de tres: explicación práctica"
 description: "Resuelve proporciones comunes con pasos claros y ejemplos fáciles de adaptar."
-pubDate: 2026-05-04
+pubDate: 2026-03-04
 categorySlug: "matematicas"
 tags:
   - regla de tres

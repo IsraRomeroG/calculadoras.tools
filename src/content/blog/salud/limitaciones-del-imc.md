@@ -2,7 +2,7 @@
 title: "Limitaciones del IMC: cuándo puede fallar"
 seoTitle: "Limitaciones del IMC: masa muscular, grasa corporal y casos especiales"
 description: "Conoce las principales limitaciones del IMC y por qué no debe usarse como diagnóstico único."
-pubDate: 2026-06-15
+pubDate: 2026-07-01
 categorySlug: "salud"
 tags:
   - imc

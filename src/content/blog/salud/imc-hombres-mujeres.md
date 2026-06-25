@@ -2,7 +2,7 @@
 title: "IMC en hombres y mujeres: ¿se calcula diferente?"
 seoTitle: "IMC en hombres y mujeres: fórmula, diferencias y límites"
 description: "Conoce si el IMC se calcula diferente en hombres y mujeres y qué factores pueden cambiar su interpretación."
-pubDate: 2026-06-08
+pubDate: 2026-06-04
 categorySlug: "salud"
 tags:
   - imc

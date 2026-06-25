@@ -1,7 +1,7 @@
 ---
 title: "Cómo calcular un descuento"
 description: "Aprende a calcular descuentos reales antes de comprar y compara el precio final con claridad."
-pubDate: 2026-05-08
+pubDate: 2026-03-07
 categorySlug: "finanzas"
 tags:
   - descuentos

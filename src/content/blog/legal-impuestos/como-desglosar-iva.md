@@ -1,7 +1,7 @@
 ---
 title: "Cómo desglosar el IVA de un precio total"
 description: "Aprende a quitar el IVA incluido de un precio final sin cometer el error de restar el porcentaje directo."
-pubDate: 2026-05-15
+pubDate: 2026-03-18
 categorySlug: "legal-impuestos"
 tags:
   - iva incluido

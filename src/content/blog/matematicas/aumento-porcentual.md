@@ -1,7 +1,7 @@
 ---
 title: "Qué es el aumento porcentual"
 description: "Compara valores iniciales y finales de forma sencilla para entender cuánto cambió una cantidad."
-pubDate: 2026-05-06
+pubDate: 2026-03-05
 categorySlug: "matematicas"
 tags:
   - aumento porcentual

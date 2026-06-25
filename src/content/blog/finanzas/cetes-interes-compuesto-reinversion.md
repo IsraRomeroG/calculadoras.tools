@@ -1,7 +1,7 @@
 ---
 title: "CETES e interes compuesto: que pasa si reinviertes"
 description: "Entiende como funciona la reinversion en CETES, que datos necesitas para estimar ganancias y que limites tiene el calculo."
-pubDate: 2026-05-23
+pubDate: 2026-04-11
 categorySlug: "finanzas"
 tags:
   - cetes

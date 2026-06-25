@@ -2,7 +2,7 @@
 title: "Pagos extra en un préstamo: cómo ahorrar intereses"
 seoTitle: "Abono a capital y pagos extra: cómo reducir intereses de un préstamo"
 description: "Conoce cómo los pagos extra pueden reducir capital, plazo e intereses, y qué debes revisar antes de hacer un abono anticipado."
-pubDate: 2026-06-02
+pubDate: 2026-05-16
 categorySlug: "finanzas"
 tags:
   - abono a capital
