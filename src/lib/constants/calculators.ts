@@ -197,6 +197,15 @@ export const CALCULATORS: CalculatorDirectoryItem[] = [
     order: 38,
   },
   {
+    id: "calculadora-renta-vs-compra",
+    title: "Calculadora renta vs compra",
+    description:
+      "Compara rentar e invertir frente a comprar vivienda con hipoteca, enganche, plusvalia y supuestos editables.",
+    href: "/inmuebles/calculadora-renta-vs-compra",
+    categorySlug: "inmuebles",
+    order: 38.25,
+  },
+  {
     id: "calculadora-de-imc",
     title: "Calculadora de IMC",
     description:
