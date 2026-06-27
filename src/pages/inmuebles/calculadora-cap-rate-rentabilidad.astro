@@ -1,0 +1,1378 @@
+---
+import AdSlot from "@components/ads/AdSlot.astro";
+import Container from "@components/layout/Container.astro";
+import PageShell from "@components/layout/PageShell.astro";
+import FaqSection from "@components/shared/FaqSection.astro";
+import PageHero from "@components/shared/PageHero.astro";
+import SectionIntro from "@components/shared/SectionIntro.astro";
+import BaseLayout from "@layouts/BaseLayout.astro";
+import { buildFaqJsonLd } from "@lib/seo";
+
+const title = "Calculadora de cap rate y rentabilidad de alquiler";
+const description =
+  "Calcula cap rate, rendimiento bruto, NOI, flujo de caja y cash-on-cash return de una propiedad en alquiler con gastos y vacancia editables.";
+const canonical = "/inmuebles/calculadora-cap-rate-rentabilidad";
+
+const amountModeOptions = [
+  { value: "rent-percent", label: "% renta" },
+  { value: "monthly", label: "mensual" },
+] as const;
+
+const debtPeriodOptions = [
+  { value: "monthly", label: "mensual" },
+  { value: "annual", label: "anual" },
+] as const;
+
+const propertyFields = [
+  {
+    id: "cap-property-value",
+    name: "propertyValue",
+    label: "Precio o valor actual",
+    placeholder: "2500000",
+    prefix: "$",
+  },
+  {
+    id: "cap-closing-costs",
+    name: "closingCosts",
+    label: "Costos de cierre",
+    placeholder: "80000",
+    prefix: "$",
+  },
+  {
+    id: "cap-improvements",
+    name: "initialImprovements",
+    label: "Remodelacion/equipamiento",
+    placeholder: "120000",
+    prefix: "$",
+  },
+] as const;
+
+const incomeFields = [
+  {
+    id: "cap-monthly-rent",
+    name: "monthlyRent",
+    label: "Renta mensual bruta",
+    placeholder: "18000",
+    prefix: "$",
+  },
+  {
+    id: "cap-other-income",
+    name: "otherMonthlyIncome",
+    label: "Otros ingresos mensuales",
+    placeholder: "0",
+    prefix: "$",
+  },
+  {
+    id: "cap-vacancy",
+    name: "vacancyPercent",
+    label: "Vacancia estimada",
+    value: "5",
+    suffix: "%",
+  },
+] as const;
+
+const fixedExpenseFields = [
+  {
+    id: "cap-property-tax",
+    name: "annualPropertyTax",
+    label: "Predial anual",
+    placeholder: "7000",
+    prefix: "$",
+  },
+  {
+    id: "cap-insurance",
+    name: "annualInsurance",
+    label: "Seguro anual",
+    placeholder: "5000",
+    prefix: "$",
+  },
+  {
+    id: "cap-hoa",
+    name: "monthlyHoa",
+    label: "Cuota mensual",
+    placeholder: "800",
+    prefix: "$",
+  },
+  {
+    id: "cap-other-expenses",
+    name: "otherAnnualOperatingExpenses",
+    label: "Otros gastos anuales",
+    placeholder: "0",
+    prefix: "$",
+  },
+] as const;
+
+const financingFields = [
+  {
+    id: "cap-down-payment",
+    name: "downPayment",
+    label: "Enganche / capital inicial",
+    placeholder: "500000",
+    prefix: "$",
+  },
+  {
+    id: "cap-debt-payment",
+    name: "debtPayment",
+    label: "Pago de deuda",
+    placeholder: "10000",
+    prefix: "$",
+  },
+  {
+    id: "cap-target-rate",
+    name: "targetCapRatePercent",
+    label: "Cap rate objetivo",
+    placeholder: "7",
+    suffix: "%",
+  },
+] as const;
+
+const examples = [
+  {
+    label: "Departamento",
+    rent: "18000",
+    value: "2500000",
+    vacancy: "5",
+  },
+  {
+    label: "Local",
+    rent: "35000",
+    value: "4200000",
+    vacancy: "8",
+  },
+  {
+    label: "Casa",
+    rent: "24000",
+    value: "3200000",
+    vacancy: "6",
+  },
+] as const;
+
+const explainerCards = [
+  {
+    title: "Cap rate",
+    text: "Mide el NOI anual dividido entre el valor de la propiedad. No incluye deuda.",
+  },
+  {
+    title: "Flujo de caja",
+    text: "Resta el pago de deuda al NOI para estimar cuanto queda al mes o al ano.",
+  },
+  {
+    title: "Cash-on-cash",
+    text: "Compara el flujo anual contra el capital inicial invertido.",
+  },
+];
+
+const faqs = [
+  {
+    question: "Que es el cap rate?",
+    answer:
+      "El cap rate es el ingreso operativo neto anual dividido entre el valor de la propiedad. Sirve para comparar la rentabilidad operativa de inmuebles sin considerar deuda.",
+  },
+  {
+    question: "El cap rate incluye hipoteca?",
+    answer:
+      "No. El cap rate usa NOI antes de deuda. Para ver el efecto de la hipoteca revisa el flujo de caja despues de deuda y el cash-on-cash return.",
+  },
+  {
+    question: "Que gastos se incluyen en NOI?",
+    answer:
+      "Normalmente se incluyen gastos operativos como predial, seguro, administracion, mantenimiento, cuotas y reservas. No se incluye deuda ni impuestos personales.",
+  },
+  {
+    question: "Que diferencia hay entre cap rate y rendimiento bruto?",
+    answer:
+      "El rendimiento bruto usa ingresos antes de vacancia y gastos. El cap rate usa NOI, por eso suele ser menor y mas cercano a la operacion real.",
+  },
+  {
+    question: "Que es cash-on-cash return?",
+    answer:
+      "Es el flujo de caja anual dividido entre el capital inicial invertido. Ayuda cuando la propiedad tiene financiamiento.",
+  },
+  {
+    question: "Como calcular la renta minima para no perder dinero?",
+    answer:
+      "La calculadora estima una renta de equilibrio considerando gastos fijos, gastos variables, vacancia, deuda y otros ingresos mensuales.",
+  },
+];
+
+const faqJsonLd = buildFaqJsonLd(faqs);
+---
+
+<BaseLayout title={title} description={description} canonical={canonical}>
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={JSON.stringify(faqJsonLd)} />
+  </Fragment>
+
+  <PageShell>
+    <PageHero
+      title="Calculadora de cap rate"
+      description="Calcula NOI, cap rate, flujo de caja, cash-on-cash y puntos de equilibrio para una propiedad en alquiler."
+      kicker="Inmuebles"
+      kickerHref="/inmuebles"
+      collapseBreadcrumbOnMobile
+      containerClass="py-6 md:py-8"
+      breadcrumbs={[
+        { label: "Inicio", href: "/", ariaLabel: "Inicio" },
+        { label: "Inmuebles", href: "/inmuebles", optional: true },
+        { label: "Cap rate", truncate: true },
+      ]}
+    />
+
+    <Container as="section" class="py-6 md:py-8">
+      <section
+        id="cap-rate-calculator"
+        class="overflow-hidden rounded-lg border border-gray-700 bg-gray-950 shadow-xl shadow-gray-950/30"
+        aria-labelledby="calculator-heading"
+      >
+        <div
+          class="grid gap-0 lg:grid-cols-[minmax(0,1fr)_minmax(19rem,0.72fr)]"
+        >
+          <form
+            class="order-2 p-4 sm:p-6 lg:order-1"
+            data-calculator-form
+          >
+            <div class="mb-5">
+              <p class="text-sm font-semibold uppercase tracking-wide text-emerald-300">
+                Rentabilidad de alquiler
+              </p>
+              <h2 id="calculator-heading" class="mt-2 text-2xl font-semibold">
+                Datos de la propiedad
+              </h2>
+              <p class="mt-2 text-sm leading-relaxed text-gray-400">
+                Los supuestos quedan separados para distinguir ingresos,
+                gastos operativos y deuda.
+              </p>
+            </div>
+
+            <div class="grid gap-5">
+              <fieldset class="rounded-lg border border-gray-800 bg-gray-900/50 p-4">
+                <legend class="px-1 text-sm font-semibold text-emerald-200">
+                  Propiedad
+                </legend>
+                <div class="mt-3 grid gap-4 sm:grid-cols-3">
+                  {
+                    propertyFields.map((field) => (
+                      <div>
+                        <label
+                          for={field.id}
+                          class="block text-sm font-medium text-gray-200"
+                        >
+                          {field.label}
+                        </label>
+                        <div class="mt-2 flex rounded-lg border border-gray-700 bg-gray-900 focus-within:border-emerald-300 focus-within:ring-3 focus-within:ring-emerald-300/15">
+                          {"prefix" in field && field.prefix ? (
+                            <span class="flex items-center px-4 text-gray-500">
+                              {field.prefix}
+                            </span>
+                          ) : null}
+                          <input
+                            id={field.id}
+                            class="min-h-12 w-full bg-transparent px-4 text-base text-white outline-none placeholder:text-gray-600"
+                            type="text"
+                            inputmode="decimal"
+                            autocomplete="off"
+                            placeholder={field.placeholder}
+                            value={"value" in field ? field.value : undefined}
+                            aria-describedby={`${field.id}-error`}
+                            data-input={field.name}
+                          />
+                          {"suffix" in field && field.suffix ? (
+                            <span class="flex items-center px-4 text-gray-500">
+                              {field.suffix}
+                            </span>
+                          ) : null}
+                        </div>
+                        <p
+                          id={`${field.id}-error`}
+                          class="mt-2 hidden text-sm text-red-300"
+                          data-error-for={field.name}
+                        />
+                      </div>
+                    ))
+                  }
+                </div>
+              </fieldset>
+
+              <fieldset class="rounded-lg border border-gray-800 bg-gray-900/50 p-4">
+                <legend class="px-1 text-sm font-semibold text-emerald-200">
+                  Ingresos
+                </legend>
+                <div class="mt-3 grid gap-4 sm:grid-cols-3">
+                  {
+                    incomeFields.map((field) => (
+                      <div>
+                        <label
+                          for={field.id}
+                          class="block text-sm font-medium text-gray-200"
+                        >
+                          {field.label}
+                        </label>
+                        <div class="mt-2 flex rounded-lg border border-gray-700 bg-gray-900 focus-within:border-emerald-300 focus-within:ring-3 focus-within:ring-emerald-300/15">
+                          {"prefix" in field && field.prefix ? (
+                            <span class="flex items-center px-4 text-gray-500">
+                              {field.prefix}
+                            </span>
+                          ) : null}
+                          <input
+                            id={field.id}
+                            class="min-h-12 w-full bg-transparent px-4 text-base text-white outline-none placeholder:text-gray-600"
+                            type="text"
+                            inputmode="decimal"
+                            autocomplete="off"
+                            placeholder={"placeholder" in field ? field.placeholder : undefined}
+                            value={"value" in field ? field.value : undefined}
+                            aria-describedby={`${field.id}-error`}
+                            data-input={field.name}
+                          />
+                          {"suffix" in field && field.suffix ? (
+                            <span class="flex items-center px-4 text-gray-500">
+                              {field.suffix}
+                            </span>
+                          ) : null}
+                        </div>
+                        <p
+                          id={`${field.id}-error`}
+                          class="mt-2 hidden text-sm text-red-300"
+                          data-error-for={field.name}
+                        />
+                      </div>
+                    ))
+                  }
+                </div>
+              </fieldset>
+
+              <fieldset class="rounded-lg border border-gray-800 bg-gray-900/50 p-4">
+                <legend class="px-1 text-sm font-semibold text-emerald-200">
+                  Gastos operativos
+                </legend>
+                <div class="mt-3 grid gap-4 sm:grid-cols-2">
+                  {
+                    fixedExpenseFields.map((field) => (
+                      <div>
+                        <label
+                          for={field.id}
+                          class="block text-sm font-medium text-gray-200"
+                        >
+                          {field.label}
+                        </label>
+                        <div class="mt-2 flex rounded-lg border border-gray-700 bg-gray-900 focus-within:border-emerald-300 focus-within:ring-3 focus-within:ring-emerald-300/15">
+                          <span class="flex items-center px-4 text-gray-500">
+                            {field.prefix}
+                          </span>
+                          <input
+                            id={field.id}
+                            class="min-h-12 w-full bg-transparent px-4 text-base text-white outline-none placeholder:text-gray-600"
+                            type="text"
+                            inputmode="decimal"
+                            autocomplete="off"
+                            placeholder={field.placeholder}
+                            aria-describedby={`${field.id}-error`}
+                            data-input={field.name}
+                          />
+                        </div>
+                        <p
+                          id={`${field.id}-error`}
+                          class="mt-2 hidden text-sm text-red-300"
+                          data-error-for={field.name}
+                        />
+                      </div>
+                    ))
+                  }
+
+                  <div>
+                    <label
+                      for="cap-management"
+                      class="block text-sm font-medium text-gray-200"
+                    >
+                      Administracion
+                    </label>
+                    <div class="mt-2 grid grid-cols-[minmax(0,1fr)_8rem] rounded-lg border border-gray-700 bg-gray-900 focus-within:border-emerald-300 focus-within:ring-3 focus-within:ring-emerald-300/15">
+                      <input
+                        id="cap-management"
+                        class="min-h-12 w-full bg-transparent px-4 text-base text-white outline-none placeholder:text-gray-600"
+                        type="text"
+                        inputmode="decimal"
+                        autocomplete="off"
+                        placeholder="8"
+                        aria-describedby="cap-management-error"
+                        data-input="managementFee"
+                      />
+                      <select
+                        class="min-h-12 border-l border-gray-700 bg-transparent px-2 text-sm text-white outline-none"
+                        aria-label="Administracion como"
+                        data-select="managementFeeMode"
+                      >
+                        {
+                          amountModeOptions.map((option) => (
+                            <option
+                              value={option.value}
+                              selected={option.value === "rent-percent"}
+                            >
+                              {option.label}
+                            </option>
+                          ))
+                        }
+                      </select>
+                    </div>
+                    <p
+                      id="cap-management-error"
+                      class="mt-2 hidden text-sm text-red-300"
+                      data-error-for="managementFee"
+                    />
+                  </div>
+
+                  <div>
+                    <label
+                      for="cap-maintenance-reserve"
+                      class="block text-sm font-medium text-gray-200"
+                    >
+                      Mantenimiento/reserva
+                    </label>
+                    <div class="mt-2 grid grid-cols-[minmax(0,1fr)_8rem] rounded-lg border border-gray-700 bg-gray-900 focus-within:border-emerald-300 focus-within:ring-3 focus-within:ring-emerald-300/15">
+                      <input
+                        id="cap-maintenance-reserve"
+                        class="min-h-12 w-full bg-transparent px-4 text-base text-white outline-none placeholder:text-gray-600"
+                        type="text"
+                        inputmode="decimal"
+                        autocomplete="off"
+                        placeholder="5"
+                        aria-describedby="cap-maintenance-reserve-error"
+                        data-input="maintenanceReserve"
+                      />
+                      <select
+                        class="min-h-12 border-l border-gray-700 bg-transparent px-2 text-sm text-white outline-none"
+                        aria-label="Mantenimiento como"
+                        data-select="maintenanceReserveMode"
+                      >
+                        {
+                          amountModeOptions.map((option) => (
+                            <option
+                              value={option.value}
+                              selected={option.value === "rent-percent"}
+                            >
+                              {option.label}
+                            </option>
+                          ))
+                        }
+                      </select>
+                    </div>
+                    <p
+                      id="cap-maintenance-reserve-error"
+                      class="mt-2 hidden text-sm text-red-300"
+                      data-error-for="maintenanceReserve"
+                    />
+                  </div>
+                </div>
+              </fieldset>
+
+              <fieldset class="rounded-lg border border-gray-800 bg-gray-900/50 p-4">
+                <legend class="px-1 text-sm font-semibold text-emerald-200">
+                  Financiamiento y objetivo
+                </legend>
+                <div class="mt-3 grid gap-4 sm:grid-cols-3">
+                  {
+                    financingFields.map((field) => (
+                      <div>
+                        <label
+                          for={field.id}
+                          class="block text-sm font-medium text-gray-200"
+                        >
+                          {field.label}
+                        </label>
+                        <div class="mt-2 flex rounded-lg border border-gray-700 bg-gray-900 focus-within:border-emerald-300 focus-within:ring-3 focus-within:ring-emerald-300/15">
+                          {"prefix" in field && field.prefix ? (
+                            <span class="flex items-center px-4 text-gray-500">
+                              {field.prefix}
+                            </span>
+                          ) : null}
+                          <input
+                            id={field.id}
+                            class="min-h-12 w-full bg-transparent px-4 text-base text-white outline-none placeholder:text-gray-600"
+                            type="text"
+                            inputmode="decimal"
+                            autocomplete="off"
+                            placeholder={field.placeholder}
+                            aria-describedby={`${field.id}-error`}
+                            data-input={field.name}
+                          />
+                          {"suffix" in field && field.suffix ? (
+                            <span class="flex items-center px-4 text-gray-500">
+                              {field.suffix}
+                            </span>
+                          ) : null}
+                        </div>
+                        <p
+                          id={`${field.id}-error`}
+                          class="mt-2 hidden text-sm text-red-300"
+                          data-error-for={field.name}
+                        />
+                      </div>
+                    ))
+                  }
+                </div>
+
+                <div class="mt-4 max-w-xs">
+                  <label
+                    for="cap-debt-period"
+                    class="block text-sm font-medium text-gray-200"
+                  >
+                    Pago de deuda como
+                  </label>
+                  <select
+                    id="cap-debt-period"
+                    class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-900 px-4 text-base text-white outline-none transition focus:border-emerald-300 focus:ring-3 focus:ring-emerald-300/15"
+                    data-select="debtPaymentPeriod"
+                  >
+                    {
+                      debtPeriodOptions.map((option) => (
+                        <option
+                          value={option.value}
+                          selected={option.value === "monthly"}
+                        >
+                          {option.label}
+                        </option>
+                      ))
+                    }
+                  </select>
+                </div>
+              </fieldset>
+            </div>
+
+            <p
+              class="mt-4 hidden rounded-lg border border-red-400/25 bg-red-400/10 p-3 text-sm leading-relaxed text-red-200"
+              role="alert"
+              data-form-error
+            ></p>
+
+            <div class="mt-5 grid gap-2 sm:grid-cols-3">
+              {
+                examples.map((example) => (
+                  <button
+                    class="min-h-16 rounded-lg border border-gray-700 bg-gray-900 px-3 py-2 text-left text-sm text-gray-200 transition hover:border-emerald-400/60 hover:bg-gray-800 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-emerald-300/30"
+                    type="button"
+                    data-example
+                    data-example-value={example.value}
+                    data-example-rent={example.rent}
+                    data-example-vacancy={example.vacancy}
+                  >
+                    <span class="block font-semibold">{example.label}</span>
+                    <span class="mt-1 block font-mono text-xs text-emerald-200">
+                      ${example.rent} / mes
+                    </span>
+                  </button>
+                ))
+              }
+            </div>
+
+            <div class="mt-5 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+              <button
+                class="min-h-12 rounded-lg bg-emerald-400 px-5 py-3 text-sm font-semibold text-gray-950 transition hover:bg-emerald-300 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-emerald-300/40"
+                type="submit"
+              >
+                Calcular
+              </button>
+              <button
+                class="min-h-12 rounded-lg border border-gray-700 px-5 py-3 text-sm font-semibold text-gray-200 transition hover:border-gray-500 hover:bg-gray-900 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-gray-400/30"
+                type="button"
+                data-clear-calculator
+              >
+                Limpiar
+              </button>
+            </div>
+          </form>
+
+          <aside
+            class="order-1 border-b border-gray-800 bg-gray-900/65 p-4 sm:p-6 lg:order-2 lg:border-b-0 lg:border-l"
+          >
+            <p class="text-xs font-semibold uppercase tracking-wide text-gray-500">
+              Resultado principal
+            </p>
+            <p class="mt-2 text-sm font-semibold text-emerald-300">
+              Cap rate
+            </p>
+            <div class="mt-3 rounded-lg border border-gray-800 bg-gray-950 p-4">
+              <p
+                class="break-words text-4xl font-semibold text-emerald-100"
+                data-main-result
+              >
+                Sin calculo
+              </p>
+              <p
+                class="mt-3 min-h-12 text-sm leading-relaxed text-gray-400"
+                data-result-context
+              >
+                Ingresa valor, renta y gastos para calcular.
+              </p>
+            </div>
+
+            <dl class="mt-4 grid grid-cols-2 gap-2" data-summary-grid>
+              <div class="rounded-lg border border-gray-800 bg-gray-950 p-3">
+                <dt class="text-xs font-semibold uppercase text-gray-500">
+                  Flujo mensual
+                </dt>
+                <dd class="mt-1 font-mono text-base font-semibold text-white">
+                  -
+                </dd>
+              </div>
+              <div class="rounded-lg border border-gray-800 bg-gray-950 p-3">
+                <dt class="text-xs font-semibold uppercase text-gray-500">
+                  NOI anual
+                </dt>
+                <dd class="mt-1 font-mono text-base font-semibold text-white">
+                  -
+                </dd>
+              </div>
+              <div class="rounded-lg border border-gray-800 bg-gray-950 p-3">
+                <dt class="text-xs font-semibold uppercase text-gray-500">
+                  Cash-on-cash
+                </dt>
+                <dd class="mt-1 font-mono text-base font-semibold text-white">
+                  -
+                </dd>
+              </div>
+              <div class="rounded-lg border border-gray-800 bg-gray-950 p-3">
+                <dt class="text-xs font-semibold uppercase text-gray-500">
+                  Rend. bruto
+                </dt>
+                <dd class="mt-1 font-mono text-base font-semibold text-white">
+                  -
+                </dd>
+              </div>
+            </dl>
+
+            <p
+              class="mt-4 hidden rounded-lg border border-amber-300/25 bg-amber-300/10 p-3 text-sm leading-relaxed text-amber-100"
+              data-result-warning
+            ></p>
+
+            <div class="mt-4 flex flex-col gap-2 sm:flex-row sm:flex-wrap">
+              <button
+                class="hidden min-h-11 rounded-lg bg-emerald-400 px-4 py-2 text-sm font-semibold text-gray-950 transition hover:bg-emerald-300 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-emerald-300/40"
+                type="button"
+                data-copy-result
+              >
+                <span data-copy-label>Copiar resumen</span>
+              </button>
+              <button
+                class="hidden min-h-11 rounded-lg border border-emerald-400/60 px-4 py-2 text-sm font-semibold text-emerald-200 transition hover:bg-emerald-400/10 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-emerald-300/40"
+                type="button"
+                data-export-csv
+              >
+                Exportar CSV
+              </button>
+            </div>
+            <p
+              class="mt-3 min-h-5 text-sm text-emerald-300"
+              role="status"
+              aria-live="polite"
+              data-copy-status
+            ></p>
+
+            <div class="mt-4 rounded-lg border border-gray-800 bg-gray-950 p-4">
+              <h3 class="text-sm font-semibold text-gray-200">
+                Lectura rapida
+              </h3>
+              <p class="mt-2 text-sm leading-relaxed text-gray-400">
+                El cap rate no descuenta deuda. El flujo de caja y el
+                cash-on-cash si cambian cuando agregas financiamiento.
+              </p>
+            </div>
+          </aside>
+        </div>
+
+        <div class="border-t border-gray-800 p-4 sm:p-6">
+          <div class="grid gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(18rem,0.7fr)]">
+            <section aria-labelledby="breakdown-heading">
+              <h3 id="breakdown-heading" class="text-lg font-semibold">
+                Desglose anual
+              </h3>
+              <p class="mt-1 text-sm leading-relaxed text-gray-500">
+                La deuda se muestra separada porque no forma parte del cap rate.
+              </p>
+              <div
+                class="mt-4 grid gap-2 sm:grid-cols-2"
+                data-breakdown-grid
+              >
+                <dl class="rounded-lg border border-gray-800 bg-gray-900/60 p-4">
+                  <dt class="text-xs font-semibold uppercase text-gray-500">
+                    Estado
+                  </dt>
+                  <dd class="mt-2 text-sm font-semibold text-gray-300">
+                    Pendiente
+                  </dd>
+                </dl>
+              </div>
+            </section>
+
+            <section
+              class="rounded-lg border border-gray-800 bg-gray-900/60 p-4"
+              aria-labelledby="decision-heading"
+            >
+              <h3 id="decision-heading" class="text-lg font-semibold">
+                Puntos de decision
+              </h3>
+              <dl class="mt-4 grid gap-3" data-action-grid>
+                <div>
+                  <dt class="text-xs font-semibold uppercase text-gray-500">
+                    Renta de equilibrio
+                  </dt>
+                  <dd class="mt-1 font-mono text-sm font-semibold text-gray-200">
+                    -
+                  </dd>
+                </div>
+                <div>
+                  <dt class="text-xs font-semibold uppercase text-gray-500">
+                    Precio maximo objetivo
+                  </dt>
+                  <dd class="mt-1 font-mono text-sm font-semibold text-gray-200">
+                    -
+                  </dd>
+                </div>
+                <div>
+                  <dt class="text-xs font-semibold uppercase text-gray-500">
+                    Vacancia maxima
+                  </dt>
+                  <dd class="mt-1 font-mono text-sm font-semibold text-gray-200">
+                    -
+                  </dd>
+                </div>
+              </dl>
+            </section>
+          </div>
+        </div>
+      </section>
+    </Container>
+
+    <AdSlot placement="calculator-after-tool" />
+
+    <Container as="section" class="py-6 md:py-8">
+      <SectionIntro
+        title="Como leer el resultado"
+        description="La calculadora separa rentabilidad operativa, deuda y capital inicial para que cada metrica tenga su lugar."
+      />
+      <div class="grid gap-4 md:grid-cols-3">
+        {
+          explainerCards.map((card) => (
+            <article class="rounded-lg border border-gray-800 bg-gray-950 p-5">
+              <h3 class="text-base font-semibold text-white">{card.title}</h3>
+              <p class="mt-2 text-sm leading-relaxed text-gray-400">
+                {card.text}
+              </p>
+            </article>
+          ))
+        }
+      </div>
+    </Container>
+
+    <FaqSection faqs={faqs} />
+  </PageShell>
+</BaseLayout>
+
+<script>
+  import {
+    buildCopyText,
+    calculateCapRate,
+    formatCurrency,
+    formatPercent,
+    parseLocalizedNumber,
+    roundMoney,
+  } from "@lib/calculators/inmuebles/calculadora-cap-rate-rentabilidad/capRate";
+
+  const form = document.querySelector("[data-calculator-form]");
+  const inputs = Object.fromEntries(
+    Array.from(document.querySelectorAll("[data-input]")).map((input) => [
+      input.dataset.input,
+      input,
+    ]),
+  );
+  const selects = Object.fromEntries(
+    Array.from(document.querySelectorAll("[data-select]")).map((select) => [
+      select.dataset.select,
+      select,
+    ]),
+  );
+  const formError = document.querySelector("[data-form-error]");
+  const mainResult = document.querySelector("[data-main-result]");
+  const resultContext = document.querySelector("[data-result-context]");
+  const summaryGrid = document.querySelector("[data-summary-grid]");
+  const resultWarning = document.querySelector("[data-result-warning]");
+  const breakdownGrid = document.querySelector("[data-breakdown-grid]");
+  const actionGrid = document.querySelector("[data-action-grid]");
+  const copyButton = document.querySelector("[data-copy-result]");
+  const copyLabel = document.querySelector("[data-copy-label]");
+  const copyStatus = document.querySelector("[data-copy-status]");
+  const exportButton = document.querySelector("[data-export-csv]");
+  const clearButton = document.querySelector("[data-clear-calculator]");
+  let currentResult = null;
+  let currentCopyText = "";
+  let copiedTimeout = 0;
+
+  const DEFAULTS = {
+    propertyValue: "",
+    closingCosts: "",
+    initialImprovements: "",
+    monthlyRent: "",
+    otherMonthlyIncome: "",
+    vacancyPercent: "5",
+    annualPropertyTax: "",
+    annualInsurance: "",
+    monthlyHoa: "",
+    managementFee: "",
+    maintenanceReserve: "",
+    otherAnnualOperatingExpenses: "",
+    downPayment: "",
+    debtPayment: "",
+    targetCapRatePercent: "",
+  };
+
+  const EXAMPLE = {
+    propertyValue: "2500000",
+    closingCosts: "80000",
+    initialImprovements: "120000",
+    monthlyRent: "18000",
+    otherMonthlyIncome: "0",
+    vacancyPercent: "5",
+    annualPropertyTax: "7000",
+    annualInsurance: "5000",
+    monthlyHoa: "800",
+    managementFee: "8",
+    maintenanceReserve: "5",
+    otherAnnualOperatingExpenses: "0",
+    downPayment: "500000",
+    debtPayment: "10000",
+    targetCapRatePercent: "7",
+  };
+
+  const FIELD_RULES = {
+    propertyValue: { required: true, positive: true },
+    closingCosts: { defaultValue: 0 },
+    initialImprovements: { defaultValue: 0 },
+    monthlyRent: { required: true, min: 0 },
+    otherMonthlyIncome: { defaultValue: 0 },
+    vacancyPercent: { defaultValue: 5, min: 0, max: 100 },
+    annualPropertyTax: { defaultValue: 0 },
+    annualInsurance: { defaultValue: 0 },
+    monthlyHoa: { defaultValue: 0 },
+    managementFee: { defaultValue: 0 },
+    maintenanceReserve: { defaultValue: 0 },
+    otherAnnualOperatingExpenses: { defaultValue: 0 },
+    downPayment: { defaultValue: 0 },
+    debtPayment: { defaultValue: 0 },
+    targetCapRatePercent: { optional: true, positive: true },
+  };
+
+  const ERROR_MESSAGES = {
+    required: "Completa este campo.",
+    invalid: "Usa un numero valido.",
+    negative: "No puede ser negativo.",
+    positive: "Debe ser mayor que cero.",
+    range: "El valor esta fuera del rango permitido.",
+  };
+
+  function parseCalculatorInput() {
+    const errors = {};
+    const values = {};
+
+    Object.entries(FIELD_RULES).forEach(([field, rules]) => {
+      const rawValue = inputs[field]?.value ?? "";
+      const trimmed = rawValue.trim();
+
+      if (!trimmed) {
+        if (rules.optional) {
+          values[field] = null;
+          return;
+        }
+
+        if (Object.prototype.hasOwnProperty.call(rules, "defaultValue")) {
+          values[field] = rules.defaultValue;
+          return;
+        }
+
+        errors[field] = "required";
+        return;
+      }
+
+      const parsed = parseLocalizedNumber(trimmed);
+
+      if (parsed === null) {
+        errors[field] = "invalid";
+        return;
+      }
+
+      if (parsed < 0) {
+        errors[field] = "negative";
+        return;
+      }
+
+      if (rules.positive && parsed <= 0) {
+        errors[field] = "positive";
+        return;
+      }
+
+      if (
+        (typeof rules.min === "number" && parsed < rules.min) ||
+        (typeof rules.max === "number" && parsed > rules.max)
+      ) {
+        errors[field] = "range";
+        return;
+      }
+
+      values[field] = parsed;
+    });
+
+    const managementMode = selects.managementFeeMode?.value ?? "rent-percent";
+    const maintenanceMode =
+      selects.maintenanceReserveMode?.value ?? "rent-percent";
+
+    if (
+      managementMode === "rent-percent" &&
+      typeof values.managementFee === "number" &&
+      values.managementFee > 100
+    ) {
+      errors.managementFee = "range";
+    }
+
+    if (
+      maintenanceMode === "rent-percent" &&
+      typeof values.maintenanceReserve === "number" &&
+      values.maintenanceReserve > 100
+    ) {
+      errors.maintenanceReserve = "range";
+    }
+
+    if (Object.keys(errors).length > 0) {
+      return { ok: false, errors };
+    }
+
+    return {
+      ok: true,
+      values: {
+        ...values,
+        managementFeeMode: managementMode,
+        maintenanceReserveMode: maintenanceMode,
+        debtPaymentPeriod: selects.debtPaymentPeriod?.value ?? "monthly",
+      },
+    };
+  }
+
+  function updateCalculator({ force = false } = {}) {
+    clearErrors();
+    const parsed = parseCalculatorInput();
+
+    if (!parsed.ok) {
+      showErrors(parsed.errors);
+
+      if (force || currentResult) {
+        setInvalidState();
+      }
+
+      return;
+    }
+
+    try {
+      currentResult = calculateCapRate(parsed.values);
+      currentCopyText = buildCopyText(currentResult);
+      renderResult(currentResult);
+      setActionsVisible(true);
+    } catch (error) {
+      setInvalidState(
+        error instanceof Error ? error.message : "No fue posible calcular.",
+      );
+    }
+  }
+
+  function renderResult(result) {
+    if (
+      !mainResult ||
+      !resultContext ||
+      !summaryGrid ||
+      !breakdownGrid ||
+      !actionGrid
+    ) {
+      return;
+    }
+
+    mainResult.textContent = formatPercent(result.capRatePercent);
+    mainResult.classList.toggle("text-red-100", result.capRatePercent < 0);
+    mainResult.classList.toggle("text-emerald-100", result.capRatePercent >= 0);
+    resultContext.textContent = `NOI anual ${formatCurrency(result.noi)}. La deuda no se resta al calcular cap rate.`;
+
+    summaryGrid.innerHTML = [
+      {
+        label: "Flujo mensual",
+        value: formatCurrency(result.cashFlowMonthly),
+      },
+      {
+        label: "NOI anual",
+        value: formatCurrency(result.noi),
+      },
+      {
+        label: "Cash-on-cash",
+        value: formatPercent(result.cashOnCashReturnPercent),
+      },
+      {
+        label: "Rend. bruto",
+        value: formatPercent(result.grossYieldPercent),
+      },
+    ]
+      .map(renderMetricCard)
+      .join("");
+
+    breakdownGrid.innerHTML = [
+      ["Ingreso bruto anual", formatCurrency(result.grossAnnualIncome)],
+      ["Perdida por vacancia", formatCurrency(result.vacancyLoss)],
+      ["Ingreso efectivo", formatCurrency(result.effectiveIncome)],
+      ["Gastos fijos", formatCurrency(result.fixedAnnualOperatingExpenses)],
+      ["Gastos variables", formatCurrency(result.variableAnnualExpenses)],
+      ["Gastos operativos", formatCurrency(result.operatingExpensesAnnual)],
+      ["NOI", formatCurrency(result.noi)],
+      ["Pago anual de deuda", formatCurrency(result.annualDebtPayment)],
+      ["Flujo anual", formatCurrency(result.cashFlowAnnual)],
+      ["Capital inicial", formatCurrency(result.initialCapital)],
+    ]
+      .map(([label, value]) => renderDetail(label, value))
+      .join("");
+
+    actionGrid.innerHTML = [
+      [
+        "Renta de equilibrio",
+        formatOptionalCurrency(result.breakEvenMonthlyRent),
+      ],
+      [
+        "Precio maximo objetivo",
+        formatOptionalCurrency(
+          result.maxPriceForTargetCapRate,
+          "Captura objetivo y NOI positivo",
+        ),
+      ],
+      [
+        "Vacancia maxima",
+        formatOptionalPercent(result.maxVacancyBeforeNoiZeroPercent),
+      ],
+      [
+        "Brecha bruto vs cap rate",
+        formatPercent(result.grossToCapRateSpreadPercent),
+      ],
+    ]
+      .map(([label, value]) => renderDecision(label, value))
+      .join("");
+
+    renderWarnings(result.warnings);
+  }
+
+  function renderMetricCard(item) {
+    return `
+      <div class="rounded-lg border border-gray-800 bg-gray-950 p-3">
+        <dt class="text-xs font-semibold uppercase text-gray-500">${escapeHtml(item.label)}</dt>
+        <dd class="mt-1 break-words font-mono text-base font-semibold text-white">${escapeHtml(item.value)}</dd>
+      </div>
+    `;
+  }
+
+  function renderDetail(label, value) {
+    return `
+      <dl class="rounded-lg border border-gray-800 bg-gray-900/60 p-4">
+        <dt class="text-xs font-semibold uppercase text-gray-500">${escapeHtml(label)}</dt>
+        <dd class="mt-2 break-words font-mono text-sm font-semibold text-gray-100">${escapeHtml(value)}</dd>
+      </dl>
+    `;
+  }
+
+  function renderDecision(label, value) {
+    return `
+      <div>
+        <dt class="text-xs font-semibold uppercase text-gray-500">${escapeHtml(label)}</dt>
+        <dd class="mt-1 break-words font-mono text-sm font-semibold text-gray-200">${escapeHtml(value)}</dd>
+      </div>
+    `;
+  }
+
+  function renderWarnings(warnings) {
+    if (!resultWarning) {
+      return;
+    }
+
+    if (warnings.length === 0) {
+      resultWarning.textContent = "";
+      resultWarning.classList.add("hidden");
+      return;
+    }
+
+    resultWarning.textContent = warnings.join(" ");
+    resultWarning.classList.remove("hidden");
+  }
+
+  function setInitialState() {
+    if (!mainResult || !resultContext || !summaryGrid || !breakdownGrid || !actionGrid) {
+      return;
+    }
+
+    mainResult.textContent = "Sin calculo";
+    mainResult.classList.remove("text-red-100");
+    mainResult.classList.add("text-emerald-100");
+    resultContext.textContent = "Ingresa valor, renta y gastos para calcular.";
+    summaryGrid.innerHTML = [
+      { label: "Flujo mensual", value: "-" },
+      { label: "NOI anual", value: "-" },
+      { label: "Cash-on-cash", value: "-" },
+      { label: "Rend. bruto", value: "-" },
+    ]
+      .map(renderMetricCard)
+      .join("");
+    breakdownGrid.innerHTML = renderDetail("Estado", "Pendiente");
+    actionGrid.innerHTML = [
+      ["Renta de equilibrio", "-"],
+      ["Precio maximo objetivo", "-"],
+      ["Vacancia maxima", "-"],
+    ]
+      .map(([label, value]) => renderDecision(label, value))
+      .join("");
+    renderWarnings([]);
+    currentResult = null;
+    currentCopyText = "";
+    setActionsVisible(false);
+    hideFormError();
+  }
+
+  function setInvalidState(message = "Corrige los campos marcados para calcular.") {
+    if (!mainResult || !resultContext) {
+      return;
+    }
+
+    mainResult.textContent = "Revisa los datos";
+    resultContext.textContent = message;
+    setActionsVisible(false);
+  }
+
+  function setActionsVisible(isVisible) {
+    copyButton?.classList.toggle("hidden", !isVisible);
+    copyButton?.classList.toggle("inline-flex", isVisible);
+    exportButton?.classList.toggle("hidden", !isVisible);
+    exportButton?.classList.toggle("inline-flex", isVisible);
+  }
+
+  function clearErrors() {
+    document.querySelectorAll("[data-error-for]").forEach((errorElement) => {
+      errorElement.textContent = "";
+      errorElement.classList.add("hidden");
+    });
+    hideFormError();
+  }
+
+  function showErrors(errors) {
+    Object.entries(errors).forEach(([field, error]) => {
+      const errorElement = document.querySelector(
+        `[data-error-for="${field}"]`,
+      );
+
+      if (!errorElement) {
+        return;
+      }
+
+      errorElement.textContent =
+        ERROR_MESSAGES[error] ?? ERROR_MESSAGES.invalid;
+      errorElement.classList.remove("hidden");
+    });
+  }
+
+  function hideFormError() {
+    if (!formError) {
+      return;
+    }
+
+    formError.textContent = "";
+    formError.classList.add("hidden");
+  }
+
+  function fillValues(values) {
+    Object.entries(values).forEach(([field, value]) => {
+      if (inputs[field]) {
+        inputs[field].value = value;
+      }
+    });
+  }
+
+  function fillExample(overrides = {}) {
+    fillValues({ ...EXAMPLE, ...overrides });
+    selects.managementFeeMode.value = "rent-percent";
+    selects.maintenanceReserveMode.value = "rent-percent";
+    selects.debtPaymentPeriod.value = "monthly";
+    updateCalculator({ force: true });
+  }
+
+  function clearCalculator() {
+    fillValues(DEFAULTS);
+    selects.managementFeeMode.value = "rent-percent";
+    selects.maintenanceReserveMode.value = "rent-percent";
+    selects.debtPaymentPeriod.value = "monthly";
+    clearErrors();
+    setInitialState();
+  }
+
+  async function copyResult() {
+    if (!currentCopyText || !copyLabel || !copyStatus) {
+      return;
+    }
+
+    try {
+      if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(currentCopyText);
+      } else {
+        const textArea = document.createElement("textarea");
+        textArea.value = currentCopyText;
+        textArea.setAttribute("readonly", "");
+        textArea.style.position = "fixed";
+        textArea.style.opacity = "0";
+        document.body.append(textArea);
+        textArea.select();
+        document.execCommand("copy");
+        textArea.remove();
+      }
+
+      window.clearTimeout(copiedTimeout);
+      copyLabel.textContent = "Copiado";
+      copyStatus.textContent = "Resumen copiado.";
+      copiedTimeout = window.setTimeout(() => {
+        copyLabel.textContent = "Copiar resumen";
+        copyStatus.textContent = "";
+      }, 2000);
+    } catch {
+      copyStatus.textContent = "No fue posible copiar el resumen.";
+    }
+  }
+
+  function exportCsv() {
+    if (!currentResult) {
+      return;
+    }
+
+    const rows = [
+      ["concepto", "valor"],
+      ["cap_rate_percent", roundMoney(currentResult.capRatePercent)],
+      ["gross_yield_percent", roundMoney(currentResult.grossYieldPercent)],
+      ["gross_annual_income", roundMoney(currentResult.grossAnnualIncome)],
+      ["vacancy_loss", roundMoney(currentResult.vacancyLoss)],
+      ["effective_income", roundMoney(currentResult.effectiveIncome)],
+      ["operating_expenses_annual", roundMoney(currentResult.operatingExpensesAnnual)],
+      ["noi", roundMoney(currentResult.noi)],
+      ["annual_debt_payment", roundMoney(currentResult.annualDebtPayment)],
+      ["cash_flow_annual", roundMoney(currentResult.cashFlowAnnual)],
+      ["cash_flow_monthly", roundMoney(currentResult.cashFlowMonthly)],
+      ["initial_capital", roundMoney(currentResult.initialCapital)],
+      [
+        "cash_on_cash_return_percent",
+        currentResult.cashOnCashReturnPercent === null
+          ? ""
+          : roundMoney(currentResult.cashOnCashReturnPercent),
+      ],
+      [
+        "break_even_monthly_rent",
+        currentResult.breakEvenMonthlyRent === null
+          ? ""
+          : roundMoney(currentResult.breakEvenMonthlyRent),
+      ],
+      [
+        "max_price_for_target_cap_rate",
+        currentResult.maxPriceForTargetCapRate === null
+          ? ""
+          : roundMoney(currentResult.maxPriceForTargetCapRate),
+      ],
+    ];
+    const blob = new Blob(
+      [rows.map((row) => row.map(csvEscape).join(",")).join("\n")],
+      { type: "text/csv;charset=utf-8" },
+    );
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "cap-rate-rentabilidad.csv";
+    document.body.append(link);
+    link.click();
+    link.remove();
+    URL.revokeObjectURL(url);
+  }
+
+  function formatOptionalCurrency(value, fallback = "No disponible") {
+    if (value === null || !Number.isFinite(value)) {
+      return fallback;
+    }
+
+    if (value <= 0) {
+      return "$0.00 o menos";
+    }
+
+    return formatCurrency(value);
+  }
+
+  function formatOptionalPercent(value) {
+    if (value === null || !Number.isFinite(value)) {
+      return "No disponible";
+    }
+
+    if (value < 0) {
+      return "Sin margen";
+    }
+
+    if (value > 100) {
+      return "Mas de 100%";
+    }
+
+    return formatPercent(value);
+  }
+
+  function csvEscape(value) {
+    const text = String(value);
+
+    if (/[",\n]/.test(text)) {
+      return `"${text.replaceAll('"', '""')}"`;
+    }
+
+    return text;
+  }
+
+  function escapeHtml(value) {
+    return String(value)
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;")
+      .replaceAll("'", "&#039;");
+  }
+
+  form?.addEventListener("submit", (event) => {
+    event.preventDefault();
+    updateCalculator({ force: true });
+  });
+
+  Object.values(inputs).forEach((input) => {
+    input?.addEventListener("input", () => {
+      if (currentResult) {
+        updateCalculator();
+      }
+    });
+  });
+
+  Object.values(selects).forEach((select) => {
+    select?.addEventListener("change", () => {
+      if (currentResult) {
+        updateCalculator();
+      }
+    });
+  });
+
+  document.querySelectorAll("[data-example]").forEach((button) => {
+    button.addEventListener("click", () => {
+      fillExample({
+        propertyValue: button.dataset.exampleValue ?? EXAMPLE.propertyValue,
+        monthlyRent: button.dataset.exampleRent ?? EXAMPLE.monthlyRent,
+        vacancyPercent: button.dataset.exampleVacancy ?? EXAMPLE.vacancyPercent,
+      });
+    });
+  });
+
+  clearButton?.addEventListener("click", clearCalculator);
+  copyButton?.addEventListener("click", copyResult);
+  exportButton?.addEventListener("click", exportCsv);
+
+  setInitialState();
+</script>

@@ -206,6 +206,15 @@ export const CALCULATORS: CalculatorDirectoryItem[] = [
     order: 38.25,
   },
   {
+    id: "calculadora-cap-rate-rentabilidad",
+    title: "Calculadora de cap rate",
+    description:
+      "Calcula cap rate, NOI, rendimiento bruto, flujo de caja y cash-on-cash de una propiedad en alquiler.",
+    href: "/inmuebles/calculadora-cap-rate-rentabilidad",
+    categorySlug: "inmuebles",
+    order: 38.3,
+  },
+  {
     id: "calculadora-de-imc",
     title: "Calculadora de IMC",
     description:
