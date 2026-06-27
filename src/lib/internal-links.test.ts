@@ -8,9 +8,20 @@ const sourcePaths = [
   join(process.cwd(), "src", "pages"),
   join(process.cwd(), "src", "lib", "constants", "calculators.ts"),
   join(process.cwd(), "src", "lib", "constants", "menu.ts"),
+  join(process.cwd(), "src", "lib", "i18n"),
 ];
 
 const supportedExtensions = new Set([".astro", ".md", ".ts"]);
+const localizedPilotRoutes = [
+  "/en",
+  "/en/math",
+  "/en/math/percentage-calculator",
+];
+const unpublishedEnglishRoutes = new Set([
+  "/en/blog",
+  "/en/contact",
+  "/en/privacy",
+]);
 const internalLinkPatterns = [
   /\bhref\s*=\s*["'](\/[^"']*)["']/g,
   /\b(?:href|relatedHref|slug):\s*["'](\/[^"']*)["']/g,
@@ -41,23 +52,51 @@ const hasTrailingSlash = (url: string) => {
   return path !== "/" && path.endsWith("/") && !extname(path);
 };
 
+const isUnpublishedEnglishRoute = (url: string) => {
+  const path = url.split(/[?#]/, 1)[0];
+
+  return [...unpublishedEnglishRoutes].some(
+    (route) => path === route || path.startsWith(`${route}/`),
+  );
+};
+
+const collectInternalLinks = () =>
+  sourcePaths.flatMap(getSourceFiles).flatMap((filePath) => {
+    const content = readFileSync(filePath, "utf8");
+
+    return internalLinkPatterns.flatMap((pattern) =>
+      Array.from(content.matchAll(pattern)).map((match) => ({
+        filePath,
+        url: match[1],
+      })),
+    );
+  });
+
 describe("internal links", () => {
   it("points literal page links to URLs without trailing slashes", () => {
-    const violations = sourcePaths
-      .flatMap(getSourceFiles)
-      .flatMap((filePath) => {
-        const content = readFileSync(filePath, "utf8");
+    const violations = collectInternalLinks()
+      .filter(({ url }) => hasTrailingSlash(url))
+      .map(
+        ({ filePath, url }) =>
+          `${relative(process.cwd(), filePath)}: remove trailing slash from ${url}`,
+      );
 
-        return internalLinkPatterns.flatMap((pattern) =>
-          Array.from(content.matchAll(pattern))
-            .map((match) => match[1])
-            .filter(hasTrailingSlash)
-            .map(
-              (url) =>
-                `${relative(process.cwd(), filePath)}: remove trailing slash from ${url}`,
-            ),
-        );
-      });
+    expect(violations).toEqual([]);
+  });
+
+  it("keeps localized pilot routes canonical without trailing slashes", () => {
+    localizedPilotRoutes.forEach((route) => {
+      expect(hasTrailingSlash(route)).toBe(false);
+    });
+  });
+
+  it("does not link to unpublished English routes", () => {
+    const violations = collectInternalLinks()
+      .filter(({ url }) => isUnpublishedEnglishRoute(url))
+      .map(
+        ({ filePath, url }) =>
+          `${relative(process.cwd(), filePath)}: remove unpublished English link ${url}`,
+      );
 
     expect(violations).toEqual([]);
   });

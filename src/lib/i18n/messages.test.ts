@@ -29,4 +29,13 @@ describe("i18n messages", () => {
       "Show intermediate levels",
     );
   });
+
+  it("localizes category titles", () => {
+    expect(t("es", "category.title", { category: "matematicas" })).toBe(
+      "Calculadoras de matematicas",
+    );
+    expect(t("en", "category.title", { category: "Math" })).toBe(
+      "Math calculators",
+    );
+  });
 });

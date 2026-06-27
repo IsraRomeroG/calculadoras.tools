@@ -29,6 +29,11 @@ describe("i18n routing helpers", () => {
     expect(prefixLocalePath("en", "/")).toBe("/en");
   });
 
+  it("keeps English pilot paths without trailing slashes", () => {
+    expect(prefixLocalePath("en", "/")).toBe("/en");
+    expect(prefixLocalePath("en", "/math/")).toBe("/en/math");
+  });
+
   it("builds absolute canonical URLs without trailing slashes", () => {
     expect(buildCanonicalUrl("/en/math/", site)).toBe(
       "https://calculadoras.tools/en/math",

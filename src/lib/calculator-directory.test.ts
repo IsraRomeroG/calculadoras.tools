@@ -27,6 +27,10 @@ describe("calculator category directory", () => {
     expect(getCalculatorCategoryUrl("finanzas", "en")).toBeNull();
   });
 
+  it("keeps the English pilot category URL without a trailing slash", () => {
+    expect(getCalculatorCategoryUrl("matematicas", "en")).toBe("/en/math");
+  });
+
   it("keeps the Spanish percentage calculator route and creates the English pilot route", () => {
     const percentageCalculator = CALCULATOR_DEFINITIONS.find(
       (calculator) => calculator.id === "calculadora-de-porcentajes",
@@ -72,6 +76,7 @@ describe("calculator category directory", () => {
         count: 1,
       }),
     ]);
+    expect(categories.map((category) => category.id)).not.toContain("finanzas");
   });
 
   it("keeps display labels separate from canonical slugs", () => {

@@ -111,4 +111,12 @@ describe("percentage formatting helpers", () => {
     expect(formatCurrency(-1234.567)).toBe("-$1,234.57");
     expect(formatPercent(12.345)).toBe("12.35%");
   });
+
+  it("formats numbers with explicit English options", () => {
+    const options = { formatLocale: "en-US", currencySymbol: "$" };
+
+    expect(formatNumber(1234.5, options)).toBe("1,234.5");
+    expect(formatCurrency(1234.5, options)).toBe("$1,234.5");
+    expect(formatPercent(12.5, options)).toBe("12.5%");
+  });
 });

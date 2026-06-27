@@ -29,6 +29,12 @@ Contenido de prueba.
 `;
 
 describe("blog sitemap publication filtering", () => {
+  const emptySitemapSets = {
+    legacyBlogArticleSlugs: new Set<string>(),
+    publishedBlogArticlePaths: new Set<string>(),
+    publishedBlogCategorySlugs: new Set<string>(),
+  };
+
   it("uses the same draft and future-date publication rules as blog content", () => {
     const now = new Date("2026-06-23T18:00:00.000Z");
 
@@ -123,5 +129,37 @@ describe("blog sitemap publication filtering", () => {
     } finally {
       rmSync(contentDir, { recursive: true, force: true });
     }
+  });
+
+  it("allows published localized pilot routes while blocking unpublished English routes", () => {
+    const shouldIncludeInSitemap = createSitemapFilter({
+      ...emptySitemapSets,
+      excludedPaths: new Set(["/en/blog", "/en/contact", "/en/privacy"]),
+    });
+
+    expect(shouldIncludeInSitemap("https://calculadoras.tools/en")).toBe(true);
+    expect(shouldIncludeInSitemap("https://calculadoras.tools/en/math")).toBe(
+      true,
+    );
+    expect(
+      shouldIncludeInSitemap(
+        "https://calculadoras.tools/en/math/percentage-calculator",
+      ),
+    ).toBe(true);
+    expect(shouldIncludeInSitemap("https://calculadoras.tools/en/blog")).toBe(
+      false,
+    );
+    expect(
+      shouldIncludeInSitemap("https://calculadoras.tools/en/blog/"),
+    ).toBe(false);
+    expect(
+      shouldIncludeInSitemap("https://calculadoras.tools/en/blog/post"),
+    ).toBe(false);
+    expect(
+      shouldIncludeInSitemap("https://calculadoras.tools/en/contact"),
+    ).toBe(false);
+    expect(
+      shouldIncludeInSitemap("https://calculadoras.tools/en/privacy"),
+    ).toBe(false);
   });
 });

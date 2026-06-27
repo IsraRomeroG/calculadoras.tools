@@ -1,9 +1,11 @@
 ---
 import Container from "@components/layout/Container.astro";
 import Breadcrumb, { type BreadcrumbItem } from "@components/shared/Breadcrumb.astro";
+import { DEFAULT_LOCALE, type Locale } from "@lib/i18n/config";
 
 interface Props {
   as?: "section" | "header";
+  locale?: Locale;
   title: string;
   description?: string;
   kicker?: string;
@@ -22,6 +24,7 @@ interface Props {
 
 const {
   as: Tag = "section",
+  locale = DEFAULT_LOCALE,
   title,
   description,
   kicker,
@@ -44,6 +47,7 @@ const {
     {
       breadcrumbs && (
         <Breadcrumb
+          locale={locale}
           class={breadcrumbClass}
           collapseOnMobile={collapseBreadcrumbOnMobile}
           showHomeIcon={showHomeIcon}

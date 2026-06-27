@@ -22,11 +22,17 @@ const publishedBlogArticlePaths =
   getPublishedBlogArticlePathsForSitemap(BLOG_CONTENT_DIR);
 const publishedBlogCategorySlugs =
   getPublishedBlogCategorySlugsForSitemap(BLOG_CONTENT_DIR);
+const unpublishedLocalizedPaths = new Set([
+  '/en/blog',
+  '/en/contact',
+  '/en/privacy',
+]);
 
 const shouldIncludeInSitemap = createSitemapFilter({
   legacyBlogArticleSlugs,
   publishedBlogArticlePaths,
   publishedBlogCategorySlugs,
+  excludedPaths: unpublishedLocalizedPaths,
 });
 
 // https://astro.build/config

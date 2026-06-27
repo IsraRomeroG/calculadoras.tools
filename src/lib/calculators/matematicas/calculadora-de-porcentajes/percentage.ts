@@ -31,17 +31,24 @@ export interface SubtractPercentResult {
   total: number;
 }
 
-const numberFormatter = new Intl.NumberFormat("es-MX", {
-  maximumFractionDigits: 2,
-});
+export interface PercentageFormatOptions {
+  formatLocale?: string;
+  currencySymbol?: string;
+}
 
-const absoluteCurrencyFormatter = new Intl.NumberFormat("es-MX", {
-  maximumFractionDigits: 2,
-});
+const DEFAULT_FORMAT_LOCALE = "es-MX";
+const DEFAULT_CURRENCY_SYMBOL = "$";
 
-const percentFormatter = new Intl.NumberFormat("es-MX", {
-  maximumFractionDigits: 2,
-});
+const getFormatLocale = (options?: PercentageFormatOptions) =>
+  options?.formatLocale ?? DEFAULT_FORMAT_LOCALE;
+
+const getCurrencySymbol = (options?: PercentageFormatOptions) =>
+  options?.currencySymbol ?? DEFAULT_CURRENCY_SYMBOL;
+
+const createNumberFormatter = (options?: PercentageFormatOptions) =>
+  new Intl.NumberFormat(getFormatLocale(options), {
+    maximumFractionDigits: 2,
+  });
 
 export function calculatePercentageOfNumber(
   percent: number,
@@ -137,19 +144,28 @@ export function parseNumericInput(value: string): ParseNumericInputResult {
   };
 }
 
-export function formatNumber(value: number): string {
-  return numberFormatter.format(roundToTwo(value));
+export function formatNumber(
+  value: number,
+  options?: PercentageFormatOptions,
+): string {
+  return createNumberFormatter(options).format(roundToTwo(value));
 }
 
-export function formatCurrency(value: number): string {
+export function formatCurrency(
+  value: number,
+  options?: PercentageFormatOptions,
+): string {
   const rounded = roundToTwo(value);
   const sign = rounded < 0 ? "-" : "";
 
-  return `${sign}$${absoluteCurrencyFormatter.format(Math.abs(rounded))}`;
+  return `${sign}${getCurrencySymbol(options)}${createNumberFormatter(options).format(Math.abs(rounded))}`;
 }
 
-export function formatPercent(value: number): string {
-  return `${percentFormatter.format(roundToTwo(value))}%`;
+export function formatPercent(
+  value: number,
+  options?: PercentageFormatOptions,
+): string {
+  return `${createNumberFormatter(options).format(roundToTwo(value))}%`;
 }
 
 export function roundToTwo(value: number): number {

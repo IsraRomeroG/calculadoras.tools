@@ -1,0 +1,80 @@
+---
+import BaseLayout from "@layouts/BaseLayout.astro";
+import Card from "@components/shared/Card.astro";
+import Container from "@components/layout/Container.astro";
+import PageShell from "@components/layout/PageShell.astro";
+import PageHero from "@components/shared/PageHero.astro";
+import { LOCALE_CONFIG, type Locale } from "@lib/i18n/config";
+import { t } from "@lib/i18n/messages";
+import type { AlternateLink } from "@lib/i18n/routing";
+import type {
+  CalculatorCategory,
+  CalculatorDirectoryItem,
+} from "@lib/calculator-directory";
+
+interface Props {
+  locale: Locale;
+  category: CalculatorCategory;
+  calculators: CalculatorDirectoryItem[];
+  canonical: string;
+  alternates: AlternateLink[];
+}
+
+const { locale, category, calculators, canonical, alternates } = Astro.props;
+const categoryTitleName =
+  locale === "es"
+    ? category.label.toLocaleLowerCase(LOCALE_CONFIG[locale].formatLocale)
+    : category.label;
+const title = t(locale, "category.title", { category: categoryTitleName });
+const description = category.description;
+const homeHref = LOCALE_CONFIG[locale].urlPrefix || "/";
+const homeLabel = t(locale, "breadcrumbs.home");
+const useCta = `${t(locale, "common.use")} ->`;
+---
+
+<BaseLayout
+  title={title}
+  description={description}
+  canonical={canonical}
+  locale={locale}
+  alternates={alternates}
+>
+  <PageShell>
+    <PageHero
+      locale={locale}
+      title={title}
+      description={description}
+      kicker={category.label}
+      breadcrumbs={[
+        { label: homeLabel, href: homeHref, ariaLabel: homeLabel },
+        { label: category.label, truncate: true },
+      ]}
+    />
+
+    <Container as="section" class="py-8 md:py-10">
+      {
+        calculators.length > 0 ? (
+          <div class="grid gap-6 sm:grid-cols-2 md:grid-cols-3">
+            {calculators.map((calculator) => (
+              <Card
+                href={calculator.href}
+                title={calculator.title}
+                description={calculator.description}
+                cta={useCta}
+              />
+            ))}
+          </div>
+        ) : (
+          <div class="rounded-lg border border-gray-700 p-6">
+            <h2 class="text-xl font-semibold">
+              {t(locale, "category.emptyTitle")}
+            </h2>
+            <p class="mt-2 text-sm text-gray-400">
+              {t(locale, "category.emptyDescription")}
+            </p>
+          </div>
+        )
+      }
+    </Container>
+  </PageShell>
+</BaseLayout>

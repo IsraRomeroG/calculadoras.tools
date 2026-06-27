@@ -1,27 +1,26 @@
 ---
-import BaseLayout from "@layouts/BaseLayout.astro";
-import Card from "@components/shared/Card.astro";
-import Container from "@components/layout/Container.astro";
-import PageShell from "@components/layout/PageShell.astro";
-import PageHero from "@components/shared/PageHero.astro";
+import CategoryPage from "@components/pages/CategoryPage.astro";
 import {
-  getCalculatorsByCategorySlug,
   getCalculatorCategories,
   getCalculatorCategoryUrl,
+  getCalculatorsByCategoryId,
   getPublishedCalculators,
   type CalculatorCategory,
   type CalculatorDirectoryItem,
 } from "@lib/calculator-directory";
+import { buildAlternateLinks } from "@lib/i18n/routing";
+
+const locale = "es";
 
 export function getStaticPaths() {
-  const calculators = getPublishedCalculators();
-  const categories = getCalculatorCategories(calculators);
+  const calculators = getPublishedCalculators(locale);
+  const categories = getCalculatorCategories(calculators, locale);
 
   return categories.map((category) => ({
     params: { category: category.slug },
     props: {
       category,
-      calculators: getCalculatorsByCategorySlug(calculators, category.slug),
+      calculators: getCalculatorsByCategoryId(calculators, category.id),
     },
   }));
 }
@@ -32,48 +31,18 @@ interface Props {
 }
 
 const { category, calculators } = Astro.props;
-const categoryName = category.label.toLowerCase();
-const title = `Calculadoras de ${categoryName}`;
-const description = category.description;
-const canonical = getCalculatorCategoryUrl(category.slug);
+const canonical = getCalculatorCategoryUrl(category.id, locale) ?? `/${category.slug}`;
+const enCanonical = getCalculatorCategoryUrl(category.id, "en");
+const alternates = buildAlternateLinks(
+  { es: canonical, ...(enCanonical ? { en: enCanonical } : {}) },
+  Astro.site ?? Astro.url,
+);
 ---
 
-<BaseLayout title={title} description={description} canonical={canonical}>
-  <PageShell>
-    <PageHero
-      title={title}
-      description={description}
-      kicker={category.label}
-      breadcrumbs={[
-        { label: "Inicio", href: "/", ariaLabel: "Inicio" },
-        { label: category.label, truncate: true },
-      ]}
-    />
-
-    <Container as="section" class="py-8 md:py-10">
-      {
-        calculators.length > 0 ? (
-          <div class="grid gap-6 sm:grid-cols-2 md:grid-cols-3">
-            {calculators.map((calculator) => (
-              <Card
-                href={calculator.href}
-                title={calculator.title}
-                description={calculator.description}
-                cta="Usar →"
-              />
-            ))}
-          </div>
-        ) : (
-          <div class="rounded-lg border border-gray-700 p-6">
-            <h2 class="text-xl font-semibold">
-              No hay calculadoras publicadas
-            </h2>
-            <p class="mt-2 text-sm text-gray-400">
-              Esta categoría todavía no tiene herramientas disponibles.
-            </p>
-          </div>
-        )
-      }
-    </Container>
-  </PageShell>
-</BaseLayout>
+<CategoryPage
+  locale={locale}
+  category={category}
+  calculators={calculators}
+  canonical={canonical}
+  alternates={alternates}
+/>

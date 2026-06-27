@@ -1,0 +1,1141 @@
+---
+import BaseLayout from "@layouts/BaseLayout.astro";
+import AdSlot from "@components/ads/AdSlot.astro";
+import Container from "@components/layout/Container.astro";
+import PageShell from "@components/layout/PageShell.astro";
+import FaqSection from "@components/shared/FaqSection.astro";
+import PageHero from "@components/shared/PageHero.astro";
+import SectionIntro from "@components/shared/SectionIntro.astro";
+import { LOCALE_CONFIG, type Locale } from "@lib/i18n/config";
+import type { AlternateLink } from "@lib/i18n/routing";
+import { getCalculatorCategoryUrl } from "@lib/calculator-directory";
+import { buildFaqJsonLd } from "@lib/seo";
+import {
+  percentageCalculatorContent,
+  type PercentageCalculatorField,
+} from "@lib/i18n/calculators/percentage";
+import type { PercentageMode } from "@lib/calculators/matematicas/calculadora-de-porcentajes/percentage";
+
+interface Props {
+  locale: Locale;
+  canonical: string;
+  alternates: AlternateLink[];
+}
+
+interface PanelField {
+  name: string;
+  suffix?: string;
+}
+
+const MODES = [
+  "percentageOfNumber",
+  "whatPercentIs",
+  "percentChange",
+  "addPercent",
+  "subtractPercent",
+] as const satisfies PercentageMode[];
+
+const PANEL_FIELDS = {
+  percentageOfNumber: [
+    { name: "percent", suffix: "%" },
+    { name: "base" },
+  ],
+  whatPercentIs: [{ name: "partial" }, { name: "total" }],
+  percentChange: [{ name: "original" }, { name: "next" }],
+  addPercent: [{ name: "base" }, { name: "percent", suffix: "%" }],
+  subtractPercent: [{ name: "base" }, { name: "percent", suffix: "%" }],
+} satisfies Record<PercentageMode, PanelField[]>;
+
+const { locale, canonical, alternates } = Astro.props;
+const content = percentageCalculatorContent[locale];
+const categoryHref =
+  (getCalculatorCategoryUrl("matematicas", locale) ??
+    LOCALE_CONFIG[locale].urlPrefix) ||
+  "/";
+const relatedGuides = content.relatedGuides.filter((guide) => guide.published);
+const faqJsonLd = buildFaqJsonLd(content.faq);
+const homeHref = LOCALE_CONFIG[locale].urlPrefix || "/";
+const shouldRenderAds = locale === "es";
+const fieldFor = (
+  mode: PercentageMode,
+  field: string,
+): PercentageCalculatorField =>
+  content.fields[`${mode}.${field}`] ?? { label: field };
+const clientPayload = {
+  locale,
+  formatLocale: LOCALE_CONFIG[locale].formatLocale,
+  currencySymbol: "$",
+  modeLabels: content.tabs,
+  ui: content.client,
+};
+---
+
+<BaseLayout
+  title={content.seo.title}
+  description={content.seo.description}
+  canonical={canonical}
+  locale={locale}
+  alternates={alternates}
+>
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={JSON.stringify(faqJsonLd)} />
+  </Fragment>
+
+  <PageShell>
+    <PageHero
+      locale={locale}
+      title={content.hero.title}
+      description={content.hero.description}
+      kicker={content.breadcrumbs.category}
+      collapseBreadcrumbOnMobile
+      containerClass="py-6 md:py-8"
+      breadcrumbs={[
+        {
+          label: content.breadcrumbs.home,
+          href: homeHref,
+          ariaLabel: content.breadcrumbs.home,
+        },
+        {
+          label: content.breadcrumbs.category,
+          href: categoryHref,
+          optional: true,
+        },
+        { label: content.breadcrumbs.current, truncate: true },
+      ]}
+    />
+
+    <Container as="section" class="py-6 md:py-8">
+      <div class="grid gap-6 lg:grid-cols-[minmax(0,1fr)_20rem]">
+        <section
+          id="percentage-calculator"
+          class="overflow-hidden rounded-lg border border-gray-700 bg-gray-950 shadow-xl shadow-gray-950/30"
+          aria-labelledby="calculator-heading"
+        >
+          <div class="border-b border-gray-700 p-2">
+            <div
+              class="flex gap-2 overflow-x-auto"
+              role="tablist"
+              aria-label={content.client.tablistLabel}
+            >
+              {
+                MODES.map((mode, index) => (
+                  <button
+                    id={`tab-${mode}`}
+                    class="min-h-11 shrink-0 rounded-lg px-4 py-2 text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/40"
+                    type="button"
+                    role="tab"
+                    aria-selected={index === 0 ? "true" : "false"}
+                    aria-controls={`panel-${mode}`}
+                    data-tab={mode}
+                    tabindex={index === 0 ? undefined : "-1"}
+                  >
+                    {content.tabs[mode]}
+                  </button>
+                ))
+              }
+            </div>
+          </div>
+
+          <div
+            class="grid gap-0 lg:grid-cols-[minmax(0,1fr)_minmax(17rem,0.78fr)]"
+          >
+            <div class="p-4 sm:p-6">
+              <h2 id="calculator-heading" class="sr-only">
+                {content.client.calculatorHeading}
+              </h2>
+
+              {
+                MODES.map((mode, index) => (
+                  <div
+                    id={`panel-${mode}`}
+                    role="tabpanel"
+                    aria-labelledby={`tab-${mode}`}
+                    data-panel={mode}
+                    hidden={index === 0 ? undefined : true}
+                  >
+                    <div
+                      class:list={[
+                        "mb-5",
+                        mode === "percentChange" &&
+                          "flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between",
+                      ]}
+                    >
+                      <div>
+                        <h3 class="text-xl font-semibold">
+                          {content.client[`${mode}.title`]}
+                        </h3>
+                        <p class="mt-2 text-sm text-gray-400">
+                          {content.client[`${mode}.hint`]}
+                        </p>
+                      </div>
+
+                      {mode === "percentChange" && (
+                        <button
+                          class="inline-flex min-h-11 items-center justify-center rounded-lg border border-gray-700 px-4 py-2 text-sm font-semibold text-gray-200 transition hover:border-amber-400 hover:text-white focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/40"
+                          type="button"
+                          data-swap
+                        >
+                          {content.client.swap}
+                        </button>
+                      )}
+                    </div>
+
+                    <div class="grid gap-4 sm:grid-cols-2">
+                      {PANEL_FIELDS[mode].map((field) => {
+                        const inputId = `${mode}-${field.name}`;
+                        const inputErrorId = `${inputId}-error`;
+                        const inputContent = fieldFor(mode, field.name);
+
+                        return (
+                          <div>
+                            <label
+                              for={inputId}
+                              class="block text-sm font-medium text-gray-200"
+                            >
+                              {inputContent.label}
+                            </label>
+                            {field.suffix ? (
+                              <div class="mt-2 flex rounded-lg border border-gray-700 bg-gray-900 focus-within:border-amber-400 focus-within:ring-3 focus-within:ring-amber-400/15">
+                                <input
+                                  id={inputId}
+                                  class="min-h-12 w-full bg-transparent px-4 text-base text-white outline-none"
+                                  type="text"
+                                  inputmode="decimal"
+                                  autocomplete="off"
+                                  placeholder={inputContent.placeholder}
+                                  aria-describedby={inputErrorId}
+                                  data-input={field.name}
+                                />
+                                <span class="flex items-center px-4 text-gray-500">
+                                  {field.suffix}
+                                </span>
+                              </div>
+                            ) : (
+                              <input
+                                id={inputId}
+                                class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-900 px-4 text-base text-white outline-none transition placeholder:text-gray-600 focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15"
+                                type="text"
+                                inputmode="decimal"
+                                autocomplete="off"
+                                placeholder={inputContent.placeholder}
+                                aria-describedby={inputErrorId}
+                                data-input={field.name}
+                              />
+                            )}
+                            <p
+                              id={inputErrorId}
+                              class="mt-2 hidden text-sm text-red-300"
+                              data-error-for={field.name}
+                            >
+                            </p>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                ))
+              }
+
+              <div class="mt-6 flex flex-wrap gap-3">
+                <button
+                  class="inline-flex min-h-11 items-center justify-center rounded-lg bg-amber-400 px-5 py-2 text-sm font-semibold text-gray-950 transition hover:bg-amber-300 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/40"
+                  type="button"
+                  data-clear-active
+                >
+                  {content.client.clear}
+                </button>
+              </div>
+            </div>
+
+            <aside
+              class="border-t border-gray-700 bg-gray-900/80 p-4 sm:p-6 lg:border-l lg:border-t-0"
+            >
+              <div
+                class="min-h-[15rem]"
+                aria-live="polite"
+                aria-atomic="true"
+                data-result-region
+              >
+                <p class="text-sm font-semibold text-gray-400">
+                  {content.client.resultTitle}
+                </p>
+                <p
+                  class="mt-4 break-words text-3xl font-bold leading-tight text-white"
+                  data-main-result
+                >
+                  {content.client["state.initial.main"]}
+                </p>
+                <div
+                  class="mt-4 space-y-2 text-sm text-gray-300"
+                  data-secondary-result
+                >
+                </div>
+                <p
+                  class="mt-5 border-t border-gray-700 pt-4 text-sm leading-relaxed text-gray-400"
+                  data-explanation
+                >
+                  {content.client["state.initial.explanation"]}
+                </p>
+                <button
+                  class="mt-5 hidden min-h-11 w-full items-center justify-center gap-2 rounded-lg border border-gray-700 px-4 py-2 text-sm font-semibold text-gray-200 transition hover:border-amber-400 hover:text-white focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/40"
+                  type="button"
+                  aria-label={content.client.copyResult}
+                  data-copy-result
+                >
+                  <svg
+                    class="h-4 w-4"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    aria-hidden="true"
+                  >
+                    <path
+                      d="M8 8.5A2.5 2.5 0 0 1 10.5 6H18a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2h-7.5A2.5 2.5 0 0 1 8 17.5v-9Z"
+                      stroke="currentColor"
+                      stroke-width="1.7"></path>
+                    <path
+                      d="M6 16H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v1"
+                      stroke="currentColor"
+                      stroke-width="1.7"
+                      stroke-linecap="round"></path>
+                  </svg>
+                  <span data-copy-label>{content.client.copyResult}</span>
+                </button>
+                <p class="sr-only" aria-live="polite" data-copy-status></p>
+              </div>
+            </aside>
+          </div>
+        </section>
+
+        <aside class="rounded-lg border border-gray-700 bg-gray-950 p-4 sm:p-5">
+          <div class="flex items-center justify-between gap-3">
+            <h2 class="text-lg font-semibold">
+              {content.client.historyTitle}
+            </h2>
+            <button
+              class="min-h-11 rounded-lg border border-gray-700 px-3 py-2 text-sm font-semibold text-gray-300 transition hover:border-red-300 hover:text-white focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-red-400/30"
+              type="button"
+              data-clear-history
+            >
+              {content.client.clear}
+            </button>
+          </div>
+
+          <p class="mt-4 text-sm text-gray-500" data-history-empty>
+            {content.client.historyEmpty}
+          </p>
+
+          <ol class="mt-4 space-y-3" data-history-list></ol>
+        </aside>
+      </div>
+    </Container>
+
+    {shouldRenderAds && <AdSlot placement="calculator-after-tool" />}
+
+    <Container as="section" class="py-8">
+      <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+        {
+          content.examples.map((example) => (
+            <article class="rounded-lg border border-gray-700 bg-gray-950 p-5">
+              <h2 class="text-lg font-semibold">{example.title}</h2>
+              <p class="mt-3 text-sm leading-relaxed text-gray-400">
+                {example.description}
+              </p>
+              {example.href && (
+                <a
+                  href={example.href}
+                  class="mt-4 inline-flex text-sm font-semibold text-amber-400 transition hover:text-amber-300 hover:underline"
+                >
+                  {content.client.exampleLinkLabel}
+                </a>
+              )}
+            </article>
+          ))
+        }
+      </div>
+    </Container>
+
+    {
+      relatedGuides.length > 0 && (
+        <Container as="section" class="py-8">
+          <SectionIntro
+            title={content.client.relatedGuidesTitle}
+            description={content.client.relatedGuidesDescription}
+            class="mb-5"
+          />
+
+          <div class="grid gap-5 md:grid-cols-3">
+            {relatedGuides.map((guide) => (
+              <a
+                href={guide.href}
+                class="group rounded-lg border border-gray-700 bg-gray-950 p-5 transition hover:border-amber-400"
+              >
+                <h3 class="text-lg font-semibold group-hover:text-white">
+                  {guide.title}
+                </h3>
+                <p class="mt-3 text-sm leading-relaxed text-gray-400">
+                  {guide.description}
+                </p>
+                <span class="mt-4 inline-block text-sm font-semibold text-amber-400 group-hover:underline">
+                  {content.client.relatedGuideCta}
+                </span>
+              </a>
+            ))}
+          </div>
+        </Container>
+      )
+    }
+
+    <Container as="section" class="py-8">
+      <SectionIntro
+        title={content.client.quickReferenceTitle}
+        description={content.client.quickReferenceDescription}
+        class="mb-5"
+      />
+
+      <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        {
+          content.quickReference.map((item) => (
+            <div class="rounded-lg border border-gray-700 bg-gray-950 p-4">
+              <p class="text-sm text-gray-400">{item.label}</p>
+              <p class="mt-2 text-xl font-semibold text-white">
+                {item.value}
+              </p>
+            </div>
+          ))
+        }
+      </div>
+    </Container>
+
+    <FaqSection faqs={content.faq} title={content.client.faqTitle} />
+  </PageShell>
+</BaseLayout>
+
+<script
+  id="percentage-calculator-i18n"
+  type="application/json"
+  set:html={JSON.stringify(clientPayload)}
+></script>
+
+<script>
+  import {
+    calculateAddPercent,
+    calculatePercentChange,
+    calculatePercentageOfNumber,
+    calculateSubtractPercent,
+    calculateWhatPercentIs,
+    formatCurrency,
+    formatNumber,
+    formatPercent,
+    parseNumericInput,
+    type PercentageFormatOptions,
+    type PercentageMode,
+  } from "@lib/calculators/matematicas/calculadora-de-porcentajes/percentage";
+
+  interface ClientConfig {
+    locale: string;
+    formatLocale: string;
+    currencySymbol: string;
+    modeLabels: Record<string, string>;
+    ui: Record<string, string>;
+  }
+
+  interface CalculatorResult {
+    main: string;
+    copy: string;
+    secondary: string[];
+    explanation: string;
+    tone: "positive" | "negative" | "neutral";
+  }
+
+  interface HistoryEntry {
+    id: string;
+    mode: PercentageMode;
+    modeLabel: string;
+    values: Record<string, number>;
+    result: string;
+    summary: string;
+    createdAt: string;
+  }
+
+  const MODES = [
+    "percentageOfNumber",
+    "whatPercentIs",
+    "percentChange",
+    "addPercent",
+    "subtractPercent",
+  ] as const satisfies PercentageMode[];
+
+  const REQUIRED_FIELDS = {
+    percentageOfNumber: ["percent", "base"],
+    whatPercentIs: ["partial", "total"],
+    percentChange: ["original", "next"],
+    addPercent: ["base", "percent"],
+    subtractPercent: ["base", "percent"],
+  } satisfies Record<PercentageMode, string[]>;
+
+  const DEFAULT_CLIENT_CONFIG: ClientConfig = {
+    locale: "es",
+    formatLocale: "es-MX",
+    currencySymbol: "$",
+    modeLabels: {},
+    ui: {},
+  };
+
+  const parseClientConfig = (): ClientConfig => {
+    const source = document.getElementById("percentage-calculator-i18n");
+
+    if (!source?.textContent) {
+      return DEFAULT_CLIENT_CONFIG;
+    }
+
+    try {
+      return {
+        ...DEFAULT_CLIENT_CONFIG,
+        ...JSON.parse(source.textContent),
+      };
+    } catch {
+      return DEFAULT_CLIENT_CONFIG;
+    }
+  };
+
+  const clientConfig = parseClientConfig();
+  const formatOptions: PercentageFormatOptions = {
+    formatLocale: clientConfig.formatLocale,
+    currencySymbol: clientConfig.currencySymbol,
+  };
+  const HISTORY_KEY = `percentage-calculator-history-${clientConfig.locale}`;
+  const HISTORY_LIMIT = 10;
+  const HISTORY_DEBOUNCE_MS = 800;
+
+  const text = (key: string) => clientConfig.ui[key] ?? key;
+  const interpolate = (
+    template: string,
+    params: Record<string, string | number>,
+  ) =>
+    Object.entries(params).reduce(
+      (result, [name, value]) =>
+        result.replaceAll(`{${name}}`, String(value)),
+      template,
+    );
+  const message = (key: string, params: Record<string, string | number> = {}) =>
+    interpolate(text(key), params);
+  const isMode = (value: string | undefined): value is PercentageMode =>
+    MODES.includes(value as PercentageMode);
+
+  const tabs = Array.from(
+    document.querySelectorAll<HTMLElement>("[data-tab]"),
+  );
+  const panels = Array.from(
+    document.querySelectorAll<HTMLElement>("[data-panel]"),
+  );
+  const resultRegion = document.querySelector<HTMLElement>(
+    "[data-result-region]",
+  );
+  const mainResult = document.querySelector<HTMLElement>("[data-main-result]");
+  const secondaryResult = document.querySelector<HTMLElement>(
+    "[data-secondary-result]",
+  );
+  const explanation = document.querySelector<HTMLElement>(
+    "[data-explanation]",
+  );
+  const copyButton = document.querySelector<HTMLElement>("[data-copy-result]");
+  const copyLabel = document.querySelector<HTMLElement>("[data-copy-label]");
+  const copyStatus = document.querySelector<HTMLElement>("[data-copy-status]");
+  const historyList = document.querySelector<HTMLElement>(
+    "[data-history-list]",
+  );
+  const historyEmpty = document.querySelector<HTMLElement>(
+    "[data-history-empty]",
+  );
+  const clearHistoryButton = document.querySelector<HTMLElement>(
+    "[data-clear-history]",
+  );
+  const clearActiveButton = document.querySelector<HTMLElement>(
+    "[data-clear-active]",
+  );
+  const swapButton = document.querySelector<HTMLElement>("[data-swap]");
+
+  let activeMode: PercentageMode = "percentageOfNumber";
+  let currentCopyText = "";
+  let currentHistoryEntry: HistoryEntry | null = null;
+  let historyDebounce = 0;
+  let copiedTimeout = 0;
+
+  const getModeInputs = (mode: PercentageMode = activeMode) =>
+    Array.from(
+      document.querySelectorAll<HTMLInputElement>(
+        `[data-panel="${mode}"] [data-input]`,
+      ),
+    );
+
+  const getFieldInput = (field: string, mode: PercentageMode = activeMode) =>
+    document.querySelector<HTMLInputElement>(
+      `[data-panel="${mode}"] [data-input="${field}"]`,
+    );
+
+  function setActiveMode(mode: PercentageMode, shouldFocus = false) {
+    activeMode = mode;
+
+    tabs.forEach((tab) => {
+      const isActive = tab.dataset.tab === mode;
+      tab.setAttribute("aria-selected", String(isActive));
+      tab.setAttribute("tabindex", isActive ? "0" : "-1");
+      tab.classList.toggle("bg-amber-400", isActive);
+      tab.classList.toggle("text-gray-950", isActive);
+      tab.classList.toggle("text-gray-300", !isActive);
+      tab.classList.toggle("hover:bg-gray-800", !isActive);
+
+      if (isActive && shouldFocus) {
+        tab.focus();
+      }
+    });
+
+    panels.forEach((panel) => {
+      panel.hidden = panel.dataset.panel !== mode;
+    });
+
+    updateCalculator();
+  }
+
+  function parseModeValues(mode: PercentageMode) {
+    const values: Record<string, number> = {};
+    const errors: Record<string, string> = {};
+    const inputs = getModeInputs(mode);
+
+    inputs.forEach((input) => {
+      const field = input.dataset.input;
+
+      if (!field) {
+        return;
+      }
+
+      const parsed = parseNumericInput(input.value);
+
+      if (parsed.ok) {
+        values[field] = parsed.value;
+        return;
+      }
+
+      errors[field] = parsed.error;
+    });
+
+    return { values, errors };
+  }
+
+  function clearErrors(mode: PercentageMode = activeMode) {
+    document
+      .querySelectorAll<HTMLElement>(`[data-panel="${mode}"] [data-error-for]`)
+      .forEach((errorElement) => {
+        errorElement.textContent = "";
+        errorElement.classList.add("hidden");
+      });
+  }
+
+  function getErrorMessage(error: string) {
+    return text(`error.${error}`);
+  }
+
+  function showSpecificErrors(
+    errors: Record<string, string>,
+    mode: PercentageMode = activeMode,
+  ) {
+    clearErrors(mode);
+
+    Object.entries(errors).forEach(([field, error]) => {
+      const errorElement = document.querySelector<HTMLElement>(
+        `[data-panel="${mode}"] [data-error-for="${field}"]`,
+      );
+
+      if (!errorElement) {
+        return;
+      }
+
+      errorElement.textContent = getErrorMessage(error);
+      errorElement.classList.remove("hidden");
+    });
+  }
+
+  function hasTouchedInputs(mode: PercentageMode = activeMode) {
+    return getModeInputs(mode).some(
+      (input) => input.dataset.touched === "true",
+    );
+  }
+
+  function hasAnyValue(mode: PercentageMode = activeMode) {
+    return getModeInputs(mode).some((input) => input.value.trim() !== "");
+  }
+
+  function getValidationErrors(
+    mode: PercentageMode,
+    errors: Record<string, string>,
+    values: Record<string, number>,
+  ) {
+    const modeErrors = { ...errors };
+
+    if (mode === "whatPercentIs" && values.total === 0) {
+      modeErrors.total = "zero_total";
+    }
+
+    if (mode === "percentChange" && values.original === 0) {
+      modeErrors.original = "zero_original";
+    }
+
+    return modeErrors;
+  }
+
+  function computeResult(
+    mode: PercentageMode,
+    values: Record<string, number>,
+  ): CalculatorResult {
+    if (mode === "percentageOfNumber") {
+      const result = calculatePercentageOfNumber(values.percent, values.base);
+
+      return {
+        main: message("result.percentageOfNumber.main", {
+          percent: formatPercent(values.percent, formatOptions),
+          base: formatNumber(values.base, formatOptions),
+          result: formatNumber(result, formatOptions),
+        }),
+        copy: formatNumber(result, formatOptions),
+        secondary: [],
+        explanation: message("result.percentageOfNumber.explanation", {
+          base: formatNumber(values.base, formatOptions),
+          rate: formatNumber(values.percent / 100, formatOptions),
+          result: formatNumber(result, formatOptions),
+        }),
+        tone: "neutral",
+      };
+    }
+
+    if (mode === "whatPercentIs") {
+      const result = calculateWhatPercentIs(values.partial, values.total);
+
+      return {
+        main: message("result.whatPercentIs.main", {
+          partial: formatNumber(values.partial, formatOptions),
+          percent: formatPercent(result, formatOptions),
+          total: formatNumber(values.total, formatOptions),
+        }),
+        copy: formatPercent(result, formatOptions),
+        secondary: [],
+        explanation: message("result.whatPercentIs.explanation", {
+          partial: formatNumber(values.partial, formatOptions),
+          total: formatNumber(values.total, formatOptions),
+          percent: formatPercent(result, formatOptions),
+        }),
+        tone: "neutral",
+      };
+    }
+
+    if (mode === "percentChange") {
+      const result = calculatePercentChange(values.original, values.next);
+      const absoluteChange = Math.abs(result.change);
+      const formattedChange = formatPercent(absoluteChange, formatOptions);
+      const directionText =
+        result.direction === "increase"
+          ? message("result.percentChange.increase", {
+              change: formattedChange,
+            })
+          : result.direction === "decrease"
+            ? message("result.percentChange.decrease", {
+                change: formattedChange,
+              })
+            : text("result.percentChange.none");
+
+      return {
+        main: directionText,
+        copy: directionText,
+        secondary: [
+          message("result.percentChange.secondary", {
+            difference: formatNumber(values.next - values.original, formatOptions),
+          }),
+        ],
+        explanation: message("result.percentChange.explanation", {
+          next: formatNumber(values.next, formatOptions),
+          original: formatNumber(values.original, formatOptions),
+          change: formatPercent(result.change, formatOptions),
+        }),
+        tone:
+          result.direction === "increase"
+            ? "positive"
+            : result.direction === "decrease"
+              ? "negative"
+              : "neutral",
+      };
+    }
+
+    if (mode === "addPercent") {
+      const result = calculateAddPercent(values.base, values.percent);
+
+      return {
+        main: message("result.addPercent.main", {
+          total: formatCurrency(result.total, formatOptions),
+        }),
+        copy: formatCurrency(result.total, formatOptions),
+        secondary: [
+          message("result.addPercent.secondary", {
+            increment: formatCurrency(result.increment, formatOptions),
+          }),
+        ],
+        explanation: message("result.addPercent.explanation", {
+          base: formatNumber(values.base, formatOptions),
+          rate: formatNumber(values.percent / 100, formatOptions),
+          increment: formatNumber(result.increment, formatOptions),
+          total: formatNumber(result.total, formatOptions),
+        }),
+        tone: "positive",
+      };
+    }
+
+    const result = calculateSubtractPercent(values.base, values.percent);
+
+    return {
+      main: message("result.subtractPercent.main", {
+        total: formatCurrency(result.total, formatOptions),
+      }),
+      copy: formatCurrency(result.total, formatOptions),
+      secondary: [
+        message("result.subtractPercent.secondary", {
+          discount: formatCurrency(result.discount, formatOptions),
+        }),
+      ],
+      explanation: message("result.subtractPercent.explanation", {
+        base: formatNumber(values.base, formatOptions),
+        rate: formatNumber(values.percent / 100, formatOptions),
+        discount: formatNumber(result.discount, formatOptions),
+        total: formatNumber(result.total, formatOptions),
+      }),
+      tone: result.total < 0 ? "negative" : "neutral",
+    };
+  }
+
+  function setResultState(
+    state: "initial" | "invalid" | "valid",
+    result: CalculatorResult | null = null,
+  ) {
+    if (!mainResult || !secondaryResult || !explanation || !copyButton) {
+      return;
+    }
+
+    mainResult.classList.remove(
+      "text-emerald-300",
+      "text-red-300",
+      "text-white",
+    );
+    resultRegion?.classList.remove("text-red-300");
+
+    if (state === "initial") {
+      mainResult.textContent = text("state.initial.main");
+      mainResult.classList.add("text-white");
+      secondaryResult.innerHTML = "";
+      explanation.textContent = text("state.initial.explanation");
+      copyButton.classList.add("hidden");
+      copyButton.classList.remove("inline-flex");
+      currentCopyText = "";
+      currentHistoryEntry = null;
+      return;
+    }
+
+    if (state === "invalid") {
+      mainResult.textContent = text("state.invalid.main");
+      mainResult.classList.add("text-red-300");
+      secondaryResult.innerHTML = "";
+      explanation.textContent = text("state.invalid.explanation");
+      copyButton.classList.add("hidden");
+      copyButton.classList.remove("inline-flex");
+      currentCopyText = "";
+      currentHistoryEntry = null;
+      return;
+    }
+
+    if (!result) {
+      return;
+    }
+
+    mainResult.textContent = result.main;
+    mainResult.classList.add(
+      result.tone === "positive"
+        ? "text-emerald-300"
+        : result.tone === "negative"
+          ? "text-red-300"
+          : "text-white",
+    );
+
+    secondaryResult.innerHTML = result.secondary
+      .map((item) => `<p>${escapeHtml(item)}</p>`)
+      .join("");
+    explanation.textContent = result.explanation;
+    copyButton.classList.remove("hidden");
+    copyButton.classList.add("inline-flex");
+    currentCopyText = result.copy;
+  }
+
+  function updateCalculator() {
+    window.clearTimeout(historyDebounce);
+
+    const { values, errors } = parseModeValues(activeMode);
+    const requiredFields = REQUIRED_FIELDS[activeMode];
+    const missingFields = requiredFields.filter(
+      (field) => errors[field] === "required",
+    );
+    const hasOnlyMissingErrors =
+      Object.keys(errors).length > 0 &&
+      Object.keys(errors).every((field) => errors[field] === "required");
+
+    if (!hasAnyValue(activeMode)) {
+      clearErrors(activeMode);
+      setResultState("initial");
+      return;
+    }
+
+    if (missingFields.length > 0 && hasOnlyMissingErrors) {
+      if (hasTouchedInputs(activeMode)) {
+        showSpecificErrors(errors, activeMode);
+      }
+      setResultState("initial");
+      return;
+    }
+
+    const validationErrors = getValidationErrors(activeMode, errors, values);
+
+    if (Object.keys(validationErrors).length > 0) {
+      showSpecificErrors(validationErrors, activeMode);
+      setResultState("invalid");
+      return;
+    }
+
+    clearErrors(activeMode);
+    const result = computeResult(activeMode, values);
+    setResultState("valid", result);
+
+    currentHistoryEntry = {
+      id: `${Date.now()}-${Math.random().toString(16).slice(2)}`,
+      mode: activeMode,
+      modeLabel: clientConfig.modeLabels[activeMode] ?? activeMode,
+      values,
+      result: result.copy,
+      summary: result.main,
+      createdAt: new Date().toLocaleTimeString(clientConfig.formatLocale, {
+        hour: "2-digit",
+        minute: "2-digit",
+      }),
+    };
+
+    historyDebounce = window.setTimeout(() => {
+      if (currentHistoryEntry) {
+        saveHistoryEntry(currentHistoryEntry);
+      }
+    }, HISTORY_DEBOUNCE_MS);
+  }
+
+  function loadHistory(): HistoryEntry[] {
+    try {
+      const rawHistory = sessionStorage.getItem(HISTORY_KEY);
+      const parsed = rawHistory ? JSON.parse(rawHistory) : [];
+
+      return Array.isArray(parsed)
+        ? parsed.filter((item) => isMode(item?.mode))
+        : [];
+    } catch {
+      return [];
+    }
+  }
+
+  function writeHistory(history: HistoryEntry[]) {
+    sessionStorage.setItem(HISTORY_KEY, JSON.stringify(history));
+    renderHistory(history);
+  }
+
+  function saveHistoryEntry(entry: HistoryEntry) {
+    const history = loadHistory();
+    const previous = history[0];
+
+    if (
+      previous &&
+      previous.mode === entry.mode &&
+      JSON.stringify(previous.values) === JSON.stringify(entry.values)
+    ) {
+      return;
+    }
+
+    writeHistory([entry, ...history].slice(0, HISTORY_LIMIT));
+  }
+
+  function renderHistory(history = loadHistory()) {
+    if (!historyList || !historyEmpty) {
+      return;
+    }
+
+    historyEmpty.classList.toggle("hidden", history.length > 0);
+    historyList.innerHTML = "";
+
+    history.forEach((item) => {
+      const listItem = document.createElement("li");
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className =
+        "w-full rounded-lg border border-gray-800 bg-gray-900 p-3 text-left transition hover:border-amber-400 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/30";
+      button.dataset.historyId = item.id;
+      button.innerHTML = `
+        <span class="block text-xs font-semibold uppercase tracking-wide text-amber-400">${escapeHtml(item.modeLabel)} - ${escapeHtml(item.createdAt)}</span>
+        <span class="mt-2 block break-words text-sm font-semibold text-white">${escapeHtml(item.result)}</span>
+        <span class="mt-1 block break-words text-xs leading-relaxed text-gray-500">${escapeHtml(item.summary)}</span>
+      `;
+      listItem.append(button);
+      historyList.append(listItem);
+    });
+  }
+
+  function restoreHistoryItem(id: string | undefined) {
+    const item = loadHistory().find((historyItem) => historyItem.id === id);
+
+    if (!item) {
+      return;
+    }
+
+    setActiveMode(item.mode);
+
+    Object.entries(item.values).forEach(([field, value]) => {
+      const input = getFieldInput(field, item.mode);
+
+      if (input) {
+        input.value = String(value);
+        input.dataset.touched = "true";
+      }
+    });
+
+    updateCalculator();
+  }
+
+  function escapeHtml(value: unknown) {
+    return String(value)
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;")
+      .replaceAll("'", "&#039;");
+  }
+
+  function clearActiveMode() {
+    getModeInputs(activeMode).forEach((input) => {
+      input.value = "";
+      delete input.dataset.touched;
+    });
+    clearErrors(activeMode);
+    setResultState("initial");
+  }
+
+  async function copyResult() {
+    if (!currentCopyText || !copyLabel || !copyStatus) {
+      return;
+    }
+
+    try {
+      if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(currentCopyText);
+      } else {
+        const textArea = document.createElement("textarea");
+        textArea.value = currentCopyText;
+        textArea.setAttribute("readonly", "");
+        textArea.style.position = "fixed";
+        textArea.style.opacity = "0";
+        document.body.append(textArea);
+        textArea.select();
+        document.execCommand("copy");
+        textArea.remove();
+      }
+
+      window.clearTimeout(copiedTimeout);
+      copyLabel.textContent = text("copy.copied");
+      copyStatus.textContent = text("copy.status");
+      copiedTimeout = window.setTimeout(() => {
+        copyLabel.textContent = text("copyResult");
+        copyStatus.textContent = "";
+      }, 2000);
+    } catch {
+      copyStatus.textContent = text("copy.error");
+    }
+  }
+
+  tabs.forEach((tab, index) => {
+    tab.addEventListener("click", () => {
+      if (isMode(tab.dataset.tab)) {
+        setActiveMode(tab.dataset.tab);
+      }
+    });
+
+    tab.addEventListener("keydown", (event) => {
+      const key = event.key;
+      let nextIndex = index;
+
+      if (key === "ArrowRight" || key === "ArrowDown") {
+        nextIndex = (index + 1) % tabs.length;
+      } else if (key === "ArrowLeft" || key === "ArrowUp") {
+        nextIndex = (index - 1 + tabs.length) % tabs.length;
+      } else if (key === "Home") {
+        nextIndex = 0;
+      } else if (key === "End") {
+        nextIndex = tabs.length - 1;
+      } else {
+        return;
+      }
+
+      event.preventDefault();
+      const nextMode = tabs[nextIndex]?.dataset.tab;
+
+      if (isMode(nextMode)) {
+        setActiveMode(nextMode, true);
+      }
+    });
+  });
+
+  document.querySelectorAll<HTMLInputElement>("[data-input]").forEach((input) => {
+    input.addEventListener("input", () => {
+      input.dataset.touched = "true";
+      updateCalculator();
+    });
+
+    input.addEventListener("blur", () => {
+      input.dataset.touched = "true";
+      updateCalculator();
+    });
+  });
+
+  swapButton?.addEventListener("click", () => {
+    const original = getFieldInput("original", "percentChange");
+    const next = getFieldInput("next", "percentChange");
+
+    if (!original || !next) {
+      return;
+    }
+
+    const previousOriginal = original.value;
+    original.value = next.value;
+    next.value = previousOriginal;
+    original.dataset.touched = "true";
+    next.dataset.touched = "true";
+    updateCalculator();
+  });
+
+  clearActiveButton?.addEventListener("click", clearActiveMode);
+  copyButton?.addEventListener("click", copyResult);
+
+  clearHistoryButton?.addEventListener("click", () => {
+    writeHistory([]);
+  });
+
+  historyList?.addEventListener("click", (event) => {
+    if (!(event.target instanceof Element)) {
+      return;
+    }
+
+    const button = event.target.closest<HTMLElement>("[data-history-id]");
+
+    if (button) {
+      restoreHistoryItem(button.dataset.historyId);
+    }
+  });
+
+  renderHistory();
+  setActiveMode(activeMode);
+</script>

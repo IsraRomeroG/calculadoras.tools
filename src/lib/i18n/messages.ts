@@ -24,10 +24,14 @@ export const messages = {
     "common.use": "Usar",
     "common.readArticle": "Leer guia",
     "common.search": "Buscar",
+    "common.calculator": "calculadora",
     "common.calculators": "calculadoras",
+    "common.category": "categoria",
     "common.categories": "categorias",
     "common.result": "resultado",
     "common.results": "resultados",
+    "common.tool": "herramienta",
+    "common.tools": "herramientas",
     "home.title": "Calculadoras disponibles",
     "home.description":
       "Calculadoras online simples para resolver porcentajes y otros calculos cotidianos de forma rapida, clara y gratuita.",
@@ -41,6 +45,10 @@ export const messages = {
     "home.availableCalculators": "Calculadoras disponibles",
     "home.selectTool": "Selecciona una herramienta para comenzar.",
     "home.resultsFor": "{count} {resultLabel} para \"{query}\".",
+    "category.title": "Calculadoras de {category}",
+    "category.emptyTitle": "No hay calculadoras publicadas",
+    "category.emptyDescription":
+      "Esta categoria todavia no tiene herramientas disponibles.",
     "adConsent.title": "Ayudanos a mantener estas herramientas gratuitas",
     "adConsent.body":
       "La publicidad ayuda a financiar calculadoras.tools. Con tu permiso, cargaremos anuncios de terceros que pueden usar cookies o tecnologias similares para medir y seleccionar publicidad. Puedes aceptar o rechazar estos anuncios sin perder acceso al sitio.",
@@ -71,10 +79,14 @@ export const messages = {
     "common.use": "Use",
     "common.readArticle": "Read guide",
     "common.search": "Search",
+    "common.calculator": "calculator",
     "common.calculators": "calculators",
+    "common.category": "category",
     "common.categories": "categories",
     "common.result": "result",
     "common.results": "results",
+    "common.tool": "tool",
+    "common.tools": "tools",
     "home.title": "Available calculators",
     "home.description":
       "Simple online calculators for percentages and everyday math, with fast and clear results.",
@@ -88,6 +100,10 @@ export const messages = {
     "home.availableCalculators": "Available calculators",
     "home.selectTool": "Choose a tool to get started.",
     "home.resultsFor": "{count} {resultLabel} for \"{query}\".",
+    "category.title": "{category} calculators",
+    "category.emptyTitle": "No calculators published",
+    "category.emptyDescription":
+      "This category does not have available tools yet.",
     "adConsent.title": "Help us keep these tools free",
     "adConsent.body":
       "Advertising helps fund calculadoras.tools. With your permission, we will load third-party ads that may use cookies or similar technologies to measure and select advertising. You can accept or reject these ads without losing access to the site.",

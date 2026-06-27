@@ -125,43 +125,66 @@ export const getPublishedBlogCategorySlugsForSitemap = (
       .filter(Boolean),
   );
 
+const getSitemapPath = (page) => {
+  const path = new URL(page, "https://calculadoras.tools").pathname.replace(
+    /\/$/,
+    "",
+  );
+
+  return path || "/";
+};
+
 export const createSitemapFilter =
   ({
     legacyBlogArticleSlugs,
     publishedBlogArticlePaths,
     publishedBlogCategorySlugs,
+    excludedPaths = [],
   }) =>
-  (page) => {
-    const path = new URL(page).pathname.replace(/\/$/, "");
+  {
+    const excludedPathSet = new Set([...excludedPaths].map(getSitemapPath));
 
-    if (path === "/blog/categoria" || path.startsWith("/blog/categoria/")) {
-      return false;
-    }
+    return (page) => {
+      const path = getSitemapPath(page);
 
-    const blogSegments = path.split("/").filter(Boolean);
+      if (
+        excludedPathSet.has(path) ||
+        [...excludedPathSet].some((excludedPath) =>
+          path.startsWith(`${excludedPath}/`),
+        )
+      ) {
+        return false;
+      }
 
-    if (blogSegments[0] !== "blog" || blogSegments.length === 1) {
-      return true;
-    }
+      if (path === "/blog/categoria" || path.startsWith("/blog/categoria/")) {
+        return false;
+      }
 
-    if (blogSegments[1] === "pagina") {
-      return true;
-    }
+      const blogSegments = path.split("/").filter(Boolean);
 
-    if (
-      blogSegments.length === 2 &&
-      legacyBlogArticleSlugs.has(blogSegments[1])
-    ) {
-      return false;
-    }
+      if (blogSegments[0] !== "blog" || blogSegments.length === 1) {
+        return true;
+      }
 
-    if (blogSegments.length === 2) {
-      return publishedBlogCategorySlugs.has(blogSegments[1]);
-    }
+      if (blogSegments[1] === "pagina") {
+        return true;
+      }
 
-    if (blogSegments[2] === "pagina") {
-      return publishedBlogCategorySlugs.has(blogSegments[1]);
-    }
+      if (
+        blogSegments.length === 2 &&
+        legacyBlogArticleSlugs.has(blogSegments[1])
+      ) {
+        return false;
+      }
 
-    return publishedBlogArticlePaths.has(path);
+      if (blogSegments.length === 2) {
+        return publishedBlogCategorySlugs.has(blogSegments[1]);
+      }
+
+      if (blogSegments[2] === "pagina") {
+        return publishedBlogCategorySlugs.has(blogSegments[1]);
+      }
+
+      return publishedBlogArticlePaths.has(path);
+    };
   };
