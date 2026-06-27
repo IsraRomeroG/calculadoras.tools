@@ -2,23 +2,36 @@
 import Navbar from "@components/template/Navbar.astro";
 import Footer from "@components/template/Footer.astro";
 import AdConsentBanner from "@components/ads/AdConsentBanner.astro";
+import { LOCALE_CONFIG, type Locale } from "@lib/i18n/config";
+import {
+  buildCanonicalUrl,
+  getLocaleFromPathname,
+  type AlternateLink,
+} from "@lib/i18n/routing";
 import "@styles/global.css";
 
 interface Props {
   title?: string;
   description?: string;
   canonical?: string;
+  locale?: Locale;
+  alternates?: AlternateLink[];
 }
 
-const { title = "calculadoras.tools", description, canonical } = Astro.props;
-const canonicalWithoutTrailingSlash =
-  canonical && canonical !== "/" ? canonical.replace(/\/+$/, "") : canonical;
-const canonicalUrl = canonicalWithoutTrailingSlash
-  ? new URL(canonicalWithoutTrailingSlash, Astro.site ?? Astro.url).toString()
+const {
+  title = "calculadoras.tools",
+  description,
+  canonical,
+  locale: localeProp,
+  alternates = [],
+} = Astro.props;
+const locale = localeProp ?? getLocaleFromPathname(Astro.url.pathname);
+const canonicalUrl = canonical
+  ? buildCanonicalUrl(canonical, Astro.site ?? Astro.url)
   : undefined;
 ---
 
-<html lang="es-MX">
+<html lang={LOCALE_CONFIG[locale].htmlLang}>
   <head>
     <meta charset="utf-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
@@ -30,14 +43,23 @@ const canonicalUrl = canonicalWithoutTrailingSlash
     </title>
     {description && <meta name="description" content={description} />}
     {canonicalUrl && <link rel="canonical" href={canonicalUrl} />}
+    {
+      alternates.map((alternate) => (
+        <link
+          rel="alternate"
+          hreflang={alternate.hreflang}
+          href={alternate.href}
+        />
+      ))
+    }
     <slot name="head" />
   </head>
   <body class="antialiased">
     <div class="grid min-h-screen grid-rows-[auto_1fr_auto]">
-      <Navbar />
+      <Navbar locale={locale} />
       <slot />
-      <Footer />
+      <Footer locale={locale} />
     </div>
-    <AdConsentBanner />
+    <AdConsentBanner locale={locale} />
   </body>
 </html>
