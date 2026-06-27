@@ -20,4 +20,13 @@ describe("i18n messages", () => {
       }),
     ).toBe('2 results for "tax".');
   });
+
+  it("localizes breadcrumb overflow text", () => {
+    expect(t("es", "breadcrumbs.showIntermediate")).toBe(
+      "Mostrar niveles intermedios",
+    );
+    expect(t("en", "breadcrumbs.showIntermediate")).toBe(
+      "Show intermediate levels",
+    );
+  });
 });
