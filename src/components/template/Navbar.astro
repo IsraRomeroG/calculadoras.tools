@@ -1,15 +1,31 @@
 ---
-import { MENU } from "@lib/constants/menu";
+import { getMenuItems } from "@lib/constants/menu";
+import { DEFAULT_LOCALE, LOCALE_CONFIG, type Locale } from "@lib/i18n/config";
+import { normalizePath } from "@lib/i18n/routing";
+import { t } from "@lib/i18n/messages";
 
-const currentPath = Astro.url.pathname;
+interface Props {
+  locale?: Locale;
+}
 
-function isActiveRoute(currentPath: string, slug: string): boolean {
-  // caso especial para "/"
-  if (slug === "/") {
-    return currentPath === "/";
+const { locale = DEFAULT_LOCALE } = Astro.props;
+const currentPath = normalizePath(Astro.url.pathname);
+const menuItems = getMenuItems(locale);
+const homePath = LOCALE_CONFIG[locale].urlPrefix || "/";
+const openMenuLabel = t(locale, "nav.openMenu");
+const closeMenuLabel = t(locale, "nav.closeMenu");
+
+function isActiveRoute(currentPath: string, path: string): boolean {
+  const normalizedPath = normalizePath(path);
+
+  if (normalizedPath === homePath) {
+    return currentPath === normalizedPath;
   }
 
-  return currentPath.startsWith(slug);
+  return (
+    currentPath === normalizedPath ||
+    currentPath.startsWith(`${normalizedPath}/`)
+  );
 }
 ---
 
@@ -17,21 +33,21 @@ function isActiveRoute(currentPath: string, slug: string): boolean {
   <div
     class="relative flex justify-between items-center max-w-5xl mx-auto px-6 py-3 text-white"
   >
-    <!-- Logo -->
     <div class="font-semibold text-xl">
-      <a href="/">
+      <a href={homePath}>
         calculadoras<span class="text-amber-400">.tools</span>
       </a>
     </div>
 
-    <!-- Botón hamburguesa -->
     <button
       id="menuBtn"
       class="md:hidden focus:outline-none"
       type="button"
-      aria-label="Abrir menú de navegación"
+      aria-label={openMenuLabel}
       aria-controls="menu"
       aria-expanded="false"
+      data-open-label={openMenuLabel}
+      data-close-label={closeMenuLabel}
     >
       <svg
         xmlns="http://www.w3.org/2000/svg"
@@ -39,6 +55,7 @@ function isActiveRoute(currentPath: string, slug: string): boolean {
         fill="none"
         viewBox="0 0 24 24"
         stroke="currentColor"
+        aria-hidden="true"
       >
         <path
           stroke-linecap="round"
@@ -48,21 +65,25 @@ function isActiveRoute(currentPath: string, slug: string): boolean {
       </svg>
     </button>
 
-    <!-- Menú -->
     <nav
       id="menu"
       class="hidden absolute top-full left-0 w-full bg-gray-900 md:static md:block md:w-auto"
     >
       <ul class="flex flex-col md:flex-row">
         {
-          MENU.map((menuItem) => (
+          menuItems.map((menuItem) => (
             <li>
               <a
                 href={menuItem.slug}
-                class:list={[
-                  "block px-4 py-2 ",
+                aria-current={
                   isActiveRoute(currentPath, menuItem.slug)
-                    ? "hover:bg-gray-700"
+                    ? "page"
+                    : undefined
+                }
+                class:list={[
+                  "block px-4 py-2",
+                  isActiveRoute(currentPath, menuItem.slug)
+                    ? "bg-gray-800 text-white"
                     : "hover:bg-gray-700",
                 ]}
               >
@@ -84,12 +105,11 @@ function isActiveRoute(currentPath: string, slug: string): boolean {
     menuBtn.addEventListener("click", () => {
       const isExpanded = menuBtn.getAttribute("aria-expanded") === "true";
       const nextExpanded = !isExpanded;
+      const openLabel = menuBtn.dataset.openLabel ?? "Open navigation menu";
+      const closeLabel = menuBtn.dataset.closeLabel ?? "Close navigation menu";
 
       menuBtn.setAttribute("aria-expanded", String(nextExpanded));
-      menuBtn.setAttribute(
-        "aria-label",
-        nextExpanded ? "Cerrar menú de navegación" : "Abrir menú de navegación",
-      );
+      menuBtn.setAttribute("aria-label", nextExpanded ? closeLabel : openLabel);
       menu.classList.toggle("hidden", !nextExpanded);
     });
   }

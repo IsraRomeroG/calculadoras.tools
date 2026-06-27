@@ -1,6 +1,7 @@
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
+import { getFooterLinks } from "./i18n/shell";
 
 const ROOT = process.cwd();
 const PAGES_DIR = join(ROOT, "src", "pages");
@@ -9,16 +10,16 @@ const read = (path: string) => readFileSync(path, "utf8");
 
 describe("editorial trust pages", () => {
   it("links institutional trust pages from the footer", () => {
-    const footer = read(join(ROOT, "src", "components", "template", "Footer.astro"));
-
-    [
-      "/acerca-de",
-      "/metodologia",
-      "/politica-editorial",
-      "/correcciones",
-    ].forEach((href) => {
-      expect(footer).toContain(`href="${href}"`);
-    });
+    expect(getFooterLinks("es").map((link) => link.href)).toEqual(
+      expect.arrayContaining([
+        "/privacidad",
+        "/contacto",
+        "/acerca-de",
+        "/metodologia",
+        "/politica-editorial",
+        "/correcciones",
+      ]),
+    );
   });
 
   it("keeps notice pages discoverable before YMYL migration", () => {

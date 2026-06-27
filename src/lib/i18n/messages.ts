@@ -6,6 +6,8 @@ export const messages = {
     "nav.home": "Inicio",
     "nav.blog": "Blog",
     "nav.contact": "Contacto",
+    "nav.openMenu": "Abrir menu de navegacion",
+    "nav.closeMenu": "Cerrar menu de navegacion",
     "footer.tagline":
       "Herramientas simples y rapidas para resolver calculos del dia a dia.",
     "footer.rights": "Todos los derechos reservados.",
@@ -16,6 +18,7 @@ export const messages = {
     "footer.editorialPolicy": "Politica editorial",
     "footer.corrections": "Correcciones",
     "footer.adPreferences": "Preferencias de publicidad",
+    "breadcrumbs.ariaLabel": "Ruta de navegacion",
     "breadcrumbs.home": "Inicio",
     "common.use": "Usar",
     "common.readArticle": "Leer guia",
@@ -49,6 +52,8 @@ export const messages = {
     "nav.home": "Home",
     "nav.blog": "Blog",
     "nav.contact": "Contact",
+    "nav.openMenu": "Open navigation menu",
+    "nav.closeMenu": "Close navigation menu",
     "footer.tagline":
       "Simple tools for everyday calculations, built to be clear and fast.",
     "footer.rights": "All rights reserved.",
@@ -59,6 +64,7 @@ export const messages = {
     "footer.editorialPolicy": "Editorial policy",
     "footer.corrections": "Corrections",
     "footer.adPreferences": "Ad preferences",
+    "breadcrumbs.ariaLabel": "Breadcrumb",
     "breadcrumbs.home": "Home",
     "common.use": "Use",
     "common.readArticle": "Read guide",

@@ -1,24 +1,61 @@
-import type { MenuItem } from "@lib/types/menuItem";
+import type { Locale } from "@lib/i18n/config";
+import type { MenuItem, MenuItemDefinition } from "@lib/types/menuItem";
 
-export const MENU: MenuItem[] = [
+export const MENU: MenuItemDefinition[] = [
   {
-    id: "inicio",
-    name: "Inicio",
-    description:
-      "Calculadoras para inversiones, ahorros, préstamos e intereses.",
-    slug: "/",
+    id: "home",
+    order: 10,
+    labels: {
+      es: "Inicio",
+      en: "Home",
+    },
+    descriptions: {
+      es: "Calculadoras para inversiones, ahorros, prestamos e intereses.",
+      en: "Calculators and practical tools for everyday numbers.",
+    },
+    paths: {
+      es: "/",
+      en: "/en",
+    },
   },
   {
     id: "blog",
-    name: "Blog",
-    description:
-      "Blog con artículos sobre finanzas personales, salud, matemáticas y más.",
-    slug: "/blog",
+    order: 20,
+    labels: {
+      es: "Blog",
+      en: "Blog",
+    },
+    descriptions: {
+      es: "Blog con articulos sobre finanzas personales, salud, matematicas y mas.",
+    },
+    paths: {
+      es: "/blog",
+    },
   },
   {
-    id: "contacto",
-    name: "Contacto",
-    description: "Contáctanos para cualquier pregunta o comentario.",
-    slug: "/contacto",
+    id: "contact",
+    order: 30,
+    labels: {
+      es: "Contacto",
+      en: "Contact",
+    },
+    descriptions: {
+      es: "Contactanos para cualquier pregunta o comentario.",
+    },
+    paths: {
+      es: "/contacto",
+    },
   },
 ];
+
+export const getMenuItems = (locale: Locale): MenuItem[] =>
+  MENU.filter((item) => item.paths[locale])
+    .sort((a, b) => a.order - b.order)
+    .map((item) => ({
+      id: item.id,
+      name: item.labels[locale],
+      slug: item.paths[locale] as string,
+      ...(item.descriptions[locale]
+        ? { description: item.descriptions[locale] }
+        : {}),
+    }));

@@ -1,48 +1,59 @@
 ---
+import { DEFAULT_LOCALE, LOCALE_CONFIG, type Locale } from "@lib/i18n/config";
+import { t } from "@lib/i18n/messages";
+import { getFooterLinks, isAdConsentEnabled } from "@lib/i18n/shell";
+
+interface Props {
+  locale?: Locale;
+}
+
+const { locale = DEFAULT_LOCALE } = Astro.props;
 const year = new Date().getFullYear();
+const homePath = LOCALE_CONFIG[locale].urlPrefix || "/";
+const footerLinks = getFooterLinks(locale);
+const showAdPreferences = isAdConsentEnabled(locale);
 ---
 
 <footer class="bg-gray-950 border-t border-gray-700 text-gray-300">
   <div class="max-w-5xl mx-auto px-6 py-8">
-    <!-- Top -->
     <div class="flex flex-col md:flex-row justify-between gap-6">
-      <!-- Brand -->
       <div>
-        <a href="/" class="text-white font-semibold text-lg">
+        <a href={homePath} class="text-white font-semibold text-lg">
           calculadoras<span class="text-amber-400">.tools</span>
         </a>
         <p class="mt-2 text-sm text-gray-400 max-w-dvw">
-          Herramientas simples y rápidas para resolver cálculos del día a día.
+          {t(locale, "footer.tagline")}
         </p>
       </div>
     </div>
 
-    <!-- Divider -->
     <div class="border-t border-gray-700 my-6"></div>
 
-    <!-- Bottom -->
     <div
       class="flex flex-col md:flex-row justify-between items-center text-sm text-gray-400"
     >
-      <p>© {year} calculadoras.tools. Todos los derechos reservados.</p>
+      <p>&copy; {year} calculadoras.tools. {t(locale, "footer.rights")}</p>
 
-      <div class="mt-3 flex flex-wrap justify-center gap-x-4 gap-y-2 md:mt-0 md:justify-end">
-        <a href="/privacidad" class="hover:text-white">Privacidad</a>
-        <a href="/contacto" class="hover:text-white">Contacto</a>
-        <a href="/acerca-de" class="hover:text-white">Acerca de</a>
-        <a href="/metodologia" class="hover:text-white">Metodología</a>
-        <a href="/politica-editorial" class="hover:text-white">
-          Política editorial
-        </a>
-        <a href="/correcciones" class="hover:text-white">Correcciones</a>
-        <button
-          type="button"
-          class="hidden hover:text-white"
-          data-ad-consent-open
-        >
-          Preferencias de publicidad
-        </button>
-      </div>
+      {
+        (footerLinks.length > 0 || showAdPreferences) && (
+          <div class="mt-3 flex flex-wrap justify-center gap-x-4 gap-y-2 md:mt-0 md:justify-end">
+            {footerLinks.map((link) => (
+              <a href={link.href} class="hover:text-white">
+                {t(locale, link.labelKey)}
+              </a>
+            ))}
+            {showAdPreferences && (
+              <button
+                type="button"
+                class="hidden hover:text-white"
+                data-ad-consent-open
+              >
+                {t(locale, "footer.adPreferences")}
+              </button>
+            )}
+          </div>
+        )
+      }
     </div>
   </div>
 </footer>
