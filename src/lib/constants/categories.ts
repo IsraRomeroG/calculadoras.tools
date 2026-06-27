@@ -1,3 +1,5 @@
+import { DEFAULT_LOCALE, type Locale } from "@lib/i18n/config";
+
 export interface CategoryMetadata {
   slug: string;
   label: string;
@@ -24,6 +26,16 @@ export const CATEGORY_SLUGS = [
 ] as const;
 
 export type CategorySlug = (typeof CATEGORY_SLUGS)[number];
+export type CategoryId = CategorySlug;
+
+export const CATEGORY_IDS = CATEGORY_SLUGS;
+
+export type LocalizedCategoryMetadata = CategoryMetadata;
+
+export interface CategoryDefinition {
+  id: CategoryId;
+  locales: Partial<Record<Locale, LocalizedCategoryMetadata>>;
+}
 
 export const CATEGORIES = {
   finanzas: {
@@ -121,21 +133,67 @@ export const CATEGORIES = {
   },
 } as const satisfies Record<CategorySlug, CategoryMetadata>;
 
+const ENGLISH_CATEGORIES: Partial<Record<CategoryId, LocalizedCategoryMetadata>> = {
+  matematicas: {
+    slug: "math",
+    label: "Math",
+    description:
+      "Calculators for percentages, proportions, geometry and everyday math problems.",
+  },
+};
+
+export const CATEGORY_DEFINITIONS = Object.fromEntries(
+  CATEGORY_IDS.map((id) => [
+    id,
+    {
+      id,
+      locales: {
+        es: CATEGORIES[id],
+        ...(ENGLISH_CATEGORIES[id]
+          ? { en: ENGLISH_CATEGORIES[id] }
+          : {}),
+      },
+    },
+  ]),
+) as Record<CategoryId, CategoryDefinition>;
+
 export const isCategorySlug = (slug: string): slug is CategorySlug =>
   CATEGORY_SLUGS.includes(slug as CategorySlug);
 
-export const getCategory = (slug: CategorySlug) => CATEGORIES[slug];
+export const getCategoryLocale = (
+  id: CategoryId,
+  locale: Locale = DEFAULT_LOCALE,
+) => CATEGORY_DEFINITIONS[id].locales[locale];
 
-export const getCategoryByLabel = (label: string) =>
-  CATEGORY_SLUGS.map((slug) => CATEGORIES[slug]).find(
-    (category) => category.label === label,
-  );
+export const getCategory = (
+  id: CategoryId,
+  locale: Locale = DEFAULT_LOCALE,
+) => getCategoryLocale(id, locale) ?? CATEGORIES[id];
 
-export const getCategoryBySlugOrLegacySlug = (slug: string) =>
-  CATEGORY_SLUGS.map((key) => CATEGORIES[key]).find(
-    (category) =>
-      category.slug === slug || category.legacySlugs?.includes(slug),
-  );
+export const getCategoryByLabel = (
+  label: string,
+  locale: Locale = DEFAULT_LOCALE,
+) =>
+  CATEGORY_IDS.map((id) => getCategoryLocale(id, locale))
+    .filter((category): category is LocalizedCategoryMetadata =>
+      Boolean(category),
+    )
+    .find((category) => category.label === label);
 
-export const getCategoryLegacySlugs = (slug: CategorySlug) =>
-  CATEGORIES[slug].legacySlugs ?? [];
+export const getCategoryBySlugOrLegacySlug = (
+  slug: string,
+  locale: Locale = DEFAULT_LOCALE,
+) =>
+  CATEGORY_IDS.map((id) => getCategoryLocale(id, locale))
+    .filter((category): category is LocalizedCategoryMetadata =>
+      Boolean(category),
+    )
+    .find(
+      (category) =>
+        category.slug === slug || category.legacySlugs?.includes(slug),
+    );
+
+export const getCategoryLegacySlugs = (
+  id: CategoryId,
+  locale: Locale = DEFAULT_LOCALE,
+) => getCategoryLocale(id, locale)?.legacySlugs ?? [];

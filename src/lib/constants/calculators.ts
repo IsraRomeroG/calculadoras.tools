@@ -1,6 +1,32 @@
-import type { CalculatorDirectoryItem } from "@lib/calculator-directory";
+import type { Locale } from "@lib/i18n/config";
+import type { CategoryId, CategorySlug } from "./categories";
 
-export const CALCULATORS: CalculatorDirectoryItem[] = [
+export interface LegacyCalculatorDirectoryItem {
+  id: string;
+  title: string;
+  description: string;
+  href: string;
+  categorySlug: CategorySlug;
+  order: number;
+  draft?: boolean;
+}
+
+export interface LocalizedCalculatorMetadata {
+  title: string;
+  description: string;
+  slug: string;
+  published: boolean;
+}
+
+export interface CalculatorDefinition {
+  id: string;
+  categoryId: CategoryId;
+  order: number;
+  draft?: boolean;
+  locales: Partial<Record<Locale, LocalizedCalculatorMetadata>>;
+}
+
+export const CALCULATORS: LegacyCalculatorDirectoryItem[] = [
   {
     id: "calculadora-de-porcentajes",
     title: "Calculadora de porcentajes",
@@ -647,3 +673,38 @@ export const CALCULATORS: CalculatorDirectoryItem[] = [
     order: 94,
   },
 ];
+
+const ENGLISH_CALCULATOR_METADATA: Partial<
+  Record<string, LocalizedCalculatorMetadata>
+> = {
+  "calculadora-de-porcentajes": {
+    title: "Percentage calculator",
+    description:
+      "Calculate percentages, discounts, increases and changes between values instantly.",
+    slug: "percentage-calculator",
+    published: true,
+  },
+};
+
+const getCalculatorSlugFromHref = (href: string) =>
+  href.split("/").filter(Boolean).at(-1) ?? href;
+
+export const CALCULATOR_DEFINITIONS: CalculatorDefinition[] = CALCULATORS.map(
+  (calculator) => ({
+    id: calculator.id,
+    categoryId: calculator.categorySlug,
+    order: calculator.order,
+    ...(calculator.draft ? { draft: calculator.draft } : {}),
+    locales: {
+      es: {
+        title: calculator.title,
+        description: calculator.description,
+        slug: getCalculatorSlugFromHref(calculator.href),
+        published: !calculator.draft,
+      },
+      ...(ENGLISH_CALCULATOR_METADATA[calculator.id]
+        ? { en: ENGLISH_CALCULATOR_METADATA[calculator.id] }
+        : {}),
+    },
+  }),
+);

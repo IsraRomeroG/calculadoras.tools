@@ -1,14 +1,16 @@
 import { describe, expect, it } from "vitest";
 import {
   CATEGORIES,
+  CATEGORY_DEFINITIONS,
   CATEGORY_SLUGS,
   getCategoryByLabel,
   getCategoryBySlugOrLegacySlug,
 } from "./constants/categories";
-import { CALCULATORS } from "./constants/calculators";
+import { CALCULATOR_DEFINITIONS, CALCULATORS } from "./constants/calculators";
 import {
   getCalculatorCategories,
   getCalculatorCategoryUrl,
+  getCalculatorUrl,
   getPublishedCalculators,
 } from "./calculator-directory";
 
@@ -21,6 +23,55 @@ describe("calculator category directory", () => {
     expect(getCalculatorCategoryUrl("probabilidad-estadistica")).toBe(
       "/probabilidad-estadistica",
     );
+    expect(getCalculatorCategoryUrl("matematicas", "en")).toBe("/en/math");
+    expect(getCalculatorCategoryUrl("finanzas", "en")).toBeNull();
+  });
+
+  it("keeps the Spanish percentage calculator route and creates the English pilot route", () => {
+    const percentageCalculator = CALCULATOR_DEFINITIONS.find(
+      (calculator) => calculator.id === "calculadora-de-porcentajes",
+    );
+
+    expect(percentageCalculator).toBeDefined();
+    expect(getCalculatorUrl(percentageCalculator!, "es")).toBe(
+      "/matematicas/calculadora-de-porcentajes",
+    );
+    expect(getCalculatorUrl(percentageCalculator!, "en")).toBe(
+      "/en/math/percentage-calculator",
+    );
+  });
+
+  it("publishes only reviewed English calculator metadata", () => {
+    const englishCalculators = getPublishedCalculators("en");
+
+    expect(englishCalculators).toEqual([
+      expect.objectContaining({
+        id: "calculadora-de-porcentajes",
+        title: "Percentage calculator",
+        href: "/en/math/percentage-calculator",
+        categoryId: "matematicas",
+      }),
+    ]);
+
+    expect(
+      englishCalculators.map((calculator) => calculator.id),
+    ).not.toContain("calculadora-de-regla-de-tres");
+  });
+
+  it("groups English calculators only under localized published categories", () => {
+    const categories = getCalculatorCategories(
+      getPublishedCalculators("en"),
+      "en",
+    );
+
+    expect(categories).toEqual([
+      expect.objectContaining({
+        id: "matematicas",
+        slug: "math",
+        label: "Math",
+        count: 1,
+      }),
+    ]);
   });
 
   it("keeps display labels separate from canonical slugs", () => {
@@ -62,6 +113,8 @@ describe("calculator category directory", () => {
       "calculadora-deficit-calorico",
       "categoria",
       "contacto",
+      "en",
+      "pagina",
       "privacidad",
       "robots.txt",
     ]);
@@ -77,6 +130,52 @@ describe("calculator category directory", () => {
       expect(calculator.href.startsWith(`/${calculator.categorySlug}/`)).toBe(
         true,
       );
+    });
+
+    CALCULATOR_DEFINITIONS.forEach((calculator) => {
+      expect("href" in calculator).toBe(false);
+      expect(CATEGORIES[calculator.categoryId]).toBeDefined();
+      expect(calculator.locales.es?.published).toBe(!calculator.draft);
+    });
+  });
+
+  it("keeps localized category and calculator slugs unique", () => {
+    const reservedSlugs = new Set([
+      "404",
+      "blog",
+      "categoria",
+      "contacto",
+      "en",
+      "pagina",
+      "privacidad",
+      "robots.txt",
+    ]);
+    const categorySlugsByLocale = new Map<string, string>();
+    const calculatorSlugsByLocaleAndCategory = new Map<string, string>();
+
+    Object.values(CATEGORY_DEFINITIONS).forEach((definition) => {
+      Object.entries(definition.locales).forEach(([locale, metadata]) => {
+        expect(metadata).toBeDefined();
+        expect(reservedSlugs.has(metadata.slug)).toBe(false);
+
+        const key = `${locale}:${metadata.slug}`;
+        expect(categorySlugsByLocale.has(key)).toBe(false);
+        categorySlugsByLocale.set(key, definition.id);
+
+        metadata.legacySlugs?.forEach((legacySlug) => {
+          expect(reservedSlugs.has(legacySlug)).toBe(false);
+        });
+      });
+    });
+
+    CALCULATOR_DEFINITIONS.forEach((definition) => {
+      Object.entries(definition.locales).forEach(([locale, metadata]) => {
+        expect(metadata).toBeDefined();
+
+        const key = `${locale}:${definition.categoryId}:${metadata.slug}`;
+        expect(calculatorSlugsByLocaleAndCategory.has(key)).toBe(false);
+        calculatorSlugsByLocaleAndCategory.set(key, definition.id);
+      });
     });
   });
 
@@ -121,5 +220,6 @@ describe("calculator category directory", () => {
     expect(getCategoryBySlugOrLegacySlug("eventos-sociales")?.slug).toBe(
       "restaurantes",
     );
+    expect(getCategoryBySlugOrLegacySlug("math", "en")?.slug).toBe("math");
   });
 });

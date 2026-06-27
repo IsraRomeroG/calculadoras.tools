@@ -1,5 +1,16 @@
-import { CALCULATORS } from "@lib/constants/calculators";
-import { getCategory, type CategorySlug } from "@lib/constants/categories";
+import {
+  CALCULATOR_DEFINITIONS,
+  type CalculatorDefinition,
+} from "@lib/constants/calculators";
+import {
+  getCategory,
+  getCategoryLocale,
+  isCategorySlug,
+  type CategoryId,
+  type CategorySlug,
+} from "@lib/constants/categories";
+import { DEFAULT_LOCALE, LOCALE_CONFIG, type Locale } from "@lib/i18n/config";
+import { prefixLocalePath } from "@lib/i18n/routing";
 
 export type CalculatorCategorySlug = CategorySlug;
 
@@ -8,58 +19,133 @@ export interface CalculatorDirectoryItem {
   title: string;
   description: string;
   href: string;
+  categoryId: CategoryId;
   categorySlug: CalculatorCategorySlug;
   order: number;
   draft?: boolean;
 }
 
 export interface CalculatorCategory {
-  slug: CalculatorCategorySlug;
+  id: CategoryId;
+  slug: string;
   label: string;
   description: string;
   count: number;
 }
 
-export const getCalculatorCategory = (slug: CalculatorCategorySlug) =>
-  getCategory(slug);
+export const getCalculatorCategory = (
+  id: CategoryId,
+  locale: Locale = DEFAULT_LOCALE,
+) => getCategory(id, locale);
 
-export const getCalculatorCategoryUrl = (slug: CalculatorCategorySlug) =>
-  `/${slug}`;
+export const getCalculatorCategoryUrl = (
+  id: CategoryId | string,
+  locale: Locale = DEFAULT_LOCALE,
+) => {
+  if (!isCategorySlug(id)) {
+    return null;
+  }
 
-export const getCalculatorCategoryDescription = (slug: CalculatorCategorySlug) =>
-  getCalculatorCategory(slug).description;
+  const category = getCategoryLocale(id, locale);
 
-export const sortCalculators = (items: CalculatorDirectoryItem[]) =>
+  return category ? prefixLocalePath(locale, `/${category.slug}`) : null;
+};
+
+export const getCalculatorCategoryDescription = (
+  id: CategoryId,
+  locale: Locale = DEFAULT_LOCALE,
+) => getCalculatorCategory(id, locale).description;
+
+export const getCalculatorUrl = (
+  calculator: CalculatorDefinition,
+  locale: Locale = DEFAULT_LOCALE,
+) => {
+  if (calculator.draft) {
+    return null;
+  }
+
+  const category = getCategoryLocale(calculator.categoryId, locale);
+  const metadata = calculator.locales[locale];
+
+  if (!category || !metadata?.published) {
+    return null;
+  }
+
+  return prefixLocalePath(locale, `/${category.slug}/${metadata.slug}`);
+};
+
+export const sortCalculators = (
+  items: CalculatorDirectoryItem[],
+  locale: Locale = DEFAULT_LOCALE,
+) =>
   [...items].sort(
-    (a, b) => a.order - b.order || a.title.localeCompare(b.title),
+    (a, b) =>
+      a.order - b.order ||
+      a.title.localeCompare(b.title, LOCALE_CONFIG[locale].formatLocale),
   );
 
-export const getPublishedCalculators = () =>
-  sortCalculators(CALCULATORS.filter((calculator) => !calculator.draft));
+export const getPublishedCalculators = (
+  locale: Locale = DEFAULT_LOCALE,
+): CalculatorDirectoryItem[] =>
+  sortCalculators(
+    CALCULATOR_DEFINITIONS.flatMap((calculator) => {
+      const metadata = calculator.locales[locale];
+      const href = getCalculatorUrl(calculator, locale);
+
+      if (!metadata?.published || !href) {
+        return [];
+      }
+
+      return [
+        {
+          id: calculator.id,
+          title: metadata.title,
+          description: metadata.description,
+          href,
+          categoryId: calculator.categoryId,
+          categorySlug: calculator.categoryId,
+          order: calculator.order,
+          ...(calculator.draft ? { draft: calculator.draft } : {}),
+        },
+      ];
+    }),
+    locale,
+  );
 
 export const getCalculatorsByCategorySlug = (
   items: CalculatorDirectoryItem[],
-  categorySlug: CalculatorCategorySlug,
+  categorySlug: string,
 ) => items.filter((item) => item.categorySlug === categorySlug);
+
+export const getCalculatorsByCategoryId = (
+  items: CalculatorDirectoryItem[],
+  categoryId: CategoryId,
+) => items.filter((item) => item.categoryId === categoryId);
 
 export const getCalculatorCategories = (
   items: CalculatorDirectoryItem[],
+  locale: Locale = DEFAULT_LOCALE,
 ): CalculatorCategory[] => {
-  const categories = new Map<CalculatorCategorySlug, CalculatorCategory>();
+  const categories = new Map<CategoryId, CalculatorCategory>();
 
   items.forEach((item) => {
-    const slug = item.categorySlug;
-    const category = categories.get(slug);
+    const id = item.categoryId;
+    const category = categories.get(id);
 
     if (category) {
       category.count += 1;
       return;
     }
 
-    const metadata = getCalculatorCategory(slug);
+    const metadata = getCategoryLocale(id, locale);
 
-    categories.set(slug, {
-      slug,
+    if (!metadata) {
+      return;
+    }
+
+    categories.set(id, {
+      id,
+      slug: metadata.slug,
       label: metadata.label,
       description: metadata.description,
       count: 1,
@@ -67,6 +153,6 @@ export const getCalculatorCategories = (
   });
 
   return [...categories.values()].sort((a, b) =>
-    a.label.localeCompare(b.label, "es"),
+    a.label.localeCompare(b.label, LOCALE_CONFIG[locale].formatLocale),
   );
 };
