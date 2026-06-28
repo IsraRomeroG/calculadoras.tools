@@ -21,10 +21,11 @@ import { buildAlternateLinks } from "@lib/i18n/routing";
 const locale = "es";
 
 export async function getStaticPaths() {
-  const posts = await getPublishedBlogPostsByLocale(locale);
+  const pathLocale = "es";
+  const posts = await getPublishedBlogPostsByLocale(pathLocale);
   const englishPosts = await getPublishedBlogPostsByLocale("en");
   assertNoBlogRouteConflicts([...posts, ...englishPosts]);
-  const categories = getBlogCategories(posts, locale);
+  const categories = getBlogCategories(posts, pathLocale);
   const englishCategoryIds = new Set(
     getBlogCategories(englishPosts, "en").map((category) => category.id),
   );

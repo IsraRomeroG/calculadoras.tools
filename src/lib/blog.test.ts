@@ -53,7 +53,7 @@ const publishableBlogPost = ({
 const publishableEnglishBlogPost = ({
   draft,
   filePath = "src/content/blog/en/math/how-to-calculate-percentages.md",
-  id = "how-to-calculate-percentages",
+  id = "en/math/how-to-calculate-percentages",
   pubDate,
   slug = "how-to-calculate-percentages",
   translationKey = "percentage-basics",
@@ -166,7 +166,7 @@ describe("blog route helpers", () => {
     expect(
       isBlogPostInLocale(
         {
-          id: "math/percentages",
+          id: "en/math/percentages",
           filePath: "src/content/blog/en/math/percentages.md",
           data: {
             categoryId: "matematicas",

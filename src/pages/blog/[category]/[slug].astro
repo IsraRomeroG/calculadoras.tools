@@ -15,7 +15,8 @@ import { buildAlternateLinks } from "@lib/i18n/routing";
 const locale = "es";
 
 export async function getStaticPaths() {
-  const posts = await getPublishedBlogPostsByLocale(locale);
+  const pathLocale = "es";
+  const posts = await getPublishedBlogPostsByLocale(pathLocale);
   const englishPosts = await getPublishedBlogPostsByLocale("en");
   const allPosts = [...posts, ...englishPosts];
   assertNoBlogRouteConflicts(allPosts);

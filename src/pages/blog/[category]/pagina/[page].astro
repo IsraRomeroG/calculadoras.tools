@@ -20,9 +20,10 @@ import { t } from "@lib/i18n/messages";
 const locale = "es";
 
 export async function getStaticPaths() {
-  const posts = await getPublishedBlogPostsByLocale(locale);
+  const pathLocale = "es";
+  const posts = await getPublishedBlogPostsByLocale(pathLocale);
   assertNoBlogRouteConflicts(posts);
-  const categories = getBlogCategories(posts, locale);
+  const categories = getBlogCategories(posts, pathLocale);
 
   return categories.flatMap((category) => {
     const categoryPosts = getBlogPostsByCategoryId(posts, category.id);
