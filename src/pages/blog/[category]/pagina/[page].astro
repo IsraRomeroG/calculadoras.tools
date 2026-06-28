@@ -1,30 +1,31 @@
 ---
-import BaseLayout from "@layouts/BaseLayout.astro";
-import BlogPostCard from "@components/blog/BlogPostCard.astro";
-import Container from "@components/layout/Container.astro";
-import PageShell from "@components/layout/PageShell.astro";
-import PageHero from "@components/shared/PageHero.astro";
-import Pagination from "@components/shared/Pagination.astro";
+import BlogListPage from "@components/blog/BlogListPage.astro";
 import {
   assertNoBlogRouteConflicts,
-  getBlogPostsByCategorySlug,
   getBlogCategories,
-  getCategoryPageUrl,
-  getCategoryUrl,
-  getPublishedBlogPosts,
+  getBlogCategoryPageUrl,
+  getBlogCategoryUrl,
+  getBlogIndexPageUrl,
+  getBlogPostsByCategoryId,
+  getPublishedBlogPostsByLocale,
   paginateItems,
   type BlogCategory,
   type BlogPost,
   type PaginatedItems,
 } from "@lib/blog";
+import { LOCALE_CONFIG } from "@lib/i18n/config";
+import { getBlogUi } from "@lib/i18n/blog";
+import { t } from "@lib/i18n/messages";
+
+const locale = "es";
 
 export async function getStaticPaths() {
-  const posts = await getPublishedBlogPosts();
+  const posts = await getPublishedBlogPostsByLocale(locale);
   assertNoBlogRouteConflicts(posts);
-  const categories = getBlogCategories(posts);
+  const categories = getBlogCategories(posts, locale);
 
   return categories.flatMap((category) => {
-    const categoryPosts = getBlogPostsByCategorySlug(posts, category.slug);
+    const categoryPosts = getBlogPostsByCategoryId(posts, category.id);
     const firstPage = paginateItems(categoryPosts, 1);
 
     return Array.from(
@@ -56,71 +57,37 @@ interface Props {
 }
 
 const { category, posts, pagination } = Astro.props;
-const title = `Blog de ${category.label} - página ${pagination.currentPage}`;
-const description = `Más artículos de ${category.label.toLowerCase()} con explicaciones claras, fórmulas prácticas y ejemplos.`;
-const canonical = getCategoryPageUrl(category.slug, pagination.currentPage);
+const ui = getBlogUi(locale);
+const title = ui.categoryPage.title(category.label, pagination.currentPage);
+const description = ui.categoryPage.description(category.label);
+const canonical = getBlogCategoryPageUrl(
+  category.id,
+  pagination.currentPage,
+  locale,
+);
+const homeHref = LOCALE_CONFIG[locale].urlPrefix || "/";
 ---
 
-<BaseLayout title={title} description={description} canonical={canonical}>
-  <Fragment slot="head">
+<BlogListPage
+  locale={locale}
+  title={title}
+  description={description}
+  canonical={canonical}
+  alternates={[]}
+  heroTitle={ui.categoryPage.heroTitle(category.label, pagination.currentPage)}
+  heroDescription={ui.categoryPage.heroDescription(category.label)}
+  kicker={category.label}
+  breadcrumbs={[
+    { label: t(locale, "breadcrumbs.home"), href: homeHref, ariaLabel: t(locale, "breadcrumbs.home") },
+    { label: "Blog", href: getBlogIndexPageUrl(1, locale), optional: true },
     {
-      pagination.previousPage && (
-        <link
-          rel="prev"
-          href={getCategoryPageUrl(category.slug, pagination.previousPage)}
-        />
-      )
-    }
-    {
-      pagination.nextPage && (
-        <link
-          rel="next"
-          href={getCategoryPageUrl(category.slug, pagination.nextPage)}
-        />
-      )
-    }
-  </Fragment>
-
-  <PageShell>
-    <PageHero
-      title={`Artículos de ${category.label.toLowerCase()} - página ${pagination.currentPage}`}
-      description={`Más guías y ejemplos para resolver cálculos de ${category.label.toLowerCase()} con contexto práctico.`}
-      kicker={category.label}
-      collapseBreadcrumbOnMobile
-      breadcrumbs={[
-        { label: "Inicio", href: "/", ariaLabel: "Inicio" },
-        { label: "Blog", href: "/blog", optional: true },
-        {
-          label: category.label,
-          href: getCategoryUrl(category.slug),
-          optional: true,
-        },
-        { label: `Página ${pagination.currentPage}` },
-      ]}
-    />
-
-    <Container as="section" class="py-8 md:py-10">
-      <div class="mb-6">
-        <h2 class="text-2xl font-semibold">Artículos</h2>
-        <p class="mt-2 text-sm text-gray-400">
-          Página {pagination.currentPage} de {pagination.totalPages}.
-        </p>
-      </div>
-
-      <div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-        {
-          posts.map((post) => (
-            <BlogPostCard post={post} headingLevel="h2" cta="Leer artículo" />
-          ))
-        }
-      </div>
-
-      <Pagination
-        currentPage={pagination.currentPage}
-        totalPages={pagination.totalPages}
-        getPageUrl={(page) => getCategoryPageUrl(category.slug, page)}
-        class="mt-8"
-      />
-    </Container>
-  </PageShell>
-</BaseLayout>
+      label: category.label,
+      href: getBlogCategoryUrl(category.id, locale),
+      optional: true,
+    },
+    { label: ui.page.title(pagination.currentPage) },
+  ]}
+  posts={posts}
+  pagination={pagination}
+  getPageUrl={(page) => getBlogCategoryPageUrl(category.id, page, locale)}
+/>

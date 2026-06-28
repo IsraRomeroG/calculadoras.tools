@@ -1,5 +1,6 @@
 import { z } from "astro/zod";
-import { CATEGORY_SLUGS } from "./constants/categories";
+import { CATEGORY_IDS, CATEGORY_SLUGS } from "./constants/categories";
+import { LOCALES } from "./i18n/config";
 
 export const editorialEntitySchema = z.object({
   name: z.string(),
@@ -30,11 +31,16 @@ export const blogSchema = z
     description: z.string(),
     pubDate: z.coerce.date(),
     updatedDate: z.coerce.date().optional(),
-    categorySlug: z.enum(CATEGORY_SLUGS),
+    categorySlug: z.enum(CATEGORY_SLUGS).optional(),
     tags: z.array(z.string()).default([]),
     readTime: z.string().optional(),
     featured: z.boolean().default(false),
     draft: z.boolean().default(false),
+    translationKey: z.string().optional(),
+    contentId: z.string().optional(),
+    locale: z.enum(LOCALES).optional(),
+    categoryId: z.enum(CATEGORY_IDS).optional(),
+    slug: z.string().optional(),
     relatedCalculator: relatedCalculatorSchema.optional(),
     seoTitle: z.string().optional(),
     author: editorialEntitySchema.optional(),
@@ -45,6 +51,55 @@ export const blogSchema = z
     methodologyNote: z.string().optional(),
   })
   .superRefine((data, ctx) => {
+    const locale = data.locale ?? "es";
+
+    if (locale === "es" && !data.categorySlug) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "categorySlug is required for Spanish blog posts.",
+        path: ["categorySlug"],
+      });
+    }
+
+    if (
+      locale === "es" &&
+      data.categoryId &&
+      data.categorySlug &&
+      data.categoryId !== data.categorySlug
+    ) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "categoryId must match categorySlug for Spanish blog posts.",
+        path: ["categoryId"],
+      });
+    }
+
+    if (locale !== "es") {
+      if (!data.translationKey?.trim()) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "translationKey is required for localized blog posts.",
+          path: ["translationKey"],
+        });
+      }
+
+      if (!data.categoryId) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "categoryId is required for localized blog posts.",
+          path: ["categoryId"],
+        });
+      }
+
+      if (!data.slug?.trim()) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "slug is required for localized blog posts.",
+          path: ["slug"],
+        });
+      }
+    }
+
     if (
       data.reviewedDate &&
       !data.reviewer &&

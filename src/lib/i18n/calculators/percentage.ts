@@ -432,6 +432,7 @@ export const percentageCalculatorContent = {
         title: "Increases",
         description:
           "Compare an initial and final value to see how much it grew.",
+        href: "/en/blog/math/percentage-increase",
       },
       {
         title: "Taxes",
@@ -441,9 +442,32 @@ export const percentageCalculatorContent = {
         title: "Grades",
         description:
           "Find what percentage a partial result represents.",
+        href: "/en/blog/math/what-percentage-is-one-number-of-another",
       },
     ],
-    relatedGuides: [],
+    relatedGuides: [
+      {
+        href: "/en/blog/math/how-to-calculate-percentages",
+        title: "How to calculate percentages",
+        description:
+          "Review the base formulas for percentages, parts of a total and percentage change.",
+        published: true,
+      },
+      {
+        href: "/en/blog/math/percentage-increase",
+        title: "What is percentage increase?",
+        description:
+          "Compare original and new values to understand a change relative to its starting point.",
+        published: true,
+      },
+      {
+        href: "/en/blog/math/what-percentage-is-one-number-of-another",
+        title: "What percentage is one number of another?",
+        description:
+          "Use part divided by total to find what percentage one value represents.",
+        published: true,
+      },
+    ],
     quickReference: [
       { label: "10% of $100", value: "$10" },
       { label: "15% of $500", value: "$75" },

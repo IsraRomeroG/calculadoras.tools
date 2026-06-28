@@ -16,9 +16,12 @@ const localizedPilotRoutes = [
   "/en",
   "/en/math",
   "/en/math/percentage-calculator",
+  "/en/blog",
+  "/en/blog/math",
+  "/en/blog/math/how-to-calculate-percentages",
 ];
 const unpublishedEnglishRoutes = new Set([
-  "/en/blog",
+  "/en/blog/pagina",
   "/en/contact",
   "/en/privacy",
 ]);

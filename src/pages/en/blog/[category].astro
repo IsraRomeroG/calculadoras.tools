@@ -1,0 +1,82 @@
+---
+import BlogListPage from "@components/blog/BlogListPage.astro";
+import {
+  assertNoBlogRouteConflicts,
+  getBlogCategories,
+  getBlogCategoryPageUrl,
+  getBlogCategoryUrl,
+  getBlogIndexPageUrl,
+  getBlogPostsByCategoryId,
+  getPublishedBlogPostsByLocale,
+  paginateItems,
+  type BlogCategory,
+  type BlogPost,
+  type PaginatedItems,
+} from "@lib/blog";
+import { LOCALE_CONFIG } from "@lib/i18n/config";
+import { getBlogUi } from "@lib/i18n/blog";
+import { t } from "@lib/i18n/messages";
+import { buildAlternateLinks } from "@lib/i18n/routing";
+
+const locale = "en";
+
+export async function getStaticPaths() {
+  const posts = await getPublishedBlogPostsByLocale(locale);
+  const spanishPosts = await getPublishedBlogPostsByLocale("es");
+  assertNoBlogRouteConflicts([...spanishPosts, ...posts]);
+  const categories = getBlogCategories(posts, locale);
+
+  return categories.map((category) => {
+    const categoryPosts = getBlogPostsByCategoryId(posts, category.id);
+    const pagination = paginateItems(categoryPosts, 1);
+
+    return {
+      params: { category: category.slug },
+      props: {
+        category,
+        posts: pagination.items,
+        pagination,
+      },
+    };
+  });
+}
+
+interface Props {
+  category: BlogCategory;
+  posts: BlogPost[];
+  pagination: PaginatedItems<BlogPost>;
+}
+
+const { category, posts, pagination } = Astro.props;
+const ui = getBlogUi(locale);
+const title = ui.category.title(category.label);
+const description = ui.category.description(category.label);
+const canonical = getBlogCategoryUrl(category.id, locale);
+const homeHref = LOCALE_CONFIG[locale].urlPrefix || "/";
+const alternates = buildAlternateLinks(
+  {
+    es: getBlogCategoryUrl(category.id, "es"),
+    en: getBlogCategoryUrl(category.id, "en"),
+  },
+  Astro.site ?? Astro.url,
+);
+---
+
+<BlogListPage
+  locale={locale}
+  title={title}
+  description={description}
+  canonical={canonical}
+  alternates={alternates}
+  heroTitle={ui.category.heroTitle(category.label)}
+  heroDescription={ui.category.heroDescription(category.label)}
+  kicker={category.label}
+  breadcrumbs={[
+    { label: t(locale, "breadcrumbs.home"), href: homeHref, ariaLabel: t(locale, "breadcrumbs.home") },
+    { label: "Blog", href: getBlogIndexPageUrl(1, locale), optional: true },
+    { label: category.label, truncate: true },
+  ]}
+  posts={posts}
+  pagination={pagination}
+  getPageUrl={(page) => getBlogCategoryPageUrl(category.id, page, locale)}
+/>

@@ -38,6 +38,61 @@ describe("blog frontmatter schema", () => {
     expect(result.sources).toEqual([]);
   });
 
+  it("accepts future i18n metadata without requiring route changes", () => {
+    const result = blogSchema.parse({
+      ...basePost,
+      translationKey: "healthy-weight-basics",
+      contentId: "healthy-weight-basics",
+      locale: "es",
+      categoryId: "salud",
+      slug: "healthy-weight-basics",
+    });
+
+    expect(result.translationKey).toBe("healthy-weight-basics");
+    expect(result.contentId).toBe("healthy-weight-basics");
+    expect(result.locale).toBe("es");
+    expect(result.categoryId).toBe("salud");
+    expect(result.slug).toBe("healthy-weight-basics");
+  });
+
+  it("accepts a published English post with localized route metadata", () => {
+    const result = blogSchema.parse({
+      title: "How to calculate percentages",
+      description: "A short English guide.",
+      pubDate: "2026-06-20",
+      locale: "en",
+      categoryId: "matematicas",
+      slug: "how-to-calculate-percentages",
+      translationKey: "percentage-basics",
+    });
+
+    expect(result.categorySlug).toBeUndefined();
+    expect(result.locale).toBe("en");
+    expect(result.categoryId).toBe("matematicas");
+    expect(result.slug).toBe("how-to-calculate-percentages");
+  });
+
+  it("rejects Spanish posts without categorySlug", () => {
+    expect(() =>
+      blogSchema.parse({
+        title: "Articulo sin categoria",
+        description: "Descripcion breve.",
+        pubDate: "2026-06-20",
+      }),
+    ).toThrow(/categorySlug is required/);
+  });
+
+  it("rejects localized posts without required route metadata", () => {
+    expect(() =>
+      blogSchema.parse({
+        title: "Localized draft",
+        description: "Description.",
+        pubDate: "2026-06-20",
+        locale: "en",
+      }),
+    ).toThrow(/translationKey is required/);
+  });
+
   it("accepts a reviewer with reviewedDate", () => {
     const result = blogSchema.parse({
       ...basePost,

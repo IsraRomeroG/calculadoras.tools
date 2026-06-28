@@ -1,157 +1,23 @@
 ---
-import BaseLayout from "@layouts/BaseLayout.astro";
-import BlogPostCard from "@components/blog/BlogPostCard.astro";
-import Container from "@components/layout/Container.astro";
-import PageShell from "@components/layout/PageShell.astro";
-import Button from "@components/shared/Button.astro";
-import Pagination from "@components/shared/Pagination.astro";
-import PageHero from "@components/shared/PageHero.astro";
-import {
-  formatBlogDate,
-  getBlogIndexPageUrl,
-  getBlogListingPosts,
-  getBlogCategories,
-  getFeaturedBlogPost,
-  getBlogPostCategory,
-  getBlogPostUrl,
-  getCategoryUrl,
-  getPublishedBlogPosts,
-  paginateItems,
-} from "@lib/blog";
+import BlogIndexPage from "@components/blog/BlogIndexPage.astro";
+import { getBlogIndexPageUrl, getPublishedBlogPostsByLocale } from "@lib/blog";
+import { buildAlternateLinks } from "@lib/i18n/routing";
 
-const title = "Blog";
-const description =
-  "Guías simples, fórmulas prácticas y ejemplos para usar mejor las calculadoras de calculadoras.tools.";
-const canonical = "/blog";
-
-const posts = await getPublishedBlogPosts();
-const featuredPost = getFeaturedBlogPost(posts);
-const featuredPostCategory = featuredPost
-  ? getBlogPostCategory(featuredPost)
-  : undefined;
-const latestPosts = getBlogListingPosts(posts, featuredPost);
-const latestPostsPage = paginateItems(latestPosts, 1);
-const categories = getBlogCategories(posts);
+const locale = "es";
+const posts = await getPublishedBlogPostsByLocale(locale);
+const canonical = getBlogIndexPageUrl(1, locale);
+const alternates = buildAlternateLinks(
+  {
+    es: getBlogIndexPageUrl(1, "es"),
+    en: getBlogIndexPageUrl(1, "en"),
+  },
+  Astro.site ?? Astro.url,
+);
 ---
 
-<BaseLayout title={title} description={description} canonical={canonical}>
-  <Fragment slot="head">
-    {
-      latestPostsPage.nextPage && (
-        <link rel="next" href={getBlogIndexPageUrl(latestPostsPage.nextPage)} />
-      )
-    }
-  </Fragment>
-
-  <PageShell>
-    <PageHero
-      title="Guías simples para entender tus cálculos diarios"
-      description="Explicaciones claras, fórmulas prácticas y ejemplos para usar mejor las calculadoras de calculadoras.tools."
-      kicker="Blog"
-      breadcrumbs={[
-        { label: "Inicio", href: "/", ariaLabel: "Inicio" },
-        { label: "Blog" },
-      ]}
-    >
-      <Fragment slot="after">
-        {
-          categories.length > 0 && (
-            <div class="mt-8 flex flex-wrap gap-3">
-              {categories.map((category) => (
-                <a
-                  href={getCategoryUrl(category.slug)}
-                  class="inline-flex items-center gap-2 rounded-full border border-gray-700 px-4 py-2 text-sm text-gray-300 transition hover:border-amber-400 hover:text-white"
-                >
-                  <span>{category.label}</span>
-                  <span class="text-xs text-gray-500">{category.count}</span>
-                </a>
-              ))}
-            </div>
-          )
-        }
-      </Fragment>
-    </PageHero>
-
-    {
-      featuredPost && (
-        <Container as="section" class="py-8 md:py-10">
-          <article class="grid gap-6 rounded-lg border border-gray-700 bg-gray-950 p-6 md:grid-cols-[minmax(0,1fr)_16rem] md:p-8">
-            <div>
-              <p class="text-sm font-semibold text-amber-400">
-                {featuredPostCategory?.label}
-                {featuredPost.data.readTime && ` · ${featuredPost.data.readTime}`}
-              </p>
-
-              <h2 class="mt-3 text-3xl font-semibold tracking-tight">
-                <a
-                  href={getBlogPostUrl(featuredPost)}
-                  class="transition hover:text-amber-300"
-                >
-                  {featuredPost.data.title}
-                </a>
-              </h2>
-
-              <p class="mt-4 text-gray-400">
-                {featuredPost.data.description}
-              </p>
-
-              <Button
-                href={getBlogPostUrl(featuredPost)}
-                class="mt-6"
-              >
-                Leer guía destacada
-              </Button>
-            </div>
-
-            <dl class="grid content-start gap-4 border-t border-gray-800 pt-5 text-sm md:border-l md:border-t-0 md:pl-6 md:pt-0">
-              <div>
-                <dt class="text-gray-500">Publicado</dt>
-                <dd class="mt-1 font-medium text-gray-200">
-                  <time datetime={featuredPost.data.pubDate.toISOString()}>
-                    {formatBlogDate(featuredPost.data.pubDate)}
-                  </time>
-                </dd>
-              </div>
-
-              <div>
-                <dt class="text-gray-500">Categoría</dt>
-                <dd class="mt-1">
-                  <a
-                    href={getCategoryUrl(featuredPost.data.categorySlug)}
-                    class="font-medium text-gray-200 transition hover:text-amber-300"
-                  >
-                    {featuredPostCategory?.label}
-                  </a>
-                </dd>
-              </div>
-            </dl>
-          </article>
-        </Container>
-      )
-    }
-
-    <Container as="section" class="pb-12">
-      <div class="mb-6">
-        <h2 class="text-2xl font-semibold">Últimos artículos</h2>
-        <p class="mt-2 text-sm text-gray-400">
-          Contenido pensado para acompañar cada herramienta del sitio.
-        </p>
-      </div>
-
-      <div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-        {
-          latestPostsPage.items.map((post) => (
-            <BlogPostCard post={post} cta="Leer artículo" />
-          ))
-        }
-      </div>
-
-      <Pagination
-        currentPage={latestPostsPage.currentPage}
-        totalPages={latestPostsPage.totalPages}
-        getPageUrl={getBlogIndexPageUrl}
-        class="mt-8"
-      />
-    </Container>
-  </PageShell>
-</BaseLayout>
+<BlogIndexPage
+  locale={locale}
+  posts={posts}
+  canonical={canonical}
+  alternates={alternates}
+/>

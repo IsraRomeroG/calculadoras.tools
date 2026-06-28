@@ -55,7 +55,7 @@ describe("advertising placements", () => {
 
   it("uses at most one placement on blog posts", () => {
     const postTemplate = read(
-      join(PAGES_DIR, "blog", "[category]", "[slug].astro"),
+      join(PAGES_DIR, "..", "components", "blog", "BlogArticlePage.astro"),
     );
     const placements = postTemplate.match(/<AdSlot\b/g) ?? [];
 
@@ -63,6 +63,7 @@ describe("advertising placements", () => {
     expect(postTemplate).not.toContain('placement="blog-post-after-header"');
     expect(postTemplate).toContain('placement="blog-post-sidebar"');
     expect(postTemplate).toContain('variant="rectangle"');
+    expect(postTemplate).toContain('const shouldRenderAds = locale === "es"');
   });
 
   it("keeps ads off utility and trust pages", () => {

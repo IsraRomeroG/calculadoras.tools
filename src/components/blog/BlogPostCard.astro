@@ -1,17 +1,21 @@
 ---
 import { getBlogPostCategory, getBlogPostUrl, type BlogPost } from "@lib/blog";
+import { DEFAULT_LOCALE, type Locale } from "@lib/i18n/config";
+import { getBlogUi } from "@lib/i18n/blog";
 
 interface Props {
   post: BlogPost;
+  locale?: Locale;
   headingLevel?: "h2" | "h3";
-  cta: string;
+  cta?: string;
   class?: string;
 }
 
 const {
   post,
+  locale = DEFAULT_LOCALE,
   headingLevel: Heading = "h3",
-  cta,
+  cta = getBlogUi(locale).card.readArticle,
   class: className = "",
 } = Astro.props;
 const category = getBlogPostCategory(post);

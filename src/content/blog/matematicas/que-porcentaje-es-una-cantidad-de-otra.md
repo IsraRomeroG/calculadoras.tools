@@ -4,6 +4,7 @@ seoTitle: "Qué porcentaje es X de Y: fórmula y ejemplos"
 description: "Aprende cómo calcular qué porcentaje representa una cantidad de otra con fórmula, ejemplos y errores comunes."
 pubDate: 2026-04-06
 categorySlug: "matematicas"
+translationKey: "what-percentage-is-one-number-of-another"
 tags:
   - porcentajes
   - regla de tres

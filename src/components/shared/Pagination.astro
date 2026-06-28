@@ -1,13 +1,18 @@
 ---
+import { DEFAULT_LOCALE, type Locale } from "@lib/i18n/config";
+import { getBlogUi } from "@lib/i18n/blog";
+
 interface Props {
   currentPage: number;
   totalPages: number;
   getPageUrl: (page: number) => string;
+  locale?: Locale;
   class?: string;
 }
 
-const { currentPage, totalPages, getPageUrl, class: className = "" } =
+const { currentPage, totalPages, getPageUrl, locale = DEFAULT_LOCALE, class: className = "" } =
   Astro.props;
+const pagination = getBlogUi(locale).pagination;
 
 const maxVisiblePages = 5;
 const rangeSize = Math.min(maxVisiblePages, totalPages);
@@ -33,7 +38,7 @@ const pageLinkClass =
 {
   totalPages > 1 && (
     <nav
-      aria-label="Paginacion"
+      aria-label={pagination.ariaLabel}
       class:list={["flex justify-center", className]}
     >
       <ul class="flex flex-wrap items-center justify-center gap-2">
@@ -43,14 +48,14 @@ const pageLinkClass =
               href={getPageUrl(previousPage)}
               class={`${pageLinkClass} border-gray-700 text-gray-300 hover:border-amber-400 hover:text-white`}
             >
-              Anterior
+              {pagination.previous}
             </a>
           ) : (
             <span
               aria-disabled="true"
               class={`${pageLinkClass} cursor-not-allowed border-gray-800 text-gray-600`}
             >
-              Anterior
+              {pagination.previous}
             </span>
           )}
         </li>
@@ -65,8 +70,8 @@ const pageLinkClass =
                 aria-current={isCurrent ? "page" : undefined}
                 aria-label={
                   isCurrent
-                    ? `Pagina ${pageNumber}, pagina actual`
-                    : `Pagina ${pageNumber}`
+                    ? pagination.currentPage(pageNumber)
+                    : pagination.page(pageNumber)
                 }
                 class:list={[
                   pageLinkClass,
@@ -87,14 +92,14 @@ const pageLinkClass =
               href={getPageUrl(nextPage)}
               class={`${pageLinkClass} border-gray-700 text-gray-300 hover:border-amber-400 hover:text-white`}
             >
-              Siguiente
+              {pagination.next}
             </a>
           ) : (
             <span
               aria-disabled="true"
               class={`${pageLinkClass} cursor-not-allowed border-gray-800 text-gray-600`}
             >
-              Siguiente
+              {pagination.next}
             </span>
           )}
         </li>

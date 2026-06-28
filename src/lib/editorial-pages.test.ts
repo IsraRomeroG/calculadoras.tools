@@ -5,6 +5,7 @@ import { getFooterLinks } from "./i18n/shell";
 
 const ROOT = process.cwd();
 const PAGES_DIR = join(ROOT, "src", "pages");
+const COMPONENTS_DIR = join(ROOT, "src", "components");
 
 const read = (path: string) => readFileSync(path, "utf8");
 
@@ -31,7 +32,7 @@ describe("editorial trust pages", () => {
 
   it("renders article editorial metadata and structured sources from the blog template", () => {
     const articleTemplate = read(
-      join(PAGES_DIR, "blog", "[category]", "[slug].astro"),
+      join(COMPONENTS_DIR, "blog", "BlogArticlePage.astro"),
     );
 
     expect(articleTemplate).toContain("ArticleEditorialMeta");

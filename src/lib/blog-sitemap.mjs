@@ -4,6 +4,12 @@ import { basename, extname, join } from "node:path";
 export const BLOG_CONTENT_DIR_MARKDOWN_EXTENSION = ".md";
 export const BLOG_PUBLICATION_TIME_ZONE = "America/Mexico_City";
 
+const LOCALIZED_BLOG_CATEGORY_SLUGS = {
+  en: {
+    matematicas: "math",
+  },
+};
+
 const editorialDateFormatter = new Intl.DateTimeFormat("en-US", {
   timeZone: BLOG_PUBLICATION_TIME_ZONE,
   year: "numeric",
@@ -84,21 +90,61 @@ const getPublishableBlogFiles = (blogContentDir, now = new Date()) =>
     isPublishableBlogContent(readFileSync(filePath, "utf8"), now),
   );
 
+const getBlogContentLocale = (content, filePath, blogContentDir) => {
+  const locale = getFrontmatterValue(content, "locale");
+
+  if (locale) {
+    return locale;
+  }
+
+  return filePath
+    .slice(blogContentDir.length)
+    .replace(/^[/\\]+/, "")
+    .startsWith("en/")
+    ? "en"
+    : "es";
+};
+
+const getLocalizedCategorySlug = (locale, categoryId) =>
+  locale === "es"
+    ? categoryId
+    : LOCALIZED_BLOG_CATEGORY_SLUGS[locale]?.[categoryId] ?? null;
+
+const getPublishedBlogPathForFile = (blogContentDir, filePath) => {
+  const content = readFileSync(filePath, "utf8");
+  const locale = getBlogContentLocale(content, filePath, blogContentDir);
+
+  if (locale === "es") {
+    const categorySlug = getFrontmatterValue(content, "categorySlug");
+    const articleSlug = basename(
+      filePath,
+      BLOG_CONTENT_DIR_MARKDOWN_EXTENSION,
+    );
+
+    return categorySlug ? `/blog/${categorySlug}/${articleSlug}` : null;
+  }
+
+  const categoryId = getFrontmatterValue(content, "categoryId");
+  const articleSlug =
+    getFrontmatterValue(content, "slug") ??
+    basename(filePath, BLOG_CONTENT_DIR_MARKDOWN_EXTENSION);
+  const categorySlug = categoryId
+    ? getLocalizedCategorySlug(locale, categoryId)
+    : null;
+
+  return categorySlug
+    ? `/${locale}/blog/${categorySlug}/${articleSlug}`
+    : null;
+};
+
 export const getPublishedBlogArticlePathsForSitemap = (
   blogContentDir,
   now = new Date(),
 ) =>
   new Set(
-    getPublishableBlogFiles(blogContentDir, now).map((filePath) => {
-      const content = readFileSync(filePath, "utf8");
-      const categorySlug = getFrontmatterValue(content, "categorySlug");
-      const articleSlug = basename(
-        filePath,
-        BLOG_CONTENT_DIR_MARKDOWN_EXTENSION,
-      );
-
-      return categorySlug ? `/blog/${categorySlug}/${articleSlug}` : null;
-    }).filter(Boolean),
+    getPublishableBlogFiles(blogContentDir, now)
+      .map((filePath) => getPublishedBlogPathForFile(blogContentDir, filePath))
+      .filter(Boolean),
   );
 
 export const getLegacyBlogArticleSlugsForSitemap = (
@@ -106,9 +152,13 @@ export const getLegacyBlogArticleSlugsForSitemap = (
   now = new Date(),
 ) =>
   new Set(
-    getPublishableBlogFiles(blogContentDir, now).map((filePath) =>
-      basename(filePath, BLOG_CONTENT_DIR_MARKDOWN_EXTENSION),
-    ),
+    getPublishableBlogFiles(blogContentDir, now)
+      .filter((filePath) => {
+        const content = readFileSync(filePath, "utf8");
+
+        return getBlogContentLocale(content, filePath, blogContentDir) === "es";
+      })
+      .map((filePath) => basename(filePath, BLOG_CONTENT_DIR_MARKDOWN_EXTENSION)),
   );
 
 export const getPublishedBlogCategorySlugsForSitemap = (
@@ -120,7 +170,33 @@ export const getPublishedBlogCategorySlugsForSitemap = (
       .map((filePath) => {
         const content = readFileSync(filePath, "utf8");
 
-        return getFrontmatterValue(content, "categorySlug");
+        return getBlogContentLocale(content, filePath, blogContentDir) === "es"
+          ? getFrontmatterValue(content, "categorySlug")
+          : null;
+      })
+      .filter(Boolean),
+  );
+
+export const getPublishedBlogCategoryPathsForSitemap = (
+  blogContentDir,
+  now = new Date(),
+) =>
+  new Set(
+    getPublishableBlogFiles(blogContentDir, now)
+      .map((filePath) => {
+        const content = readFileSync(filePath, "utf8");
+        const locale = getBlogContentLocale(content, filePath, blogContentDir);
+        const categoryId =
+          locale === "es"
+            ? getFrontmatterValue(content, "categorySlug")
+            : getFrontmatterValue(content, "categoryId");
+        const categorySlug = categoryId
+          ? getLocalizedCategorySlug(locale, categoryId)
+          : null;
+
+        return categorySlug
+          ? `${locale === "es" ? "" : `/${locale}`}/blog/${categorySlug}`
+          : null;
       })
       .filter(Boolean),
   );
@@ -138,6 +214,7 @@ export const createSitemapFilter =
   ({
     legacyBlogArticleSlugs,
     publishedBlogArticlePaths,
+    publishedBlogCategoryPaths = new Set(),
     publishedBlogCategorySlugs,
     excludedPaths = [],
   }) =>
@@ -161,6 +238,36 @@ export const createSitemapFilter =
       }
 
       const blogSegments = path.split("/").filter(Boolean);
+
+      if (blogSegments[0] === "en" && blogSegments[1] === "blog") {
+        const hasEnglishBlogContent = [...publishedBlogCategoryPaths].some(
+          (categoryPath) => categoryPath.startsWith("/en/blog/"),
+        );
+
+        if (!hasEnglishBlogContent) {
+          return false;
+        }
+
+        if (blogSegments.length === 2) {
+          return true;
+        }
+
+        if (blogSegments[2] === "page") {
+          return true;
+        }
+
+        const categoryPath = `/en/blog/${blogSegments[2]}`;
+
+        if (blogSegments.length === 3) {
+          return publishedBlogCategoryPaths.has(categoryPath);
+        }
+
+        if (blogSegments[3] === "page") {
+          return publishedBlogCategoryPaths.has(categoryPath);
+        }
+
+        return publishedBlogArticlePaths.has(path);
+      }
 
       if (blogSegments[0] !== "blog" || blogSegments.length === 1) {
         return true;

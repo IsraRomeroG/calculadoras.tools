@@ -40,6 +40,9 @@ const getMarkdownFiles = (directory: string): string[] =>
 const getArticleSlug = (filePath: string) =>
   basename(filePath, markdownExtension);
 
+const isEnglishBlogFile = (filePath: string) =>
+  relative(blogContentDir, filePath).split(/[\\/]/)[0] === "en";
+
 const getCategorySlug = (content: string, filePath: string) => {
   const categorySlug = content.match(categorySlugPattern)?.[1];
 
@@ -54,7 +57,9 @@ const getCategorySlug = (content: string, filePath: string) => {
 
 describe("blog content links", () => {
   it("uses canonical category URLs for internal article links", () => {
-    const markdownFiles = getMarkdownFiles(blogContentDir);
+    const markdownFiles = getMarkdownFiles(blogContentDir).filter(
+      (filePath) => !isEnglishBlogFile(filePath),
+    );
     const canonicalArticleUrls = new Map<string, string>();
 
     for (const filePath of markdownFiles) {
@@ -89,7 +94,9 @@ describe("blog content links", () => {
   });
 
   it("does not link to consolidated article URLs", () => {
-    const markdownFiles = getMarkdownFiles(blogContentDir);
+    const markdownFiles = getMarkdownFiles(blogContentDir).filter(
+      (filePath) => !isEnglishBlogFile(filePath),
+    );
     const retiredLinks = markdownFiles.flatMap((filePath) => {
       const relativePath = relative(process.cwd(), filePath);
       const content = readFileSync(filePath, "utf8");
@@ -107,5 +114,21 @@ describe("blog content links", () => {
     });
 
     expect(retiredLinks).toEqual([]);
+  });
+
+  it("does not link English blog content to Spanish blog URLs", () => {
+    const englishFiles = getMarkdownFiles(blogContentDir).filter(
+      isEnglishBlogFile,
+    );
+    const spanishBlogLinks = englishFiles.flatMap((filePath) => {
+      const relativePath = relative(process.cwd(), filePath);
+      const content = readFileSync(filePath, "utf8");
+
+      return Array.from(content.matchAll(/]\(\/blog\/[^)\s]+/g)).map(
+        (match) => `${relativePath}: replace Spanish blog link ${match[0]}`,
+      );
+    });
+
+    expect(spanishBlogLinks).toEqual([]);
   });
 });

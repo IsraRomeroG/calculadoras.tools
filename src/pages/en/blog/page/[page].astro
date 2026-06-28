@@ -1,0 +1,71 @@
+---
+import BlogListPage from "@components/blog/BlogListPage.astro";
+import {
+  getBlogIndexPageUrl,
+  getBlogListingPosts,
+  getFeaturedBlogPost,
+  getPublishedBlogPostsByLocale,
+  paginateItems,
+  type BlogPost,
+  type PaginatedItems,
+} from "@lib/blog";
+import { LOCALE_CONFIG } from "@lib/i18n/config";
+import { getBlogUi } from "@lib/i18n/blog";
+import { t } from "@lib/i18n/messages";
+
+const locale = "en";
+
+export async function getStaticPaths() {
+  const posts = await getPublishedBlogPostsByLocale(locale);
+  const featuredPost = getFeaturedBlogPost(posts);
+  const listingPosts = getBlogListingPosts(posts, featuredPost);
+  const firstPage = paginateItems(listingPosts, 1);
+
+  return Array.from(
+    { length: Math.max(0, firstPage.totalPages - 1) },
+    (_, index) => {
+      const currentPage = index + 2;
+      const pagination = paginateItems(listingPosts, currentPage);
+
+      return {
+        params: { page: String(currentPage) },
+        props: {
+          posts: pagination.items,
+          pagination,
+        },
+      };
+    },
+  );
+}
+
+interface Props {
+  posts: BlogPost[];
+  pagination: PaginatedItems<BlogPost>;
+}
+
+const { posts, pagination } = Astro.props;
+const ui = getBlogUi(locale);
+const title = ui.page.title(pagination.currentPage);
+const description = ui.page.description;
+const canonical = getBlogIndexPageUrl(pagination.currentPage, locale);
+const homeHref = LOCALE_CONFIG[locale].urlPrefix || "/";
+---
+
+<BlogListPage
+  locale={locale}
+  title={title}
+  description={description}
+  canonical={canonical}
+  alternates={[]}
+  heroTitle={ui.page.heroTitle(pagination.currentPage)}
+  heroDescription={ui.page.heroDescription}
+  kicker="Blog"
+  breadcrumbs={[
+    { label: t(locale, "breadcrumbs.home"), href: homeHref, ariaLabel: t(locale, "breadcrumbs.home") },
+    { label: "Blog", href: getBlogIndexPageUrl(1, locale), optional: true },
+    { label: ui.page.title(pagination.currentPage) },
+  ]}
+  posts={posts}
+  pagination={pagination}
+  getPageUrl={(page) => getBlogIndexPageUrl(page, locale)}
+/>

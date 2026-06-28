@@ -2,12 +2,16 @@
 import { formatBlogDate } from "@lib/blog";
 import { getEditorialAuthor } from "@lib/editorial";
 import type { BlogFrontmatter } from "@lib/blog-schema";
+import { DEFAULT_LOCALE, type Locale } from "@lib/i18n/config";
+import { getBlogUi } from "@lib/i18n/blog";
 
 interface Props {
   data: BlogFrontmatter;
+  locale?: Locale;
 }
 
-const { data } = Astro.props;
+const { data, locale = DEFAULT_LOCALE } = Astro.props;
+const ui = getBlogUi(locale).article;
 const author = getEditorialAuthor(data.author);
 const publishedDate = data.pubDate.toISOString();
 ---
@@ -15,7 +19,7 @@ const publishedDate = data.pubDate.toISOString();
 <div class="mt-6 space-y-3 text-sm text-gray-500">
   <div class="flex flex-wrap items-center gap-x-3 gap-y-2">
     <span>
-      Por{" "}
+      {ui.by}{" "}
       {
         author.url ? (
           <a href={author.url} class="font-medium text-gray-300 hover:text-white">
@@ -26,19 +30,19 @@ const publishedDate = data.pubDate.toISOString();
         )
       }
     </span>
-    <span aria-hidden="true">·</span>
+    <span aria-hidden="true">&middot;</span>
     <span>
-      Publicado{" "}
-      <time datetime={publishedDate}>{formatBlogDate(data.pubDate)}</time>
+      {ui.published}{" "}
+      <time datetime={publishedDate}>{formatBlogDate(data.pubDate, locale)}</time>
     </span>
     {
       data.updatedDate && (
         <>
-          <span aria-hidden="true">·</span>
+          <span aria-hidden="true">&middot;</span>
           <span>
-            Actualizado{" "}
+            {ui.updated}{" "}
             <time datetime={data.updatedDate.toISOString()}>
-              {formatBlogDate(data.updatedDate)}
+              {formatBlogDate(data.updatedDate, locale)}
             </time>
           </span>
         </>
@@ -47,7 +51,7 @@ const publishedDate = data.pubDate.toISOString();
     {
       data.readTime && (
         <>
-          <span aria-hidden="true">·</span>
+          <span aria-hidden="true">&middot;</span>
           <span>{data.readTime}</span>
         </>
       )
@@ -57,7 +61,7 @@ const publishedDate = data.pubDate.toISOString();
   {
     data.reviewer && data.reviewedDate && (
       <p>
-        Revisado por{" "}
+        {ui.reviewedBy}{" "}
         {data.reviewer.url ? (
           <a
             href={data.reviewer.url}
@@ -68,9 +72,9 @@ const publishedDate = data.pubDate.toISOString();
         ) : (
           <span class="font-medium text-gray-300">{data.reviewer.name}</span>
         )}
-        {data.reviewer.role && `, ${data.reviewer.role}`} ·{" "}
+        {data.reviewer.role && `, ${data.reviewer.role}`} &middot;{" "}
         <time datetime={data.reviewedDate.toISOString()}>
-          {formatBlogDate(data.reviewedDate)}
+          {formatBlogDate(data.reviewedDate, locale)}
         </time>
       </p>
     )
@@ -79,7 +83,7 @@ const publishedDate = data.pubDate.toISOString();
   {
     data.reviewNote && (
       <p class="max-w-2xl leading-relaxed text-gray-400">
-        Revisión editorial: {data.reviewNote}
+        {ui.editorialReview}: {data.reviewNote}
       </p>
     )
   }

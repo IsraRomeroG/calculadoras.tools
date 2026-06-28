@@ -22,8 +22,8 @@ describe("localized shell configuration", () => {
   it("shows only published English navigation routes", () => {
     expect(getMenuItems("en")).toEqual([
       expect.objectContaining({ id: "home", name: "Home", slug: "/en" }),
+      expect.objectContaining({ id: "blog", name: "Blog", slug: "/en/blog" }),
     ]);
-    expect(getMenuItems("en").map((item) => item.id)).not.toContain("blog");
     expect(getMenuItems("en").map((item) => item.id)).not.toContain(
       "contact",
     );

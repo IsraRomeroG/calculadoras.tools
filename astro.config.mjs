@@ -7,6 +7,7 @@ import {
   createSitemapFilter,
   getLegacyBlogArticleSlugsForSitemap,
   getPublishedBlogArticlePathsForSitemap,
+  getPublishedBlogCategoryPathsForSitemap,
   getPublishedBlogCategorySlugsForSitemap,
 } from './src/lib/blog-sitemap.mjs';
 import rehypeWrapTables from './src/lib/rehype/wrap-tables.mjs';
@@ -20,10 +21,11 @@ const legacyBlogArticleSlugs =
   getLegacyBlogArticleSlugsForSitemap(BLOG_CONTENT_DIR);
 const publishedBlogArticlePaths =
   getPublishedBlogArticlePathsForSitemap(BLOG_CONTENT_DIR);
+const publishedBlogCategoryPaths =
+  getPublishedBlogCategoryPathsForSitemap(BLOG_CONTENT_DIR);
 const publishedBlogCategorySlugs =
   getPublishedBlogCategorySlugsForSitemap(BLOG_CONTENT_DIR);
 const unpublishedLocalizedPaths = new Set([
-  '/en/blog',
   '/en/contact',
   '/en/privacy',
 ]);
@@ -31,6 +33,7 @@ const unpublishedLocalizedPaths = new Set([
 const shouldIncludeInSitemap = createSitemapFilter({
   legacyBlogArticleSlugs,
   publishedBlogArticlePaths,
+  publishedBlogCategoryPaths,
   publishedBlogCategorySlugs,
   excludedPaths: unpublishedLocalizedPaths,
 });

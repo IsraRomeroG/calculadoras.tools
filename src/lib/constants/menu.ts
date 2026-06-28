@@ -27,9 +27,11 @@ export const MENU: MenuItemDefinition[] = [
     },
     descriptions: {
       es: "Blog con articulos sobre finanzas personales, salud, matematicas y mas.",
+      en: "English guides for calculators and everyday formulas.",
     },
     paths: {
       es: "/blog",
+      en: "/en/blog",
     },
   },
   {

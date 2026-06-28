@@ -1,0 +1,23 @@
+---
+import BlogIndexPage from "@components/blog/BlogIndexPage.astro";
+import { getBlogIndexPageUrl, getPublishedBlogPostsByLocale } from "@lib/blog";
+import { buildAlternateLinks } from "@lib/i18n/routing";
+
+const locale = "en";
+const posts = await getPublishedBlogPostsByLocale(locale);
+const canonical = getBlogIndexPageUrl(1, locale);
+const alternates = buildAlternateLinks(
+  {
+    es: getBlogIndexPageUrl(1, "es"),
+    en: getBlogIndexPageUrl(1, "en"),
+  },
+  Astro.site ?? Astro.url,
+);
+---
+
+<BlogIndexPage
+  locale={locale}
+  posts={posts}
+  canonical={canonical}
+  alternates={alternates}
+/>

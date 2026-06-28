@@ -11,6 +11,8 @@ No traducir blog en fase 1.
 Cambios permitidos:
 
 - Mantener coleccion actual `blog` como fuente espanola.
+- Mantener rutas espanolas actuales bajo `/blog/...`, sin prefijo de locale.
+- Agregar metadatos futuros al contenido espanol solo si son aditivos y no cambian rutas, slugs ni ubicacion de archivos.
 - No mostrar `Blog` en navbar inglesa hasta que exista `/en/blog`.
 - Ocultar `relatedGuides` en calculadoras inglesas si no existe traduccion inglesa.
 - Documentar campos futuros como `translationKey` o `contentId`.
@@ -18,16 +20,18 @@ Cambios permitidos:
 Cambios no permitidos en fase 1:
 
 - Mover Markdown existente.
+- Mover contenido espanol a carpetas `es` o publicar rutas `/blog/es/...`.
+- Cambiar slugs, categorias, canonicals o enlaces internos espanoles actuales.
 - Crear `/en/blog` vacio.
 - Traducir articulos sueltos que queden aislados.
 - Enlazar desde `/en` a articulos espanoles como si fueran contenido ingles.
 
 ## Modelo futuro recomendado
 
-Cuando se implemente blog i18n, usar contenido por locale:
+Cuando se implemente blog i18n, usar un modelo donde el espanol sigue siendo el idioma base sin prefijo y los idiomas nuevos viven en una estructura separada por locale:
 
 ```txt
-src/content/blog/es/<categoria>/<slug>.md
+src/content/blog/<categoria>/<slug>.md
 src/content/blog/en/<category>/<slug>.md
 ```
 
@@ -45,8 +49,9 @@ pubDate: 2026-06-26
 Reglas:
 
 - `translationKey` o `contentId` empareja articulos equivalentes.
-- `categoryId` es estable; el slug de categoria se localiza con helpers.
-- `slug` es localizado por idioma.
+- En contenido espanol existente, `translationKey`, `contentId`, `locale` y `slug` son opcionales y solo pueden agregarse sin cambiar la ruta publicada.
+- `categoryId` es estable; el slug de categoria se localiza con helpers solo para idiomas nuevos.
+- `slug` es localizado por idioma nuevo; en espanol sigue derivando del archivo y categoria actuales.
 - `draft` y fecha futura excluyen la ruta del sitemap.
 - `hreflang` solo incluye articulos publicados.
 - No publicar articulos ingleses sin enlaces internos validos hacia calculadoras o articulos tambien publicados en ingles.
@@ -70,14 +75,15 @@ No publicar una traduccion si deja:
 
 ## Migracion futura de rutas
 
-Si en una fase futura se mueve contenido actual, antes de editar se debe generar un mapa completo:
+No se debe migrar el blog espanol actual. Las URLs espanolas existentes bajo `/blog/<categoria>/<slug>` son canonicas y deben conservarse.
+
+Si en una fase futura se agregan idiomas nuevos, sus rutas deben usar prefijo del idioma nuevo sin crear una variante espanola con prefijo:
 
 ```txt
-/blog/<categoria>/<slug> -> /blog/es/<categoria>/<slug>
-/blog/<slug-legacy> -> /blog/es/<categoria>/<slug>
+/en/blog/<category>/<slug>
 ```
 
-Y entregar reglas Apache 301 en `.htaccess`.
+Solo se deben entregar reglas Apache 301 en `.htaccess` cuando una ruta ya publicada cambie. Agregar ingles nuevo no requiere redirects desde rutas espanolas.
 
 No usar:
 
@@ -91,13 +97,13 @@ No usar:
 Agregar tests para:
 
 - `translationKey` unico por locale.
-- Slugs unicos por categoria y locale.
+- Slugs unicos por categoria en espanol y por categoria/locale en idiomas nuevos.
 - `hreflang` solo para articulos publicados.
 - Sitemap excluye drafts y fechas futuras.
-- Legacy redirects no colisionan con categorias localizadas.
+- No existe `/blog/es` ni redirects desde `/blog/...` hacia `/blog/es/...`.
 
 ## Criterios de aceptacion futuro
 
 - `/en/blog` solo existe cuando hay contenido ingles publicado.
 - Cada articulo ingles tiene cluster minimo viable y enlaces internos correctos.
-- El blog espanol conserva rutas o entrega redirects 301 si se mueve.
+- El blog espanol conserva rutas, archivos, slugs, categorias, canonicals y enlaces internos actuales sin moverlos a `/blog/es/...`.

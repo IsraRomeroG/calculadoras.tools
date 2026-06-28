@@ -1,22 +1,22 @@
 ---
-import BaseLayout from "@layouts/BaseLayout.astro";
-import BlogPostCard from "@components/blog/BlogPostCard.astro";
-import Container from "@components/layout/Container.astro";
-import PageShell from "@components/layout/PageShell.astro";
-import PageHero from "@components/shared/PageHero.astro";
-import Pagination from "@components/shared/Pagination.astro";
+import BlogListPage from "@components/blog/BlogListPage.astro";
 import {
   getBlogIndexPageUrl,
   getBlogListingPosts,
   getFeaturedBlogPost,
-  getPublishedBlogPosts,
+  getPublishedBlogPostsByLocale,
   paginateItems,
   type BlogPost,
   type PaginatedItems,
 } from "@lib/blog";
+import { LOCALE_CONFIG } from "@lib/i18n/config";
+import { getBlogUi } from "@lib/i18n/blog";
+import { t } from "@lib/i18n/messages";
+
+const locale = "es";
 
 export async function getStaticPaths() {
-  const posts = await getPublishedBlogPosts();
+  const posts = await getPublishedBlogPostsByLocale(locale);
   const featuredPost = getFeaturedBlogPost(posts);
   const listingPosts = getBlogListingPosts(posts, featuredPost);
   const firstPage = paginateItems(listingPosts, 1);
@@ -44,63 +44,28 @@ interface Props {
 }
 
 const { posts, pagination } = Astro.props;
-const title = `Blog - pagina ${pagination.currentPage}`;
-const description =
-  "Mas guias simples, formulas practicas y ejemplos para usar mejor las calculadoras de calculadoras.tools.";
-const canonical = getBlogIndexPageUrl(pagination.currentPage);
+const ui = getBlogUi(locale);
+const title = ui.page.title(pagination.currentPage);
+const description = ui.page.description;
+const canonical = getBlogIndexPageUrl(pagination.currentPage, locale);
+const homeHref = LOCALE_CONFIG[locale].urlPrefix || "/";
 ---
 
-<BaseLayout title={title} description={description} canonical={canonical}>
-  <Fragment slot="head">
-    {
-      pagination.previousPage && (
-        <link
-          rel="prev"
-          href={getBlogIndexPageUrl(pagination.previousPage)}
-        />
-      )
-    }
-    {
-      pagination.nextPage && (
-        <link rel="next" href={getBlogIndexPageUrl(pagination.nextPage)} />
-      )
-    }
-  </Fragment>
-
-  <PageShell>
-    <PageHero
-      title={`Blog - pagina ${pagination.currentPage}`}
-      description="Mas guias y ejemplos para consultar herramientas, formulas y conceptos utiles."
-      kicker="Blog"
-      breadcrumbs={[
-        { label: "Inicio", href: "/", ariaLabel: "Inicio" },
-        { label: "Blog", href: "/blog", optional: true },
-        { label: `Pagina ${pagination.currentPage}` },
-      ]}
-    />
-
-    <Container as="section" class="py-8 md:py-10">
-      <div class="mb-6">
-        <h2 class="text-2xl font-semibold">Articulos</h2>
-        <p class="mt-2 text-sm text-gray-400">
-          Pagina {pagination.currentPage} de {pagination.totalPages}.
-        </p>
-      </div>
-
-      <div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-        {
-          posts.map((post) => (
-            <BlogPostCard post={post} cta="Leer articulo" />
-          ))
-        }
-      </div>
-
-      <Pagination
-        currentPage={pagination.currentPage}
-        totalPages={pagination.totalPages}
-        getPageUrl={getBlogIndexPageUrl}
-        class="mt-8"
-      />
-    </Container>
-  </PageShell>
-</BaseLayout>
+<BlogListPage
+  locale={locale}
+  title={title}
+  description={description}
+  canonical={canonical}
+  alternates={[]}
+  heroTitle={ui.page.heroTitle(pagination.currentPage)}
+  heroDescription={ui.page.heroDescription}
+  kicker="Blog"
+  breadcrumbs={[
+    { label: t(locale, "breadcrumbs.home"), href: homeHref, ariaLabel: t(locale, "breadcrumbs.home") },
+    { label: "Blog", href: getBlogIndexPageUrl(1, locale), optional: true },
+    { label: ui.page.title(pagination.currentPage) },
+  ]}
+  posts={posts}
+  pagination={pagination}
+  getPageUrl={(page) => getBlogIndexPageUrl(page, locale)}
+/>

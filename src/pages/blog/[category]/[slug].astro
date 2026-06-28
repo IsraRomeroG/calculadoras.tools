@@ -1,184 +1,50 @@
 ---
-import { render } from "astro:content";
-import ArticleEditorialMeta from "@components/blog/ArticleEditorialMeta.astro";
-import ArticleSources from "@components/blog/ArticleSources.astro";
-import BaseLayout from "@layouts/BaseLayout.astro";
-import AdSlot from "@components/ads/AdSlot.astro";
-import Container from "@components/layout/Container.astro";
-import PageShell from "@components/layout/PageShell.astro";
-import PageHero from "@components/shared/PageHero.astro";
-import Panel from "@components/shared/Panel.astro";
-import { buildBlogArticleJsonLd } from "@lib/blog-article-jsonld";
+import BlogArticlePage from "@components/blog/BlogArticlePage.astro";
 import {
   assertNoBlogRouteConflicts,
-  getBlogPostCategory,
+  getBlogPostAlternatePaths,
   getBlogPostCategorySlug,
   getBlogPostSlug,
   getBlogPostUrl,
-  getCategoryUrl,
-  getPublishedBlogPosts,
+  getPublishedBlogPostsByLocale,
   type BlogPost,
 } from "@lib/blog";
+import type { Locale } from "@lib/i18n/config";
+import { buildAlternateLinks } from "@lib/i18n/routing";
+
+const locale = "es";
 
 export async function getStaticPaths() {
-  const posts = await getPublishedBlogPosts();
-  assertNoBlogRouteConflicts(posts);
+  const posts = await getPublishedBlogPostsByLocale(locale);
+  const englishPosts = await getPublishedBlogPostsByLocale("en");
+  const allPosts = [...posts, ...englishPosts];
+  assertNoBlogRouteConflicts(allPosts);
 
   return posts.map((post) => ({
     params: {
       category: getBlogPostCategorySlug(post),
       slug: getBlogPostSlug(post),
     },
-    props: { post },
+    props: {
+      post,
+      alternatePaths: getBlogPostAlternatePaths(post, allPosts),
+    },
   }));
 }
 
 interface Props {
   post: BlogPost;
+  alternatePaths: Partial<Record<Locale, string>>;
 }
 
-const { post } = Astro.props;
-const category = getBlogPostCategory(post);
-const { Content } = await render(post);
-const title = post.data.seoTitle ?? post.data.title;
-const description = post.data.description;
-const siteUrl = Astro.site ?? Astro.url;
-const canonical = new URL(
-  getBlogPostUrl(post),
-  siteUrl,
-).toString();
-const articleJsonLd = buildBlogArticleJsonLd({
-  author: post.data.author,
-  canonical,
-  description,
-  headline: post.data.title,
-  pubDate: post.data.pubDate,
-  siteUrl,
-  updatedDate: post.data.updatedDate,
-});
+const { post, alternatePaths } = Astro.props;
+const canonical = getBlogPostUrl(post);
+const alternates = buildAlternateLinks(alternatePaths, Astro.site ?? Astro.url);
 ---
 
-<BaseLayout title={title} description={description} canonical={canonical}>
-  <Fragment slot="head">
-    <script type="application/ld+json" set:html={JSON.stringify(articleJsonLd)} />
-  </Fragment>
-
-  <PageShell>
-    <article>
-      <PageHero
-        as="header"
-        size="4xl"
-        title={post.data.title}
-        description={post.data.description}
-        kicker={category.label}
-        kickerHref={getCategoryUrl(category.slug)}
-        collapseBreadcrumbOnMobile
-        breadcrumbs={[
-          { label: "Inicio", href: "/", ariaLabel: "Inicio" },
-          { label: "Blog", href: "/blog", optional: true },
-          {
-            label: category.label,
-            href: getCategoryUrl(category.slug),
-            optional: true,
-          },
-          {
-            label: post.data.title,
-            truncate: true,
-          },
-        ]}
-      >
-        <ArticleEditorialMeta data={post.data} />
-      </PageHero>
-
-      <Container
-        size="4xl"
-        class="grid gap-8 py-8 md:py-10 lg:grid-cols-[minmax(0,1fr)_18.75rem]"
-      >
-        <div
-          class="blog-content max-w-none text-base leading-7 text-gray-300"
-        >
-          {
-            post.data.methodologyNote && (
-              <Panel as="aside" class="mb-8 border-amber-400/40 bg-amber-400/5">
-                <h2 class="text-base font-semibold text-white">
-                  Nota metodológica
-                </h2>
-                <p class="mt-2 text-sm leading-relaxed text-gray-300">
-                  {post.data.methodologyNote}
-                </p>
-              </Panel>
-            )
-          }
-          <Content />
-          <ArticleSources sources={post.data.sources} />
-        </div>
-
-        <aside class="space-y-5 text-sm lg:sticky lg:top-8 lg:self-start">
-          {
-            post.data.tags.length > 0 && (
-              <section>
-                <h2 class="text-sm font-semibold text-white">Temas</h2>
-                <div class="mt-3 flex flex-wrap gap-2">
-                  {post.data.tags.map((tag) => (
-                    <span class="rounded-full border border-gray-700 px-3 py-1 text-gray-400">
-                      {tag}
-                    </span>
-                  ))}
-                </div>
-              </section>
-            )
-          }
-
-          {
-            post.data.relatedCalculator && (
-              <section class="border-t border-gray-800 pt-5">
-                <h2 class="text-sm font-semibold text-white">Calculadora</h2>
-                <a
-                  href={post.data.relatedCalculator.href}
-                  class="mt-3 inline-flex min-h-11 items-center rounded-lg border border-gray-700 px-4 py-2 font-semibold text-amber-400 transition hover:border-amber-400 hover:text-amber-300"
-                >
-                  {post.data.relatedCalculator.label}
-                </a>
-              </section>
-            )
-          }
-
-          <AdSlot
-            placement="blog-post-sidebar"
-            variant="rectangle"
-            class="lg:!px-0"
-          />
-        </aside>
-      </Container>
-    </article>
-  </PageShell>
-</BaseLayout>
-
-<style>
-  .blog-content :global(h2) {
-    margin-top: 2.5rem;
-    margin-bottom: 0.75rem;
-    color: rgb(243 244 246);
-    font-size: 1.5rem;
-    font-weight: 700;
-    line-height: 1.25;
-  }
-
-  .blog-content :global(p) {
-    margin-top: 1rem;
-  }
-
-  .blog-content :global(pre) {
-    margin-top: 1.25rem;
-    overflow-x: auto;
-    border-radius: 0.5rem;
-    border: 1px solid rgb(55 65 81);
-    background: rgb(3 7 18);
-    padding: 1rem;
-    color: rgb(229 231 235);
-  }
-
-  .blog-content :global(code) {
-    font-size: 0.95em;
-  }
-</style>
+<BlogArticlePage
+  locale={locale}
+  post={post}
+  canonical={canonical}
+  alternates={alternates}
+/>

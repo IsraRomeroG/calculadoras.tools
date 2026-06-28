@@ -1,18 +1,22 @@
 ---
 import { formatBlogDate } from "@lib/blog";
 import type { BlogSource } from "@lib/blog-schema";
+import { DEFAULT_LOCALE, type Locale } from "@lib/i18n/config";
+import { getBlogUi } from "@lib/i18n/blog";
 
 interface Props {
   sources: BlogSource[];
+  locale?: Locale;
 }
 
-const { sources } = Astro.props;
+const { sources, locale = DEFAULT_LOCALE } = Astro.props;
+const ui = getBlogUi(locale).article;
 ---
 
 {
   sources.length > 0 && (
     <section class="mt-12 border-t border-gray-800 pt-8">
-      <h2 class="text-xl font-semibold text-white">Fuentes</h2>
+      <h2 class="text-xl font-semibold text-white">{ui.sourcesTitle}</h2>
       <ol class="mt-4 space-y-4 text-sm leading-relaxed text-gray-400">
         {sources.map((source) => (
           <li>
@@ -25,12 +29,13 @@ const { sources } = Astro.props;
               {source.label}
             </a>
             {source.publisher && (
-              <span class="text-gray-500"> · {source.publisher}</span>
+              <span class="text-gray-500"> &middot; {source.publisher}</span>
             )}
             {source.accessedDate && (
               <span class="text-gray-500">
                 {" "}
-                · Consultado el {formatBlogDate(source.accessedDate)}
+                &middot; {ui.accessedPrefix}{" "}
+                {formatBlogDate(source.accessedDate, locale)}
               </span>
             )}
           </li>

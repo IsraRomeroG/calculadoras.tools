@@ -1,0 +1,50 @@
+---
+import BlogArticlePage from "@components/blog/BlogArticlePage.astro";
+import {
+  assertNoBlogRouteConflicts,
+  getBlogPostAlternatePaths,
+  getBlogPostCategorySlug,
+  getBlogPostSlug,
+  getBlogPostUrl,
+  getPublishedBlogPostsByLocale,
+  type BlogPost,
+} from "@lib/blog";
+import type { Locale } from "@lib/i18n/config";
+import { buildAlternateLinks } from "@lib/i18n/routing";
+
+const locale = "en";
+
+export async function getStaticPaths() {
+  const posts = await getPublishedBlogPostsByLocale(locale);
+  const spanishPosts = await getPublishedBlogPostsByLocale("es");
+  const allPosts = [...spanishPosts, ...posts];
+  assertNoBlogRouteConflicts(allPosts);
+
+  return posts.map((post) => ({
+    params: {
+      category: getBlogPostCategorySlug(post),
+      slug: getBlogPostSlug(post),
+    },
+    props: {
+      post,
+      alternatePaths: getBlogPostAlternatePaths(post, allPosts),
+    },
+  }));
+}
+
+interface Props {
+  post: BlogPost;
+  alternatePaths: Partial<Record<Locale, string>>;
+}
+
+const { post, alternatePaths } = Astro.props;
+const canonical = getBlogPostUrl(post);
+const alternates = buildAlternateLinks(alternatePaths, Astro.site ?? Astro.url);
+---
+
+<BlogArticlePage
+  locale={locale}
+  post={post}
+  canonical={canonical}
+  alternates={alternates}
+/>
