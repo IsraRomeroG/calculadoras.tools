@@ -223,6 +223,15 @@ export const CALCULATORS: LegacyCalculatorDirectoryItem[] = [
     order: 38,
   },
   {
+    id: "calculadora-capacidad-compra-vivienda",
+    title: "Calculadora de capacidad de compra de vivienda",
+    description:
+      "Estima que precio de vivienda podrias considerar segun ingreso, deudas, enganche, gastos iniciales, tasa y plazo.",
+    href: "/inmuebles/calculadora-capacidad-compra-vivienda",
+    categorySlug: "inmuebles",
+    order: 38.15,
+  },
+  {
     id: "calculadora-renta-vs-compra",
     title: "Calculadora renta vs compra",
     description:
@@ -239,6 +248,24 @@ export const CALCULATORS: LegacyCalculatorDirectoryItem[] = [
     href: "/inmuebles/calculadora-cap-rate-rentabilidad",
     categorySlug: "inmuebles",
     order: 38.3,
+  },
+  {
+    id: "calculadora-gastos-escrituracion",
+    title: "Calculadora de gastos de escrituracion",
+    description:
+      "Estima gastos de escrituracion y cierre con partidas editables, efectivo requerido y neto del vendedor.",
+    href: "/inmuebles/calculadora-gastos-escrituracion",
+    categorySlug: "inmuebles",
+    order: 38.35,
+  },
+  {
+    id: "calculadora-plusvalia-estimada",
+    title: "Calculadora de plusvalía estimada",
+    description:
+      "Proyecta el valor futuro de una propiedad con plusvalía compuesta y escenarios conservador, base y optimista.",
+    href: "/inmuebles/calculadora-plusvalia-estimada",
+    categorySlug: "inmuebles",
+    order: 38.4,
   },
   {
     id: "calculadora-de-imc",
@@ -662,6 +689,24 @@ export const CALCULATORS: LegacyCalculatorDirectoryItem[] = [
     href: "/vehiculos/calculadora-de-costo-por-kilometro",
     categorySlug: "vehiculos",
     order: 92,
+  },
+  {
+    id: "calculadora-volumen-concreto-cemento",
+    title: "Calculadora de concreto",
+    description:
+      "Calcula volumen de concreto por secciones, desperdicio, sacos estimados y costo opcional.",
+    href: "/construccion/calculadora-volumen-concreto-cemento",
+    categorySlug: "construccion",
+    order: 93,
+  },
+  {
+    id: "calculadora-cantidad-ladrillos",
+    title: "Calculadora de ladrillos",
+    description:
+      "Estima ladrillos o blocks por area de muros, aberturas, juntas, desperdicio, paquetes y costo opcional.",
+    href: "/construccion/calculadora-cantidad-ladrillos",
+    categorySlug: "construccion",
+    order: 93.5,
   },
   {
     id: "metros-cuadrados-de-pintura",

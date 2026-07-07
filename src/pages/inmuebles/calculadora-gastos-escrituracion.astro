@@ -1,0 +1,1101 @@
+---
+import AdSlot from "@components/ads/AdSlot.astro";
+import Container from "@components/layout/Container.astro";
+import PageShell from "@components/layout/PageShell.astro";
+import FaqSection from "@components/shared/FaqSection.astro";
+import PageHero from "@components/shared/PageHero.astro";
+import SectionIntro from "@components/shared/SectionIntro.astro";
+import BaseLayout from "@layouts/BaseLayout.astro";
+import {
+  COST_TYPE_LABELS,
+  RESPONSIBILITY_LABELS,
+  SUGGESTED_CLOSING_COSTS,
+} from "@lib/calculators/inmuebles/calculadora-gastos-escrituracion/closingCosts";
+import { buildFaqJsonLd } from "@lib/seo";
+
+const title = "Calculadora de gastos de escrituracion";
+const description =
+  "Estima gastos de escrituracion y cierre con porcentajes y montos editables para comprador y vendedor.";
+const canonical = "/inmuebles/calculadora-gastos-escrituracion";
+
+const reserveOptions = [0, 5, 10, 15, 20, 30] as const;
+
+const explainerCards = [
+  {
+    title: "Efectivo para cerrar",
+    text: "Suma enganche, gastos del comprador y margen de reserva para ver cuanto dinero necesitas tener disponible.",
+  },
+  {
+    title: "Neto del vendedor",
+    text: "Resta las partidas del vendedor al precio de la propiedad para estimar lo que quedaria antes de otros acuerdos.",
+  },
+  {
+    title: "Partidas editables",
+    text: "Cada concepto puede ser porcentaje del precio o monto fijo. Los valores no son tasas oficiales.",
+  },
+];
+
+const faqs = [
+  {
+    question: "Que incluyen los gastos de escrituracion?",
+    answer:
+      "Pueden incluir impuestos o derechos locales, honorarios notariales, registro, avaluo, gestoria y otros conceptos de cierre. La composicion real depende de la operacion y la ubicacion.",
+  },
+  {
+    question: "Los porcentajes son oficiales?",
+    answer:
+      "No. La calculadora usa porcentajes y montos que tu capturas. No sustituye una cotizacion notarial ni una revision profesional local.",
+  },
+  {
+    question: "Quien paga cada gasto?",
+    answer:
+      "Depende del tipo de gasto y de lo negociado entre comprador y vendedor. Por eso cada partida permite elegir responsable.",
+  },
+  {
+    question: "El enganche forma parte de los gastos?",
+    answer:
+      "El enganche no es gasto de escrituracion, pero si forma parte del efectivo que el comprador necesita para cerrar. La calculadora lo muestra separado.",
+  },
+  {
+    question: "Cuanto debo ahorrar ademas del enganche?",
+    answer:
+      "Revisa el resultado adicional al enganche: suma los gastos del comprador y el margen de reserva elegido.",
+  },
+];
+
+const faqJsonLd = buildFaqJsonLd(faqs);
+---
+
+<BaseLayout title={title} description={description} canonical={canonical}>
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={JSON.stringify(faqJsonLd)} />
+  </Fragment>
+
+  <PageShell>
+    <PageHero
+      title="Calculadora de gastos de escrituracion"
+      description="Estima cuanto efectivo necesitas para cerrar una compra o cuanto recibirias neto como vendedor, con partidas editables."
+      kicker="Inmuebles"
+      kickerHref="/inmuebles"
+      collapseBreadcrumbOnMobile
+      containerClass="py-6 md:py-8"
+      breadcrumbs={[
+        { label: "Inicio", href: "/", ariaLabel: "Inicio" },
+        { label: "Inmuebles", href: "/inmuebles", optional: true },
+        { label: "Gastos de escrituracion", truncate: true },
+      ]}
+    />
+
+    <Container as="section" class="py-6 md:py-8">
+      <section
+        id="closing-costs-calculator"
+        class="overflow-hidden rounded-lg border border-gray-700 bg-gray-950 shadow-xl shadow-gray-950/30"
+        aria-labelledby="calculator-heading"
+      >
+        <div class="grid lg:grid-cols-[minmax(0,1fr)_minmax(20rem,0.78fr)]">
+          <aside
+            class="order-1 border-b border-gray-800 bg-gray-900/70 p-4 sm:p-6 lg:order-2 lg:border-b-0 lg:border-l"
+          >
+            <div class="lg:sticky lg:top-6">
+              <p class="text-xs font-semibold uppercase tracking-wide text-gray-500">
+                Resultado principal
+              </p>
+              <p
+                class="mt-2 text-sm font-semibold text-emerald-300"
+                data-main-label
+              >
+                Efectivo para cerrar
+              </p>
+              <div class="mt-3 rounded-lg border border-gray-800 bg-gray-950 p-4">
+                <p
+                  class="break-words text-3xl font-semibold text-emerald-100 sm:text-4xl"
+                  data-main-result
+                >
+                  Sin calculo
+                </p>
+                <p
+                  class="mt-3 min-h-10 text-sm leading-relaxed text-gray-400"
+                  data-result-context
+                >
+                  Captura precio y partidas para estimar el cierre.
+                </p>
+              </div>
+
+              <dl class="mt-4 grid grid-cols-2 gap-2" data-summary-grid>
+                <div class="rounded-lg border border-gray-800 bg-gray-950 p-3">
+                  <dt class="text-xs font-semibold uppercase text-gray-500">
+                    Comprador
+                  </dt>
+                  <dd class="mt-1 font-mono text-base font-semibold text-white">
+                    -
+                  </dd>
+                </div>
+                <div class="rounded-lg border border-gray-800 bg-gray-950 p-3">
+                  <dt class="text-xs font-semibold uppercase text-gray-500">
+                    Vendedor
+                  </dt>
+                  <dd class="mt-1 font-mono text-base font-semibold text-white">
+                    -
+                  </dd>
+                </div>
+              </dl>
+
+              <p
+                class="mt-4 hidden rounded-lg border border-amber-300/25 bg-amber-300/10 p-3 text-sm leading-relaxed text-amber-100"
+                data-warning-panel
+              ></p>
+
+              <section
+                class="mt-4 rounded-lg border border-gray-800 bg-gray-950 p-4"
+                aria-labelledby="impact-heading"
+              >
+                <h3 id="impact-heading" class="text-sm font-semibold text-gray-200">
+                  Partidas de mayor impacto
+                </h3>
+                <ol class="mt-3 grid gap-2 text-sm" data-impact-list>
+                  <li class="text-gray-500">Sin partidas con monto.</li>
+                </ol>
+              </section>
+
+              <details class="mt-4 rounded-lg border border-gray-800 bg-gray-950 p-4">
+                <summary class="cursor-pointer text-sm font-semibold text-gray-200">
+                  Desglose completo
+                </summary>
+                <div class="mt-3 overflow-x-auto">
+                  <table class="min-w-full text-left text-sm">
+                    <thead class="text-xs uppercase text-gray-500">
+                      <tr>
+                        <th class="px-2 py-2 font-semibold">Partida</th>
+                        <th class="px-2 py-2 font-semibold">Resp.</th>
+                        <th class="px-2 py-2 font-semibold">Tipo</th>
+                        <th class="px-2 py-2 font-semibold">Monto</th>
+                      </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-800" data-breakdown-body>
+                      <tr>
+                        <td class="px-2 py-3 text-gray-500" colspan="4">
+                          Sin desglose.
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </details>
+
+              <div class="mt-4 flex flex-col gap-2 sm:flex-row sm:flex-wrap">
+                <button
+                  class="hidden min-h-11 rounded-lg bg-emerald-400 px-4 py-2 text-sm font-semibold text-gray-950 transition hover:bg-emerald-300 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-emerald-300/40"
+                  type="button"
+                  data-copy-result
+                >
+                  Copiar resumen
+                </button>
+                <button
+                  class="hidden min-h-11 rounded-lg border border-emerald-400/60 px-4 py-2 text-sm font-semibold text-emerald-200 transition hover:bg-emerald-400/10 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-emerald-300/40"
+                  type="button"
+                  data-export-csv
+                >
+                  Exportar CSV
+                </button>
+              </div>
+              <p
+                class="mt-3 min-h-5 text-sm text-emerald-300"
+                role="status"
+                aria-live="polite"
+                data-copy-status
+              ></p>
+              <p class="sr-only" role="status" aria-live="polite" data-live-status>
+              </p>
+            </div>
+          </aside>
+
+          <form
+            class="order-2 p-4 sm:p-6 lg:order-1"
+            data-calculator-form
+          >
+            <div>
+              <p class="text-sm font-semibold uppercase tracking-wide text-emerald-300">
+                Cierre inmobiliario
+              </p>
+              <h2 id="calculator-heading" class="mt-2 text-2xl font-semibold">
+                Datos de la operacion
+              </h2>
+            </div>
+
+            <fieldset class="mt-5">
+              <legend class="text-sm font-semibold text-gray-200">
+                Vista
+              </legend>
+              <div
+                class="mt-2 grid grid-cols-3 rounded-lg border border-gray-700 bg-gray-900 p-1"
+                role="group"
+                aria-label="Modo de uso"
+              >
+                <button
+                  class="min-h-11 rounded-md bg-emerald-400 px-2 py-2 text-sm font-semibold text-gray-950 transition focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-emerald-300/40"
+                  type="button"
+                  aria-pressed="true"
+                  data-mode-button="buyer"
+                >
+                  Compro
+                </button>
+                <button
+                  class="min-h-11 rounded-md px-2 py-2 text-sm font-semibold text-gray-300 transition hover:bg-gray-800 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-emerald-300/30"
+                  type="button"
+                  aria-pressed="false"
+                  data-mode-button="seller"
+                >
+                  Vendo
+                </button>
+                <button
+                  class="min-h-11 rounded-md px-2 py-2 text-sm font-semibold text-gray-300 transition hover:bg-gray-800 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-emerald-300/30"
+                  type="button"
+                  aria-pressed="false"
+                  data-mode-button="both"
+                >
+                  Ambos
+                </button>
+              </div>
+            </fieldset>
+
+            <div class="mt-5 grid gap-4 sm:grid-cols-2">
+              <div>
+                <label
+                  for="closing-property-price"
+                  class="block text-sm font-semibold text-gray-200"
+                >
+                  Precio de propiedad
+                </label>
+                <div class="mt-2 flex rounded-lg border border-gray-700 bg-gray-900 focus-within:border-emerald-300 focus-within:ring-3 focus-within:ring-emerald-300/15">
+                  <span class="flex items-center px-4 text-gray-500">$</span>
+                  <input
+                    id="closing-property-price"
+                    class="min-h-12 w-full bg-transparent px-4 font-mono text-base text-white outline-none placeholder:text-gray-600"
+                    type="text"
+                    inputmode="decimal"
+                    autocomplete="off"
+                    placeholder="3000000"
+                    aria-describedby="closing-form-error"
+                    data-property-price
+                  />
+                </div>
+              </div>
+
+              <div data-buyer-only>
+                <label
+                  for="closing-down-payment"
+                  class="block text-sm font-semibold text-gray-200"
+                >
+                  Enganche
+                </label>
+                <div class="mt-2 flex rounded-lg border border-gray-700 bg-gray-900 focus-within:border-emerald-300 focus-within:ring-3 focus-within:ring-emerald-300/15">
+                  <span class="flex items-center px-4 text-gray-500">$</span>
+                  <input
+                    id="closing-down-payment"
+                    class="min-h-12 w-full bg-transparent px-4 font-mono text-base text-white outline-none placeholder:text-gray-600"
+                    type="text"
+                    inputmode="decimal"
+                    autocomplete="off"
+                    placeholder="600000"
+                    aria-describedby="closing-form-error"
+                    data-down-payment
+                  />
+                </div>
+              </div>
+
+              <div data-buyer-only>
+                <label
+                  for="closing-reserve"
+                  class="block text-sm font-semibold text-gray-200"
+                >
+                  Margen de reserva
+                </label>
+                <select
+                  id="closing-reserve"
+                  class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-900 px-4 text-base text-white outline-none transition focus:border-emerald-400 focus:ring-3 focus:ring-emerald-400/15"
+                  data-reserve-percent
+                >
+                  {
+                    reserveOptions.map((option) => (
+                      <option value={option} selected={option === 0}>
+                        {option}%
+                      </option>
+                    ))
+                  }
+                </select>
+              </div>
+            </div>
+
+            <fieldset class="mt-6">
+              <div class="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+                <div>
+                  <legend class="text-sm font-semibold text-gray-200">
+                    Partidas de cierre
+                  </legend>
+                  <p class="mt-1 text-sm leading-relaxed text-gray-500">
+                    Usa montos estimados y confirma valores con la notaria o profesional local.
+                  </p>
+                </div>
+                <button
+                  class="min-h-11 rounded-lg border border-emerald-400/60 px-4 py-2 text-sm font-semibold text-emerald-200 transition hover:bg-emerald-400/10 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-emerald-300/40"
+                  type="button"
+                  data-add-expense
+                >
+                  Agregar partida
+                </button>
+              </div>
+
+              <div class="mt-4 flex flex-wrap gap-2">
+                {
+                  SUGGESTED_CLOSING_COSTS.map((item) => (
+                    <button
+                      class="min-h-10 rounded-full border border-gray-700 bg-gray-900 px-3 py-2 text-sm font-semibold text-gray-200 transition hover:border-emerald-400/60 hover:bg-gray-800 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-emerald-300/30"
+                      type="button"
+                      data-chip-name={item.name}
+                      data-chip-type={item.type}
+                      data-chip-responsible={item.responsible}
+                    >
+                      + {item.name}
+                    </button>
+                  ))
+                }
+              </div>
+
+              <div class="mt-4 grid gap-3" data-expense-list></div>
+              <p
+                class="mt-3 hidden rounded-lg border border-gray-800 bg-gray-900/60 p-3 text-sm leading-relaxed text-gray-400"
+                data-empty-expenses
+              >
+                No hay partidas. Puedes agregar una manualmente o usar un chip.
+              </p>
+            </fieldset>
+
+            <p
+              id="closing-form-error"
+              class="mt-4 hidden rounded-lg border border-red-400/25 bg-red-400/10 p-3 text-sm leading-relaxed text-red-200"
+              role="alert"
+              data-form-error
+            ></p>
+
+            <div class="mt-5 rounded-lg border border-amber-300/25 bg-amber-300/10 p-4 text-sm leading-relaxed text-amber-100">
+              Estimacion informativa: los porcentajes y montos son editables,
+              no oficiales y no representan una cotizacion notarial.
+            </div>
+
+            <div class="mt-5 flex flex-col gap-3 sm:flex-row">
+              <button
+                class="min-h-11 rounded-lg bg-emerald-400 px-5 py-2 text-sm font-semibold text-gray-950 transition hover:bg-emerald-300 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-emerald-300/40"
+                type="submit"
+              >
+                Calcular
+              </button>
+              <button
+                class="min-h-11 rounded-lg border border-gray-700 px-5 py-2 text-sm font-semibold text-gray-200 transition hover:border-gray-500 hover:bg-gray-900 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-gray-400/30"
+                type="button"
+                data-clear-calculator
+              >
+                Limpiar
+              </button>
+            </div>
+          </form>
+        </div>
+      </section>
+    </Container>
+
+    <AdSlot placement="calculator-after-tool" />
+
+    <Container as="section" class="py-6 md:py-8">
+      <SectionIntro
+        title="Como leer el resultado"
+        description="La estimacion separa el dinero que necesita el comprador, los costos del vendedor y las partidas con mayor impacto."
+      />
+      <div class="grid gap-4 md:grid-cols-3">
+        {
+          explainerCards.map((card) => (
+            <article class="rounded-lg border border-gray-800 bg-gray-950 p-5">
+              <h3 class="text-base font-semibold text-white">{card.title}</h3>
+              <p class="mt-2 text-sm leading-relaxed text-gray-400">
+                {card.text}
+              </p>
+            </article>
+          ))
+        }
+      </div>
+    </Container>
+
+    <FaqSection faqs={faqs} />
+  </PageShell>
+</BaseLayout>
+
+<script>
+  import {
+    COST_TYPE_LABELS,
+    RESPONSIBILITY_LABELS,
+    buildCopyText,
+    calculateClosingCosts,
+    formatCurrency,
+    formatPercent,
+    parseLocalizedNumber,
+    roundMoney,
+  } from "@lib/calculators/inmuebles/calculadora-gastos-escrituracion/closingCosts";
+
+  const form = document.querySelector("[data-calculator-form]");
+  const modeButtons = Array.from(document.querySelectorAll("[data-mode-button]"));
+  const buyerOnlyBlocks = Array.from(document.querySelectorAll("[data-buyer-only]"));
+  const propertyPriceInput = document.querySelector("[data-property-price]");
+  const downPaymentInput = document.querySelector("[data-down-payment]");
+  const reserveSelect = document.querySelector("[data-reserve-percent]");
+  const expenseList = document.querySelector("[data-expense-list]");
+  const emptyExpenses = document.querySelector("[data-empty-expenses]");
+  const addExpenseButton = document.querySelector("[data-add-expense]");
+  const clearButton = document.querySelector("[data-clear-calculator]");
+  const formError = document.querySelector("[data-form-error]");
+  const mainLabel = document.querySelector("[data-main-label]");
+  const mainResult = document.querySelector("[data-main-result]");
+  const resultContext = document.querySelector("[data-result-context]");
+  const summaryGrid = document.querySelector("[data-summary-grid]");
+  const warningPanel = document.querySelector("[data-warning-panel]");
+  const impactList = document.querySelector("[data-impact-list]");
+  const breakdownBody = document.querySelector("[data-breakdown-body]");
+  const copyButton = document.querySelector("[data-copy-result]");
+  const exportButton = document.querySelector("[data-export-csv]");
+  const copyStatus = document.querySelector("[data-copy-status]");
+  const liveStatus = document.querySelector("[data-live-status]");
+
+  let currentMode = "buyer";
+  let currentResult = null;
+  let currentCopyText = "";
+  let nextExpenseId = 1;
+  let liveTimer = 0;
+  let copyTimer = 0;
+  let expenses = [
+    createExpense({
+      name: "Impuesto / derecho",
+      type: "percent",
+      responsible: "buyer",
+    }),
+  ];
+
+  function createExpense(overrides = {}) {
+    const expense = {
+      id: `expense-${nextExpenseId}`,
+      name: "Impuesto / derecho",
+      type: "percent",
+      value: "",
+      responsible: "buyer",
+      ...overrides,
+    };
+
+    nextExpenseId += 1;
+
+    return expense;
+  }
+
+  function renderExpenseCards() {
+    if (!expenseList || !emptyExpenses) {
+      return;
+    }
+
+    expenseList.textContent = "";
+    emptyExpenses.classList.toggle("hidden", expenses.length > 0);
+
+    expenses.forEach((expense, index) => {
+      const card = document.createElement("article");
+      card.className =
+        "rounded-lg border border-gray-800 bg-gray-900/55 p-4";
+      card.dataset.expenseCard = expense.id;
+      card.innerHTML = `
+        <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+          <div>
+            <p class="text-sm font-semibold text-gray-200">Partida ${index + 1}</p>
+            <p class="mt-1 text-xs text-gray-500" data-expense-preview="${expense.id}">Sin monto</p>
+          </div>
+          <button class="min-h-10 rounded-md border border-gray-700 px-3 py-2 text-xs font-semibold text-gray-300 transition hover:border-red-300/60 hover:bg-red-300/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-300/30" type="button" data-remove-expense="${expense.id}">
+            Eliminar
+          </button>
+        </div>
+        <div class="mt-4 grid gap-3 sm:grid-cols-2">
+          <label class="block sm:col-span-2">
+            <span class="text-sm font-semibold text-gray-300">Nombre</span>
+            <input class="mt-1 min-h-11 w-full rounded-lg border border-gray-700 bg-gray-950 px-3 text-base text-white outline-none transition placeholder:text-gray-600 focus:border-emerald-400 focus:ring-3 focus:ring-emerald-400/15" type="text" autocomplete="off" maxlength="60" placeholder="Impuesto / derecho" data-expense-field="name" data-expense-id="${expense.id}" />
+          </label>
+          <label class="block">
+            <span class="text-sm font-semibold text-gray-300">Tipo</span>
+            <select class="mt-1 min-h-11 w-full rounded-lg border border-gray-700 bg-gray-950 px-3 text-base text-white outline-none transition focus:border-emerald-400 focus:ring-3 focus:ring-emerald-400/15" data-expense-field="type" data-expense-id="${expense.id}">
+              ${Object.entries(COST_TYPE_LABELS).map(([value, label]) => `<option value="${value}">${label}</option>`).join("")}
+            </select>
+          </label>
+          <label class="block">
+            <span class="text-sm font-semibold text-gray-300">Valor</span>
+            <input class="mt-1 min-h-11 w-full rounded-lg border border-gray-700 bg-gray-950 px-3 font-mono text-base text-white outline-none transition placeholder:text-gray-600 focus:border-emerald-400 focus:ring-3 focus:ring-emerald-400/15" type="text" inputmode="decimal" autocomplete="off" placeholder="5 o 8000" data-expense-field="value" data-expense-id="${expense.id}" />
+          </label>
+          <label class="block sm:col-span-2">
+            <span class="text-sm font-semibold text-gray-300">Responsable</span>
+            <select class="mt-1 min-h-11 w-full rounded-lg border border-gray-700 bg-gray-950 px-3 text-base text-white outline-none transition focus:border-emerald-400 focus:ring-3 focus:ring-emerald-400/15" data-expense-field="responsible" data-expense-id="${expense.id}">
+              ${Object.entries(RESPONSIBILITY_LABELS).map(([value, label]) => `<option value="${value}">${label}</option>`).join("")}
+            </select>
+          </label>
+        </div>
+      `;
+      expenseList.append(card);
+      syncCardValues(card, expense);
+      updateExpensePreview(expense);
+    });
+  }
+
+  function syncCardValues(card, expense) {
+    card.querySelector('[data-expense-field="name"]').value = expense.name;
+    card.querySelector('[data-expense-field="type"]').value = expense.type;
+    card.querySelector('[data-expense-field="value"]').value = expense.value;
+    card.querySelector('[data-expense-field="responsible"]').value =
+      expense.responsible;
+  }
+
+  function updateExpensePreview(expense) {
+    const preview = document.querySelector(
+      `[data-expense-preview="${expense.id}"]`,
+    );
+
+    if (!preview) {
+      return;
+    }
+
+    const value = parseLocalizedNumber(expense.value);
+
+    if (value === null || value === 0) {
+      preview.textContent = "Sin monto";
+      preview.className = "mt-1 text-xs text-gray-500";
+      return;
+    }
+
+    const typeLabel = expense.type === "percent" ? formatPercent(value) : formatCurrency(value);
+    preview.textContent =
+      `${typeLabel} · ${RESPONSIBILITY_LABELS[expense.responsible]}`;
+    preview.className = "mt-1 text-xs font-semibold text-emerald-300";
+  }
+
+  function updateExpenseState(element) {
+    const id = element.dataset.expenseId;
+    const field = element.dataset.expenseField;
+    const expense = expenses.find((item) => item.id === id);
+
+    if (!expense || !field || !(field in expense)) {
+      return;
+    }
+
+    expense[field] = element.value;
+    updateExpensePreview(expense);
+
+    if (currentResult) {
+      updateCalculator();
+    }
+  }
+
+  function parseCalculatorInput({ force = false } = {}) {
+    const propertyPrice = parseNumberField(
+      propertyPriceInput?.value ?? "",
+      "El precio de la propiedad",
+      { required: force, positive: true },
+    );
+
+    if (propertyPrice === null) {
+      return null;
+    }
+
+    const downPayment =
+      parseNumberField(downPaymentInput?.value ?? "", "El enganche", {
+        required: false,
+        defaultValue: 0,
+      }) ?? 0;
+    const reservePercent =
+      parseNumberField(reserveSelect?.value ?? "0", "El margen de reserva", {
+        required: false,
+        defaultValue: 0,
+        min: 0,
+        max: 30,
+      }) ?? 0;
+    const parsedExpenses = expenses.map((expense, index) => ({
+      id: expense.id,
+      name: expense.name.trim() || `Partida ${index + 1}`,
+      type: expense.type,
+      value:
+        parseNumberField(expense.value, `El valor de ${expense.name || "la partida"}`, {
+          required: false,
+          defaultValue: 0,
+        }) ?? 0,
+      responsible: expense.responsible,
+    }));
+
+    return {
+      propertyPrice,
+      downPayment,
+      reservePercent,
+      items: parsedExpenses,
+    };
+  }
+
+  function parseNumberField(value, label, options = {}) {
+    const trimmed = String(value).trim();
+
+    if (!trimmed) {
+      if (Object.prototype.hasOwnProperty.call(options, "defaultValue")) {
+        return options.defaultValue;
+      }
+
+      if (options.required) {
+        throw new RangeError(`${label} es obligatorio.`);
+      }
+
+      return null;
+    }
+
+    const parsed = parseLocalizedNumber(trimmed);
+
+    if (parsed === null) {
+      throw new RangeError(`${label} debe ser un numero valido.`);
+    }
+
+    if (parsed < 0) {
+      throw new RangeError(`${label} no puede ser negativo.`);
+    }
+
+    if (options.positive && parsed <= 0) {
+      throw new RangeError(`${label} debe ser mayor que cero.`);
+    }
+
+    if (
+      (typeof options.min === "number" && parsed < options.min) ||
+      (typeof options.max === "number" && parsed > options.max)
+    ) {
+      throw new RangeError(
+        `${label} debe estar entre ${options.min}% y ${options.max}%.`,
+      );
+    }
+
+    return parsed;
+  }
+
+  function updateCalculator(options = {}) {
+    try {
+      hideFormError();
+      const input = parseCalculatorInput(options);
+
+      if (!input) {
+        setInitialState();
+        return;
+      }
+
+      currentResult = calculateClosingCosts(input);
+      currentCopyText = buildCopyText(currentResult, currentMode);
+      renderResult(currentResult);
+      setActionsVisible(true);
+    } catch (error) {
+      currentResult = null;
+      currentCopyText = "";
+      showFormError(error instanceof Error ? error.message : "Revisa los datos.");
+      setInvalidState();
+    }
+  }
+
+  function renderResult(result) {
+    if (!mainLabel || !mainResult || !resultContext || !summaryGrid) {
+      return;
+    }
+
+    if (currentMode === "seller") {
+      mainLabel.textContent = "Neto estimado del vendedor";
+      mainResult.textContent = formatCurrency(result.sellerNet);
+      resultContext.textContent =
+        `Gastos del vendedor: ${formatCurrency(result.sellerCosts)}.`;
+    } else if (currentMode === "both") {
+      mainLabel.textContent = "Gastos totales de cierre";
+      mainResult.textContent = formatCurrency(result.totalCosts);
+      resultContext.textContent =
+        `${formatPercent(result.totalCostPercent)} del precio de la propiedad.`;
+    } else {
+      mainLabel.textContent = "Efectivo para cerrar";
+      mainResult.textContent = formatCurrency(result.buyerCashRequired);
+      resultContext.textContent =
+        `Adicional al enganche: ${formatCurrency(result.additionalCashToDownPayment)}.`;
+    }
+
+    summaryGrid.innerHTML = [
+      ["Gastos comprador", formatCurrency(result.buyerCosts)],
+      ["Adicional enganche", formatCurrency(result.additionalCashToDownPayment)],
+      ["Gastos vendedor", formatCurrency(result.sellerCosts)],
+      ["Neto vendedor", formatCurrency(result.sellerNet)],
+      ["Reserva", formatCurrency(result.reserveAmount)],
+      ["Total cierre", formatCurrency(result.totalCosts)],
+    ]
+      .map(([label, value]) => renderMetric(label, value))
+      .join("");
+
+    renderWarnings(result.warnings);
+    renderImpact(result);
+    renderBreakdown(result);
+    scheduleAnnouncement(`Resultado: ${mainResult.textContent}`);
+  }
+
+  function renderMetric(label, value) {
+    return `
+      <div class="rounded-lg border border-gray-800 bg-gray-950 p-3">
+        <dt class="text-xs font-semibold uppercase text-gray-500">${escapeHtml(label)}</dt>
+        <dd class="mt-1 break-words font-mono text-base font-semibold text-white">${escapeHtml(value)}</dd>
+      </div>
+    `;
+  }
+
+  function renderWarnings(warnings) {
+    if (!warningPanel) {
+      return;
+    }
+
+    if (warnings.length === 0) {
+      warningPanel.textContent = "";
+      warningPanel.classList.add("hidden");
+      return;
+    }
+
+    warningPanel.textContent = warnings.join(" ");
+    warningPanel.classList.remove("hidden");
+  }
+
+  function renderImpact(result) {
+    if (!impactList) {
+      return;
+    }
+
+    if (result.impactItems.length === 0) {
+      impactList.innerHTML = '<li class="text-gray-500">Sin partidas con monto.</li>';
+      return;
+    }
+
+    impactList.innerHTML = result.impactItems
+      .slice(0, 5)
+      .map(
+        (item) => `
+          <li class="flex items-start justify-between gap-3 rounded-md border border-gray-800 bg-gray-900/65 p-3">
+            <span>
+              <span class="block font-semibold text-gray-100">${escapeHtml(item.name)}</span>
+              <span class="mt-1 block text-xs text-gray-500">${RESPONSIBILITY_LABELS[item.responsible]} · ${formatPercent(item.percentOfPrice)}</span>
+            </span>
+            <span class="shrink-0 font-mono font-semibold text-emerald-200">${formatCurrency(item.amount)}</span>
+          </li>
+        `,
+      )
+      .join("");
+  }
+
+  function renderBreakdown(result) {
+    if (!breakdownBody) {
+      return;
+    }
+
+    if (result.items.length === 0) {
+      breakdownBody.innerHTML =
+        '<tr><td class="px-2 py-3 text-gray-500" colspan="4">Sin desglose.</td></tr>';
+      return;
+    }
+
+    breakdownBody.innerHTML = result.items
+      .map(
+        (item) => `
+          <tr>
+            <td class="px-2 py-3 text-gray-200">${escapeHtml(item.name)}</td>
+            <td class="px-2 py-3 text-gray-400">${RESPONSIBILITY_LABELS[item.responsible]}</td>
+            <td class="px-2 py-3 text-gray-400">${COST_TYPE_LABELS[item.type]}</td>
+            <td class="px-2 py-3 font-mono text-gray-100">${formatCurrency(item.amount)}</td>
+          </tr>
+        `,
+      )
+      .join("");
+  }
+
+  function setInitialState() {
+    if (!mainLabel || !mainResult || !resultContext || !summaryGrid) {
+      return;
+    }
+
+    currentResult = null;
+    currentCopyText = "";
+    mainLabel.textContent =
+      currentMode === "seller" ? "Neto estimado del vendedor" : "Efectivo para cerrar";
+    mainResult.textContent = "Sin calculo";
+    resultContext.textContent =
+      "Captura precio y partidas para estimar el cierre.";
+    summaryGrid.innerHTML = [
+      ["Gastos comprador", "-"],
+      ["Adicional enganche", "-"],
+      ["Gastos vendedor", "-"],
+      ["Neto vendedor", "-"],
+    ]
+      .map(([label, value]) => renderMetric(label, value))
+      .join("");
+    renderWarnings([]);
+    renderImpact({ impactItems: [] });
+    renderBreakdown({ items: [] });
+    setActionsVisible(false);
+  }
+
+  function setInvalidState() {
+    if (!mainResult || !resultContext) {
+      return;
+    }
+
+    mainResult.textContent = "Revisa los datos";
+    resultContext.textContent = "Corrige los campos marcados para calcular.";
+    setActionsVisible(false);
+  }
+
+  function setActionsVisible(isVisible) {
+    copyButton?.classList.toggle("hidden", !isVisible);
+    exportButton?.classList.toggle("hidden", !isVisible);
+  }
+
+  function setMode(mode) {
+    currentMode = ["buyer", "seller", "both"].includes(mode) ? mode : "buyer";
+
+    modeButtons.forEach((button) => {
+      const isActive = button.dataset.modeButton === currentMode;
+
+      button.setAttribute("aria-pressed", String(isActive));
+      button.classList.toggle("bg-emerald-400", isActive);
+      button.classList.toggle("text-gray-950", isActive);
+      button.classList.toggle("text-gray-300", !isActive);
+      button.classList.toggle("hover:bg-gray-800", !isActive);
+    });
+
+    buyerOnlyBlocks.forEach((block) => {
+      block.classList.toggle("hidden", currentMode === "seller");
+    });
+
+    if (currentResult) {
+      currentCopyText = buildCopyText(currentResult, currentMode);
+      renderResult(currentResult);
+    } else {
+      setInitialState();
+    }
+  }
+
+  function showFormError(message) {
+    if (!formError) {
+      return;
+    }
+
+    formError.textContent = message;
+    formError.classList.remove("hidden");
+  }
+
+  function hideFormError() {
+    if (!formError) {
+      return;
+    }
+
+    formError.textContent = "";
+    formError.classList.add("hidden");
+  }
+
+  function clearCalculator() {
+    propertyPriceInput.value = "";
+    downPaymentInput.value = "";
+    reserveSelect.value = "0";
+    expenses = [
+      createExpense({
+        name: "Impuesto / derecho",
+        type: "percent",
+        responsible: "buyer",
+      }),
+    ];
+    hideFormError();
+    renderExpenseCards();
+    setMode("buyer");
+    setInitialState();
+    propertyPriceInput?.focus();
+  }
+
+  async function copyResult() {
+    if (!currentCopyText) {
+      return;
+    }
+
+    try {
+      if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(currentCopyText);
+      } else {
+        const textArea = document.createElement("textarea");
+        textArea.value = currentCopyText;
+        textArea.setAttribute("readonly", "");
+        textArea.style.position = "fixed";
+        textArea.style.opacity = "0";
+        document.body.append(textArea);
+        textArea.select();
+        document.execCommand("copy");
+        textArea.remove();
+      }
+
+      showCopyStatus("Resumen copiado.");
+    } catch {
+      showCopyStatus("No fue posible copiar el resumen.");
+    }
+  }
+
+  function exportCsv() {
+    if (!currentResult) {
+      return;
+    }
+
+    const rows = [
+      ["concepto", "responsable", "tipo", "valor", "monto"],
+      ...currentResult.items.map((item) => [
+        item.name,
+        RESPONSIBILITY_LABELS[item.responsible],
+        COST_TYPE_LABELS[item.type],
+        roundMoney(item.value),
+        roundMoney(item.amount),
+      ]),
+      ["gastos_comprador", "", "", "", roundMoney(currentResult.buyerCosts)],
+      ["gastos_vendedor", "", "", "", roundMoney(currentResult.sellerCosts)],
+      ["reserva", "", "", "", roundMoney(currentResult.reserveAmount)],
+      [
+        "efectivo_requerido_comprador",
+        "",
+        "",
+        "",
+        roundMoney(currentResult.buyerCashRequired),
+      ],
+      ["neto_vendedor", "", "", "", roundMoney(currentResult.sellerNet)],
+    ];
+    const blob = new Blob(
+      [rows.map((row) => row.map(csvEscape).join(",")).join("\n")],
+      { type: "text/csv;charset=utf-8" },
+    );
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "gastos-escrituracion.csv";
+    document.body.append(link);
+    link.click();
+    link.remove();
+    URL.revokeObjectURL(url);
+  }
+
+  function scheduleAnnouncement(message) {
+    window.clearTimeout(liveTimer);
+    liveTimer = window.setTimeout(() => {
+      if (liveStatus) {
+        liveStatus.textContent = message;
+      }
+    }, 350);
+  }
+
+  function showCopyStatus(message) {
+    if (!copyStatus) {
+      return;
+    }
+
+    copyStatus.textContent = message;
+    window.clearTimeout(copyTimer);
+    copyTimer = window.setTimeout(() => {
+      copyStatus.textContent = "";
+    }, 2200);
+  }
+
+  function csvEscape(value) {
+    const text = String(value);
+
+    if (/[",\n]/.test(text)) {
+      return `"${text.replaceAll('"', '""')}"`;
+    }
+
+    return text;
+  }
+
+  function escapeHtml(value) {
+    return String(value)
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;")
+      .replaceAll("'", "&#039;");
+  }
+
+  form?.addEventListener("submit", (event) => {
+    event.preventDefault();
+    updateCalculator({ force: true });
+  });
+
+  [propertyPriceInput, downPaymentInput].forEach((input) => {
+    input?.addEventListener("input", () => updateCalculator());
+  });
+
+  reserveSelect?.addEventListener("change", () => updateCalculator());
+
+  modeButtons.forEach((button) => {
+    button.addEventListener("click", () => {
+      setMode(button.dataset.modeButton);
+    });
+  });
+
+  addExpenseButton?.addEventListener("click", () => {
+    expenses.push(createExpense({ name: `Partida ${expenses.length + 1}` }));
+    renderExpenseCards();
+  });
+
+  expenseList?.addEventListener("input", (event) => {
+    if (event.target instanceof HTMLInputElement) {
+      updateExpenseState(event.target);
+    }
+  });
+
+  expenseList?.addEventListener("change", (event) => {
+    if (event.target instanceof HTMLSelectElement) {
+      updateExpenseState(event.target);
+    }
+  });
+
+  expenseList?.addEventListener("click", (event) => {
+    if (!(event.target instanceof Element)) {
+      return;
+    }
+
+    const removeButton = event.target.closest("[data-remove-expense]");
+
+    if (!removeButton) {
+      return;
+    }
+
+    const id = removeButton.dataset.removeExpense;
+    expenses = expenses.filter((expense) => expense.id !== id);
+    renderExpenseCards();
+    updateCalculator();
+  });
+
+  document.addEventListener("click", (event) => {
+    if (!(event.target instanceof Element)) {
+      return;
+    }
+
+    const chip = event.target.closest("[data-chip-name]");
+
+    if (!chip) {
+      return;
+    }
+
+    expenses.push(
+      createExpense({
+        name: chip.dataset.chipName,
+        type: chip.dataset.chipType,
+        responsible: chip.dataset.chipResponsible,
+      }),
+    );
+    renderExpenseCards();
+    updateCalculator();
+  });
+
+  clearButton?.addEventListener("click", clearCalculator);
+  copyButton?.addEventListener("click", copyResult);
+  exportButton?.addEventListener("click", exportCsv);
+
+  renderExpenseCards();
+  setMode("buyer");
+</script>

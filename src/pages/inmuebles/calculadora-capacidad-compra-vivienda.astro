@@ -1,0 +1,1254 @@
+---
+import AdSlot from "@components/ads/AdSlot.astro";
+import Container from "@components/layout/Container.astro";
+import PageShell from "@components/layout/PageShell.astro";
+import FaqSection from "@components/shared/FaqSection.astro";
+import PageHero from "@components/shared/PageHero.astro";
+import SectionIntro from "@components/shared/SectionIntro.astro";
+import BaseLayout from "@layouts/BaseLayout.astro";
+import {
+  CAPACITY_PRESET_RATIOS,
+  CAPACITY_PRESET_LABELS,
+} from "@lib/calculators/inmuebles/calculadora-capacidad-compra-vivienda/homeAffordability";
+import { buildFaqJsonLd } from "@lib/seo";
+
+const title = "Calculadora de capacidad de compra de vivienda";
+const description =
+  "Estima cuanto podrias pagar por una casa segun ingreso, deudas, enganche, gastos iniciales, tasa y plazo hipotecario.";
+const canonical = "/inmuebles/calculadora-capacidad-compra-vivienda";
+
+const examples = [
+  {
+    label: "Primer hogar",
+    monthlyIncome: "60000",
+    monthlyDebts: "5000",
+    availableCash: "500000",
+    annualRate: "10",
+    years: "20",
+    monthlyHousingCosts: "2000",
+    upfrontCostPercent: "6",
+    targetHomePrice: "2200000",
+  },
+  {
+    label: "Perfil prudente",
+    monthlyIncome: "80000",
+    monthlyDebts: "8000",
+    availableCash: "650000",
+    annualRate: "9.5",
+    years: "20",
+    monthlyHousingCosts: "2500",
+    upfrontCostPercent: "6",
+    targetHomePrice: "2500000",
+  },
+  {
+    label: "Enganche fijo",
+    monthlyIncome: "70000",
+    monthlyDebts: "3000",
+    availableCash: "420000",
+    annualRate: "10.5",
+    years: "25",
+    monthlyHousingCosts: "1800",
+    upfrontCostPercent: "5",
+    targetHomePrice: "1800000",
+    downPaymentType: "amount",
+    downPaymentAmount: "300000",
+  },
+] as const;
+
+const explainerCards = [
+  {
+    title: "Capacidad mensual",
+    text: "Parte de tu ingreso, resta deudas y costos recurrentes, y calcula cuanto pago hipotecario queda dentro del ratio elegido.",
+  },
+  {
+    title: "Efectivo inicial",
+    text: "El precio tambien puede quedar limitado por enganche, gastos de compra y efectivo disponible, no solo por la mensualidad.",
+  },
+  {
+    title: "Vivienda objetivo",
+    text: "Si capturas un precio objetivo, la calculadora muestra faltante mensual, faltante de efectivo e ingreso aproximado requerido.",
+  },
+];
+
+const faqs = [
+  {
+    question: "Como se calcula cuanto puedo pagar por una casa?",
+    answer:
+      "Se estima un limite de obligaciones sobre tu ingreso, se restan deudas y costos mensuales, y el pago hipotecario disponible se convierte en un prestamo aproximado con tasa y plazo.",
+  },
+  {
+    question: "Que es el ratio deuda/ingreso?",
+    answer:
+      "Es el porcentaje del ingreso mensual que se destinaria a deudas actuales, costos de vivienda y pago hipotecario. Un ratio mas alto deja menos margen para otros gastos.",
+  },
+  {
+    question: "Que gastos iniciales debo considerar ademas del enganche?",
+    answer:
+      "Pueden existir escrituracion, avaluo, comisiones, impuestos, mudanza y otros costos. Por eso el MVP permite capturar un porcentaje y un monto fijo.",
+  },
+  {
+    question: "La calculadora garantiza aprobacion?",
+    answer:
+      "No. Es una estimacion educativa. La aprobacion real depende de la institucion, historial, comprobacion de ingresos, inmueble, seguros, comisiones y condiciones vigentes.",
+  },
+  {
+    question: "Debo incluir seguros, predial o mantenimiento?",
+    answer:
+      "Si. Capturalos como costos mensuales adicionales para evitar que el resultado sea demasiado optimista.",
+  },
+];
+
+const faqJsonLd = buildFaqJsonLd(faqs);
+---
+
+<BaseLayout title={title} description={description} canonical={canonical}>
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={JSON.stringify(faqJsonLd)} />
+  </Fragment>
+
+  <PageShell>
+    <PageHero
+      title="Calculadora de capacidad de compra de vivienda"
+      description="Estima que precio de vivienda podrias considerar y detecta si te limita el ingreso, las deudas, el enganche o el efectivo inicial."
+      kicker="Inmuebles"
+      kickerHref="/inmuebles"
+      collapseBreadcrumbOnMobile
+      containerClass="py-6 md:py-8"
+      breadcrumbs={[
+        { label: "Inicio", href: "/", ariaLabel: "Inicio" },
+        { label: "Inmuebles", href: "/inmuebles", optional: true },
+        { label: "Capacidad de compra", truncate: true },
+      ]}
+    />
+
+    <Container as="section" class="py-6 md:py-8">
+      <section
+        id="home-affordability-calculator"
+        class="overflow-hidden rounded-lg border border-gray-700 bg-gray-950 shadow-xl shadow-gray-950/30"
+        aria-labelledby="calculator-heading"
+      >
+        <div class="grid lg:grid-cols-[minmax(0,1fr)_minmax(20rem,0.82fr)]">
+          <aside
+            class="order-1 border-b border-gray-800 bg-gray-900/70 p-4 sm:p-6 lg:order-2 lg:border-b-0 lg:border-l"
+          >
+            <div class="lg:sticky lg:top-6">
+              <p class="text-xs font-semibold uppercase tracking-wide text-gray-500">
+                Resultado principal
+              </p>
+              <p class="mt-2 text-sm font-semibold text-emerald-300">
+                Precio maximo estimado
+              </p>
+              <div class="mt-3 rounded-lg border border-gray-800 bg-gray-950 p-4">
+                <p
+                  class="break-words text-3xl font-semibold text-emerald-100 sm:text-4xl"
+                  data-main-result
+                >
+                  Sin calculo
+                </p>
+                <p
+                  class="mt-3 min-h-12 text-sm leading-relaxed text-gray-400"
+                  data-result-context
+                >
+                  Captura ingreso, efectivo, tasa y plazo para estimar.
+                </p>
+              </div>
+
+              <dl class="mt-4 grid grid-cols-2 gap-2" data-summary-grid>
+                <div class="rounded-lg border border-gray-800 bg-gray-950 p-3">
+                  <dt class="text-xs font-semibold uppercase text-gray-500">
+                    Pago disponible
+                  </dt>
+                  <dd class="mt-1 font-mono text-base font-semibold text-white">
+                    -
+                  </dd>
+                </div>
+                <div class="rounded-lg border border-gray-800 bg-gray-950 p-3">
+                  <dt class="text-xs font-semibold uppercase text-gray-500">
+                    Limitante
+                  </dt>
+                  <dd class="mt-1 font-mono text-base font-semibold text-white">
+                    -
+                  </dd>
+                </div>
+              </dl>
+
+              <section
+                class="mt-4 rounded-lg border border-gray-800 bg-gray-950 p-4"
+                aria-labelledby="income-breakdown-heading"
+              >
+                <h3
+                  id="income-breakdown-heading"
+                  class="text-sm font-semibold text-gray-200"
+                >
+                  Desglose mensual
+                </h3>
+                <div class="mt-3 grid gap-3" data-income-breakdown>
+                  <p class="text-sm text-gray-500">
+                    Sin datos suficientes para el desglose.
+                  </p>
+                </div>
+              </section>
+
+              <section
+                class="mt-4 hidden rounded-lg border border-gray-800 bg-gray-950 p-4"
+                aria-labelledby="target-heading"
+                data-target-panel
+              >
+                <h3 id="target-heading" class="text-sm font-semibold text-gray-200">
+                  Vivienda objetivo
+                </h3>
+                <div class="mt-3 grid gap-2" data-target-content></div>
+              </section>
+
+              <p
+                class="mt-4 hidden rounded-lg border border-amber-300/25 bg-amber-300/10 p-3 text-sm leading-relaxed text-amber-100"
+                data-warning-panel
+              ></p>
+
+              <div class="mt-4 flex flex-col gap-2 sm:flex-row sm:flex-wrap">
+                <button
+                  class="hidden min-h-11 rounded-lg bg-emerald-400 px-4 py-2 text-sm font-semibold text-gray-950 transition hover:bg-emerald-300 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-emerald-300/40"
+                  type="button"
+                  data-copy-result
+                >
+                  Copiar resultado
+                </button>
+                <a
+                  class="min-h-11 rounded-lg border border-emerald-400/60 px-4 py-2 text-center text-sm font-semibold text-emerald-200 transition hover:bg-emerald-400/10 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-emerald-300/40"
+                  href="/inmuebles/calculadora-de-hipoteca"
+                >
+                  Ver hipoteca
+                </a>
+              </div>
+              <p
+                class="mt-3 min-h-5 text-sm text-emerald-300"
+                role="status"
+                aria-live="polite"
+                data-copy-status
+              ></p>
+              <p class="sr-only" role="status" aria-live="polite" data-live-status>
+              </p>
+            </div>
+          </aside>
+
+          <form
+            class="order-2 p-4 sm:p-6 lg:order-1"
+            data-calculator-form
+          >
+            <div>
+              <p class="text-sm font-semibold uppercase tracking-wide text-emerald-300">
+                Presupuesto de compra
+              </p>
+              <h2 id="calculator-heading" class="mt-2 text-2xl font-semibold">
+                Datos para estimar tu rango
+              </h2>
+              <p class="mt-2 text-sm leading-relaxed text-gray-400">
+                Ajusta ingreso, deudas, efectivo inicial, tasa y costos. Los
+                resultados se actualizan sin enviar datos a un servidor.
+              </p>
+            </div>
+
+            <fieldset class="mt-5 rounded-lg border border-gray-800 bg-gray-900/55 p-4">
+              <legend class="px-1 text-sm font-semibold text-gray-200">
+                Ingresos y deudas
+              </legend>
+              <div class="mt-3 grid gap-4 sm:grid-cols-2">
+                <label class="block">
+                  <span class="text-sm font-semibold text-gray-300">
+                    Ingreso mensual bruto
+                  </span>
+                  <div class="mt-2 flex rounded-lg border border-gray-700 bg-gray-950 focus-within:border-emerald-400 focus-within:ring-3 focus-within:ring-emerald-400/15">
+                    <span class="flex items-center px-4 text-gray-500">$</span>
+                    <input
+                      class="min-h-12 w-full bg-transparent px-4 font-mono text-base text-white outline-none placeholder:text-gray-600"
+                      type="text"
+                      inputmode="decimal"
+                      autocomplete="off"
+                      placeholder="60000"
+                      data-monthly-income
+                    />
+                  </div>
+                </label>
+
+                <label class="block">
+                  <span class="text-sm font-semibold text-gray-300">
+                    Deudas mensuales
+                  </span>
+                  <div class="mt-2 flex rounded-lg border border-gray-700 bg-gray-950 focus-within:border-emerald-400 focus-within:ring-3 focus-within:ring-emerald-400/15">
+                    <span class="flex items-center px-4 text-gray-500">$</span>
+                    <input
+                      class="min-h-12 w-full bg-transparent px-4 font-mono text-base text-white outline-none placeholder:text-gray-600"
+                      type="text"
+                      inputmode="decimal"
+                      autocomplete="off"
+                      value="0"
+                      placeholder="0"
+                      data-monthly-debts
+                    />
+                  </div>
+                </label>
+              </div>
+
+              <div class="mt-4">
+                <span class="block text-sm font-semibold text-gray-300">
+                  Perfil de capacidad
+                </span>
+                <div
+                  class="mt-2 grid gap-2 sm:grid-cols-3"
+                  role="group"
+                  aria-label="Perfil de capacidad"
+                >
+                  {
+                    (Object.entries(CAPACITY_PRESET_RATIOS) as [
+                      keyof typeof CAPACITY_PRESET_RATIOS,
+                      number,
+                    ][]).map(([preset, ratio]) => (
+                      <button
+                        class:list={[
+                          "min-h-11 rounded-lg border px-3 py-2 text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-emerald-300/40",
+                          preset === "standard"
+                            ? "border-emerald-400 bg-emerald-400 text-gray-950"
+                            : "border-gray-700 text-gray-300 hover:bg-gray-800",
+                        ]}
+                        type="button"
+                        aria-pressed={preset === "standard" ? "true" : "false"}
+                        data-preset-button={preset}
+                        data-preset-ratio={ratio}
+                      >
+                        {CAPACITY_PRESET_LABELS[preset]} {ratio}%
+                      </button>
+                    ))
+                  }
+                </div>
+              </div>
+
+              <label class="mt-4 block">
+                <span class="text-sm font-semibold text-gray-300">
+                  Ratio maximo obligaciones/ingreso
+                </span>
+                <div class="mt-2 flex rounded-lg border border-gray-700 bg-gray-950 focus-within:border-emerald-400 focus-within:ring-3 focus-within:ring-emerald-400/15">
+                  <input
+                    class="min-h-12 w-full bg-transparent px-4 font-mono text-base text-white outline-none placeholder:text-gray-600"
+                    type="text"
+                    inputmode="decimal"
+                    autocomplete="off"
+                    value="35"
+                    data-max-ratio
+                  />
+                  <span class="flex items-center px-4 text-gray-500">%</span>
+                </div>
+              </label>
+            </fieldset>
+
+            <fieldset class="mt-4 rounded-lg border border-gray-800 bg-gray-900/55 p-4">
+              <legend class="px-1 text-sm font-semibold text-gray-200">
+                Compra y enganche
+              </legend>
+              <div class="mt-3 grid gap-4 sm:grid-cols-2">
+                <label class="block">
+                  <span class="text-sm font-semibold text-gray-300">
+                    Efectivo total disponible
+                  </span>
+                  <div class="mt-2 flex rounded-lg border border-gray-700 bg-gray-950 focus-within:border-emerald-400 focus-within:ring-3 focus-within:ring-emerald-400/15">
+                    <span class="flex items-center px-4 text-gray-500">$</span>
+                    <input
+                      class="min-h-12 w-full bg-transparent px-4 font-mono text-base text-white outline-none placeholder:text-gray-600"
+                      type="text"
+                      inputmode="decimal"
+                      autocomplete="off"
+                      value="0"
+                      placeholder="500000"
+                      data-available-cash
+                    />
+                  </div>
+                </label>
+
+                <label class="block">
+                  <span class="text-sm font-semibold text-gray-300">
+                    Financiamiento maximo
+                  </span>
+                  <div class="mt-2 flex rounded-lg border border-gray-700 bg-gray-950 focus-within:border-emerald-400 focus-within:ring-3 focus-within:ring-emerald-400/15">
+                    <input
+                      class="min-h-12 w-full bg-transparent px-4 font-mono text-base text-white outline-none placeholder:text-gray-600"
+                      type="text"
+                      inputmode="decimal"
+                      autocomplete="off"
+                      value="80"
+                      data-max-financing
+                    />
+                    <span class="flex items-center px-4 text-gray-500">%</span>
+                  </div>
+                </label>
+              </div>
+
+              <div class="mt-4">
+                <span class="block text-sm font-semibold text-gray-300">
+                  Capturar enganche como
+                </span>
+                <div
+                  class="mt-2 grid grid-cols-2 gap-2"
+                  role="group"
+                  aria-label="Tipo de enganche"
+                >
+                  <button
+                    class="min-h-11 rounded-lg border border-emerald-400 bg-emerald-400 px-3 py-2 text-sm font-semibold text-gray-950 transition focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-emerald-300/40"
+                    type="button"
+                    aria-pressed="true"
+                    data-down-payment-type-button="percent"
+                  >
+                    Porcentaje
+                  </button>
+                  <button
+                    class="min-h-11 rounded-lg border border-gray-700 px-3 py-2 text-sm font-semibold text-gray-300 transition hover:bg-gray-800 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-emerald-300/40"
+                    type="button"
+                    aria-pressed="false"
+                    data-down-payment-type-button="amount"
+                  >
+                    Monto
+                  </button>
+                </div>
+              </div>
+
+              <div class="mt-4 grid gap-4 sm:grid-cols-2">
+                <label class="block" data-down-payment-percent-block>
+                  <span class="text-sm font-semibold text-gray-300">
+                    Enganche
+                  </span>
+                  <div class="mt-2 flex rounded-lg border border-gray-700 bg-gray-950 focus-within:border-emerald-400 focus-within:ring-3 focus-within:ring-emerald-400/15">
+                    <input
+                      class="min-h-12 w-full bg-transparent px-4 font-mono text-base text-white outline-none placeholder:text-gray-600"
+                      type="text"
+                      inputmode="decimal"
+                      autocomplete="off"
+                      value="20"
+                      data-down-payment-percent
+                    />
+                    <span class="flex items-center px-4 text-gray-500">%</span>
+                  </div>
+                </label>
+
+                <label class="block hidden" data-down-payment-amount-block>
+                  <span class="text-sm font-semibold text-gray-300">
+                    Enganche en dinero
+                  </span>
+                  <div class="mt-2 flex rounded-lg border border-gray-700 bg-gray-950 focus-within:border-emerald-400 focus-within:ring-3 focus-within:ring-emerald-400/15">
+                    <span class="flex items-center px-4 text-gray-500">$</span>
+                    <input
+                      class="min-h-12 w-full bg-transparent px-4 font-mono text-base text-white outline-none placeholder:text-gray-600"
+                      type="text"
+                      inputmode="decimal"
+                      autocomplete="off"
+                      value="0"
+                      placeholder="300000"
+                      data-down-payment-amount
+                    />
+                  </div>
+                </label>
+              </div>
+            </fieldset>
+
+            <fieldset class="mt-4 rounded-lg border border-gray-800 bg-gray-900/55 p-4">
+              <legend class="px-1 text-sm font-semibold text-gray-200">
+                Credito y costos
+              </legend>
+              <div class="mt-3 grid gap-4 sm:grid-cols-2">
+                <label class="block">
+                  <span class="text-sm font-semibold text-gray-300">
+                    Tasa anual
+                  </span>
+                  <div class="mt-2 flex rounded-lg border border-gray-700 bg-gray-950 focus-within:border-emerald-400 focus-within:ring-3 focus-within:ring-emerald-400/15">
+                    <input
+                      class="min-h-12 w-full bg-transparent px-4 font-mono text-base text-white outline-none placeholder:text-gray-600"
+                      type="text"
+                      inputmode="decimal"
+                      autocomplete="off"
+                      placeholder="10"
+                      data-annual-rate
+                    />
+                    <span class="flex items-center px-4 text-gray-500">%</span>
+                  </div>
+                </label>
+
+                <label class="block">
+                  <span class="text-sm font-semibold text-gray-300">Plazo</span>
+                  <div class="mt-2 flex rounded-lg border border-gray-700 bg-gray-950 focus-within:border-emerald-400 focus-within:ring-3 focus-within:ring-emerald-400/15">
+                    <input
+                      class="min-h-12 w-full bg-transparent px-4 font-mono text-base text-white outline-none placeholder:text-gray-600"
+                      type="text"
+                      inputmode="numeric"
+                      autocomplete="off"
+                      value="20"
+                      data-years
+                    />
+                    <span class="flex items-center px-4 text-gray-500">anos</span>
+                  </div>
+                </label>
+
+                <label class="block">
+                  <span class="text-sm font-semibold text-gray-300">
+                    Costos mensuales adicionales
+                  </span>
+                  <div class="mt-2 flex rounded-lg border border-gray-700 bg-gray-950 focus-within:border-emerald-400 focus-within:ring-3 focus-within:ring-emerald-400/15">
+                    <span class="flex items-center px-4 text-gray-500">$</span>
+                    <input
+                      class="min-h-12 w-full bg-transparent px-4 font-mono text-base text-white outline-none placeholder:text-gray-600"
+                      type="text"
+                      inputmode="decimal"
+                      autocomplete="off"
+                      value="0"
+                      placeholder="2000"
+                      data-monthly-housing-costs
+                    />
+                  </div>
+                </label>
+
+                <label class="block">
+                  <span class="text-sm font-semibold text-gray-300">
+                    Costos iniciales
+                  </span>
+                  <div class="mt-2 flex rounded-lg border border-gray-700 bg-gray-950 focus-within:border-emerald-400 focus-within:ring-3 focus-within:ring-emerald-400/15">
+                    <input
+                      class="min-h-12 w-full bg-transparent px-4 font-mono text-base text-white outline-none placeholder:text-gray-600"
+                      type="text"
+                      inputmode="decimal"
+                      autocomplete="off"
+                      value="6"
+                      data-upfront-cost-percent
+                    />
+                    <span class="flex items-center px-4 text-gray-500">%</span>
+                  </div>
+                </label>
+
+                <label class="block">
+                  <span class="text-sm font-semibold text-gray-300">
+                    Costos iniciales fijos
+                  </span>
+                  <div class="mt-2 flex rounded-lg border border-gray-700 bg-gray-950 focus-within:border-emerald-400 focus-within:ring-3 focus-within:ring-emerald-400/15">
+                    <span class="flex items-center px-4 text-gray-500">$</span>
+                    <input
+                      class="min-h-12 w-full bg-transparent px-4 font-mono text-base text-white outline-none placeholder:text-gray-600"
+                      type="text"
+                      inputmode="decimal"
+                      autocomplete="off"
+                      value="0"
+                      data-upfront-cost-fixed
+                    />
+                  </div>
+                </label>
+
+                <label class="block">
+                  <span class="text-sm font-semibold text-gray-300">
+                    Precio de vivienda objetivo
+                  </span>
+                  <div class="mt-2 flex rounded-lg border border-gray-700 bg-gray-950 focus-within:border-emerald-400 focus-within:ring-3 focus-within:ring-emerald-400/15">
+                    <span class="flex items-center px-4 text-gray-500">$</span>
+                    <input
+                      class="min-h-12 w-full bg-transparent px-4 font-mono text-base text-white outline-none placeholder:text-gray-600"
+                      type="text"
+                      inputmode="decimal"
+                      autocomplete="off"
+                      placeholder="2200000"
+                      data-target-home-price
+                    />
+                  </div>
+                </label>
+              </div>
+            </fieldset>
+
+            <p
+              class="mt-4 hidden rounded-lg border border-red-400/25 bg-red-400/10 p-3 text-sm leading-relaxed text-red-200"
+              role="alert"
+              data-form-error
+            ></p>
+
+            <div class="mt-5 grid gap-2 sm:grid-cols-3">
+              {
+                examples.map((example) => (
+                  <button
+                    class="min-h-16 rounded-lg border border-gray-700 bg-gray-900 px-3 py-2 text-left text-sm text-gray-200 transition hover:border-emerald-400/60 hover:bg-gray-800 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-emerald-300/30"
+                    type="button"
+                    data-example={JSON.stringify(example)}
+                  >
+                    <span class="block font-semibold">{example.label}</span>
+                    <span class="mt-1 block font-mono text-xs text-emerald-200">
+                      {example.monthlyIncome} ingreso
+                    </span>
+                  </button>
+                ))
+              }
+            </div>
+
+            <div class="mt-5 rounded-lg border border-amber-300/25 bg-amber-300/10 p-4 text-sm leading-relaxed text-amber-100">
+              Estimacion informativa: no es aprobacion bancaria ni asesoria
+              financiera. Confirma tasas, seguros, comisiones y gastos reales
+              con la institucion correspondiente.
+            </div>
+
+            <div class="mt-5 flex flex-col gap-3 sm:flex-row">
+              <button
+                class="min-h-11 rounded-lg bg-emerald-400 px-5 py-2 text-sm font-semibold text-gray-950 transition hover:bg-emerald-300 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-emerald-300/40"
+                type="submit"
+              >
+                Calcular
+              </button>
+              <button
+                class="min-h-11 rounded-lg border border-gray-700 px-5 py-2 text-sm font-semibold text-gray-200 transition hover:border-gray-500 hover:bg-gray-900 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-gray-400/30"
+                type="button"
+                data-clear-calculator
+              >
+                Limpiar
+              </button>
+            </div>
+          </form>
+        </div>
+      </section>
+    </Container>
+
+    <AdSlot placement="calculator-after-tool" />
+
+    <Container as="section" class="py-6 md:py-8">
+      <SectionIntro
+        title="Como interpretar el resultado"
+        description="La cifra principal es un rango estimado. Lo importante es ver que restriccion manda y cuanto cambia el escenario si agregas costos reales."
+      />
+      <div class="grid gap-4 md:grid-cols-3">
+        {
+          explainerCards.map((card) => (
+            <article class="rounded-lg border border-gray-800 bg-gray-950 p-5">
+              <h3 class="text-base font-semibold text-white">{card.title}</h3>
+              <p class="mt-2 text-sm leading-relaxed text-gray-400">
+                {card.text}
+              </p>
+            </article>
+          ))
+        }
+      </div>
+    </Container>
+
+    <Container as="section" class="py-6 md:py-8">
+      <SectionIntro
+        title="Herramientas relacionadas"
+        description="Despues de estimar tu rango, puedes profundizar en mensualidad, amortizacion y gastos de cierre."
+      />
+      <div class="grid gap-4 md:grid-cols-2">
+        <a
+          class="rounded-lg border border-gray-800 bg-gray-950 p-5 transition hover:border-emerald-400/60 hover:bg-gray-900"
+          href="/inmuebles/calculadora-de-hipoteca"
+        >
+          <h3 class="text-base font-semibold text-white">
+            Calculadora de hipoteca
+          </h3>
+          <p class="mt-2 text-sm leading-relaxed text-gray-400">
+            Estima cuota mensual, intereses y tabla de amortizacion con un
+            monto de prestamo concreto.
+          </p>
+        </a>
+        <a
+          class="rounded-lg border border-gray-800 bg-gray-950 p-5 transition hover:border-emerald-400/60 hover:bg-gray-900"
+          href="/inmuebles/calculadora-gastos-escrituracion"
+        >
+          <h3 class="text-base font-semibold text-white">
+            Calculadora de gastos de escrituracion
+          </h3>
+          <p class="mt-2 text-sm leading-relaxed text-gray-400">
+            Desglosa gastos de cierre, efectivo requerido y partidas editables.
+          </p>
+        </a>
+      </div>
+    </Container>
+
+    <FaqSection faqs={faqs} />
+  </PageShell>
+</BaseLayout>
+
+<script>
+  import {
+    buildCopyText,
+    buildInterpretation,
+    calculateHomeAffordability,
+    formatCurrency,
+    formatPercent,
+    parseLocalizedNumber,
+  } from "@lib/calculators/inmuebles/calculadora-capacidad-compra-vivienda/homeAffordability";
+
+  const form = document.querySelector("[data-calculator-form]");
+  const monthlyIncomeInput = document.querySelector("[data-monthly-income]");
+  const monthlyDebtsInput = document.querySelector("[data-monthly-debts]");
+  const maxRatioInput = document.querySelector("[data-max-ratio]");
+  const availableCashInput = document.querySelector("[data-available-cash]");
+  const downPaymentPercentInput = document.querySelector(
+    "[data-down-payment-percent]",
+  );
+  const downPaymentAmountInput = document.querySelector(
+    "[data-down-payment-amount]",
+  );
+  const maxFinancingInput = document.querySelector("[data-max-financing]");
+  const annualRateInput = document.querySelector("[data-annual-rate]");
+  const yearsInput = document.querySelector("[data-years]");
+  const monthlyHousingCostsInput = document.querySelector(
+    "[data-monthly-housing-costs]",
+  );
+  const upfrontCostPercentInput = document.querySelector(
+    "[data-upfront-cost-percent]",
+  );
+  const upfrontCostFixedInput = document.querySelector("[data-upfront-cost-fixed]");
+  const targetHomePriceInput = document.querySelector("[data-target-home-price]");
+  const presetButtons = document.querySelectorAll("[data-preset-button]");
+  const downPaymentTypeButtons = document.querySelectorAll(
+    "[data-down-payment-type-button]",
+  );
+  const downPaymentPercentBlock = document.querySelector(
+    "[data-down-payment-percent-block]",
+  );
+  const downPaymentAmountBlock = document.querySelector(
+    "[data-down-payment-amount-block]",
+  );
+  const exampleButtons = document.querySelectorAll("[data-example]");
+  const clearButton = document.querySelector("[data-clear-calculator]");
+  const formError = document.querySelector("[data-form-error]");
+  const mainResult = document.querySelector("[data-main-result]");
+  const resultContext = document.querySelector("[data-result-context]");
+  const summaryGrid = document.querySelector("[data-summary-grid]");
+  const incomeBreakdown = document.querySelector("[data-income-breakdown]");
+  const targetPanel = document.querySelector("[data-target-panel]");
+  const targetContent = document.querySelector("[data-target-content]");
+  const warningPanel = document.querySelector("[data-warning-panel]");
+  const copyButton = document.querySelector("[data-copy-result]");
+  const copyStatus = document.querySelector("[data-copy-status]");
+  const liveStatus = document.querySelector("[data-live-status]");
+
+  let currentResult = null;
+  let currentCopyText = "";
+  let currentPreset = "standard";
+  let currentDownPaymentType = "percent";
+  let copyTimer = 0;
+  let liveTimer = 0;
+
+  function parseCalculatorInput({ force = false } = {}) {
+    const monthlyIncome = parseNumberField(
+      monthlyIncomeInput?.value ?? "",
+      "El ingreso mensual",
+      { required: force, positive: true },
+    );
+    const annualRatePercent = parseNumberField(
+      annualRateInput?.value ?? "",
+      "La tasa anual",
+      { required: force, min: 0, max: 100 },
+    );
+
+    if (monthlyIncome === null || annualRatePercent === null) {
+      return null;
+    }
+
+    return {
+      monthlyIncome,
+      annualRatePercent,
+      monthlyDebts:
+        parseNumberField(monthlyDebtsInput?.value ?? "", "Las deudas", {
+          defaultValue: 0,
+        }) ?? 0,
+      maxDebtToIncomePercent:
+        parseNumberField(maxRatioInput?.value ?? "", "El ratio maximo", {
+          defaultValue: 35,
+          min: 1,
+          max: 100,
+        }) ?? 35,
+      capacityPreset: currentPreset,
+      availableCash:
+        parseNumberField(availableCashInput?.value ?? "", "El efectivo", {
+          defaultValue: 0,
+        }) ?? 0,
+      downPaymentType: currentDownPaymentType,
+      downPaymentPercent:
+        parseNumberField(
+          downPaymentPercentInput?.value ?? "",
+          "El enganche",
+          { defaultValue: 20, min: 0, max: 100 },
+        ) ?? 20,
+      downPaymentAmount:
+        parseNumberField(
+          downPaymentAmountInput?.value ?? "",
+          "El enganche en dinero",
+          { defaultValue: 0 },
+        ) ?? 0,
+      maxFinancingPercent:
+        parseNumberField(
+          maxFinancingInput?.value ?? "",
+          "El financiamiento maximo",
+          { defaultValue: 80, min: 1, max: 100 },
+        ) ?? 80,
+      years:
+        parseNumberField(yearsInput?.value ?? "", "El plazo", {
+          defaultValue: 20,
+          integer: true,
+          min: 1,
+          max: 40,
+        }) ?? 20,
+      monthlyHousingCosts:
+        parseNumberField(
+          monthlyHousingCostsInput?.value ?? "",
+          "Los costos mensuales",
+          { defaultValue: 0 },
+        ) ?? 0,
+      upfrontCostPercent:
+        parseNumberField(
+          upfrontCostPercentInput?.value ?? "",
+          "Los costos iniciales",
+          { defaultValue: 6, min: 0, max: 30 },
+        ) ?? 6,
+      upfrontCostFixed:
+        parseNumberField(
+          upfrontCostFixedInput?.value ?? "",
+          "Los costos iniciales fijos",
+          { defaultValue: 0 },
+        ) ?? 0,
+      targetHomePrice:
+        parseNumberField(
+          targetHomePriceInput?.value ?? "",
+          "La vivienda objetivo",
+          { required: false, defaultValue: undefined },
+        ) ?? undefined,
+    };
+  }
+
+  function parseNumberField(value, label, options = {}) {
+    const trimmed = String(value).trim();
+
+    if (!trimmed) {
+      if (Object.prototype.hasOwnProperty.call(options, "defaultValue")) {
+        return options.defaultValue;
+      }
+
+      if (options.required) {
+        throw new RangeError(`${label} es obligatorio.`);
+      }
+
+      return null;
+    }
+
+    const parsed = parseLocalizedNumber(trimmed);
+
+    if (parsed === null) {
+      throw new RangeError(`${label} debe ser un numero valido.`);
+    }
+
+    if (parsed < 0) {
+      throw new RangeError(`${label} no puede ser negativo.`);
+    }
+
+    if (options.positive && parsed <= 0) {
+      throw new RangeError(`${label} debe ser mayor que cero.`);
+    }
+
+    if (options.integer && !Number.isInteger(parsed)) {
+      throw new RangeError(`${label} debe ser un numero entero.`);
+    }
+
+    if (
+      (typeof options.min === "number" && parsed < options.min) ||
+      (typeof options.max === "number" && parsed > options.max)
+    ) {
+      throw new RangeError(
+        `${label} debe estar entre ${options.min} y ${options.max}.`,
+      );
+    }
+
+    return parsed;
+  }
+
+  function updateCalculator(options = {}) {
+    try {
+      hideFormError();
+      const input = parseCalculatorInput(options);
+
+      if (!input) {
+        setInitialState();
+        return;
+      }
+
+      currentResult = calculateHomeAffordability(input);
+      currentCopyText = buildCopyText(currentResult);
+      renderResult(currentResult);
+      setActionsVisible(true);
+    } catch (error) {
+      currentResult = null;
+      currentCopyText = "";
+      showFormError(error instanceof Error ? error.message : "Revisa los datos.");
+      setInvalidState();
+    }
+  }
+
+  function renderResult(result) {
+    if (!mainResult || !resultContext || !summaryGrid) {
+      return;
+    }
+
+    mainResult.textContent = formatCurrency(result.maxHomePrice);
+    resultContext.textContent = buildInterpretation(result);
+    summaryGrid.innerHTML = [
+      ["Pago disponible", formatCurrency(result.mortgagePaymentAvailable)],
+      ["Prestamo aprox.", formatCurrency(result.estimatedLoanAmount)],
+      ["Efectivo inicial", formatCurrency(result.initialCashRequired)],
+      ["Limitante", result.limitingFactor.label],
+      ["Enganche", formatCurrency(result.estimatedDownPayment)],
+      ["Costos iniciales", formatCurrency(result.estimatedUpfrontCosts)],
+      ["Ratio total", formatPercent(result.totalDebtToIncomePercent)],
+      ["Ingreso restante", formatCurrency(result.remainingMonthlyIncome)],
+    ]
+      .map(([label, value]) => renderMetric(label, value))
+      .join("");
+
+    renderIncomeBreakdown(result);
+    renderTarget(result);
+    renderWarnings(result.warnings);
+    scheduleAnnouncement(`Resultado: ${mainResult.textContent}`);
+  }
+
+  function renderMetric(label, value) {
+    return `
+      <div class="rounded-lg border border-gray-800 bg-gray-950 p-3">
+        <dt class="text-xs font-semibold uppercase text-gray-500">${escapeHtml(label)}</dt>
+        <dd class="mt-1 break-words font-mono text-base font-semibold text-white">${escapeHtml(value)}</dd>
+      </div>
+    `;
+  }
+
+  function renderIncomeBreakdown(result) {
+    if (!incomeBreakdown) {
+      return;
+    }
+
+    const rows = [
+      {
+        label: "Deudas actuales",
+        value: result.monthlyDebts,
+        color: "bg-amber-300",
+      },
+      {
+        label: "Costos vivienda",
+        value: result.monthlyHousingCosts,
+        color: "bg-sky-300",
+      },
+      {
+        label: "Hipoteca estimada",
+        value: result.estimatedMortgagePayment,
+        color: "bg-emerald-300",
+      },
+      {
+        label: "Restante",
+        value: Math.max(0, result.remainingMonthlyIncome),
+        color: "bg-gray-600",
+      },
+    ];
+
+    incomeBreakdown.innerHTML = rows
+      .map((row) => {
+        const width =
+          result.monthlyIncome > 0
+            ? Math.min(100, Math.max(0, (row.value / result.monthlyIncome) * 100))
+            : 0;
+
+        return `
+          <article>
+            <div class="flex items-start justify-between gap-3 text-sm">
+              <span class="text-gray-300">${escapeHtml(row.label)}</span>
+              <span class="font-mono font-semibold text-gray-100">${formatCurrency(row.value)}</span>
+            </div>
+            <div class="mt-2 h-2 overflow-hidden rounded-full bg-gray-800">
+              <div class="h-full ${row.color}" style="width: ${width}%"></div>
+            </div>
+          </article>
+        `;
+      })
+      .join("");
+  }
+
+  function renderTarget(result) {
+    if (!targetPanel || !targetContent) {
+      return;
+    }
+
+    if (!result.target) {
+      targetPanel.classList.add("hidden");
+      targetContent.innerHTML = "";
+      return;
+    }
+
+    const isWithin = result.target.status === "within_range";
+    targetPanel.classList.remove("hidden");
+    targetContent.innerHTML = `
+      <p class="rounded-md border ${isWithin ? "border-emerald-400/40 bg-emerald-400/10 text-emerald-100" : "border-amber-300/30 bg-amber-300/10 text-amber-100"} p-3 text-sm font-semibold">
+        ${isWithin ? "Dentro del rango estimado" : "Por encima del rango estimado"}
+      </p>
+      <dl class="grid grid-cols-2 gap-2">
+        ${[
+          ["Pago objetivo", formatCurrency(result.target.mortgagePayment)],
+          ["Efectivo objetivo", formatCurrency(result.target.initialCashRequired)],
+          ["Faltante mensual", formatCurrency(result.target.monthlyShortfall)],
+          ["Faltante efectivo", formatCurrency(result.target.cashShortfall)],
+          ["Ingreso requerido", formatCurrency(result.target.requiredMonthlyIncome)],
+          ["Ratio objetivo", formatPercent(result.target.totalDebtToIncomePercent)],
+        ]
+          .map(([label, value]) => renderMetric(label, value))
+          .join("")}
+      </dl>
+    `;
+  }
+
+  function renderWarnings(warnings) {
+    if (!warningPanel) {
+      return;
+    }
+
+    if (warnings.length === 0) {
+      warningPanel.textContent = "";
+      warningPanel.classList.add("hidden");
+      return;
+    }
+
+    warningPanel.textContent = warnings.join(" ");
+    warningPanel.classList.remove("hidden");
+  }
+
+  function setInitialState() {
+    if (!mainResult || !resultContext || !summaryGrid || !incomeBreakdown) {
+      return;
+    }
+
+    currentResult = null;
+    currentCopyText = "";
+    mainResult.textContent = "Sin calculo";
+    resultContext.textContent =
+      "Captura ingreso, efectivo, tasa y plazo para estimar.";
+    summaryGrid.innerHTML = [
+      ["Pago disponible", "-"],
+      ["Prestamo aprox.", "-"],
+      ["Efectivo inicial", "-"],
+      ["Limitante", "-"],
+    ]
+      .map(([label, value]) => renderMetric(label, value))
+      .join("");
+    incomeBreakdown.innerHTML =
+      '<p class="text-sm text-gray-500">Sin datos suficientes para el desglose.</p>';
+    targetPanel?.classList.add("hidden");
+    renderWarnings([]);
+    setActionsVisible(false);
+  }
+
+  function setInvalidState() {
+    if (!mainResult || !resultContext) {
+      return;
+    }
+
+    mainResult.textContent = "Revisa los datos";
+    resultContext.textContent = "Corrige los campos marcados para calcular.";
+    setActionsVisible(false);
+  }
+
+  function setActionsVisible(isVisible) {
+    copyButton?.classList.toggle("hidden", !isVisible);
+  }
+
+  function setPreset(preset, ratio) {
+    currentPreset = preset;
+
+    if (maxRatioInput && ratio) {
+      maxRatioInput.value = ratio;
+    }
+
+    presetButtons.forEach((button) => {
+      const isActive = button.dataset.presetButton === currentPreset;
+
+      button.setAttribute("aria-pressed", String(isActive));
+      button.classList.toggle("border-emerald-400", isActive);
+      button.classList.toggle("bg-emerald-400", isActive);
+      button.classList.toggle("text-gray-950", isActive);
+      button.classList.toggle("border-gray-700", !isActive);
+      button.classList.toggle("text-gray-300", !isActive);
+      button.classList.toggle("hover:bg-gray-800", !isActive);
+    });
+
+    updateCalculator();
+  }
+
+  function setDownPaymentType(type) {
+    currentDownPaymentType = type === "amount" ? "amount" : "percent";
+
+    downPaymentTypeButtons.forEach((button) => {
+      const isActive =
+        button.dataset.downPaymentTypeButton === currentDownPaymentType;
+
+      button.setAttribute("aria-pressed", String(isActive));
+      button.classList.toggle("border-emerald-400", isActive);
+      button.classList.toggle("bg-emerald-400", isActive);
+      button.classList.toggle("text-gray-950", isActive);
+      button.classList.toggle("border-gray-700", !isActive);
+      button.classList.toggle("text-gray-300", !isActive);
+      button.classList.toggle("hover:bg-gray-800", !isActive);
+    });
+
+    downPaymentPercentBlock?.classList.toggle(
+      "hidden",
+      currentDownPaymentType !== "percent",
+    );
+    downPaymentAmountBlock?.classList.toggle(
+      "hidden",
+      currentDownPaymentType !== "amount",
+    );
+    downPaymentAmountBlock?.classList.toggle(
+      "sm:block",
+      currentDownPaymentType === "amount",
+    );
+    updateCalculator();
+  }
+
+  function applyExample(rawExample) {
+    let example = {};
+
+    try {
+      example = JSON.parse(rawExample || "{}");
+    } catch {
+      return;
+    }
+
+    monthlyIncomeInput.value = example.monthlyIncome ?? "";
+    monthlyDebtsInput.value = example.monthlyDebts ?? "0";
+    availableCashInput.value = example.availableCash ?? "0";
+    annualRateInput.value = example.annualRate ?? "";
+    yearsInput.value = example.years ?? "20";
+    monthlyHousingCostsInput.value = example.monthlyHousingCosts ?? "0";
+    upfrontCostPercentInput.value = example.upfrontCostPercent ?? "6";
+    upfrontCostFixedInput.value = "0";
+    targetHomePriceInput.value = example.targetHomePrice ?? "";
+    downPaymentPercentInput.value = "20";
+    downPaymentAmountInput.value = example.downPaymentAmount ?? "0";
+    setDownPaymentType(example.downPaymentType ?? "percent");
+    updateCalculator({ force: true });
+  }
+
+  function showFormError(message) {
+    if (!formError) {
+      return;
+    }
+
+    formError.textContent = message;
+    formError.classList.remove("hidden");
+  }
+
+  function hideFormError() {
+    if (!formError) {
+      return;
+    }
+
+    formError.textContent = "";
+    formError.classList.add("hidden");
+  }
+
+  function clearCalculator() {
+    monthlyIncomeInput.value = "";
+    monthlyDebtsInput.value = "0";
+    maxRatioInput.value = "35";
+    availableCashInput.value = "0";
+    downPaymentPercentInput.value = "20";
+    downPaymentAmountInput.value = "0";
+    maxFinancingInput.value = "80";
+    annualRateInput.value = "";
+    yearsInput.value = "20";
+    monthlyHousingCostsInput.value = "0";
+    upfrontCostPercentInput.value = "6";
+    upfrontCostFixedInput.value = "0";
+    targetHomePriceInput.value = "";
+    hideFormError();
+    setPreset("standard", "35");
+    setDownPaymentType("percent");
+    setInitialState();
+    monthlyIncomeInput?.focus();
+  }
+
+  async function copyResult() {
+    if (!currentCopyText) {
+      return;
+    }
+
+    try {
+      if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(currentCopyText);
+      } else {
+        const textArea = document.createElement("textarea");
+        textArea.value = currentCopyText;
+        textArea.setAttribute("readonly", "");
+        textArea.style.position = "fixed";
+        textArea.style.opacity = "0";
+        document.body.append(textArea);
+        textArea.select();
+        document.execCommand("copy");
+        textArea.remove();
+      }
+
+      showCopyStatus("Resultado copiado.");
+    } catch {
+      showCopyStatus("No fue posible copiar el resultado.");
+    }
+  }
+
+  function showCopyStatus(message) {
+    if (!copyStatus) {
+      return;
+    }
+
+    copyStatus.textContent = message;
+    window.clearTimeout(copyTimer);
+    copyTimer = window.setTimeout(() => {
+      copyStatus.textContent = "";
+    }, 2600);
+  }
+
+  function scheduleAnnouncement(message) {
+    if (!liveStatus) {
+      return;
+    }
+
+    window.clearTimeout(liveTimer);
+    liveTimer = window.setTimeout(() => {
+      liveStatus.textContent = message;
+    }, 250);
+  }
+
+  function escapeHtml(value) {
+    return String(value).replace(/[&<>"']/g, (character) => {
+      const entities = {
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#39;",
+      };
+
+      return entities[character] ?? character;
+    });
+  }
+
+  form?.addEventListener("submit", (event) => {
+    event.preventDefault();
+    updateCalculator({ force: true });
+  });
+
+  form?.addEventListener("input", () => updateCalculator());
+  presetButtons.forEach((button) => {
+    button.addEventListener("click", () =>
+      setPreset(button.dataset.presetButton, button.dataset.presetRatio),
+    );
+  });
+  downPaymentTypeButtons.forEach((button) => {
+    button.addEventListener("click", () =>
+      setDownPaymentType(button.dataset.downPaymentTypeButton),
+    );
+  });
+  exampleButtons.forEach((button) => {
+    button.addEventListener("click", () => applyExample(button.dataset.example));
+  });
+  clearButton?.addEventListener("click", clearCalculator);
+  copyButton?.addEventListener("click", copyResult);
+
+  setInitialState();
+</script>

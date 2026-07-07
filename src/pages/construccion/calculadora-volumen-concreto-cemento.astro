@@ -1,0 +1,992 @@
+---
+import BaseLayout from "@layouts/BaseLayout.astro";
+import AdSlot from "@components/ads/AdSlot.astro";
+import Container from "@components/layout/Container.astro";
+import PageShell from "@components/layout/PageShell.astro";
+import FaqSection from "@components/shared/FaqSection.astro";
+import PageHero from "@components/shared/PageHero.astro";
+import SectionIntro from "@components/shared/SectionIntro.astro";
+import { buildFaqJsonLd } from "@lib/seo";
+
+const title = "Calculadora de volumen de concreto y cemento";
+const description =
+  "Calcula metros cúbicos de concreto para losas, columnas, vigas y zapatas, con desperdicio, sacos estimados y costo opcional.";
+const canonical = "/construccion/calculadora-volumen-concreto-cemento";
+
+const faqs = [
+  {
+    question: "¿Cómo calculo metros cúbicos de concreto?",
+    answer:
+      "Multiplica largo, ancho y espesor en metros. Para columnas circulares usa el radio al cuadrado por pi y por la altura. La calculadora convierte cm, ft e in a metros antes de sumar.",
+  },
+  {
+    question: "¿Cuánto desperdicio debo agregar al concreto?",
+    answer:
+      "Un margen frecuente es 5% a 10%, pero puede cambiar por excavación irregular, cimbra, bombeo, acceso y forma de colado. Puedes editarlo según tu caso.",
+  },
+  {
+    question: "¿Cómo se calcula concreto para una losa?",
+    answer:
+      "Para una losa rectangular se multiplica largo por ancho por espesor. Puedes capturar largo y ancho en metros y el espesor en centímetros.",
+  },
+  {
+    question: "¿Cómo se calcula concreto para una columna circular?",
+    answer:
+      "Se usa el diámetro para obtener el radio, después se calcula pi por radio al cuadrado por altura y por cantidad de columnas.",
+  },
+  {
+    question: "¿Cómo sé el rendimiento por saco?",
+    answer:
+      "Debe venir en la ficha o empaque del fabricante. Si el empaque indica litros de mezcla, divide los litros entre 1000 para obtener m³ por saco.",
+  },
+  {
+    question: "¿Cemento y concreto son lo mismo?",
+    answer:
+      "No. El cemento es un componente; el concreto combina cemento, agregados y agua. Esta calculadora estima concreto por volumen y sacos/premezclado.",
+  },
+  {
+    question: "¿La calculadora estima arena y grava?",
+    answer:
+      "El MVP no dosifica materiales por proporción. Esa estimación queda para una fase posterior porque depende de la mezcla, resistencia y agregados.",
+  },
+  {
+    question: "¿Puedo usar centímetros para el espesor y metros para largo y ancho?",
+    answer:
+      "Sí. Cada dimensión tiene su propia unidad para evitar conversiones manuales, como 5 m x 4 m x 10 cm.",
+  },
+];
+
+const faqJsonLd = buildFaqJsonLd(faqs);
+---
+
+<BaseLayout title={title} description={description} canonical={canonical}>
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={JSON.stringify(faqJsonLd)} />
+  </Fragment>
+
+  <PageShell>
+    <PageHero
+      title="Calculadora de concreto"
+      description="Estima cuánto concreto pedir o cuántos sacos comprar para losas, columnas, vigas y otras secciones de obra."
+      kicker="Construcción"
+      collapseBreadcrumbOnMobile
+      containerClass="py-5 md:py-7"
+      breadcrumbs={[
+        { label: "Inicio", href: "/", ariaLabel: "Inicio" },
+        { label: "Construcción", href: "/construccion", optional: true },
+        { label: "Calculadora de concreto", truncate: true },
+      ]}
+    />
+
+    <Container as="section" class="py-4 pb-24 md:py-7 md:pb-7">
+      <section
+        id="concrete-calculator"
+        class="overflow-hidden rounded-lg border border-gray-700 bg-gray-950 shadow-xl shadow-gray-950/30"
+        aria-labelledby="calculator-heading"
+      >
+        <div class="grid gap-0 lg:grid-cols-[minmax(0,1.08fr)_minmax(21rem,0.92fr)]">
+          <div class="p-4 sm:p-6">
+            <p class="text-sm font-semibold uppercase text-cyan-300">
+              Pedido de concreto
+            </p>
+            <h2 id="calculator-heading" class="mt-2 text-2xl font-semibold">
+              Calcula volumen, sacos y costo estimado
+            </h2>
+            <p class="mt-2 text-sm leading-relaxed text-gray-400">
+              Agrega una o varias secciones. Cada dimensión puede usar su propia unidad.
+            </p>
+
+            <form class="mt-6 grid gap-6" novalidate data-concrete-form>
+              <section>
+                <span class="block text-sm font-semibold text-gray-200">
+                  ¿Qué quieres estimar?
+                </span>
+                <div
+                  class="mt-2 grid rounded-lg border border-gray-700 bg-gray-900 p-1 sm:grid-cols-2"
+                  aria-label="Modo de estimación"
+                >
+                  <button
+                    class="min-h-12 rounded-md px-3 text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-cyan-400/35"
+                    type="button"
+                    data-mode-button="ready-mix"
+                    aria-pressed="true"
+                  >
+                    Concreto por m³
+                  </button>
+                  <button
+                    class="min-h-12 rounded-md px-3 text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-cyan-400/35"
+                    type="button"
+                    data-mode-button="bags"
+                    aria-pressed="false"
+                  >
+                    Sacos / premezclado
+                  </button>
+                </div>
+              </section>
+
+              <section class="grid gap-4 sm:grid-cols-2">
+                <div>
+                  <label for="concrete-waste" class="block text-sm font-semibold text-gray-200">
+                    Desperdicio
+                  </label>
+                  <div class="mt-2 grid grid-cols-[minmax(0,1fr)_3.5rem] overflow-hidden rounded-lg border border-gray-700 bg-gray-900 focus-within:border-cyan-400 focus-within:ring-3 focus-within:ring-cyan-400/15">
+                    <input
+                      id="concrete-waste"
+                      class="min-h-12 w-full bg-transparent px-4 text-lg font-semibold text-white outline-none placeholder:text-gray-600"
+                      type="text"
+                      inputmode="decimal"
+                      autocomplete="off"
+                      value="10"
+                      data-global-field="waste"
+                      aria-describedby="concrete-waste-error"
+                    />
+                    <span class="grid place-items-center border-l border-gray-700 bg-gray-950 text-sm font-semibold text-gray-300">
+                      %
+                    </span>
+                  </div>
+                  <p id="concrete-waste-error" class="mt-2 min-h-5 text-sm text-red-300" data-error-for="waste"></p>
+                </div>
+
+                <div>
+                  <label for="concrete-price-m3" class="block text-sm font-semibold text-gray-200">
+                    Precio por m³
+                  </label>
+                  <div class="mt-2 grid grid-cols-[3rem_minmax(0,1fr)] overflow-hidden rounded-lg border border-gray-700 bg-gray-900 focus-within:border-cyan-400 focus-within:ring-3 focus-within:ring-cyan-400/15">
+                    <span class="grid place-items-center border-r border-gray-700 bg-gray-950 text-sm font-semibold text-gray-300">
+                      $
+                    </span>
+                    <input
+                      id="concrete-price-m3"
+                      class="min-h-12 w-full bg-transparent px-4 text-lg font-semibold text-white outline-none placeholder:text-gray-600"
+                      type="text"
+                      inputmode="decimal"
+                      autocomplete="off"
+                      placeholder="2500"
+                      data-global-field="priceM3"
+                      aria-describedby="concrete-price-m3-error"
+                    />
+                  </div>
+                  <p id="concrete-price-m3-error" class="mt-2 min-h-5 text-sm text-red-300" data-error-for="priceM3"></p>
+                </div>
+
+                <div data-bag-field>
+                  <label for="concrete-bag-yield" class="block text-sm font-semibold text-gray-200">
+                    Rendimiento por saco
+                  </label>
+                  <div class="mt-2 grid grid-cols-[minmax(0,1fr)_5rem] overflow-hidden rounded-lg border border-gray-700 bg-gray-900 focus-within:border-cyan-400 focus-within:ring-3 focus-within:ring-cyan-400/15">
+                    <input
+                      id="concrete-bag-yield"
+                      class="min-h-12 w-full bg-transparent px-4 text-lg font-semibold text-white outline-none placeholder:text-gray-600"
+                      type="text"
+                      inputmode="decimal"
+                      autocomplete="off"
+                      placeholder="0.02"
+                      data-global-field="bagYield"
+                      aria-describedby="concrete-bag-yield-help concrete-bag-yield-error"
+                    />
+                    <span class="grid place-items-center border-l border-gray-700 bg-gray-950 text-sm font-semibold text-gray-300">
+                      m³
+                    </span>
+                  </div>
+                  <p id="concrete-bag-yield-help" class="mt-2 text-xs leading-relaxed text-gray-500">
+                    Usa el dato del fabricante. Litros ÷ 1000 = m³.
+                  </p>
+                  <p id="concrete-bag-yield-error" class="mt-1 min-h-5 text-sm text-red-300" data-error-for="bagYield"></p>
+                </div>
+
+                <div data-bag-field>
+                  <label for="concrete-price-bag" class="block text-sm font-semibold text-gray-200">
+                    Precio por saco
+                  </label>
+                  <div class="mt-2 grid grid-cols-[3rem_minmax(0,1fr)] overflow-hidden rounded-lg border border-gray-700 bg-gray-900 focus-within:border-cyan-400 focus-within:ring-3 focus-within:ring-cyan-400/15">
+                    <span class="grid place-items-center border-r border-gray-700 bg-gray-950 text-sm font-semibold text-gray-300">
+                      $
+                    </span>
+                    <input
+                      id="concrete-price-bag"
+                      class="min-h-12 w-full bg-transparent px-4 text-lg font-semibold text-white outline-none placeholder:text-gray-600"
+                      type="text"
+                      inputmode="decimal"
+                      autocomplete="off"
+                      placeholder="130"
+                      data-global-field="priceBag"
+                      aria-describedby="concrete-price-bag-error"
+                    />
+                  </div>
+                  <p id="concrete-price-bag-error" class="mt-2 min-h-5 text-sm text-red-300" data-error-for="priceBag"></p>
+                </div>
+              </section>
+
+              <section>
+                <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                  <div>
+                    <h3 class="text-lg font-semibold text-white">Secciones de obra</h3>
+                    <p class="mt-1 text-sm leading-relaxed text-gray-400">
+                      Usa presets para cambiar etiquetas y unidades sin bloquear valores personalizados.
+                    </p>
+                  </div>
+                  <button
+                    class="inline-flex min-h-11 items-center justify-center rounded-lg bg-cyan-300 px-4 py-2 text-sm font-semibold text-gray-950 transition hover:bg-cyan-200 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-cyan-300/40"
+                    type="button"
+                    data-add-section
+                  >
+                    Agregar sección
+                  </button>
+                </div>
+
+                <div class="mt-4 grid gap-4" data-section-list></div>
+              </section>
+
+              <div class="flex flex-col gap-3 sm:flex-row">
+                <button
+                  class="min-h-11 justify-center rounded-lg border border-gray-700 px-4 py-2 text-sm font-semibold text-gray-200 transition hover:border-cyan-400 hover:text-white focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-cyan-400/30"
+                  type="button"
+                  data-clear-calculator
+                >
+                  Limpiar
+                </button>
+              </div>
+            </form>
+          </div>
+
+          <aside
+            class="border-t border-gray-800 bg-gray-900/70 p-4 sm:p-6 lg:border-l lg:border-t-0"
+            aria-live="polite"
+            data-result-region
+          >
+            <p class="text-xs font-semibold uppercase text-cyan-300">
+              Resultado
+            </p>
+            <p class="mt-3 break-words text-3xl font-bold leading-tight text-white" data-main-result>
+              Ingresa tus medidas
+            </p>
+            <p class="mt-2 min-h-5 text-sm leading-relaxed text-gray-400" data-result-note>
+              El pedido sugerido aparecerá aquí junto con el desglose.
+            </p>
+
+            <div class="mt-5 grid gap-3" data-summary-list></div>
+            <div class="mt-5 grid gap-3" data-warning-list></div>
+            <div class="mt-5 space-y-3" data-section-breakdown></div>
+
+            <div class="mt-5 rounded-lg border border-amber-400/30 bg-amber-400/10 p-4 text-sm leading-relaxed text-amber-100">
+              Estimación orientativa. Revisa el rendimiento del fabricante y consulta a un profesional para elementos estructurales.
+            </div>
+
+            <div class="mt-5 grid gap-3 sm:grid-cols-2">
+              <button
+                class="hidden min-h-11 items-center justify-center rounded-lg bg-cyan-300 px-4 py-2 text-sm font-semibold text-gray-950 transition hover:bg-cyan-200 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-cyan-300/40"
+                type="button"
+                data-copy-result
+              >
+                Copiar resumen
+              </button>
+              <button
+                class="hidden min-h-11 items-center justify-center rounded-lg border border-gray-700 px-4 py-2 text-sm font-semibold text-gray-200 transition hover:border-cyan-400 hover:text-white focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-cyan-400/30"
+                type="button"
+                data-export-csv
+              >
+                Exportar CSV
+              </button>
+            </div>
+            <p class="mt-3 min-h-5 text-sm text-cyan-100" role="status" aria-live="polite" data-copy-status></p>
+          </aside>
+        </div>
+      </section>
+
+      <div
+        class="fixed inset-x-0 bottom-0 z-30 hidden border-t border-gray-800 bg-gray-950/95 px-4 py-3 shadow-2xl shadow-black/50 backdrop-blur md:hidden"
+        data-mobile-total
+      >
+        <div class="mx-auto flex max-w-xl items-center justify-between gap-3">
+          <span class="text-xs font-semibold uppercase text-gray-500">
+            Resultado
+          </span>
+          <span class="break-words text-right text-lg font-bold text-cyan-100" data-mobile-total-text></span>
+        </div>
+      </div>
+    </Container>
+
+    <AdSlot placement="calculator-after-tool" />
+
+    <Container as="section" class="py-6 md:py-8">
+      <SectionIntro
+        title="Cómo medir para concreto"
+        description="Mide cada elemento según su forma. La calculadora convierte unidades antes de sumar los volúmenes."
+      />
+      <div class="grid gap-4 md:grid-cols-3">
+        <article class="rounded-lg border border-gray-800 bg-gray-950 p-5">
+          <h3 class="text-lg font-semibold">Losas y vigas</h3>
+          <p class="mt-3 text-sm leading-relaxed text-gray-400">
+            Multiplica largo, ancho y espesor o alto. Capturar el espesor en centímetros evita conversiones mentales.
+          </p>
+        </article>
+        <article class="rounded-lg border border-gray-800 bg-gray-950 p-5">
+          <h3 class="text-lg font-semibold">Columnas</h3>
+          <p class="mt-3 text-sm leading-relaxed text-gray-400">
+            Para columnas rectangulares usa ancho, fondo y altura. Para circulares usa diámetro y altura.
+          </p>
+        </article>
+        <article class="rounded-lg border border-gray-800 bg-gray-950 p-5">
+          <h3 class="text-lg font-semibold">Compra</h3>
+          <p class="mt-3 text-sm leading-relaxed text-gray-400">
+            Para sacos, captura el rendimiento real del producto. La calculadora redondea hacia arriba y muestra sobrante.
+          </p>
+        </article>
+      </div>
+    </Container>
+
+    <Container as="section" class="py-6 md:py-8">
+      <div class="rounded-lg border border-gray-800 bg-gray-950 p-5">
+        <SectionIntro
+          title="Concreto no es lo mismo que cemento"
+          description="El concreto combina cemento, agregados y agua. Esta herramienta estima volumen de concreto y compra por sacos o m³; no sustituye una dosificación estructural."
+          class="mb-0"
+        />
+      </div>
+    </Container>
+
+    <FaqSection faqs={faqs} />
+  </PageShell>
+</BaseLayout>
+
+<script>
+  import {
+    CONCRETE_PRESET_CONFIG,
+    buildConcreteCsv,
+    buildConcreteShareText,
+    calculateConcreteVolume,
+    formatConcreteCompactNumber,
+    formatConcreteCurrency,
+    formatConcreteNumber,
+    parseConcreteNumberInput,
+  } from "@lib/calculators/construccion/calculadora-volumen-concreto-cemento/concreteVolume";
+
+  const UNIT_OPTIONS = ["m", "cm", "ft", "in"];
+  const PRESET_ORDER = [
+    "slab",
+    "rectangular-column",
+    "circular-column",
+    "beam",
+    "custom",
+  ];
+  const PLACEHOLDERS = {
+    slab: ["5", "4", "10"],
+    "rectangular-column": ["30", "30", "3"],
+    "circular-column": ["40", "3"],
+    beam: ["4", "20", "40"],
+    custom: ["5", "4", "0.1"],
+  };
+
+  const sectionList = document.querySelector("[data-section-list]");
+  const addSectionButton = document.querySelector("[data-add-section]");
+  const clearButton = document.querySelector("[data-clear-calculator]");
+  const modeButtons = document.querySelectorAll("[data-mode-button]");
+  const bagFields = document.querySelectorAll("[data-bag-field]");
+  const globalFields = {
+    waste: document.querySelector("[data-global-field='waste']"),
+    bagYield: document.querySelector("[data-global-field='bagYield']"),
+    priceM3: document.querySelector("[data-global-field='priceM3']"),
+    priceBag: document.querySelector("[data-global-field='priceBag']"),
+  };
+  const mainResult = document.querySelector("[data-main-result]");
+  const resultNote = document.querySelector("[data-result-note]");
+  const summaryList = document.querySelector("[data-summary-list]");
+  const warningList = document.querySelector("[data-warning-list]");
+  const sectionBreakdown = document.querySelector("[data-section-breakdown]");
+  const copyButton = document.querySelector("[data-copy-result]");
+  const exportButton = document.querySelector("[data-export-csv]");
+  const copyStatus = document.querySelector("[data-copy-status]");
+  const mobileTotal = document.querySelector("[data-mobile-total]");
+  const mobileTotalText = document.querySelector("[data-mobile-total-text]");
+
+  let estimateMode = "ready-mix";
+  let sectionSequence = 0;
+  let sections = [createSection("slab")];
+  let currentShareText = "";
+  let currentCsv = "";
+  let copyTimer;
+
+  function createSection(preset) {
+    sectionSequence += 1;
+    const config = CONCRETE_PRESET_CONFIG[preset];
+    const thirdUnit = config.defaultUnits[2] ?? "m";
+
+    return {
+      name: `${config.defaultName} ${sectionSequence}`,
+      preset,
+      shape: config.shape,
+      quantity: "1",
+      first: { value: "", unit: config.defaultUnits[0] },
+      second: { value: "", unit: config.defaultUnits[1] },
+      third: { value: "", unit: thirdUnit },
+    };
+  }
+
+  function renderSections() {
+    sectionList.textContent = "";
+
+    sections.forEach((section, index) => {
+      const config = CONCRETE_PRESET_CONFIG[section.preset];
+      const article = document.createElement("article");
+      article.className = "rounded-lg border border-gray-800 bg-gray-900/80 p-4";
+      article.dataset.sectionIndex = String(index);
+
+      article.innerHTML = `
+        <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+          <div class="min-w-0">
+            <p class="text-xs font-semibold uppercase text-gray-500">Sección ${index + 1}</p>
+            <p class="mt-1 break-words text-base font-semibold text-white" data-section-summary>${escapeHtml(section.name)}</p>
+          </div>
+          <div class="grid grid-cols-2 gap-2 sm:flex">
+            <button class="min-h-10 rounded-lg border border-gray-700 px-3 text-sm font-semibold text-gray-200 transition hover:border-cyan-400 hover:text-white focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-cyan-400/30" type="button" data-duplicate-section>Duplicar</button>
+            <button class="min-h-10 rounded-lg border border-gray-700 px-3 text-sm font-semibold text-gray-200 transition hover:border-red-300 hover:text-red-100 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-red-300/25" type="button" data-delete-section ${sections.length === 1 ? "disabled" : ""}>Eliminar</button>
+          </div>
+        </div>
+
+        <div class="mt-4 grid gap-4 sm:grid-cols-2">
+          <div>
+            <label class="block text-sm font-semibold text-gray-200">Nombre</label>
+            <input class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-950 px-3 text-sm font-semibold text-white outline-none placeholder:text-gray-600 focus:border-cyan-400 focus:ring-3 focus:ring-cyan-400/15" type="text" maxlength="60" value="${escapeAttribute(section.name)}" data-section-field="name" autocomplete="off" />
+          </div>
+          <div>
+            <label class="block text-sm font-semibold text-gray-200">Elemento</label>
+            <select class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-950 px-3 text-sm font-semibold text-gray-100 outline-none focus:border-cyan-400 focus:ring-3 focus:ring-cyan-400/15" data-section-field="preset">
+              ${buildPresetOptions(section.preset)}
+            </select>
+          </div>
+          <div>
+            <label class="block text-sm font-semibold text-gray-200">Cantidad</label>
+            <input class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-950 px-3 text-sm font-semibold text-white outline-none placeholder:text-gray-600 focus:border-cyan-400 focus:ring-3 focus:ring-cyan-400/15" type="text" inputmode="numeric" value="${escapeAttribute(section.quantity)}" data-section-field="quantity" autocomplete="off" />
+          </div>
+          <div>
+            <label class="block text-sm font-semibold text-gray-200">Forma</label>
+            <div class="mt-2 flex min-h-12 items-center rounded-lg border border-gray-800 bg-gray-950 px-3 text-sm font-semibold text-gray-300">
+              ${section.shape === "cylinder" ? "Cilindro" : "Prisma rectangular"}
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-4 grid gap-3">
+          ${renderDimensionField(section, config, "first", 0)}
+          ${renderDimensionField(section, config, "second", 1)}
+          ${section.shape === "rectangular-prism" ? renderDimensionField(section, config, "third", 2) : ""}
+        </div>
+
+        <p class="mt-3 min-h-5 text-sm text-red-300" data-section-error></p>
+      `;
+
+      article.querySelectorAll("[data-section-field]").forEach((field) => {
+        field.addEventListener("input", (event) => updateSectionFromField(index, event.currentTarget));
+        field.addEventListener("change", (event) => updateSectionFromField(index, event.currentTarget));
+      });
+
+      article.querySelector("[data-duplicate-section]").addEventListener("click", () => {
+        duplicateSection(index);
+      });
+
+      article.querySelector("[data-delete-section]").addEventListener("click", () => {
+        deleteSection(index);
+      });
+
+      sectionList.appendChild(article);
+    });
+  }
+
+  function renderDimensionField(section, config, key, labelIndex) {
+    const dimension = section[key];
+    const label = config.dimensionLabels[labelIndex];
+    const placeholder = PLACEHOLDERS[section.preset][labelIndex] ?? "";
+
+    return `
+      <div class="grid gap-2 sm:grid-cols-[8rem_minmax(0,1fr)_5rem] sm:items-end">
+        <label class="block text-sm font-semibold text-gray-200 sm:pb-3">${escapeHtml(label)}</label>
+        <input class="min-h-12 w-full rounded-lg border border-gray-700 bg-gray-950 px-3 text-lg font-semibold text-white outline-none placeholder:text-gray-600 focus:border-cyan-400 focus:ring-3 focus:ring-cyan-400/15" type="text" inputmode="decimal" autocomplete="off" placeholder="${escapeAttribute(placeholder)}" value="${escapeAttribute(dimension.value)}" data-section-field="${key}Value" aria-label="${escapeAttribute(label)}" />
+        <select class="min-h-12 w-full rounded-lg border border-gray-700 bg-gray-950 px-3 text-sm font-semibold text-gray-100 outline-none focus:border-cyan-400 focus:ring-3 focus:ring-cyan-400/15" data-section-field="${key}Unit" aria-label="Unidad de ${escapeAttribute(label)}">
+          ${buildUnitOptions(dimension.unit)}
+        </select>
+      </div>
+    `;
+  }
+
+  function buildPresetOptions(selectedPreset) {
+    return PRESET_ORDER.map((preset) => {
+      const selected = preset === selectedPreset ? " selected" : "";
+      return `<option value="${preset}"${selected}>${escapeHtml(CONCRETE_PRESET_CONFIG[preset].label)}</option>`;
+    }).join("");
+  }
+
+  function buildUnitOptions(selectedUnit) {
+    return UNIT_OPTIONS.map((unit) => {
+      const selected = unit === selectedUnit ? " selected" : "";
+      return `<option value="${unit}"${selected}>${unit}</option>`;
+    }).join("");
+  }
+
+  function updateSectionFromField(index, field) {
+    const section = sections[index];
+    const fieldName = field.dataset.sectionField;
+    const value = field.value;
+
+    if (fieldName === "preset") {
+      applyPreset(index, value);
+      return;
+    }
+
+    if (fieldName === "name") {
+      section.name = value;
+    } else if (fieldName === "quantity") {
+      section.quantity = value;
+    } else if (fieldName === "firstValue") {
+      section.first.value = value;
+    } else if (fieldName === "firstUnit") {
+      section.first.unit = value;
+    } else if (fieldName === "secondValue") {
+      section.second.value = value;
+    } else if (fieldName === "secondUnit") {
+      section.second.unit = value;
+    } else if (fieldName === "thirdValue") {
+      section.third.value = value;
+    } else if (fieldName === "thirdUnit") {
+      section.third.unit = value;
+    }
+
+    updateCalculator();
+  }
+
+  function applyPreset(index, preset) {
+    const config = CONCRETE_PRESET_CONFIG[preset];
+    const section = sections[index];
+
+    section.preset = preset;
+    section.shape = config.shape;
+    section.first.unit = config.defaultUnits[0];
+    section.second.unit = config.defaultUnits[1];
+    section.third.unit = config.defaultUnits[2] ?? "m";
+
+    if (config.shape === "cylinder") {
+      section.third.value = "";
+    }
+
+    renderSections();
+    updateCalculator();
+  }
+
+  function duplicateSection(index) {
+    const source = sections[index];
+    sections.splice(index + 1, 0, {
+      name: `${source.name.trim() || "Sección"} copia`,
+      preset: source.preset,
+      shape: source.shape,
+      quantity: source.quantity,
+      first: { ...source.first },
+      second: { ...source.second },
+      third: { ...source.third },
+    });
+    renderSections();
+    updateCalculator();
+  }
+
+  function deleteSection(index) {
+    if (sections.length === 1) {
+      return;
+    }
+
+    sections.splice(index, 1);
+    renderSections();
+    updateCalculator();
+  }
+
+  function setMode(mode) {
+    estimateMode = mode;
+    modeButtons.forEach((button) => {
+      const active = button.dataset.modeButton === mode;
+      button.setAttribute("aria-pressed", String(active));
+      button.classList.toggle("bg-cyan-300", active);
+      button.classList.toggle("text-gray-950", active);
+      button.classList.toggle("text-gray-200", !active);
+    });
+    bagFields.forEach((field) => {
+      field.classList.toggle("hidden", mode !== "bags");
+    });
+    updateCalculator();
+  }
+
+  function updateCalculator() {
+    clearErrors();
+
+    const parseResult = parseInput();
+
+    if (!parseResult.ok) {
+      setNeutralResult(parseResult.message);
+      setSectionErrors(parseResult.sectionErrors);
+      setGlobalErrors(parseResult.globalErrors);
+      return;
+    }
+
+    try {
+      const result = calculateConcreteVolume(parseResult.input);
+      renderResult(result, parseResult.input);
+      currentShareText = buildConcreteShareText(result, parseResult.input);
+      currentCsv = buildConcreteCsv(result);
+      showActions();
+    } catch (error) {
+      setNeutralResult(error instanceof Error ? error.message : "Revisa los datos capturados.");
+    }
+  }
+
+  function parseInput() {
+    const globalErrors = {};
+    const sectionErrors = {};
+    const waste = parseRequiredNumber(globalFields.waste.value, "desperdicio", globalErrors, "waste");
+    const bagYield = estimateMode === "bags"
+      ? parseOptionalNumber(globalFields.bagYield.value, "rendimiento por saco", globalErrors, "bagYield")
+      : undefined;
+    const pricePerM3 = parseOptionalNumber(globalFields.priceM3.value, "precio por m³", globalErrors, "priceM3");
+    const pricePerBag = estimateMode === "bags"
+      ? parseOptionalNumber(globalFields.priceBag.value, "precio por saco", globalErrors, "priceBag")
+      : undefined;
+    const parsedSections = [];
+
+    sections.forEach((section, index) => {
+      const errors = [];
+      const name = section.name.trim();
+
+      if (!name) {
+        errors.push("Escribe un nombre para esta sección.");
+      } else if (name.length > 60) {
+        errors.push("El nombre no puede superar 60 caracteres.");
+      }
+
+      const quantity = parseConcreteNumberInput(section.quantity);
+      if (!quantity.ok || !Number.isInteger(quantity.value) || quantity.value < 1 || quantity.value > 10000) {
+        errors.push("La cantidad debe ser un entero entre 1 y 10000.");
+      }
+
+      const first = parseDimension(section.first, errors, "primera medida");
+      const second = parseDimension(section.second, errors, "segunda medida");
+      const third = section.shape === "rectangular-prism"
+        ? parseDimension(section.third, errors, "tercera medida")
+        : undefined;
+
+      if (errors.length) {
+        sectionErrors[index] = errors.join(" ");
+        return;
+      }
+
+      parsedSections.push({
+        name,
+        preset: section.preset,
+        shape: section.shape,
+        quantity: quantity.value,
+        first,
+        second,
+        ...(third ? { third } : {}),
+      });
+    });
+
+    if (Object.keys(globalErrors).length || Object.keys(sectionErrors).length) {
+      return {
+        ok: false,
+        message: "Completa las medidas marcadas para calcular.",
+        globalErrors,
+        sectionErrors,
+      };
+    }
+
+    return {
+      ok: true,
+      input: {
+        sections: parsedSections,
+        wastePercentage: waste,
+        mode: estimateMode,
+        ...(typeof bagYield === "number" ? { bagYield } : {}),
+        ...(typeof pricePerM3 === "number" ? { pricePerM3 } : {}),
+        ...(typeof pricePerBag === "number" ? { pricePerBag } : {}),
+      },
+    };
+  }
+
+  function parseDimension(dimension, errors, label) {
+    const parsed = parseConcreteNumberInput(dimension.value);
+
+    if (!parsed.ok) {
+      errors.push(`Revisa la ${label}.`);
+      return undefined;
+    }
+
+    return {
+      value: parsed.value,
+      unit: UNIT_OPTIONS.includes(dimension.unit) ? dimension.unit : "m",
+    };
+  }
+
+  function parseRequiredNumber(value, label, errors, key) {
+    const parsed = parseConcreteNumberInput(value);
+
+    if (!parsed.ok) {
+      errors[key] = `Revisa ${label}.`;
+      return undefined;
+    }
+
+    return parsed.value;
+  }
+
+  function parseOptionalNumber(value, label, errors, key) {
+    if (!value.trim()) {
+      return undefined;
+    }
+
+    const parsed = parseConcreteNumberInput(value);
+
+    if (!parsed.ok) {
+      errors[key] = `Revisa ${label}.`;
+      return undefined;
+    }
+
+    return parsed.value;
+  }
+
+  function renderResult(result, input) {
+    if (input.mode === "bags" && typeof result.bagCount === "number") {
+      mainResult.textContent = `Compra ${result.bagCount} saco${result.bagCount === 1 ? "" : "s"}`;
+      resultNote.textContent = `${formatConcreteNumber(result.totalVolume)} m³ requeridos con desperdicio.`;
+    } else if (input.mode === "bags") {
+      mainResult.textContent = `${formatConcreteNumber(result.totalVolume)} m³`;
+      resultNote.textContent = "Agrega rendimiento por saco para estimar la compra.";
+    } else {
+      mainResult.textContent = `Pide ${formatConcreteNumber(result.totalVolume)} m³`;
+      resultNote.textContent = "Volumen con desperdicio incluido.";
+    }
+
+    const summaryItems = [
+      ["Volumen neto", `${formatConcreteNumber(result.netVolume)} m³`],
+      ["Con desperdicio", `${formatConcreteNumber(result.totalVolume)} m³`],
+      ["Equivalencia", `${formatConcreteNumber(result.volumeFt3)} ft³ · ${formatConcreteNumber(result.volumeYd3)} yd³`],
+    ];
+
+    if (typeof result.bagCount === "number") {
+      summaryItems.push(["Sacos", `${result.bagCount}`]);
+      summaryItems.push(["Sobrante estimado", `${formatConcreteNumber(result.bagSurplus ?? 0)} m³`]);
+    }
+
+    if (typeof result.concreteCost === "number") {
+      summaryItems.push(["Costo por m³", formatConcreteCurrency(result.concreteCost)]);
+    }
+
+    if (typeof result.bagCost === "number") {
+      summaryItems.push(["Costo por sacos", formatConcreteCurrency(result.bagCost)]);
+    }
+
+    renderKeyValueList(summaryList, summaryItems);
+    renderWarnings(result.warnings);
+    renderBreakdown(result);
+    updateMobileResult(mainResult.textContent);
+  }
+
+  function renderKeyValueList(container, items) {
+    container.textContent = "";
+
+    items.forEach(([label, value]) => {
+      const row = document.createElement("div");
+      row.className =
+        "flex items-start justify-between gap-4 rounded-lg border border-gray-800 bg-gray-950 p-3 text-sm";
+      row.innerHTML = `<span class="text-gray-400"></span><strong class="break-words text-right font-semibold text-white"></strong>`;
+      row.querySelector("span").textContent = label;
+      row.querySelector("strong").textContent = value;
+      container.appendChild(row);
+    });
+  }
+
+  function renderWarnings(warnings) {
+    warningList.textContent = "";
+
+    warnings.forEach((warning) => {
+      const item = document.createElement("p");
+      item.className =
+        "rounded-lg border border-amber-400/30 bg-amber-400/10 p-3 text-sm leading-relaxed text-amber-100";
+      item.textContent = warning;
+      warningList.appendChild(item);
+    });
+  }
+
+  function renderBreakdown(result) {
+    sectionBreakdown.textContent = "";
+
+    const title = document.createElement("p");
+    title.className = "text-sm font-semibold text-white";
+    title.textContent = "Desglose por sección";
+    sectionBreakdown.appendChild(title);
+
+    result.sections.forEach((section) => {
+      const row = document.createElement("div");
+      row.className = "rounded-lg border border-gray-800 bg-gray-950 p-3 text-sm";
+      row.innerHTML = `
+        <div class="flex items-start justify-between gap-3">
+          <div class="min-w-0">
+            <p class="break-words font-semibold text-white"></p>
+            <p class="mt-1 text-gray-500"></p>
+          </div>
+          <strong class="shrink-0 text-right text-cyan-100"></strong>
+        </div>
+      `;
+      row.querySelector("p").textContent = section.name;
+      row.querySelectorAll("p")[1].textContent = `${section.quantity}x · ${formatConcreteCompactNumber(section.sharePercentage)}% del neto`;
+      row.querySelector("strong").textContent = `${formatConcreteNumber(section.volume)} m³`;
+      sectionBreakdown.appendChild(row);
+    });
+  }
+
+  function setNeutralResult(message) {
+    mainResult.textContent = "Ingresa tus medidas";
+    resultNote.textContent = message;
+    summaryList.textContent = "";
+    warningList.textContent = "";
+    sectionBreakdown.textContent = "";
+    currentShareText = "";
+    currentCsv = "";
+    hideActions();
+    mobileTotal.classList.add("hidden");
+  }
+
+  function showActions() {
+    copyButton.classList.remove("hidden");
+    copyButton.classList.add("inline-flex");
+    exportButton.classList.remove("hidden");
+    exportButton.classList.add("inline-flex");
+  }
+
+  function hideActions() {
+    copyButton.classList.add("hidden");
+    copyButton.classList.remove("inline-flex");
+    exportButton.classList.add("hidden");
+    exportButton.classList.remove("inline-flex");
+  }
+
+  function updateMobileResult(text) {
+    mobileTotalText.textContent = text;
+    mobileTotal.classList.remove("hidden");
+  }
+
+  function clearErrors() {
+    document.querySelectorAll("[data-error-for]").forEach((error) => {
+      error.textContent = "";
+    });
+    document.querySelectorAll("[data-section-error]").forEach((error) => {
+      error.textContent = "";
+    });
+  }
+
+  function setGlobalErrors(errors) {
+    Object.entries(errors).forEach(([key, message]) => {
+      const error = document.querySelector(`[data-error-for='${key}']`);
+      if (error) {
+        error.textContent = message;
+      }
+    });
+  }
+
+  function setSectionErrors(errors) {
+    Object.entries(errors).forEach(([index, message]) => {
+      const error = document.querySelector(`[data-section-index='${index}'] [data-section-error]`);
+      if (error) {
+        error.textContent = message;
+      }
+    });
+  }
+
+  function clearCopyStatus() {
+    window.clearTimeout(copyTimer);
+    copyStatus.textContent = "";
+  }
+
+  function copyText(text) {
+    clearCopyStatus();
+
+    if (!text) {
+      copyStatus.textContent = "No hay resultado para copiar.";
+      return;
+    }
+
+    if (navigator.clipboard?.writeText) {
+      navigator.clipboard
+        .writeText(text)
+        .then(() => {
+          copyStatus.textContent = "Resultado copiado.";
+        })
+        .catch(() => {
+          copyStatus.textContent = "No fue posible copiar automáticamente.";
+        });
+    } else {
+      copyStatus.textContent = "No fue posible copiar automáticamente.";
+    }
+
+    copyTimer = window.setTimeout(() => {
+      copyStatus.textContent = "";
+    }, 3000);
+  }
+
+  function exportCsv() {
+    clearCopyStatus();
+
+    if (!currentCsv) {
+      copyStatus.textContent = "No hay resultado para exportar.";
+      return;
+    }
+
+    const blob = new Blob([currentCsv], { type: "text/csv;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "calculo-concreto.csv";
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    URL.revokeObjectURL(url);
+    copyStatus.textContent = "CSV generado.";
+  }
+
+  function resetCalculator() {
+    estimateMode = "ready-mix";
+    sectionSequence = 0;
+    sections = [createSection("slab")];
+    globalFields.waste.value = "10";
+    globalFields.bagYield.value = "";
+    globalFields.priceM3.value = "";
+    globalFields.priceBag.value = "";
+    renderSections();
+    setMode("ready-mix");
+    setNeutralResult("El pedido sugerido aparecerá aquí junto con el desglose.");
+  }
+
+  function escapeHtml(value) {
+    return String(value)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;");
+  }
+
+  function escapeAttribute(value) {
+    return escapeHtml(value).replace(/"/g, "&quot;");
+  }
+
+  Object.values(globalFields).forEach((field) => {
+    field.addEventListener("input", () => updateCalculator());
+  });
+
+  modeButtons.forEach((button) => {
+    button.addEventListener("click", () => setMode(button.dataset.modeButton));
+  });
+
+  addSectionButton.addEventListener("click", () => {
+    sections.push(createSection("slab"));
+    renderSections();
+    updateCalculator();
+  });
+
+  clearButton.addEventListener("click", resetCalculator);
+  copyButton.addEventListener("click", () => copyText(currentShareText));
+  exportButton.addEventListener("click", exportCsv);
+
+  renderSections();
+  setMode("ready-mix");
+</script>

@@ -1,0 +1,1220 @@
+---
+import BaseLayout from "@layouts/BaseLayout.astro";
+import AdSlot from "@components/ads/AdSlot.astro";
+import Container from "@components/layout/Container.astro";
+import PageShell from "@components/layout/PageShell.astro";
+import FaqSection from "@components/shared/FaqSection.astro";
+import PageHero from "@components/shared/PageHero.astro";
+import SectionIntro from "@components/shared/SectionIntro.astro";
+import { buildFaqJsonLd } from "@lib/seo";
+import { BRICK_CANONICAL_PATH } from "@lib/calculators/construccion/calculadora-cantidad-ladrillos/bricks";
+
+const title = "Calculadora de cantidad de ladrillos";
+const description =
+  "Estima cuantos ladrillos o bloques necesitas segun area de muros, aberturas, juntas, desperdicio y costo opcional.";
+const canonical = BRICK_CANONICAL_PATH;
+
+const faqs = [
+  {
+    question: "Como calcular ladrillos por metro cuadrado?",
+    answer:
+      "Divide un metro cuadrado entre el modulo de la pieza colocada. El modulo suma el largo y alto reales de la pieza mas la junta vertical y horizontal.",
+  },
+  {
+    question: "Se restan puertas y ventanas?",
+    answer:
+      "Si. La calculadora resta las aberturas rectangulares del area bruta de los muros para obtener el area neta.",
+  },
+  {
+    question: "Como influyen las juntas?",
+    answer:
+      "Una junta mas grande aumenta el modulo de colocacion y reduce las piezas por metro cuadrado. Una junta capturada dos veces puede subestimar la compra.",
+  },
+  {
+    question: "Cuanto desperdicio debo agregar?",
+    answer:
+      "Un margen comun para una estimacion preliminar es 5% a 10%. Puede subir por cortes, roturas, esquinas, transporte o aparejos complejos.",
+  },
+  {
+    question: "Como calcular blocks para un muro?",
+    answer:
+      "Selecciona un preset de block o captura sus dimensiones reales. La formula usa el area visible del block mas la junta para calcular piezas por metro cuadrado.",
+  },
+  {
+    question: "La calculadora tambien estima mortero?",
+    answer:
+      "Si, de forma aproximada. Usa el volumen del muro menos el volumen de piezas netas y agrega desperdicio de mortero.",
+  },
+  {
+    question: "Por que el resultado puede cambiar segun el aparejo?",
+    answer:
+      "El patron de colocacion, cortes, esquinas y piezas especiales cambian el consumo real. Esta version entrega una base de compra preliminar.",
+  },
+];
+
+const faqJsonLd = buildFaqJsonLd(faqs);
+---
+
+<BaseLayout title={title} description={description} canonical={canonical}>
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={JSON.stringify(faqJsonLd)} />
+  </Fragment>
+
+  <PageShell>
+    <PageHero
+      title="Calculadora de ladrillos"
+      description="Calcula cuantas piezas comprar para muros con aberturas, juntas, desperdicio, paquetes, costo opcional y mortero aproximado."
+      kicker="Construccion"
+      collapseBreadcrumbOnMobile
+      containerClass="py-5 md:py-7"
+      breadcrumbs={[
+        { label: "Inicio", href: "/", ariaLabel: "Inicio" },
+        { label: "Construccion", href: "/construccion", optional: true },
+        { label: "Calculadora de ladrillos", truncate: true },
+      ]}
+    />
+
+    <Container as="section" class="py-4 pb-24 md:py-7 md:pb-7">
+      <section
+        id="brick-calculator"
+        class="overflow-hidden rounded-lg border border-gray-700 bg-gray-950 shadow-xl shadow-gray-950/30"
+        aria-labelledby="calculator-heading"
+      >
+        <div class="grid gap-0 lg:grid-cols-[minmax(0,1.08fr)_minmax(21rem,0.92fr)]">
+          <div class="order-last p-4 sm:p-6 lg:order-first">
+            <p class="text-sm font-semibold uppercase text-amber-300">
+              Material para muro
+            </p>
+            <h2 id="calculator-heading" class="mt-2 text-2xl font-semibold">
+              Calcula piezas, paquetes y costo estimado
+            </h2>
+
+            <form class="mt-6 grid gap-6" novalidate data-brick-form>
+              <section>
+                <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                  <div>
+                    <h3 class="text-lg font-semibold text-white">Muros</h3>
+                    <p class="mt-1 text-sm leading-relaxed text-gray-400">
+                      Captura cada muro rectangular en metros.
+                    </p>
+                  </div>
+                  <button
+                    class="inline-flex min-h-11 items-center justify-center rounded-lg bg-amber-300 px-4 py-2 text-sm font-semibold text-gray-950 transition hover:bg-amber-200 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-300/40"
+                    type="button"
+                    data-add-wall
+                  >
+                    Agregar muro
+                  </button>
+                </div>
+                <div class="mt-4 grid gap-4" data-wall-list></div>
+              </section>
+
+              <section>
+                <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                  <div>
+                    <h3 class="text-lg font-semibold text-white">Aberturas</h3>
+                    <p class="mt-1 text-sm leading-relaxed text-gray-400">
+                      Puertas, ventanas u otros huecos rectangulares.
+                    </p>
+                  </div>
+                  <button
+                    class="inline-flex min-h-11 items-center justify-center rounded-lg border border-gray-700 px-4 py-2 text-sm font-semibold text-gray-200 transition hover:border-amber-300 hover:text-white focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-300/30"
+                    type="button"
+                    data-add-opening
+                  >
+                    Agregar abertura
+                  </button>
+                </div>
+                <div class="mt-4 grid gap-4" data-opening-list></div>
+              </section>
+
+              <section class="rounded-lg border border-gray-800 bg-gray-900/70 p-4">
+                <h3 class="text-lg font-semibold text-white">Pieza</h3>
+                <div class="mt-4 grid gap-4 sm:grid-cols-2">
+                  <div>
+                    <label for="brick-preset" class="block text-sm font-semibold text-gray-200">
+                      Preset
+                    </label>
+                    <select
+                      id="brick-preset"
+                      class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-950 px-3 text-sm font-semibold text-gray-100 outline-none focus:border-amber-300 focus:ring-3 focus:ring-amber-300/15"
+                      data-piece-field="preset"
+                    >
+                      <option value="custom">Personalizado</option>
+                      <option value="red-brick">Ladrillo rojo comun</option>
+                      <option value="block-10">Block 10</option>
+                      <option value="block-12">Block 12</option>
+                      <option value="block-15">Block 15</option>
+                      <option value="block-20">Block 20</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label for="brick-waste" class="block text-sm font-semibold text-gray-200">
+                      Desperdicio
+                    </label>
+                    <div class="mt-2 grid grid-cols-[minmax(0,1fr)_3.5rem] overflow-hidden rounded-lg border border-gray-700 bg-gray-950 focus-within:border-amber-300 focus-within:ring-3 focus-within:ring-amber-300/15">
+                      <input
+                        id="brick-waste"
+                        class="min-h-12 w-full bg-transparent px-4 text-lg font-semibold text-white outline-none placeholder:text-gray-600"
+                        type="text"
+                        inputmode="decimal"
+                        autocomplete="off"
+                        value="10"
+                        data-piece-field="waste"
+                        aria-describedby="brick-waste-error"
+                      />
+                      <span class="grid place-items-center border-l border-gray-700 bg-gray-900 text-sm font-semibold text-gray-300">
+                        %
+                      </span>
+                    </div>
+                    <p id="brick-waste-error" class="mt-2 min-h-5 text-sm text-red-300" data-error-for="waste"></p>
+                  </div>
+
+                  <div>
+                    <label for="brick-length" class="block text-sm font-semibold text-gray-200">
+                      Largo real
+                    </label>
+                    <div class="mt-2 grid grid-cols-[minmax(0,1fr)_4rem] overflow-hidden rounded-lg border border-gray-700 bg-gray-950 focus-within:border-amber-300 focus-within:ring-3 focus-within:ring-amber-300/15">
+                      <input
+                        id="brick-length"
+                        class="min-h-12 w-full bg-transparent px-4 text-lg font-semibold text-white outline-none placeholder:text-gray-600"
+                        type="text"
+                        inputmode="decimal"
+                        autocomplete="off"
+                        placeholder="20"
+                        data-piece-field="length"
+                        aria-describedby="brick-length-error"
+                      />
+                      <span class="grid place-items-center border-l border-gray-700 bg-gray-900 text-sm font-semibold text-gray-300">
+                        cm
+                      </span>
+                    </div>
+                    <p id="brick-length-error" class="mt-2 min-h-5 text-sm text-red-300" data-error-for="length"></p>
+                  </div>
+
+                  <div>
+                    <label for="brick-height" class="block text-sm font-semibold text-gray-200">
+                      Alto real
+                    </label>
+                    <div class="mt-2 grid grid-cols-[minmax(0,1fr)_4rem] overflow-hidden rounded-lg border border-gray-700 bg-gray-950 focus-within:border-amber-300 focus-within:ring-3 focus-within:ring-amber-300/15">
+                      <input
+                        id="brick-height"
+                        class="min-h-12 w-full bg-transparent px-4 text-lg font-semibold text-white outline-none placeholder:text-gray-600"
+                        type="text"
+                        inputmode="decimal"
+                        autocomplete="off"
+                        placeholder="10"
+                        data-piece-field="height"
+                        aria-describedby="brick-height-error"
+                      />
+                      <span class="grid place-items-center border-l border-gray-700 bg-gray-900 text-sm font-semibold text-gray-300">
+                        cm
+                      </span>
+                    </div>
+                    <p id="brick-height-error" class="mt-2 min-h-5 text-sm text-red-300" data-error-for="height"></p>
+                  </div>
+
+                  <div>
+                    <label for="brick-thickness" class="block text-sm font-semibold text-gray-200">
+                      Espesor real
+                    </label>
+                    <div class="mt-2 grid grid-cols-[minmax(0,1fr)_4rem] overflow-hidden rounded-lg border border-gray-700 bg-gray-950 focus-within:border-amber-300 focus-within:ring-3 focus-within:ring-amber-300/15">
+                      <input
+                        id="brick-thickness"
+                        class="min-h-12 w-full bg-transparent px-4 text-lg font-semibold text-white outline-none placeholder:text-gray-600"
+                        type="text"
+                        inputmode="decimal"
+                        autocomplete="off"
+                        placeholder="6"
+                        data-piece-field="thickness"
+                        aria-describedby="brick-thickness-error"
+                      />
+                      <span class="grid place-items-center border-l border-gray-700 bg-gray-900 text-sm font-semibold text-gray-300">
+                        cm
+                      </span>
+                    </div>
+                    <p id="brick-thickness-error" class="mt-2 min-h-5 text-sm text-red-300" data-error-for="thickness"></p>
+                  </div>
+
+                  <div>
+                    <label for="brick-vertical-joint" class="block text-sm font-semibold text-gray-200">
+                      Junta vertical
+                    </label>
+                    <div class="mt-2 grid grid-cols-[minmax(0,1fr)_4rem] overflow-hidden rounded-lg border border-gray-700 bg-gray-950 focus-within:border-amber-300 focus-within:ring-3 focus-within:ring-amber-300/15">
+                      <input
+                        id="brick-vertical-joint"
+                        class="min-h-12 w-full bg-transparent px-4 text-lg font-semibold text-white outline-none placeholder:text-gray-600"
+                        type="text"
+                        inputmode="decimal"
+                        autocomplete="off"
+                        value="1"
+                        data-piece-field="verticalJoint"
+                        aria-describedby="brick-vertical-joint-error"
+                      />
+                      <span class="grid place-items-center border-l border-gray-700 bg-gray-900 text-sm font-semibold text-gray-300">
+                        cm
+                      </span>
+                    </div>
+                    <p id="brick-vertical-joint-error" class="mt-2 min-h-5 text-sm text-red-300" data-error-for="verticalJoint"></p>
+                  </div>
+
+                  <div>
+                    <label for="brick-horizontal-joint" class="block text-sm font-semibold text-gray-200">
+                      Junta horizontal
+                    </label>
+                    <div class="mt-2 grid grid-cols-[minmax(0,1fr)_4rem] overflow-hidden rounded-lg border border-gray-700 bg-gray-950 focus-within:border-amber-300 focus-within:ring-3 focus-within:ring-amber-300/15">
+                      <input
+                        id="brick-horizontal-joint"
+                        class="min-h-12 w-full bg-transparent px-4 text-lg font-semibold text-white outline-none placeholder:text-gray-600"
+                        type="text"
+                        inputmode="decimal"
+                        autocomplete="off"
+                        value="1"
+                        data-piece-field="horizontalJoint"
+                        aria-describedby="brick-horizontal-joint-error"
+                      />
+                      <span class="grid place-items-center border-l border-gray-700 bg-gray-900 text-sm font-semibold text-gray-300">
+                        cm
+                      </span>
+                    </div>
+                    <p id="brick-horizontal-joint-error" class="mt-2 min-h-5 text-sm text-red-300" data-error-for="horizontalJoint"></p>
+                  </div>
+                </div>
+              </section>
+
+              <section class="grid gap-4 sm:grid-cols-2">
+                <div>
+                  <label for="brick-price" class="block text-sm font-semibold text-gray-200">
+                    Precio por pieza
+                  </label>
+                  <div class="mt-2 grid grid-cols-[3rem_minmax(0,1fr)] overflow-hidden rounded-lg border border-gray-700 bg-gray-900 focus-within:border-amber-300 focus-within:ring-3 focus-within:ring-amber-300/15">
+                    <span class="grid place-items-center border-r border-gray-700 bg-gray-950 text-sm font-semibold text-gray-300">
+                      $
+                    </span>
+                    <input
+                      id="brick-price"
+                      class="min-h-12 w-full bg-transparent px-4 text-lg font-semibold text-white outline-none placeholder:text-gray-600"
+                      type="text"
+                      inputmode="decimal"
+                      autocomplete="off"
+                      placeholder="8"
+                      data-piece-field="pricePerPiece"
+                      aria-describedby="brick-price-error"
+                    />
+                  </div>
+                  <p id="brick-price-error" class="mt-2 min-h-5 text-sm text-red-300" data-error-for="pricePerPiece"></p>
+                </div>
+
+                <div>
+                  <label for="brick-package" class="block text-sm font-semibold text-gray-200">
+                    Piezas por paquete
+                  </label>
+                  <input
+                    id="brick-package"
+                    class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-900 px-4 text-lg font-semibold text-white outline-none placeholder:text-gray-600 focus:border-amber-300 focus:ring-3 focus:ring-amber-300/15"
+                    type="text"
+                    inputmode="numeric"
+                    autocomplete="off"
+                    placeholder="100"
+                    data-piece-field="piecesPerPackage"
+                    aria-describedby="brick-package-error"
+                  />
+                  <p id="brick-package-error" class="mt-2 min-h-5 text-sm text-red-300" data-error-for="piecesPerPackage"></p>
+                </div>
+              </section>
+
+              <section class="rounded-lg border border-gray-800 bg-gray-900/70 p-4">
+                <label class="flex items-start gap-3 text-sm font-semibold text-gray-100">
+                  <input
+                    class="mt-1 size-4 rounded border-gray-600 bg-gray-950 text-amber-300 focus:ring-amber-300"
+                    type="checkbox"
+                    data-piece-field="estimateMortar"
+                  />
+                  <span>Estimar mortero aproximado</span>
+                </label>
+
+                <div class="mt-4 hidden" data-mortar-options>
+                  <label for="brick-mortar-waste" class="block text-sm font-semibold text-gray-200">
+                    Desperdicio de mortero
+                  </label>
+                  <div class="mt-2 grid grid-cols-[minmax(0,1fr)_3.5rem] overflow-hidden rounded-lg border border-gray-700 bg-gray-950 focus-within:border-amber-300 focus-within:ring-3 focus-within:ring-amber-300/15">
+                    <input
+                      id="brick-mortar-waste"
+                      class="min-h-12 w-full bg-transparent px-4 text-lg font-semibold text-white outline-none placeholder:text-gray-600"
+                      type="text"
+                      inputmode="decimal"
+                      autocomplete="off"
+                      value="10"
+                      data-piece-field="mortarWaste"
+                      aria-describedby="brick-mortar-waste-error"
+                    />
+                    <span class="grid place-items-center border-l border-gray-700 bg-gray-900 text-sm font-semibold text-gray-300">
+                      %
+                    </span>
+                  </div>
+                  <p id="brick-mortar-waste-error" class="mt-2 min-h-5 text-sm text-red-300" data-error-for="mortarWaste"></p>
+                </div>
+              </section>
+
+              <div class="flex flex-col gap-3 sm:flex-row">
+                <button
+                  class="min-h-11 justify-center rounded-lg border border-gray-700 px-4 py-2 text-sm font-semibold text-gray-200 transition hover:border-amber-300 hover:text-white focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-300/30"
+                  type="button"
+                  data-clear-calculator
+                >
+                  Limpiar
+                </button>
+              </div>
+            </form>
+          </div>
+
+          <aside
+            class="order-first border-b border-gray-800 bg-gray-900/70 p-4 sm:p-6 lg:order-last lg:border-b-0 lg:border-l"
+            aria-live="polite"
+            data-result-region
+          >
+            <p class="text-xs font-semibold uppercase text-amber-300">
+              Resultado
+            </p>
+            <p class="mt-3 break-words text-3xl font-bold leading-tight text-white" data-main-result>
+              Ingresa tus medidas
+            </p>
+            <p class="mt-2 min-h-5 text-sm leading-relaxed text-gray-400" data-result-note>
+              Las piezas a comprar apareceran aqui.
+            </p>
+
+            <div class="mt-5 grid gap-3" data-summary-list></div>
+            <div class="mt-5 grid gap-3" data-warning-list></div>
+            <div class="mt-5 space-y-3" data-breakdown-list></div>
+
+            <div class="mt-5 rounded-lg border border-amber-400/30 bg-amber-400/10 p-4 text-sm leading-relaxed text-amber-100">
+              Estimacion orientativa. Revisa medidas reales, aparejo, cortes, esquinas y condiciones de obra antes de comprar.
+            </div>
+
+            <div class="mt-5 grid gap-3 sm:grid-cols-2">
+              <button
+                class="hidden min-h-11 items-center justify-center rounded-lg bg-amber-300 px-4 py-2 text-sm font-semibold text-gray-950 transition hover:bg-amber-200 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-300/40"
+                type="button"
+                data-copy-result
+              >
+                Copiar resumen
+              </button>
+              <button
+                class="hidden min-h-11 items-center justify-center rounded-lg border border-gray-700 px-4 py-2 text-sm font-semibold text-gray-200 transition hover:border-amber-300 hover:text-white focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-300/30"
+                type="button"
+                data-export-csv
+              >
+                Exportar CSV
+              </button>
+            </div>
+            <p class="mt-3 min-h-5 text-sm text-amber-100" role="status" aria-live="polite" data-copy-status></p>
+          </aside>
+        </div>
+      </section>
+
+      <div
+        class="fixed inset-x-0 bottom-0 z-30 hidden border-t border-gray-800 bg-gray-950/95 px-4 py-3 shadow-2xl shadow-black/50 backdrop-blur md:hidden"
+        data-mobile-total
+      >
+        <div class="mx-auto flex max-w-xl items-center justify-between gap-3">
+          <span class="text-xs font-semibold uppercase text-gray-500">
+            Resultado
+          </span>
+          <span class="break-words text-right text-lg font-bold text-amber-100" data-mobile-total-text></span>
+        </div>
+      </div>
+    </Container>
+
+    <AdSlot placement="calculator-after-tool" />
+
+    <Container as="section" class="py-6 md:py-8">
+      <SectionIntro
+        title="Que incluye la estimacion"
+        description="La herramienta usa area neta, modulo de pieza con junta y redondeo hacia arriba para transformar medidas de muro en piezas de compra."
+      />
+      <div class="grid gap-4 md:grid-cols-3">
+        <article class="rounded-lg border border-gray-800 bg-gray-950 p-5">
+          <h3 class="text-lg font-semibold">Area neta</h3>
+          <p class="mt-3 text-sm leading-relaxed text-gray-400">
+            Suma los muros y resta puertas o ventanas para evitar comprar sobre huecos que no llevan pieza.
+          </p>
+        </article>
+        <article class="rounded-lg border border-gray-800 bg-gray-950 p-5">
+          <h3 class="text-lg font-semibold">Modulo con junta</h3>
+          <p class="mt-3 text-sm leading-relaxed text-gray-400">
+            El largo y alto reales de la pieza se combinan con la junta para calcular piezas por metro cuadrado.
+          </p>
+        </article>
+        <article class="rounded-lg border border-gray-800 bg-gray-950 p-5">
+          <h3 class="text-lg font-semibold">Compra</h3>
+          <p class="mt-3 text-sm leading-relaxed text-gray-400">
+            El resultado agrega desperdicio y puede redondearse por paquete cuando el proveedor vende lotes cerrados.
+          </p>
+        </article>
+      </div>
+    </Container>
+
+    <Container as="section" class="py-6 md:py-8">
+      <div class="rounded-lg border border-gray-800 bg-gray-950 p-5">
+        <SectionIntro
+          title="Mortero y aparejo"
+          description="El consumo real cambia por tipo de pieza, huecos, cortes y patron de colocacion. Usa el mortero aproximado como referencia preliminar, no como dosificacion estructural."
+          class="mb-0"
+        />
+      </div>
+    </Container>
+
+    <FaqSection faqs={faqs} />
+  </PageShell>
+</BaseLayout>
+
+<script>
+  import {
+    BRICK_PRESET_CONFIG,
+    buildBrickCsv,
+    buildBrickShareText,
+    calculateBrickEstimate,
+    formatBrickCurrency,
+    formatBrickFixedNumber,
+    parseBrickNumberInput,
+  } from "@lib/calculators/construccion/calculadora-cantidad-ladrillos/bricks";
+
+  const PRESET_ORDER = [
+    "custom",
+    "red-brick",
+    "block-10",
+    "block-12",
+    "block-15",
+    "block-20",
+  ];
+
+  const wallList = document.querySelector("[data-wall-list]");
+  const openingList = document.querySelector("[data-opening-list]");
+  const addWallButton = document.querySelector("[data-add-wall]");
+  const addOpeningButton = document.querySelector("[data-add-opening]");
+  const clearButton = document.querySelector("[data-clear-calculator]");
+  const pieceFields = {
+    preset: document.querySelector("[data-piece-field='preset']"),
+    length: document.querySelector("[data-piece-field='length']"),
+    height: document.querySelector("[data-piece-field='height']"),
+    thickness: document.querySelector("[data-piece-field='thickness']"),
+    verticalJoint: document.querySelector("[data-piece-field='verticalJoint']"),
+    horizontalJoint: document.querySelector("[data-piece-field='horizontalJoint']"),
+    waste: document.querySelector("[data-piece-field='waste']"),
+    pricePerPiece: document.querySelector("[data-piece-field='pricePerPiece']"),
+    piecesPerPackage: document.querySelector("[data-piece-field='piecesPerPackage']"),
+    estimateMortar: document.querySelector("[data-piece-field='estimateMortar']"),
+    mortarWaste: document.querySelector("[data-piece-field='mortarWaste']"),
+  };
+  const mortarOptions = document.querySelector("[data-mortar-options]");
+  const mainResult = document.querySelector("[data-main-result]");
+  const resultNote = document.querySelector("[data-result-note]");
+  const summaryList = document.querySelector("[data-summary-list]");
+  const warningList = document.querySelector("[data-warning-list]");
+  const breakdownList = document.querySelector("[data-breakdown-list]");
+  const copyButton = document.querySelector("[data-copy-result]");
+  const exportButton = document.querySelector("[data-export-csv]");
+  const copyStatus = document.querySelector("[data-copy-status]");
+  const mobileTotal = document.querySelector("[data-mobile-total]");
+  const mobileTotalText = document.querySelector("[data-mobile-total-text]");
+
+  let wallSequence = 0;
+  let openingSequence = 0;
+  let walls = [createWall()];
+  let openings = [createOpening()];
+  let currentShareText = "";
+  let currentCsv = "";
+  let copyTimer;
+
+  function createWall() {
+    wallSequence += 1;
+    return {
+      name: `Muro ${wallSequence}`,
+      width: "",
+      height: "",
+      quantity: "1",
+    };
+  }
+
+  function createOpening() {
+    openingSequence += 1;
+    return {
+      name: `Abertura ${openingSequence}`,
+      width: "",
+      height: "",
+      quantity: "1",
+    };
+  }
+
+  function renderWalls() {
+    wallList.textContent = "";
+
+    walls.forEach((wall, index) => {
+      const article = document.createElement("article");
+      article.className = "rounded-lg border border-gray-800 bg-gray-900/70 p-4";
+      article.dataset.wallIndex = String(index);
+      article.innerHTML = `
+        <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+          <div class="min-w-0">
+            <p class="text-xs font-semibold uppercase text-gray-500">Muro ${index + 1}</p>
+            <p class="mt-1 break-words text-base font-semibold text-white">${escapeHtml(wall.name)}</p>
+          </div>
+          <button class="min-h-10 rounded-lg border border-gray-700 px-3 text-sm font-semibold text-gray-200 transition hover:border-red-300 hover:text-red-100 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-red-300/25 disabled:opacity-40" type="button" data-delete-wall ${walls.length === 1 ? "disabled" : ""}>Eliminar</button>
+        </div>
+        <div class="mt-4 grid gap-4 sm:grid-cols-2">
+          ${renderTextField("Nombre", wall.name, "name")}
+          ${renderMeasuredField("Ancho", wall.width, "width", "m", "5")}
+          ${renderMeasuredField("Alto", wall.height, "height", "m", "2.5")}
+          ${renderTextField("Cantidad", wall.quantity, "quantity", "1", "numeric")}
+        </div>
+        <p class="mt-3 min-h-5 text-sm text-red-300" data-wall-error></p>
+      `;
+
+      article.querySelectorAll("[data-row-field]").forEach((field) => {
+        field.addEventListener("input", (event) => {
+          updateRowFromField(walls, index, event.currentTarget);
+        });
+      });
+
+      article.querySelector("[data-delete-wall]").addEventListener("click", () => {
+        deleteWall(index);
+      });
+
+      wallList.appendChild(article);
+    });
+  }
+
+  function renderOpenings() {
+    openingList.textContent = "";
+
+    openings.forEach((opening, index) => {
+      const article = document.createElement("article");
+      article.className = "rounded-lg border border-gray-800 bg-gray-900/70 p-4";
+      article.dataset.openingIndex = String(index);
+      article.innerHTML = `
+        <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+          <div class="min-w-0">
+            <p class="text-xs font-semibold uppercase text-gray-500">Abertura ${index + 1}</p>
+            <p class="mt-1 break-words text-base font-semibold text-white">${escapeHtml(opening.name)}</p>
+          </div>
+          <button class="min-h-10 rounded-lg border border-gray-700 px-3 text-sm font-semibold text-gray-200 transition hover:border-red-300 hover:text-red-100 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-red-300/25 disabled:opacity-40" type="button" data-delete-opening ${openings.length === 1 ? "disabled" : ""}>Eliminar</button>
+        </div>
+        <div class="mt-4 grid gap-4 sm:grid-cols-2">
+          ${renderTextField("Nombre", opening.name, "name")}
+          ${renderMeasuredField("Ancho", opening.width, "width", "m", "0.9")}
+          ${renderMeasuredField("Alto", opening.height, "height", "m", "2.1")}
+          ${renderTextField("Cantidad", opening.quantity, "quantity", "1", "numeric")}
+        </div>
+        <p class="mt-3 min-h-5 text-sm text-red-300" data-opening-error></p>
+      `;
+
+      article.querySelectorAll("[data-row-field]").forEach((field) => {
+        field.addEventListener("input", (event) => {
+          updateRowFromField(openings, index, event.currentTarget);
+        });
+      });
+
+      article.querySelector("[data-delete-opening]").addEventListener("click", () => {
+        deleteOpening(index);
+      });
+
+      openingList.appendChild(article);
+    });
+  }
+
+  function renderTextField(label, value, fieldName, placeholder = "", inputMode = "text") {
+    return `
+      <div>
+        <label class="block text-sm font-semibold text-gray-200">${escapeHtml(label)}</label>
+        <input class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-950 px-3 text-sm font-semibold text-white outline-none placeholder:text-gray-600 focus:border-amber-300 focus:ring-3 focus:ring-amber-300/15" type="text" inputmode="${escapeAttribute(inputMode)}" autocomplete="off" placeholder="${escapeAttribute(placeholder)}" value="${escapeAttribute(value)}" data-row-field="${escapeAttribute(fieldName)}" />
+      </div>
+    `;
+  }
+
+  function renderMeasuredField(label, value, fieldName, unit, placeholder) {
+    return `
+      <div>
+        <label class="block text-sm font-semibold text-gray-200">${escapeHtml(label)}</label>
+        <div class="mt-2 grid grid-cols-[minmax(0,1fr)_3.5rem] overflow-hidden rounded-lg border border-gray-700 bg-gray-950 focus-within:border-amber-300 focus-within:ring-3 focus-within:ring-amber-300/15">
+          <input class="min-h-12 w-full bg-transparent px-3 text-lg font-semibold text-white outline-none placeholder:text-gray-600" type="text" inputmode="decimal" autocomplete="off" placeholder="${escapeAttribute(placeholder)}" value="${escapeAttribute(value)}" data-row-field="${escapeAttribute(fieldName)}" />
+          <span class="grid place-items-center border-l border-gray-700 bg-gray-900 text-sm font-semibold text-gray-300">${escapeHtml(unit)}</span>
+        </div>
+      </div>
+    `;
+  }
+
+  function updateRowFromField(collection, index, field) {
+    collection[index][field.dataset.rowField] = field.value;
+    renderRowTitles();
+    updateCalculator();
+  }
+
+  function renderRowTitles() {
+    document.querySelectorAll("[data-wall-index]").forEach((row) => {
+      const index = Number(row.dataset.wallIndex);
+      row.querySelectorAll("p")[1].textContent = walls[index].name || `Muro ${index + 1}`;
+    });
+    document.querySelectorAll("[data-opening-index]").forEach((row) => {
+      const index = Number(row.dataset.openingIndex);
+      row.querySelectorAll("p")[1].textContent = openings[index].name || `Abertura ${index + 1}`;
+    });
+  }
+
+  function deleteWall(index) {
+    if (walls.length === 1) {
+      return;
+    }
+
+    walls.splice(index, 1);
+    renderWalls();
+    updateCalculator();
+  }
+
+  function deleteOpening(index) {
+    if (openings.length === 1) {
+      openings = [createOpening()];
+    } else {
+      openings.splice(index, 1);
+    }
+
+    renderOpenings();
+    updateCalculator();
+  }
+
+  function applyPreset(preset) {
+    const config = BRICK_PRESET_CONFIG[preset];
+
+    pieceFields.preset.value = preset;
+    pieceFields.length.value = typeof config.lengthCm === "number" ? String(config.lengthCm) : "";
+    pieceFields.height.value = typeof config.heightCm === "number" ? String(config.heightCm) : "";
+    pieceFields.thickness.value = typeof config.thicknessCm === "number" ? String(config.thicknessCm) : "";
+
+    updateCalculator();
+  }
+
+  function updateCalculator() {
+    clearErrors();
+    toggleMortarOptions();
+
+    const parseResult = parseInput();
+
+    if (!parseResult.ok) {
+      setNeutralResult(parseResult.message);
+      setErrors(parseResult);
+      return;
+    }
+
+    try {
+      const result = calculateBrickEstimate(parseResult.input);
+      renderResult(result, parseResult.input);
+      currentShareText = buildBrickShareText(result, parseResult.input);
+      currentCsv = buildBrickCsv(result);
+      showActions();
+    } catch (error) {
+      setNeutralResult(error instanceof Error ? error.message : "Revisa los datos capturados.");
+    }
+  }
+
+  function parseInput() {
+    const globalErrors = {};
+    const wallErrors = {};
+    const openingErrors = {};
+    const parsedWalls = [];
+    const parsedOpenings = [];
+
+    walls.forEach((wall, index) => {
+      const errors = [];
+      const name = parseName(wall.name, `Muro ${index + 1}`, errors);
+      const width = parsePositiveDimension(wall.width, "ancho", "m", errors);
+      const height = parsePositiveDimension(wall.height, "alto", "m", errors);
+      const quantity = parseIntegerField(wall.quantity, "cantidad", errors);
+
+      if (errors.length) {
+        wallErrors[index] = errors.join(" ");
+        return;
+      }
+
+      parsedWalls.push({
+        name,
+        width,
+        height,
+        quantity,
+      });
+    });
+
+    openings.forEach((opening, index) => {
+      const emptyOpening = !opening.width.trim() && !opening.height.trim();
+
+      if (emptyOpening) {
+        return;
+      }
+
+      const errors = [];
+      const name = parseName(opening.name, `Abertura ${index + 1}`, errors);
+      const width = parsePositiveDimension(opening.width, "ancho", "m", errors);
+      const height = parsePositiveDimension(opening.height, "alto", "m", errors);
+      const quantity = parseIntegerField(opening.quantity, "cantidad", errors);
+
+      if (errors.length) {
+        openingErrors[index] = errors.join(" ");
+        return;
+      }
+
+      parsedOpenings.push({
+        name,
+        width,
+        height,
+        quantity,
+      });
+    });
+
+    const length = parsePositivePieceDimension(pieceFields.length.value, "largo", globalErrors, "length");
+    const height = parsePositivePieceDimension(pieceFields.height.value, "alto", globalErrors, "height");
+    const thickness = parseOptionalPieceDimension(pieceFields.thickness.value, "espesor", globalErrors, "thickness");
+    const verticalJoint = parseNonNegativePieceDimension(pieceFields.verticalJoint.value, "junta vertical", globalErrors, "verticalJoint");
+    const horizontalJoint = parseNonNegativePieceDimension(pieceFields.horizontalJoint.value, "junta horizontal", globalErrors, "horizontalJoint");
+    const wastePercentage = parsePercentageField(pieceFields.waste.value, "desperdicio", globalErrors, "waste");
+    const pricePerPiece = parseOptionalNonNegativeNumber(pieceFields.pricePerPiece.value, "precio por pieza", globalErrors, "pricePerPiece");
+    const piecesPerPackage = parseOptionalInteger(pieceFields.piecesPerPackage.value, "piezas por paquete", globalErrors, "piecesPerPackage");
+    const estimateMortar = pieceFields.estimateMortar.checked;
+    const mortarWastePercentage = estimateMortar
+      ? parsePercentageField(pieceFields.mortarWaste.value, "desperdicio de mortero", globalErrors, "mortarWaste")
+      : undefined;
+
+    if (estimateMortar && !thickness) {
+      globalErrors.thickness = "Captura espesor para estimar mortero.";
+    }
+
+    if (
+      Object.keys(globalErrors).length ||
+      Object.keys(wallErrors).length ||
+      Object.keys(openingErrors).length
+    ) {
+      return {
+        ok: false,
+        message: "Completa las medidas marcadas para calcular.",
+        globalErrors,
+        wallErrors,
+        openingErrors,
+      };
+    }
+
+    return {
+      ok: true,
+      input: {
+        walls: parsedWalls,
+        openings: parsedOpenings,
+        piece: {
+          preset: PRESET_ORDER.includes(pieceFields.preset.value)
+            ? pieceFields.preset.value
+            : "custom",
+          length,
+          height,
+          ...(thickness ? { thickness } : {}),
+          horizontalJoint,
+          verticalJoint,
+        },
+        wastePercentage,
+        ...(typeof pricePerPiece === "number" ? { pricePerPiece } : {}),
+        ...(typeof piecesPerPackage === "number" ? { piecesPerPackage } : {}),
+        estimateMortar,
+        ...(typeof mortarWastePercentage === "number" ? { mortarWastePercentage } : {}),
+      },
+    };
+  }
+
+  function parseName(value, fallback, errors) {
+    const name = value.trim() || fallback;
+
+    if (name.length > 60) {
+      errors.push("El nombre no puede superar 60 caracteres.");
+    }
+
+    return name;
+  }
+
+  function parsePositiveDimension(value, label, unit, errors) {
+    const parsed = parseBrickNumberInput(value);
+
+    if (!parsed.ok || parsed.value <= 0) {
+      errors.push(`Revisa ${label}.`);
+      return undefined;
+    }
+
+    return {
+      value: parsed.value,
+      unit,
+    };
+  }
+
+  function parseIntegerField(value, label, errors) {
+    const parsed = parseBrickNumberInput(value);
+
+    if (
+      !parsed.ok ||
+      !Number.isInteger(parsed.value) ||
+      parsed.value < 1 ||
+      parsed.value > 1000
+    ) {
+      errors.push(`${label} debe ser entero entre 1 y 1000.`);
+      return undefined;
+    }
+
+    return parsed.value;
+  }
+
+  function parsePositivePieceDimension(value, label, errors, key) {
+    const parsed = parseBrickNumberInput(value);
+
+    if (!parsed.ok || parsed.value <= 0) {
+      errors[key] = `Revisa ${label}.`;
+      return undefined;
+    }
+
+    return {
+      value: parsed.value,
+      unit: "cm",
+    };
+  }
+
+  function parseOptionalPieceDimension(value, label, errors, key) {
+    if (!value.trim()) {
+      return undefined;
+    }
+
+    return parsePositivePieceDimension(value, label, errors, key);
+  }
+
+  function parseNonNegativePieceDimension(value, label, errors, key) {
+    const parsed = parseBrickNumberInput(value);
+
+    if (!parsed.ok) {
+      errors[key] = `Revisa ${label}.`;
+      return undefined;
+    }
+
+    return {
+      value: parsed.value,
+      unit: "cm",
+    };
+  }
+
+  function parsePercentageField(value, label, errors, key) {
+    const parsed = parseBrickNumberInput(value);
+
+    if (!parsed.ok || parsed.value > 100) {
+      errors[key] = `Revisa ${label}.`;
+      return undefined;
+    }
+
+    return parsed.value;
+  }
+
+  function parseOptionalNonNegativeNumber(value, label, errors, key) {
+    if (!value.trim()) {
+      return undefined;
+    }
+
+    const parsed = parseBrickNumberInput(value);
+
+    if (!parsed.ok) {
+      errors[key] = `Revisa ${label}.`;
+      return undefined;
+    }
+
+    return parsed.value;
+  }
+
+  function parseOptionalInteger(value, label, errors, key) {
+    if (!value.trim()) {
+      return undefined;
+    }
+
+    const parsed = parseBrickNumberInput(value);
+
+    if (!parsed.ok || !Number.isInteger(parsed.value) || parsed.value < 1 || parsed.value > 1000) {
+      errors[key] = `Revisa ${label}.`;
+      return undefined;
+    }
+
+    return parsed.value;
+  }
+
+  function renderResult(result, input) {
+    mainResult.textContent = `Compra ${result.roundedPurchasePieces} pieza${result.roundedPurchasePieces === 1 ? "" : "s"}`;
+
+    if (typeof result.packages === "number" && typeof result.piecesPerPackage === "number") {
+      resultNote.textContent = `${result.packages} paquete${result.packages === 1 ? "" : "s"} de ${result.piecesPerPackage} piezas; ${result.purchasePieces} piezas calculadas.`;
+    } else {
+      resultNote.textContent = `${result.purchasePieces} piezas con desperdicio incluido.`;
+    }
+
+    const summaryItems = [
+      ["Area bruta", `${formatBrickFixedNumber(result.wallArea)} m2`],
+      ["Aberturas", `${formatBrickFixedNumber(result.openingArea)} m2`],
+      ["Area neta", `${formatBrickFixedNumber(result.netArea)} m2`],
+      ["Piezas por m2", formatBrickFixedNumber(result.module.piecesPerM2, 2)],
+      ["Piezas netas", String(result.netPieces)],
+      ["Con desperdicio", String(result.purchasePieces)],
+    ];
+
+    if (typeof result.packages === "number") {
+      summaryItems.push(["Paquetes", String(result.packages)]);
+    }
+
+    if (typeof result.estimatedCost === "number") {
+      summaryItems.push(["Costo estimado", formatBrickCurrency(result.estimatedCost)]);
+    }
+
+    if (result.mortar) {
+      summaryItems.push(["Mortero aprox.", `${formatBrickFixedNumber(result.mortar.purchaseVolume, 3)} m3`]);
+    }
+
+    renderKeyValueList(summaryList, summaryItems);
+    renderWarnings(result.warnings);
+    renderBreakdown(result);
+    updateMobileResult(mainResult.textContent);
+  }
+
+  function renderKeyValueList(container, items) {
+    container.textContent = "";
+
+    items.forEach(([label, value]) => {
+      const row = document.createElement("div");
+      row.className =
+        "flex items-start justify-between gap-4 rounded-lg border border-gray-800 bg-gray-950 p-3 text-sm";
+      row.innerHTML = `<span class="text-gray-400"></span><strong class="break-words text-right font-semibold text-white"></strong>`;
+      row.querySelector("span").textContent = label;
+      row.querySelector("strong").textContent = value;
+      container.appendChild(row);
+    });
+  }
+
+  function renderWarnings(warnings) {
+    warningList.textContent = "";
+
+    warnings.forEach((warning) => {
+      const item = document.createElement("p");
+      item.className =
+        "rounded-lg border border-amber-400/30 bg-amber-400/10 p-3 text-sm leading-relaxed text-amber-100";
+      item.textContent = warning;
+      warningList.appendChild(item);
+    });
+  }
+
+  function renderBreakdown(result) {
+    breakdownList.textContent = "";
+
+    const title = document.createElement("p");
+    title.className = "text-sm font-semibold text-white";
+    title.textContent = "Desglose";
+    breakdownList.appendChild(title);
+
+    result.walls.forEach((wall) => {
+      breakdownList.appendChild(buildBreakdownRow(wall.name, `${wall.quantity}x muro`, `${formatBrickFixedNumber(wall.area)} m2`));
+    });
+
+    result.openings.forEach((opening) => {
+      breakdownList.appendChild(buildBreakdownRow(opening.name, `${opening.quantity}x abertura`, `-${formatBrickFixedNumber(opening.area)} m2`));
+    });
+  }
+
+  function buildBreakdownRow(name, detail, value) {
+    const row = document.createElement("div");
+    row.className = "rounded-lg border border-gray-800 bg-gray-950 p-3 text-sm";
+    row.innerHTML = `
+      <div class="flex items-start justify-between gap-3">
+        <div class="min-w-0">
+          <p class="break-words font-semibold text-white"></p>
+          <p class="mt-1 text-gray-500"></p>
+        </div>
+        <strong class="shrink-0 text-right text-amber-100"></strong>
+      </div>
+    `;
+    row.querySelector("p").textContent = name;
+    row.querySelectorAll("p")[1].textContent = detail;
+    row.querySelector("strong").textContent = value;
+    return row;
+  }
+
+  function setNeutralResult(message) {
+    mainResult.textContent = "Ingresa tus medidas";
+    resultNote.textContent = message;
+    summaryList.textContent = "";
+    warningList.textContent = "";
+    breakdownList.textContent = "";
+    currentShareText = "";
+    currentCsv = "";
+    hideActions();
+    mobileTotal.classList.add("hidden");
+  }
+
+  function setErrors(parseResult) {
+    Object.entries(parseResult.globalErrors ?? {}).forEach(([key, message]) => {
+      const error = document.querySelector(`[data-error-for='${key}']`);
+      if (error) {
+        error.textContent = message;
+      }
+    });
+
+    Object.entries(parseResult.wallErrors ?? {}).forEach(([index, message]) => {
+      const error = document.querySelector(`[data-wall-index='${index}'] [data-wall-error]`);
+      if (error) {
+        error.textContent = message;
+      }
+    });
+
+    Object.entries(parseResult.openingErrors ?? {}).forEach(([index, message]) => {
+      const error = document.querySelector(`[data-opening-index='${index}'] [data-opening-error]`);
+      if (error) {
+        error.textContent = message;
+      }
+    });
+  }
+
+  function clearErrors() {
+    document.querySelectorAll("[data-error-for]").forEach((error) => {
+      error.textContent = "";
+    });
+    document.querySelectorAll("[data-wall-error], [data-opening-error]").forEach((error) => {
+      error.textContent = "";
+    });
+  }
+
+  function showActions() {
+    copyButton.classList.remove("hidden");
+    copyButton.classList.add("inline-flex");
+    exportButton.classList.remove("hidden");
+    exportButton.classList.add("inline-flex");
+  }
+
+  function hideActions() {
+    copyButton.classList.add("hidden");
+    copyButton.classList.remove("inline-flex");
+    exportButton.classList.add("hidden");
+    exportButton.classList.remove("inline-flex");
+  }
+
+  function updateMobileResult(text) {
+    mobileTotalText.textContent = text;
+    mobileTotal.classList.remove("hidden");
+  }
+
+  function toggleMortarOptions() {
+    mortarOptions.classList.toggle("hidden", !pieceFields.estimateMortar.checked);
+  }
+
+  function clearCopyStatus() {
+    window.clearTimeout(copyTimer);
+    copyStatus.textContent = "";
+  }
+
+  function copyText(text) {
+    clearCopyStatus();
+
+    if (!text) {
+      copyStatus.textContent = "No hay resultado para copiar.";
+      return;
+    }
+
+    if (navigator.clipboard?.writeText) {
+      navigator.clipboard
+        .writeText(text)
+        .then(() => {
+          copyStatus.textContent = "Resultado copiado.";
+        })
+        .catch(() => {
+          copyStatus.textContent = "No fue posible copiar automaticamente.";
+        });
+    } else {
+      copyStatus.textContent = "No fue posible copiar automaticamente.";
+    }
+
+    copyTimer = window.setTimeout(() => {
+      copyStatus.textContent = "";
+    }, 3000);
+  }
+
+  function exportCsv() {
+    clearCopyStatus();
+
+    if (!currentCsv) {
+      copyStatus.textContent = "No hay resultado para exportar.";
+      return;
+    }
+
+    const blob = new Blob([currentCsv], { type: "text/csv;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "calculo-ladrillos.csv";
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    URL.revokeObjectURL(url);
+    copyStatus.textContent = "CSV generado.";
+  }
+
+  function resetCalculator() {
+    wallSequence = 0;
+    openingSequence = 0;
+    walls = [createWall()];
+    openings = [createOpening()];
+    pieceFields.preset.value = "custom";
+    pieceFields.length.value = "";
+    pieceFields.height.value = "";
+    pieceFields.thickness.value = "";
+    pieceFields.verticalJoint.value = "1";
+    pieceFields.horizontalJoint.value = "1";
+    pieceFields.waste.value = "10";
+    pieceFields.pricePerPiece.value = "";
+    pieceFields.piecesPerPackage.value = "";
+    pieceFields.estimateMortar.checked = false;
+    pieceFields.mortarWaste.value = "10";
+    renderWalls();
+    renderOpenings();
+    toggleMortarOptions();
+    setNeutralResult("Las piezas a comprar apareceran aqui.");
+  }
+
+  function escapeHtml(value) {
+    return String(value)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;");
+  }
+
+  function escapeAttribute(value) {
+    return escapeHtml(value).replace(/"/g, "&quot;");
+  }
+
+  addWallButton.addEventListener("click", () => {
+    walls.push(createWall());
+    renderWalls();
+    updateCalculator();
+  });
+
+  addOpeningButton.addEventListener("click", () => {
+    openings.push(createOpening());
+    renderOpenings();
+    updateCalculator();
+  });
+
+  Object.values(pieceFields).forEach((field) => {
+    field.addEventListener("input", () => updateCalculator());
+    field.addEventListener("change", () => updateCalculator());
+  });
+
+  pieceFields.preset.addEventListener("change", () => {
+    applyPreset(pieceFields.preset.value);
+  });
+
+  clearButton.addEventListener("click", resetCalculator);
+  copyButton.addEventListener("click", () => copyText(currentShareText));
+  exportButton.addEventListener("click", exportCsv);
+
+  renderWalls();
+  renderOpenings();
+  toggleMortarOptions();
+</script>
