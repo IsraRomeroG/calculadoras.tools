@@ -1,0 +1,1623 @@
+---
+import BaseLayout from "@layouts/BaseLayout.astro";
+import AdSlot from "@components/ads/AdSlot.astro";
+import Container from "@components/layout/Container.astro";
+import PageShell from "@components/layout/PageShell.astro";
+import FaqSection from "@components/shared/FaqSection.astro";
+import PageHero from "@components/shared/PageHero.astro";
+import SectionIntro from "@components/shared/SectionIntro.astro";
+import {
+  REMODEL_BUDGET_CANONICAL_PATH,
+  REMODEL_TEMPLATES,
+} from "@lib/calculators/construccion/calculadora-presupuesto-remodelacion/remodelBudget";
+import { buildFaqJsonLd } from "@lib/seo";
+
+const title = "Calculadora de presupuesto de remodelación";
+const description =
+  "Crea un presupuesto de remodelación por partidas, calcula imprevistos, costo por m² y compara el total contra tu presupuesto.";
+const canonical = REMODEL_BUDGET_CANONICAL_PATH;
+
+const faqs = [
+  {
+    question: "¿Qué incluye un presupuesto de remodelación?",
+    answer:
+      "Conviene incluir materiales, mano de obra, permisos, demoliciones, retiro de escombro, fletes, limpieza y una reserva para imprevistos. Las plantillas de esta calculadora sirven como punto de partida y puedes modificarlas.",
+  },
+  {
+    question: "¿Cuánta contingencia conviene agregar?",
+    answer:
+      "Depende del alcance y de la incertidumbre del proyecto. Esta herramienta inicia con 15%, pero el porcentaje es editable. Una obra con instalaciones ocultas o alcance poco definido suele requerir una reserva mayor.",
+  },
+  {
+    question: "¿Los precios deben incluir IVA?",
+    answer:
+      "Puedes capturar costos finales que ya incluyan impuestos o elegir agregar un porcentaje al subtotal. Define una sola opción para evitar contar el impuesto dos veces.",
+  },
+  {
+    question: "¿La calculadora usa precios actuales?",
+    answer:
+      "No. Todos los importes los proporciona el usuario porque los precios cambian según ciudad, proveedor, calidad, disponibilidad y condiciones de la obra.",
+  },
+  {
+    question: "¿Cómo se calcula el costo por metro cuadrado?",
+    answer:
+      "Se divide el total estimado, incluida la contingencia y los impuestos configurados, entre la superficie capturada. Es útil para comparar escenarios, pero no representa un precio universal de remodelación.",
+  },
+  {
+    question: "¿Puedo separar materiales, mano de obra y permisos?",
+    answer:
+      "Sí. Cada partida tiene un tipo de costo y una zona independientes. El resultado muestra subtotales por tipo y por zona.",
+  },
+  {
+    question: "¿Dónde se guarda mi presupuesto?",
+    answer:
+      "Se guarda automáticamente en el almacenamiento local de este navegador y dispositivo. No se envía a un servidor. Al borrar los datos del navegador también puede eliminarse.",
+  },
+];
+
+const faqJsonLd = buildFaqJsonLd(faqs);
+---
+
+<BaseLayout title={title} description={description} canonical={canonical}>
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={JSON.stringify(faqJsonLd)} />
+  </Fragment>
+
+  <PageShell>
+    <PageHero
+      title="Calculadora de presupuesto de remodelación"
+      description="Organiza partidas, reserva dinero para imprevistos y comprueba si tu presupuesto alcanza."
+      kicker="Construcción"
+      collapseBreadcrumbOnMobile
+      containerClass="py-5 md:py-7"
+      breadcrumbs={[
+        { label: "Inicio", href: "/", ariaLabel: "Inicio" },
+        { label: "Construcción", href: "/construccion", optional: true },
+        { label: "Presupuesto de remodelación", truncate: true },
+      ]}
+    />
+
+    <Container as="section" class="py-4 md:py-7">
+      <section
+        id="remodel-budget-calculator"
+        class="overflow-hidden rounded-xl border border-gray-700 bg-gray-950 shadow-xl shadow-gray-950/30"
+        aria-labelledby="calculator-heading"
+      >
+        <form
+          class="grid lg:grid-cols-[minmax(0,1.15fr)_minmax(21rem,0.85fr)]"
+          novalidate
+          data-remodel-form
+        >
+          <section class="p-4 sm:p-6 lg:col-start-1 lg:row-start-1">
+            <p class="text-sm font-semibold uppercase tracking-wide text-amber-300">
+              Datos del proyecto
+            </p>
+            <h2 id="calculator-heading" class="mt-2 text-2xl font-semibold text-white">
+              Define el dinero disponible
+            </h2>
+            <p class="mt-2 text-sm leading-relaxed text-gray-400">
+              Puedes calcular sin presupuesto y compararlo después. Los precios no se
+              consultan ni se envían a servidores.
+            </p>
+
+            <div class="mt-6 grid gap-4 sm:grid-cols-2">
+              <div>
+                <label for="remodel-budget" class="block text-sm font-semibold text-gray-200">
+                  Presupuesto disponible
+                  <span class="font-normal text-gray-500">(opcional)</span>
+                </label>
+                <div class="remodel-input-group">
+                  <span aria-hidden="true">$</span>
+                  <input
+                    id="remodel-budget"
+                    class="remodel-input remodel-input-with-prefix"
+                    type="text"
+                    inputmode="decimal"
+                    autocomplete="off"
+                    placeholder="250,000"
+                    data-project-field="budget"
+                    aria-describedby="remodel-budget-help remodel-budget-error"
+                  />
+                  <span class="remodel-input-suffix">MXN</span>
+                </div>
+                <p id="remodel-budget-help" class="mt-2 text-xs leading-relaxed text-gray-500">
+                  Se usa para mostrar cuánto queda o cuánto se excede.
+                </p>
+                <p id="remodel-budget-error" class="remodel-field-error" data-error-for="budget"></p>
+              </div>
+
+              <div>
+                <label for="remodel-contingency" class="block text-sm font-semibold text-gray-200">
+                  Reserva para imprevistos
+                </label>
+                <div class="remodel-input-group">
+                  <input
+                    id="remodel-contingency"
+                    class="remodel-input remodel-input-with-suffix"
+                    type="text"
+                    inputmode="decimal"
+                    autocomplete="off"
+                    value="15"
+                    data-project-field="contingency"
+                    aria-describedby="remodel-contingency-help remodel-contingency-error"
+                  />
+                  <span class="remodel-input-suffix">%</span>
+                </div>
+                <p id="remodel-contingency-help" class="mt-2 text-xs leading-relaxed text-gray-500">
+                  Se calcula después de los impuestos adicionales.
+                </p>
+                <p id="remodel-contingency-error" class="remodel-field-error" data-error-for="contingency"></p>
+              </div>
+            </div>
+
+            <section class="mt-6 rounded-xl border border-gray-800 bg-gray-900/60 p-4">
+              <div class="flex flex-col gap-3 sm:flex-row sm:items-end">
+                <div class="min-w-0 flex-1">
+                  <label for="remodel-template" class="block text-sm font-semibold text-gray-200">
+                    Comenzar con una plantilla
+                  </label>
+                  <select
+                    id="remodel-template"
+                    class="remodel-input mt-2"
+                    data-project-field="template"
+                    aria-describedby="remodel-template-description"
+                  >
+                    {
+                      Object.entries(REMODEL_TEMPLATES).map(([id, template]) => (
+                        <option value={id}>{template.label}</option>
+                      ))
+                    }
+                  </select>
+                </div>
+                <button
+                  class="remodel-secondary-button shrink-0"
+                  type="button"
+                  data-apply-template
+                >
+                  Cargar plantilla
+                </button>
+              </div>
+              <p id="remodel-template-description" class="mt-3 text-xs leading-relaxed text-gray-400" data-template-description>
+                Empieza con una partida vacía.
+              </p>
+              <p class="mt-2 text-xs leading-relaxed text-gray-500">
+                Las plantillas agregan conceptos frecuentes sin asignar precios.
+              </p>
+            </section>
+
+            <details class="mt-5 rounded-xl border border-gray-800 bg-gray-900/40" data-more-settings>
+              <summary class="flex min-h-12 cursor-pointer list-none items-center justify-between gap-3 px-4 py-3 text-sm font-semibold text-gray-200">
+                <span>Más ajustes</span>
+                <span class="text-xs font-normal text-gray-500" data-settings-summary>
+                  Costos finales · sin superficie
+                </span>
+              </summary>
+              <div class="grid gap-4 border-t border-gray-800 p-4 sm:grid-cols-2">
+                <div>
+                  <label for="remodel-area" class="block text-sm font-semibold text-gray-200">
+                    Superficie
+                    <span class="font-normal text-gray-500">(opcional)</span>
+                  </label>
+                  <div class="remodel-input-group">
+                    <input
+                      id="remodel-area"
+                      class="remodel-input remodel-input-with-suffix"
+                      type="text"
+                      inputmode="decimal"
+                      autocomplete="off"
+                      placeholder="50"
+                      data-project-field="area"
+                      aria-describedby="remodel-area-error"
+                    />
+                    <span class="remodel-input-suffix">m²</span>
+                  </div>
+                  <p id="remodel-area-error" class="remodel-field-error" data-error-for="area"></p>
+                </div>
+
+                <div>
+                  <label for="remodel-tax-mode" class="block text-sm font-semibold text-gray-200">
+                    Tratamiento de impuestos
+                  </label>
+                  <select
+                    id="remodel-tax-mode"
+                    class="remodel-input mt-2"
+                    data-project-field="taxMode"
+                  >
+                    <option value="costos_finales">Usar costos como finales</option>
+                    <option value="agregar_impuestos">Agregar impuestos</option>
+                  </select>
+                  <p class="mt-2 text-xs leading-relaxed text-gray-500">
+                    Usa costos finales si tus cotizaciones ya incluyen impuestos.
+                  </p>
+                </div>
+
+                <div class="sm:col-span-2 hidden" data-tax-rate-field>
+                  <label for="remodel-tax-rate" class="block text-sm font-semibold text-gray-200">
+                    Impuestos por agregar
+                  </label>
+                  <div class="remodel-input-group sm:max-w-xs">
+                    <input
+                      id="remodel-tax-rate"
+                      class="remodel-input remodel-input-with-suffix"
+                      type="text"
+                      inputmode="decimal"
+                      autocomplete="off"
+                      value="16"
+                      data-project-field="taxRate"
+                      aria-describedby="remodel-tax-rate-help remodel-tax-rate-error"
+                    />
+                    <span class="remodel-input-suffix">%</span>
+                  </div>
+                  <p id="remodel-tax-rate-help" class="mt-2 text-xs leading-relaxed text-gray-500">
+                    Porcentaje editable. Verifica qué tasa corresponde a tus partidas.
+                  </p>
+                  <p id="remodel-tax-rate-error" class="remodel-field-error" data-error-for="taxRate"></p>
+                </div>
+              </div>
+            </details>
+
+            <div class="mt-5 flex flex-col gap-3 rounded-xl border border-emerald-400/20 bg-emerald-400/5 p-4 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <p class="text-sm font-semibold text-emerald-100">Autoguardado local</p>
+                <p class="mt-1 text-xs leading-relaxed text-emerald-100/70" data-storage-status>
+                  Tus cambios se guardan solamente en este dispositivo.
+                </p>
+              </div>
+              <button
+                class="hidden min-h-11 rounded-lg border border-emerald-300/30 px-3 text-sm font-semibold text-emerald-100 hover:border-emerald-200"
+                type="button"
+                data-discard-saved
+              >
+                Descartar guardado
+              </button>
+            </div>
+          </section>
+
+          <aside class="border-y border-gray-800 bg-gray-900/70 p-4 sm:p-6 lg:col-start-2 lg:row-span-2 lg:row-start-1 lg:border-b-0 lg:border-l lg:border-r-0 lg:border-t-0">
+            <div class="lg:sticky lg:top-4">
+              <p class="text-sm font-semibold uppercase tracking-wide text-amber-300">
+                Resultado en vivo
+              </p>
+              <p class="mt-3 text-3xl font-bold leading-tight text-white" data-main-total>
+                Agrega el costo de una partida
+              </p>
+              <p class="mt-2 text-sm leading-relaxed text-gray-400" data-budget-status>
+                El total aparecerá cuando exista al menos una partida completa.
+              </p>
+              <p class="sr-only" role="status" aria-live="polite" data-live-summary></p>
+
+              <div class="mt-5 hidden" data-budget-progress>
+                <div class="flex items-center justify-between gap-4 text-xs font-semibold">
+                  <span class="text-gray-400">Presupuesto utilizado</span>
+                  <span class="text-white" data-budget-progress-label></span>
+                </div>
+                <div class="mt-2 h-2 overflow-hidden rounded-full bg-gray-800">
+                  <div class="h-full rounded-full transition-[width,background-color]" data-budget-progress-bar></div>
+                </div>
+              </div>
+
+              <div class="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-1" data-summary-grid>
+                <div class="rounded-xl border border-gray-800 bg-gray-950/70 p-4 text-sm leading-relaxed text-gray-400">
+                  Captura cantidad y costo unitario. Una partida con costo explícito de
+                  cero sí se considera completa.
+                </div>
+              </div>
+
+              <p class="mt-4 hidden rounded-xl border border-amber-400/30 bg-amber-400/10 p-3 text-sm leading-relaxed text-amber-100" data-incomplete-notice></p>
+
+              <section class="mt-5 hidden border-t border-gray-800 pt-5" data-breakdowns>
+                <h3 class="text-base font-semibold text-white">Desglose por tipo</h3>
+                <div class="mt-3 grid gap-2" data-type-breakdown></div>
+
+                <h3 class="mt-5 text-base font-semibold text-white">Zonas</h3>
+                <div class="mt-3 grid gap-2" data-zone-breakdown></div>
+
+                <h3 class="mt-5 text-base font-semibold text-white">Mayor impacto</h3>
+                <div class="mt-3 grid gap-2" data-top-items></div>
+              </section>
+
+              <div class="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-1">
+                <button class="remodel-primary-button" type="button" disabled data-copy-result>
+                  Copiar resumen
+                </button>
+                <button class="remodel-secondary-button" type="button" disabled data-export-csv>
+                  Exportar CSV
+                </button>
+                <button class="remodel-quiet-button sm:col-span-2 lg:col-span-1" type="button" data-clear-calculator>
+                  Limpiar presupuesto
+                </button>
+              </div>
+              <p class="mt-3 min-h-5 text-sm text-emerald-100" role="status" aria-live="polite" data-action-status></p>
+
+              <p class="mt-4 text-xs leading-relaxed text-gray-500">
+                Estimación preliminar. Los precios, impuestos y alcances pueden cambiar.
+              </p>
+            </div>
+          </aside>
+
+          <section class="p-4 sm:p-6 lg:col-start-1 lg:row-start-2 lg:border-t lg:border-gray-800">
+            <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <h2 class="text-2xl font-semibold text-white">Partidas</h2>
+                <p class="mt-1 text-sm leading-relaxed text-gray-400" data-item-count>
+                  Agrega los conceptos que forman parte de la obra.
+                </p>
+              </div>
+              <button class="remodel-primary-button shrink-0" type="button" data-add-item>
+                Agregar partida
+              </button>
+            </div>
+
+            <div class="mt-5 grid gap-4" data-item-list></div>
+
+            <button class="remodel-secondary-button mt-5 w-full" type="button" data-add-item-bottom>
+              Agregar otra partida
+            </button>
+
+            <datalist id="remodel-zone-options">
+              <option value="General"></option>
+              <option value="Cocina"></option>
+              <option value="Baño"></option>
+              <option value="Pintura"></option>
+              <option value="Pisos"></option>
+              <option value="Instalación eléctrica"></option>
+              <option value="Plomería"></option>
+              <option value="Exterior"></option>
+            </datalist>
+
+            <datalist id="remodel-unit-options">
+              <option value="pieza"></option>
+              <option value="m²"></option>
+              <option value="m³"></option>
+              <option value="metro lineal"></option>
+              <option value="lote"></option>
+              <option value="hora"></option>
+              <option value="día"></option>
+              <option value="servicio"></option>
+            </datalist>
+          </section>
+        </form>
+      </section>
+
+      <div
+        class="fixed inset-x-3 bottom-3 z-40 hidden items-center justify-between gap-3 rounded-xl border border-amber-300/40 bg-gray-950 p-3 shadow-2xl shadow-black/60 sm:left-auto sm:max-w-md"
+        role="status"
+        data-undo-toast
+      >
+        <p class="text-sm text-gray-200">Partida eliminada.</p>
+        <button class="min-h-11 rounded-lg bg-amber-300 px-4 text-sm font-bold text-gray-950" type="button" data-undo-delete>
+          Deshacer
+        </button>
+      </div>
+    </Container>
+
+    <AdSlot placement="calculator-after-tool" />
+
+    <Container as="section" class="py-8">
+      <SectionIntro
+        title="Cómo preparar un presupuesto útil"
+        description="La suma importa, pero también importa saber qué supuestos hay detrás."
+        class="mb-5"
+      />
+      <div class="grid gap-4 md:grid-cols-3">
+        <article class="remodel-info-card">
+          <p class="text-sm font-semibold text-amber-300">1. Divide el alcance</p>
+          <h2 class="mt-2 text-lg font-semibold text-white">Separa por zona</h2>
+          <p class="mt-2 text-sm leading-relaxed text-gray-400">
+            Cocina, baño, pintura e instalaciones pueden tener responsables y tiempos
+            distintos. La zona permite detectar dónde se concentra el gasto.
+          </p>
+        </article>
+        <article class="remodel-info-card">
+          <p class="text-sm font-semibold text-amber-300">2. Evita duplicados</p>
+          <h2 class="mt-2 text-lg font-semibold text-white">Aclara los impuestos</h2>
+          <p class="mt-2 text-sm leading-relaxed text-gray-400">
+            Revisa si cada cotización es precio final o precio más impuestos antes de
+            elegir el tratamiento global.
+          </p>
+        </article>
+        <article class="remodel-info-card">
+          <p class="text-sm font-semibold text-amber-300">3. Reserva margen</p>
+          <h2 class="mt-2 text-lg font-semibold text-white">Protege el presupuesto</h2>
+          <p class="mt-2 text-sm leading-relaxed text-gray-400">
+            La contingencia no es dinero ya gastado: es una reserva para cambios,
+            reparaciones ocultas o diferencias de alcance.
+          </p>
+        </article>
+      </div>
+    </Container>
+
+    <Container as="section" class="py-8">
+      <div class="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(18rem,0.55fr)]">
+        <article class="rounded-xl border border-gray-700 bg-gray-950 p-5 sm:p-6">
+          <h2 class="text-2xl font-semibold text-white">Gastos que suelen olvidarse</h2>
+          <p class="mt-3 text-sm leading-relaxed text-gray-400">
+            Antes de cerrar tu cifra, revisa si contemplaste preparación de superficies,
+            demoliciones, retiro de escombro, fletes, permisos, limpieza final y
+            supervisión. No todos aplican a cada proyecto, pero omitir uno relevante
+            puede consumir la reserva rápidamente.
+          </p>
+          <p class="mt-3 text-sm leading-relaxed text-gray-400">
+            El costo por metro cuadrado sirve para comparar versiones del mismo alcance.
+            No debería usarse por sí solo para comparar obras con calidades, instalaciones
+            o condiciones diferentes.
+          </p>
+        </article>
+
+        <aside class="rounded-xl border border-amber-300/30 bg-amber-300/5 p-5 sm:p-6">
+          <h2 class="text-lg font-semibold text-white">Calculadoras relacionadas</h2>
+          <div class="mt-4 grid gap-3">
+            <a class="remodel-related-link" href="/construccion/calculadora-piso-azulejo-superficie">
+              Piso y azulejo
+              <span>Calcula piezas, cajas y desperdicio.</span>
+            </a>
+            <a class="remodel-related-link" href="/construccion/metros-cuadrados-de-pintura">
+              Metros cuadrados de pintura
+              <span>Estima superficie y litros.</span>
+            </a>
+            <a class="remodel-related-link" href="/construccion/calculadora-volumen-concreto-cemento">
+              Volumen de concreto
+              <span>Calcula volumen, sacos y costo.</span>
+            </a>
+          </div>
+        </aside>
+      </div>
+    </Container>
+
+    <FaqSection faqs={faqs} />
+  </PageShell>
+</BaseLayout>
+
+<style is:global>
+  .remodel-input {
+    min-height: 3rem;
+    width: 100%;
+    border-radius: 0.75rem;
+    border: 1px solid rgb(55 65 81);
+    background: rgb(17 24 39);
+    padding: 0 0.875rem;
+    font-size: 1rem;
+    color: white;
+    outline: none;
+  }
+
+  .remodel-input:focus {
+    border-color: rgb(252 211 77);
+    box-shadow: 0 0 0 3px rgb(252 211 77 / 0.14);
+  }
+
+  .remodel-input[aria-invalid="true"] {
+    border-color: rgb(252 165 165);
+  }
+
+  .remodel-input-group {
+    position: relative;
+    margin-top: 0.5rem;
+  }
+
+  .remodel-input-group > span:first-child {
+    pointer-events: none;
+    position: absolute;
+    left: 0.875rem;
+    top: 50%;
+    z-index: 1;
+    transform: translateY(-50%);
+    color: rgb(156 163 175);
+  }
+
+  .remodel-input-with-prefix {
+    padding-left: 2rem;
+    padding-right: 4.25rem;
+  }
+
+  .remodel-input-with-suffix {
+    padding-right: 4rem;
+  }
+
+  .remodel-input-suffix {
+    pointer-events: none;
+    position: absolute;
+    right: 0.875rem;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: rgb(156 163 175);
+  }
+
+  .remodel-field-error {
+    min-height: 1.25rem;
+    padding-top: 0.25rem;
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+    color: rgb(252 165 165);
+  }
+
+  .remodel-primary-button,
+  .remodel-secondary-button,
+  .remodel-quiet-button {
+    display: inline-flex;
+    min-height: 2.75rem;
+    align-items: center;
+    justify-content: center;
+    border-radius: 0.75rem;
+    padding: 0.55rem 1rem;
+    font-size: 0.875rem;
+    font-weight: 700;
+    transition: border-color 150ms, background-color 150ms, color 150ms, opacity 150ms;
+  }
+
+  .remodel-primary-button {
+    background: rgb(252 211 77);
+    color: rgb(3 7 18);
+  }
+
+  .remodel-primary-button:hover {
+    background: rgb(253 230 138);
+  }
+
+  .remodel-secondary-button {
+    border: 1px solid rgb(75 85 99);
+    color: rgb(229 231 235);
+  }
+
+  .remodel-secondary-button:hover {
+    border-color: rgb(252 211 77);
+    color: white;
+  }
+
+  .remodel-quiet-button {
+    color: rgb(156 163 175);
+  }
+
+  .remodel-quiet-button:hover {
+    color: rgb(254 202 202);
+  }
+
+  .remodel-primary-button:focus-visible,
+  .remodel-secondary-button:focus-visible,
+  .remodel-quiet-button:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 3px rgb(252 211 77 / 0.25);
+  }
+
+  .remodel-primary-button:disabled,
+  .remodel-secondary-button:disabled {
+    cursor: not-allowed;
+    opacity: 0.4;
+  }
+
+  .remodel-info-card {
+    border-radius: 0.75rem;
+    border: 1px solid rgb(55 65 81);
+    background: rgb(3 7 18);
+    padding: 1.25rem;
+  }
+
+  .remodel-related-link {
+    display: block;
+    border-radius: 0.75rem;
+    border: 1px solid rgb(75 85 99);
+    padding: 0.875rem;
+    font-size: 0.875rem;
+    font-weight: 700;
+    color: rgb(253 230 138);
+    transition: border-color 150ms, background-color 150ms;
+  }
+
+  .remodel-related-link:hover {
+    border-color: rgb(252 211 77);
+    background: rgb(252 211 77 / 0.06);
+  }
+
+  .remodel-related-link span {
+    margin-top: 0.25rem;
+    display: block;
+    font-size: 0.75rem;
+    font-weight: 400;
+    color: rgb(156 163 175);
+  }
+</style>
+
+<script>
+  import {
+    REMODEL_COST_TYPES,
+    REMODEL_COST_TYPE_LABELS,
+    REMODEL_TEMPLATE_IDS,
+    REMODEL_TEMPLATES,
+    buildRemodelCsv,
+    buildRemodelShareText,
+    calculateRemodelBudget,
+    createRemodelTemplateItems,
+    formatRemodelCurrency,
+    formatRemodelNumber,
+    parseRemodelNumberInput,
+  } from "@lib/calculators/construccion/calculadora-presupuesto-remodelacion/remodelBudget";
+
+  const STORAGE_KEY = "calculadoras-tools:presupuesto-remodelacion:v1";
+  const STORAGE_VERSION = 1;
+  const MAX_ITEMS = 200;
+  const defaultProject = {
+    budget: "",
+    area: "",
+    contingency: "15",
+    taxMode: "costos_finales",
+    taxRate: "16",
+    template: "blank",
+  };
+
+  const form = document.querySelector("[data-remodel-form]");
+  const itemList = document.querySelector("[data-item-list]");
+  const addButtons = document.querySelectorAll("[data-add-item], [data-add-item-bottom]");
+  const applyTemplateButton = document.querySelector("[data-apply-template]");
+  const templateDescription = document.querySelector("[data-template-description]");
+  const settingsSummary = document.querySelector("[data-settings-summary]");
+  const taxRateField = document.querySelector("[data-tax-rate-field]");
+  const storageStatus = document.querySelector("[data-storage-status]");
+  const discardSavedButton = document.querySelector("[data-discard-saved]");
+  const clearButton = document.querySelector("[data-clear-calculator]");
+  const itemCount = document.querySelector("[data-item-count]");
+  const mainTotal = document.querySelector("[data-main-total]");
+  const budgetStatus = document.querySelector("[data-budget-status]");
+  const liveSummary = document.querySelector("[data-live-summary]");
+  const summaryGrid = document.querySelector("[data-summary-grid]");
+  const incompleteNotice = document.querySelector("[data-incomplete-notice]");
+  const breakdowns = document.querySelector("[data-breakdowns]");
+  const typeBreakdown = document.querySelector("[data-type-breakdown]");
+  const zoneBreakdown = document.querySelector("[data-zone-breakdown]");
+  const topItems = document.querySelector("[data-top-items]");
+  const budgetProgress = document.querySelector("[data-budget-progress]");
+  const budgetProgressLabel = document.querySelector("[data-budget-progress-label]");
+  const budgetProgressBar = document.querySelector("[data-budget-progress-bar]");
+  const copyButton = document.querySelector("[data-copy-result]");
+  const exportButton = document.querySelector("[data-export-csv]");
+  const actionStatus = document.querySelector("[data-action-status]");
+  const undoToast = document.querySelector("[data-undo-toast]");
+  const undoButton = document.querySelector("[data-undo-delete]");
+  const projectFields = Object.fromEntries(
+    [...document.querySelectorAll("[data-project-field]")].map((field) => [
+      field.dataset.projectField,
+      field,
+    ]),
+  );
+
+  let project = { ...defaultProject };
+  let items = [];
+  let currentResult = null;
+  let currentInput = null;
+  let saveTimer;
+  let statusTimer;
+  let undoTimer;
+  let lastDeleted = null;
+
+  function createId() {
+    if (globalThis.crypto?.randomUUID) {
+      return globalThis.crypto.randomUUID();
+    }
+
+    return `item-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+  }
+
+  function createBlankItem(index = items.length) {
+    return {
+      id: createId(),
+      name: `Partida ${index + 1}`,
+      zone: "General",
+      type: "material",
+      quantity: "1",
+      unit: "pieza",
+      unitCost: "",
+      expanded: true,
+    };
+  }
+
+  function createDraftFromTemplate(templateItem, index) {
+    return {
+      id: createId(),
+      name: templateItem.name,
+      zone: templateItem.zone,
+      type: templateItem.type,
+      quantity: String(templateItem.quantity),
+      unit: templateItem.unit,
+      unitCost: "",
+      expanded: index === 0,
+    };
+  }
+
+  function renderItems(focusId = "") {
+    itemList.textContent = "";
+
+    items.forEach((item, index) => {
+      const article = document.createElement("article");
+      article.className =
+        "rounded-xl border border-gray-700 bg-gray-900/60 p-4 transition-colors";
+      article.dataset.itemId = item.id;
+      article.innerHTML = renderItemCard(item, index);
+      itemList.appendChild(article);
+      updateItemCard(article, item);
+    });
+
+    const completeCount = items.filter((item) => getDraftState(item).complete).length;
+    itemCount.textContent = items.length
+      ? `${items.length} ${items.length === 1 ? "partida" : "partidas"} · ${completeCount} ${completeCount === 1 ? "completa" : "completas"}`
+      : "Aún no hay partidas. Agrega una para comenzar.";
+
+    addButtons.forEach((button) => {
+      button.disabled = items.length >= MAX_ITEMS;
+    });
+
+    if (focusId) {
+      requestAnimationFrame(() => {
+        document.getElementById(`remodel-item-${focusId}-name`)?.focus();
+      });
+    }
+  }
+
+  function renderItemCard(item, index) {
+    const bodyHidden = item.expanded ? "" : "hidden";
+    const typeOptions = REMODEL_COST_TYPES.map(
+      (type) =>
+        `<option value="${type}" ${item.type === type ? "selected" : ""}>${escapeHtml(REMODEL_COST_TYPE_LABELS[type])}</option>`,
+    ).join("");
+
+    return `
+      <div class="flex items-start justify-between gap-3">
+        <button
+          class="min-w-0 flex-1 rounded-lg text-left focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-300/25"
+          type="button"
+          data-item-action="toggle"
+          aria-expanded="${item.expanded}"
+          aria-controls="remodel-item-${escapeAttribute(item.id)}-body"
+        >
+          <span class="block text-xs font-semibold uppercase tracking-wide text-gray-500">Partida ${index + 1}</span>
+          <span class="mt-1 block break-words text-base font-semibold text-white" data-item-title>${escapeHtml(item.name || `Partida ${index + 1}`)}</span>
+          <span class="mt-2 flex flex-wrap items-center gap-2">
+            <span class="rounded-full border px-2 py-1 text-xs font-semibold" data-item-badge></span>
+            <span class="text-sm font-semibold text-amber-100" data-item-subtotal>—</span>
+          </span>
+        </button>
+        <span class="text-xl text-gray-500" aria-hidden="true">${item.expanded ? "−" : "+"}</span>
+      </div>
+
+      <div id="remodel-item-${escapeAttribute(item.id)}-body" class="mt-4 ${bodyHidden}" data-item-body>
+        <div class="grid gap-4 sm:grid-cols-2">
+          ${renderItemInput(item, "name", "Nombre", "Ej. Pintura interior", "text", "sm:col-span-2", 80)}
+          ${renderItemInput(item, "zone", "Zona o trabajo", "General", "text", "", 40, "remodel-zone-options")}
+          <div>
+            <label for="remodel-item-${escapeAttribute(item.id)}-type" class="block text-sm font-semibold text-gray-200">Tipo de costo</label>
+            <select id="remodel-item-${escapeAttribute(item.id)}-type" class="remodel-input mt-2" data-item-field="type" aria-describedby="remodel-item-${escapeAttribute(item.id)}-message">
+              ${typeOptions}
+            </select>
+          </div>
+          ${renderItemInput(item, "quantity", "Cantidad", "1", "decimal")}
+          ${renderItemInput(item, "unit", "Unidad", "pieza", "text", "", 20, "remodel-unit-options")}
+          <div class="sm:col-span-2">
+            <label for="remodel-item-${escapeAttribute(item.id)}-unitCost" class="block text-sm font-semibold text-gray-200">Costo unitario</label>
+            <div class="remodel-input-group">
+              <span aria-hidden="true">$</span>
+              <input
+                id="remodel-item-${escapeAttribute(item.id)}-unitCost"
+                class="remodel-input remodel-input-with-prefix remodel-input-with-suffix"
+                type="text"
+                inputmode="decimal"
+                autocomplete="off"
+                placeholder="0.00"
+                value="${escapeAttribute(item.unitCost)}"
+                data-item-field="unitCost"
+                aria-describedby="remodel-item-${escapeAttribute(item.id)}-message"
+              />
+              <span class="remodel-input-suffix">MXN</span>
+            </div>
+          </div>
+        </div>
+
+        <p id="remodel-item-${escapeAttribute(item.id)}-message" class="mt-3 min-h-5 text-sm leading-relaxed" data-item-message></p>
+
+        <div class="mt-4 flex flex-wrap gap-2 border-t border-gray-800 pt-4">
+          <button class="min-h-11 rounded-lg border border-gray-700 px-3 text-sm font-semibold text-gray-200 hover:border-amber-300" type="button" data-item-action="duplicate">
+            Duplicar
+          </button>
+          <button class="min-h-11 rounded-lg border border-red-300/30 px-3 text-sm font-semibold text-red-200 hover:border-red-300" type="button" data-item-action="delete">
+            Eliminar
+          </button>
+        </div>
+      </div>
+    `;
+  }
+
+  function renderItemInput(
+    item,
+    field,
+    label,
+    placeholder,
+    inputMode = "text",
+    wrapperClass = "",
+    maxLength,
+    list,
+  ) {
+    const id = `remodel-item-${item.id}-${field}`;
+    const value = item[field] ?? "";
+
+    return `
+      <div class="${wrapperClass}">
+        <label for="${escapeAttribute(id)}" class="block text-sm font-semibold text-gray-200">${escapeHtml(label)}</label>
+        <input
+          id="${escapeAttribute(id)}"
+          class="remodel-input mt-2"
+          type="text"
+          inputmode="${escapeAttribute(inputMode)}"
+          autocomplete="off"
+          placeholder="${escapeAttribute(placeholder)}"
+          value="${escapeAttribute(value)}"
+          data-item-field="${escapeAttribute(field)}"
+          aria-describedby="remodel-item-${escapeAttribute(item.id)}-message"
+          ${maxLength ? `maxlength="${maxLength}"` : ""}
+          ${list ? `list="${list}"` : ""}
+        />
+      </div>
+    `;
+  }
+
+  function updateItemCard(article, item) {
+    const state = getDraftState(item);
+    const title = article.querySelector("[data-item-title]");
+    const badge = article.querySelector("[data-item-badge]");
+    const subtotal = article.querySelector("[data-item-subtotal]");
+    const message = article.querySelector("[data-item-message]");
+
+    title.textContent = item.name.trim() || "Partida sin nombre";
+    badge.textContent = state.complete
+      ? REMODEL_COST_TYPE_LABELS[item.type]
+      : state.errors.length
+        ? "Revisar"
+        : "Incompleta";
+    badge.className = `rounded-full border px-2 py-1 text-xs font-semibold ${
+      state.complete
+        ? "border-emerald-300/30 bg-emerald-300/10 text-emerald-100"
+        : state.errors.length
+          ? "border-red-300/30 bg-red-300/10 text-red-100"
+          : "border-amber-300/30 bg-amber-300/10 text-amber-100"
+    }`;
+    subtotal.textContent = state.complete
+      ? formatRemodelCurrency(state.item.quantity * state.item.unitCost)
+      : "No incluida";
+
+    if (state.errors.length) {
+      message.textContent = state.errors.join(" ");
+      message.className = "mt-3 min-h-5 text-sm leading-relaxed text-red-200";
+    } else if (state.missing.length) {
+      message.textContent = `Pendiente: ${state.missing.join(", ")}.`;
+      message.className = "mt-3 min-h-5 text-sm leading-relaxed text-amber-100";
+    } else {
+      message.textContent = "Partida incluida en el total.";
+      message.className = "mt-3 min-h-5 text-sm leading-relaxed text-emerald-100";
+    }
+
+    article.querySelectorAll("[data-item-field]").forEach((field) => {
+      field.setAttribute(
+        "aria-invalid",
+        String(state.invalidFields.includes(field.dataset.itemField)),
+      );
+    });
+  }
+
+  function getDraftState(item) {
+    const missing = [];
+    const errors = [];
+    const invalidFields = [];
+    const name = item.name.trim();
+    const zone = item.zone.trim();
+    const unit = item.unit.trim();
+
+    if (!name) missing.push("nombre");
+    if (!zone) missing.push("zona");
+    if (!unit) missing.push("unidad");
+    if (!REMODEL_COST_TYPES.includes(item.type)) {
+      errors.push("Selecciona un tipo de costo válido.");
+      invalidFields.push("type");
+    }
+
+    const quantity = parseRemodelNumberInput(item.quantity);
+    if (quantity.ok && quantity.value > 0 && quantity.value <= 1_000_000) {
+      // Valid quantity.
+    } else if (quantity.error === "required") {
+      missing.push("cantidad");
+    } else {
+      errors.push("La cantidad debe ser mayor que cero.");
+      invalidFields.push("quantity");
+    }
+
+    const unitCost = parseRemodelNumberInput(item.unitCost);
+    if (unitCost.ok) {
+      // Explicit zero is valid.
+    } else if (unitCost.error === "required") {
+      missing.push("costo unitario");
+    } else {
+      errors.push("Revisa el costo unitario.");
+      invalidFields.push("unitCost");
+    }
+
+    if (name.length > 80) {
+      errors.push("El nombre no puede superar 80 caracteres.");
+      invalidFields.push("name");
+    }
+    if (zone.length > 40) {
+      errors.push("La zona no puede superar 40 caracteres.");
+      invalidFields.push("zone");
+    }
+    if (unit.length > 20) {
+      errors.push("La unidad no puede superar 20 caracteres.");
+      invalidFields.push("unit");
+    }
+
+    const complete =
+      !missing.length && !errors.length && quantity.ok && unitCost.ok;
+
+    return {
+      complete,
+      missing,
+      errors,
+      invalidFields,
+      ...(complete
+        ? {
+            item: {
+              id: item.id,
+              name,
+              zone,
+              type: item.type,
+              quantity: quantity.value,
+              unit,
+              unitCost: unitCost.value,
+            },
+          }
+        : {}),
+    };
+  }
+
+  function parseProject() {
+    clearProjectErrors();
+    const errors = {};
+    const availableBudget = parseOptionalNumber(
+      project.budget,
+      "Ingresa un presupuesto válido.",
+      errors,
+      "budget",
+      false,
+    );
+    const areaM2 = parseOptionalNumber(
+      project.area,
+      "La superficie debe ser mayor que cero.",
+      errors,
+      "area",
+      true,
+    );
+    const contingencyPercentage = parsePercentage(
+      project.contingency,
+      "La contingencia debe estar entre 0 y 100.",
+      errors,
+      "contingency",
+    );
+    const taxPercentage =
+      project.taxMode === "agregar_impuestos"
+        ? parsePercentage(
+            project.taxRate,
+            "Los impuestos deben estar entre 0 y 100.",
+            errors,
+            "taxRate",
+          )
+        : 0;
+
+    Object.entries(errors).forEach(([key, message]) => {
+      const element = document.querySelector(`[data-error-for="${key}"]`);
+      if (element) element.textContent = message;
+      projectFields[key]?.setAttribute("aria-invalid", "true");
+    });
+
+    if (Object.keys(errors).length) {
+      return { ok: false };
+    }
+
+    return {
+      ok: true,
+      values: {
+        ...(typeof availableBudget === "number" ? { availableBudget } : {}),
+        ...(typeof areaM2 === "number" ? { areaM2 } : {}),
+        contingencyPercentage,
+        taxMode: project.taxMode,
+        taxPercentage,
+      },
+    };
+  }
+
+  function parseOptionalNumber(value, message, errors, key, positive) {
+    if (!value.trim()) return undefined;
+    const parsed = parseRemodelNumberInput(value);
+
+    if (!parsed.ok || (positive && parsed.value <= 0)) {
+      errors[key] = message;
+      return undefined;
+    }
+
+    return parsed.value;
+  }
+
+  function parsePercentage(value, message, errors, key) {
+    const parsed = parseRemodelNumberInput(value);
+
+    if (!parsed.ok || parsed.value > 100) {
+      errors[key] = message;
+      return 0;
+    }
+
+    return parsed.value;
+  }
+
+  function clearProjectErrors() {
+    document.querySelectorAll("[data-error-for]").forEach((element) => {
+      element.textContent = "";
+    });
+    Object.values(projectFields).forEach((field) => {
+      field.setAttribute("aria-invalid", "false");
+    });
+  }
+
+  function updateCalculator() {
+    const projectResult = parseProject();
+    const draftStates = items.map(getDraftState);
+    const validItems = draftStates
+      .filter((state) => state.complete)
+      .map((state) => state.item);
+    const incompleteCount = items.length - validItems.length;
+
+    items.forEach((item) => {
+      const article = [...itemList.querySelectorAll("[data-item-id]")].find(
+        (row) => row.dataset.itemId === item.id,
+      );
+      if (article) updateItemCard(article, item);
+    });
+
+    const completeCount = validItems.length;
+    itemCount.textContent = items.length
+      ? `${items.length} ${items.length === 1 ? "partida" : "partidas"} · ${completeCount} ${completeCount === 1 ? "completa" : "completas"}`
+      : "Aún no hay partidas. Agrega una para comenzar.";
+
+    if (!projectResult.ok) {
+      setNeutralResult("Revisa los ajustes marcados para continuar.");
+      renderIncompleteNotice(incompleteCount);
+      return;
+    }
+
+    if (!validItems.length) {
+      setNeutralResult(
+        items.length
+          ? "Completa el costo de al menos una partida."
+          : "Agrega una partida para comenzar.",
+      );
+      renderIncompleteNotice(incompleteCount);
+      return;
+    }
+
+    try {
+      currentInput = {
+        ...projectResult.values,
+        items: validItems,
+      };
+      currentResult = calculateRemodelBudget(currentInput);
+      renderResult(currentResult, currentInput);
+      renderIncompleteNotice(incompleteCount);
+      copyButton.disabled = false;
+      exportButton.disabled = false;
+    } catch (error) {
+      setNeutralResult(
+        error instanceof Error ? error.message : "No fue posible calcular.",
+      );
+      renderIncompleteNotice(incompleteCount);
+    }
+  }
+
+  function setNeutralResult(message) {
+    currentInput = null;
+    currentResult = null;
+    mainTotal.textContent = "Aún no hay una estimación";
+    budgetStatus.textContent = message;
+    budgetStatus.className = "mt-2 text-sm leading-relaxed text-gray-400";
+    liveSummary.textContent = message;
+    summaryGrid.innerHTML =
+      '<div class="rounded-xl border border-gray-800 bg-gray-950/70 p-4 text-sm leading-relaxed text-gray-400">Las partidas incompletas se conservan, pero no se suman silenciosamente.</div>';
+    budgetProgress.classList.add("hidden");
+    breakdowns.classList.add("hidden");
+    copyButton.disabled = true;
+    exportButton.disabled = true;
+  }
+
+  function renderResult(result, input) {
+    mainTotal.textContent = formatRemodelCurrency(result.total);
+
+    if (
+      typeof input.availableBudget === "number" &&
+      typeof result.budgetDifference === "number"
+    ) {
+      if (result.budgetDifference >= 0) {
+        budgetStatus.textContent = `Dentro de presupuesto: quedan ${formatRemodelCurrency(result.budgetDifference)}.`;
+        budgetStatus.className = "mt-2 text-sm font-semibold leading-relaxed text-emerald-200";
+      } else {
+        budgetStatus.textContent = `El total excede el presupuesto por ${formatRemodelCurrency(Math.abs(result.budgetDifference))}.`;
+        budgetStatus.className = "mt-2 text-sm font-semibold leading-relaxed text-red-200";
+      }
+    } else {
+      budgetStatus.textContent = `Estimación basada en ${result.items.length} ${result.items.length === 1 ? "partida completa" : "partidas completas"}.`;
+      budgetStatus.className = "mt-2 text-sm leading-relaxed text-gray-400";
+    }
+
+    liveSummary.textContent = `${mainTotal.textContent}. ${budgetStatus.textContent}`;
+
+    const metrics = [
+      ["Partidas", formatRemodelCurrency(result.baseSubtotal)],
+      input.taxMode === "agregar_impuestos"
+        ? [`Impuestos (${formatRemodelNumber(input.taxPercentage)}%)`, formatRemodelCurrency(result.taxAmount)]
+        : ["Impuestos adicionales", "No agregados"],
+      [`Contingencia (${formatRemodelNumber(input.contingencyPercentage)}%)`, formatRemodelCurrency(result.contingencyAmount)],
+    ];
+
+    if (typeof result.costPerM2 === "number") {
+      metrics.push(["Costo por m²", formatRemodelCurrency(result.costPerM2)]);
+    }
+
+    if (typeof result.baseCapacity === "number") {
+      metrics.push(
+        result.baseCapacity >= 0
+          ? ["Aún puedes asignar", `${formatRemodelCurrency(result.baseCapacity)} en partidas base`]
+          : ["Reducción aproximada", `${formatRemodelCurrency(Math.abs(result.baseCapacity))} en partidas base`],
+      );
+    }
+
+    summaryGrid.innerHTML = metrics.map(([label, value]) => summaryCard(label, value)).join("");
+    renderProgress(result, input);
+    renderBreakdowns(result);
+  }
+
+  function renderProgress(result, input) {
+    if (
+      typeof input.availableBudget !== "number" ||
+      input.availableBudget <= 0 ||
+      typeof result.budgetUsedPercentage !== "number"
+    ) {
+      budgetProgress.classList.add("hidden");
+      return;
+    }
+
+    const used = result.budgetUsedPercentage;
+    budgetProgress.classList.remove("hidden");
+    budgetProgressLabel.textContent = `${formatRemodelNumber(used, 1)}%`;
+    budgetProgressBar.style.width = `${Math.min(used, 100)}%`;
+    budgetProgressBar.className = `h-full rounded-full transition-[width,background-color] ${
+      used <= 100 ? "bg-emerald-300" : "bg-red-300"
+    }`;
+  }
+
+  function renderIncompleteNotice(count) {
+    if (!count) {
+      incompleteNotice.classList.add("hidden");
+      incompleteNotice.textContent = "";
+      return;
+    }
+
+    incompleteNotice.textContent = `${count} ${count === 1 ? "partida incompleta no está incluida" : "partidas incompletas no están incluidas"} en el total.`;
+    incompleteNotice.classList.remove("hidden");
+  }
+
+  function renderBreakdowns(result) {
+    breakdowns.classList.remove("hidden");
+    typeBreakdown.innerHTML = REMODEL_COST_TYPES.map((type) =>
+      breakdownRow(
+        REMODEL_COST_TYPE_LABELS[type],
+        formatRemodelCurrency(result.subtotalsByType[type]),
+      ),
+    ).join("");
+
+    zoneBreakdown.innerHTML = result.subtotalsByZone
+      .map((zone) =>
+        breakdownRow(
+          zone.zone,
+          formatRemodelCurrency(zone.subtotal),
+          `${formatRemodelNumber(zone.percentageOfBase, 1)}%`,
+        ),
+      )
+      .join("");
+
+    topItems.innerHTML = result.topItems
+      .map((item) =>
+        breakdownRow(
+          item.name,
+          formatRemodelCurrency(item.subtotal),
+          `${formatRemodelNumber(item.percentageOfBase, 1)}%`,
+        ),
+      )
+      .join("");
+  }
+
+  function summaryCard(label, value) {
+    return `
+      <div class="rounded-xl border border-gray-800 bg-gray-950/70 p-4">
+        <span class="block text-xs font-semibold uppercase tracking-wide text-gray-500">${escapeHtml(label)}</span>
+        <strong class="mt-2 block break-words text-base font-semibold text-white">${escapeHtml(value)}</strong>
+      </div>
+    `;
+  }
+
+  function breakdownRow(label, value, note = "") {
+    return `
+      <div class="flex items-start justify-between gap-3 rounded-lg border border-gray-800 bg-gray-950/70 p-3 text-sm">
+        <div class="min-w-0">
+          <span class="block break-words text-gray-300">${escapeHtml(label)}</span>
+          ${note ? `<span class="mt-1 block text-xs text-gray-500">${escapeHtml(note)} del subtotal</span>` : ""}
+        </div>
+        <strong class="shrink-0 text-right text-white">${escapeHtml(value)}</strong>
+      </div>
+    `;
+  }
+
+  function addItem() {
+    if (items.length >= MAX_ITEMS) {
+      setActionStatus(`El límite es de ${MAX_ITEMS} partidas.`, true);
+      return;
+    }
+
+    const item = createBlankItem();
+    items.push(item);
+    renderItems(item.id);
+    updateCalculator();
+    scheduleSave();
+  }
+
+  function duplicateItem(index) {
+    if (items.length >= MAX_ITEMS) {
+      setActionStatus(`El límite es de ${MAX_ITEMS} partidas.`, true);
+      return;
+    }
+
+    const source = items[index];
+    const duplicate = {
+      ...source,
+      id: createId(),
+      name: `${source.name.trim() || `Partida ${index + 1}`} copia`.slice(0, 80),
+      expanded: true,
+    };
+    items.splice(index + 1, 0, duplicate);
+    renderItems(duplicate.id);
+    updateCalculator();
+    scheduleSave();
+  }
+
+  function deleteItem(index) {
+    const [removed] = items.splice(index, 1);
+    lastDeleted = { item: removed, index };
+    renderItems();
+    updateCalculator();
+    scheduleSave();
+    showUndoToast();
+  }
+
+  function showUndoToast() {
+    window.clearTimeout(undoTimer);
+    undoToast.classList.remove("hidden");
+    undoToast.classList.add("flex");
+    undoTimer = window.setTimeout(hideUndoToast, 6000);
+  }
+
+  function hideUndoToast() {
+    undoToast.classList.add("hidden");
+    undoToast.classList.remove("flex");
+    lastDeleted = null;
+  }
+
+  function undoDelete() {
+    if (!lastDeleted) return;
+    items.splice(Math.min(lastDeleted.index, items.length), 0, lastDeleted.item);
+    const restoredId = lastDeleted.item.id;
+    hideUndoToast();
+    renderItems(restoredId);
+    updateCalculator();
+    scheduleSave();
+  }
+
+  function applyTemplate() {
+    const templateId = project.template;
+
+    if (!REMODEL_TEMPLATE_IDS.includes(templateId)) return;
+
+    if (
+      hasMeaningfulData() &&
+      !window.confirm("La plantilla reemplazará las partidas actuales. ¿Quieres continuar?")
+    ) {
+      return;
+    }
+
+    const templateItems = createRemodelTemplateItems(templateId);
+    items = templateItems.length
+      ? templateItems.map(createDraftFromTemplate)
+      : [createBlankItem(0)];
+    renderItems(items[0]?.id);
+    updateCalculator();
+    scheduleSave();
+    setActionStatus(`Plantilla ${REMODEL_TEMPLATES[templateId].label.toLowerCase()} cargada.`);
+  }
+
+  function hasMeaningfulData() {
+    return items.some(
+      (item) =>
+        item.unitCost.trim() ||
+        (item.name.trim() && !/^Partida \d+$/.test(item.name.trim())),
+    );
+  }
+
+  function syncProjectFromFields() {
+    Object.entries(projectFields).forEach(([key, field]) => {
+      project[key] = field.value;
+    });
+    updateTaxVisibility();
+    updateTemplateDescription();
+    updateSettingsSummary();
+  }
+
+  function syncProjectFields() {
+    Object.entries(projectFields).forEach(([key, field]) => {
+      field.value = project[key] ?? defaultProject[key] ?? "";
+    });
+    updateTaxVisibility();
+    updateTemplateDescription();
+    updateSettingsSummary();
+  }
+
+  function updateTaxVisibility() {
+    const addsTaxes = project.taxMode === "agregar_impuestos";
+    taxRateField.classList.toggle("hidden", !addsTaxes);
+    projectFields.taxRate.disabled = !addsTaxes;
+  }
+
+  function updateTemplateDescription() {
+    const template = REMODEL_TEMPLATES[project.template] ?? REMODEL_TEMPLATES.blank;
+    templateDescription.textContent = template.description;
+  }
+
+  function updateSettingsSummary() {
+    const taxLabel =
+      project.taxMode === "agregar_impuestos"
+        ? `Impuestos ${project.taxRate || "—"}%`
+        : "Costos finales";
+    const areaLabel = project.area.trim() ? `${project.area.trim()} m²` : "sin superficie";
+    settingsSummary.textContent = `${taxLabel} · ${areaLabel}`;
+  }
+
+  function scheduleSave() {
+    window.clearTimeout(saveTimer);
+    storageStatus.textContent = "Guardando cambios…";
+    saveTimer = window.setTimeout(saveState, 350);
+  }
+
+  function saveState() {
+    try {
+      localStorage.setItem(
+        STORAGE_KEY,
+        JSON.stringify({
+          version: STORAGE_VERSION,
+          project,
+          items,
+        }),
+      );
+      storageStatus.textContent = "Cambios guardados en este dispositivo.";
+    } catch {
+      storageStatus.textContent = "No fue posible guardar en este dispositivo.";
+    }
+  }
+
+  function restoreState() {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) return false;
+      const saved = JSON.parse(raw);
+
+      if (
+        saved?.version !== STORAGE_VERSION ||
+        !saved.project ||
+        !Array.isArray(saved.items)
+      ) {
+        return false;
+      }
+
+      project = {
+        budget: stringValue(saved.project.budget),
+        area: stringValue(saved.project.area),
+        contingency: stringValue(saved.project.contingency) || "15",
+        taxMode:
+          saved.project.taxMode === "agregar_impuestos"
+            ? "agregar_impuestos"
+            : "costos_finales",
+        taxRate: stringValue(saved.project.taxRate) || "16",
+        template: REMODEL_TEMPLATE_IDS.includes(saved.project.template)
+          ? saved.project.template
+          : "blank",
+      };
+      items = saved.items.slice(0, MAX_ITEMS).map((item, index) => ({
+        id: typeof item.id === "string" && item.id ? item.id : createId(),
+        name: stringValue(item.name).slice(0, 80) || `Partida ${index + 1}`,
+        zone: stringValue(item.zone).slice(0, 40) || "General",
+        type: REMODEL_COST_TYPES.includes(item.type) ? item.type : "material",
+        quantity: stringValue(item.quantity) || "1",
+        unit: stringValue(item.unit).slice(0, 20) || "pieza",
+        unitCost: stringValue(item.unitCost),
+        expanded: Boolean(item.expanded),
+      }));
+
+      if (!items.length) items = [createBlankItem(0)];
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  function resetCalculator(requireConfirmation = true) {
+    if (
+      requireConfirmation &&
+      hasMeaningfulData() &&
+      !window.confirm("¿Quieres borrar todas las partidas y empezar de nuevo?")
+    ) {
+      return;
+    }
+
+    window.clearTimeout(saveTimer);
+    try {
+      localStorage.removeItem(STORAGE_KEY);
+    } catch {
+      // The calculator can continue without storage.
+    }
+
+    project = { ...defaultProject };
+    items = [createBlankItem(0)];
+    currentInput = null;
+    currentResult = null;
+    syncProjectFields();
+    renderItems(items[0].id);
+    updateCalculator();
+    discardSavedButton.classList.add("hidden");
+    storageStatus.textContent = "Presupuesto limpio. Los próximos cambios se guardarán aquí.";
+    setActionStatus("Presupuesto limpiado.");
+  }
+
+  async function copyResult() {
+    if (!currentResult || !currentInput) return;
+
+    try {
+      await navigator.clipboard.writeText(
+        buildRemodelShareText(currentResult, currentInput),
+      );
+      setActionStatus("Resumen copiado.");
+    } catch {
+      setActionStatus("No fue posible copiar automáticamente.", true);
+    }
+  }
+
+  function exportCsv() {
+    if (!currentResult || !currentInput) return;
+
+    const csv = buildRemodelCsv(currentResult, currentInput);
+    const url = URL.createObjectURL(
+      new Blob([`\uFEFF${csv}`], { type: "text/csv;charset=utf-8" }),
+    );
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "presupuesto-remodelacion.csv";
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    URL.revokeObjectURL(url);
+    setActionStatus("CSV generado.");
+  }
+
+  function setActionStatus(message, isError = false) {
+    window.clearTimeout(statusTimer);
+    actionStatus.textContent = message;
+    actionStatus.className = `mt-3 min-h-5 text-sm ${isError ? "text-red-200" : "text-emerald-100"}`;
+    statusTimer = window.setTimeout(() => {
+      actionStatus.textContent = "";
+    }, 3500);
+  }
+
+  function stringValue(value) {
+    return typeof value === "string" || typeof value === "number"
+      ? String(value)
+      : "";
+  }
+
+  function escapeHtml(value) {
+    return String(value)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;");
+  }
+
+  function escapeAttribute(value) {
+    return escapeHtml(value)
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
+  }
+
+  form.addEventListener("submit", (event) => event.preventDefault());
+
+  form.addEventListener("input", (event) => {
+    const projectField = event.target.closest("[data-project-field]");
+    if (projectField) {
+      syncProjectFromFields();
+      updateCalculator();
+      scheduleSave();
+      return;
+    }
+
+    const itemField = event.target.closest("[data-item-field]");
+    const article = event.target.closest("[data-item-id]");
+    if (!itemField || !article) return;
+    const item = items.find((entry) => entry.id === article.dataset.itemId);
+    if (!item) return;
+    item[itemField.dataset.itemField] = itemField.value;
+    updateItemCard(article, item);
+    updateCalculator();
+    scheduleSave();
+  });
+
+  form.addEventListener("change", (event) => {
+    const projectField = event.target.closest("[data-project-field]");
+    if (projectField) {
+      syncProjectFromFields();
+      updateCalculator();
+      scheduleSave();
+      return;
+    }
+
+    const itemField = event.target.closest("[data-item-field]");
+    const article = event.target.closest("[data-item-id]");
+    if (!itemField || !article) return;
+    const item = items.find((entry) => entry.id === article.dataset.itemId);
+    if (!item) return;
+    item[itemField.dataset.itemField] = itemField.value;
+    updateItemCard(article, item);
+    updateCalculator();
+    scheduleSave();
+  });
+
+  itemList.addEventListener("click", (event) => {
+    const button = event.target.closest("[data-item-action]");
+    const article = event.target.closest("[data-item-id]");
+    if (!button || !article) return;
+    const index = items.findIndex((item) => item.id === article.dataset.itemId);
+    if (index < 0) return;
+
+    if (button.dataset.itemAction === "toggle") {
+      items[index].expanded = !items[index].expanded;
+      renderItems();
+      scheduleSave();
+    } else if (button.dataset.itemAction === "duplicate") {
+      duplicateItem(index);
+    } else if (button.dataset.itemAction === "delete") {
+      deleteItem(index);
+    }
+  });
+
+  addButtons.forEach((button) => button.addEventListener("click", addItem));
+  applyTemplateButton.addEventListener("click", applyTemplate);
+  clearButton.addEventListener("click", () => resetCalculator(true));
+  discardSavedButton.addEventListener("click", () => resetCalculator(false));
+  undoButton.addEventListener("click", undoDelete);
+  copyButton.addEventListener("click", copyResult);
+  exportButton.addEventListener("click", exportCsv);
+
+  const restored = restoreState();
+  if (!restored) items = [createBlankItem(0)];
+  syncProjectFields();
+  renderItems();
+  updateCalculator();
+
+  if (restored) {
+    storageStatus.textContent = "Recuperamos el último presupuesto guardado en este dispositivo.";
+    discardSavedButton.classList.remove("hidden");
+  }
+</script>

@@ -493,6 +493,15 @@ export const CALCULATORS: LegacyCalculatorDirectoryItem[] = [
     order: 69,
   },
   {
+    id: "litros-a-galones",
+    title: "Litros a galones",
+    description:
+      "Convierte litros a galones estadounidenses e imperiales, o galones a litros, con ambas variantes claramente identificadas.",
+    href: "/conversores/litros-a-galones",
+    categorySlug: "conversores",
+    order: 69.5,
+  },
+  {
     id: "conversor-de-peso",
     title: "Conversor de peso",
     description:
@@ -707,6 +716,24 @@ export const CALCULATORS: LegacyCalculatorDirectoryItem[] = [
     href: "/construccion/calculadora-cantidad-ladrillos",
     categorySlug: "construccion",
     order: 93.5,
+  },
+  {
+    id: "calculadora-piso-azulejo-superficie",
+    title: "Calculadora de piso y azulejo",
+    description:
+      "Calcula cajas de piso, loseta o azulejo segun superficie, pieza, desperdicio, sobrante y costo opcional.",
+    href: "/construccion/calculadora-piso-azulejo-superficie",
+    categorySlug: "construccion",
+    order: 93.75,
+  },
+  {
+    id: "calculadora-presupuesto-remodelacion",
+    title: "Calculadora de presupuesto de remodelación",
+    description:
+      "Organiza partidas, imprevistos e impuestos, calcula costo por m² y compara el total contra tu presupuesto.",
+    href: "/construccion/calculadora-presupuesto-remodelacion",
+    categorySlug: "construccion",
+    order: 93.8,
   },
   {
     id: "metros-cuadrados-de-pintura",

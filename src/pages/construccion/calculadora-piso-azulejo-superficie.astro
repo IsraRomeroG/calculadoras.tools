@@ -1,0 +1,1245 @@
+---
+import BaseLayout from "@layouts/BaseLayout.astro";
+import AdSlot from "@components/ads/AdSlot.astro";
+import Container from "@components/layout/Container.astro";
+import PageShell from "@components/layout/PageShell.astro";
+import FaqSection from "@components/shared/FaqSection.astro";
+import PageHero from "@components/shared/PageHero.astro";
+import SectionIntro from "@components/shared/SectionIntro.astro";
+import { buildFaqJsonLd } from "@lib/seo";
+import { TILE_CANONICAL_PATH } from "@lib/calculators/construccion/calculadora-piso-azulejo-superficie/tiles";
+
+const title = "Calculadora de piso y azulejo por superficie";
+const description =
+  "Calcula cuantas cajas de piso, loseta o azulejo necesitas segun superficie, tamano de pieza, desperdicio y rendimiento por caja.";
+const canonical = TILE_CANONICAL_PATH;
+
+const faqs = [
+  {
+    question: "Cuanto desperdicio agregar al piso o azulejo?",
+    answer:
+      "Un margen comun es 10% para colocacion recta. Puede subir a 15% o mas en diagonal, espiga, areas pequenas o superficies con muchos cortes.",
+  },
+  {
+    question: "Que desperdicio usar para patron diagonal o espiga?",
+    answer:
+      "Como referencia inicial, usa 15% para diagonal y 18% para espiga. Ajusta el margen si hay muchas esquinas, pasillos estrechos o piezas grandes.",
+  },
+  {
+    question: "Como calculo piezas por metro cuadrado?",
+    answer:
+      "Convierte largo y ancho de la pieza a metros, multiplicalos para obtener el area de una pieza y divide 1 m2 entre esa area.",
+  },
+  {
+    question: "Como calcular cajas necesarias?",
+    answer:
+      "La calculadora suma el area neta, agrega desperdicio, calcula piezas requeridas y redondea hacia arriba segun piezas por caja o m2 por caja.",
+  },
+  {
+    question: "Que significa rendimiento por caja?",
+    answer:
+      "Es la cobertura que indica el empaque. Puede venir como cantidad de piezas por caja o como metros cuadrados cubiertos por caja.",
+  },
+  {
+    question: "Puedo descontar puertas, muebles o areas sin azulejo?",
+    answer:
+      "Si. Agrega descuentos por medidas o por area directa para restarlos de la superficie bruta.",
+  },
+  {
+    question: "Por que conviene comprar piezas del mismo lote o tono?",
+    answer:
+      "Porque el color y calibre pueden variar entre lotes. Comprar todo junto reduce diferencias visibles y deja reserva para reposiciones.",
+  },
+  {
+    question: "Que hago si mi habitacion es irregular?",
+    answer:
+      "Divide la superficie en rectangulos, suma cada seccion y usa descuentos para zonas que no llevan pieza.",
+  },
+];
+
+const faqJsonLd = buildFaqJsonLd(faqs);
+---
+
+<BaseLayout title={title} description={description} canonical={canonical}>
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={JSON.stringify(faqJsonLd)} />
+  </Fragment>
+
+  <PageShell>
+    <PageHero
+      title="Calculadora de piso y azulejo"
+      description="Estima cajas, piezas, cobertura comprada, sobrante y costo para piso, loseta, ceramica o porcelanato."
+      kicker="Construccion"
+      collapseBreadcrumbOnMobile
+      containerClass="py-5 md:py-7"
+      breadcrumbs={[
+        { label: "Inicio", href: "/", ariaLabel: "Inicio" },
+        { label: "Construccion", href: "/construccion", optional: true },
+        { label: "Calculadora de piso y azulejo", truncate: true },
+      ]}
+    />
+
+    <Container as="section" class="py-4 pb-28 md:py-7 md:pb-7">
+      <section
+        id="tile-calculator"
+        class="overflow-hidden rounded-lg border border-gray-700 bg-gray-950 shadow-xl shadow-gray-950/30"
+        aria-labelledby="calculator-heading"
+      >
+        <div class="grid gap-0 lg:grid-cols-[minmax(0,1.08fr)_minmax(21rem,0.92fr)]">
+          <div class="order-last p-4 sm:p-6 lg:order-first">
+            <p class="text-sm font-semibold uppercase text-emerald-300">
+              Material de compra
+            </p>
+            <h2 id="calculator-heading" class="mt-2 text-2xl font-semibold">
+              Calcula cajas, piezas y sobrante
+            </h2>
+
+            <form class="mt-6 grid gap-6" novalidate data-tile-form>
+              <section>
+                <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                  <div>
+                    <h3 class="text-lg font-semibold text-white">Superficies</h3>
+                    <p class="mt-1 text-sm leading-relaxed text-gray-400">
+                      Agrega cada zona que llevara piso o azulejo.
+                    </p>
+                  </div>
+                  <button
+                    class="inline-flex min-h-11 items-center justify-center rounded-lg bg-emerald-300 px-4 py-2 text-sm font-semibold text-gray-950 transition hover:bg-emerald-200 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-emerald-300/40"
+                    type="button"
+                    data-add-surface
+                  >
+                    Agregar superficie
+                  </button>
+                </div>
+                <div class="mt-4 grid gap-4" data-surface-list></div>
+              </section>
+
+              <section>
+                <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                  <div>
+                    <h3 class="text-lg font-semibold text-white">Descuentos</h3>
+                    <p class="mt-1 text-sm leading-relaxed text-gray-400">
+                      Resta zonas que no llevan pieza.
+                    </p>
+                  </div>
+                  <button
+                    class="inline-flex min-h-11 items-center justify-center rounded-lg border border-gray-700 px-4 py-2 text-sm font-semibold text-gray-200 transition hover:border-emerald-300 hover:text-white focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-emerald-300/30"
+                    type="button"
+                    data-add-deduction
+                  >
+                    Agregar descuento
+                  </button>
+                </div>
+                <div class="mt-4 grid gap-4" data-deduction-list></div>
+              </section>
+
+              <section class="border-t border-gray-800 pt-5">
+                <h3 class="text-lg font-semibold text-white">Pieza</h3>
+                <div class="mt-4 grid gap-4 sm:grid-cols-2">
+                  <div>
+                    <label for="tile-piece-length" class="block text-sm font-semibold text-gray-200">
+                      Largo de pieza
+                    </label>
+                    <div class="mt-2 grid grid-cols-[minmax(0,1fr)_4rem] overflow-hidden rounded-lg border border-gray-700 bg-gray-900 focus-within:border-emerald-300 focus-within:ring-3 focus-within:ring-emerald-300/15">
+                      <input
+                        id="tile-piece-length"
+                        class="min-h-12 w-full bg-transparent px-4 text-lg font-semibold text-white outline-none placeholder:text-gray-600"
+                        type="text"
+                        inputmode="decimal"
+                        autocomplete="off"
+                        placeholder="60"
+                        data-global-field="pieceLength"
+                        aria-describedby="tile-piece-length-error"
+                      />
+                      <span class="grid place-items-center border-l border-gray-700 bg-gray-950 text-sm font-semibold text-gray-300">
+                        cm
+                      </span>
+                    </div>
+                    <p id="tile-piece-length-error" class="mt-2 min-h-5 text-sm text-red-300" data-error-for="pieceLength"></p>
+                  </div>
+
+                  <div>
+                    <label for="tile-piece-width" class="block text-sm font-semibold text-gray-200">
+                      Ancho de pieza
+                    </label>
+                    <div class="mt-2 grid grid-cols-[minmax(0,1fr)_4rem] overflow-hidden rounded-lg border border-gray-700 bg-gray-900 focus-within:border-emerald-300 focus-within:ring-3 focus-within:ring-emerald-300/15">
+                      <input
+                        id="tile-piece-width"
+                        class="min-h-12 w-full bg-transparent px-4 text-lg font-semibold text-white outline-none placeholder:text-gray-600"
+                        type="text"
+                        inputmode="decimal"
+                        autocomplete="off"
+                        placeholder="60"
+                        data-global-field="pieceWidth"
+                        aria-describedby="tile-piece-width-error"
+                      />
+                      <span class="grid place-items-center border-l border-gray-700 bg-gray-950 text-sm font-semibold text-gray-300">
+                        cm
+                      </span>
+                    </div>
+                    <p id="tile-piece-width-error" class="mt-2 min-h-5 text-sm text-red-300" data-error-for="pieceWidth"></p>
+                  </div>
+                </div>
+              </section>
+
+              <section class="border-t border-gray-800 pt-5">
+                <h3 class="text-lg font-semibold text-white">Patron y desperdicio</h3>
+                <div
+                  class="mt-4 grid rounded-lg border border-gray-700 bg-gray-900 p-1 sm:grid-cols-5"
+                  aria-label="Patron de colocacion"
+                  data-pattern-buttons
+                >
+                  <button class="min-h-12 rounded-md px-3 text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-emerald-300/35" type="button" data-pattern-button="straight" aria-pressed="true">
+                    Recto
+                  </button>
+                  <button class="min-h-12 rounded-md px-3 text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-emerald-300/35" type="button" data-pattern-button="diagonal" aria-pressed="false">
+                    Diagonal
+                  </button>
+                  <button class="min-h-12 rounded-md px-3 text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-emerald-300/35" type="button" data-pattern-button="herringbone" aria-pressed="false">
+                    Espiga
+                  </button>
+                  <button class="min-h-12 rounded-md px-3 text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-emerald-300/35" type="button" data-pattern-button="many-cuts" aria-pressed="false">
+                    Muchos cortes
+                  </button>
+                  <button class="min-h-12 rounded-md px-3 text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-emerald-300/35" type="button" data-pattern-button="custom" aria-pressed="false">
+                    Personalizado
+                  </button>
+                </div>
+
+                <div class="mt-4 grid gap-4 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-end">
+                  <div>
+                    <label for="tile-waste" class="block text-sm font-semibold text-gray-200">
+                      Desperdicio
+                    </label>
+                    <div class="mt-2 grid grid-cols-[minmax(0,1fr)_3.5rem] overflow-hidden rounded-lg border border-gray-700 bg-gray-900 focus-within:border-emerald-300 focus-within:ring-3 focus-within:ring-emerald-300/15">
+                      <input
+                        id="tile-waste"
+                        class="min-h-12 w-full bg-transparent px-4 text-lg font-semibold text-white outline-none placeholder:text-gray-600"
+                        type="text"
+                        inputmode="decimal"
+                        autocomplete="off"
+                        value="10"
+                        data-global-field="waste"
+                        aria-describedby="tile-waste-note tile-waste-error"
+                      />
+                      <span class="grid place-items-center border-l border-gray-700 bg-gray-950 text-sm font-semibold text-gray-300">
+                        %
+                      </span>
+                    </div>
+                    <p id="tile-waste-note" class="mt-2 min-h-5 text-xs leading-relaxed text-gray-500" data-waste-note></p>
+                    <p id="tile-waste-error" class="mt-1 min-h-5 text-sm text-red-300" data-error-for="waste"></p>
+                  </div>
+                  <button
+                    class="min-h-11 rounded-lg border border-gray-700 px-4 py-2 text-sm font-semibold text-gray-200 transition hover:border-emerald-300 hover:text-white focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-emerald-300/30"
+                    type="button"
+                    data-apply-waste-suggestion
+                  >
+                    Aplicar sugerencia
+                  </button>
+                </div>
+              </section>
+
+              <section class="border-t border-gray-800 pt-5">
+                <h3 class="text-lg font-semibold text-white">Caja y costo</h3>
+                <div
+                  class="mt-4 grid rounded-lg border border-gray-700 bg-gray-900 p-1 sm:grid-cols-2"
+                  aria-label="Modo de caja"
+                >
+                  <button
+                    class="min-h-12 rounded-md px-3 text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-emerald-300/35"
+                    type="button"
+                    data-box-mode-button="pieces"
+                    aria-pressed="true"
+                  >
+                    Piezas por caja
+                  </button>
+                  <button
+                    class="min-h-12 rounded-md px-3 text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-emerald-300/35"
+                    type="button"
+                    data-box-mode-button="area"
+                    aria-pressed="false"
+                  >
+                    m2 por caja
+                  </button>
+                </div>
+
+                <div class="mt-4 grid gap-4 sm:grid-cols-2">
+                  <div data-box-pieces-field>
+                    <label for="tile-pieces-per-box" class="block text-sm font-semibold text-gray-200">
+                      Piezas por caja
+                    </label>
+                    <input
+                      id="tile-pieces-per-box"
+                      class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-900 px-4 text-lg font-semibold text-white outline-none placeholder:text-gray-600 focus:border-emerald-300 focus:ring-3 focus:ring-emerald-300/15"
+                      type="text"
+                      inputmode="numeric"
+                      autocomplete="off"
+                      placeholder="4"
+                      data-global-field="piecesPerBox"
+                      aria-describedby="tile-pieces-per-box-error"
+                    />
+                    <p id="tile-pieces-per-box-error" class="mt-2 min-h-5 text-sm text-red-300" data-error-for="piecesPerBox"></p>
+                  </div>
+
+                  <div data-box-area-field>
+                    <label for="tile-area-per-box" class="block text-sm font-semibold text-gray-200">
+                      Cobertura por caja
+                    </label>
+                    <div class="mt-2 grid grid-cols-[minmax(0,1fr)_4rem] overflow-hidden rounded-lg border border-gray-700 bg-gray-900 focus-within:border-emerald-300 focus-within:ring-3 focus-within:ring-emerald-300/15">
+                      <input
+                        id="tile-area-per-box"
+                        class="min-h-12 w-full bg-transparent px-4 text-lg font-semibold text-white outline-none placeholder:text-gray-600"
+                        type="text"
+                        inputmode="decimal"
+                        autocomplete="off"
+                        placeholder="1.44"
+                        data-global-field="areaPerBox"
+                        aria-describedby="tile-area-per-box-error"
+                      />
+                      <span class="grid place-items-center border-l border-gray-700 bg-gray-950 text-sm font-semibold text-gray-300">
+                        m2
+                      </span>
+                    </div>
+                    <p id="tile-area-per-box-error" class="mt-2 min-h-5 text-sm text-red-300" data-error-for="areaPerBox"></p>
+                  </div>
+
+                  <div>
+                    <label for="tile-price-per-box" class="block text-sm font-semibold text-gray-200">
+                      Precio por caja
+                    </label>
+                    <div class="mt-2 grid grid-cols-[3rem_minmax(0,1fr)] overflow-hidden rounded-lg border border-gray-700 bg-gray-900 focus-within:border-emerald-300 focus-within:ring-3 focus-within:ring-emerald-300/15">
+                      <span class="grid place-items-center border-r border-gray-700 bg-gray-950 text-sm font-semibold text-gray-300">
+                        $
+                      </span>
+                      <input
+                        id="tile-price-per-box"
+                        class="min-h-12 w-full bg-transparent px-4 text-lg font-semibold text-white outline-none placeholder:text-gray-600"
+                        type="text"
+                        inputmode="decimal"
+                        autocomplete="off"
+                        placeholder="580"
+                        data-global-field="pricePerBox"
+                        aria-describedby="tile-price-per-box-error"
+                      />
+                    </div>
+                    <p id="tile-price-per-box-error" class="mt-2 min-h-5 text-sm text-red-300" data-error-for="pricePerBox"></p>
+                  </div>
+                </div>
+              </section>
+
+              <div class="flex flex-col gap-3 sm:flex-row">
+                <button
+                  class="min-h-11 justify-center rounded-lg border border-gray-700 px-4 py-2 text-sm font-semibold text-gray-200 transition hover:border-emerald-300 hover:text-white focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-emerald-300/30"
+                  type="button"
+                  data-clear-calculator
+                >
+                  Limpiar
+                </button>
+              </div>
+            </form>
+          </div>
+
+          <aside
+            id="tile-results"
+            class="order-first border-b border-gray-800 bg-gray-900/70 p-4 sm:p-6 lg:sticky lg:top-6 lg:order-last lg:max-h-[calc(100vh-3rem)] lg:overflow-auto lg:border-b-0 lg:border-l"
+            aria-live="polite"
+            data-result-region
+          >
+            <p class="text-xs font-semibold uppercase text-emerald-300">
+              Resultado
+            </p>
+            <p class="mt-3 break-words text-3xl font-bold leading-tight text-white" data-main-result>
+              Ingresa tus medidas
+            </p>
+            <p class="mt-2 min-h-5 text-sm leading-relaxed text-gray-400" data-result-note>
+              Completa superficie, pieza y caja para calcular.
+            </p>
+
+            <div class="mt-5 grid gap-3" data-summary-list></div>
+            <div class="mt-5 grid gap-3" data-warning-list></div>
+            <div class="mt-5 space-y-3" data-breakdown-list></div>
+
+            <div class="mt-5 rounded-lg border border-emerald-400/30 bg-emerald-400/10 p-4 text-sm leading-relaxed text-emerald-100">
+              Estimacion orientativa. Revisa cortes, piezas rotas, lote, tono y condiciones de obra antes de comprar.
+            </div>
+
+            <div class="mt-5 grid gap-3 sm:grid-cols-2">
+              <button
+                class="hidden min-h-11 items-center justify-center rounded-lg bg-emerald-300 px-4 py-2 text-sm font-semibold text-gray-950 transition hover:bg-emerald-200 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-emerald-300/40"
+                type="button"
+                data-copy-result
+              >
+                Copiar resumen
+              </button>
+              <button
+                class="hidden min-h-11 items-center justify-center rounded-lg border border-gray-700 px-4 py-2 text-sm font-semibold text-gray-200 transition hover:border-emerald-300 hover:text-white focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-emerald-300/30"
+                type="button"
+                data-export-csv
+              >
+                Exportar CSV
+              </button>
+            </div>
+            <p class="mt-3 min-h-5 text-sm text-emerald-100" role="status" aria-live="polite" data-copy-status></p>
+          </aside>
+        </div>
+      </section>
+
+      <div
+        class="fixed inset-x-0 bottom-0 z-30 hidden border-t border-gray-800 bg-gray-950/95 px-4 py-3 shadow-2xl shadow-black/50 backdrop-blur md:hidden"
+        data-mobile-total
+      >
+        <div class="mx-auto flex max-w-xl items-center justify-between gap-3">
+          <div class="min-w-0">
+            <span class="block text-xs font-semibold uppercase text-gray-500">
+              Resultado
+            </span>
+            <span class="block break-words text-lg font-bold text-emerald-100" data-mobile-total-text></span>
+            <span class="block text-xs text-gray-400" data-mobile-total-note></span>
+          </div>
+          <a
+            class="shrink-0 rounded-lg border border-emerald-300/50 px-3 py-2 text-sm font-semibold text-emerald-100"
+            href="#tile-results"
+          >
+            Ver
+          </a>
+        </div>
+      </div>
+    </Container>
+
+    <AdSlot placement="calculator-after-tool" />
+
+    <Container as="section" class="py-6 md:py-8">
+      <SectionIntro
+        title="Que incluye el resultado"
+        description="La herramienta transforma superficies, pieza, desperdicio y rendimiento por caja en una lista de compra estimada."
+      />
+      <div class="grid gap-4 md:grid-cols-3">
+        <article class="rounded-lg border border-gray-800 bg-gray-950 p-5">
+          <h3 class="text-lg font-semibold">Area neta</h3>
+          <p class="mt-3 text-sm leading-relaxed text-gray-400">
+            Suma superficies y resta descuentos para estimar la zona que realmente llevara pieza.
+          </p>
+        </article>
+        <article class="rounded-lg border border-gray-800 bg-gray-950 p-5">
+          <h3 class="text-lg font-semibold">Compra redondeada</h3>
+          <p class="mt-3 text-sm leading-relaxed text-gray-400">
+            Las piezas y cajas se redondean hacia arriba para evitar una compra incompleta.
+          </p>
+        </article>
+        <article class="rounded-lg border border-gray-800 bg-gray-950 p-5">
+          <h3 class="text-lg font-semibold">Sobrante</h3>
+          <p class="mt-3 text-sm leading-relaxed text-gray-400">
+            El desglose muestra cobertura comprada y sobrante para revisar si conviene dejar reserva.
+          </p>
+        </article>
+      </div>
+    </Container>
+
+    <FaqSection faqs={faqs} />
+  </PageShell>
+</BaseLayout>
+
+<script>
+  import {
+    TILE_PATTERN_CONFIG,
+    buildTileCsv,
+    buildTileShareText,
+    calculateTileEstimate,
+    formatTileCurrency,
+    formatTileFixedNumber,
+    parseTileNumberInput,
+  } from "@lib/calculators/construccion/calculadora-piso-azulejo-superficie/tiles";
+
+  const PATTERN_ORDER = ["straight", "diagonal", "herringbone", "many-cuts", "custom"];
+
+  const surfaceList = document.querySelector("[data-surface-list]");
+  const deductionList = document.querySelector("[data-deduction-list]");
+  const addSurfaceButton = document.querySelector("[data-add-surface]");
+  const addDeductionButton = document.querySelector("[data-add-deduction]");
+  const clearButton = document.querySelector("[data-clear-calculator]");
+  const globalFields = {
+    pieceLength: document.querySelector("[data-global-field='pieceLength']"),
+    pieceWidth: document.querySelector("[data-global-field='pieceWidth']"),
+    waste: document.querySelector("[data-global-field='waste']"),
+    piecesPerBox: document.querySelector("[data-global-field='piecesPerBox']"),
+    areaPerBox: document.querySelector("[data-global-field='areaPerBox']"),
+    pricePerBox: document.querySelector("[data-global-field='pricePerBox']"),
+  };
+  const patternButtons = document.querySelectorAll("[data-pattern-button]");
+  const applyWasteSuggestionButton = document.querySelector("[data-apply-waste-suggestion]");
+  const wasteNote = document.querySelector("[data-waste-note]");
+  const boxModeButtons = document.querySelectorAll("[data-box-mode-button]");
+  const boxPiecesField = document.querySelector("[data-box-pieces-field]");
+  const boxAreaField = document.querySelector("[data-box-area-field]");
+  const mainResult = document.querySelector("[data-main-result]");
+  const resultNote = document.querySelector("[data-result-note]");
+  const summaryList = document.querySelector("[data-summary-list]");
+  const warningList = document.querySelector("[data-warning-list]");
+  const breakdownList = document.querySelector("[data-breakdown-list]");
+  const copyButton = document.querySelector("[data-copy-result]");
+  const exportButton = document.querySelector("[data-export-csv]");
+  const copyStatus = document.querySelector("[data-copy-status]");
+  const mobileTotal = document.querySelector("[data-mobile-total]");
+  const mobileTotalText = document.querySelector("[data-mobile-total-text]");
+  const mobileTotalNote = document.querySelector("[data-mobile-total-note]");
+
+  let surfaceSequence = 0;
+  let deductionSequence = 0;
+  let surfaces = [createSurface()];
+  let deductions = [createDeduction()];
+  let currentPattern = "straight";
+  let currentBoxMode = "pieces";
+  let wasteTouched = false;
+  let currentShareText = "";
+  let currentCsv = "";
+  let copyTimer;
+
+  function createSurface() {
+    surfaceSequence += 1;
+    return {
+      name: `Superficie ${surfaceSequence}`,
+      mode: "dimensions",
+      length: "",
+      width: "",
+      area: "",
+      quantity: "1",
+    };
+  }
+
+  function createDeduction() {
+    deductionSequence += 1;
+    return {
+      name: "",
+      mode: "dimensions",
+      length: "",
+      width: "",
+      area: "",
+      quantity: "1",
+    };
+  }
+
+  function renderAreaRows(type) {
+    const rows = type === "surface" ? surfaces : deductions;
+    const container = type === "surface" ? surfaceList : deductionList;
+    const label = type === "surface" ? "Superficie" : "Descuento";
+
+    container.textContent = "";
+
+    rows.forEach((row, index) => {
+      const article = document.createElement("article");
+      article.className = "rounded-lg border border-gray-800 bg-gray-900/70 p-4";
+      article.dataset.areaType = type;
+      article.dataset.areaIndex = String(index);
+      article.innerHTML = `
+        <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+          <div class="min-w-0">
+            <p class="text-xs font-semibold uppercase text-gray-500">${label} ${index + 1}</p>
+            <p class="mt-1 break-words text-base font-semibold text-white">${escapeHtml(row.name || `${label} ${index + 1}`)}</p>
+          </div>
+          <div class="flex flex-wrap gap-2">
+            <button class="min-h-10 rounded-lg border border-gray-700 px-3 text-sm font-semibold text-gray-200 transition hover:border-emerald-300 hover:text-white focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-emerald-300/25" type="button" data-duplicate-row>Duplicar</button>
+            <button class="min-h-10 rounded-lg border border-gray-700 px-3 text-sm font-semibold text-gray-200 transition hover:border-red-300 hover:text-red-100 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-red-300/25 disabled:opacity-40" type="button" data-delete-row ${type === "surface" && rows.length === 1 ? "disabled" : ""}>Eliminar</button>
+          </div>
+        </div>
+        <div class="mt-4 grid rounded-lg border border-gray-700 bg-gray-950 p-1 sm:grid-cols-2" aria-label="Modo de captura">
+          ${renderModeButton("dimensions", row.mode, "Medidas")}
+          ${renderModeButton("area", row.mode, "Area directa")}
+        </div>
+        <div class="mt-4 grid gap-4 sm:grid-cols-2">
+          ${renderTextField("Nombre", row.name, "name", `${label} ${index + 1}`)}
+          ${renderTextField("Cantidad", row.quantity, "quantity", "1", "numeric")}
+          ${
+            row.mode === "dimensions"
+              ? `${renderMeasuredField("Largo", row.length, "length", "m", "4")}${renderMeasuredField("Ancho", row.width, "width", "m", "5")}`
+              : renderMeasuredField("Area", row.area, "area", "m2", "20")
+          }
+        </div>
+        <p class="mt-3 min-h-5 text-sm text-red-300" data-area-error></p>
+      `;
+
+      article.querySelectorAll("[data-row-field]").forEach((field) => {
+        field.addEventListener("input", (event) => {
+          updateAreaRowFromField(type, index, event.currentTarget);
+        });
+      });
+
+      article.querySelectorAll("[data-row-mode]").forEach((button) => {
+        button.addEventListener("click", () => {
+          row.mode = button.dataset.rowMode;
+          renderAreaRows(type);
+          updateCalculator();
+        });
+      });
+
+      article.querySelector("[data-duplicate-row]").addEventListener("click", () => {
+        duplicateAreaRow(type, index);
+      });
+
+      article.querySelector("[data-delete-row]").addEventListener("click", () => {
+        deleteAreaRow(type, index);
+      });
+
+      container.appendChild(article);
+    });
+  }
+
+  function renderModeButton(mode, currentMode, label) {
+    const active = mode === currentMode;
+
+    return `
+      <button
+        class="min-h-11 rounded-md px-3 text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-emerald-300/35 ${active ? "bg-emerald-300 text-gray-950" : "text-gray-200"}"
+        type="button"
+        data-row-mode="${escapeAttribute(mode)}"
+        aria-pressed="${active}"
+      >
+        ${escapeHtml(label)}
+      </button>
+    `;
+  }
+
+  function renderTextField(label, value, fieldName, placeholder = "", inputMode = "text") {
+    return `
+      <div>
+        <label class="block text-sm font-semibold text-gray-200">${escapeHtml(label)}</label>
+        <input class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-950 px-3 text-sm font-semibold text-white outline-none placeholder:text-gray-600 focus:border-emerald-300 focus:ring-3 focus:ring-emerald-300/15" type="text" inputmode="${escapeAttribute(inputMode)}" autocomplete="off" placeholder="${escapeAttribute(placeholder)}" value="${escapeAttribute(value)}" data-row-field="${escapeAttribute(fieldName)}" />
+      </div>
+    `;
+  }
+
+  function renderMeasuredField(label, value, fieldName, unit, placeholder) {
+    return `
+      <div>
+        <label class="block text-sm font-semibold text-gray-200">${escapeHtml(label)}</label>
+        <div class="mt-2 grid grid-cols-[minmax(0,1fr)_3.75rem] overflow-hidden rounded-lg border border-gray-700 bg-gray-950 focus-within:border-emerald-300 focus-within:ring-3 focus-within:ring-emerald-300/15">
+          <input class="min-h-12 w-full bg-transparent px-3 text-lg font-semibold text-white outline-none placeholder:text-gray-600" type="text" inputmode="decimal" autocomplete="off" placeholder="${escapeAttribute(placeholder)}" value="${escapeAttribute(value)}" data-row-field="${escapeAttribute(fieldName)}" />
+          <span class="grid place-items-center border-l border-gray-700 bg-gray-900 text-sm font-semibold text-gray-300">${escapeHtml(unit)}</span>
+        </div>
+      </div>
+    `;
+  }
+
+  function updateAreaRowFromField(type, index, field) {
+    const rows = type === "surface" ? surfaces : deductions;
+    rows[index][field.dataset.rowField] = field.value;
+    renderAreaRowTitles(type);
+    updateCalculator();
+  }
+
+  function renderAreaRowTitles(type) {
+    const rows = type === "surface" ? surfaces : deductions;
+    const label = type === "surface" ? "Superficie" : "Descuento";
+
+    document.querySelectorAll(`[data-area-type='${type}']`).forEach((row) => {
+      const index = Number(row.dataset.areaIndex);
+      row.querySelectorAll("p")[1].textContent =
+        rows[index].name || `${label} ${index + 1}`;
+    });
+  }
+
+  function duplicateAreaRow(type, index) {
+    const rows = type === "surface" ? surfaces : deductions;
+    const source = rows[index];
+    rows.splice(index + 1, 0, {
+      ...source,
+      name: `${source.name.trim() || (type === "surface" ? "Superficie" : "Descuento")} copia`,
+    });
+    renderAreaRows(type);
+    updateCalculator();
+  }
+
+  function deleteAreaRow(type, index) {
+    if (type === "surface") {
+      if (surfaces.length === 1) {
+        return;
+      }
+
+      surfaces.splice(index, 1);
+    } else if (deductions.length === 1) {
+      deductions = [createDeduction()];
+    } else {
+      deductions.splice(index, 1);
+    }
+
+    renderAreaRows(type);
+    updateCalculator();
+  }
+
+  function setPattern(pattern, forceSuggestion = false) {
+    if (!PATTERN_ORDER.includes(pattern)) {
+      return;
+    }
+
+    currentPattern = pattern;
+
+    const config = TILE_PATTERN_CONFIG[pattern];
+    if (
+      typeof config.suggestedWastePercentage === "number" &&
+      (!wasteTouched || forceSuggestion)
+    ) {
+      globalFields.waste.value = String(config.suggestedWastePercentage);
+      wasteTouched = false;
+    }
+
+    patternButtons.forEach((button) => {
+      const active = button.dataset.patternButton === pattern;
+      button.setAttribute("aria-pressed", String(active));
+      button.classList.toggle("bg-emerald-300", active);
+      button.classList.toggle("text-gray-950", active);
+      button.classList.toggle("text-gray-200", !active);
+    });
+
+    renderWasteNote();
+    updateCalculator();
+  }
+
+  function renderWasteNote() {
+    const config = TILE_PATTERN_CONFIG[currentPattern];
+
+    if (typeof config.suggestedWastePercentage === "number") {
+      wasteNote.textContent = `Sugerido para ${config.label.toLowerCase()}: ${config.suggestedWastePercentage}%.`;
+    } else {
+      wasteNote.textContent = "Usa el margen que indique tu proyecto.";
+    }
+  }
+
+  function setBoxMode(mode) {
+    currentBoxMode = mode === "area" ? "area" : "pieces";
+
+    boxModeButtons.forEach((button) => {
+      const active = button.dataset.boxModeButton === currentBoxMode;
+      button.setAttribute("aria-pressed", String(active));
+      button.classList.toggle("bg-emerald-300", active);
+      button.classList.toggle("text-gray-950", active);
+      button.classList.toggle("text-gray-200", !active);
+    });
+
+    boxPiecesField.classList.toggle("hidden", currentBoxMode !== "pieces");
+    boxAreaField.classList.toggle("hidden", currentBoxMode !== "area");
+    updateCalculator();
+  }
+
+  function updateCalculator() {
+    clearErrors();
+
+    const parseResult = parseInput();
+
+    if (!parseResult.ok) {
+      setNeutralResult(parseResult.message);
+      setErrors(parseResult);
+      return;
+    }
+
+    try {
+      const result = calculateTileEstimate(parseResult.input);
+      renderResult(result, parseResult.input);
+      currentShareText = buildTileShareText(result, parseResult.input);
+      currentCsv = buildTileCsv(result, parseResult.input);
+      showActions();
+    } catch (error) {
+      setNeutralResult(error instanceof Error ? error.message : "Revisa los datos capturados.");
+    }
+  }
+
+  function parseInput() {
+    const globalErrors = {};
+    const surfaceErrors = {};
+    const deductionErrors = {};
+    const parsedSurfaces = [];
+    const parsedDeductions = [];
+
+    surfaces.forEach((surface, index) => {
+      const errors = [];
+      const parsed = parseAreaRow(surface, index, "surface", errors);
+
+      if (errors.length) {
+        surfaceErrors[index] = errors.join(" ");
+        return;
+      }
+
+      parsedSurfaces.push(parsed);
+    });
+
+    deductions.forEach((deduction, index) => {
+      if (isEmptyAreaRow(deduction)) {
+        return;
+      }
+
+      const errors = [];
+      const parsed = parseAreaRow(deduction, index, "deduction", errors);
+
+      if (errors.length) {
+        deductionErrors[index] = errors.join(" ");
+        return;
+      }
+
+      parsedDeductions.push(parsed);
+    });
+
+    const pieceLength = parsePositiveNumber(globalFields.pieceLength.value, "largo de pieza", globalErrors, "pieceLength");
+    const pieceWidth = parsePositiveNumber(globalFields.pieceWidth.value, "ancho de pieza", globalErrors, "pieceWidth");
+    const wastePercentage = parsePercentageField(globalFields.waste.value, "desperdicio", globalErrors, "waste");
+    const pricePerBox = parseOptionalNonNegativeNumber(globalFields.pricePerBox.value, "precio por caja", globalErrors, "pricePerBox");
+    const piecesPerBox = currentBoxMode === "pieces"
+      ? parseIntegerField(globalFields.piecesPerBox.value, "piezas por caja", globalErrors, "piecesPerBox")
+      : undefined;
+    const areaPerBox = currentBoxMode === "area"
+      ? parsePositiveNumber(globalFields.areaPerBox.value, "m2 por caja", globalErrors, "areaPerBox")
+      : undefined;
+
+    if (
+      Object.keys(globalErrors).length ||
+      Object.keys(surfaceErrors).length ||
+      Object.keys(deductionErrors).length
+    ) {
+      return {
+        ok: false,
+        message: "Completa superficie, pieza y caja para calcular.",
+        globalErrors,
+        surfaceErrors,
+        deductionErrors,
+      };
+    }
+
+    return {
+      ok: true,
+      input: {
+        surfaces: parsedSurfaces,
+        deductions: parsedDeductions,
+        piece: {
+          lengthCm: pieceLength,
+          widthCm: pieceWidth,
+        },
+        pattern: currentPattern,
+        wastePercentage,
+        box:
+          currentBoxMode === "pieces"
+            ? { mode: "pieces", piecesPerBox }
+            : { mode: "area", areaPerBoxM2: areaPerBox },
+        ...(typeof pricePerBox === "number" ? { pricePerBox } : {}),
+      },
+    };
+  }
+
+  function parseAreaRow(row, index, type, errors) {
+    const fallback = type === "surface" ? `Superficie ${index + 1}` : `Descuento ${index + 1}`;
+    const name = parseName(row.name, fallback, errors);
+    const quantity = parseIntegerValue(row.quantity, "cantidad", errors);
+
+    if (row.mode === "area") {
+      const areaM2 = parsePositiveValue(row.area, "area", errors);
+
+      return {
+        name,
+        mode: "area",
+        quantity,
+        areaM2,
+      };
+    }
+
+    const lengthMeters = parsePositiveValue(row.length, "largo", errors);
+    const widthMeters = parsePositiveValue(row.width, "ancho", errors);
+
+    return {
+      name,
+      mode: "dimensions",
+      quantity,
+      lengthMeters,
+      widthMeters,
+    };
+  }
+
+  function isEmptyAreaRow(row) {
+    return (
+      !row.name.trim() &&
+      !row.length.trim() &&
+      !row.width.trim() &&
+      !row.area.trim()
+    );
+  }
+
+  function parseName(value, fallback, errors) {
+    const name = value.trim() || fallback;
+
+    if (name.length > 40) {
+      errors.push("El nombre no puede superar 40 caracteres.");
+    }
+
+    return name;
+  }
+
+  function parsePositiveValue(value, label, errors) {
+    const parsed = parseTileNumberInput(value);
+
+    if (!parsed.ok || parsed.value <= 0) {
+      errors.push(`Revisa ${label}.`);
+      return undefined;
+    }
+
+    return parsed.value;
+  }
+
+  function parseIntegerValue(value, label, errors) {
+    const parsed = parseTileNumberInput(value);
+
+    if (
+      !parsed.ok ||
+      !Number.isInteger(parsed.value) ||
+      parsed.value < 1 ||
+      parsed.value > 1000
+    ) {
+      errors.push(`${label} debe ser entero entre 1 y 1000.`);
+      return undefined;
+    }
+
+    return parsed.value;
+  }
+
+  function parsePositiveNumber(value, label, errors, key) {
+    const parsed = parseTileNumberInput(value);
+
+    if (!parsed.ok || parsed.value <= 0) {
+      errors[key] = `Revisa ${label}.`;
+      return undefined;
+    }
+
+    return parsed.value;
+  }
+
+  function parseIntegerField(value, label, errors, key) {
+    const parsed = parseTileNumberInput(value);
+
+    if (
+      !parsed.ok ||
+      !Number.isInteger(parsed.value) ||
+      parsed.value < 1 ||
+      parsed.value > 1000
+    ) {
+      errors[key] = `Revisa ${label}.`;
+      return undefined;
+    }
+
+    return parsed.value;
+  }
+
+  function parsePercentageField(value, label, errors, key) {
+    const parsed = parseTileNumberInput(value);
+
+    if (!parsed.ok || parsed.value > 100) {
+      errors[key] = `Revisa ${label}.`;
+      return undefined;
+    }
+
+    return parsed.value;
+  }
+
+  function parseOptionalNonNegativeNumber(value, label, errors, key) {
+    if (!value.trim()) {
+      return undefined;
+    }
+
+    const parsed = parseTileNumberInput(value);
+
+    if (!parsed.ok) {
+      errors[key] = `Revisa ${label}.`;
+      return undefined;
+    }
+
+    return parsed.value;
+  }
+
+  function renderResult(result, input) {
+    const boxLabel = result.boxes === 1 ? "caja" : "cajas";
+    mainResult.textContent = `Compra ${result.boxes} ${boxLabel}`;
+    resultNote.textContent =
+      typeof result.totalCost === "number"
+        ? `${formatTileCurrency(result.totalCost)} estimados con desperdicio incluido.`
+        : `${result.requiredPieces} piezas requeridas con desperdicio incluido.`;
+
+    const summaryItems = [
+      ["Area neta", `${formatTileFixedNumber(result.netArea)} m2`],
+      ["Con desperdicio", `${formatTileFixedNumber(result.purchaseArea)} m2`],
+      ["Piezas requeridas", String(result.requiredPieces)],
+      ["Cajas", String(result.boxes)],
+      ["Cobertura comprada", `${formatTileFixedNumber(result.purchasedArea)} m2`],
+      ["Sobrante", `${formatTileFixedNumber(result.surplusArea)} m2`],
+    ];
+
+    if (typeof result.purchasedPieces === "number") {
+      summaryItems.push(["Piezas compradas", String(result.purchasedPieces)]);
+      summaryItems.push(["Piezas sobrantes", String(result.surplusPieces ?? 0)]);
+    }
+
+    if (typeof result.estimatedPurchasedPieces === "number") {
+      summaryItems.push(["Piezas compradas est.", String(result.estimatedPurchasedPieces)]);
+      summaryItems.push(["Piezas sobrantes est.", String(result.estimatedSurplusPieces ?? 0)]);
+    }
+
+    if (typeof result.totalCost === "number") {
+      summaryItems.push(["Costo total", formatTileCurrency(result.totalCost)]);
+    }
+
+    if (typeof result.costPerNetM2 === "number") {
+      summaryItems.push(["Costo por m2 neto", formatTileCurrency(result.costPerNetM2)]);
+    }
+
+    renderKeyValueList(summaryList, summaryItems);
+    renderWarnings(result.warnings);
+    renderBreakdown(result);
+    updateMobileResult(mainResult.textContent, typeof result.totalCost === "number" ? formatTileCurrency(result.totalCost) : "");
+  }
+
+  function renderKeyValueList(container, items) {
+    container.textContent = "";
+
+    items.forEach(([label, value]) => {
+      const row = document.createElement("div");
+      row.className =
+        "flex items-start justify-between gap-4 rounded-lg border border-gray-800 bg-gray-950 p-3 text-sm";
+      row.innerHTML = `<span class="text-gray-400"></span><strong class="break-words text-right font-semibold text-white"></strong>`;
+      row.querySelector("span").textContent = label;
+      row.querySelector("strong").textContent = value;
+      container.appendChild(row);
+    });
+  }
+
+  function renderWarnings(warnings) {
+    warningList.textContent = "";
+
+    warnings.forEach((warning) => {
+      const item = document.createElement("p");
+      item.className =
+        "rounded-lg border border-amber-400/30 bg-amber-400/10 p-3 text-sm leading-relaxed text-amber-100";
+      item.textContent = warning;
+      warningList.appendChild(item);
+    });
+  }
+
+  function renderBreakdown(result) {
+    breakdownList.textContent = "";
+
+    const title = document.createElement("p");
+    title.className = "text-sm font-semibold text-white";
+    title.textContent = "Desglose por area";
+    breakdownList.appendChild(title);
+
+    result.surfaces.forEach((surface) => {
+      breakdownList.appendChild(buildBreakdownRow(surface.name, `${surface.quantity}x superficie`, `${formatTileFixedNumber(surface.area)} m2`));
+    });
+
+    result.deductions.forEach((deduction) => {
+      breakdownList.appendChild(buildBreakdownRow(deduction.name, `${deduction.quantity}x descuento`, `-${formatTileFixedNumber(deduction.area)} m2`));
+    });
+  }
+
+  function buildBreakdownRow(name, detail, value) {
+    const row = document.createElement("div");
+    row.className = "rounded-lg border border-gray-800 bg-gray-950 p-3 text-sm";
+    row.innerHTML = `
+      <div class="flex items-start justify-between gap-3">
+        <div class="min-w-0">
+          <p class="break-words font-semibold text-white"></p>
+          <p class="mt-1 text-gray-500"></p>
+        </div>
+        <strong class="shrink-0 text-right text-emerald-100"></strong>
+      </div>
+    `;
+    row.querySelector("p").textContent = name;
+    row.querySelectorAll("p")[1].textContent = detail;
+    row.querySelector("strong").textContent = value;
+    return row;
+  }
+
+  function setNeutralResult(message) {
+    mainResult.textContent = "Ingresa tus medidas";
+    resultNote.textContent = message;
+    summaryList.textContent = "";
+    warningList.textContent = "";
+    breakdownList.textContent = "";
+    currentShareText = "";
+    currentCsv = "";
+    hideActions();
+    mobileTotal.classList.add("hidden");
+  }
+
+  function setErrors(parseResult) {
+    Object.entries(parseResult.globalErrors ?? {}).forEach(([key, message]) => {
+      const error = document.querySelector(`[data-error-for='${key}']`);
+      if (error) {
+        error.textContent = message;
+      }
+    });
+
+    Object.entries(parseResult.surfaceErrors ?? {}).forEach(([index, message]) => {
+      const error = document.querySelector(`[data-area-type='surface'][data-area-index='${index}'] [data-area-error]`);
+      if (error) {
+        error.textContent = message;
+      }
+    });
+
+    Object.entries(parseResult.deductionErrors ?? {}).forEach(([index, message]) => {
+      const error = document.querySelector(`[data-area-type='deduction'][data-area-index='${index}'] [data-area-error]`);
+      if (error) {
+        error.textContent = message;
+      }
+    });
+  }
+
+  function clearErrors() {
+    document.querySelectorAll("[data-error-for]").forEach((error) => {
+      error.textContent = "";
+    });
+    document.querySelectorAll("[data-area-error]").forEach((error) => {
+      error.textContent = "";
+    });
+  }
+
+  function showActions() {
+    copyButton.classList.remove("hidden");
+    copyButton.classList.add("inline-flex");
+    exportButton.classList.remove("hidden");
+    exportButton.classList.add("inline-flex");
+  }
+
+  function hideActions() {
+    copyButton.classList.add("hidden");
+    copyButton.classList.remove("inline-flex");
+    exportButton.classList.add("hidden");
+    exportButton.classList.remove("inline-flex");
+  }
+
+  function updateMobileResult(text, note) {
+    mobileTotalText.textContent = text;
+    mobileTotalNote.textContent = note;
+    mobileTotal.classList.remove("hidden");
+  }
+
+  function clearCopyStatus() {
+    window.clearTimeout(copyTimer);
+    copyStatus.textContent = "";
+  }
+
+  function copyText(text) {
+    clearCopyStatus();
+
+    if (!text) {
+      copyStatus.textContent = "No hay resultado para copiar.";
+      return;
+    }
+
+    if (navigator.clipboard?.writeText) {
+      navigator.clipboard
+        .writeText(text)
+        .then(() => {
+          copyStatus.textContent = "Resultado copiado.";
+        })
+        .catch(() => {
+          copyStatus.textContent = "No fue posible copiar automaticamente.";
+        });
+    } else {
+      copyStatus.textContent = "No fue posible copiar automaticamente.";
+    }
+
+    copyTimer = window.setTimeout(() => {
+      copyStatus.textContent = "";
+    }, 3000);
+  }
+
+  function exportCsv() {
+    clearCopyStatus();
+
+    if (!currentCsv) {
+      copyStatus.textContent = "No hay resultado para exportar.";
+      return;
+    }
+
+    const blob = new Blob([currentCsv], { type: "text/csv;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "calculo-piso-azulejo.csv";
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    URL.revokeObjectURL(url);
+    copyStatus.textContent = "CSV generado.";
+  }
+
+  function resetCalculator() {
+    surfaceSequence = 0;
+    deductionSequence = 0;
+    surfaces = [createSurface()];
+    deductions = [createDeduction()];
+    currentPattern = "straight";
+    currentBoxMode = "pieces";
+    wasteTouched = false;
+    globalFields.pieceLength.value = "";
+    globalFields.pieceWidth.value = "";
+    globalFields.waste.value = "10";
+    globalFields.piecesPerBox.value = "";
+    globalFields.areaPerBox.value = "";
+    globalFields.pricePerBox.value = "";
+    renderAreaRows("surface");
+    renderAreaRows("deduction");
+    setPattern("straight");
+    setBoxMode("pieces");
+    setNeutralResult("Completa superficie, pieza y caja para calcular.");
+    clearErrors();
+  }
+
+  function escapeHtml(value) {
+    return String(value)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;");
+  }
+
+  function escapeAttribute(value) {
+    return escapeHtml(value).replace(/"/g, "&quot;");
+  }
+
+  addSurfaceButton.addEventListener("click", () => {
+    surfaces.push(createSurface());
+    renderAreaRows("surface");
+    updateCalculator();
+  });
+
+  addDeductionButton.addEventListener("click", () => {
+    deductions.push(createDeduction());
+    renderAreaRows("deduction");
+    updateCalculator();
+  });
+
+  Object.values(globalFields).forEach((field) => {
+    field.addEventListener("input", () => {
+      if (field === globalFields.waste) {
+        wasteTouched = true;
+        renderWasteNote();
+      }
+      updateCalculator();
+    });
+  });
+
+  patternButtons.forEach((button) => {
+    button.addEventListener("click", () => setPattern(button.dataset.patternButton));
+  });
+
+  applyWasteSuggestionButton.addEventListener("click", () => {
+    setPattern(currentPattern, true);
+  });
+
+  boxModeButtons.forEach((button) => {
+    button.addEventListener("click", () => setBoxMode(button.dataset.boxModeButton));
+  });
+
+  clearButton.addEventListener("click", resetCalculator);
+  copyButton.addEventListener("click", () => copyText(currentShareText));
+  exportButton.addEventListener("click", exportCsv);
+
+  renderAreaRows("surface");
+  renderAreaRows("deduction");
+  setPattern("straight");
+  setBoxMode("pieces");
+  setNeutralResult("Completa superficie, pieza y caja para calcular.");
+  clearErrors();
+</script>
