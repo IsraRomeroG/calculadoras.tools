@@ -511,6 +511,15 @@ export const CALCULATORS: LegacyCalculatorDirectoryItem[] = [
     order: 70,
   },
   {
+    id: "conversor-tallas-de-ropa",
+    title: "Conversor de tallas de ropa",
+    description:
+      "Convierte tallas de ropa entre sistemas internacionales, US, EU, UK y MX con rangos de medidas orientativos.",
+    href: "/conversores/conversor-tallas-de-ropa",
+    categorySlug: "conversores",
+    order: 70.5,
+  },
+  {
     id: "conversor-de-bases-numericas",
     title: "Conversor de bases numéricas",
     description:
