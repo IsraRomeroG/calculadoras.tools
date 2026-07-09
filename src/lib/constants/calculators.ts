@@ -502,6 +502,24 @@ export const CALCULATORS: LegacyCalculatorDirectoryItem[] = [
     order: 69.5,
   },
   {
+    id: "conversor-de-area-m2-ft2-hectareas-acres",
+    title: "Conversor de área",
+    description:
+      "Convierte m², ft², hectáreas y acres, o calcula la superficie desde largo y ancho.",
+    href: "/conversores/conversor-de-area-m2-ft2-hectareas-acres",
+    categorySlug: "conversores",
+    order: 69.75,
+  },
+  {
+    id: "conversor-de-volumen",
+    title: "Conversor de volumen",
+    description:
+      "Convierte ml, L, cm³, m³ y medidas líquidas US o imperiales con el sistema regional siempre visible.",
+    href: "/conversores/conversor-de-volumen",
+    categorySlug: "conversores",
+    order: 69.8,
+  },
+  {
     id: "conversor-de-peso",
     title: "Conversor de peso",
     description:

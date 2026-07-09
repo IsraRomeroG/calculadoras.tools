@@ -1,0 +1,1176 @@
+---
+import AdSlot from "@components/ads/AdSlot.astro";
+import Container from "@components/layout/Container.astro";
+import PageShell from "@components/layout/PageShell.astro";
+import FaqSection from "@components/shared/FaqSection.astro";
+import PageHero from "@components/shared/PageHero.astro";
+import SectionIntro from "@components/shared/SectionIntro.astro";
+import BaseLayout from "@layouts/BaseLayout.astro";
+import {
+  AREA_UNIT_METADATA,
+  AREA_UNITS,
+  convertArea,
+  formatArea,
+} from "@lib/calculators/conversores/conversor-de-area-m2-ft2-hectareas-acres/area";
+import { buildFaqJsonLd } from "@lib/seo";
+
+const title = "Conversor de área: m², ft², hectáreas y acres";
+const description =
+  "Convierte superficies entre metros cuadrados, pies cuadrados, hectáreas y acres, o calcula el área desde largo y ancho.";
+const canonical = "/conversores/conversor-de-area-m2-ft2-hectareas-acres";
+
+const faqs = [
+  {
+    question: "¿Cuántos pies cuadrados tiene un metro cuadrado?",
+    answer:
+      "Un metro cuadrado equivale aproximadamente a 10.7639 pies cuadrados.",
+  },
+  {
+    question: "¿Cuántos metros cuadrados tiene una hectárea?",
+    answer: "Una hectárea equivale exactamente a 10,000 metros cuadrados.",
+  },
+  {
+    question: "¿Cuántos metros cuadrados tiene un acre?",
+    answer: "Un acre equivale exactamente a 4,046.8564224 metros cuadrados.",
+  },
+  {
+    question: "¿Cuántos acres tiene una hectárea?",
+    answer: "Una hectárea equivale aproximadamente a 2.4711 acres.",
+  },
+  {
+    question: "¿Cuál es la diferencia entre metros y metros cuadrados?",
+    answer:
+      "El metro mide longitud. El metro cuadrado mide superficie: largo por ancho. Por eso 10 m no equivalen a 10 m².",
+  },
+  {
+    question: "¿Puedo calcular el área desde largo y ancho?",
+    answer:
+      "Sí. El modo de medidas multiplica largo por ancho y luego convierte el resultado a m², ft², hectáreas y acres.",
+  },
+];
+
+const faqJsonLd = buildFaqJsonLd(faqs);
+
+const quickConversions = [
+  { label: "m² a ft²", value: "1", from: "m2", to: "ft2" },
+  { label: "ft² a m²", value: "1", from: "ft2", to: "m2" },
+  { label: "ha a acres", value: "1", from: "ha", to: "acre" },
+  { label: "acres a ha", value: "1", from: "acre", to: "ha" },
+  { label: "m² a ha", value: "10000", from: "m2", to: "ha" },
+] as const;
+
+const commonValues = [1, 10, 100, 1_000, 10_000];
+const equivalenceRows = [
+  {
+    label: "1 m²",
+    value: "10.7639 ft²",
+    note: "Base útil para construcción e inmuebles.",
+  },
+  {
+    label: "1 ft²",
+    value: "0.09290304 m²",
+    note: "Equivalencia exacta a metros cuadrados.",
+  },
+  {
+    label: "1 ha",
+    value: "10,000 m²",
+    note: "Referencia frecuente para terrenos agrícolas.",
+  },
+  {
+    label: "1 acre",
+    value: "4,046.8564224 m²",
+    note: "Medida común en sistemas imperiales.",
+  },
+  {
+    label: "1 ha",
+    value: "2.4711 acres",
+    note: "Conversión rápida de hectáreas a acres.",
+  },
+  {
+    label: "1 acre",
+    value: "0.4047 ha",
+    note: "Conversión rápida de acres a hectáreas.",
+  },
+];
+---
+
+<BaseLayout title={title} description={description} canonical={canonical}>
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={JSON.stringify(faqJsonLd)} />
+  </Fragment>
+
+  <PageShell>
+    <PageHero
+      title="Conversor de área"
+      description="Convierte superficies conocidas o calcula el área desde largo y ancho. Obtén m², ft², hectáreas y acres al mismo tiempo."
+      kicker="Conversores"
+      collapseBreadcrumbOnMobile
+      containerClass="py-6 md:py-8"
+      breadcrumbs={[
+        { label: "Inicio", href: "/", ariaLabel: "Inicio" },
+        { label: "Conversores", href: "/conversores", optional: true },
+        { label: "Conversor de área", truncate: true },
+      ]}
+    />
+
+    <Container as="section" class="py-6 md:py-8">
+      <section
+        id="area-converter"
+        class="overflow-hidden rounded-lg border border-gray-700 bg-gray-950 shadow-xl shadow-gray-950/30"
+        aria-labelledby="calculator-heading"
+      >
+        <div
+          class="grid gap-0 lg:grid-cols-[minmax(0,1fr)_minmax(19rem,0.82fr)]"
+        >
+          <div class="p-4 sm:p-6">
+            <p class="text-sm font-semibold text-amber-300">
+              Conversión rápida
+            </p>
+            <h2 id="calculator-heading" class="mt-2 text-2xl font-semibold">
+              ¿Qué superficie quieres calcular?
+            </h2>
+
+            <fieldset class="mt-6">
+              <legend class="text-sm font-semibold text-gray-200">
+                Modo
+              </legend>
+              <div class="mt-2 grid grid-cols-2 gap-2">
+                <button
+                  class="min-h-12 rounded-lg border border-amber-400 bg-amber-400/10 px-3 py-2 text-sm font-semibold text-amber-100 transition hover:border-amber-300 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/30"
+                  type="button"
+                  aria-pressed="true"
+                  data-mode-button="convert"
+                >
+                  Convertir superficie
+                </button>
+                <button
+                  class="min-h-12 rounded-lg border border-gray-700 bg-gray-900 px-3 py-2 text-sm font-semibold text-gray-200 transition hover:border-gray-500 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/30"
+                  type="button"
+                  aria-pressed="false"
+                  data-mode-button="measure"
+                >
+                  Calcular desde medidas
+                </button>
+              </div>
+            </fieldset>
+
+            <div class="mt-6" data-convert-panel>
+              <label
+                for="area-value"
+                class="block text-sm font-semibold text-gray-200"
+              >
+                Superficie
+              </label>
+              <div
+                class="mt-2 flex rounded-lg border border-gray-700 bg-gray-900 focus-within:border-amber-400 focus-within:ring-3 focus-within:ring-amber-400/15"
+              >
+                <input
+                  id="area-value"
+                  class="min-h-14 w-full min-w-0 bg-transparent px-4 text-xl text-white outline-none placeholder:text-gray-600"
+                  type="text"
+                  inputmode="decimal"
+                  autocomplete="off"
+                  placeholder="Ej. 1,5 ha o 100 m²"
+                  aria-describedby="area-help area-interpretation area-error"
+                  data-area-input
+                />
+                <span
+                  class="flex shrink-0 items-center px-4 text-sm text-gray-500"
+                  data-area-input-symbol
+                >
+                  m²
+                </span>
+              </div>
+              <p
+                id="area-help"
+                class="mt-2 text-xs leading-relaxed text-gray-500"
+              >
+                Acepta coma o punto decimal. También puedes pegar valores con
+                unidad, como 250 m², 1 ha o 2 acres.
+              </p>
+              <p
+                id="area-interpretation"
+                class="mt-2 hidden text-xs leading-relaxed text-blue-200"
+                data-area-interpretation
+              >
+              </p>
+              <p
+                id="area-error"
+                class="mt-2 hidden text-sm text-red-300"
+                data-area-error
+              >
+              </p>
+
+              <div class="mt-4">
+                <label
+                  for="origin-unit"
+                  class="block text-sm font-semibold text-gray-200"
+                >
+                  Unidad origen
+                </label>
+                <select
+                  id="origin-unit"
+                  class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-900 px-3 text-sm text-white outline-none transition focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15"
+                  data-origin-select
+                >
+                  {
+                    AREA_UNITS.map((unit) => (
+                      <option value={unit}>
+                        {AREA_UNIT_METADATA[unit].symbol} · {AREA_UNIT_METADATA[
+                          unit
+                        ].label.toLocaleLowerCase("es-MX")}
+                      </option>
+                    ))
+                  }
+                </select>
+              </div>
+
+              <div class="mt-5">
+                <p class="text-sm font-semibold text-gray-200">
+                  Conversiones rápidas
+                </p>
+                <div class="mt-2 flex flex-wrap gap-2">
+                  {
+                    quickConversions.map((shortcut) => (
+                      <button
+                        class="min-h-10 rounded-lg border border-gray-700 bg-gray-900 px-3 py-2 text-sm font-semibold text-amber-200 transition hover:border-amber-400/70 hover:bg-gray-800 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/30"
+                        type="button"
+                        data-shortcut-value={shortcut.value}
+                        data-shortcut-from={shortcut.from}
+                        data-shortcut-to={shortcut.to}
+                      >
+                        {shortcut.label}
+                      </button>
+                    ))
+                  }
+                </div>
+              </div>
+            </div>
+
+            <div class="mt-6 hidden" data-measure-panel>
+              <div class="grid gap-4 sm:grid-cols-2">
+                <div>
+                  <label
+                    for="area-length"
+                    class="block text-sm font-semibold text-gray-200"
+                  >
+                    Largo
+                  </label>
+                  <input
+                    id="area-length"
+                    class="mt-2 min-h-14 w-full rounded-lg border border-gray-700 bg-gray-900 px-4 text-xl text-white outline-none placeholder:text-gray-600 transition focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15"
+                    type="text"
+                    inputmode="decimal"
+                    autocomplete="off"
+                    placeholder="Ej. 20"
+                    aria-describedby="length-error"
+                    data-length-input
+                  />
+                  <p
+                    id="length-error"
+                    class="mt-2 hidden text-sm text-red-300"
+                    data-length-error
+                  >
+                  </p>
+                </div>
+                <div>
+                  <label
+                    for="area-width"
+                    class="block text-sm font-semibold text-gray-200"
+                  >
+                    Ancho
+                  </label>
+                  <input
+                    id="area-width"
+                    class="mt-2 min-h-14 w-full rounded-lg border border-gray-700 bg-gray-900 px-4 text-xl text-white outline-none placeholder:text-gray-600 transition focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15"
+                    type="text"
+                    inputmode="decimal"
+                    autocomplete="off"
+                    placeholder="Ej. 15"
+                    aria-describedby="width-error"
+                    data-width-input
+                  />
+                  <p
+                    id="width-error"
+                    class="mt-2 hidden text-sm text-red-300"
+                    data-width-error
+                  >
+                  </p>
+                </div>
+              </div>
+
+              <div class="mt-4">
+                <label
+                  for="linear-unit"
+                  class="block text-sm font-semibold text-gray-200"
+                >
+                  Unidad lineal
+                </label>
+                <select
+                  id="linear-unit"
+                  class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-900 px-3 text-sm text-white outline-none transition focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15"
+                  data-linear-unit-select
+                >
+                  <option value="m">m · metros</option>
+                  <option value="ft">ft · pies</option>
+                </select>
+              </div>
+
+              <p class="mt-3 text-xs leading-relaxed text-gray-500">
+                El resultado se calcula como largo por ancho y luego se
+                convierte a las unidades de superficie.
+              </p>
+            </div>
+
+            <div class="mt-5 grid gap-3 sm:grid-cols-2">
+              <div>
+                <label
+                  for="highlight-unit"
+                  class="block text-sm font-semibold text-gray-200"
+                >
+                  Resultado destacado
+                </label>
+                <select
+                  id="highlight-unit"
+                  class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-900 px-3 text-sm text-white outline-none transition focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15"
+                  data-highlight-select
+                >
+                  {
+                    AREA_UNITS.map((unit) => (
+                      <option value={unit} selected={unit === "ft2"}>
+                        {AREA_UNIT_METADATA[unit].symbol} · {AREA_UNIT_METADATA[
+                          unit
+                        ].label.toLocaleLowerCase("es-MX")}
+                      </option>
+                    ))
+                  }
+                </select>
+              </div>
+
+              <div>
+                <label
+                  for="area-decimals"
+                  class="block text-sm font-semibold text-gray-200"
+                >
+                  Decimales
+                </label>
+                <select
+                  id="area-decimals"
+                  class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-900 px-3 text-sm text-white outline-none transition focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15"
+                  data-decimals-select
+                >
+                  {
+                    Array.from({ length: 9 }, (_, decimals) => (
+                      <option value={String(decimals)} selected={decimals === 4}>
+                        {decimals}
+                      </option>
+                    ))
+                  }
+                </select>
+              </div>
+            </div>
+
+            <div class="mt-5 flex flex-wrap gap-3">
+              <button
+                class="min-h-11 rounded-lg border border-gray-700 px-4 py-2 text-sm font-semibold text-gray-200 transition hover:border-gray-500 hover:bg-gray-900 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-gray-400/30"
+                type="button"
+                data-clear-calculator
+              >
+                Limpiar
+              </button>
+            </div>
+          </div>
+
+          <aside
+            class="border-t border-gray-800 bg-gray-900/65 p-4 sm:p-6 lg:border-l lg:border-t-0"
+          >
+            <p
+              class="text-xs font-semibold uppercase tracking-wide text-gray-500"
+            >
+              Resultado principal
+            </p>
+
+            <div data-empty-result>
+              <p class="mt-3 min-h-10 text-2xl font-semibold text-amber-100">
+                Ingresa una superficie
+              </p>
+              <p class="mt-3 text-sm leading-relaxed text-gray-400">
+                Verás todas las equivalencias sin cambiar de pantalla.
+              </p>
+            </div>
+
+            <div class="hidden" data-result-content>
+              <p
+                class="mt-3 text-sm font-medium text-gray-300"
+                data-source-result
+              >
+              </p>
+              <p
+                class="mt-2 min-h-10 break-words text-3xl font-semibold text-amber-100"
+                tabindex="-1"
+                data-main-result
+              >
+              </p>
+              <p
+                class="mt-3 text-sm leading-relaxed text-blue-100"
+                data-context-note
+              >
+              </p>
+
+              <div class="mt-5">
+                <h3 class="text-sm font-semibold text-gray-200">
+                  Equivalencias
+                </h3>
+                <div class="mt-3 grid gap-3" data-results-list></div>
+              </div>
+
+              <div class="mt-4 flex flex-wrap gap-2">
+                <button
+                  class="min-h-11 rounded-lg bg-amber-400 px-4 py-2 text-sm font-semibold text-gray-950 transition hover:bg-amber-300 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-300/40"
+                  type="button"
+                  data-copy-main
+                >
+                  Copiar destacado
+                </button>
+              </div>
+            </div>
+
+            <p
+              class="sr-only"
+              role="status"
+              aria-live="polite"
+              data-live-status
+            >
+            </p>
+            <p
+              class="mt-3 min-h-5 text-sm text-emerald-300"
+              role="status"
+              aria-live="polite"
+              data-copy-status
+            >
+            </p>
+          </aside>
+        </div>
+
+        <div class="border-t border-gray-800 p-4 sm:p-6">
+          <div class="grid gap-4 lg:grid-cols-2">
+            <article class="rounded-lg border border-gray-800 bg-gray-900/70 p-4">
+              <h3 class="text-lg font-semibold">Fórmula</h3>
+              <p class="mt-3 text-sm leading-relaxed text-gray-300" data-formula>
+                La fórmula aparecerá cuando ingreses un valor.
+              </p>
+              <details class="mt-3 hidden" data-procedure-panel>
+                <summary
+                  class="min-h-11 cursor-pointer py-2 text-sm font-semibold text-amber-300"
+                >
+                  Ver procedimiento
+                </summary>
+                <ol
+                  class="mt-2 space-y-2 text-sm leading-relaxed text-gray-400"
+                  data-procedure-list
+                >
+                </ol>
+              </details>
+            </article>
+
+            <article class="rounded-lg border border-blue-400/25 bg-blue-400/10 p-4">
+              <h3 class="text-lg font-semibold text-white">
+                Área no es longitud
+              </h3>
+              <p class="mt-3 text-sm leading-relaxed text-blue-100">
+                Para superficie se usan unidades cuadradas. Si mides un espacio
+                rectangular, primero calcula largo por ancho y luego convierte
+                el área.
+              </p>
+            </article>
+          </div>
+        </div>
+      </section>
+    </Container>
+
+    <AdSlot placement="calculator-after-tool" />
+
+    <Container as="section" class="py-6 md:py-8">
+      <SectionIntro
+        title="Tabla breve de equivalencias"
+        description="Referencias estáticas para comprobar rápidamente los factores más usados."
+      />
+      <div class="overflow-hidden rounded-lg border border-gray-800 bg-gray-950">
+        <table class="w-full table-fixed text-left text-xs sm:text-sm">
+          <caption class="sr-only">
+            Equivalencias entre metros cuadrados, pies cuadrados, hectáreas y
+            acres
+          </caption>
+          <thead
+            class="bg-gray-900 text-[0.68rem] uppercase tracking-wide text-gray-500 sm:text-xs"
+          >
+            <tr>
+              <th class="px-2 py-3 sm:px-4">Unidad</th>
+              <th class="px-2 py-3 sm:px-4">Equivalencia</th>
+              <th class="px-2 py-3 sm:px-4">Uso común</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-gray-800 text-gray-300">
+            {
+              equivalenceRows.map((row) => (
+                <tr>
+                  <th
+                    scope="row"
+                    class="px-2 py-3 font-semibold text-white sm:px-4"
+                  >
+                    {row.label}
+                  </th>
+                  <td class="break-words px-2 py-3 text-amber-200 sm:px-4">
+                    {row.value}
+                  </td>
+                  <td class="px-2 py-3 sm:px-4">{row.note}</td>
+                </tr>
+              ))
+            }
+          </tbody>
+        </table>
+      </div>
+    </Container>
+
+    <Container as="section" class="py-6 md:py-8">
+      <SectionIntro
+        title="Valores frecuentes"
+        description="Puntos de referencia para viviendas, locales, lotes y terrenos."
+      />
+      <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+        {
+          commonValues.map((value) => (
+            <article class="rounded-lg border border-gray-800 bg-gray-950 p-4">
+              <h3 class="font-semibold text-white">{formatArea(value, "m2", 0)}</h3>
+              <p class="mt-2 text-sm text-amber-300">
+                {formatArea(convertArea(value, "m2", "ft2"), "ft2", 2)}
+              </p>
+              <p class="mt-1 text-xs text-gray-400">
+                {formatArea(convertArea(value, "m2", "ha"), "ha", 4)}
+              </p>
+            </article>
+          ))
+        }
+      </div>
+    </Container>
+
+    <Container as="section" class="py-6 md:py-8">
+      <SectionIntro
+        title="Cómo se calculan las conversiones"
+        description="La calculadora usa m² como unidad base y conserva precisión interna hasta el resultado final."
+      />
+      <div class="grid gap-4 lg:grid-cols-2">
+        <article class="rounded-lg border border-gray-800 bg-gray-950 p-5">
+          <h3 class="text-lg font-semibold">Factores base</h3>
+          <div class="mt-4 space-y-2 text-sm leading-relaxed text-gray-300">
+            <p class="rounded-lg bg-gray-900 p-3">
+              1 ft² = 0.09290304 m²
+            </p>
+            <p class="rounded-lg bg-gray-900 p-3">1 ha = 10,000 m²</p>
+            <p class="rounded-lg bg-gray-900 p-3">
+              1 acre = 4,046.8564224 m²
+            </p>
+          </div>
+        </article>
+        <article class="rounded-lg border border-gray-800 bg-gray-950 p-5">
+          <h3 class="text-lg font-semibold">Área desde medidas</h3>
+          <div class="mt-4 space-y-2 text-sm leading-relaxed text-gray-300">
+            <p class="rounded-lg bg-gray-900 p-3">m² = largo_m * ancho_m</p>
+            <p class="rounded-lg bg-gray-900 p-3">1 ft = 0.3048 m</p>
+            <p class="rounded-lg bg-gray-900 p-3">
+              Después de obtener m², se convierte a ft², ha y acres.
+            </p>
+          </div>
+        </article>
+      </div>
+    </Container>
+
+    <Container as="section" class="py-6 md:py-8">
+      <SectionIntro
+        title="Calculadoras relacionadas"
+        description="Herramientas útiles cuando la superficie forma parte de una estimación mayor."
+      />
+      <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        <a
+          class="rounded-lg border border-gray-800 bg-gray-950 p-4 transition hover:border-amber-400/60 hover:bg-gray-900"
+          href="/inmuebles/calculadora-precio-por-metro-cuadrado"
+        >
+          <span class="block font-semibold text-white"
+            >Precio por metro cuadrado</span
+          >
+          <span class="mt-2 block text-sm leading-relaxed text-gray-400">
+            Compara propiedades por superficie y costo efectivo.
+          </span>
+        </a>
+        <a
+          class="rounded-lg border border-gray-800 bg-gray-950 p-4 transition hover:border-amber-400/60 hover:bg-gray-900"
+          href="/construccion/calculadora-piso-azulejo-superficie"
+        >
+          <span class="block font-semibold text-white">Piso y azulejo</span>
+          <span class="mt-2 block text-sm leading-relaxed text-gray-400">
+            Calcula cajas, desperdicio y sobrante para una superficie.
+          </span>
+        </a>
+        <a
+          class="rounded-lg border border-gray-800 bg-gray-950 p-4 transition hover:border-amber-400/60 hover:bg-gray-900"
+          href="/construccion/metros-cuadrados-de-pintura"
+        >
+          <span class="block font-semibold text-white"
+            >Metros cuadrados de pintura</span
+          >
+          <span class="mt-2 block text-sm leading-relaxed text-gray-400">
+            Estima superficie de paredes y litros de pintura.
+          </span>
+        </a>
+      </div>
+    </Container>
+
+    <FaqSection faqs={faqs} />
+  </PageShell>
+</BaseLayout>
+
+<script>
+  import {
+    AREA_UNIT_METADATA,
+    AREA_UNITS,
+    LINEAR_UNIT_METADATA,
+    MAX_LINEAR_INPUT,
+    buildAreaExplanation,
+    calculateRectangleArea,
+    convertAllAreas,
+    convertArea,
+    formatArea,
+    formatAreaNumber,
+    formatAreaRate,
+    isAreaUnit,
+    isLinearUnit,
+    parseAreaInput,
+    parseNumericInput,
+  } from "@lib/calculators/conversores/conversor-de-area-m2-ft2-hectareas-acres/area";
+
+  const modeButtons = document.querySelectorAll("[data-mode-button]");
+  const convertPanel = document.querySelector("[data-convert-panel]");
+  const measurePanel = document.querySelector("[data-measure-panel]");
+  const areaInput = document.querySelector("[data-area-input]");
+  const areaInputSymbol = document.querySelector("[data-area-input-symbol]");
+  const originSelect = document.querySelector("[data-origin-select]");
+  const lengthInput = document.querySelector("[data-length-input]");
+  const widthInput = document.querySelector("[data-width-input]");
+  const linearUnitSelect = document.querySelector("[data-linear-unit-select]");
+  const highlightSelect = document.querySelector("[data-highlight-select]");
+  const decimalsSelect = document.querySelector("[data-decimals-select]");
+  const areaError = document.querySelector("[data-area-error]");
+  const lengthError = document.querySelector("[data-length-error]");
+  const widthError = document.querySelector("[data-width-error]");
+  const interpretationElement = document.querySelector(
+    "[data-area-interpretation]",
+  );
+  const emptyResult = document.querySelector("[data-empty-result]");
+  const resultContent = document.querySelector("[data-result-content]");
+  const sourceResult = document.querySelector("[data-source-result]");
+  const mainResult = document.querySelector("[data-main-result]");
+  const contextNote = document.querySelector("[data-context-note]");
+  const resultsList = document.querySelector("[data-results-list]");
+  const formula = document.querySelector("[data-formula]");
+  const procedurePanel = document.querySelector("[data-procedure-panel]");
+  const procedureList = document.querySelector("[data-procedure-list]");
+  const copyMainButton = document.querySelector("[data-copy-main]");
+  const clearButton = document.querySelector("[data-clear-calculator]");
+  const copyStatus = document.querySelector("[data-copy-status]");
+  const liveStatus = document.querySelector("[data-live-status]");
+
+  let mode = "convert";
+  let originUnit = "m2";
+  let highlightUnit = "ft2";
+  let linearUnit = "m";
+  let currentCopyText = "";
+  let currentCopyByUnit = {};
+  let copyTimer = 0;
+  let liveTimer = 0;
+
+  function getDecimals() {
+    const decimals = Number(decimalsSelect.value);
+
+    return Number.isInteger(decimals) && decimals >= 0 && decimals <= 8
+      ? decimals
+      : 4;
+  }
+
+  function setButtonActive(button, active) {
+    button.setAttribute("aria-pressed", active ? "true" : "false");
+    button.classList.toggle("border-amber-400", active);
+    button.classList.toggle("bg-amber-400/10", active);
+    button.classList.toggle("text-amber-100", active);
+    button.classList.toggle("border-gray-700", !active);
+    button.classList.toggle("bg-gray-900", !active);
+    button.classList.toggle("text-gray-200", !active);
+  }
+
+  function updateControls() {
+    modeButtons.forEach((button) => {
+      setButtonActive(button, button.dataset.modeButton === mode);
+    });
+
+    convertPanel.classList.toggle("hidden", mode !== "convert");
+    measurePanel.classList.toggle("hidden", mode !== "measure");
+    originSelect.value = originUnit;
+    highlightSelect.value = highlightUnit;
+    linearUnitSelect.value = linearUnit;
+    areaInputSymbol.textContent = AREA_UNIT_METADATA[originUnit].symbol;
+  }
+
+  function setFieldError(element, input, message = "") {
+    element.textContent = message;
+    element.classList.toggle("hidden", !message);
+    input.setAttribute("aria-invalid", message ? "true" : "false");
+  }
+
+  function setInterpretation(message = "") {
+    interpretationElement.textContent = message;
+    interpretationElement.classList.toggle("hidden", !message);
+  }
+
+  function getInputError(error, fieldName = "valor") {
+    switch (error) {
+      case "negative":
+        return `El ${fieldName} no puede ser negativo.`;
+      case "out_of_range":
+        return `El ${fieldName} es demasiado grande para calcularlo con precisión.`;
+      case "invalid":
+        return `No pudimos interpretar el ${fieldName}.`;
+      default:
+        return "";
+    }
+  }
+
+  function clearOutputs(note = "Verás todas las equivalencias al escribir.") {
+    currentCopyText = "";
+    currentCopyByUnit = {};
+    window.clearTimeout(liveTimer);
+    liveStatus.textContent = "";
+    emptyResult.classList.remove("hidden");
+    resultContent.classList.add("hidden");
+    sourceResult.textContent = "";
+    mainResult.textContent = "";
+    contextNote.textContent = note;
+    resultsList.replaceChildren();
+    formula.textContent = "La fórmula aparecerá cuando ingreses un valor.";
+    procedurePanel.classList.add("hidden");
+    procedureList.replaceChildren();
+  }
+
+  function buildContextNote(squareMeters) {
+    if (squareMeters === 0) {
+      return "El área es cero; todas las equivalencias también son cero.";
+    }
+
+    if (squareMeters >= 10_000) {
+      return "Esta magnitud suele leerse mejor también en hectáreas o acres.";
+    }
+
+    if (squareMeters >= 80 && squareMeters <= 250) {
+      return "Este rango puede servir como referencia rápida para vivienda, local o área construida.";
+    }
+
+    return "La conversión conserva precisión interna y solo redondea los valores mostrados.";
+  }
+
+  function createProcedure(steps) {
+    procedureList.replaceChildren(
+      ...steps.map((step) => {
+        const item = document.createElement("li");
+
+        item.textContent = step;
+
+        return item;
+      }),
+    );
+    procedurePanel.classList.remove("hidden");
+  }
+
+  function renderResults({
+    sourceText,
+    sourceUnit,
+    baseSquareMeters,
+    results,
+    formulaText,
+    procedureSteps,
+  }) {
+    const decimals = getDecimals();
+    const highlighted = formatArea(results[highlightUnit], highlightUnit, decimals);
+    const allResults = AREA_UNITS.map((unit) =>
+      formatArea(results[unit], unit, decimals),
+    );
+
+    emptyResult.classList.add("hidden");
+    resultContent.classList.remove("hidden");
+    sourceResult.textContent = `${sourceText} equivalen a`;
+    mainResult.textContent = highlighted;
+    contextNote.textContent = buildContextNote(baseSquareMeters);
+    formula.textContent = formulaText;
+    createProcedure(procedureSteps);
+
+    currentCopyByUnit = {};
+    resultsList.replaceChildren(
+      ...AREA_UNITS.map((unit) => {
+        const metadata = AREA_UNIT_METADATA[unit];
+        const formatted = formatArea(results[unit], unit, decimals);
+        const active = unit === highlightUnit;
+        const item = document.createElement("article");
+        const header = document.createElement("div");
+        const labelButton = document.createElement("button");
+        const copyButton = document.createElement("button");
+        const value = document.createElement("p");
+        const rate = document.createElement("p");
+
+        item.className = active
+          ? "rounded-lg border border-amber-400 bg-amber-400/10 p-3"
+          : "rounded-lg border border-gray-800 bg-gray-950 p-3";
+        header.className = "flex items-start justify-between gap-3";
+        labelButton.type = "button";
+        labelButton.dataset.resultUnit = unit;
+        labelButton.className =
+          "min-h-9 text-left text-sm font-semibold text-white hover:text-amber-200 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/30";
+        labelButton.textContent = `${metadata.symbol} · ${metadata.label.toLocaleLowerCase(
+          "es-MX",
+        )}`;
+        copyButton.type = "button";
+        copyButton.dataset.copyUnit = unit;
+        copyButton.className =
+          "min-h-9 shrink-0 rounded-lg border border-gray-700 px-3 text-xs font-semibold text-gray-200 transition hover:border-amber-400 hover:text-amber-200 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/30";
+        copyButton.textContent = "Copiar";
+        value.className = "mt-2 break-words text-xl font-semibold text-amber-100";
+        value.textContent = formatted;
+        rate.className = "mt-2 text-xs leading-relaxed text-gray-500";
+        rate.textContent =
+          unit === sourceUnit
+            ? "Unidad de origen"
+            : formatAreaRate(sourceUnit, unit, decimals);
+
+        currentCopyByUnit[unit] = `${sourceText} = ${formatted}`;
+        header.append(labelButton, copyButton);
+        item.append(header, value, rate);
+
+        return item;
+      }),
+    );
+
+    currentCopyText = `${sourceText} = ${highlighted}\n${allResults.join("\n")}`;
+    scheduleAnnouncement(`Resultado: ${sourceText} = ${highlighted}`);
+  }
+
+  function parseConversion() {
+    const parsed = parseAreaInput(areaInput.value);
+
+    if (!parsed.ok) {
+      const message =
+        areaInput.value.trim() && !["empty", "incomplete"].includes(parsed.error)
+          ? getInputError(parsed.error, "área")
+          : "";
+
+      setFieldError(areaError, areaInput, message);
+      setInterpretation();
+      clearOutputs();
+
+      return null;
+    }
+
+    if (parsed.detectedUnit) {
+      originUnit = parsed.detectedUnit;
+      updateControls();
+    }
+
+    setFieldError(areaError, areaInput);
+    setInterpretation(
+      parsed.interpretation ||
+        (parsed.detectedUnit
+          ? `Unidad detectada: ${AREA_UNIT_METADATA[parsed.detectedUnit].label.toLocaleLowerCase(
+              "es-MX",
+            )}.`
+          : ""),
+    );
+
+    const decimals = getDecimals();
+    const results = convertAllAreas(parsed.value, originUnit);
+    const sourceText = formatArea(parsed.value, originUnit, decimals);
+    const explanation = buildAreaExplanation(
+      parsed.value,
+      originUnit,
+      highlightUnit,
+      decimals,
+    );
+
+    return {
+      sourceText,
+      sourceUnit: originUnit,
+      baseSquareMeters: convertArea(parsed.value, originUnit, "m2"),
+      results,
+      formulaText: `Fórmula: ${explanation.formula}. Sustitución: ${explanation.substitution}.`,
+      procedureSteps: explanation.steps,
+    };
+  }
+
+  function parseMeasurements() {
+    const parsedLength = parseNumericInput(lengthInput.value, MAX_LINEAR_INPUT);
+    const parsedWidth = parseNumericInput(widthInput.value, MAX_LINEAR_INPUT);
+    const lengthHasValue = Boolean(lengthInput.value.trim());
+    const widthHasValue = Boolean(widthInput.value.trim());
+
+    setFieldError(areaError, areaInput);
+    setInterpretation();
+
+    if (!parsedLength.ok || !parsedWidth.ok) {
+      const lengthMessage =
+        lengthHasValue && !["empty", "incomplete"].includes(parsedLength.error)
+          ? getInputError(parsedLength.error, "largo")
+          : "";
+      const widthMessage =
+        widthHasValue && !["empty", "incomplete"].includes(parsedWidth.error)
+          ? getInputError(parsedWidth.error, "ancho")
+          : "";
+
+      setFieldError(lengthError, lengthInput, lengthMessage);
+      setFieldError(widthError, widthInput, widthMessage);
+      clearOutputs(
+        lengthHasValue || widthHasValue
+          ? "Completa largo y ancho para calcular el área."
+          : "Ingresa largo y ancho para ver las equivalencias.",
+      );
+
+      return null;
+    }
+
+    setFieldError(lengthError, lengthInput);
+    setFieldError(widthError, widthInput);
+
+    const decimals = getDecimals();
+    const squareMeters = calculateRectangleArea(
+      parsedLength.value,
+      parsedWidth.value,
+      linearUnit,
+    );
+    const results = convertAllAreas(squareMeters, "m2");
+    const unitSymbol = LINEAR_UNIT_METADATA[linearUnit].symbol;
+    const sourceText = `${formatAreaNumber(
+      parsedLength.value,
+      decimals,
+    )} ${unitSymbol} × ${formatAreaNumber(
+      parsedWidth.value,
+      decimals,
+    )} ${unitSymbol}`;
+    const highlightedExplanation = buildAreaExplanation(
+      squareMeters,
+      "m2",
+      highlightUnit,
+      decimals,
+    );
+    const measureSteps = [
+      `Convertimos las medidas a metros: ${formatAreaNumber(
+        parsedLength.value * LINEAR_UNIT_METADATA[linearUnit].meters,
+        decimals,
+      )} m y ${formatAreaNumber(
+        parsedWidth.value * LINEAR_UNIT_METADATA[linearUnit].meters,
+        decimals,
+      )} m.`,
+      `Multiplicamos largo por ancho: ${formatArea(squareMeters, "m2", decimals)}.`,
+      `Convertimos el área destacada: ${highlightedExplanation.substitution}.`,
+    ];
+
+    return {
+      sourceText,
+      sourceUnit: "m2",
+      baseSquareMeters: squareMeters,
+      results,
+      formulaText: `Fórmula: m² = largo_m * ancho_m. Resultado base: ${formatArea(
+        squareMeters,
+        "m2",
+        decimals,
+      )}.`,
+      procedureSteps: measureSteps,
+    };
+  }
+
+  function render() {
+    updateControls();
+
+    try {
+      const data = mode === "convert" ? parseConversion() : parseMeasurements();
+
+      if (data) {
+        renderResults(data);
+      }
+    } catch (error) {
+      const message =
+        error instanceof Error
+          ? error.message
+          : "No pudimos calcular esta superficie.";
+
+      if (mode === "convert") {
+        setFieldError(areaError, areaInput, message);
+      } else {
+        setFieldError(widthError, widthInput, message);
+      }
+
+      clearOutputs("Corrige los valores para continuar.");
+    }
+  }
+
+  function scheduleAnnouncement(message) {
+    window.clearTimeout(liveTimer);
+    liveTimer = window.setTimeout(() => {
+      liveStatus.textContent = message;
+    }, 300);
+  }
+
+  function showStatus(message) {
+    copyStatus.textContent = message;
+    window.clearTimeout(copyTimer);
+    copyTimer = window.setTimeout(() => {
+      copyStatus.textContent = "";
+    }, 2200);
+  }
+
+  async function copyText(text) {
+    if (!text) {
+      return;
+    }
+
+    try {
+      await navigator.clipboard.writeText(text);
+      showStatus("Resultado copiado.");
+    } catch {
+      showStatus("No fue posible copiar automáticamente.");
+    }
+  }
+
+  function setMode(nextMode) {
+    mode = nextMode;
+    updateControls();
+    render();
+  }
+
+  modeButtons.forEach((button) => {
+    button.addEventListener("click", () => {
+      setMode(button.dataset.modeButton === "measure" ? "measure" : "convert");
+    });
+  });
+
+  areaInput.addEventListener("input", () => {
+    render();
+  });
+
+  lengthInput.addEventListener("input", () => {
+    render();
+  });
+
+  widthInput.addEventListener("input", () => {
+    render();
+  });
+
+  originSelect.addEventListener("change", () => {
+    if (isAreaUnit(originSelect.value)) {
+      originUnit = originSelect.value;
+      render();
+    }
+  });
+
+  highlightSelect.addEventListener("change", () => {
+    if (isAreaUnit(highlightSelect.value)) {
+      highlightUnit = highlightSelect.value;
+      render();
+    }
+  });
+
+  linearUnitSelect.addEventListener("change", () => {
+    if (isLinearUnit(linearUnitSelect.value)) {
+      linearUnit = linearUnitSelect.value;
+      render();
+    }
+  });
+
+  decimalsSelect.addEventListener("change", () => {
+    render();
+  });
+
+  clearButton.addEventListener("click", () => {
+    areaInput.value = "";
+    lengthInput.value = "";
+    widthInput.value = "";
+    originUnit = "m2";
+    highlightUnit = "ft2";
+    linearUnit = "m";
+    decimalsSelect.value = "4";
+    setFieldError(areaError, areaInput);
+    setFieldError(lengthError, lengthInput);
+    setFieldError(widthError, widthInput);
+    setInterpretation();
+    updateControls();
+    clearOutputs();
+    (mode === "convert" ? areaInput : lengthInput).focus();
+  });
+
+  copyMainButton.addEventListener("click", () => {
+    copyText(currentCopyText);
+  });
+
+  document.addEventListener("click", (event) => {
+    const shortcutButton = event.target.closest("[data-shortcut-value]");
+
+    if (shortcutButton) {
+      const { shortcutValue, shortcutFrom, shortcutTo } = shortcutButton.dataset;
+
+      if (
+        typeof shortcutValue !== "string" ||
+        !isAreaUnit(shortcutFrom) ||
+        !isAreaUnit(shortcutTo)
+      ) {
+        return;
+      }
+
+      mode = "convert";
+      areaInput.value = shortcutValue;
+      originUnit = shortcutFrom;
+      highlightUnit = shortcutTo;
+      updateControls();
+      render();
+      mainResult.focus();
+      document.querySelector("#area-converter")?.scrollIntoView({
+        behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches
+          ? "auto"
+          : "smooth",
+        block: "start",
+      });
+
+      return;
+    }
+
+    const resultButton = event.target.closest("[data-result-unit]");
+
+    if (resultButton) {
+      const unit = resultButton.dataset.resultUnit;
+
+      if (isAreaUnit(unit)) {
+        highlightUnit = unit;
+        updateControls();
+        render();
+      }
+
+      return;
+    }
+
+    const copyButton = event.target.closest("[data-copy-unit]");
+
+    if (!copyButton) {
+      return;
+    }
+
+    const unit = copyButton.dataset.copyUnit;
+
+    if (isAreaUnit(unit)) {
+      copyText(currentCopyByUnit[unit]);
+    }
+  });
+
+  updateControls();
+  clearOutputs();
+</script>

@@ -1,3 +1,8 @@
+import {
+  LITERS_PER_IMPERIAL_GALLON as SHARED_LITERS_PER_IMPERIAL_GALLON,
+  LITERS_PER_US_GALLON as SHARED_LITERS_PER_US_GALLON,
+} from "../shared/volumeUnits";
+
 export const VOLUME_UNITS = ["l", "us_gal", "imp_gal"] as const;
 
 export type VolumeUnit = (typeof VOLUME_UNITS)[number];
@@ -10,8 +15,8 @@ export interface VolumeUnitMetadata {
   liters: number;
 }
 
-export const LITERS_PER_US_GALLON = 3.785411784;
-export const LITERS_PER_IMPERIAL_GALLON = 4.54609;
+export const LITERS_PER_US_GALLON = SHARED_LITERS_PER_US_GALLON;
+export const LITERS_PER_IMPERIAL_GALLON = SHARED_LITERS_PER_IMPERIAL_GALLON;
 export const MAX_VOLUME_INPUT = 1_000_000_000_000_000;
 export const IMPERIAL_GALLON_DIFFERENCE_PERCENT =
   (LITERS_PER_IMPERIAL_GALLON / LITERS_PER_US_GALLON - 1) * 100;
