@@ -1,0 +1,809 @@
+---
+import BaseLayout from "@layouts/BaseLayout.astro";
+import AdSlot from "@components/ads/AdSlot.astro";
+import Container from "@components/layout/Container.astro";
+import PageShell from "@components/layout/PageShell.astro";
+import FaqSection from "@components/shared/FaqSection.astro";
+import PageHero from "@components/shared/PageHero.astro";
+import SectionIntro from "@components/shared/SectionIntro.astro";
+import { COOKING_PRESETS } from "@lib/calculators/cocina/calculadora-tiempo-coccion-por-peso/cookingPresets";
+import { buildFaqJsonLd } from "@lib/seo";
+
+const title = "Calculadora de tiempo de coccion por peso";
+const description =
+  "Estima tiempo de coccion por kilogramo o libra, usa referencias orientativas, anade reposo y calcula cuando revisar, terminar y servir.";
+const canonical = "/cocina/calculadora-tiempo-coccion-por-peso";
+
+const defaultPreset = COOKING_PRESETS[0];
+
+const faqs = [
+  {
+    question: "Como calcular tiempo de coccion por peso?",
+    answer:
+      "Multiplica el peso por los minutos por kilogramo o libra, suma minutos extra de coccion y despues suma el reposo para estimar la hora de servir.",
+  },
+  {
+    question: "El tiempo confirma que la comida es segura?",
+    answer:
+      "No. El tiempo solo ayuda a planificar. La coccion segura se confirma midiendo la temperatura interna con un termometro de alimentos.",
+    relatedHref: "/cocina/conversor-de-temperatura-de-horno",
+    relatedLabel: "Ver temperaturas de horno e internas",
+  },
+  {
+    question: "Por que la calculadora muestra un rango?",
+    answer:
+      "Porque dos piezas con el mismo peso pueden cocinarse distinto por grosor, forma, hueso, relleno, temperatura inicial, horno y recipiente.",
+  },
+  {
+    question: "Puedo usar mis propios minutos por kilo?",
+    answer:
+      "Si. Cambia a modo manual y escribe la tasa de tu receta, empaque o experiencia. La calculadora convierte kg y lb si la tasa usa otra unidad.",
+  },
+  {
+    question: "Que significa empieza a revisar?",
+    answer:
+      "Es la hora calculada con el limite inferior del rango. Desde ahi conviene medir temperatura interna y decidir si necesita mas tiempo.",
+  },
+  {
+    question: "El reposo se suma a la coccion?",
+    answer:
+      "No cambia la hora de fin de coccion. Se suma despues para estimar la hora de servir.",
+  },
+];
+
+const faqJsonLd = buildFaqJsonLd(faqs);
+---
+
+<BaseLayout title={title} description={description} canonical={canonical}>
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={JSON.stringify(faqJsonLd)} />
+  </Fragment>
+
+  <PageShell>
+    <PageHero
+      title="Calculadora de tiempo de coccion"
+      description="Estima cuando empezar a revisar, cuando termina la coccion y cuando servir. Usa una referencia orientativa o tu propia tasa por kg o lb."
+      kicker="Cocina"
+      collapseBreadcrumbOnMobile
+      containerClass="py-6 md:py-8"
+      breadcrumbs={[
+        { label: "Inicio", href: "/", ariaLabel: "Inicio" },
+        { label: "Cocina", href: "/cocina", optional: true },
+        { label: "Tiempo de coccion", truncate: true },
+      ]}
+    />
+
+    <Container as="section" class="py-5 md:py-8">
+      <section
+        id="cooking-time-calculator"
+        class="overflow-hidden rounded-lg border border-gray-700 bg-gray-950 shadow-xl shadow-gray-950/30"
+        aria-labelledby="calculator-heading"
+      >
+        <div class="grid gap-0 lg:grid-cols-[minmax(0,1fr)_minmax(20rem,0.8fr)]">
+          <div class="p-4 sm:p-6">
+            <p class="text-sm font-semibold text-amber-300">Plan de coccion</p>
+            <h2 id="calculator-heading" class="mt-2 text-2xl font-semibold">
+              Tiempo por peso
+            </h2>
+
+            <div class="mt-5">
+              <span class="block text-sm font-semibold text-gray-200">
+                Modo de calculo
+              </span>
+              <div class="mt-2 grid grid-cols-2 gap-2 rounded-lg bg-gray-900 p-1" role="group" aria-label="Modo de calculo">
+                <button
+                  class="min-h-12 rounded-md bg-amber-400 px-3 text-sm font-semibold text-gray-950 transition focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-300/40"
+                  type="button"
+                  data-mode-button="reference"
+                  aria-pressed="true"
+                >
+                  Referencia
+                </button>
+                <button
+                  class="min-h-12 rounded-md px-3 text-sm font-semibold text-gray-300 transition hover:bg-gray-800 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-300/40"
+                  type="button"
+                  data-mode-button="manual"
+                  aria-pressed="false"
+                >
+                  Mi tasa
+                </button>
+              </div>
+            </div>
+
+            <div class="mt-5 rounded-lg border border-gray-800 bg-gray-900/65 p-4" data-reference-panel>
+              <label for="cooking-preset" class="block text-sm font-semibold text-gray-200">
+                Alimento y metodo
+              </label>
+              <select
+                id="cooking-preset"
+                class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-950 px-4 text-base text-white outline-none transition focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15"
+                data-preset-select
+              >
+                {
+                  COOKING_PRESETS.map((preset) => (
+                    <option value={preset.id} selected={preset.id === defaultPreset.id}>
+                      {preset.label}
+                    </option>
+                  ))
+                }
+              </select>
+              <div class="mt-3 space-y-2 text-sm leading-relaxed">
+                <p class="text-amber-100" data-preset-rate>
+                  {defaultPreset.minMinutesPerUnit}-{defaultPreset.maxMinutesPerUnit} {defaultPreset.rateUnit} a {defaultPreset.ovenTemperature}
+                </p>
+                <p class="text-gray-400" data-preset-note>
+                  {defaultPreset.note}
+                </p>
+                <a
+                  class="inline-flex text-sm font-semibold text-amber-300 underline underline-offset-4 transition hover:text-amber-200"
+                  href={defaultPreset.sourceUrl}
+                  rel="noreferrer"
+                  data-preset-source
+                >
+                  Fuente: {defaultPreset.sourceLabel}
+                </a>
+              </div>
+            </div>
+
+            <div class="mt-5 hidden rounded-lg border border-gray-800 bg-gray-900/65 p-4" data-manual-panel>
+              <div class="grid gap-4 sm:grid-cols-[minmax(0,1fr)_10rem]">
+                <div>
+                  <label for="manual-rate" class="block text-sm font-semibold text-gray-200">
+                    Minutos por unidad
+                  </label>
+                  <input
+                    id="manual-rate"
+                    class="mt-2 min-h-14 w-full rounded-lg border border-gray-700 bg-gray-950 px-4 text-xl text-white outline-none placeholder:text-gray-600 transition focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15"
+                    type="text"
+                    inputmode="decimal"
+                    autocomplete="off"
+                    placeholder="Ej. 40"
+                    data-manual-rate
+                  />
+                </div>
+                <div>
+                  <label for="manual-rate-unit" class="block text-sm font-semibold text-gray-200">
+                    Unidad
+                  </label>
+                  <select
+                    id="manual-rate-unit"
+                    class="mt-2 min-h-14 w-full rounded-lg border border-gray-700 bg-gray-950 px-4 text-base text-white outline-none transition focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15"
+                    data-manual-rate-unit
+                  >
+                    <option value="min/kg">min/kg</option>
+                    <option value="min/lb">min/lb</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <div class="mt-5 grid gap-4 sm:grid-cols-[minmax(0,1fr)_12rem]">
+              <div>
+                <label for="cooking-weight" class="block text-sm font-semibold text-gray-200">
+                  Peso
+                </label>
+                <input
+                  id="cooking-weight"
+                  class="mt-2 min-h-14 w-full rounded-lg border border-gray-700 bg-gray-900 px-4 text-xl text-white outline-none placeholder:text-gray-600 transition focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15"
+                  type="text"
+                  inputmode="decimal"
+                  autocomplete="off"
+                  placeholder="Ej. 2,5"
+                  aria-describedby="cooking-time-error"
+                  data-weight-input
+                />
+              </div>
+              <div>
+                <span class="block text-sm font-semibold text-gray-200">
+                  Unidad
+                </span>
+                <div class="mt-2 grid grid-cols-2 gap-2 rounded-lg bg-gray-900 p-1" role="group" aria-label="Unidad de peso">
+                  <button
+                    class="min-h-14 rounded-md bg-amber-400 px-3 text-sm font-semibold text-gray-950 transition focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-300/40"
+                    type="button"
+                    data-weight-unit="kg"
+                    aria-pressed="true"
+                  >
+                    kg
+                  </button>
+                  <button
+                    class="min-h-14 rounded-md px-3 text-sm font-semibold text-gray-300 transition hover:bg-gray-800 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-300/40"
+                    type="button"
+                    data-weight-unit="lb"
+                    aria-pressed="false"
+                  >
+                    lb
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div class="mt-5 grid gap-4 sm:grid-cols-3">
+              <div>
+                <label for="extra-cook-minutes" class="block text-sm font-semibold text-gray-200">
+                  Minutos extra
+                </label>
+                <input
+                  id="extra-cook-minutes"
+                  class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-900 px-4 text-base text-white outline-none placeholder:text-gray-600 transition focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15"
+                  type="text"
+                  inputmode="decimal"
+                  autocomplete="off"
+                  value="0"
+                  data-extra-minutes
+                />
+              </div>
+              <div>
+                <label for="rest-minutes" class="block text-sm font-semibold text-gray-200">
+                  Reposo
+                </label>
+                <input
+                  id="rest-minutes"
+                  class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-900 px-4 text-base text-white outline-none placeholder:text-gray-600 transition focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15"
+                  type="text"
+                  inputmode="decimal"
+                  autocomplete="off"
+                  value={String(defaultPreset.restMinutesDefault ?? 0)}
+                  data-rest-minutes
+                />
+              </div>
+              <div>
+                <label for="start-time" class="block text-sm font-semibold text-gray-200">
+                  Hora inicio
+                </label>
+                <input
+                  id="start-time"
+                  class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-900 px-4 text-base text-white outline-none placeholder:text-gray-600 transition focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15"
+                  type="time"
+                  data-start-time
+                />
+              </div>
+            </div>
+
+            <p
+              id="cooking-time-error"
+              class="mt-3 min-h-5 text-sm leading-relaxed text-red-300"
+              data-error
+            ></p>
+
+            <div class="mt-4 flex flex-wrap gap-3">
+              <button
+                class="min-h-11 rounded-lg border border-gray-700 px-4 py-2 text-sm font-semibold text-gray-200 transition hover:border-gray-500 hover:bg-gray-900 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-gray-400/30"
+                type="button"
+                data-clear-calculator
+              >
+                Limpiar
+              </button>
+            </div>
+          </div>
+
+          <aside class="border-t border-gray-800 bg-gray-900/65 p-4 sm:p-6 lg:border-l lg:border-t-0">
+            <p class="text-xs font-semibold uppercase tracking-wide text-gray-500">
+              Tiempo activo
+            </p>
+            <p class="mt-3 min-h-10 break-words text-3xl font-semibold text-amber-100" data-main-result>
+              Ingresa el peso
+            </p>
+            <p class="mt-2 min-h-5 text-sm leading-relaxed text-gray-400" data-main-note>
+              Usa la referencia seleccionada o cambia a modo manual.
+            </p>
+
+            <div class="mt-5 divide-y divide-gray-800 overflow-hidden rounded-lg border border-gray-800 bg-gray-950 text-sm">
+              <div class="grid min-h-14 grid-cols-[1fr_auto] items-center gap-3 px-4 py-3">
+                <span class="text-gray-400">Empieza a revisar</span>
+                <span class="text-right font-semibold text-white" data-review-result>-</span>
+              </div>
+              <div class="grid min-h-14 grid-cols-[1fr_auto] items-center gap-3 px-4 py-3">
+                <span class="text-gray-400">Fin de coccion</span>
+                <span class="text-right font-semibold text-white" data-finish-result>-</span>
+              </div>
+              <div class="grid min-h-14 grid-cols-[1fr_auto] items-center gap-3 px-4 py-3">
+                <span class="text-gray-400">Hora de servir</span>
+                <span class="text-right font-semibold text-white" data-serve-result>-</span>
+              </div>
+              <div class="grid min-h-14 grid-cols-[1fr_auto] items-center gap-3 px-4 py-3">
+                <span class="text-gray-400">Peso usado</span>
+                <span class="text-right font-semibold text-white" data-conversion-result>-</span>
+              </div>
+            </div>
+
+            <p class="mt-4 hidden rounded-lg border border-amber-400/25 bg-amber-400/10 p-3 text-sm leading-relaxed text-amber-100" data-warning></p>
+
+            <div class="mt-4 rounded-lg border border-red-400/25 bg-red-400/10 p-4">
+              <p class="text-sm font-semibold text-red-100">Verifica con termometro</p>
+              <p class="mt-2 text-sm leading-relaxed text-red-100">
+                El tiempo no confirma coccion segura. Mide temperatura interna en la parte mas gruesa.
+              </p>
+              <a
+                href="/cocina/conversor-de-temperatura-de-horno"
+                class="mt-3 inline-flex text-sm font-semibold text-red-100 underline underline-offset-4 transition hover:text-white"
+              >
+                Ver temperaturas internas
+              </a>
+            </div>
+
+            <button
+              class="mt-4 hidden min-h-11 rounded-lg bg-amber-400 px-4 py-2 text-sm font-semibold text-gray-950 transition hover:bg-amber-300 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-300/40"
+              type="button"
+              data-copy-result
+            >
+              Copiar resultado
+            </button>
+            <p class="sr-only" role="status" aria-live="polite" data-live-status></p>
+            <p class="mt-3 min-h-5 text-sm text-emerald-300" role="status" aria-live="polite" data-copy-status></p>
+          </aside>
+        </div>
+      </section>
+    </Container>
+
+    <AdSlot placement="calculator-after-tool" />
+
+    <Container as="section" class="py-6 md:py-8">
+      <SectionIntro
+        title="Referencias orientativas"
+        description="Los presets ayudan a planificar, pero no reemplazan tu receta ni un termometro de alimentos."
+      />
+      <div class="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+        {
+          COOKING_PRESETS.map((preset) => (
+            <article class="rounded-lg border border-gray-800 bg-gray-950 p-5">
+              <h3 class="text-lg font-semibold">{preset.label}</h3>
+              <p class="mt-2 text-sm leading-relaxed text-amber-100">
+                {preset.minMinutesPerUnit}-{preset.maxMinutesPerUnit} {preset.rateUnit} · {preset.ovenTemperature}
+              </p>
+              <p class="mt-3 text-sm leading-relaxed text-gray-400">
+                {preset.note}
+              </p>
+              <p class="mt-3 text-xs leading-relaxed text-gray-500">
+                Revision editorial: {preset.reviewedAt}
+              </p>
+              {preset.sourceUrl && (
+                <a
+                  href={preset.sourceUrl}
+                  rel="noreferrer"
+                  class="mt-3 inline-flex text-sm font-semibold text-amber-300 underline underline-offset-4 transition hover:text-amber-200"
+                >
+                  {preset.sourceLabel}
+                </a>
+              )}
+            </article>
+          ))
+        }
+      </div>
+    </Container>
+
+    <Container as="section" class="py-6 md:py-8">
+      <SectionIntro
+        title="Lo que cambia el tiempo real"
+        description="El peso es solo una parte del calculo. La pieza y el horno pueden mover el resultado."
+      />
+      <div class="grid gap-4 md:grid-cols-3">
+        <article class="rounded-lg border border-gray-800 bg-gray-950 p-5">
+          <h3 class="text-lg font-semibold">Forma y grosor</h3>
+          <p class="mt-3 text-sm leading-relaxed text-gray-400">
+            Una pieza compacta tarda mas que una pieza extendida aunque pesen lo mismo.
+          </p>
+        </article>
+        <article class="rounded-lg border border-gray-800 bg-gray-950 p-5">
+          <h3 class="text-lg font-semibold">Hueso y relleno</h3>
+          <p class="mt-3 text-sm leading-relaxed text-gray-400">
+            El hueso, el relleno y la temperatura inicial pueden retrasar el centro del alimento.
+          </p>
+        </article>
+        <article class="rounded-lg border border-gray-800 bg-gray-950 p-5">
+          <h3 class="text-lg font-semibold">Horno y recipiente</h3>
+          <p class="mt-3 text-sm leading-relaxed text-gray-400">
+            Cada horno calienta distinto. Usa el tiempo como alarma para medir, no como veredicto.
+          </p>
+        </article>
+      </div>
+    </Container>
+
+    <FaqSection faqs={faqs} />
+  </PageShell>
+</BaseLayout>
+
+<script>
+  import {
+    COOKING_PRESETS,
+    getCookingPreset,
+  } from "@lib/calculators/cocina/calculadora-tiempo-coccion-por-peso/cookingPresets";
+  import {
+    calculateCookingTime,
+    formatCookingDuration,
+    formatCookingDurationRange,
+    formatCookingNumber,
+    formatTimeOfDay,
+    formatTimeRange,
+    isCookingRateUnit,
+    isCookingWeightUnit,
+    parseCookingNumber,
+    parseTimeOfDay,
+  } from "@lib/calculators/cocina/calculadora-tiempo-coccion-por-peso/cookingTime";
+
+  const modeButtons = document.querySelectorAll("[data-mode-button]");
+  const referencePanel = document.querySelector("[data-reference-panel]");
+  const manualPanel = document.querySelector("[data-manual-panel]");
+  const presetSelect = document.querySelector("[data-preset-select]");
+  const presetRate = document.querySelector("[data-preset-rate]");
+  const presetNote = document.querySelector("[data-preset-note]");
+  const presetSource = document.querySelector("[data-preset-source]");
+  const manualRateInput = document.querySelector("[data-manual-rate]");
+  const manualRateUnitSelect = document.querySelector("[data-manual-rate-unit]");
+  const weightInput = document.querySelector("[data-weight-input]");
+  const weightUnitButtons = document.querySelectorAll("[data-weight-unit]");
+  const extraInput = document.querySelector("[data-extra-minutes]");
+  const restInput = document.querySelector("[data-rest-minutes]");
+  const startTimeInput = document.querySelector("[data-start-time]");
+  const errorElement = document.querySelector("[data-error]");
+  const clearButton = document.querySelector("[data-clear-calculator]");
+  const mainResult = document.querySelector("[data-main-result]");
+  const mainNote = document.querySelector("[data-main-note]");
+  const reviewResult = document.querySelector("[data-review-result]");
+  const finishResult = document.querySelector("[data-finish-result]");
+  const serveResult = document.querySelector("[data-serve-result]");
+  const conversionResult = document.querySelector("[data-conversion-result]");
+  const warningElement = document.querySelector("[data-warning]");
+  const copyButton = document.querySelector("[data-copy-result]");
+  const copyStatus = document.querySelector("[data-copy-status]");
+  const liveStatus = document.querySelector("[data-live-status]");
+
+  let mode = "reference";
+  let weightUnit = "kg";
+  let currentCopyText = "";
+  let copyTimer = 0;
+
+  function getCurrentPreset() {
+    return (
+      getCookingPreset(presetSelect.value) ??
+      COOKING_PRESETS[0]
+    );
+  }
+
+  function setMode(nextMode) {
+    mode = nextMode === "manual" ? "manual" : "reference";
+    referencePanel.classList.toggle("hidden", mode !== "reference");
+    manualPanel.classList.toggle("hidden", mode !== "manual");
+
+    modeButtons.forEach((button) => {
+      const active = button.dataset.modeButton === mode;
+
+      button.setAttribute("aria-pressed", active ? "true" : "false");
+      button.classList.toggle("bg-amber-400", active);
+      button.classList.toggle("text-gray-950", active);
+      button.classList.toggle("text-gray-300", !active);
+      button.classList.toggle("hover:bg-gray-800", !active);
+    });
+  }
+
+  function setWeightUnit(nextUnit) {
+    weightUnit = isCookingWeightUnit(nextUnit) ? nextUnit : "kg";
+
+    weightUnitButtons.forEach((button) => {
+      const active = button.dataset.weightUnit === weightUnit;
+
+      button.setAttribute("aria-pressed", active ? "true" : "false");
+      button.classList.toggle("bg-amber-400", active);
+      button.classList.toggle("text-gray-950", active);
+      button.classList.toggle("text-gray-300", !active);
+      button.classList.toggle("hover:bg-gray-800", !active);
+    });
+  }
+
+  function formatRate(min, max, unit) {
+    if (Math.abs(min - max) < 1e-9) {
+      return `${formatCookingNumber(min, 2)} ${unit}`;
+    }
+
+    return `${formatCookingNumber(min, 2)}-${formatCookingNumber(max, 2)} ${unit}`;
+  }
+
+  function formatWeight(value, unit) {
+    return `${formatCookingNumber(value, 2)} ${unit}`;
+  }
+
+  function updatePresetDetails(applyRestDefault = false) {
+    const preset = getCurrentPreset();
+
+    presetRate.textContent = `${formatRate(
+      preset.minMinutesPerUnit,
+      preset.maxMinutesPerUnit,
+      preset.rateUnit,
+    )} a ${preset.ovenTemperature}`;
+    presetNote.textContent = preset.note;
+    presetSource.textContent = `Fuente: ${preset.sourceLabel}`;
+
+    if (preset.sourceUrl) {
+      presetSource.href = preset.sourceUrl;
+      presetSource.classList.remove("hidden");
+    } else {
+      presetSource.classList.add("hidden");
+    }
+
+    if (applyRestDefault) {
+      restInput.value = String(preset.restMinutesDefault ?? 0);
+    }
+  }
+
+  function setError(message = "") {
+    errorElement.textContent = message;
+    weightInput.setAttribute("aria-invalid", message ? "true" : "false");
+  }
+
+  function clearResults(note = "Usa la referencia seleccionada o cambia a modo manual.") {
+    currentCopyText = "";
+    mainResult.textContent = "Ingresa el peso";
+    mainNote.textContent = note;
+    reviewResult.textContent = "-";
+    finishResult.textContent = "-";
+    serveResult.textContent = "-";
+    conversionResult.textContent = "-";
+    warningElement.textContent = "";
+    warningElement.classList.add("hidden");
+    copyButton.classList.add("hidden");
+  }
+
+  function readRequiredPositive(input, label) {
+    const parsed = parseCookingNumber(input.value);
+
+    if (!parsed.ok) {
+      if (parsed.error === "empty") {
+        return { ok: false, message: `Escribe ${label}.`, empty: true };
+      }
+
+      return { ok: false, message: `Revisa ${label}.` };
+    }
+
+    if (parsed.value <= 0) {
+      return { ok: false, message: `${label} debe ser mayor que cero.` };
+    }
+
+    return { ok: true, value: parsed.value };
+  }
+
+  function readOptionalNonNegative(input, label) {
+    if (!input.value.trim()) {
+      return { ok: true, value: 0 };
+    }
+
+    const parsed = parseCookingNumber(input.value);
+
+    if (!parsed.ok || parsed.value < 0) {
+      return { ok: false, message: `Revisa ${label}.` };
+    }
+
+    return { ok: true, value: parsed.value };
+  }
+
+  function getStartTimeMinutes() {
+    if (!startTimeInput.value.trim()) {
+      const now = new Date();
+
+      return {
+        ok: true,
+        value: now.getHours() * 60 + now.getMinutes(),
+        labelSuffix: " (ahora)",
+      };
+    }
+
+    const parsed = parseTimeOfDay(startTimeInput.value);
+
+    if (!parsed.ok) {
+      return { ok: false, message: "Revisa la hora de inicio." };
+    }
+
+    return { ok: true, value: parsed.minutes, labelSuffix: "" };
+  }
+
+  function getRateRange() {
+    if (mode === "reference") {
+      const preset = getCurrentPreset();
+
+      return {
+        ok: true,
+        rate: {
+          rateUnit: preset.rateUnit,
+          minMinutesPerUnit: preset.minMinutesPerUnit,
+          maxMinutesPerUnit: preset.maxMinutesPerUnit,
+        },
+        label: preset.label,
+        note: `${preset.label}: ${formatRate(
+          preset.minMinutesPerUnit,
+          preset.maxMinutesPerUnit,
+          preset.rateUnit,
+        )}. ${preset.ovenTemperature}.`,
+        source: preset.sourceLabel,
+      };
+    }
+
+    const rate = readRequiredPositive(manualRateInput, "los minutos por unidad");
+    const rateUnit = isCookingRateUnit(manualRateUnitSelect.value)
+      ? manualRateUnitSelect.value
+      : "min/kg";
+
+    if (!rate.ok) {
+      return { ok: false, message: rate.message };
+    }
+
+    return {
+      ok: true,
+      rate: {
+        rateUnit,
+        minMinutesPerUnit: rate.value,
+        maxMinutesPerUnit: rate.value,
+      },
+      label: "Tasa manual",
+      note: `Tasa manual: ${formatRate(rate.value, rate.value, rateUnit)}.`,
+      source: "",
+    };
+  }
+
+  function render() {
+    const weight = readRequiredPositive(weightInput, "el peso");
+
+    if (!weight.ok) {
+      setError(weight.empty ? "" : weight.message);
+      clearResults();
+      return;
+    }
+
+    const extra = readOptionalNonNegative(extraInput, "los minutos extra");
+    const rest = readOptionalNonNegative(restInput, "el reposo");
+    const start = getStartTimeMinutes();
+    const rate = getRateRange();
+
+    for (const check of [extra, rest, start, rate]) {
+      if (!check.ok) {
+        setError(check.message);
+        clearResults("Corrige los campos marcados para ver el resultado.");
+        return;
+      }
+    }
+
+    try {
+      const result = calculateCookingTime({
+        weight: weight.value,
+        weightUnit,
+        rate: rate.rate,
+        extraCookMinutes: extra.value,
+        restMinutes: rest.value,
+        startTimeMinutes: start.value,
+      });
+      const rateTargetUnit = rate.rate.rateUnit === "min/kg" ? "kg" : "lb";
+      const startLabel = `${formatTimeOfDay({
+        minutesOfDay: start.value,
+        dayOffset: 0,
+      })}${start.labelSuffix}`;
+      const activeText = formatCookingDurationRange(result.activeMinutes);
+      const totalText = formatCookingDurationRange(result.totalMinutes);
+      const reviewText = result.reviewFromTime
+        ? formatTimeOfDay(result.reviewFromTime)
+        : formatCookingDuration(result.reviewFromMinutes, "floor");
+      const finishText = result.finishCookingTime
+        ? formatTimeRange(result.finishCookingTime)
+        : "-";
+      const serveText = result.serveTime ? formatTimeRange(result.serveTime) : "-";
+      const conversionText = `${formatWeight(
+        result.weightInRateUnit,
+        rateTargetUnit,
+      )} para ${rate.rate.rateUnit}`;
+
+      setError();
+      mainResult.textContent = activeText;
+      mainNote.textContent = `${rate.note} Inicio: ${startLabel}. Total con reposo: ${totalText}.`;
+      reviewResult.textContent = reviewText;
+      finishResult.textContent = finishText;
+      serveResult.textContent = serveText;
+      conversionResult.textContent = conversionText;
+      copyButton.classList.remove("hidden");
+
+      if (result.warning === "active-over-24h") {
+        warningElement.textContent =
+          "El tiempo activo supera 24 horas. Revisa si la tasa o el peso son correctos.";
+        warningElement.classList.remove("hidden");
+      } else {
+        warningElement.textContent = "";
+        warningElement.classList.add("hidden");
+      }
+
+      currentCopyText = [
+        "Calculadora de tiempo de coccion por peso",
+        `Modo: ${mode === "reference" ? rate.label : "mi tasa"}`,
+        `Peso: ${formatWeight(weight.value, weightUnit)}`,
+        `Tasa: ${formatRate(
+          rate.rate.minMinutesPerUnit,
+          rate.rate.maxMinutesPerUnit,
+          rate.rate.rateUnit,
+        )}`,
+        `Tiempo activo: ${activeText}`,
+        `Empieza a revisar: ${reviewText}`,
+        `Fin de coccion: ${finishText}`,
+        `Hora de servir: ${serveText}`,
+        `Peso usado en formula: ${conversionText}`,
+        rate.source ? `Fuente orientativa: ${rate.source}` : "",
+        "Nota: verifica la temperatura interna con termometro de alimentos.",
+      ]
+        .filter(Boolean)
+        .join("\n");
+
+      liveStatus.textContent = `Tiempo activo: ${activeText}. Empieza a revisar: ${reviewText}.`;
+    } catch (error) {
+      setError(
+        error instanceof Error ? error.message : "No pudimos calcular el tiempo.",
+      );
+      clearResults("Corrige los valores para continuar.");
+    }
+  }
+
+  async function copyResult() {
+    if (!currentCopyText) {
+      return;
+    }
+
+    try {
+      await navigator.clipboard.writeText(currentCopyText);
+      copyStatus.textContent = "Resultado copiado.";
+    } catch {
+      copyStatus.textContent = "No fue posible copiar automaticamente.";
+    }
+
+    window.clearTimeout(copyTimer);
+    copyTimer = window.setTimeout(() => {
+      copyStatus.textContent = "";
+    }, 2500);
+  }
+
+  function clearCalculator() {
+    setMode("reference");
+    setWeightUnit("kg");
+    presetSelect.value = COOKING_PRESETS[0].id;
+    manualRateInput.value = "";
+    manualRateUnitSelect.value = "min/kg";
+    weightInput.value = "";
+    extraInput.value = "0";
+    updatePresetDetails(true);
+    startTimeInput.value = "";
+    setError();
+    clearResults();
+    weightInput.focus();
+  }
+
+  modeButtons.forEach((button) => {
+    button.addEventListener("click", () => {
+      setMode(button.dataset.modeButton);
+      render();
+    });
+  });
+
+  weightUnitButtons.forEach((button) => {
+    button.addEventListener("click", () => {
+      setWeightUnit(button.dataset.weightUnit);
+      render();
+    });
+  });
+
+  presetSelect.addEventListener("change", () => {
+    updatePresetDetails(true);
+    render();
+  });
+
+  [
+    manualRateInput,
+    manualRateUnitSelect,
+    weightInput,
+    extraInput,
+    restInput,
+    startTimeInput,
+  ].forEach((input) => {
+    input.addEventListener("input", render);
+    input.addEventListener("change", render);
+  });
+
+  clearButton.addEventListener("click", clearCalculator);
+  copyButton.addEventListener("click", copyResult);
+
+  setMode("reference");
+  setWeightUnit("kg");
+  updatePresetDetails(false);
+  render();
+</script>

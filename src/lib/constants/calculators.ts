@@ -664,6 +664,24 @@ export const CALCULATORS: LegacyCalculatorDirectoryItem[] = [
     order: 78,
   },
   {
+    id: "conversor-de-temperatura-de-horno",
+    title: "Conversor de temperatura de horno",
+    description:
+      "Convierte °C, °F y marca de gas con ajuste practico para horno, ventilador y seguridad alimentaria.",
+    href: "/cocina/conversor-de-temperatura-de-horno",
+    categorySlug: "cocina",
+    order: 79,
+  },
+  {
+    id: "calculadora-tiempo-coccion-por-peso",
+    title: "Calculadora de tiempo de coccion por peso",
+    description:
+      "Estima tiempo de coccion por kilogramo o libra, hora para revisar, fin de coccion y hora de servir.",
+    href: "/cocina/calculadora-tiempo-coccion-por-peso",
+    categorySlug: "cocina",
+    order: 79.5,
+  },
+  {
     id: "escalar-receta-por-porciones",
     title: "Escalar receta por porciones",
     description:
