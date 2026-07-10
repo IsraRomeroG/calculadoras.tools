@@ -18,7 +18,7 @@ No incluye traducir calculadoras completas, aunque desbloquea su publicacion.
 
 ## Regla de identidad
 
-El `categoryId` no se traduce. Puede seguir usando el slug espanol canonico actual:
+El `categoryId` no se traduce. Durante la fase actual puede conservar el identificador basado en la categoria espanola existente:
 
 ```txt
 matematicas
@@ -32,6 +32,8 @@ El slug publico si se localiza:
 es: /matematicas
 en: /en/math
 ```
+
+El ID debe tratarse como identidad inmutable, no como URL. La arquitectura futura no debe exigir `categoryId === locales.es.slug`; si alguna URL ES cambia con su 301, el ID debe poder permanecer estable.
 
 ## Mapeo EN recomendado
 
@@ -64,7 +66,7 @@ Estos slugs deben revisarse antes de publicarse. En especial:
 
 ## Publicacion de categorias
 
-Una categoria EN debe tener metadata lista aunque puede permanecer no visible si no tiene calculadoras publicadas.
+Una categoria EN puede tener metadata lista en estado no publicado aunque no tenga calculadoras publicadas. Metadata disponible y ruta publicada son conceptos distintos.
 
 Reglas:
 
@@ -72,6 +74,9 @@ Reglas:
 - `getCalculatorCategories(getPublishedCalculators("en"), "en")` solo muestra categorias con calculadoras publicadas.
 - No crear paginas EN vacias para categorias sin calculadoras.
 - No enlazar categorias EN desde home si no tienen contenido.
+- No emitir alternate EN desde la categoria ES solo porque exista metadata EN.
+- `buildCategoryPath()` construye un candidato; `getPublishedCategoryPath()` comprueba que la superficie exista en `PublishedRouteManifest`.
+- La superficie de directorio `/en/<category>` y la superficie de blog `/en/blog/<category>` tienen disponibilidad independiente.
 
 ## Slugs de calculadoras
 
@@ -84,6 +89,8 @@ Cada slug EN debe cumplir:
 - Sin colision dentro de su categoria EN.
 - Sin segmentos reservados.
 - Descriptivo para SEO.
+- Regex estricta: `^[a-z0-9]+(?:-[a-z0-9]+)*$`.
+- No puede producir colision de ruta completa con otra pagina emitida.
 
 Ejemplos:
 
@@ -95,9 +102,9 @@ calculadora-de-prestamo -> loan-calculator
 conversor-de-temperatura -> temperature-converter
 ```
 
-## Segmentos reservados
+## Segmentos reservados y namespaces
 
-No usar como slug de categoria o calculadora:
+Los reservados se definen por locale y profundidad. No usar como slug de categoria raiz un segmento que colisione con una ruta estatica/global, por ejemplo:
 
 ```txt
 en
@@ -118,7 +125,9 @@ editorial-policy
 corrections
 ```
 
-Si se agregan rutas globales nuevas, actualizar esta lista y los tests.
+Para ES se deben considerar tambien sus rutas reales como `contacto`, `privacidad`, `acerca-de`, `metodologia`, `politica-editorial` y `correcciones`. Incluir asimismo artefactos publicos relevantes como `sitemap-index.xml` cuando el regex del namespace los permita.
+
+No aplicar una lista global ciegamente a slugs de calculadora: `/en/math/blog` no colisiona necesariamente con `/en/blog`. La validacion final se hace sobre rutas completas del manifest y el route tree de Astro. Si se agregan rutas globales nuevas, actualizar la definicion central y sus tests, no varias listas copiadas.
 
 ## Canonicals y alternates
 
@@ -143,6 +152,8 @@ Si solo existe ES:
 - No crear ruta EN.
 - No listar en home EN.
 
+La existencia se consulta en `PublishedRouteManifest`, no se infiere de metadata localizada ni de un helper capaz de construir el path.
+
 Si solo existe EN en el futuro:
 
 - Se permite solo si no es traduccion directa y tiene razon editorial.
@@ -152,7 +163,7 @@ Si solo existe EN en el futuro:
 
 Agregar rutas EN nuevas no requiere redirects.
 
-Cambiar una ruta ES existente requiere:
+Cambiar cualquier URL publica existente, ES o EN, requiere:
 
 1. Mapa old -> new.
 2. Actualizar imports, links, breadcrumbs, canonicals, sitemap y tests.
@@ -160,12 +171,16 @@ Cambiar una ruta ES existente requiere:
 4. Agregar reglas Apache `.htaccess` 301.
 5. Buscar old slugs en `src` y `specs`.
 
+Registrar por locale `firstPublishedAt` e historial de rutas/legacy slugs para distinguir un slug aun no publicado de una URL que ya requiere redirect. Los redirects viven en Apache `.htaccess`; no conservar wrappers Astro legacy.
+
 No se permiten:
 
 - Paginas Astro duplicadas como redirects.
 - Meta refresh.
 - Redirects cliente.
 - Cadenas de redirects.
+
+Agregar tests que analicen las reglas `.htaccess` y detecten targets que tambien sean sources, duplicados o cadenas.
 
 ## Tests recomendados
 
@@ -176,8 +191,11 @@ Agregar o extender tests para:
 - No usar segmentos reservados.
 - `getCalculatorCategoryUrl("matematicas", "en") -> "/en/math"`.
 - Categorias EN sin calculadoras no aparecen en home EN.
+- Categorias ES no emiten alternate EN si la superficie EN no esta publicada.
 - Rutas ES actuales no cambian.
 - Rutas EN publicadas no tienen trailing slash.
+- Slugs cumplen regex y no colisionan por ruta completa/namespace.
+- Historial de URLs publicadas tiene su correspondiente 301 sin cadenas.
 
 ## Criterios de aceptacion
 
@@ -185,3 +203,5 @@ Agregar o extender tests para:
 - Ninguna URL ES cambia.
 - Las categorias EN se publican solo con contenido.
 - Los helpers generan URLs; no se escriben rutas localizadas a mano salvo wrappers Astro.
+- Construccion de path y disponibilidad publica son APIs distintas.
+- Sitemap, alternates y links consumen rutas publicadas, no metadata candidata.
