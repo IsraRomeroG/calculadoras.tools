@@ -20,6 +20,7 @@ export const CATEGORY_SLUGS = [
   "conversores",
   "mascotas",
   "cocina",
+  "eventos",
   "restaurantes",
   "vehiculos",
   "construccion",
@@ -112,12 +113,18 @@ export const CATEGORIES = {
     description:
       "Herramientas para ajustar recetas, convertir medidas culinarias y cocinar con cantidades más claras.",
   },
+  eventos: {
+    slug: "eventos",
+    label: "Eventos",
+    description:
+      "Herramientas para estimar presupuestos, costos por persona, pagos y partidas de bodas, fiestas y celebraciones.",
+    legacySlugs: ["eventos-sociales"],
+  },
   restaurantes: {
     slug: "restaurantes",
     label: "Restaurantes",
     description:
       "Herramientas para calcular propinas, dividir cuentas y revisar pagos compartidos en restaurantes.",
-    legacySlugs: ["eventos-sociales"],
   },
   vehiculos: {
     slug: "vehiculos",

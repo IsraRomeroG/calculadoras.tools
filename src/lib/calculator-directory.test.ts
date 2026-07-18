@@ -23,6 +23,7 @@ describe("calculator category directory", () => {
     expect(getCalculatorCategoryUrl("probabilidad-estadistica")).toBe(
       "/probabilidad-estadistica",
     );
+    expect(getCalculatorCategoryUrl("eventos")).toBe("/eventos");
     expect(getCalculatorCategoryUrl("matematicas", "en")).toBe("/en/math");
     expect(getCalculatorCategoryUrl("finanzas", "en")).toBeNull();
   });
@@ -99,6 +100,10 @@ describe("calculator category directory", () => {
         expect.objectContaining({
           slug: "programacion",
           label: "Programación",
+        }),
+        expect.objectContaining({
+          slug: "eventos",
+          label: "Eventos",
         }),
       ]),
     );
@@ -211,6 +216,7 @@ describe("calculator category directory", () => {
       "legal-impuestos",
     );
     expect(getCategoryByLabel("Fecha y tiempo")?.slug).toBe("fecha-tiempo");
+    expect(getCategoryByLabel("Eventos")?.slug).toBe("eventos");
     expect(getCategoryByLabel("Restaurantes")?.slug).toBe("restaurantes");
     expect(getCategoryByLabel("Probabilidad y estadística")?.slug).toBe(
       "probabilidad-estadistica",
@@ -223,7 +229,7 @@ describe("calculator category directory", () => {
       "fecha-tiempo",
     );
     expect(getCategoryBySlugOrLegacySlug("eventos-sociales")?.slug).toBe(
-      "restaurantes",
+      "eventos",
     );
     expect(getCategoryBySlugOrLegacySlug("math", "en")?.slug).toBe("math");
   });

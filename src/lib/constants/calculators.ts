@@ -709,6 +709,15 @@ export const CALCULATORS: LegacyCalculatorDirectoryItem[] = [
     order: 84,
   },
   {
+    id: "calculadora-presupuesto-boda",
+    title: "Calculadora de presupuesto de boda",
+    description:
+      "Organiza partidas, depósitos y contingencia para estimar el total y costo por invitado de una boda.",
+    href: "/eventos/calculadora-presupuesto-boda",
+    categorySlug: "eventos",
+    order: 85,
+  },
+  {
     id: "dividir-cuenta-en-restaurante",
     title: "Dividir cuenta en restaurante",
     description:
