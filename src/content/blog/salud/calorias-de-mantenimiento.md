@@ -3,7 +3,6 @@ title: "Calorías de mantenimiento: qué son y cómo calcularlas"
 seoTitle: "Calorías de mantenimiento: calcula tu TDEE para mantener peso"
 description: "Aprende qué son las calorías de mantenimiento, cómo se relacionan con el TDEE y cómo usarlas como punto de partida."
 pubDate: 2026-07-16
-draft: true
 categorySlug: "salud"
 tags:
   - calorías

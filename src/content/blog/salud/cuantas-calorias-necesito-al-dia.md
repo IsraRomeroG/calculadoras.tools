@@ -3,7 +3,6 @@ title: "Cuántas calorías necesito al día"
 seoTitle: "Cuántas calorías necesito al día: cómo estimarlas con TDEE"
 description: "Conoce de qué dependen tus calorías diarias y cómo estimarlas con edad, sexo, peso, estatura y nivel de actividad."
 pubDate: 2026-07-14
-draft: true
 categorySlug: "salud"
 tags:
   - calorías
