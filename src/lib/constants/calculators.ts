@@ -718,6 +718,15 @@ export const CALCULATORS: LegacyCalculatorDirectoryItem[] = [
     order: 85,
   },
   {
+    id: "calculadora-costo-por-persona-evento",
+    title: "Calculadora de costo por persona en evento",
+    description:
+      "Calcula costo total, costo por persona, cuota sugerida e invitados posibles para fiestas, cenas y celebraciones.",
+    href: "/eventos/calculadora-costo-por-persona-evento",
+    categorySlug: "eventos",
+    order: 85.5,
+  },
+  {
     id: "dividir-cuenta-en-restaurante",
     title: "Dividir cuenta en restaurante",
     description:
@@ -743,6 +752,15 @@ export const CALCULATORS: LegacyCalculatorDirectoryItem[] = [
     href: "/vehiculos/calculadora-de-consumo-de-gasolina",
     categorySlug: "vehiculos",
     order: 90,
+  },
+  {
+    id: "calculadora-de-depreciacion-del-vehiculo",
+    title: "Calculadora de depreciacion del vehiculo",
+    description:
+      "Estima valor futuro, perdida acumulada y tasa anual equivalente con depreciacion porcentual, lineal o valor actual.",
+    href: "/vehiculos/calculadora-de-depreciacion-del-vehiculo",
+    categorySlug: "vehiculos",
+    order: 91,
   },
   {
     id: "calculadora-de-costo-por-kilometro",

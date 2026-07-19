@@ -286,7 +286,7 @@ Estado base del proyecto: 29 calculadoras publicadas en 13 categorías. Este cat
 - `[SIN BACKEND]` Depreciación del vehículo.
 - `[SIN BACKEND]` Crédito automotriz.
 - `[SIN BACKEND]` Leasing vs compra.
-- `[SIN BACKEND]` Costo anual de mantenimiento.
+- `[SIN BACKEND]` Gastos anuales del vehículo.
 - `[SIN BACKEND]` Costo total de propiedad.
 - `[SIN BACKEND]` Rendimiento km/L a L/100 km.
 - `[SIN BACKEND]` Viaje por carretera con gasolina manual.

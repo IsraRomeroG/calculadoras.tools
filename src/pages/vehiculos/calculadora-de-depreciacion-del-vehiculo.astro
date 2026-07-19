@@ -1,0 +1,1013 @@
+---
+import BaseLayout from "@layouts/BaseLayout.astro";
+import AdSlot from "@components/ads/AdSlot.astro";
+import Container from "@components/layout/Container.astro";
+import PageShell from "@components/layout/PageShell.astro";
+import FaqSection from "@components/shared/FaqSection.astro";
+import PageHero from "@components/shared/PageHero.astro";
+import SectionIntro from "@components/shared/SectionIntro.astro";
+import { buildFaqJsonLd } from "@lib/seo";
+
+const title = "Calculadora de depreciacion del vehiculo";
+const description =
+  "Estima la depreciacion y valor futuro de un vehiculo con tasa anual, primer ano distinto, metodo lineal o valor actual ingresado.";
+const canonical = "/vehiculos/calculadora-de-depreciacion-del-vehiculo";
+
+const faqs = [
+  {
+    question: "Como calcular la depreciacion de un vehiculo?",
+    answer:
+      "Puedes aplicar una tasa anual sobre el valor inicial, repartir la perdida de forma lineal hasta un valor residual o comparar el valor inicial contra un valor actual capturado.",
+  },
+  {
+    question: "Que significa valor residual?",
+    answer:
+      "Es el valor minimo estimado que quieres conservar al final del plazo. En el metodo lineal, la perdida se reparte en partes iguales hasta llegar a ese valor.",
+  },
+  {
+    question: "Para que sirve la tasa del primer ano?",
+    answer:
+      "Sirve para modelar una caida inicial distinta a la de los anos posteriores. Si la dejas vacia, la calculadora usa la misma tasa anual para todo el plazo.",
+  },
+  {
+    question: "Que es la tasa anual equivalente?",
+    answer:
+      "Es la tasa anual constante que llevaria el valor inicial al valor final estimado durante el plazo ingresado.",
+  },
+  {
+    question: "La calculadora muestra precio de mercado?",
+    answer:
+      "No. El resultado es orientativo y depende de los supuestos capturados. No sustituye un avaluo, inspeccion mecanica ni una oferta real de compra o venta.",
+  },
+];
+
+const faqJsonLd = buildFaqJsonLd(faqs);
+---
+
+<BaseLayout title={title} description={description} canonical={canonical}>
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={JSON.stringify(faqJsonLd)} />
+  </Fragment>
+
+  <PageShell>
+    <PageHero
+      title={title}
+      description="Proyecta valor futuro, perdida acumulada y tasa anual equivalente con supuestos editables."
+      kicker="Vehiculos"
+      collapseBreadcrumbOnMobile
+      containerClass="py-5 md:py-7"
+      breadcrumbs={[
+        { label: "Inicio", href: "/", ariaLabel: "Inicio" },
+        { label: "Vehiculos", href: "/vehiculos", optional: true },
+        { label: "Depreciacion del vehiculo", truncate: true },
+      ]}
+    />
+
+    <Container as="section" class="py-4 md:py-7">
+      <section
+        id="vehicle-depreciation-calculator"
+        class="overflow-hidden rounded-lg border border-gray-700 bg-gray-950 shadow-xl shadow-gray-950/30"
+        aria-labelledby="calculator-heading"
+      >
+        <div class="grid gap-0 lg:grid-cols-[minmax(0,1fr)_minmax(20rem,0.78fr)]">
+          <div class="p-4 sm:p-6">
+            <h2 id="calculator-heading" class="sr-only">
+              Calculadora de depreciacion del vehiculo
+            </h2>
+
+            <div
+              class="grid rounded-lg border border-gray-700 bg-gray-900 p-1 sm:grid-cols-3"
+              role="tablist"
+              aria-label="Modo de calculo"
+            >
+              <button
+                class="min-h-12 rounded-md px-3 text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-sky-400/35"
+                type="button"
+                role="tab"
+                aria-selected="true"
+                data-mode-button="porcentaje"
+              >
+                Porcentaje
+              </button>
+              <button
+                class="min-h-12 rounded-md px-3 text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-sky-400/35"
+                type="button"
+                role="tab"
+                aria-selected="false"
+                data-mode-button="lineal"
+              >
+                Lineal
+              </button>
+              <button
+                class="min-h-12 rounded-md px-3 text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-sky-400/35"
+                type="button"
+                role="tab"
+                aria-selected="false"
+                data-mode-button="valor-observado"
+              >
+                Valor actual
+              </button>
+            </div>
+
+            <div class="mt-5 grid gap-5 sm:grid-cols-[minmax(0,1fr)_9rem]">
+              <div>
+                <label for="initial-value" class="block text-sm font-semibold text-gray-200">
+                  Valor inicial
+                </label>
+                <div class="mt-2 grid grid-cols-[minmax(0,1fr)_6.75rem] overflow-hidden rounded-lg border border-gray-700 bg-gray-900 focus-within:border-sky-400 focus-within:ring-3 focus-within:ring-sky-400/15">
+                  <input
+                    id="initial-value"
+                    class="min-h-14 w-full bg-transparent px-4 text-2xl font-semibold text-white outline-none placeholder:text-gray-600"
+                    type="text"
+                    inputmode="decimal"
+                    autocomplete="off"
+                    placeholder="500000"
+                    aria-describedby="initial-value-error"
+                    data-initial-value
+                  />
+                  <select
+                    class="border-l border-gray-700 bg-gray-950 px-3 text-sm font-semibold text-gray-100 outline-none"
+                    aria-label="Moneda"
+                    data-currency
+                  >
+                    <option value="MXN">MXN</option>
+                    <option value="USD">USD</option>
+                    <option value="EUR">EUR</option>
+                    <option value="COP">COP</option>
+                  </select>
+                </div>
+                <p id="initial-value-error" class="mt-2 min-h-5 text-sm text-red-300" data-error="initial-value"></p>
+              </div>
+
+              <div>
+                <label for="years" class="block text-sm font-semibold text-gray-200">
+                  Plazo
+                </label>
+                <div class="mt-2 grid grid-cols-[minmax(0,1fr)_4.75rem] overflow-hidden rounded-lg border border-gray-700 bg-gray-900 focus-within:border-sky-400 focus-within:ring-3 focus-within:ring-sky-400/15">
+                  <input
+                    id="years"
+                    class="min-h-14 w-full bg-transparent px-4 text-2xl font-semibold text-white outline-none"
+                    type="text"
+                    inputmode="numeric"
+                    autocomplete="off"
+                    value="5"
+                    aria-describedby="years-error"
+                    data-years
+                  />
+                  <span class="grid place-items-center border-l border-gray-700 bg-gray-950 px-3 text-sm font-semibold text-gray-300">
+                    anos
+                  </span>
+                </div>
+                <p id="years-error" class="mt-2 min-h-5 text-sm text-red-300" data-error="years"></p>
+              </div>
+            </div>
+
+            <div class="mt-1 grid gap-5" data-mode-panel="porcentaje">
+              <div class="grid gap-5 sm:grid-cols-2">
+                <div>
+                  <label for="annual-rate" class="block text-sm font-semibold text-gray-200">
+                    Depreciacion anual
+                  </label>
+                  <div class="mt-2 grid grid-cols-[minmax(0,1fr)_3.75rem] overflow-hidden rounded-lg border border-gray-700 bg-gray-900 focus-within:border-sky-400 focus-within:ring-3 focus-within:ring-sky-400/15">
+                    <input
+                      id="annual-rate"
+                      class="min-h-14 w-full bg-transparent px-4 text-2xl font-semibold text-white outline-none"
+                      type="text"
+                      inputmode="decimal"
+                      autocomplete="off"
+                      value="15"
+                      aria-describedby="annual-rate-error"
+                      data-annual-rate
+                    />
+                    <span class="grid place-items-center border-l border-gray-700 bg-gray-950 px-3 text-sm font-semibold text-gray-300">
+                      %
+                    </span>
+                  </div>
+                  <p id="annual-rate-error" class="mt-2 min-h-5 text-sm text-red-300" data-error="annual-rate"></p>
+                </div>
+
+                <div>
+                  <label for="first-year-rate" class="block text-sm font-semibold text-gray-200">
+                    Tasa primer ano
+                  </label>
+                  <div class="mt-2 grid grid-cols-[minmax(0,1fr)_3.75rem] overflow-hidden rounded-lg border border-gray-700 bg-gray-900 focus-within:border-sky-400 focus-within:ring-3 focus-within:ring-sky-400/15">
+                    <input
+                      id="first-year-rate"
+                      class="min-h-14 w-full bg-transparent px-4 text-2xl font-semibold text-white outline-none placeholder:text-gray-600"
+                      type="text"
+                      inputmode="decimal"
+                      autocomplete="off"
+                      placeholder="igual"
+                      aria-describedby="first-year-rate-error"
+                      data-first-year-rate
+                    />
+                    <span class="grid place-items-center border-l border-gray-700 bg-gray-950 px-3 text-sm font-semibold text-gray-300">
+                      %
+                    </span>
+                  </div>
+                  <p id="first-year-rate-error" class="mt-2 min-h-5 text-sm text-red-300" data-error="first-year-rate"></p>
+                </div>
+              </div>
+
+              <div>
+                <label for="sensitivity-step" class="block text-sm font-semibold text-gray-200">
+                  Sensibilidad
+                </label>
+                <select
+                  id="sensitivity-step"
+                  class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-900 px-3 text-base font-semibold text-gray-100 outline-none focus:border-sky-400 focus:ring-3 focus:ring-sky-400/15"
+                  data-sensitivity-step
+                >
+                  <option value="3">+/- 3 puntos</option>
+                  <option value="5" selected>+/- 5 puntos</option>
+                  <option value="10">+/- 10 puntos</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="mt-1 hidden grid gap-5" data-mode-panel="lineal">
+              <div>
+                <label for="residual-value" class="block text-sm font-semibold text-gray-200">
+                  Valor residual
+                </label>
+                <div class="mt-2 grid grid-cols-[minmax(0,1fr)_4rem] overflow-hidden rounded-lg border border-gray-700 bg-gray-900 focus-within:border-sky-400 focus-within:ring-3 focus-within:ring-sky-400/15">
+                  <input
+                    id="residual-value"
+                    class="min-h-14 w-full bg-transparent px-4 text-2xl font-semibold text-white outline-none placeholder:text-gray-600"
+                    type="text"
+                    inputmode="decimal"
+                    autocomplete="off"
+                    placeholder="250000"
+                    aria-describedby="residual-value-error"
+                    data-residual-value
+                  />
+                  <span class="grid place-items-center border-l border-gray-700 bg-gray-950 px-3 text-sm font-semibold text-gray-300">
+                    fin
+                  </span>
+                </div>
+                <p id="residual-value-error" class="mt-2 min-h-5 text-sm text-red-300" data-error="residual-value"></p>
+              </div>
+            </div>
+
+            <div class="mt-1 hidden grid gap-5" data-mode-panel="valor-observado">
+              <div>
+                <label for="current-value" class="block text-sm font-semibold text-gray-200">
+                  Valor actual o final
+                </label>
+                <div class="mt-2 grid grid-cols-[minmax(0,1fr)_5rem] overflow-hidden rounded-lg border border-gray-700 bg-gray-900 focus-within:border-sky-400 focus-within:ring-3 focus-within:ring-sky-400/15">
+                  <input
+                    id="current-value"
+                    class="min-h-14 w-full bg-transparent px-4 text-2xl font-semibold text-white outline-none placeholder:text-gray-600"
+                    type="text"
+                    inputmode="decimal"
+                    autocomplete="off"
+                    placeholder="300000"
+                    aria-describedby="current-value-error"
+                    data-current-value
+                  />
+                  <span class="grid place-items-center border-l border-gray-700 bg-gray-950 px-3 text-sm font-semibold text-gray-300">
+                    hoy
+                  </span>
+                </div>
+                <p id="current-value-error" class="mt-2 min-h-5 text-sm text-red-300" data-error="current-value"></p>
+              </div>
+            </div>
+
+            <div class="mt-5 flex flex-col gap-3 sm:flex-row">
+              <button
+                class="min-h-11 justify-center rounded-lg border border-gray-700 px-4 py-2 text-sm font-semibold text-gray-200 transition hover:border-sky-400 hover:text-white focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-sky-400/30"
+                type="button"
+                data-clear
+              >
+                Limpiar
+              </button>
+            </div>
+          </div>
+
+          <aside
+            class="border-t border-gray-800 bg-gray-900/70 p-4 sm:p-6 lg:border-l lg:border-t-0"
+            aria-live="polite"
+            data-result-region
+          >
+            <p class="text-xs font-semibold uppercase tracking-wide text-sky-300">
+              Resultado
+            </p>
+            <p class="mt-3 break-words text-3xl font-bold leading-tight text-white" data-main-result>
+              Ingresa tus datos
+            </p>
+            <p class="mt-2 min-h-5 text-sm leading-relaxed text-gray-400" data-result-note>
+              El valor estimado aparecera aqui.
+            </p>
+
+            <div class="mt-4 flex flex-wrap gap-2" data-summary-chips></div>
+            <div class="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-1" data-breakdown-list></div>
+
+            <div class="mt-5 hidden" data-sensitivity-section>
+              <h3 class="text-sm font-semibold text-gray-200">Sensibilidad</h3>
+              <div class="mt-3 grid gap-3 sm:grid-cols-3 lg:grid-cols-1" data-sensitivity-list></div>
+            </div>
+
+            <div class="mt-5 flex flex-col gap-3 sm:flex-row lg:flex-col">
+              <button
+                class="hidden min-h-11 items-center justify-center rounded-lg bg-sky-300 px-4 py-2 text-sm font-semibold text-gray-950 transition hover:bg-sky-200 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-sky-300/40"
+                type="button"
+                data-copy-result
+              >
+                Copiar resultado
+              </button>
+              <button
+                class="hidden min-h-11 items-center justify-center rounded-lg border border-gray-700 px-4 py-2 text-sm font-semibold text-gray-200 transition hover:border-sky-400 hover:text-white focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-sky-400/40"
+                type="button"
+                data-copy-url
+              >
+                Compartir enlace
+              </button>
+              <button
+                class="hidden min-h-11 items-center justify-center rounded-lg border border-gray-700 px-4 py-2 text-sm font-semibold text-gray-200 transition hover:border-sky-400 hover:text-white focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-sky-400/40"
+                type="button"
+                data-export-csv
+              >
+                Exportar CSV
+              </button>
+            </div>
+            <p class="mt-3 min-h-5 text-sm text-sky-200" role="status" aria-live="polite" data-copy-status></p>
+
+            <div class="mt-5 grid gap-3">
+              <a
+                class="rounded-lg border border-gray-700 bg-gray-950/70 p-4 text-sm leading-relaxed text-gray-200 transition hover:border-sky-400 hover:text-white focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-sky-400/30"
+                href="/vehiculos/calculadora-de-costo-por-kilometro"
+              >
+                Estimar costo por kilometro
+              </a>
+              <a
+                class="rounded-lg border border-gray-700 bg-gray-950/70 p-4 text-sm leading-relaxed text-gray-200 transition hover:border-sky-400 hover:text-white focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-sky-400/30"
+                href="/vehiculos/calculadora-de-consumo-de-gasolina"
+              >
+                Calcular consumo de gasolina
+              </a>
+            </div>
+          </aside>
+        </div>
+
+        <div class="hidden border-t border-gray-800 p-4 sm:p-6" data-detail-section>
+          <div class="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+            <div>
+              <p class="text-xs font-semibold uppercase tracking-wide text-sky-300">
+                Detalle anual
+              </p>
+              <h3 class="mt-1 text-lg font-semibold text-white">
+                Valor, perdida y porcentaje por ano
+              </h3>
+            </div>
+          </div>
+
+          <div class="mt-4 grid gap-3 md:hidden" data-year-cards></div>
+
+          <div class="mt-4 hidden overflow-x-auto md:block">
+            <table class="min-w-full divide-y divide-gray-800 text-sm">
+              <thead>
+                <tr class="text-left text-xs font-semibold uppercase tracking-wide text-gray-500">
+                  <th class="px-3 py-3">Ano</th>
+                  <th class="px-3 py-3">Valor estimado</th>
+                  <th class="px-3 py-3">Perdida del ano</th>
+                  <th class="px-3 py-3">Perdida acumulada</th>
+                  <th class="px-3 py-3">% depreciado</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-gray-800 text-gray-200" data-year-table></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <div
+        class="fixed inset-x-0 bottom-0 z-30 hidden border-t border-gray-800 bg-gray-950/95 px-4 py-3 shadow-2xl shadow-black/50 backdrop-blur md:hidden"
+        data-mobile-total
+      >
+        <div class="mx-auto flex max-w-xl items-center justify-between gap-3">
+          <span class="text-xs font-semibold uppercase tracking-wide text-gray-500">
+            Valor final
+          </span>
+          <span class="break-words text-right text-lg font-bold text-sky-100" data-mobile-total-text></span>
+        </div>
+      </div>
+    </Container>
+
+    <AdSlot placement="calculator-after-tool" />
+
+    <Container as="section" class="py-6 md:py-8">
+      <SectionIntro
+        title="Metodos incluidos"
+        description="Elige entre una tasa porcentual compuesta, una perdida lineal hasta valor residual o una tasa derivada desde un valor actual."
+      />
+      <div class="grid gap-4 md:grid-cols-3">
+        <article class="rounded-lg border border-gray-800 bg-gray-950 p-5">
+          <h3 class="text-lg font-semibold">Porcentaje anual</h3>
+          <p class="mt-3 text-sm leading-relaxed text-gray-400">
+            Aplica una tasa anual sobre el valor restante. Puedes separar el
+            primer ano si quieres modelar una caida inicial distinta.
+          </p>
+        </article>
+        <article class="rounded-lg border border-gray-800 bg-gray-950 p-5">
+          <h3 class="text-lg font-semibold">Lineal</h3>
+          <p class="mt-3 text-sm leading-relaxed text-gray-400">
+            Reparte la perdida total en partes iguales hasta llegar al valor
+            residual que capturas.
+          </p>
+        </article>
+        <article class="rounded-lg border border-gray-800 bg-gray-950 p-5">
+          <h3 class="text-lg font-semibold">Valor observado</h3>
+          <p class="mt-3 text-sm leading-relaxed text-gray-400">
+            Usa el valor inicial y el valor actual para obtener perdida total y
+            tasa anual equivalente.
+          </p>
+        </article>
+      </div>
+    </Container>
+
+    <Container as="section" class="py-6 md:py-8">
+      <SectionIntro
+        title="Alcance del resultado"
+        description="La estimacion depende de tus supuestos. No usa bases de datos de mercado ni ajusta automaticamente por kilometraje, version, estado mecanico o ubicacion."
+      />
+      <div class="rounded-lg border border-gray-800 bg-gray-950 p-5">
+        <p class="text-sm leading-relaxed text-gray-400">
+          Para una decision de compra o venta conviene contrastar esta proyeccion
+          con anuncios comparables, inspeccion mecanica, historial de servicio y
+          condiciones reales del vehiculo.
+        </p>
+      </div>
+    </Container>
+
+    <FaqSection faqs={faqs} />
+  </PageShell>
+</BaseLayout>
+
+<script>
+  import {
+    buildVehicleDepreciationCsv,
+    buildVehicleDepreciationShareText,
+    calculateVehicleDepreciation,
+    formatCompactNumber,
+    formatDepreciationCurrency,
+    formatDepreciationPercent,
+    parseMoneyInput,
+    parsePercentInput,
+  } from "@lib/calculators/vehiculos/calculadora-de-depreciacion-del-vehiculo/depreciation";
+
+  const modeButtons = Array.from(document.querySelectorAll("[data-mode-button]"));
+  const modePanels = Array.from(document.querySelectorAll("[data-mode-panel]"));
+  const initialValueInput = document.querySelector("[data-initial-value]");
+  const currencySelect = document.querySelector("[data-currency]");
+  const yearsInput = document.querySelector("[data-years]");
+  const annualRateInput = document.querySelector("[data-annual-rate]");
+  const firstYearRateInput = document.querySelector("[data-first-year-rate]");
+  const residualValueInput = document.querySelector("[data-residual-value]");
+  const currentValueInput = document.querySelector("[data-current-value]");
+  const sensitivityStepSelect = document.querySelector("[data-sensitivity-step]");
+  const clearButton = document.querySelector("[data-clear]");
+  const mainResult = document.querySelector("[data-main-result]");
+  const resultNote = document.querySelector("[data-result-note]");
+  const summaryChips = document.querySelector("[data-summary-chips]");
+  const breakdownList = document.querySelector("[data-breakdown-list]");
+  const sensitivitySection = document.querySelector("[data-sensitivity-section]");
+  const sensitivityList = document.querySelector("[data-sensitivity-list]");
+  const detailSection = document.querySelector("[data-detail-section]");
+  const yearCards = document.querySelector("[data-year-cards]");
+  const yearTable = document.querySelector("[data-year-table]");
+  const copyButton = document.querySelector("[data-copy-result]");
+  const copyUrlButton = document.querySelector("[data-copy-url]");
+  const exportButton = document.querySelector("[data-export-csv]");
+  const copyStatus = document.querySelector("[data-copy-status]");
+  const mobileTotal = document.querySelector("[data-mobile-total]");
+  const mobileTotalText = document.querySelector("[data-mobile-total-text]");
+
+  const FIELD_MESSAGES = {
+    required: "Completa este campo para calcular.",
+    invalid: "Escribe un numero valido.",
+    negative: "Usa cero o un numero positivo.",
+    zero: "Usa un numero mayor a cero.",
+    integer: "Usa un numero entero.",
+    maxPercent: "La tasa no puede superar 100%.",
+    maxYears: "Usa un plazo de 50 anos o menos.",
+    overInitial: "No puede superar el valor inicial.",
+  };
+
+  const CURRENCIES = ["MXN", "USD", "EUR", "COP"];
+  const MODES = ["porcentaje", "lineal", "valor-observado"];
+
+  let currentMode = "porcentaje";
+  let currentShareText = "";
+  let currentShareUrl = window.location.href;
+  let currentCsv = "";
+  let copyTimer = 0;
+  let urlTimer = 0;
+
+  function setMode(mode, { sync = true } = {}) {
+    currentMode = MODES.includes(mode) ? mode : "porcentaje";
+
+    modeButtons.forEach((button) => {
+      const active = button.dataset.modeButton === currentMode;
+      button.setAttribute("aria-selected", String(active));
+      button.classList.toggle("bg-sky-300", active);
+      button.classList.toggle("text-gray-950", active);
+      button.classList.toggle("text-gray-300", !active);
+    });
+
+    modePanels.forEach((panel) => {
+      panel.classList.toggle("hidden", panel.dataset.modePanel !== currentMode);
+    });
+
+    updateCalculator({ syncUrl: sync });
+  }
+
+  function setError(field, message = "") {
+    const element = document.querySelector(`[data-error="${field}"]`);
+
+    if (element) {
+      element.textContent = message;
+    }
+  }
+
+  function clearErrors() {
+    [
+      "initial-value",
+      "years",
+      "annual-rate",
+      "first-year-rate",
+      "residual-value",
+      "current-value",
+    ].forEach((field) => setError(field));
+  }
+
+  function parseNumberField(
+    input,
+    field,
+    {
+      allowEmpty = false,
+      allowZero = false,
+      integer = false,
+      max,
+      maxMessage,
+      parser = parseMoneyInput,
+    } = {},
+  ) {
+    const raw = input.value.trim();
+
+    if (!raw && allowEmpty) {
+      setError(field);
+      return { ok: true, value: undefined, normalized: "" };
+    }
+
+    const parsed = parser(raw);
+
+    if (!parsed.ok) {
+      setError(field, FIELD_MESSAGES[parsed.error]);
+      return parsed;
+    }
+
+    if (allowZero ? parsed.value < 0 : parsed.value <= 0) {
+      setError(field, allowZero ? FIELD_MESSAGES.negative : FIELD_MESSAGES.zero);
+      return { ok: false, error: allowZero ? "negative" : "zero" };
+    }
+
+    if (integer && !Number.isInteger(parsed.value)) {
+      setError(field, FIELD_MESSAGES.integer);
+      return { ok: false, error: "integer" };
+    }
+
+    if (max !== undefined && parsed.value > max) {
+      setError(field, maxMessage ?? FIELD_MESSAGES.invalid);
+      return { ok: false, error: "max" };
+    }
+
+    setError(field);
+    return parsed;
+  }
+
+  function buildInput() {
+    const initialValue = parseNumberField(initialValueInput, "initial-value");
+
+    if (!initialValue.ok) return undefined;
+
+    const years = parseNumberField(yearsInput, "years", {
+      integer: true,
+      max: 50,
+      maxMessage: FIELD_MESSAGES.maxYears,
+    });
+
+    if (!years.ok) return undefined;
+
+    const baseInput = {
+      mode: currentMode,
+      initialValue: initialValue.value,
+      years: years.value,
+      currency: CURRENCIES.includes(currencySelect.value) ? currencySelect.value : "MXN",
+      sensitivityStepPercent: Number(sensitivityStepSelect.value),
+    };
+
+    if (currentMode === "porcentaje") {
+      const annualRate = parseNumberField(annualRateInput, "annual-rate", {
+        allowZero: true,
+        max: 100,
+        maxMessage: FIELD_MESSAGES.maxPercent,
+        parser: parsePercentInput,
+      });
+      const firstYearRate = parseNumberField(firstYearRateInput, "first-year-rate", {
+        allowEmpty: true,
+        allowZero: true,
+        max: 100,
+        maxMessage: FIELD_MESSAGES.maxPercent,
+        parser: parsePercentInput,
+      });
+
+      if (!annualRate.ok || !firstYearRate.ok) return undefined;
+
+      return {
+        ...baseInput,
+        annualRatePercent: annualRate.value,
+        ...(firstYearRate.value !== undefined
+          ? { firstYearRatePercent: firstYearRate.value }
+          : {}),
+      };
+    }
+
+    if (currentMode === "lineal") {
+      const residualValue = parseNumberField(residualValueInput, "residual-value", {
+        allowZero: true,
+        max: initialValue.value,
+        maxMessage: FIELD_MESSAGES.overInitial,
+      });
+
+      if (!residualValue.ok) return undefined;
+
+      return {
+        ...baseInput,
+        residualValue: residualValue.value,
+      };
+    }
+
+    const currentValue = parseNumberField(currentValueInput, "current-value", {
+      allowZero: true,
+      max: initialValue.value,
+      maxMessage: FIELD_MESSAGES.overInitial,
+    });
+
+    if (!currentValue.ok) return undefined;
+
+    return {
+      ...baseInput,
+      currentValue: currentValue.value,
+    };
+  }
+
+  function setNeutralResult(message = "Ingresa tus datos") {
+    mainResult.textContent = message;
+    resultNote.textContent = "El valor estimado aparecera aqui.";
+    summaryChips.replaceChildren();
+    breakdownList.replaceChildren();
+    sensitivityList.replaceChildren();
+    yearCards.replaceChildren();
+    yearTable.replaceChildren();
+    sensitivitySection.classList.add("hidden");
+    detailSection.classList.add("hidden");
+    copyButton.classList.add("hidden");
+    copyButton.classList.remove("inline-flex");
+    copyUrlButton.classList.add("hidden");
+    copyUrlButton.classList.remove("inline-flex");
+    exportButton.classList.add("hidden");
+    exportButton.classList.remove("inline-flex");
+    mobileTotal.classList.add("hidden");
+    currentShareText = "";
+    currentCsv = "";
+  }
+
+  function renderResult(result) {
+    const currency = result.currency;
+
+    mainResult.textContent = formatDepreciationCurrency(result.finalValue, currency);
+    resultNote.textContent = `${formatDepreciationCurrency(
+      result.accumulatedLoss,
+      currency,
+    )} de perdida acumulada (${formatDepreciationPercent(
+      result.depreciatedPercent / 100,
+    )}).`;
+
+    summaryChips.replaceChildren();
+    breakdownList.replaceChildren();
+    sensitivityList.replaceChildren();
+    yearCards.replaceChildren();
+    yearTable.replaceChildren();
+
+    addChip(getModeLabel(result.mode));
+    addChip(`${result.years} anos`);
+    addChip(`Tasa eq. ${formatDepreciationPercent(result.equivalentAnnualRate)}`);
+
+    if (result.annualRate !== undefined) {
+      addChip(`Tasa ${formatDepreciationPercent(result.annualRate)}`);
+    }
+
+    if (result.firstYearRate !== undefined) {
+      addChip(`Ano 1 ${formatDepreciationPercent(result.firstYearRate)}`);
+    }
+
+    addMetric("Valor inicial", formatDepreciationCurrency(result.initialValue, currency));
+    addMetric("Perdida acumulada", formatDepreciationCurrency(result.accumulatedLoss, currency));
+    addMetric("Porcentaje depreciado", formatDepreciationPercent(result.depreciatedPercent / 100));
+    addMetric("Promedio anual", formatDepreciationCurrency(result.averageAnnualLoss, currency));
+    addMetric("Tasa anual equivalente", formatDepreciationPercent(result.equivalentAnnualRate));
+
+    if (result.residualValue !== undefined) {
+      addMetric("Valor residual", formatDepreciationCurrency(result.residualValue, currency));
+    }
+
+    if (result.currentValue !== undefined) {
+      addMetric("Valor actual", formatDepreciationCurrency(result.currentValue, currency));
+    }
+
+    result.scenarios.forEach((scenario) => addSensitivityCard(scenario, currency));
+    sensitivitySection.classList.remove("hidden");
+
+    result.rows.forEach((row) => {
+      addYearCard(row, currency);
+      addYearTableRow(row, currency);
+    });
+    detailSection.classList.remove("hidden");
+
+    currentShareText = buildVehicleDepreciationShareText(result);
+    currentCsv = buildVehicleDepreciationCsv(result);
+    currentShareUrl = window.location.href;
+    mobileTotalText.textContent = formatDepreciationCurrency(result.finalValue, currency);
+    mobileTotal.classList.remove("hidden");
+    showActionButtons();
+  }
+
+  function addChip(text) {
+    const chip = document.createElement("span");
+    chip.className =
+      "rounded-full border border-sky-300/20 bg-sky-300/10 px-3 py-1 text-xs font-semibold text-sky-100";
+    chip.textContent = text;
+    summaryChips.append(chip);
+  }
+
+  function addMetric(label, value) {
+    const card = document.createElement("div");
+    const labelElement = document.createElement("span");
+    const valueElement = document.createElement("span");
+
+    card.className = "rounded-lg border border-gray-800 bg-gray-950/70 p-4";
+    labelElement.className =
+      "block text-xs font-semibold uppercase tracking-wide text-gray-500";
+    valueElement.className = "mt-2 block break-words text-base font-semibold text-white";
+    labelElement.textContent = label;
+    valueElement.textContent = value;
+    card.append(labelElement, valueElement);
+    breakdownList.append(card);
+  }
+
+  function addSensitivityCard(scenario, currency) {
+    const card = document.createElement("div");
+    const label = document.createElement("span");
+    const value = document.createElement("span");
+    const detail = document.createElement("span");
+
+    card.className = "rounded-lg border border-gray-800 bg-gray-950/70 p-4";
+    label.className =
+      "block text-xs font-semibold uppercase tracking-wide text-gray-500";
+    value.className = "mt-2 block break-words text-base font-semibold text-white";
+    detail.className = "mt-1 block text-xs text-gray-400";
+    label.textContent = scenario.label;
+    value.textContent = formatDepreciationCurrency(scenario.finalValue, currency);
+    detail.textContent = `${formatDepreciationPercent(scenario.annualRate)} anual`;
+    card.append(label, value, detail);
+    sensitivityList.append(card);
+  }
+
+  function addYearCard(row, currency) {
+    const card = document.createElement("article");
+    const title = document.createElement("h4");
+    const value = document.createElement("p");
+    const detail = document.createElement("p");
+
+    card.className = "rounded-lg border border-gray-800 bg-gray-950/70 p-4";
+    title.className = "text-sm font-semibold text-gray-300";
+    value.className = "mt-2 break-words text-xl font-bold text-white";
+    detail.className = "mt-2 text-sm leading-relaxed text-gray-400";
+    title.textContent = row.year === 0 ? "Ano 0" : `Ano ${row.year}`;
+    value.textContent = formatDepreciationCurrency(row.value, currency);
+    detail.textContent = `${formatDepreciationCurrency(
+      row.lossThisYear,
+      currency,
+    )} perdidos este ano - ${formatDepreciationPercent(
+      row.depreciatedPercent / 100,
+    )} acumulado.`;
+    card.append(title, value, detail);
+    yearCards.append(card);
+  }
+
+  function addYearTableRow(row, currency) {
+    const tr = document.createElement("tr");
+
+    [
+      row.year,
+      formatDepreciationCurrency(row.value, currency),
+      formatDepreciationCurrency(row.lossThisYear, currency),
+      formatDepreciationCurrency(row.accumulatedLoss, currency),
+      formatDepreciationPercent(row.depreciatedPercent / 100),
+    ].forEach((value) => {
+      const td = document.createElement("td");
+      td.className = "whitespace-nowrap px-3 py-3";
+      td.textContent = String(value);
+      tr.append(td);
+    });
+
+    yearTable.append(tr);
+  }
+
+  function showActionButtons() {
+    [copyButton, copyUrlButton, exportButton].forEach((button) => {
+      button.classList.remove("hidden");
+      button.classList.add("inline-flex");
+    });
+  }
+
+  function updateCalculator({ syncUrl = true } = {}) {
+    clearErrors();
+
+    if (!initialValueInput.value.trim()) {
+      setNeutralResult();
+      if (syncUrl) syncShareUrl(false);
+      return;
+    }
+
+    const input = buildInput();
+
+    if (!input) {
+      setNeutralResult("Revisa los campos");
+      return;
+    }
+
+    try {
+      const result = calculateVehicleDepreciation(input);
+
+      renderResult(result);
+      if (syncUrl) syncShareUrl(true);
+    } catch {
+      setNeutralResult("No se puede calcular");
+    }
+  }
+
+  function syncShareUrl(hasResult) {
+    const url = new URL(window.location.href);
+    url.search = "";
+
+    if (hasResult) {
+      url.searchParams.set("modo", currentMode);
+      url.searchParams.set("valorInicial", initialValueInput.value.trim());
+      url.searchParams.set("anos", yearsInput.value.trim());
+      url.searchParams.set("moneda", currencySelect.value);
+      url.searchParams.set("sensibilidad", sensitivityStepSelect.value);
+
+      if (currentMode === "porcentaje") {
+        url.searchParams.set("tasa", annualRateInput.value.trim());
+        if (firstYearRateInput.value.trim()) {
+          url.searchParams.set("primerAno", firstYearRateInput.value.trim());
+        }
+      } else if (currentMode === "lineal") {
+        url.searchParams.set("residual", residualValueInput.value.trim());
+      } else {
+        url.searchParams.set("valorActual", currentValueInput.value.trim());
+      }
+    }
+
+    currentShareUrl = url.toString();
+    window.clearTimeout(urlTimer);
+    urlTimer = window.setTimeout(() => {
+      window.history.replaceState({}, "", url);
+    }, 250);
+  }
+
+  function loadUrlParameters() {
+    const params = new URLSearchParams(window.location.search);
+    const mode = params.get("modo");
+    const initialValue = params.get("valorInicial");
+    const years = params.get("anos");
+    const currency = params.get("moneda");
+    const sensitivity = params.get("sensibilidad");
+    const annualRate = params.get("tasa");
+    const firstYearRate = params.get("primerAno");
+    const residual = params.get("residual");
+    const currentValue = params.get("valorActual");
+
+    if (initialValue && parseMoneyInput(initialValue).ok) initialValueInput.value = initialValue;
+    if (years && parseMoneyInput(years).ok) yearsInput.value = years;
+    if (CURRENCIES.includes(currency)) currencySelect.value = currency;
+    if (["3", "5", "10"].includes(sensitivity)) sensitivityStepSelect.value = sensitivity;
+    if (annualRate && parsePercentInput(annualRate).ok) annualRateInput.value = annualRate;
+    if (firstYearRate && parsePercentInput(firstYearRate).ok) {
+      firstYearRateInput.value = firstYearRate;
+    }
+    if (residual && parseMoneyInput(residual).ok) residualValueInput.value = residual;
+    if (currentValue && parseMoneyInput(currentValue).ok) currentValueInput.value = currentValue;
+
+    setMode(MODES.includes(mode) ? mode : "porcentaje", { sync: false });
+  }
+
+  function resetCalculator() {
+    initialValueInput.value = "";
+    yearsInput.value = "5";
+    annualRateInput.value = "15";
+    firstYearRateInput.value = "";
+    residualValueInput.value = "";
+    currentValueInput.value = "";
+    sensitivityStepSelect.value = "5";
+    currencySelect.value = "MXN";
+    setMode("porcentaje", { sync: false });
+    setNeutralResult();
+    syncShareUrl(false);
+  }
+
+  async function copyText(text, successMessage) {
+    try {
+      if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(text);
+      } else {
+        const textArea = document.createElement("textarea");
+        textArea.value = text;
+        textArea.setAttribute("readonly", "");
+        textArea.style.position = "fixed";
+        textArea.style.opacity = "0";
+        document.body.append(textArea);
+        textArea.select();
+        document.execCommand("copy");
+        textArea.remove();
+      }
+      copyStatus.textContent = successMessage;
+    } catch {
+      copyStatus.textContent = "No fue posible copiar automaticamente.";
+    }
+
+    window.clearTimeout(copyTimer);
+    copyTimer = window.setTimeout(() => {
+      copyStatus.textContent = "";
+    }, 2500);
+  }
+
+  function exportCsv() {
+    if (!currentCsv) {
+      copyStatus.textContent = "No hay resultado para exportar.";
+      return;
+    }
+
+    const blob = new Blob([`\uFEFF${currentCsv}`], {
+      type: "text/csv;charset=utf-8",
+    });
+    const url = URL.createObjectURL(blob);
+    const anchor = document.createElement("a");
+    anchor.href = url;
+    anchor.download = "depreciacion-vehiculo.csv";
+    anchor.click();
+    URL.revokeObjectURL(url);
+    copyStatus.textContent = "CSV generado.";
+  }
+
+  function getModeLabel(mode) {
+    if (mode === "lineal") return "Lineal";
+    if (mode === "valor-observado") return "Valor actual";
+    return "Porcentaje anual";
+  }
+
+  modeButtons.forEach((button) => {
+    button.addEventListener("click", () => setMode(button.dataset.modeButton));
+  });
+
+  [
+    initialValueInput,
+    currencySelect,
+    yearsInput,
+    annualRateInput,
+    firstYearRateInput,
+    residualValueInput,
+    currentValueInput,
+    sensitivityStepSelect,
+  ].forEach((input) => {
+    input.addEventListener("input", () => updateCalculator());
+    input.addEventListener("change", () => updateCalculator());
+  });
+
+  clearButton.addEventListener("click", resetCalculator);
+
+  copyButton.addEventListener("click", () => {
+    if (currentShareText) {
+      copyText(currentShareText, "Resultado copiado.");
+    }
+  });
+
+  copyUrlButton.addEventListener("click", () => {
+    copyText(currentShareUrl, "Enlace copiado.");
+  });
+
+  exportButton.addEventListener("click", exportCsv);
+
+  loadUrlParameters();
+</script>

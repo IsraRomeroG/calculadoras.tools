@@ -130,7 +130,7 @@ export const CATEGORIES = {
     slug: "vehiculos",
     label: "Vehiculos",
     description:
-      "Herramientas para estimar rendimiento de combustible, trayectos y datos utiles para manejar con mas claridad.",
+      "Herramientas para estimar rendimiento, costos, depreciacion y datos utiles para manejar con mas claridad.",
   },
   construccion: {
     slug: "construccion",

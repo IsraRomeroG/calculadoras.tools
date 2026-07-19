@@ -104,7 +104,7 @@ Objetivo: profundizar categorías ya visibles en el sitio y sumar calculadoras c
 87. Presupuesto de boda - `SIN BACKEND` - Eventos.
 88. Costo por persona en evento - `SIN BACKEND` - Eventos.
 89. Depreciación del vehículo - `SIN BACKEND` - Vehículos.
-90. Costo anual de mantenimiento del vehículo - `SIN BACKEND` - Vehículos.
+90. Gastos anuales del vehículo - `SIN BACKEND` - Vehículos.
 
 ---
 
