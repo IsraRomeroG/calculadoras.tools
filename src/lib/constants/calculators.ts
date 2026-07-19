@@ -763,6 +763,15 @@ export const CALCULATORS: LegacyCalculatorDirectoryItem[] = [
     order: 91,
   },
   {
+    id: "calculadora-de-gastos-anuales-del-vehiculo",
+    title: "Calculadora de gastos anuales del vehiculo",
+    description:
+      "Estima mantenimiento, propiedad y uso anual del vehiculo con gastos editables, reserva mensual y costo por kilometro.",
+    href: "/vehiculos/calculadora-de-gastos-anuales-del-vehiculo",
+    categorySlug: "vehiculos",
+    order: 91.5,
+  },
+  {
     id: "calculadora-de-costo-por-kilometro",
     title: "Calculadora de costo por kilómetro",
     description:
