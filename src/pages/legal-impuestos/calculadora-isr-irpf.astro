@@ -1,0 +1,830 @@
+---
+import AdSlot from "@components/ads/AdSlot.astro";
+import Container from "@components/layout/Container.astro";
+import PageShell from "@components/layout/PageShell.astro";
+import FaqSection from "@components/shared/FaqSection.astro";
+import PageHero from "@components/shared/PageHero.astro";
+import SectionIntro from "@components/shared/SectionIntro.astro";
+import BaseLayout from "@layouts/BaseLayout.astro";
+import {
+  ISR_CANONICAL_PATH,
+  MEXICO_ISR_FREQUENCIES,
+  MEXICO_ISR_PRESET,
+} from "@lib/calculators/legal-impuestos/calculadora-isr-irpf/incomeTax";
+import { buildFaqJsonLd } from "@lib/seo";
+
+const title = "Calculadora de ISR en México 2026";
+const description =
+  "Estima tu ISR en México por periodo o por año, consulta tu tasa efectiva y compara el impuesto con tus retenciones.";
+const canonical = ISR_CANONICAL_PATH;
+
+const faqs = [
+  {
+    question: "¿Qué calcula esta herramienta?",
+    answer:
+      "Calcula una estimación informativa del ISR con la tarifa oficial seleccionada para México 2026. Puedes calcular una retención de nómina o un impuesto anual estimado.",
+  },
+  {
+    question: "¿Qué base debo introducir?",
+    answer:
+      "Introduce la base gravable del periodo o del ejercicio, es decir, el importe que ya corresponde al cálculo del ISR. No vuelvas a restar deducciones sobre esa base.",
+  },
+  {
+    question: "¿Qué diferencia hay entre retención e impuesto anual?",
+    answer:
+      "La retención es el ISR estimado de un pago concreto según su frecuencia. El impuesto anual utiliza la tarifa del ejercicio y se compara con retenciones acumuladas del año.",
+  },
+  {
+    question: "¿El saldo indica cuánto debo pagar al SAT?",
+    answer:
+      "No. El saldo es una comparación informativa entre el impuesto calculado y la retención que captures. Tu obligación final puede cambiar por deducciones, ingresos adicionales, créditos y otras circunstancias.",
+  },
+  {
+    question: "¿La calculadora incluye deducciones personales o IMSS?",
+    answer:
+      "No automáticamente. El MVP calcula ISR básico y no incorpora deducciones personales, IMSS, INFONAVIT ni otros conceptos que no captures o que requieran reglas adicionales.",
+  },
+];
+
+const faqJsonLd = buildFaqJsonLd(faqs);
+const fieldClass =
+  "mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-900 px-4 text-base text-white outline-none transition placeholder:text-gray-600 focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15";
+---
+
+<BaseLayout title={title} description={description} canonical={canonical}>
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={JSON.stringify(faqJsonLd)} />
+  </Fragment>
+
+  <PageShell>
+    <PageHero
+      title="Calculadora de ISR en México"
+      description="Estima el ISR de una retención de nómina o de un ejercicio anual y entiende el tramo que se aplica a tu base gravable."
+      kicker="Legal e impuestos"
+      collapseBreadcrumbOnMobile
+      containerClass="py-6 md:py-8"
+      breadcrumbs={[
+        { label: "Inicio", href: "/", ariaLabel: "Inicio" },
+        { label: "Legal e impuestos", href: "/legal-impuestos", optional: true },
+        { label: "ISR México", truncate: true },
+      ]}
+    />
+
+    <Container as="section" class="py-5 md:py-8">
+      <div class="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(20rem,0.82fr)]">
+        <section
+          class="order-1 overflow-hidden rounded-lg border border-gray-700 bg-gray-950 shadow-xl shadow-gray-950/30"
+          aria-labelledby="income-tax-heading"
+        >
+          <div class="border-b border-gray-800 p-4 sm:p-6">
+            <p class="text-sm font-semibold uppercase tracking-wide text-amber-400">
+              ISR México · 2026
+            </p>
+            <h2 id="income-tax-heading" class="mt-2 text-2xl font-semibold text-white">
+              Captura tu base gravable
+            </h2>
+            <p class="mt-2 text-sm leading-relaxed text-gray-400">
+              La base debe corresponder al importe gravable del alcance elegido.
+              La herramienta no resta deducciones automáticamente sobre ella.
+            </p>
+          </div>
+
+          <form class="p-4 sm:p-6" data-income-tax-form novalidate>
+            <div class="grid gap-4 sm:grid-cols-2">
+              <div>
+                <label class="income-tax-label" for="tax-country">País</label>
+                <select id="tax-country" class={fieldClass} disabled>
+                  <option>México</option>
+                </select>
+                <p class="income-tax-help">Preset federal disponible.</p>
+              </div>
+
+              <div>
+                <label class="income-tax-label" for="tax-period">Periodo fiscal</label>
+                <select id="tax-period" class={fieldClass} disabled>
+                  <option>{MEXICO_ISR_PRESET.period}</option>
+                </select>
+                <p class="income-tax-help">Tarifa revisada el 21 de julio de 2026.</p>
+              </div>
+            </div>
+
+            <div class="mt-5 grid gap-4 sm:grid-cols-2">
+              <div>
+                <label class="income-tax-label" for="tax-mode">¿Qué quieres estimar?</label>
+                <select id="tax-mode" class={fieldClass} data-tax-mode>
+                  <option value="payroll-withholding">Retención de nómina</option>
+                  <option value="annual-estimate">Impuesto anual</option>
+                </select>
+                <p class="income-tax-help" data-mode-help>
+                  Compara un pago con la retención del mismo periodo.
+                </p>
+              </div>
+
+              <div>
+                <label class="income-tax-label" for="tax-frequency">Frecuencia</label>
+                <select id="tax-frequency" class={fieldClass} data-tax-frequency>
+                  {
+                    MEXICO_ISR_FREQUENCIES.map((frequency) => (
+                      <option value={frequency.id}>{frequency.label}</option>
+                    ))
+                  }
+                </select>
+                <p class="income-tax-help" data-frequency-help>
+                  Se selecciona la tabla oficial correspondiente.
+                </p>
+              </div>
+            </div>
+
+            <div class="mt-5">
+              <label class="income-tax-label" for="tax-base" data-base-label>
+                Base gravable del periodo
+              </label>
+              <div class="income-tax-money-shell">
+                <span class="pl-4 text-gray-500" aria-hidden="true">$</span>
+                <input
+                  id="tax-base"
+                  class="income-tax-money-input"
+                  type="text"
+                  inputmode="decimal"
+                  autocomplete="off"
+                  placeholder="20,000"
+                  aria-describedby="tax-base-help tax-base-error"
+                  data-tax-base
+                />
+              </div>
+              <p id="tax-base-help" class="income-tax-help">
+                Usa una cantidad igual o mayor que cero. Ejemplo: 20,000.
+              </p>
+              <p id="tax-base-error" class="income-tax-error" data-error-for="base"></p>
+            </div>
+
+            <div class="mt-5">
+              <label class="income-tax-label" for="tax-retention" data-retention-label>
+                Retención ISR del periodo <span class="font-normal text-gray-500">(opcional)</span>
+              </label>
+              <div class="income-tax-money-shell">
+                <span class="pl-4 text-gray-500" aria-hidden="true">$</span>
+                <input
+                  id="tax-retention"
+                  class="income-tax-money-input"
+                  type="text"
+                  inputmode="decimal"
+                  autocomplete="off"
+                  placeholder="2,000"
+                  aria-describedby="tax-retention-help tax-retention-error"
+                  data-tax-retention
+                />
+              </div>
+              <p id="tax-retention-help" class="income-tax-help" data-retention-help>
+                Si la capturas, se mostrará el saldo estimado a pagar o a favor.
+              </p>
+              <p id="tax-retention-error" class="income-tax-error" data-error-for="retention"></p>
+            </div>
+
+            <details class="mt-6 rounded-lg border border-gray-800 bg-gray-900/50 p-4" data-advanced>
+              <summary class="cursor-pointer list-none text-sm font-semibold text-white">
+                <span class="flex items-center justify-between gap-4">
+                  <span>Opciones avanzadas</span>
+                  <span class="text-xs font-normal text-gray-500">Simulación manual</span>
+                </span>
+              </summary>
+
+              <div class="mt-5">
+                <label class="income-tax-label" for="tax-rule-mode">Origen de la tarifa</label>
+                <select id="tax-rule-mode" class={fieldClass} data-tax-rule-mode>
+                  <option value="official">Preset oficial de México</option>
+                  <option value="manual">Tasa única manual</option>
+                </select>
+                <p class="income-tax-help">
+                  La tasa manual es una simulación y no tiene fuente ni vigencia fiscal.
+                </p>
+              </div>
+
+              <div class="mt-4 hidden" data-manual-rate-wrap>
+                <label class="income-tax-label" for="tax-manual-rate">
+                  Tasa manual (%)
+                </label>
+                <div class="income-tax-money-shell">
+                  <input
+                    id="tax-manual-rate"
+                    class="income-tax-money-input pl-4"
+                    type="text"
+                    inputmode="decimal"
+                    autocomplete="off"
+                    placeholder="10"
+                    aria-describedby="tax-manual-rate-error"
+                    data-tax-manual-rate
+                  />
+                  <span class="pr-4 text-gray-500">%</span>
+                </div>
+                <p id="tax-manual-rate-error" class="income-tax-error" data-error-for="manual-rate"></p>
+              </div>
+            </details>
+
+            <div class="mt-6 flex flex-col gap-3 border-t border-gray-800 pt-5 sm:flex-row">
+              <button class="income-tax-primary-button" type="submit">
+                Calcular ISR
+              </button>
+              <button class="income-tax-secondary-button" type="button" data-example>
+                Cargar ejemplo
+              </button>
+              <button class="income-tax-quiet-button" type="button" data-clear>
+                Limpiar
+              </button>
+              <p class="sr-only" role="status" aria-live="polite" data-form-status></p>
+            </div>
+          </form>
+        </section>
+
+        <aside
+          class="order-2 h-fit rounded-lg border border-gray-700 bg-gray-900/80 p-4 shadow-xl shadow-gray-950/20 sm:p-6 lg:sticky lg:top-6"
+          aria-labelledby="tax-result-heading"
+          aria-live="polite"
+          data-result-region
+        >
+          <p class="text-sm font-semibold uppercase tracking-wide text-amber-400" data-result-status>
+            Resultado
+          </p>
+          <h2 id="tax-result-heading" class="mt-2 text-xl font-semibold text-white" data-main-label>
+            ISR estimado
+          </h2>
+          <p class="mt-3 break-words text-4xl font-bold tracking-tight text-white sm:text-5xl" data-main-result>
+            Captura tu base
+          </p>
+          <p class="mt-3 text-sm leading-relaxed text-gray-400" data-result-context>
+            El desglose aparecerá aquí después de calcular.
+          </p>
+
+          <div class="mt-5 hidden rounded-lg border border-amber-400/30 bg-amber-400/10 p-4" data-balance-card>
+            <p class="text-xs font-semibold uppercase tracking-wide text-amber-200" data-balance-label>
+              Saldo estimado
+            </p>
+            <p class="mt-2 break-words text-2xl font-bold text-white" data-balance-result>—</p>
+            <p class="mt-1 text-sm text-amber-100" data-balance-note></p>
+          </div>
+
+          <div class="mt-5 hidden grid-cols-2 gap-3" data-result-metrics>
+            <div class="income-tax-metric-card">
+              <span>Base gravable</span>
+              <strong data-metric-base>—</strong>
+            </div>
+            <div class="income-tax-metric-card">
+              <span>Tasa efectiva</span>
+              <strong data-metric-effective>—</strong>
+            </div>
+            <div class="income-tax-metric-card">
+              <span>Tasa marginal</span>
+              <strong data-metric-marginal>—</strong>
+            </div>
+            <div class="income-tax-metric-card">
+              <span>Tramo</span>
+              <strong data-metric-bracket>—</strong>
+            </div>
+          </div>
+
+          <details class="mt-5 hidden rounded-lg border border-gray-800 bg-gray-950/70 p-4" data-breakdown-details>
+            <summary class="cursor-pointer list-none text-sm font-semibold text-white">
+              ¿Cómo se calculó?
+            </summary>
+            <div class="mt-3 grid gap-2" data-breakdown-list></div>
+          </details>
+
+          <div class="mt-5 hidden rounded-lg border border-red-300/25 bg-red-300/10 p-3 text-sm leading-relaxed text-red-100" role="alert" data-errors></div>
+          <div class="mt-5 hidden rounded-lg border border-amber-400/25 bg-amber-400/10 p-3 text-sm leading-relaxed text-amber-100" role="note" data-warning></div>
+
+          <button class="income-tax-secondary-button mt-5 hidden w-full" type="button" data-copy>
+            <span data-copy-label>Copiar resultado</span>
+          </button>
+          <p class="sr-only" role="status" aria-live="polite" data-copy-status></p>
+
+          <div class="mt-5 border-t border-gray-800 pt-4 text-xs leading-relaxed text-gray-500" data-source-box>
+            Fuente y vigencia aparecerán con el resultado.
+          </div>
+        </aside>
+      </div>
+
+      <div class="mt-6 rounded-lg border border-gray-800 bg-gray-950/70 p-4 text-sm leading-relaxed text-gray-400 sm:p-5">
+        <p>
+          <strong class="text-gray-200">Cobertura del MVP:</strong> utiliza
+          tarifas de ISR 2026 para México y no aplica automáticamente deducciones
+          personales, IMSS, INFONAVIT ni otros conceptos fuera de la base capturada.
+        </p>
+        <p class="mt-3">
+          Revisa siempre tu recibo, constancias y situación fiscal con la autoridad
+          o un profesional cuando necesites una determinación oficial.
+        </p>
+      </div>
+    </Container>
+
+    <AdSlot placement="calculator-after-tool" />
+
+    <Container as="section" class="py-8">
+      <SectionIntro
+        title="Cómo interpretar el resultado"
+        description="La tarifa progresiva no aplica la tasa marginal a todo tu ingreso: usa una cuota fija y la tasa del tramo sobre el excedente de su límite inferior."
+      />
+      <div class="mt-5 grid gap-4 sm:grid-cols-3">
+        <article class="rounded-lg border border-gray-700 bg-gray-950 p-5">
+          <h3 class="font-semibold text-white">ISR estimado</h3>
+          <p class="mt-2 text-sm leading-relaxed text-gray-400">
+            Es el impuesto calculado para la frecuencia o ejercicio que elegiste.
+          </p>
+        </article>
+        <article class="rounded-lg border border-gray-700 bg-gray-950 p-5">
+          <h3 class="font-semibold text-white">Tasa efectiva</h3>
+          <p class="mt-2 text-sm leading-relaxed text-gray-400">
+            Es el ISR estimado dividido entre tu base gravable; no es lo mismo que la tasa marginal.
+          </p>
+        </article>
+        <article class="rounded-lg border border-gray-700 bg-gray-950 p-5">
+          <h3 class="font-semibold text-white">Saldo</h3>
+          <p class="mt-2 text-sm leading-relaxed text-gray-400">
+            Solo compara el cálculo con la retención que capturaste. No es una liquidación oficial.
+          </p>
+        </article>
+      </div>
+    </Container>
+
+    <FaqSection faqs={faqs} />
+  </PageShell>
+
+  <div class="fixed inset-x-0 bottom-0 z-40 border-t border-gray-700 bg-gray-950/95 px-3 py-3 shadow-2xl shadow-gray-950/60 backdrop-blur lg:hidden" data-mobile-summary>
+    <div class="mx-auto flex max-w-5xl items-center justify-between gap-3">
+      <div class="min-w-0">
+        <p class="text-xs font-semibold uppercase tracking-wide text-gray-500" data-mobile-kicker>ISR estimado</p>
+        <p class="truncate text-lg font-bold text-white" data-mobile-total>Captura tu base</p>
+      </div>
+      <p class="max-w-[48%] text-right text-xs font-semibold leading-snug text-gray-300" data-mobile-status>
+        Completa los datos.
+      </p>
+    </div>
+  </div>
+  <div class="h-20 lg:hidden"></div>
+</BaseLayout>
+
+<style is:global>
+  .income-tax-label {
+    display: block;
+    color: rgb(229 231 235);
+    font-size: 0.875rem;
+    font-weight: 700;
+  }
+
+  .income-tax-help {
+    min-height: 1.125rem;
+    margin-top: 0.5rem;
+    color: rgb(156 163 175);
+    font-size: 0.75rem;
+    line-height: 1.45;
+  }
+
+  .income-tax-error {
+    min-height: 1.25rem;
+    margin-top: 0.5rem;
+    color: rgb(252 165 165);
+    font-size: 0.875rem;
+  }
+
+  .income-tax-money-shell {
+    display: flex;
+    min-height: 3rem;
+    margin-top: 0.5rem;
+    align-items: center;
+    overflow: hidden;
+    border: 1px solid rgb(55 65 81);
+    border-radius: 0.5rem;
+    background: rgb(17 24 39);
+  }
+
+  .income-tax-money-shell:focus-within {
+    border-color: rgb(251 191 36);
+    box-shadow: 0 0 0 3px rgb(251 191 36 / 0.15);
+  }
+
+  .income-tax-money-input {
+    min-height: 2.875rem;
+    min-width: 0;
+    width: 100%;
+    background: transparent;
+    padding: 0 1rem 0 0.75rem;
+    color: white;
+    font-size: 1rem;
+    outline: none;
+  }
+
+  .income-tax-money-input[aria-invalid="true"] {
+    box-shadow: inset 0 0 0 1px rgb(252 165 165);
+  }
+
+  .income-tax-primary-button,
+  .income-tax-secondary-button,
+  .income-tax-quiet-button {
+    display: inline-flex;
+    min-height: 2.75rem;
+    align-items: center;
+    justify-content: center;
+    border-radius: 0.5rem;
+    padding: 0.55rem 0.9rem;
+    text-align: center;
+    font-size: 0.875rem;
+    font-weight: 700;
+    transition: border-color 150ms, background-color 150ms, color 150ms;
+  }
+
+  .income-tax-primary-button {
+    background: rgb(251 191 36);
+    color: rgb(17 24 39);
+  }
+
+  .income-tax-primary-button:hover {
+    background: rgb(252 211 77);
+  }
+
+  .income-tax-secondary-button {
+    border: 1px solid rgb(75 85 99);
+    color: rgb(229 231 235);
+  }
+
+  .income-tax-secondary-button:hover {
+    border-color: rgb(251 191 36);
+    color: white;
+  }
+
+  .income-tax-quiet-button {
+    color: rgb(156 163 175);
+  }
+
+  .income-tax-quiet-button:hover {
+    color: rgb(254 202 202);
+  }
+
+  .income-tax-metric-card {
+    min-width: 0;
+    border: 1px solid rgb(31 41 55);
+    border-radius: 0.5rem;
+    background: rgb(3 7 18 / 0.7);
+    padding: 0.75rem;
+  }
+
+  .income-tax-metric-card span {
+    display: block;
+    color: rgb(156 163 175);
+    font-size: 0.75rem;
+  }
+
+  .income-tax-metric-card strong {
+    display: block;
+    margin-top: 0.25rem;
+    overflow-wrap: anywhere;
+    color: white;
+    font-size: 0.875rem;
+  }
+</style>
+
+<script>
+  import {
+    buildIncomeTaxShareText,
+    calculateIncomeTax,
+    formatIncomeTaxMoney,
+    formatIncomeTaxPercent,
+    MEXICO_ISR_FREQUENCIES,
+    MEXICO_ISR_PRESET,
+    parseIncomeTaxMoneyInput,
+    parseIncomeTaxRateInput,
+    parseOptionalIncomeTaxMoneyInput,
+  } from "@lib/calculators/legal-impuestos/calculadora-isr-irpf/incomeTax";
+
+  const form = document.querySelector("[data-income-tax-form]");
+  const modeSelect = document.querySelector("[data-tax-mode]");
+  const frequencySelect = document.querySelector("[data-tax-frequency]");
+  const ruleModeSelect = document.querySelector("[data-tax-rule-mode]");
+  const baseInput = document.querySelector("[data-tax-base]");
+  const retentionInput = document.querySelector("[data-tax-retention]");
+  const manualRateInput = document.querySelector("[data-tax-manual-rate]");
+  const manualRateWrap = document.querySelector("[data-manual-rate-wrap]");
+  const baseLabel = document.querySelector("[data-base-label]");
+  const retentionLabel = document.querySelector("[data-retention-label]");
+  const retentionHelp = document.querySelector("[data-retention-help]");
+  const modeHelp = document.querySelector("[data-mode-help]");
+  const frequencyHelp = document.querySelector("[data-frequency-help]");
+  const resultStatus = document.querySelector("[data-result-status]");
+  const mainLabel = document.querySelector("[data-main-label]");
+  const mainResult = document.querySelector("[data-main-result]");
+  const resultContext = document.querySelector("[data-result-context]");
+  const balanceCard = document.querySelector("[data-balance-card]");
+  const balanceLabel = document.querySelector("[data-balance-label]");
+  const balanceResult = document.querySelector("[data-balance-result]");
+  const balanceNote = document.querySelector("[data-balance-note]");
+  const resultMetrics = document.querySelector("[data-result-metrics]");
+  const breakdownDetails = document.querySelector("[data-breakdown-details]");
+  const breakdownList = document.querySelector("[data-breakdown-list]");
+  const errorsBox = document.querySelector("[data-errors]");
+  const warningBox = document.querySelector("[data-warning]");
+  const sourceBox = document.querySelector("[data-source-box]");
+  const copyButton = document.querySelector("[data-copy]");
+  const copyLabel = document.querySelector("[data-copy-label]");
+  const copyStatus = document.querySelector("[data-copy-status]");
+  const formStatus = document.querySelector("[data-form-status]");
+  const mobileKicker = document.querySelector("[data-mobile-kicker]");
+  const mobileTotal = document.querySelector("[data-mobile-total]");
+  const mobileStatus = document.querySelector("[data-mobile-status]");
+
+  let currentResult = null;
+  let copiedTimeout = 0;
+
+  const errorMessages = {
+    required: "Este campo es obligatorio.",
+    invalid: "Ingresa un número válido.",
+    negative: "Ingresa un importe igual o mayor que cero.",
+    too_large: "El importe es demasiado alto para este cálculo.",
+  };
+
+  function updateFormOptions() {
+    const annual = modeSelect.value === "annual-estimate";
+    const current = frequencySelect.value;
+    const frequencies = annual
+      ? MEXICO_ISR_FREQUENCIES.filter((frequency) => frequency.id === "annual")
+      : MEXICO_ISR_FREQUENCIES.filter((frequency) => frequency.id !== "annual");
+
+    frequencySelect.innerHTML = frequencies
+      .map((frequency) => `<option value="${frequency.id}">${frequency.label}</option>`)
+      .join("");
+    const fallbackFrequency = annual ? "annual" : "monthly";
+    frequencySelect.value = frequencies.some((frequency) => frequency.id === current)
+      ? current
+      : fallbackFrequency;
+    frequencySelect.disabled = annual;
+
+    baseLabel.textContent = annual ? "Base gravable anual" : "Base gravable del periodo";
+    retentionLabel.innerHTML = annual
+      ? 'Retenciones ISR acumuladas <span class="font-normal text-gray-500">(opcional)</span>'
+      : 'Retención ISR del periodo <span class="font-normal text-gray-500">(opcional)</span>';
+    retentionHelp.textContent = annual
+      ? "Captura las retenciones acumuladas del ejercicio para estimar el saldo."
+      : "Si la capturas, se mostrará el saldo estimado a pagar o a favor.";
+    modeHelp.textContent = annual
+      ? "Usa la base gravable del ejercicio y retenciones acumuladas del año."
+      : "Compara un pago con la retención del mismo periodo.";
+    frequencyHelp.textContent = annual
+      ? "El modo anual usa la tarifa oficial del ejercicio 2026."
+      : "La frecuencia selecciona la tabla oficial correspondiente.";
+    baseInput.placeholder = annual ? "240,000" : "20,000";
+    manualRateWrap.classList.toggle("hidden", ruleModeSelect.value !== "manual");
+  }
+
+  function clearErrors() {
+    document.querySelectorAll("[data-error-for]").forEach((element) => {
+      element.textContent = "";
+    });
+    [baseInput, retentionInput, manualRateInput].forEach((input) => {
+      input.removeAttribute("aria-invalid");
+    });
+    errorsBox.classList.add("hidden");
+    errorsBox.textContent = "";
+  }
+
+  function showFieldError(field, message) {
+    const error = document.querySelector(`[data-error-for="${field}"]`);
+    const input = field === "base" ? baseInput : field === "retention" ? retentionInput : manualRateInput;
+    if (error) error.textContent = message;
+    if (input) input.setAttribute("aria-invalid", "true");
+  }
+
+  function renderNeutral(message = "El desglose aparecerá aquí después de calcular.") {
+    currentResult = null;
+    resultStatus.textContent = "Resultado";
+    mainLabel.textContent = "ISR estimado";
+    mainResult.textContent = "Captura tu base";
+    resultContext.textContent = message;
+    balanceCard.classList.add("hidden");
+    resultMetrics.classList.add("hidden");
+    breakdownDetails.classList.add("hidden");
+    breakdownList.innerHTML = "";
+    warningBox.classList.add("hidden");
+    warningBox.textContent = "";
+    sourceBox.textContent = "Fuente y vigencia aparecerán con el resultado.";
+    copyButton.classList.add("hidden");
+    copyStatus.textContent = "";
+    mobileKicker.textContent = "ISR estimado";
+    mobileTotal.textContent = "Captura tu base";
+    mobileStatus.textContent = "Completa los datos.";
+  }
+
+  function renderInvalid(message) {
+    renderNeutral("Corrige los datos marcados para obtener una estimación.");
+    resultStatus.textContent = "Revisa los campos";
+    mainResult.textContent = "No se puede calcular";
+    errorsBox.textContent = message;
+    errorsBox.classList.remove("hidden");
+    mobileTotal.textContent = "Revisa los campos";
+    mobileStatus.textContent = "Hay un dato inválido.";
+  }
+
+  function renderResult(result) {
+    currentResult = result;
+    const isAnnual = result.mode === "annual-estimate";
+    const amount = formatIncomeTaxMoney(result.tax);
+
+    resultStatus.textContent = result.status === "manual" ? "Simulación manual" : "Preset vigente";
+    mainLabel.textContent = isAnnual ? "ISR anual estimado" : "ISR estimado del periodo";
+    mainResult.textContent = amount;
+    resultContext.textContent = `${result.scopeLabel} · ${result.frequency.tableLabel}.`;
+    mobileKicker.textContent = mainLabel.textContent;
+    mobileTotal.textContent = amount;
+    mobileStatus.textContent = result.balanceLabel === "sin retención"
+      ? "Sin retención comparable"
+      : `Saldo ${result.balanceLabel}`;
+
+    resultMetrics.classList.remove("hidden");
+    resultMetrics.classList.add("grid");
+    document.querySelector("[data-metric-base]").textContent = formatIncomeTaxMoney(result.taxableBase);
+    document.querySelector("[data-metric-effective]").textContent = formatIncomeTaxPercent(result.effectiveRate);
+    document.querySelector("[data-metric-marginal]").textContent = formatIncomeTaxPercent(result.marginalRate / 100);
+    document.querySelector("[data-metric-bracket]").textContent = result.bracket
+      ? formatIncomeTaxMoney(result.bracket.lowerBound)
+      : "Tasa manual";
+
+    if (result.comparableRetention === null) {
+      balanceCard.classList.add("hidden");
+    } else {
+      balanceCard.classList.remove("hidden");
+      balanceLabel.textContent = `Saldo estimado ${result.balanceLabel}`;
+      balanceResult.textContent = formatIncomeTaxMoney(Math.abs(result.balance));
+      balanceNote.textContent = result.balanceLabel === "sin diferencia"
+        ? "La retención coincide con el impuesto estimado."
+        : `Comparado con ${formatIncomeTaxMoney(result.comparableRetention)} de retención.`;
+    }
+
+    const rows = result.bracket
+      ? [
+          ["Base gravable", formatIncomeTaxMoney(result.taxableBase)],
+          ["Límite inferior", formatIncomeTaxMoney(result.bracket.lowerBound)],
+          ["Cuota fija", formatIncomeTaxMoney(result.bracket.fixedAmount)],
+          ["Excedente del límite", formatIncomeTaxMoney(result.excess)],
+          ["Tasa marginal", formatIncomeTaxPercent(result.marginalRate / 100)],
+          ["ISR antes de créditos", formatIncomeTaxMoney(result.taxBeforeCredits)],
+          ["Créditos aplicados", formatIncomeTaxMoney(result.creditsApplied)],
+          ["ISR estimado", formatIncomeTaxMoney(result.tax)],
+        ]
+      : [
+          ["Base gravable", formatIncomeTaxMoney(result.taxableBase)],
+          ["Tasa manual", formatIncomeTaxPercent(result.marginalRate / 100)],
+          ["ISR antes de créditos", formatIncomeTaxMoney(result.taxBeforeCredits)],
+          ["Créditos aplicados", formatIncomeTaxMoney(result.creditsApplied)],
+          ["ISR estimado", formatIncomeTaxMoney(result.tax)],
+        ];
+
+    breakdownList.innerHTML = rows
+      .map(([label, value]) => `
+        <div class="flex items-start justify-between gap-3 rounded-lg border border-gray-800 bg-gray-900 p-3 text-sm">
+          <span class="min-w-0 text-gray-400">${escapeHtml(label)}</span>
+          <strong class="shrink-0 text-right text-white">${escapeHtml(value)}</strong>
+        </div>
+      `)
+      .join("");
+    breakdownDetails.classList.remove("hidden");
+
+    warningBox.innerHTML = result.warnings.map((warning) => `<p>${escapeHtml(warning)}</p>`).join("");
+    warningBox.classList.remove("hidden");
+    sourceBox.innerHTML = result.sourceUrl
+      ? `Fuente: <a class="font-semibold text-amber-400 hover:text-amber-300 hover:underline" href="${result.sourceUrl}" target="_blank" rel="noreferrer">${escapeHtml(result.sourceName)}</a> · Revisado el ${MEXICO_ISR_PRESET.reviewedAt}.`
+      : "Fuente: simulación manual. No se utiliza una tarifa oficial.";
+    copyButton.classList.remove("hidden");
+  }
+
+  function calculate() {
+    clearErrors();
+
+    const base = parseIncomeTaxMoneyInput(baseInput.value);
+    if (!base.ok) {
+      showFieldError("base", errorMessages[base.error]);
+      renderInvalid(errorMessages[base.error]);
+      return;
+    }
+
+    const retention = parseOptionalIncomeTaxMoneyInput(retentionInput.value);
+    if (!retention.ok) {
+      showFieldError("retention", errorMessages[retention.error]);
+      renderInvalid(errorMessages[retention.error]);
+      return;
+    }
+
+    const ruleMode = ruleModeSelect.value;
+    let manualRate;
+    if (ruleMode === "manual") {
+      const parsedRate = parseIncomeTaxRateInput(manualRateInput.value);
+      if (!parsedRate.ok) {
+        showFieldError("manual-rate", parsedRate.error === "too_large" ? "Usa una tasa entre 0% y 100%." : errorMessages[parsedRate.error]);
+        renderInvalid("Ingresa una tasa manual entre 0% y 100%.");
+        return;
+      }
+      manualRate = parsedRate.value;
+    }
+
+    try {
+      const result = calculateIncomeTax({
+        mode: modeSelect.value,
+        frequency: frequencySelect.value,
+        ruleMode,
+        taxableBase: base.value,
+        comparableRetention: retentionInput.value.trim() ? retention.value : undefined,
+        manualRate,
+      });
+      renderResult(result);
+      formStatus.textContent = "ISR calculado.";
+    } catch (error) {
+      renderInvalid(error instanceof Error ? error.message : "No fue posible calcular el ISR.");
+    }
+  }
+
+  function clearForm() {
+    modeSelect.value = "payroll-withholding";
+    ruleModeSelect.value = "official";
+    baseInput.value = "";
+    retentionInput.value = "";
+    manualRateInput.value = "";
+    updateFormOptions();
+    clearErrors();
+    formStatus.textContent = "Formulario limpio.";
+    renderNeutral();
+  }
+
+  function loadExample() {
+    modeSelect.value = "payroll-withholding";
+    ruleModeSelect.value = "official";
+    updateFormOptions();
+    frequencySelect.value = "monthly";
+    baseInput.value = "20,000";
+    retentionInput.value = "2,000";
+    manualRateInput.value = "";
+    calculate();
+  }
+
+  async function copyResult() {
+    if (!currentResult) return;
+
+    try {
+      const text = buildIncomeTaxShareText(currentResult);
+      if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(text);
+      } else {
+        const textArea = document.createElement("textarea");
+        textArea.value = text;
+        textArea.setAttribute("readonly", "");
+        textArea.style.position = "fixed";
+        textArea.style.opacity = "0";
+        document.body.append(textArea);
+        textArea.select();
+        document.execCommand("copy");
+        textArea.remove();
+      }
+      copyLabel.textContent = "Copiado";
+      copyStatus.textContent = "Resultado copiado.";
+      window.clearTimeout(copiedTimeout);
+      copiedTimeout = window.setTimeout(() => {
+        copyLabel.textContent = "Copiar resultado";
+        copyStatus.textContent = "";
+      }, 2000);
+    } catch {
+      copyStatus.textContent = "No se pudo copiar el resultado automáticamente.";
+    }
+  }
+
+  function escapeHtml(value) {
+    return String(value)
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;")
+      .replaceAll("'", "&#039;");
+  }
+
+  form.addEventListener("submit", (event) => {
+    event.preventDefault();
+    calculate();
+  });
+
+  modeSelect.addEventListener("change", () => {
+    updateFormOptions();
+    renderNeutral("El modo cambió. Calcula de nuevo para actualizar el resultado.");
+  });
+
+  frequencySelect.addEventListener("change", () => {
+    renderNeutral("La frecuencia cambió. Calcula de nuevo para actualizar el resultado.");
+  });
+
+  ruleModeSelect.addEventListener("change", () => {
+    updateFormOptions();
+    renderNeutral("El origen de la tarifa cambió. Calcula de nuevo para actualizar el resultado.");
+  });
+
+  baseInput.addEventListener("input", () => baseInput.removeAttribute("aria-invalid"));
+  retentionInput.addEventListener("input", () => retentionInput.removeAttribute("aria-invalid"));
+  manualRateInput.addEventListener("input", () => manualRateInput.removeAttribute("aria-invalid"));
+  document.querySelector("[data-example]").addEventListener("click", loadExample);
+  document.querySelector("[data-clear]").addEventListener("click", clearForm);
+  copyButton.addEventListener("click", copyResult);
+
+  updateFormOptions();
+  renderNeutral();
+</script>
