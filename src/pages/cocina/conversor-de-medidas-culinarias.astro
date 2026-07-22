@@ -61,12 +61,60 @@ const massUnits = COOKING_MASS_UNITS;
 const allUnits: CookingMeasureUnit[] = [...volumeUnits, ...massUnits];
 
 const shortcuts = [
-  { label: "2 tazas metricas en ml", value: "2", type: "volume", from: "cup", to: "ml", system: "metric", result: "500 ml" },
-  { label: "1/2 taza metrica en ml", value: "1/2", type: "volume", from: "cup", to: "ml", system: "metric", result: "125 ml" },
-  { label: "1 cda metrica en cdtas", value: "1", type: "volume", from: "tbsp", to: "tsp", system: "metric", result: "3 cdtas" },
-  { label: "1 taza estadounidense en ml", value: "1", type: "volume", from: "cup", to: "ml", system: "us", result: "236.59 ml" },
-  { label: "500 g en oz", value: "500", type: "mass", from: "g", to: "oz", system: "metric", result: "17.64 oz" },
-  { label: "1 lb en g", value: "1", type: "mass", from: "lb", to: "g", system: "metric", result: "453.59 g" },
+  {
+    label: "2 tazas metricas en ml",
+    value: "2",
+    type: "volume",
+    from: "cup",
+    to: "ml",
+    system: "metric",
+    result: "500 ml",
+  },
+  {
+    label: "1/2 taza metrica en ml",
+    value: "1/2",
+    type: "volume",
+    from: "cup",
+    to: "ml",
+    system: "metric",
+    result: "125 ml",
+  },
+  {
+    label: "1 cda metrica en cdtas",
+    value: "1",
+    type: "volume",
+    from: "tbsp",
+    to: "tsp",
+    system: "metric",
+    result: "3 cdtas",
+  },
+  {
+    label: "1 taza estadounidense en ml",
+    value: "1",
+    type: "volume",
+    from: "cup",
+    to: "ml",
+    system: "us",
+    result: "236.59 ml",
+  },
+  {
+    label: "500 g en oz",
+    value: "500",
+    type: "mass",
+    from: "g",
+    to: "oz",
+    system: "metric",
+    result: "17.64 oz",
+  },
+  {
+    label: "1 lb en g",
+    value: "1",
+    type: "mass",
+    from: "lb",
+    to: "g",
+    system: "metric",
+    result: "453.59 g",
+  },
 ];
 ---
 
@@ -95,41 +143,67 @@ const shortcuts = [
         class="overflow-hidden rounded-lg border border-gray-700 bg-gray-950 shadow-xl shadow-gray-950/30"
         aria-labelledby="calculator-heading"
       >
-        <div class="grid gap-0 lg:grid-cols-[minmax(0,1fr)_minmax(19rem,0.78fr)]">
+        <div
+          class="grid gap-0 lg:grid-cols-[minmax(0,1fr)_minmax(19rem,0.78fr)]"
+        >
           <div class="p-4 sm:p-6">
-            <p class="text-sm font-semibold text-amber-300">Conversion rapida</p>
+            <p class="text-sm font-semibold text-amber-300">
+              Conversion rapida
+            </p>
             <h2 id="calculator-heading" class="mt-2 text-2xl font-semibold">
               Que medida quieres convertir?
             </h2>
             <p class="mt-2 text-sm leading-relaxed text-gray-400">
-              Escribe decimales o fracciones como <span class="text-gray-200">1/2</span>,
+              Escribe decimales o fracciones como <span class="text-gray-200"
+                >1/2</span
+              >,
               <span class="text-gray-200">3/4</span> o
               <span class="text-gray-200">1 1/2</span>.
             </p>
 
             <div class="mt-5">
-              <label for="cooking-value" class="block text-sm font-semibold text-gray-200">
+              <label
+                for="cooking-value"
+                class="block text-sm font-semibold text-gray-200"
+              >
                 Cantidad
               </label>
               <input
                 id="cooking-value"
                 class="mt-2 min-h-14 w-full rounded-lg border border-gray-700 bg-gray-900 px-4 text-xl text-white outline-none placeholder:text-gray-600 transition focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15"
                 type="text"
-                inputmode="decimal"
+                inputmode="text"
                 autocomplete="off"
                 placeholder="Ej. 2, 1/2 o 1 1/2"
                 aria-describedby="cooking-error cooking-interpretation"
                 data-cooking-input
               />
-              <p id="cooking-error" class="mt-2 hidden text-sm text-red-300" data-cooking-error></p>
-              <p id="cooking-interpretation" class="mt-2 min-h-5 text-sm text-gray-500" data-interpretation></p>
+              <p
+                id="cooking-error"
+                class="mt-2 hidden text-sm text-red-300"
+                data-cooking-error
+              >
+              </p>
+              <p
+                id="cooking-interpretation"
+                class="mt-2 min-h-5 text-sm text-gray-500"
+                data-interpretation
+              >
+              </p>
             </div>
 
             <div class="mt-5">
-              <label for="measure-type" class="block text-sm font-medium text-gray-200">
+              <label
+                for="measure-type"
+                class="block text-sm font-medium text-gray-200"
+              >
                 Tipo de medida
               </label>
-              <div class="mt-2 grid grid-cols-2 gap-2 rounded-lg bg-gray-900 p-1" role="group" aria-label="Tipo de medida">
+              <div
+                class="mt-2 grid grid-cols-2 gap-2 rounded-lg bg-gray-900 p-1"
+                role="group"
+                aria-label="Tipo de medida"
+              >
                 <button
                   class="min-h-12 rounded-md bg-amber-400 px-3 text-sm font-semibold text-gray-950 transition focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-300/40"
                   type="button"
@@ -149,9 +223,14 @@ const shortcuts = [
               </div>
             </div>
 
-            <div class="mt-5 grid gap-4 sm:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] sm:items-end">
+            <div
+              class="mt-5 grid gap-4 sm:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] sm:items-end"
+            >
               <div>
-                <label for="origin-unit" class="block text-sm font-medium text-gray-200">
+                <label
+                  for="origin-unit"
+                  class="block text-sm font-medium text-gray-200"
+                >
                   Desde
                 </label>
                 <select
@@ -163,10 +242,13 @@ const shortcuts = [
                     allUnits.map((unit) => (
                       <option
                         value={unit}
-                        data-dimension={COOKING_MEASURE_UNIT_METADATA[unit].dimension}
+                        data-dimension={
+                          COOKING_MEASURE_UNIT_METADATA[unit].dimension
+                        }
                         selected={unit === "cup"}
                       >
-                        {COOKING_MEASURE_UNIT_METADATA[unit].shortLabel} - {COOKING_MEASURE_UNIT_METADATA[unit].label}
+                        {COOKING_MEASURE_UNIT_METADATA[unit].shortLabel} -{" "}
+                        {COOKING_MEASURE_UNIT_METADATA[unit].label}
                       </option>
                     ))
                   }
@@ -184,7 +266,10 @@ const shortcuts = [
               </button>
 
               <div>
-                <label for="destination-unit" class="block text-sm font-medium text-gray-200">
+                <label
+                  for="destination-unit"
+                  class="block text-sm font-medium text-gray-200"
+                >
                   Hacia
                 </label>
                 <select
@@ -196,10 +281,13 @@ const shortcuts = [
                     allUnits.map((unit) => (
                       <option
                         value={unit}
-                        data-dimension={COOKING_MEASURE_UNIT_METADATA[unit].dimension}
+                        data-dimension={
+                          COOKING_MEASURE_UNIT_METADATA[unit].dimension
+                        }
                         selected={unit === "ml"}
                       >
-                        {COOKING_MEASURE_UNIT_METADATA[unit].shortLabel} - {COOKING_MEASURE_UNIT_METADATA[unit].label}
+                        {COOKING_MEASURE_UNIT_METADATA[unit].shortLabel} -{" "}
+                        {COOKING_MEASURE_UNIT_METADATA[unit].label}
                       </option>
                     ))
                   }
@@ -209,7 +297,10 @@ const shortcuts = [
 
             <div class="mt-5 grid gap-4 sm:grid-cols-2">
               <div data-system-wrapper>
-                <label for="volume-system" class="block text-sm font-medium text-gray-200">
+                <label
+                  for="volume-system"
+                  class="block text-sm font-medium text-gray-200"
+                >
                   Sistema culinario
                 </label>
                 <select
@@ -231,7 +322,10 @@ const shortcuts = [
               </div>
 
               <div>
-                <label for="visible-decimals" class="block text-sm font-medium text-gray-200">
+                <label
+                  for="visible-decimals"
+                  class="block text-sm font-medium text-gray-200"
+                >
                   Decimales visibles
                 </label>
                 <select
@@ -261,19 +355,32 @@ const shortcuts = [
             </div>
           </div>
 
-          <aside class="border-t border-gray-800 bg-gray-900/65 p-4 sm:p-6 lg:border-l lg:border-t-0">
-            <p class="text-xs font-semibold uppercase tracking-wide text-gray-500">
+          <aside
+            class="border-t border-gray-800 bg-gray-900/65 p-4 sm:p-6 lg:border-l lg:border-t-0"
+          >
+            <p
+              class="text-xs font-semibold uppercase tracking-wide text-gray-500"
+            >
               Resultado principal
             </p>
-            <p class="mt-3 min-h-10 break-words text-3xl font-semibold text-amber-100" data-main-result>
+            <p
+              class="mt-3 min-h-10 break-words text-3xl font-semibold text-amber-100"
+              data-main-result
+            >
               Ingresa una cantidad
             </p>
-            <p class="mt-3 min-h-5 text-sm leading-relaxed text-gray-400" data-result-note>
+            <p
+              class="mt-3 min-h-5 text-sm leading-relaxed text-gray-400"
+              data-result-note
+            >
               Veras la equivalencia destacada y medidas relacionadas.
             </p>
-            <p class="mt-3 hidden rounded-lg border border-red-400/25 bg-red-400/10 p-3 text-sm leading-relaxed text-red-100" data-dimension-note>
-              Para convertir volumen a peso necesitas elegir un ingrediente. Harina,
-              azucar, mantequilla y arroz tienen densidades distintas.
+            <p
+              class="mt-3 hidden rounded-lg border border-red-400/25 bg-red-400/10 p-3 text-sm leading-relaxed text-red-100"
+              data-dimension-note
+            >
+              Para convertir volumen a peso necesitas elegir un ingrediente.
+              Harina, azucar, mantequilla y arroz tienen densidades distintas.
             </p>
             <div class="mt-4 flex flex-wrap gap-2">
               <button
@@ -284,22 +391,41 @@ const shortcuts = [
                 Copiar resultado
               </button>
             </div>
-            <p class="sr-only" role="status" aria-live="polite" data-live-status></p>
-            <p class="mt-3 min-h-5 text-sm text-emerald-300" role="status" aria-live="polite" data-copy-status></p>
+            <p
+              class="sr-only"
+              role="status"
+              aria-live="polite"
+              data-live-status
+            >
+            </p>
+            <p
+              class="mt-3 min-h-5 text-sm text-emerald-300"
+              role="status"
+              aria-live="polite"
+              data-copy-status
+            >
+            </p>
           </aside>
         </div>
 
         <div class="border-t border-gray-800 p-4 sm:p-6">
-          <div class="grid gap-6 lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)]">
+          <div
+            class="grid gap-6 lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)]"
+          >
             <div>
               <h3 class="text-lg font-semibold">Equivalencias relacionadas</h3>
-              <div class="mt-3 divide-y divide-gray-800 overflow-hidden rounded-lg border border-gray-800 bg-gray-950" data-equivalences-list>
+              <div
+                class="mt-3 divide-y divide-gray-800 overflow-hidden rounded-lg border border-gray-800 bg-gray-950"
+                data-equivalences-list
+              >
                 {
                   allUnits.map((unit) => (
                     <div
                       class="flex min-h-14 items-center justify-between gap-3 px-4 py-3"
                       data-equivalence-row={unit}
-                      data-dimension={COOKING_MEASURE_UNIT_METADATA[unit].dimension}
+                      data-dimension={
+                        COOKING_MEASURE_UNIT_METADATA[unit].dimension
+                      }
                     >
                       <span class="min-w-0 text-sm font-medium text-gray-300">
                         {COOKING_MEASURE_UNIT_METADATA[unit].shortLabel}
@@ -307,7 +433,10 @@ const shortcuts = [
                           {COOKING_MEASURE_UNIT_METADATA[unit].label}
                         </span>
                       </span>
-                      <span class="shrink-0 text-right text-sm font-semibold text-white" data-output={unit}>
+                      <span
+                        class="shrink-0 text-right text-sm font-semibold text-white"
+                        data-output={unit}
+                      >
                         -
                       </span>
                     </div>
@@ -318,19 +447,28 @@ const shortcuts = [
 
             <div>
               <h3 class="text-lg font-semibold">Formula aplicada</h3>
-              <div class="mt-3 rounded-lg border border-gray-800 bg-gray-900/70 p-4">
+              <div
+                class="mt-3 rounded-lg border border-gray-800 bg-gray-900/70 p-4"
+              >
                 <p class="text-sm leading-relaxed text-gray-200" data-formula>
                   La formula aparecera cuando ingreses una cantidad.
                 </p>
                 <details class="mt-3 hidden" data-procedure-panel>
-                  <summary class="min-h-11 cursor-pointer py-2 text-sm font-semibold text-amber-300">
+                  <summary
+                    class="min-h-11 cursor-pointer py-2 text-sm font-semibold text-amber-300"
+                  >
                     Ver procedimiento
                   </summary>
-                  <ol class="mt-2 space-y-2 text-sm leading-relaxed text-gray-400" data-procedure-list></ol>
+                  <ol
+                    class="mt-2 space-y-2 text-sm leading-relaxed text-gray-400"
+                    data-procedure-list
+                  >
+                  </ol>
                 </details>
               </div>
               <p class="mt-3 text-xs leading-relaxed text-gray-500">
-                El calculo conserva precision completa y redondea solo al mostrar.
+                El calculo conserva precision completa y redondea solo al
+                mostrar.
               </p>
             </div>
           </div>
@@ -357,8 +495,12 @@ const shortcuts = [
               data-shortcut-to={shortcut.to}
               data-shortcut-system={shortcut.system}
             >
-              <span class="block text-sm font-semibold text-white">{shortcut.label}</span>
-              <span class="mt-2 block text-sm text-amber-300">{shortcut.result}</span>
+              <span class="block text-sm font-semibold text-white">
+                {shortcut.label}
+              </span>
+              <span class="mt-2 block text-sm text-amber-300">
+                {shortcut.result}
+              </span>
             </button>
           ))
         }
@@ -372,7 +514,9 @@ const shortcuts = [
       />
       <div class="grid gap-4 lg:grid-cols-2">
         <article class="rounded-lg border border-gray-800 bg-gray-950 p-5">
-          <h3 class="text-lg font-semibold">Por que no convertimos taza a gramos</h3>
+          <h3 class="text-lg font-semibold">
+            Por que no convertimos taza a gramos
+          </h3>
           <p class="mt-3 text-sm leading-relaxed text-gray-400">
             Una taza de harina, una taza de azucar y una taza de mantequilla no
             pesan lo mismo. Esta herramienta evita inventar densidades y solo
@@ -410,7 +554,9 @@ const shortcuts = [
             <p class="rounded-lg bg-gray-900 p-3">1 kg = 1000 g</p>
             <p class="rounded-lg bg-gray-900 p-3">1 oz = 28.349523125 g</p>
             <p class="rounded-lg bg-gray-900 p-3">1 lb = 453.59237 g</p>
-            <p class="rounded-lg bg-gray-900 p-3">fl oz no es lo mismo que oz</p>
+            <p class="rounded-lg bg-gray-900 p-3">
+              fl oz no es lo mismo que oz
+            </p>
           </div>
         </div>
       </div>
@@ -481,7 +627,9 @@ const shortcuts = [
   let urlTimer = 0;
 
   function getOrigin() {
-    return isCookingMeasureUnit(originSelect.value) ? originSelect.value : "cup";
+    return isCookingMeasureUnit(originSelect.value)
+      ? originSelect.value
+      : "cup";
   }
 
   function getDestination() {
@@ -491,7 +639,9 @@ const shortcuts = [
   }
 
   function getSystem() {
-    return isCookingVolumeSystem(systemSelect.value) ? systemSelect.value : "metric";
+    return isCookingVolumeSystem(systemSelect.value)
+      ? systemSelect.value
+      : "metric";
   }
 
   function getDecimals() {
@@ -552,17 +702,21 @@ const shortcuts = [
   function syncSystemVisibility() {
     const shouldShow =
       measureType === "volume" &&
-      (unitDependsOnSystem(getOrigin()) || unitDependsOnSystem(getDestination()));
+      (unitDependsOnSystem(getOrigin()) ||
+        unitDependsOnSystem(getDestination()));
 
     systemWrapper.classList.toggle("hidden", !shouldShow);
   }
 
-  function clearOutputs(note = "Veras la equivalencia destacada y medidas relacionadas.") {
+  function clearOutputs(
+    note = "Veras la equivalencia destacada y medidas relacionadas.",
+  ) {
     currentCopyText = "";
     mainResult.textContent = "Ingresa una cantidad";
     resultNote.textContent = note;
     dimensionNote.classList.add("hidden");
-    formulaElement.textContent = "La formula aparecera cuando ingreses una cantidad.";
+    formulaElement.textContent =
+      "La formula aparecera cuando ingreses una cantidad.";
     procedurePanel.classList.add("hidden");
     procedureList.replaceChildren();
     copyMainButton.classList.add("hidden");
@@ -580,7 +734,10 @@ const shortcuts = [
     url.searchParams.set("destino", getDestination());
 
     if (measureType === "volume") {
-      url.searchParams.set("sistema", getSystem() === "metric" ? "metrico" : "estadounidense");
+      url.searchParams.set(
+        "sistema",
+        getSystem() === "metric" ? "metrico" : "estadounidense",
+      );
     } else {
       url.searchParams.delete("sistema");
     }
@@ -619,13 +776,14 @@ const shortcuts = [
 
     const parsed = parseCookingMeasureInput(input.value);
 
-    interpretationElement.textContent = parsed.ok && parsed.interpretation
-      ? parsed.interpretation
-      : "";
+    interpretationElement.textContent =
+      parsed.ok && parsed.interpretation ? parsed.interpretation : "";
 
     if (!parsed.ok) {
       if (parsed.error === "invalid") {
-        setError("No pudimos interpretar la cantidad. Usa 2, 2,5, 1/2 o 1 1/2.");
+        setError(
+          "No pudimos interpretar la cantidad. Usa 2, 2,5, 1/2 o 1 1/2.",
+        );
         clearOutputs("Revisa el formato para ver las equivalencias.");
       } else {
         setError();
@@ -645,8 +803,18 @@ const shortcuts = [
     const decimals = getDecimals();
 
     try {
-      const conversion = convertCookingMeasure(parsed.value, origin, destination, system);
-      const formattedSource = formatCookingMeasure(parsed.value, origin, decimals, system);
+      const conversion = convertCookingMeasure(
+        parsed.value,
+        origin,
+        destination,
+        system,
+      );
+      const formattedSource = formatCookingMeasure(
+        parsed.value,
+        origin,
+        decimals,
+        system,
+      );
       const formattedDestination = formatCookingMeasure(
         conversion.result,
         destination,
@@ -665,9 +833,10 @@ const shortcuts = [
       setError();
       dimensionNote.classList.add("hidden");
       mainResult.textContent = `${formattedSource} = ${formattedDestination}`;
-      resultNote.textContent = practical && practical !== formattedDestination
-        ? `Equivalencia practica: ${practical}.`
-        : "La conversion usa unidades compatibles y factores definidos.";
+      resultNote.textContent =
+        practical && practical !== formattedDestination
+          ? `Equivalencia practica: ${practical}.`
+          : "La conversion usa unidades compatibles y factores definidos.";
       formulaElement.textContent = `Formula: ${formula.formula}`;
       procedurePanel.classList.remove("hidden");
       procedureList.replaceChildren(
@@ -681,13 +850,19 @@ const shortcuts = [
       );
       currentCopyText =
         `${formattedSource} = ${formattedDestination}` +
-        (measureType === "volume" && (unitDependsOnSystem(origin) || unitDependsOnSystem(destination))
+        (measureType === "volume" &&
+        (unitDependsOnSystem(origin) || unitDependsOnSystem(destination))
           ? ` (${system === "metric" ? "sistema metrico" : "sistema estadounidense"})`
           : "");
       copyMainButton.classList.remove("hidden");
 
       relatedUnits.forEach((unit) => {
-        const converted = convertCookingMeasure(parsed.value, origin, unit, system).result;
+        const converted = convertCookingMeasure(
+          parsed.value,
+          origin,
+          unit,
+          system,
+        ).result;
 
         outputElements.get(unit).textContent = formatCookingMeasure(
           converted,
@@ -769,7 +944,10 @@ const shortcuts = [
     const originDimension = getCookingMeasureDimension(getOrigin());
     const destinationDimension = getCookingMeasureDimension(getDestination());
 
-    if (originDimension !== measureType || destinationDimension !== measureType) {
+    if (
+      originDimension !== measureType ||
+      destinationDimension !== measureType
+    ) {
       originSelect.value = measureType === "volume" ? "cup" : "g";
       destinationSelect.value = measureType === "volume" ? "ml" : "oz";
     }
@@ -866,8 +1044,13 @@ const shortcuts = [
       return;
     }
 
-    const { shortcutValue, shortcutType, shortcutFrom, shortcutTo, shortcutSystem } =
-      shortcutButton.dataset;
+    const {
+      shortcutValue,
+      shortcutType,
+      shortcutFrom,
+      shortcutTo,
+      shortcutSystem,
+    } = shortcutButton.dataset;
 
     if (
       typeof shortcutValue !== "string" ||
