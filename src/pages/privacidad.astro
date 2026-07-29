@@ -5,11 +5,16 @@ import PageShell from "@components/layout/PageShell.astro";
 import PageHero from "@components/shared/PageHero.astro";
 import Panel from "@components/shared/Panel.astro";
 import { AD_CONSENT_MODE } from "@lib/ads/config";
+import { buildAlternateLinks } from "@lib/i18n/routing";
 
 const description =
   "Consulta cómo calculadoras.tools maneja la información enviada por formularios y los datos necesarios para operar el sitio.";
 
 const canonical = "/privacidad";
+const alternates = buildAlternateLinks(
+  { es: canonical, en: "/en/privacy" },
+  Astro.site ?? Astro.url,
+);
 
 const adConsentDescription = {
   all: "Solicitamos consentimiento a todos los visitantes antes de cargar anuncios de terceros que puedan usar cookies, seguimiento o personalización. Si rechazas, no cargamos esos anuncios y puedes seguir usando todo el sitio.",
@@ -70,7 +75,12 @@ const sections = [
 ];
 ---
 
-<BaseLayout title="Privacidad" description={description} canonical={canonical}>
+<BaseLayout
+  title="Privacidad"
+  description={description}
+  canonical={canonical}
+  alternates={alternates}
+>
   <PageShell>
     <PageHero
       title="Privacidad"

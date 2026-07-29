@@ -4,10 +4,15 @@ import Container from "@components/layout/Container.astro";
 import PageShell from "@components/layout/PageShell.astro";
 import PageHero from "@components/shared/PageHero.astro";
 import Panel from "@components/shared/Panel.astro";
+import { buildAlternateLinks } from "@lib/i18n/routing";
 
 const description =
   "Conoce el propósito editorial de calculadoras.tools, cómo se mantiene el sitio, sus límites y las formas de contacto.";
 const canonical = "/acerca-de";
+const alternates = buildAlternateLinks(
+  { es: canonical, en: "/en/about" },
+  Astro.site ?? Astro.url,
+);
 
 const sections = [
   {
@@ -33,7 +38,12 @@ const sections = [
 ];
 ---
 
-<BaseLayout title="Acerca de" description={description} canonical={canonical}>
+<BaseLayout
+  title="Acerca de"
+  description={description}
+  canonical={canonical}
+  alternates={alternates}
+>
   <PageShell>
     <PageHero
       title="Acerca de"

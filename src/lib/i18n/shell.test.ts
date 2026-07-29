@@ -23,14 +23,23 @@ describe("localized shell configuration", () => {
     expect(getMenuItems("en")).toEqual([
       expect.objectContaining({ id: "home", name: "Home", slug: "/en" }),
       expect.objectContaining({ id: "blog", name: "Blog", slug: "/en/blog" }),
+      expect.objectContaining({
+        id: "contact",
+        name: "Contact",
+        slug: "/en/contact",
+      }),
     ]);
-    expect(getMenuItems("en").map((item) => item.id)).not.toContain(
-      "contact",
-    );
   });
 
-  it("keeps English footer links empty until localized legal pages exist", () => {
-    expect(getFooterLinks("en")).toEqual([]);
+  it("links published English institutional pages from the footer", () => {
+    expect(getFooterLinks("en").map((link) => link.href)).toEqual([
+      "/en/privacy",
+      "/en/contact",
+      "/en/about",
+      "/en/methodology",
+      "/en/editorial-policy",
+      "/en/corrections",
+    ]);
     expect(getFooterLinks("es").map((link) => link.href)).toEqual([
       "/privacidad",
       "/contacto",
@@ -43,8 +52,8 @@ describe("localized shell configuration", () => {
 
   it("enables ad consent only when the locale has a privacy page", () => {
     expect(getPrivacyPath("es")).toBe("/privacidad");
-    expect(getPrivacyPath("en")).toBeNull();
+    expect(getPrivacyPath("en")).toBe("/en/privacy");
     expect(isAdConsentEnabled("es")).toBe(true);
-    expect(isAdConsentEnabled("en")).toBe(false);
+    expect(isAdConsentEnabled("en")).toBe(true);
   });
 });

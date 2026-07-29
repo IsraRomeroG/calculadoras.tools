@@ -4,10 +4,15 @@ import Container from "@components/layout/Container.astro";
 import PageShell from "@components/layout/PageShell.astro";
 import PageHero from "@components/shared/PageHero.astro";
 import Panel from "@components/shared/Panel.astro";
+import { buildAlternateLinks } from "@lib/i18n/routing";
 
 const description =
   "Consulta cómo reportar errores, qué información enviar y cómo calculadoras.tools evalúa correcciones editoriales o de cálculo.";
 const canonical = "/correcciones";
+const alternates = buildAlternateLinks(
+  { es: canonical, en: "/en/corrections" },
+  Astro.site ?? Astro.url,
+);
 
 const steps = [
   {
@@ -33,7 +38,12 @@ const steps = [
 ];
 ---
 
-<BaseLayout title="Correcciones" description={description} canonical={canonical}>
+<BaseLayout
+  title="Correcciones"
+  description={description}
+  canonical={canonical}
+  alternates={alternates}
+>
   <PageShell>
     <PageHero
       title="Correcciones"

@@ -42,6 +42,25 @@ describe("blog article JSON-LD", () => {
     });
   });
 
+  it("uses the English editorial page for English articles", () => {
+    const jsonLd = buildBlogArticleJsonLd({
+      ...baseInput,
+      canonical:
+        "https://calculadoras.tools/en/blog/math/how-to-calculate-percentages",
+      locale: "en",
+    });
+
+    expect(jsonLd.author).toMatchObject({
+      "@type": "Organization",
+      name: "Calculadoras.Tools",
+      url: "https://calculadoras.tools/en/about",
+    });
+    expect(jsonLd.publisher).toMatchObject({
+      "@type": "Organization",
+      url: "https://calculadoras.tools/en/about",
+    });
+  });
+
   it("uses updatedDate for dateModified and does not emit reviewedBy", () => {
     const jsonLd = buildBlogArticleJsonLd({
       ...baseInput,

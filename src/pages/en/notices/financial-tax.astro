@@ -1,0 +1,83 @@
+---
+import BaseLayout from "@layouts/BaseLayout.astro";
+import Container from "@components/layout/Container.astro";
+import PageShell from "@components/layout/PageShell.astro";
+import PageHero from "@components/shared/PageHero.astro";
+import Panel from "@components/shared/Panel.astro";
+import { buildAlternateLinks } from "@lib/i18n/routing";
+
+const description =
+  "Financial and tax notice for calculadoras.tools: the tools are educational estimates, not financial, tax, legal, or mortgage advice.";
+const canonical = "/en/notices/financial-tax";
+const alternates = buildAlternateLinks(
+  { es: "/avisos/financiero-fiscal", en: canonical },
+  Astro.site ?? Astro.url,
+);
+
+const sections = [
+  {
+    title: "Educational estimates",
+    content:
+      "Financial, tax, and mortgage calculators show approximate scenarios based on the information you enter. They do not predict actual credit terms, taxes, fees, or final costs.",
+  },
+  {
+    title: "Not professional advice",
+    content:
+      "The content is not a substitute for financial, tax, legal, accounting, or mortgage advice. Before making a decision, confirm the information with an institution, official authority, or qualified professional.",
+  },
+  {
+    title: "Information that changes",
+    content:
+      "Rates, taxes, fees, insurance, credit terms, and tax rules may vary by country, institution, product, date, and personal circumstances.",
+  },
+  {
+    title: "Official sources",
+    content:
+      "When a rate, tax, or condition depends on a current rule, the official source takes precedence over any example on this site.",
+  },
+];
+---
+
+<BaseLayout
+  locale="en"
+  title="Financial and tax notice"
+  description={description}
+  canonical={canonical}
+  alternates={alternates}
+>
+  <PageShell>
+    <PageHero
+      locale="en"
+      title="Financial and tax notice"
+      description="Use financial, tax, legal, and mortgage results as an educational starting point. Always confirm rates, rules, and conditions with official sources or qualified professionals."
+      breadcrumbs={[
+        { label: "Home", href: "/en", ariaLabel: "Home" },
+        {
+          label: "Methodology",
+          href: "/en/methodology",
+          optional: true,
+        },
+        { label: "Financial and tax notice" },
+      ]}
+      containerClass="px-6 py-10"
+      breadcrumbClass="mb-8"
+      titleClass="text-4xl font-bold tracking-tight md:text-6xl"
+      descriptionClass="mt-6 text-lg leading-relaxed text-gray-400"
+    />
+
+    <Container as="section" class="px-6 py-14">
+      <div class="grid gap-6">
+        {
+          sections.map((section) => (
+            <Panel as="section" padding="lg">
+              <h2 class="text-xl font-semibold">{section.title}</h2>
+              <p class="mt-3 leading-relaxed text-gray-400">
+                {section.content}
+              </p>
+            </Panel>
+          ))
+        }
+      </div>
+    </Container>
+  </PageShell>
+</BaseLayout>

@@ -23,32 +23,32 @@ export const FOOTER_LINKS: FooterLinkDefinition[] = [
   {
     id: "privacy",
     labelKey: "footer.privacy",
-    paths: { es: "/privacidad" },
+    paths: { es: "/privacidad", en: "/en/privacy" },
   },
   {
     id: "contact",
     labelKey: "footer.contact",
-    paths: { es: "/contacto" },
+    paths: { es: "/contacto", en: "/en/contact" },
   },
   {
     id: "about",
     labelKey: "footer.about",
-    paths: { es: "/acerca-de" },
+    paths: { es: "/acerca-de", en: "/en/about" },
   },
   {
     id: "methodology",
     labelKey: "footer.methodology",
-    paths: { es: "/metodologia" },
+    paths: { es: "/metodologia", en: "/en/methodology" },
   },
   {
     id: "editorialPolicy",
     labelKey: "footer.editorialPolicy",
-    paths: { es: "/politica-editorial" },
+    paths: { es: "/politica-editorial", en: "/en/editorial-policy" },
   },
   {
     id: "corrections",
     labelKey: "footer.corrections",
-    paths: { es: "/correcciones" },
+    paths: { es: "/correcciones", en: "/en/corrections" },
   },
 ];
 

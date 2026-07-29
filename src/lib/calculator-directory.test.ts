@@ -80,6 +80,18 @@ describe("calculator category directory", () => {
     expect(categories.map((category) => category.id)).not.toContain("finanzas");
   });
 
+  it("lists all published legal and tax calculators", () => {
+    const legalCalculators = getPublishedCalculators().filter(
+      (calculator) => calculator.categoryId === "legal-impuestos",
+    );
+
+    expect(legalCalculators.map((calculator) => calculator.id)).toEqual([
+      "calculadora-de-iva",
+      "calculadora-isr-irpf",
+      "calculadora-salario-neto",
+    ]);
+  });
+
   it("keeps display labels separate from canonical slugs", () => {
     const categories = getCalculatorCategories(getPublishedCalculators());
 

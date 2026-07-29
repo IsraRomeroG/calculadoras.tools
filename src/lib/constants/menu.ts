@@ -43,9 +43,11 @@ export const MENU: MenuItemDefinition[] = [
     },
     descriptions: {
       es: "Contactanos para cualquier pregunta o comentario.",
+      en: "Send suggestions, report errors, or propose a new calculator.",
     },
     paths: {
       es: "/contacto",
+      en: "/en/contact",
     },
   },
 ];

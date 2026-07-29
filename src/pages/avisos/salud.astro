@@ -4,10 +4,15 @@ import Container from "@components/layout/Container.astro";
 import PageShell from "@components/layout/PageShell.astro";
 import PageHero from "@components/shared/PageHero.astro";
 import Panel from "@components/shared/Panel.astro";
+import { buildAlternateLinks } from "@lib/i18n/routing";
 
 const description =
   "Aviso de salud de calculadoras.tools: las calculadoras y guías son educativas, estimativas y no sustituyen atención médica.";
 const canonical = "/avisos/salud";
+const alternates = buildAlternateLinks(
+  { es: canonical, en: "/en/notices/health" },
+  Astro.site ?? Astro.url,
+);
 
 const sections = [
   {
@@ -33,7 +38,12 @@ const sections = [
 ];
 ---
 
-<BaseLayout title="Aviso de salud" description={description} canonical={canonical}>
+<BaseLayout
+  title="Aviso de salud"
+  description={description}
+  canonical={canonical}
+  alternates={alternates}
+>
   <PageShell>
     <PageHero
       title="Aviso de salud"

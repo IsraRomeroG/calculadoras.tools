@@ -4,10 +4,15 @@ import Container from "@components/layout/Container.astro";
 import PageShell from "@components/layout/PageShell.astro";
 import PageHero from "@components/shared/PageHero.astro";
 import Panel from "@components/shared/Panel.astro";
+import { buildAlternateLinks } from "@lib/i18n/routing";
 
 const description =
   "Revisa la política editorial de calculadoras.tools: selección de temas, fuentes, actualizaciones, publicidad y uso responsable de herramientas de apoyo.";
 const canonical = "/politica-editorial";
+const alternates = buildAlternateLinks(
+  { es: canonical, en: "/en/editorial-policy" },
+  Astro.site ?? Astro.url,
+);
 
 const sections = [
   {
@@ -47,6 +52,7 @@ const sections = [
   title="Política editorial"
   description={description}
   canonical={canonical}
+  alternates={alternates}
 >
   <PageShell>
     <PageHero

@@ -1,0 +1,88 @@
+---
+import BaseLayout from "@layouts/BaseLayout.astro";
+import Container from "@components/layout/Container.astro";
+import PageShell from "@components/layout/PageShell.astro";
+import PageHero from "@components/shared/PageHero.astro";
+import Panel from "@components/shared/Panel.astro";
+import { buildAlternateLinks } from "@lib/i18n/routing";
+
+const description =
+  "Read the calculadoras.tools editorial policy covering topic selection, sources, updates, advertising, and responsible use of supporting tools.";
+const canonical = "/en/editorial-policy";
+const alternates = buildAlternateLinks(
+  { es: "/politica-editorial", en: canonical },
+  Astro.site ?? Astro.url,
+);
+
+const sections = [
+  {
+    title: "Topic selection",
+    content:
+      "We prioritize calculators and guides that answer a clear task. A page should add an explanation, method, limitations, or original examples; repeating a short answer already covered more effectively elsewhere is not enough.",
+  },
+  {
+    title: "Sources",
+    content:
+      "For sensitive topics, we prefer primary sources such as government agencies, regulators, technical documentation, professional institutions, or publications with a clear methodology. Sources are reviewed to confirm that they support the claim where they are cited.",
+  },
+  {
+    title: "Authorship and review",
+    content:
+      "Every article should identify an author or editorial owner. Reviewers are named only when the review actually took place; roles, professional experience, and credentials are never invented.",
+  },
+  {
+    title: "Use of supporting tools",
+    content:
+      "Supporting tools may help structure drafts, identify inconsistencies, or improve wording, but publication requires human review. These tools do not replace sources or professional expertise.",
+  },
+  {
+    title: "Updates",
+    content:
+      "The update date should change only after a substantial editorial review or modification. Minor style corrections do not justify presenting a page as thoroughly reviewed.",
+  },
+  {
+    title: "Advertising",
+    content:
+      "Advertising must remain separate from editorial content. Ads do not determine topics, calculator results, cited sources, or conclusions.",
+  },
+];
+---
+
+<BaseLayout
+  locale="en"
+  title="Editorial policy"
+  description={description}
+  canonical={canonical}
+  alternates={alternates}
+>
+  <PageShell>
+    <PageHero
+      locale="en"
+      title="Editorial policy"
+      description="These rules explain how calculadoras.tools selects, reviews, and updates content, and which editorial commitments apply before publication."
+      breadcrumbs={[
+        { label: "Home", href: "/en", ariaLabel: "Home" },
+        { label: "Editorial policy" },
+      ]}
+      containerClass="px-6 py-10"
+      breadcrumbClass="mb-8"
+      titleClass="text-4xl font-bold tracking-tight md:text-6xl"
+      descriptionClass="mt-6 text-lg leading-relaxed text-gray-400"
+    />
+
+    <Container as="section" class="px-6 py-14">
+      <div class="grid gap-6">
+        {
+          sections.map((section) => (
+            <Panel as="section" padding="lg">
+              <h2 class="text-xl font-semibold">{section.title}</h2>
+              <p class="mt-3 leading-relaxed text-gray-400">
+                {section.content}
+              </p>
+            </Panel>
+          ))
+        }
+      </div>
+    </Container>
+  </PageShell>
+</BaseLayout>

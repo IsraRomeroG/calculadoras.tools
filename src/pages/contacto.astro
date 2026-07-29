@@ -5,16 +5,22 @@ import PageShell from "@components/layout/PageShell.astro";
 import Button from "@components/shared/Button.astro";
 import PageHero from "@components/shared/PageHero.astro";
 import Panel from "@components/shared/Panel.astro";
+import { buildAlternateLinks } from "@lib/i18n/routing";
 
 const description =
   "Envía sugerencias, reporta errores o propone nuevas calculadoras para calculadoras.tools mediante el formulario de contacto.";
 const canonical = "/contacto";
+const alternates = buildAlternateLinks(
+  { es: canonical, en: "/en/contact" },
+  Astro.site ?? Astro.url,
+);
 ---
 
 <BaseLayout
   title="Formulario de Contacto"
   description={description}
   canonical={canonical}
+  alternates={alternates}
 >
   <PageShell>
     <PageHero

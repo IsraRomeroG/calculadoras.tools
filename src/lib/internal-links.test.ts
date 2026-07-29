@@ -19,11 +19,17 @@ const localizedPilotRoutes = [
   "/en/blog",
   "/en/blog/math",
   "/en/blog/math/how-to-calculate-percentages",
+  "/en/about",
+  "/en/contact",
+  "/en/corrections",
+  "/en/methodology",
+  "/en/editorial-policy",
+  "/en/privacy",
+  "/en/notices/financial-tax",
+  "/en/notices/health",
 ];
 const unpublishedEnglishRoutes = new Set([
   "/en/blog/pagina",
-  "/en/contact",
-  "/en/privacy",
 ]);
 const internalLinkPatterns = [
   /\bhref\s*=\s*["'](\/[^"']*)["']/g,

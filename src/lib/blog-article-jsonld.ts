@@ -1,15 +1,17 @@
 import {
-  EDITORIAL_ENTITY,
+  getEditorialEntity,
   getEditorialAuthor,
   toSchemaEntity,
   type EditorialEntity,
 } from "./editorial";
+import { DEFAULT_LOCALE, type Locale } from "./i18n/config";
 
 export interface BlogArticleJsonLdInput {
   author?: EditorialEntity;
   canonical: string;
   description: string;
   headline: string;
+  locale?: Locale;
   pubDate: Date;
   siteUrl: URL | string;
   updatedDate?: Date;
@@ -20,6 +22,7 @@ export const buildBlogArticleJsonLd = ({
   canonical,
   description,
   headline,
+  locale = DEFAULT_LOCALE,
   pubDate,
   siteUrl,
   updatedDate,
@@ -31,12 +34,12 @@ export const buildBlogArticleJsonLd = ({
   datePublished: pubDate.toISOString(),
   dateModified: (updatedDate ?? pubDate).toISOString(),
   author: toSchemaEntity({
-    entity: getEditorialAuthor(author),
+    entity: getEditorialAuthor(author, locale),
     siteUrl,
     type: author ? "Person" : "Organization",
   }),
   publisher: toSchemaEntity({
-    entity: EDITORIAL_ENTITY,
+    entity: getEditorialEntity(locale),
     siteUrl,
     type: "Organization",
   }),

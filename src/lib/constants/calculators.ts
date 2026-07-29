@@ -106,6 +106,24 @@ export const CALCULATORS: LegacyCalculatorDirectoryItem[] = [
     order: 20,
   },
   {
+    id: "calculadora-isr-irpf",
+    title: "Calculadora de ISR",
+    description:
+      "Estima tu ISR por periodo o por año y consulta la tasa efectiva del impuesto.",
+    href: "/legal-impuestos/calculadora-isr-irpf",
+    categorySlug: "legal-impuestos",
+    order: 21,
+  },
+  {
+    id: "calculadora-salario-neto",
+    title: "Calculadora de salario neto",
+    description:
+      "Estima tu salario neto después de ISR, subsidios y deducciones, con desglose del cálculo.",
+    href: "/legal-impuestos/calculadora-salario-neto",
+    categorySlug: "legal-impuestos",
+    order: 22,
+  },
+  {
     id: "calculadora-de-interes-compuesto",
     title: "Calculadora de interés compuesto",
     description:

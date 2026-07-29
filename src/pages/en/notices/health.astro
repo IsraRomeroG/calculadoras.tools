@@ -1,0 +1,83 @@
+---
+import BaseLayout from "@layouts/BaseLayout.astro";
+import Container from "@components/layout/Container.astro";
+import PageShell from "@components/layout/PageShell.astro";
+import PageHero from "@components/shared/PageHero.astro";
+import Panel from "@components/shared/Panel.astro";
+import { buildAlternateLinks } from "@lib/i18n/routing";
+
+const description =
+  "Health notice for calculadoras.tools: calculators and guides are educational estimates and do not replace medical care.";
+const canonical = "/en/notices/health";
+const alternates = buildAlternateLinks(
+  { es: "/avisos/salud", en: canonical },
+  Astro.site ?? Astro.url,
+);
+
+const sections = [
+  {
+    title: "Educational use",
+    content:
+      "Health calculators and guides on calculadoras.tools are provided for educational purposes. They can help explain ranges, formulas, or estimates, but they do not evaluate your complete clinical situation.",
+  },
+  {
+    title: "Not a substitute for medical care",
+    content:
+      "The content does not replace diagnosis, treatment, follow-up care, or the judgment of a healthcare professional. If you have symptoms, medication questions, or significant recent changes, consult a qualified professional.",
+  },
+  {
+    title: "Situations requiring extra care",
+    content:
+      "Pregnancy, minors, illness, persistent symptoms, medication, eating disorders, chronic conditions, or relevant medical history require professional guidance before making decisions.",
+  },
+  {
+    title: "Sources and limitations",
+    content:
+      "Sources support general information and reference formulas. They do not turn an estimate into an individual diagnosis or guarantee that a result applies to every situation.",
+  },
+];
+---
+
+<BaseLayout
+  locale="en"
+  title="Health notice"
+  description={description}
+  canonical={canonical}
+  alternates={alternates}
+>
+  <PageShell>
+    <PageHero
+      locale="en"
+      title="Health notice"
+      description="Health-related results should be read as general estimates. Do not use a calculator as a diagnosis or as a substitute for medical care."
+      breadcrumbs={[
+        { label: "Home", href: "/en", ariaLabel: "Home" },
+        {
+          label: "Methodology",
+          href: "/en/methodology",
+          optional: true,
+        },
+        { label: "Health notice" },
+      ]}
+      containerClass="px-6 py-10"
+      breadcrumbClass="mb-8"
+      titleClass="text-4xl font-bold tracking-tight md:text-6xl"
+      descriptionClass="mt-6 text-lg leading-relaxed text-gray-400"
+    />
+
+    <Container as="section" class="px-6 py-14">
+      <div class="grid gap-6">
+        {
+          sections.map((section) => (
+            <Panel as="section" padding="lg">
+              <h2 class="text-xl font-semibold">{section.title}</h2>
+              <p class="mt-3 leading-relaxed text-gray-400">
+                {section.content}
+              </p>
+            </Panel>
+          ))
+        }
+      </div>
+    </Container>
+  </PageShell>
+</BaseLayout>

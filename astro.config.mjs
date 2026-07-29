@@ -25,9 +25,9 @@ const publishedBlogCategoryPaths =
   getPublishedBlogCategoryPathsForSitemap(BLOG_CONTENT_DIR);
 const publishedBlogCategorySlugs =
   getPublishedBlogCategorySlugsForSitemap(BLOG_CONTENT_DIR);
-const unpublishedLocalizedPaths = new Set([
-  '/en/contact',
-  '/en/privacy',
+const excludedUtilityPaths = new Set([
+  '/404',
+  '/en/404',
 ]);
 
 const shouldIncludeInSitemap = createSitemapFilter({
@@ -35,7 +35,7 @@ const shouldIncludeInSitemap = createSitemapFilter({
   publishedBlogArticlePaths,
   publishedBlogCategoryPaths,
   publishedBlogCategorySlugs,
-  excludedPaths: unpublishedLocalizedPaths,
+  excludedPaths: excludedUtilityPaths,
 });
 
 // https://astro.build/config

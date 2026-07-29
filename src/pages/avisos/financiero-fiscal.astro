@@ -4,10 +4,15 @@ import Container from "@components/layout/Container.astro";
 import PageShell from "@components/layout/PageShell.astro";
 import PageHero from "@components/shared/PageHero.astro";
 import Panel from "@components/shared/Panel.astro";
+import { buildAlternateLinks } from "@lib/i18n/routing";
 
 const description =
   "Aviso financiero y fiscal de calculadoras.tools: las herramientas son educativas y estimativas, no asesoría financiera, fiscal, legal ni hipotecaria.";
 const canonical = "/avisos/financiero-fiscal";
+const alternates = buildAlternateLinks(
+  { es: canonical, en: "/en/notices/financial-tax" },
+  Astro.site ?? Astro.url,
+);
 
 const sections = [
   {
@@ -37,6 +42,7 @@ const sections = [
   title="Aviso financiero y fiscal"
   description={description}
   canonical={canonical}
+  alternates={alternates}
 >
   <PageShell>
     <PageHero

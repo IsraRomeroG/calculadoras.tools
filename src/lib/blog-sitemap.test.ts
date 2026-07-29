@@ -239,10 +239,10 @@ describe("blog sitemap publication filtering", () => {
     }
   });
 
-  it("allows published localized pilot routes while blocking unpublished English utility routes", () => {
+  it("allows published English institutional routes while excluding error pages", () => {
     const shouldIncludeInSitemap = createSitemapFilter({
       ...emptySitemapSets,
-      excludedPaths: new Set(["/en/contact", "/en/privacy"]),
+      excludedPaths: new Set(["/404", "/en/404"]),
     });
 
     expect(shouldIncludeInSitemap("https://calculadoras.tools/en")).toBe(true);
@@ -259,9 +259,15 @@ describe("blog sitemap publication filtering", () => {
     );
     expect(
       shouldIncludeInSitemap("https://calculadoras.tools/en/contact"),
-    ).toBe(false);
+    ).toBe(true);
     expect(
       shouldIncludeInSitemap("https://calculadoras.tools/en/privacy"),
+    ).toBe(true);
+    expect(
+      shouldIncludeInSitemap("https://calculadoras.tools/en/about"),
+    ).toBe(true);
+    expect(
+      shouldIncludeInSitemap("https://calculadoras.tools/en/404"),
     ).toBe(false);
   });
 });

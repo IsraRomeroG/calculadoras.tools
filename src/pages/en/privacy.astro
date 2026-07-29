@@ -1,0 +1,127 @@
+---
+import BaseLayout from "@layouts/BaseLayout.astro";
+import Container from "@components/layout/Container.astro";
+import PageShell from "@components/layout/PageShell.astro";
+import PageHero from "@components/shared/PageHero.astro";
+import Panel from "@components/shared/Panel.astro";
+import { AD_CONSENT_MODE } from "@lib/ads/config";
+import { buildAlternateLinks } from "@lib/i18n/routing";
+
+const description =
+  "Learn how calculadoras.tools handles information submitted through forms and the technical data needed to operate the site.";
+const canonical = "/en/privacy";
+const alternates = buildAlternateLinks(
+  { es: "/privacidad", en: canonical },
+  Astro.site ?? Astro.url,
+);
+
+const adConsentDescription = {
+  all: "We ask every visitor for consent before loading third-party ads that may use cookies, tracking, or personalization. If you decline, we do not load those ads and you can continue using the entire site.",
+  europe:
+    "For visitors located in Europe, we ask for consent before loading third-party ads that may use cookies, tracking, or personalization. If you decline, we do not load those ads and you can continue using the entire site.",
+  off: "Third-party ads may use cookies, tracking, or personalization and are currently loaded without asking for consent through a banner.",
+}[AD_CONSENT_MODE];
+
+const sections = [
+  {
+    title: "Information we collect",
+    content:
+      "You can browse calculadoras.tools without creating an account. Calculators process the data you enter to display results on screen. If you use the contact form, we collect the information you submit, such as your name, email address, and message.",
+  },
+  {
+    title: "How we use information",
+    content:
+      "We use information submitted through the form only to respond to your message, follow up on suggestions, correct errors, or improve the site.",
+  },
+  {
+    title: "Contact form",
+    content:
+      "The contact form is processed by an external service that receives the submission and forwards it to the calculadoras.tools team. We do not publish contact email addresses on the site in order to reduce automated spam.",
+  },
+  {
+    title: "Cookies, advertising, and consent",
+    content: `We do not use user accounts or first-party login cookies. ${adConsentDescription} When the banner is active, we store your choice locally in your browser, and you can change it through Ad preferences in the footer.`,
+  },
+  ...(AD_CONSENT_MODE === "europe"
+    ? [
+        {
+          title: "Regional detection",
+          content:
+            "Before loading advertising, we query GeoJS from your browser to estimate whether the IP address is located in Europe. GeoJS receives the IP address when processing that request. For 24 hours, calculadoras.tools stores only whether consent is required, without storing the IP address, country, or city. If the query fails, we request consent as a precaution.",
+        },
+      ]
+    : []),
+  {
+    title: "Third-party services",
+    content:
+      "The site may rely on technical providers for hosting, site delivery, regional detection, form processing, and advertising. These services may process technical data needed to operate correctly, such as IP address, date, time, device information, and interactions with ads, under their own policies.",
+  },
+  {
+    title: "Retention",
+    content:
+      "We retain contact messages only for as long as reasonably necessary to respond, resolve issues, or maintain a basic operational history.",
+  },
+  {
+    title: "Your rights",
+    content:
+      "You may request access to, correction of, or deletion of information you submitted through the contact form.",
+  },
+  {
+    title: "Changes to this policy",
+    content:
+      "We may update this page when site features, providers, or applicable obligations change. The current version will always be available on this page.",
+  },
+];
+---
+
+<BaseLayout
+  locale="en"
+  title="Privacy"
+  description={description}
+  canonical={canonical}
+  alternates={alternates}
+>
+  <PageShell>
+    <PageHero
+      locale="en"
+      title="Privacy"
+      description="This policy explains what information calculadoras.tools may collect and how we use it to keep the site operating clearly and responsibly."
+      breadcrumbs={[
+        { label: "Home", href: "/en", ariaLabel: "Home" },
+        { label: "Privacy" },
+      ]}
+      containerClass="px-6 py-10"
+      breadcrumbClass="mb-8"
+      titleClass="text-4xl font-bold tracking-tight md:text-6xl"
+      descriptionClass="mt-6 text-lg leading-relaxed text-gray-400"
+    >
+      <p class="mt-4 text-sm text-gray-500">
+        Last updated: June 13, 2026
+      </p>
+    </PageHero>
+
+    <Container as="section" class="px-6 py-14">
+      <div class="grid gap-8">
+        <Panel as="section" padding="lg">
+          <h2 class="text-lg font-semibold">Summary</h2>
+          <ul class="mt-4 space-y-3 text-sm text-gray-400">
+            <li>You do not need an account to use the calculators.</li>
+            <li>User messages are submitted through forms.</li>
+          </ul>
+        </Panel>
+        <div class="space-y-6">
+          {
+            sections.map((section) => (
+              <Panel as="section" padding="lg">
+                <h2 class="text-xl font-semibold">{section.title}</h2>
+                <p class="mt-3 leading-relaxed text-gray-400">
+                  {section.content}
+                </p>
+              </Panel>
+            ))
+          }
+        </div>
+      </div>
+    </Container>
+  </PageShell>
+</BaseLayout>
