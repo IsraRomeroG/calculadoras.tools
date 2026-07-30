@@ -25,11 +25,24 @@ describe("calculator category directory", () => {
     );
     expect(getCalculatorCategoryUrl("eventos")).toBe("/eventos");
     expect(getCalculatorCategoryUrl("matematicas", "en")).toBe("/en/math");
-    expect(getCalculatorCategoryUrl("finanzas", "en")).toBeNull();
+    expect(getCalculatorCategoryUrl("finanzas", "en")).toBe("/en/finance");
+    expect(getCalculatorCategoryUrl("inmuebles", "en")).toBe(
+      "/en/real-estate",
+    );
+    expect(getCalculatorCategoryUrl("salud", "en")).toBe("/en/health");
   });
 
   it("keeps the English pilot category URL without a trailing slash", () => {
     expect(getCalculatorCategoryUrl("matematicas", "en")).toBe("/en/math");
+  });
+
+  it("defines English metadata for every calculator category", () => {
+    const englishCategories = Object.values(CATEGORY_DEFINITIONS).map(
+      (definition) => definition.locales.en,
+    );
+
+    expect(englishCategories).toHaveLength(CATEGORY_SLUGS.length);
+    expect(englishCategories.every(Boolean)).toBe(true);
   });
 
   it("keeps the Spanish percentage calculator route and creates the English pilot route", () => {
@@ -56,6 +69,60 @@ describe("calculator category directory", () => {
         href: "/en/math/percentage-calculator",
         categoryId: "matematicas",
       }),
+      expect.objectContaining({
+        id: "conversor-de-medidas-culinarias",
+        title: "Cooking measurement converter",
+        href: "/en/cooking/cooking-measurement-converter",
+        categoryId: "cocina",
+      }),
+      expect.objectContaining({
+        id: "conversor-de-temperatura-de-horno",
+        title: "Oven temperature converter",
+        href: "/en/cooking/oven-temperature-converter",
+        categoryId: "cocina",
+      }),
+      expect.objectContaining({
+        id: "calculadora-tiempo-coccion-por-peso",
+        title: "Cooking time by weight calculator",
+        href: "/en/cooking/cooking-time-by-weight-calculator",
+        categoryId: "cocina",
+      }),
+      expect.objectContaining({
+        id: "escalar-receta-por-porciones",
+        title: "Recipe scaler",
+        href: "/en/cooking/recipe-scaler",
+        categoryId: "cocina",
+      }),
+      expect.objectContaining({
+        id: "calculadora-volumen-concreto-cemento",
+        title: "Concrete volume calculator",
+        href: "/en/construction/concrete-volume-calculator",
+        categoryId: "construccion",
+      }),
+      expect.objectContaining({
+        id: "calculadora-cantidad-ladrillos",
+        title: "Brick calculator",
+        href: "/en/construction/brick-calculator",
+        categoryId: "construccion",
+      }),
+      expect.objectContaining({
+        id: "calculadora-piso-azulejo-superficie",
+        title: "Floor and wall tile calculator",
+        href: "/en/construction/tile-calculator",
+        categoryId: "construccion",
+      }),
+      expect.objectContaining({
+        id: "calculadora-presupuesto-remodelacion",
+        title: "Renovation budget calculator",
+        href: "/en/construction/renovation-budget-calculator",
+        categoryId: "construccion",
+      }),
+      expect.objectContaining({
+        id: "metros-cuadrados-de-pintura",
+        title: "Paint calculator",
+        href: "/en/construction/paint-calculator",
+        categoryId: "construccion",
+      }),
     ]);
 
     expect(
@@ -69,14 +136,28 @@ describe("calculator category directory", () => {
       "en",
     );
 
-    expect(categories).toEqual([
-      expect.objectContaining({
-        id: "matematicas",
-        slug: "math",
-        label: "Math",
-        count: 1,
-      }),
-    ]);
+    expect(categories).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          id: "matematicas",
+          slug: "math",
+          label: "Math",
+          count: 1,
+        }),
+        expect.objectContaining({
+          id: "cocina",
+          slug: "cooking",
+          label: "Cooking",
+          count: 4,
+        }),
+        expect.objectContaining({
+          id: "construccion",
+          slug: "construction",
+          label: "Construction",
+          count: 5,
+        }),
+      ]),
+    );
     expect(categories.map((category) => category.id)).not.toContain("finanzas");
   });
 

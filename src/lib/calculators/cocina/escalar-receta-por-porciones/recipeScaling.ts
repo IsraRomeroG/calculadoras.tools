@@ -105,6 +105,44 @@ const UNIT_ALIASES = new Set([
   "ramitas",
   "diente",
   "dientes",
+  "unit",
+  "units",
+  "gram",
+  "grams",
+  "kilogram",
+  "kilograms",
+  "liter",
+  "liters",
+  "litre",
+  "litres",
+  "milliliter",
+  "milliliters",
+  "millilitre",
+  "millilitres",
+  "cup",
+  "cups",
+  "tablespoon",
+  "tablespoons",
+  "tbsp",
+  "teaspoon",
+  "teaspoons",
+  "tsp",
+  "ounce",
+  "ounces",
+  "pound",
+  "pounds",
+  "piece",
+  "pieces",
+  "package",
+  "packages",
+  "pinch",
+  "pinches",
+  "can",
+  "cans",
+  "sprig",
+  "sprigs",
+  "clove",
+  "cloves",
 ]);
 
 const PRACTICAL_WARNING_RULES = [
@@ -150,6 +188,49 @@ const PRACTICAL_WARNING_RULES = [
   },
 ] as const;
 
+const PRACTICAL_WARNING_RULES_EN = [
+  {
+    term: "egg",
+    pattern: /\beggs?\b/i,
+    message: "Review the amount before rounding eggs or whole pieces.",
+  },
+  {
+    term: "yeast",
+    pattern: /\byeast\b/i,
+    message: "Yeast may need a practical adjustment depending on the recipe.",
+  },
+  {
+    term: "baking powder",
+    pattern: /\bbaking\s+powder\b/i,
+    message: "Review leavening ingredients before scaling.",
+  },
+  {
+    term: "baking soda",
+    pattern: /\bbaking\s+soda\b/i,
+    message: "Review leavening ingredients before scaling.",
+  },
+  {
+    term: "salt",
+    pattern: /\bsalt\b/i,
+    message: "Salt may need to be adjusted to taste.",
+  },
+  {
+    term: "spice",
+    pattern: /\bspices?\b|\bcinnamon\b|\bpepper\b|\bcumin\b|\boregano\b/i,
+    message: "Spices can taste more intense when a recipe is scaled.",
+  },
+  {
+    term: "pan",
+    pattern: /\bpans?\b|\btins?\b/i,
+    message: "Pan size can change the thickness and cooking time.",
+  },
+  {
+    term: "oven",
+    pattern: /\boven\b/i,
+    message: "Oven time does not always scale linearly.",
+  },
+] as const;
+
 export function calculateRecipeScaleFactor(
   originalServings: number,
   desiredServings: number,
@@ -187,6 +268,7 @@ export function scaleIngredientQuantity(
 
 export function parseRecipeQuantity(
   rawValue: string,
+  locale: "es" | "en" = "es",
 ): ParseRecipeQuantityResult {
   const trimmed = rawValue.trim().replaceAll("−", "-");
 
@@ -218,7 +300,7 @@ export function parseRecipeQuantity(
     };
   }
 
-  const normalized = normalizeLocalizedNumber(trimmed);
+  const normalized = normalizeLocalizedNumber(trimmed, locale);
 
   if (!normalized) {
     return { ok: false, error: "invalid" };
@@ -320,6 +402,7 @@ export function approximateCookingFraction(
 
 export function validateRecipeIngredient(
   ingredient: RecipeIngredient,
+  locale: "es" | "en" = "es",
 ): RecipeIngredientValidation {
   const errors: string[] = [];
   const name = ingredient.name.trim();
@@ -328,23 +411,40 @@ export function validateRecipeIngredient(
   const isTasteOnly = isTasteOnlyIngredient(ingredient);
 
   if (!name) {
-    errors.push("Escribe el ingrediente.");
+    errors.push(
+      locale === "en" ? "Enter the ingredient." : "Escribe el ingrediente.",
+    );
   }
 
   if (!quantity && !isTasteOnly) {
-    errors.push("Escribe la cantidad o marca la fila como al gusto.");
+    errors.push(
+      locale === "en"
+        ? "Enter an amount or mark the row as to taste."
+        : "Escribe la cantidad o marca la fila como al gusto.",
+    );
   }
 
   if (quantity) {
-    const parsed = parseRecipeQuantity(quantity);
+    const parsed = parseRecipeQuantity(quantity, locale);
 
     if (!parsed.ok) {
-      errors.push("La cantidad no se pudo interpretar.");
+      errors.push(
+        locale === "en"
+          ? "The amount could not be interpreted."
+          : "La cantidad no se pudo interpretar.",
+      );
     }
   }
 
-  if (!name && unit.toLowerCase() === "al gusto") {
-    errors.push("Escribe que ingrediente es al gusto.");
+  if (
+    !name &&
+    ["al gusto", "to taste"].includes(unit.toLowerCase())
+  ) {
+    errors.push(
+      locale === "en"
+        ? "Enter which ingredient is added to taste."
+        : "Escribe que ingrediente es al gusto.",
+    );
   }
 
   return {
@@ -354,14 +454,17 @@ export function validateRecipeIngredient(
   };
 }
 
-export function parsePastedIngredientLine(line: string): RecipeIngredient {
+export function parsePastedIngredientLine(
+  line: string,
+  locale: "es" | "en" = "es",
+): RecipeIngredient {
   const normalizedLine = line.trim().replace(/\s+/g, " ");
 
   if (!normalizedLine) {
     return { quantity: "", unit: "", name: "" };
   }
 
-  const tasteOnly = parseTasteOnlyLine(normalizedLine);
+  const tasteOnly = parseTasteOnlyLine(normalizedLine, locale);
 
   if (tasteOnly) {
     return tasteOnly;
@@ -393,7 +496,7 @@ export function parsePastedIngredientLine(line: string): RecipeIngredient {
       return {
         quantity: quantityCandidate,
         unit: rest[0],
-        name: stripLeadingConnector(rest.slice(1).join(" ")),
+        name: stripLeadingConnector(rest.slice(1).join(" "), locale),
       };
     }
 
@@ -414,11 +517,12 @@ export function parsePastedIngredientLine(line: string): RecipeIngredient {
 export function parsePastedIngredients(
   text: string,
   maxIngredients = RECIPE_SCALING_MAX_INGREDIENTS,
+  locale: "es" | "en" = "es",
 ): PastedIngredientsResult {
   const safeMax = Math.max(0, Math.trunc(maxIngredients));
   const parsedLines = text.split(/\r?\n/).map((line) => ({
     raw: line,
-    ingredient: parsePastedIngredientLine(line),
+    ingredient: parsePastedIngredientLine(line, locale),
   }));
   const nonEmptyLines = parsedLines.filter(({ raw }) => raw.trim());
   const ingredients = nonEmptyLines
@@ -434,6 +538,7 @@ export function parsePastedIngredients(
 
 export function detectPracticalWarnings(
   ingredient: RecipeIngredient | string,
+  locale: "es" | "en" = "es",
 ): PracticalWarning[] {
   const text =
     typeof ingredient === "string"
@@ -441,7 +546,14 @@ export function detectPracticalWarnings(
       : `${ingredient.unit} ${ingredient.name}`;
   const matches = new Map<string, PracticalWarning>();
 
-  PRACTICAL_WARNING_RULES.forEach((rule) => {
+  const rules: readonly {
+    term: string;
+    pattern: RegExp;
+    message: string;
+  }[] =
+    locale === "en" ? PRACTICAL_WARNING_RULES_EN : PRACTICAL_WARNING_RULES;
+
+  rules.forEach((rule) => {
     if (rule.pattern.test(text)) {
       matches.set(rule.term, {
         term: rule.term,
@@ -491,6 +603,7 @@ function isIncompleteRecipeInput(value: string) {
 
 function normalizeLocalizedNumber(
   rawValue: string,
+  locale: "es" | "en",
 ): { value: string; interpretation?: string } | undefined {
   const value = rawValue.replace(/\s/g, "");
   const lastComma = value.lastIndexOf(",");
@@ -535,7 +648,10 @@ function normalizeLocalizedNumber(
 
       return {
         value: interpreted,
-        interpretation: `Interpretado como ${interpreted}`,
+        interpretation:
+          locale === "en"
+            ? `Interpreted as ${interpreted}`
+            : `Interpretado como ${interpreted}`,
       };
     }
 
@@ -554,7 +670,10 @@ function normalizeLocalizedNumber(
 
       return {
         value: interpreted,
-        interpretation: `Interpretado como ${interpreted}`,
+        interpretation:
+          locale === "en"
+            ? `Interpreted as ${interpreted}`
+            : `Interpretado como ${interpreted}`,
       };
     }
 
@@ -566,28 +685,45 @@ function normalizeLocalizedNumber(
   return /^\d+$/.test(value) ? { value } : undefined;
 }
 
-function parseTasteOnlyLine(line: string): RecipeIngredient | undefined {
+function parseTasteOnlyLine(
+  line: string,
+  locale: "es" | "en",
+): RecipeIngredient | undefined {
   const normalized = normalizeText(line);
+  const tastePhrase = locale === "en" ? "to taste" : "al gusto";
 
-  if (!/\bal gusto\b/.test(normalized)) {
+  if (
+    !(locale === "en"
+      ? /\bto taste\b/.test(normalized)
+      : /\bal gusto\b/.test(normalized))
+  ) {
     return undefined;
   }
 
-  const name = line.replace(/\bal gusto\b/i, "").trim();
+  const name = line
+    .replace(
+      locale === "en" ? /\bto taste\b/i : /\bal gusto\b/i,
+      "",
+    )
+    .trim();
 
   return {
     quantity: "",
-    unit: "al gusto",
+    unit: tastePhrase,
     name: name || line,
   };
 }
 
-function stripLeadingConnector(value: string) {
-  return value.replace(/^de\s+/i, "").trim();
+function stripLeadingConnector(value: string, locale: "es" | "en") {
+  return value
+    .replace(locale === "en" ? /^of\s+/i : /^de\s+/i, "")
+    .trim();
 }
 
 function isTasteOnlyIngredient(ingredient: RecipeIngredient) {
-  return /\bal gusto\b/i.test(`${ingredient.unit} ${ingredient.name}`);
+  return /\b(?:al gusto|to taste)\b/i.test(
+    `${ingredient.unit} ${ingredient.name}`,
+  );
 }
 
 function formatDecimal(value: number, decimals = DEFAULT_DECIMALS) {

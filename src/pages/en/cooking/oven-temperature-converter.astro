@@ -1,0 +1,752 @@
+---
+import BaseLayout from "@layouts/BaseLayout.astro";
+import AdSlot from "@components/ads/AdSlot.astro";
+import Container from "@components/layout/Container.astro";
+import PageShell from "@components/layout/PageShell.astro";
+import FaqSection from "@components/shared/FaqSection.astro";
+import PageHero from "@components/shared/PageHero.astro";
+import SectionIntro from "@components/shared/SectionIntro.astro";
+import { GAS_MARKS } from "@lib/calculators/cocina/conversor-de-temperatura-de-horno/gasMarks";
+import {
+  OVEN_TEMPERATURE_UNIT_METADATA_EN,
+  OVEN_TEMPERATURE_UNITS,
+  type OvenTemperatureUnit,
+} from "@lib/calculators/cocina/conversor-de-temperatura-de-horno/ovenTemperature";
+import { SAFE_TEMPERATURES_EN } from "@lib/calculators/cocina/conversor-de-temperatura-de-horno/safeTemperatures.en";
+import { SAFE_TEMPERATURE_SOURCE } from "@lib/calculators/cocina/conversor-de-temperatura-de-horno/safeTemperatures";
+import { buildFaqJsonLd } from "@lib/seo";
+import { buildAlternateLinks } from "@lib/i18n/routing";
+
+const title = "Oven temperature converter: °C, °F and gas mark";
+const description =
+  "Convert oven temperatures between Celsius, Fahrenheit and gas mark, with fan-oven guidance and safe internal temperatures.";
+const canonical = "/en/cooking/oven-temperature-converter";
+const spanishCanonical = "/cocina/conversor-de-temperatura-de-horno";
+const alternates = buildAlternateLinks(
+  { es: spanishCanonical, en: canonical },
+  Astro.site ?? Astro.url,
+);
+
+const faqs = [
+  {
+    question: "What is 180 °C in Fahrenheit for an oven?",
+    answer:
+      "180 °C equals exactly 356 °F. Home ovens commonly use the practical setting of 350 °F, approximately gas mark 4.",
+  },
+  {
+    question: "What is 350 °F in Celsius?",
+    answer:
+      "350 °F equals exactly 176.67 °C. As a practical oven setting, it is commonly rounded to 180 °C.",
+  },
+  {
+    question: "What gas mark equals 180 °C?",
+    answer:
+      "180 °C is approximately gas mark 4. Gas marks are approximate and can vary by oven.",
+  },
+  {
+    question: "Should I lower the temperature for a fan oven?",
+    answer:
+      "As a general guide, subtract 20 °C or 25 °F from the conventional setting. Follow the recipe or oven manufacturer when they provide different guidance.",
+  },
+  {
+    question: "Does the oven temperature guarantee that meat is cooked?",
+    answer:
+      "No. Oven temperature does not guarantee the internal temperature of the food. Use a food thermometer to check the center or thickest point.",
+  },
+  {
+    question: "Why is Kelvin shown as an advanced option?",
+    answer:
+      "Kelvin is useful for scientific conversion but is uncommon in recipes. The calculator keeps it available without making it part of the main workflow.",
+  },
+];
+
+const faqJsonLd = buildFaqJsonLd(faqs);
+
+const visibleOriginUnits: OvenTemperatureUnit[] = ["c", "f", "gas"];
+const presets = [
+  { label: "160 °C", value: "160", unit: "c", destination: "f", result: "325 °F / gas 3" },
+  { label: "180 °C", value: "180", unit: "c", destination: "f", result: "350 °F / gas 4" },
+  { label: "200 °C", value: "200", unit: "c", destination: "f", result: "400 °F / gas 6" },
+  { label: "350 °F", value: "350", unit: "f", destination: "c", result: "180 °C / gas 4" },
+  { label: "375 °F", value: "375", unit: "f", destination: "c", result: "190 °C / gas 5" },
+  { label: "400 °F", value: "400", unit: "f", destination: "c", result: "200 °C / gas 6" },
+  { label: "gas 4", value: "4", unit: "gas", destination: "c", result: "180 °C / 350 °F" },
+  { label: "gas 6", value: "6", unit: "gas", destination: "c", result: "200 °C / 400 °F" },
+];
+---
+
+<BaseLayout
+  title={title}
+  description={description}
+  canonical={canonical}
+  locale="en"
+  alternates={alternates}
+>
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={JSON.stringify(faqJsonLd)} />
+  </Fragment>
+
+  <PageShell>
+    <PageHero
+      title="Oven temperature converter"
+      description="Convert °C, °F and gas mark with practical settings for conventional and fan ovens, plus food-safety references."
+      kicker="Cooking"
+      collapseBreadcrumbOnMobile
+      containerClass="py-6 md:py-8"
+      breadcrumbs={[
+        { label: "Home", href: "/en", ariaLabel: "Home" },
+        { label: "Cooking", href: "/en/cooking", optional: true },
+        { label: "Oven temperature", truncate: true },
+      ]}
+    />
+
+    <Container as="section" class="py-5 md:py-8">
+      <section
+        id="oven-temperature-converter"
+        class="overflow-hidden rounded-lg border border-gray-700 bg-gray-950 shadow-xl shadow-gray-950/30"
+        aria-labelledby="calculator-heading"
+      >
+        <div class="grid gap-0 lg:grid-cols-[minmax(0,1fr)_minmax(20rem,0.82fr)]">
+          <div class="p-4 sm:p-6">
+            <p class="text-sm font-semibold text-amber-300">Home oven</p>
+            <h2 id="calculator-heading" class="mt-2 text-2xl font-semibold">
+              Recipe temperature
+            </h2>
+
+            <div class="mt-5">
+              <label for="oven-temperature-value" class="block text-sm font-semibold text-gray-200">
+                Temperature
+              </label>
+              <div
+                class="mt-2 flex rounded-lg border border-gray-700 bg-gray-900 focus-within:border-amber-400 focus-within:ring-3 focus-within:ring-amber-400/15"
+              >
+                <input
+                  id="oven-temperature-value"
+                  class="min-h-14 w-full bg-transparent px-4 text-xl text-white outline-none placeholder:text-gray-600"
+                  type="text"
+                  inputmode="decimal"
+                  autocomplete="off"
+                  placeholder="e.g. 180c, 350 f or gas 4"
+                  aria-describedby="oven-temperature-error"
+                  data-temperature-input
+                />
+                <span class="flex min-w-16 items-center justify-center border-l border-gray-800 px-3 text-sm font-semibold text-gray-400" data-input-symbol>
+                  °C
+                </span>
+              </div>
+              <p
+                id="oven-temperature-error"
+                class="mt-2 hidden text-sm leading-relaxed text-red-300"
+                data-temperature-error
+              >
+              </p>
+            </div>
+
+            <div class="mt-5">
+              <span class="block text-sm font-semibold text-gray-200">
+                Source unit
+              </span>
+              <div class="mt-2 grid grid-cols-3 gap-2 rounded-lg bg-gray-900 p-1" role="group" aria-label="Source unit">
+                {
+                  visibleOriginUnits.map((unit) => (
+                    <button
+                      class:list={[
+                        "min-h-12 rounded-md px-3 text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-300/40",
+                        unit === "c"
+                          ? "bg-amber-400 text-gray-950"
+                          : "text-gray-300 hover:bg-gray-800",
+                      ]}
+                      type="button"
+                      data-origin-unit={unit}
+                      aria-pressed={unit === "c" ? "true" : "false"}
+                    >
+                      {OVEN_TEMPERATURE_UNIT_METADATA_EN[unit].shortLabel}
+                    </button>
+                  ))
+                }
+              </div>
+            </div>
+
+            <div class="mt-5 grid gap-4 sm:grid-cols-2">
+              <div>
+                <label for="oven-temperature-destination" class="block text-sm font-semibold text-gray-200">
+                  Main result
+                </label>
+                <select
+                  id="oven-temperature-destination"
+                  class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-900 px-4 text-base text-white outline-none transition focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15"
+                  data-destination-select
+                >
+                  {
+                    OVEN_TEMPERATURE_UNITS.map((unit) => (
+                      <option value={unit} selected={unit === "f"}>
+                        {OVEN_TEMPERATURE_UNIT_METADATA_EN[unit].label}
+                        {OVEN_TEMPERATURE_UNIT_METADATA_EN[unit].advanced ? " (advanced)" : ""}
+                      </option>
+                    ))
+                  }
+                </select>
+              </div>
+
+              <div>
+                <span class="block text-sm font-semibold text-gray-200">Oven</span>
+                <label class="mt-2 flex min-h-12 items-center gap-3 rounded-lg border border-gray-700 bg-gray-900 px-4 text-sm text-gray-200">
+                  <input
+                    class="size-4 accent-amber-400"
+                    type="checkbox"
+                    data-convection-toggle
+                  />
+                  <span>Fan/convection</span>
+                </label>
+              </div>
+            </div>
+
+            <details class="mt-4 rounded-lg border border-gray-800 bg-gray-950">
+              <summary class="min-h-12 cursor-pointer px-4 py-3 text-sm font-semibold text-gray-200">
+                Advanced Kelvin
+              </summary>
+              <div class="border-t border-gray-800 p-4">
+                <button
+                  class="min-h-11 rounded-lg border border-gray-700 px-4 py-2 text-sm font-semibold text-gray-200 transition hover:border-amber-400/60 hover:text-amber-200 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/30"
+                  type="button"
+                  data-origin-unit="k"
+                  aria-pressed="false"
+                >
+                  Use Kelvin as the source
+                </button>
+                <p class="mt-3 text-xs leading-relaxed text-gray-500">
+                  Kelvin does not use a degree symbol and is validated against absolute zero.
+                </p>
+              </div>
+            </details>
+
+            <div class="mt-5 flex flex-wrap gap-3">
+              <button
+                class="min-h-11 rounded-lg border border-gray-700 px-4 py-2 text-sm font-semibold text-gray-200 transition hover:border-gray-500 hover:bg-gray-900 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-gray-400/30"
+                type="button"
+                data-clear-calculator
+              >
+                Clear
+              </button>
+            </div>
+
+            <div class="mt-6">
+              <h3 class="text-lg font-semibold">Common settings</h3>
+              <div class="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4">
+                {
+                  presets.map((preset) => (
+                    <button
+                      class="min-h-16 rounded-lg border border-gray-800 bg-gray-900 px-3 py-2 text-left transition hover:border-amber-400/60 hover:bg-gray-800 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/30"
+                      type="button"
+                      data-preset-value={preset.value}
+                      data-preset-unit={preset.unit}
+                      data-preset-destination={preset.destination}
+                    >
+                      <span class="block text-sm font-semibold text-white">{preset.label}</span>
+                      <span class="mt-1 block text-xs leading-snug text-amber-300">{preset.result}</span>
+                    </button>
+                  ))
+                }
+              </div>
+            </div>
+          </div>
+
+          <aside class="border-t border-gray-800 bg-gray-900/65 p-4 sm:p-6 lg:border-l lg:border-t-0">
+            <p class="text-xs font-semibold uppercase tracking-wide text-gray-500">
+              Result
+            </p>
+            <p class="mt-3 min-h-10 break-words text-3xl font-semibold text-amber-100" data-exact-result>
+              Enter a temperature
+            </p>
+            <div class="mt-4 space-y-3 text-sm leading-relaxed">
+              <p class="min-h-6 text-gray-300" data-practical-result>
+                The practical oven setting will appear here.
+              </p>
+              <p class="hidden rounded-lg border border-amber-400/25 bg-amber-400/10 p-3 text-amber-100" data-convection-result>
+              </p>
+              <p class="hidden rounded-lg border border-red-400/25 bg-red-400/10 p-3 text-red-100" data-range-warning>
+              </p>
+              <p class="text-gray-500" data-result-note>
+                Gas marks are approximate and vary by oven.
+              </p>
+            </div>
+            <button
+              class="mt-4 hidden min-h-11 rounded-lg bg-amber-400 px-4 py-2 text-sm font-semibold text-gray-950 transition hover:bg-amber-300 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-300/40"
+              type="button"
+              data-copy-main
+            >
+              Copy result
+            </button>
+            <p class="sr-only" role="status" aria-live="polite" data-live-status></p>
+            <p class="mt-3 min-h-5 text-sm text-emerald-300" role="status" aria-live="polite" data-copy-status></p>
+
+            <div class="mt-6 border-t border-gray-800 pt-5">
+              <h3 class="text-lg font-semibold">Conversions</h3>
+              <div class="mt-3 divide-y divide-gray-800 overflow-hidden rounded-lg border border-gray-800 bg-gray-950 text-sm">
+                <div class="flex min-h-12 items-center justify-between gap-3 px-4 py-3">
+                  <span class="text-gray-400">Celsius</span>
+                  <span class="font-semibold text-white" data-output="c">-</span>
+                </div>
+                <div class="flex min-h-12 items-center justify-between gap-3 px-4 py-3">
+                  <span class="text-gray-400">Fahrenheit</span>
+                  <span class="font-semibold text-white" data-output="f">-</span>
+                </div>
+                <div class="flex min-h-12 items-center justify-between gap-3 px-4 py-3">
+                  <span class="text-gray-400">Gas mark</span>
+                  <span class="font-semibold text-white" data-output="gas">-</span>
+                </div>
+                <details>
+                  <summary class="min-h-12 cursor-pointer px-4 py-3 font-semibold text-gray-300">
+                    Kelvin
+                  </summary>
+                  <div class="flex min-h-12 items-center justify-between gap-3 border-t border-gray-800 px-4 py-3">
+                    <span class="text-gray-400">Advanced</span>
+                    <span class="font-semibold text-white" data-output="k">-</span>
+                  </div>
+                </details>
+              </div>
+            </div>
+          </aside>
+        </div>
+      </section>
+    </Container>
+
+    <AdSlot placement="calculator-after-tool" />
+
+    <Container as="section" class="py-6 md:py-8">
+      <SectionIntro
+        title="Gas mark table"
+        description="Approximate reference values used by the calculator for gas-mark ovens."
+      />
+      <div class="overflow-hidden rounded-lg border border-gray-800 bg-gray-950">
+        <div class="overflow-x-auto">
+          <table class="w-full min-w-[32rem] text-left text-sm">
+            <thead class="bg-gray-900 text-xs uppercase tracking-wide text-gray-500">
+              <tr>
+                <th class="px-4 py-3 font-semibold">Gas mark</th>
+                <th class="px-4 py-3 text-right font-semibold">Approx. °C</th>
+                <th class="px-4 py-3 text-right font-semibold">Approx. °F</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-800">
+              {
+                GAS_MARKS.map((entry) => (
+                  <tr>
+                    <th class="px-4 py-3 font-medium text-white">gas {entry.mark}</th>
+                    <td class="px-4 py-3 text-right text-gray-300">{entry.celsius} °C</td>
+                    <td class="px-4 py-3 text-right text-gray-300">{entry.fahrenheit} °F</td>
+                  </tr>
+                ))
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <p class="mt-3 text-sm leading-relaxed text-gray-500">
+        If a recipe or oven manual uses a different table, follow that reference.
+      </p>
+    </Container>
+
+    <Container as="section" class="py-6 md:py-8">
+      <SectionIntro
+        title="Safe internal temperature"
+        description="This table is independent of the oven setting. Use a food thermometer."
+      />
+      <div class="rounded-lg border border-red-400/25 bg-red-400/10 p-4 text-sm leading-relaxed text-red-100">
+        The oven setting does not confirm that food reached a safe internal temperature.
+      </div>
+      <div class="mt-5 overflow-hidden rounded-lg border border-gray-800 bg-gray-950">
+        <div class="overflow-x-auto">
+          <table class="w-full min-w-[48rem] text-left text-sm">
+            <thead class="bg-gray-900 text-xs uppercase tracking-wide text-gray-500">
+              <tr>
+                <th class="px-4 py-3 font-semibold">Food</th>
+                <th class="px-4 py-3 font-semibold">Details</th>
+                <th class="px-4 py-3 text-right font-semibold">Internal temperature</th>
+                <th class="px-4 py-3 font-semibold">Rest</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-800">
+              {
+                SAFE_TEMPERATURES_EN.map((entry) => (
+                  <tr>
+                    <th class="px-4 py-3 align-top font-medium text-white">{entry.food}</th>
+                    <td class="px-4 py-3 align-top text-gray-300">
+                      <span class="block">{entry.detail}</span>
+                      <span class="mt-1 block text-xs leading-relaxed text-gray-500">{entry.note}</span>
+                    </td>
+                    <td class="px-4 py-3 align-top text-right font-semibold text-amber-100">
+                      {entry.temperatureF && entry.temperatureC
+                        ? `${entry.temperatureF} °F / ${entry.temperatureC} °C`
+                        : "See note"}
+                    </td>
+                    <td class="px-4 py-3 align-top text-gray-300">{entry.restTime}</td>
+                  </tr>
+                ))
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <p class="mt-3 text-xs leading-relaxed text-gray-500">
+        Source: <a class="text-amber-300 underline underline-offset-4" href={SAFE_TEMPERATURE_SOURCE.url} rel="noreferrer">{SAFE_TEMPERATURE_SOURCE.name}</a>.
+        Source reviewed: {SAFE_TEMPERATURE_SOURCE.sourceReviewedAt}. Editorial review:
+        {" "}{SAFE_TEMPERATURE_SOURCE.editorialReviewedAt}.
+      </p>
+    </Container>
+
+    <Container as="section" class="py-6 md:py-8">
+      <SectionIntro
+        title="Exact conversion and practical setting"
+        description="The mathematical conversion keeps full precision; the practical setting rounds to common oven temperatures."
+      />
+      <div class="grid gap-4 md:grid-cols-3">
+        <article class="rounded-lg border border-gray-800 bg-gray-950 p-5">
+          <h3 class="text-lg font-semibold">Exact</h3>
+          <p class="mt-3 text-sm leading-relaxed text-gray-400">
+            `180 °C` converts exactly to `356 °F`.
+          </p>
+        </article>
+        <article class="rounded-lg border border-gray-800 bg-gray-950 p-5">
+          <h3 class="text-lg font-semibold">Practical</h3>
+          <p class="mt-3 text-sm leading-relaxed text-gray-400">
+            For ovens, `180 °C` is commonly set as `350 °F / gas 4`.
+          </p>
+        </article>
+        <article class="rounded-lg border border-gray-800 bg-gray-950 p-5">
+          <h3 class="text-lg font-semibold">Fan oven</h3>
+          <p class="mt-3 text-sm leading-relaxed text-gray-400">
+            As a general guide, subtract `20 °C` or `25 °F` from the conventional setting.
+          </p>
+        </article>
+      </div>
+    </Container>
+
+    <FaqSection faqs={faqs} />
+  </PageShell>
+</BaseLayout>
+
+<script>
+  import { getGasMarkEntry } from "@lib/calculators/cocina/conversor-de-temperatura-de-horno/gasMarks";
+  import {
+    OVEN_TEMPERATURE_UNIT_METADATA_EN,
+    OVEN_TEMPERATURE_UNITS,
+    convertOvenTemperature,
+    createOvenTemperatureReading,
+    formatGasMark,
+    formatOvenConversionResult,
+    formatOvenTemperature,
+    getConvectionSuggestion,
+    getOvenEquivalences,
+    getOvenRangeWarning,
+    getPracticalOvenSetting,
+    isOvenTemperatureUnit,
+    parseOvenTemperatureInput,
+  } from "@lib/calculators/cocina/conversor-de-temperatura-de-horno/ovenTemperature";
+
+  const formatGasMarkEn = (entry) => formatGasMark(entry, "en");
+  const formatOvenConversionResultEn = (result, decimals = 2) =>
+    formatOvenConversionResult(result, decimals, "en");
+  const formatOvenTemperatureEn = (value, unit, decimals = 2) =>
+    formatOvenTemperature(value, unit, decimals, "en");
+  const getOvenRangeWarningEn = (reading) => getOvenRangeWarning(reading, "en");
+
+  const input = document.querySelector("[data-temperature-input]");
+  const inputSymbol = document.querySelector("[data-input-symbol]");
+  const errorElement = document.querySelector("[data-temperature-error]");
+  const originButtons = document.querySelectorAll("[data-origin-unit]");
+  const destinationSelect = document.querySelector("[data-destination-select]");
+  const convectionToggle = document.querySelector("[data-convection-toggle]");
+  const clearButton = document.querySelector("[data-clear-calculator]");
+  const exactResult = document.querySelector("[data-exact-result]");
+  const practicalResult = document.querySelector("[data-practical-result]");
+  const convectionResult = document.querySelector("[data-convection-result]");
+  const rangeWarning = document.querySelector("[data-range-warning]");
+  const resultNote = document.querySelector("[data-result-note]");
+  const copyButton = document.querySelector("[data-copy-main]");
+  const copyStatus = document.querySelector("[data-copy-status]");
+  const liveStatus = document.querySelector("[data-live-status]");
+  const outputElements = new Map(
+    OVEN_TEMPERATURE_UNITS.map((unit) => [
+      unit,
+      document.querySelector(`[data-output="${unit}"]`),
+    ]),
+  );
+
+  let originUnit = "c";
+  let currentCopyText = "";
+  let copyTimer = 0;
+  let urlTimer = 0;
+
+  function setOriginUnit(unit) {
+    originUnit = isOvenTemperatureUnit(unit) ? unit : "c";
+    inputSymbol.textContent = OVEN_TEMPERATURE_UNIT_METADATA_EN[originUnit].shortLabel;
+
+    originButtons.forEach((button) => {
+      const active = button.dataset.originUnit === originUnit;
+
+      button.setAttribute("aria-pressed", active ? "true" : "false");
+      button.classList.toggle("bg-amber-400", active);
+      button.classList.toggle("text-gray-950", active);
+      button.classList.toggle("text-gray-300", !active);
+      button.classList.toggle("hover:bg-gray-800", !active);
+      button.classList.toggle("border-amber-400/60", active && originUnit === "k");
+    });
+  }
+
+  function getDestinationUnit() {
+    return isOvenTemperatureUnit(destinationSelect.value)
+      ? destinationSelect.value
+      : "f";
+  }
+
+  function setError(message = "") {
+    errorElement.textContent = message;
+    errorElement.classList.toggle("hidden", !message);
+    input.setAttribute("aria-invalid", message ? "true" : "false");
+  }
+
+  function clearOutputs(note = "Gas marks are approximate and vary by oven.") {
+    currentCopyText = "";
+    exactResult.textContent = "Enter a temperature";
+    practicalResult.textContent = "The practical oven setting will appear here.";
+    convectionResult.textContent = "";
+    convectionResult.classList.add("hidden");
+    rangeWarning.textContent = "";
+    rangeWarning.classList.add("hidden");
+    resultNote.textContent = note;
+    copyButton.classList.add("hidden");
+    outputElements.forEach((element) => {
+      element.textContent = "-";
+    });
+  }
+
+  function formatSource(reading) {
+    if (reading.unit === "gas") {
+      return formatGasMarkEn(getGasMarkEntry(reading.gasMark));
+    }
+
+    return formatOvenTemperatureEn(reading.value, reading.unit, 2);
+  }
+
+  function syncUrl() {
+    const url = new URL(window.location.href);
+
+    if (input.value.trim()) {
+      url.searchParams.set("value", input.value.trim());
+      url.searchParams.set("from", originUnit);
+      url.searchParams.set("to", getDestinationUnit());
+      if (convectionToggle.checked) {
+        url.searchParams.set("fan", "1");
+      } else {
+        url.searchParams.delete("fan");
+      }
+    } else {
+      ["value", "from", "to", "fan"].forEach((parameter) => {
+        url.searchParams.delete(parameter);
+      });
+    }
+
+    window.clearTimeout(urlTimer);
+    urlTimer = window.setTimeout(() => {
+      window.history.replaceState({}, "", url);
+    }, 250);
+  }
+
+  function render(options = {}) {
+    const { updateUrl = true, announce = true } = options;
+    const parsed = parseOvenTemperatureInput(input.value);
+
+    if (!parsed.ok) {
+      if (parsed.error === "invalid") {
+        setError("Unable to interpret the temperature. Use 180c, 350 f or gas 4.");
+        clearOutputs("Check the format to see the conversions.");
+      } else if (parsed.error === "unsupported-gas") {
+        setError("Unsupported gas mark. Use 1/4, 1/2 or 1 through 9.");
+        clearOutputs("Choose a gas mark from the table.");
+      } else {
+        setError();
+        clearOutputs();
+      }
+
+      if (updateUrl) {
+        syncUrl();
+      }
+      return;
+    }
+
+    if (parsed.detectedUnit) {
+      setOriginUnit(parsed.detectedUnit);
+    } else {
+      inputSymbol.textContent = OVEN_TEMPERATURE_UNIT_METADATA_EN[originUnit].shortLabel;
+    }
+
+    try {
+      const reading = createOvenTemperatureReading(parsed, originUnit);
+      const destination = getDestinationUnit();
+      const exact = convertOvenTemperature(reading, destination);
+      const equivalences = getOvenEquivalences(reading);
+      const practical = getPracticalOvenSetting(reading);
+      const convection = getConvectionSuggestion(reading);
+      const warning = getOvenRangeWarningEn(reading);
+      const exactText = `${formatSource(reading)} = ${formatOvenConversionResultEn(exact)}${exact.approximate ? " approx." : ""}`;
+      const practicalText = `Practical setting: ${formatOvenTemperatureEn(practical.celsius, "c", 0)} / ${formatOvenTemperatureEn(practical.fahrenheit, "f", 0)} / ${formatGasMarkEn(practical.gasMark)}.`;
+
+      setError();
+      exactResult.textContent = exactText;
+      practicalResult.textContent = practicalText;
+      resultNote.textContent = "Do not use the oven setting as a substitute for the internal temperature of the food.";
+      copyButton.classList.remove("hidden");
+
+      outputElements.get("c").textContent = `${formatOvenTemperatureEn(equivalences.celsius, "c", 2)}${equivalences.sourceWasGasMark ? " approx." : ""}`;
+      outputElements.get("f").textContent = `${formatOvenTemperatureEn(equivalences.fahrenheit, "f", 2)}${equivalences.sourceWasGasMark ? " approx." : ""}`;
+      outputElements.get("gas").textContent = formatGasMarkEn(equivalences.gasMark);
+      outputElements.get("k").textContent = `${formatOvenTemperatureEn(equivalences.kelvin, "k", 2)}${equivalences.sourceWasGasMark ? " approx." : ""}`;
+
+      rangeWarning.textContent = warning ?? "";
+      rangeWarning.classList.toggle("hidden", !warning);
+
+      if (convectionToggle.checked) {
+        convectionResult.textContent = `Fan/convection: ${formatOvenTemperatureEn(convection.celsius, "c", 0)} / ${formatOvenTemperatureEn(convection.fahrenheit, "f", 0)}${convection.gasMark ? ` / ${formatGasMarkEn(convection.gasMark)}` : ""}.`;
+        convectionResult.classList.remove("hidden");
+      } else {
+        convectionResult.textContent = "";
+        convectionResult.classList.add("hidden");
+      }
+
+      currentCopyText = [
+        exactText,
+        practicalText,
+        convectionToggle.checked ? convectionResult.textContent : "",
+        warning ?? "",
+        "Verify a safe internal temperature with a food thermometer.",
+      ]
+        .filter(Boolean)
+        .join("\n");
+
+      if (updateUrl) {
+        syncUrl();
+      }
+
+      if (announce) {
+        liveStatus.textContent = `Result: ${exactText}`;
+      }
+    } catch (error) {
+      setError(
+        "Unable to convert this temperature.",
+      );
+      clearOutputs("Correct the value to continue.");
+
+      if (updateUrl) {
+        syncUrl();
+      }
+    }
+  }
+
+  async function copyResult() {
+    if (!currentCopyText) {
+      return;
+    }
+
+    try {
+      await navigator.clipboard.writeText(currentCopyText);
+      copyStatus.textContent = "Result copied.";
+    } catch {
+      copyStatus.textContent = "Unable to copy automatically.";
+    }
+
+    window.clearTimeout(copyTimer);
+    copyTimer = window.setTimeout(() => {
+      copyStatus.textContent = "";
+    }, 2500);
+  }
+
+  function clearCalculator() {
+    input.value = "";
+    setOriginUnit("c");
+    destinationSelect.value = "f";
+    convectionToggle.checked = false;
+    setError();
+    clearOutputs();
+    syncUrl();
+    input.focus();
+  }
+
+  function loadUrlParameters() {
+    const parameters = new URLSearchParams(window.location.search);
+    const value = parameters.get("value");
+    const origin = parameters.get("from");
+    const destination = parameters.get("to");
+    const fan = parameters.get("fan");
+
+    if (origin && isOvenTemperatureUnit(origin)) {
+      setOriginUnit(origin);
+    }
+
+    if (destination && isOvenTemperatureUnit(destination)) {
+      destinationSelect.value = destination;
+    }
+
+    convectionToggle.checked = fan === "1" || fan === "true";
+
+    if (value) {
+      input.value = value;
+      render({ updateUrl: false, announce: false });
+    }
+  }
+
+  input.addEventListener("input", () => {
+    render();
+  });
+
+  originButtons.forEach((button) => {
+    button.addEventListener("click", () => {
+      setOriginUnit(button.dataset.originUnit);
+      render();
+    });
+  });
+
+  destinationSelect.addEventListener("change", () => {
+    render();
+  });
+
+  convectionToggle.addEventListener("change", () => {
+    render();
+  });
+
+  clearButton.addEventListener("click", clearCalculator);
+  copyButton.addEventListener("click", copyResult);
+
+  document.addEventListener("click", (event) => {
+    const presetButton = event.target.closest("[data-preset-value]");
+
+    if (!presetButton) {
+      return;
+    }
+
+    const { presetValue, presetUnit, presetDestination } = presetButton.dataset;
+
+    if (
+      typeof presetValue !== "string" ||
+      !isOvenTemperatureUnit(presetUnit) ||
+      !isOvenTemperatureUnit(presetDestination)
+    ) {
+      return;
+    }
+
+    input.value = presetValue;
+    setOriginUnit(presetUnit);
+    destinationSelect.value = presetDestination;
+    render();
+    document.querySelector("#oven-temperature-converter")?.scrollIntoView({
+      behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches
+        ? "auto"
+        : "smooth",
+      block: "start",
+    });
+    input.focus();
+  });
+
+  setOriginUnit("c");
+  loadUrlParameters();
+</script>

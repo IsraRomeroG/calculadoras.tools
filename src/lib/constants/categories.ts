@@ -140,12 +140,102 @@ export const CATEGORIES = {
   },
 } as const satisfies Record<CategorySlug, CategoryMetadata>;
 
-const ENGLISH_CATEGORIES: Partial<Record<CategoryId, LocalizedCategoryMetadata>> = {
+const ENGLISH_CATEGORIES: Record<CategoryId, LocalizedCategoryMetadata> = {
+  finanzas: {
+    slug: "finance",
+    label: "Finance",
+    description:
+      "Calculators for estimating loans, interest, savings and investment scenarios before making financial decisions.",
+  },
+  inmuebles: {
+    slug: "real-estate",
+    label: "Real Estate",
+    description:
+      "Tools for estimating payments, financing and common home or real estate scenarios.",
+  },
+  "legal-impuestos": {
+    slug: "legal-tax",
+    label: "Legal & Taxes",
+    description:
+      "Tools for reviewing taxes, take-home amounts and other legal or tax-related estimates with clear assumptions.",
+  },
   matematicas: {
     slug: "math",
     label: "Math",
     description:
       "Calculators for percentages, proportions, geometry and everyday math problems.",
+  },
+  "probabilidad-estadistica": {
+    slug: "probability-statistics",
+    label: "Probability & Statistics",
+    description:
+      "Calculators for probability, counting and statistics with clear formulas and step-by-step explanations.",
+  },
+  programacion: {
+    slug: "programming",
+    label: "Programming",
+    description:
+      "Calculators and converters for number systems, data and common software development tasks.",
+  },
+  geometria: {
+    slug: "geometry",
+    label: "Geometry",
+    description:
+      "Calculators for areas, perimeters, triangles and other geometric measurements with clear formulas.",
+  },
+  salud: {
+    slug: "health",
+    label: "Health",
+    description:
+      "Reference calculators for reviewing personal indicators and understanding general health and wellness estimates.",
+  },
+  "fecha-tiempo": {
+    slug: "date-time",
+    label: "Date & Time",
+    description:
+      "Tools for calculating ages, intervals, working time and important dates with clear results.",
+  },
+  conversores: {
+    slug: "converters",
+    label: "Converters",
+    description:
+      "Fast converters for everyday units with clear results, formulas and useful reference values.",
+  },
+  mascotas: {
+    slug: "pets",
+    label: "Pets",
+    description:
+      "Reference tools for estimating useful information about dogs and cats with clear care-related context.",
+  },
+  cocina: {
+    slug: "cooking",
+    label: "Cooking",
+    description:
+      "Tools for scaling recipes, converting cooking measurements and planning preparation times.",
+  },
+  eventos: {
+    slug: "events",
+    label: "Events",
+    description:
+      "Tools for estimating budgets, per-person costs and shared expenses for weddings, parties and celebrations.",
+  },
+  restaurantes: {
+    slug: "restaurants",
+    label: "Restaurants",
+    description:
+      "Tools for calculating tips, splitting bills and reviewing shared restaurant payments.",
+  },
+  vehiculos: {
+    slug: "vehicles",
+    label: "Vehicles",
+    description:
+      "Tools for estimating fuel economy, driving costs, depreciation and common vehicle expenses.",
+  },
+  construccion: {
+    slug: "construction",
+    label: "Construction",
+    description:
+      "Calculators for estimating areas, materials and quantities for building, painting and home improvement projects.",
   },
 };
 

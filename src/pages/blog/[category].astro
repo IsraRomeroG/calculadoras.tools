@@ -14,6 +14,7 @@ import {
   type PaginatedItems,
 } from "@lib/blog";
 import { LOCALE_CONFIG } from "@lib/i18n/config";
+import { getCategoryLocale } from "@lib/constants/categories";
 import { getBlogUi } from "@lib/i18n/blog";
 import { t } from "@lib/i18n/messages";
 import { buildAlternateLinks } from "@lib/i18n/routing";
@@ -26,10 +27,6 @@ export async function getStaticPaths() {
   const englishPosts = await getPublishedBlogPostsByLocale("en");
   assertNoBlogRouteConflicts([...posts, ...englishPosts]);
   const categories = getBlogCategories(posts, pathLocale);
-  const englishCategoryIds = new Set(
-    getBlogCategories(englishPosts, "en").map((category) => category.id),
-  );
-
   return categories.map((category) => {
     const categoryPosts = getBlogPostsByCategoryId(posts, category.id);
     const pagination = paginateItems(categoryPosts, 1);
@@ -40,7 +37,7 @@ export async function getStaticPaths() {
         category,
         posts: pagination.items,
         pagination,
-        hasEnglishAlternate: englishCategoryIds.has(category.id),
+        hasEnglishAlternate: Boolean(getCategoryLocale(category.id, "en")),
       },
     };
   });

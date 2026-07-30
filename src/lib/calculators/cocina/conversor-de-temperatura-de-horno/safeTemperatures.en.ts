@@ -1,0 +1,86 @@
+import {
+  SAFE_TEMPERATURE_SOURCE,
+  type SafeTemperatureEntry,
+} from "./safeTemperatures";
+
+const sourceFields = {
+  sourceName: SAFE_TEMPERATURE_SOURCE.name,
+  sourceUrl: SAFE_TEMPERATURE_SOURCE.url,
+  sourceReviewedAt: SAFE_TEMPERATURE_SOURCE.sourceReviewedAt,
+  editorialReviewedAt: SAFE_TEMPERATURE_SOURCE.editorialReviewedAt,
+} as const;
+
+export const SAFE_TEMPERATURES_EN: SafeTemperatureEntry[] = [
+  {
+    food: "Poultry",
+    detail: "Chicken, turkey and other poultry, including pieces, whole birds, ground poultry, giblets and stuffing cooked inside the bird.",
+    temperatureF: 165,
+    temperatureC: 74,
+    restTime: "Not specified",
+    note: "Measure at the thickest point without touching bone.",
+    ...sourceFields,
+  },
+  {
+    food: "Ground meat and sausage",
+    detail: "Ground or sausage forms of beef, bison, veal, goat, lamb and pork.",
+    temperatureF: 160,
+    temperatureC: 71,
+    restTime: "Not specified",
+    note: "Grinding can distribute surface bacteria throughout the mixture.",
+    ...sourceFields,
+  },
+  {
+    food: "Whole cuts",
+    detail: "Steaks, roasts and chops of beef, pork, veal, lamb, goat or bison.",
+    temperatureF: 145,
+    temperatureC: 63,
+    restTime: "3 minutes",
+    note: "Resting allows the internal portions to finish reaching a safe temperature.",
+    ...sourceFields,
+  },
+  {
+    food: "Fish",
+    detail: "Whole fish or fillets such as salmon, tuna, tilapia, cod or trout.",
+    temperatureF: 145,
+    temperatureC: 63,
+    restTime: "Not specified",
+    note: "Fish may also be cooked until the flesh is opaque and flakes easily with a fork.",
+    ...sourceFields,
+  },
+  {
+    food: "Casseroles",
+    detail: "With meat, poultry or no meat.",
+    temperatureF: 165,
+    temperatureC: 74,
+    restTime: "Not specified",
+    note: "Check the center of the dish, not only the surface.",
+    ...sourceFields,
+  },
+  {
+    food: "Reheated leftovers",
+    detail: "Any type of leftover food.",
+    temperatureF: 165,
+    temperatureC: 74,
+    restTime: "Not specified",
+    note: "Reheat evenly and measure the internal temperature.",
+    ...sourceFields,
+  },
+  {
+    food: "Raw eggs",
+    detail: "Eggs cooked on their own.",
+    temperatureF: null,
+    temperatureC: null,
+    restTime: "Not specified",
+    note: "Cook until the yolk and white are firm.",
+    ...sourceFields,
+  },
+  {
+    food: "Egg dishes",
+    detail: "Frittatas, quiches and similar preparations.",
+    temperatureF: 160,
+    temperatureC: 71,
+    restTime: "Not specified",
+    note: "Check the center of the dish.",
+    ...sourceFields,
+  },
+];

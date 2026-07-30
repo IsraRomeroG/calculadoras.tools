@@ -97,6 +97,8 @@ describe("blog route helpers", () => {
     expect(getBlogIndexPageUrl(1, "en")).toBe("/en/blog");
     expect(getBlogIndexPageUrl(2, "en")).toBe("/en/blog/page/2");
     expect(getBlogCategoryUrl("matematicas", "en")).toBe("/en/blog/math");
+    expect(getBlogCategoryUrl("finanzas", "en")).toBe("/en/blog/finance");
+    expect(getBlogCategoryUrl("salud", "en")).toBe("/en/blog/health");
     expect(getBlogCategoryPageUrl("matematicas", 2, "en")).toBe(
       "/en/blog/math/page/2",
     );

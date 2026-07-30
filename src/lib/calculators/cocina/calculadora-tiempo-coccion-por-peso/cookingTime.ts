@@ -242,6 +242,7 @@ export function addMinutesToTimeOfDay(
 export function formatCookingDuration(
   minutes: number,
   rounding: CookingNumberRounding = "nearest",
+  locale: "es" | "en" = "es",
 ): string {
   validateNonNegativeFinite(minutes, "La duracion");
 
@@ -252,7 +253,11 @@ export function formatCookingDuration(
   const parts: string[] = [];
 
   if (days > 0) {
-    parts.push(`${days} d`);
+    parts.push(
+      locale === "en"
+        ? `${days} ${days === 1 ? "day" : "days"}`
+        : `${days} d`,
+    );
   }
 
   if (hours > 0) {
@@ -268,17 +273,21 @@ export function formatCookingDuration(
 
 export function formatCookingDurationRange(
   range: CookingMinutesRange,
+  locale: "es" | "en" = "es",
 ): string {
   validateRange(range);
 
   if (isSameMinuteRange(range)) {
-    return formatCookingDuration(range.min);
+    return formatCookingDuration(range.min, "nearest", locale);
   }
 
-  return `${formatCookingDuration(range.min, "floor")} a ${formatCookingDuration(range.max, "ceil")}`;
+  return `${formatCookingDuration(range.min, "floor", locale)} ${locale === "en" ? "to" : "a"} ${formatCookingDuration(range.max, "ceil", locale)}`;
 }
 
-export function formatTimeOfDay(time: TimeOfDayResult): string {
+export function formatTimeOfDay(
+  time: TimeOfDayResult,
+  locale: "es" | "en" = "es",
+): string {
   const hours = Math.floor(time.minutesOfDay / 60);
   const minutes = time.minutesOfDay % 60;
   const base = `${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}`;
@@ -288,24 +297,31 @@ export function formatTimeOfDay(time: TimeOfDayResult): string {
   }
 
   if (time.dayOffset === 1) {
-    return `${base} (+1 dia)`;
+    return `${base} (+1 ${locale === "en" ? "day" : "dia"})`;
   }
 
-  return `${base} (+${time.dayOffset} dias)`;
+  return `${base} (+${time.dayOffset} ${locale === "en" ? "days" : "dias"})`;
 }
 
-export function formatTimeRange(range: TimeOfDayRange): string {
+export function formatTimeRange(
+  range: TimeOfDayRange,
+  locale: "es" | "en" = "es",
+): string {
   if (
     range.min.minutesOfDay === range.max.minutesOfDay &&
     range.min.dayOffset === range.max.dayOffset
   ) {
-    return formatTimeOfDay(range.min);
+    return formatTimeOfDay(range.min, locale);
   }
 
-  return `${formatTimeOfDay(range.min)} a ${formatTimeOfDay(range.max)}`;
+  return `${formatTimeOfDay(range.min, locale)} ${locale === "en" ? "to" : "a"} ${formatTimeOfDay(range.max, locale)}`;
 }
 
-export function formatCookingNumber(value: number, decimals = 2): string {
+export function formatCookingNumber(
+  value: number,
+  decimals = 2,
+  locale: "es" | "en" = "es",
+): string {
   if (!Number.isFinite(value)) {
     throw new RangeError("El valor debe ser un numero finito.");
   }
@@ -313,7 +329,7 @@ export function formatCookingNumber(value: number, decimals = 2): string {
   const safeDecimals = Math.min(8, Math.max(0, Math.trunc(decimals)));
   const normalizedValue = Object.is(value, -0) ? 0 : value;
 
-  return new Intl.NumberFormat("es-MX", {
+  return new Intl.NumberFormat(locale === "en" ? "en-US" : "es-MX", {
     maximumFractionDigits: safeDecimals,
   }).format(roundToDecimals(normalizedValue, safeDecimals));
 }

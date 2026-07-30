@@ -270,4 +270,29 @@ describe("blog sitemap publication filtering", () => {
       shouldIncludeInSitemap("https://calculadoras.tools/en/404"),
     ).toBe(false);
   });
+
+  it("includes translated static English blog categories", () => {
+    const shouldIncludeInSitemap = createSitemapFilter({
+      ...emptySitemapSets,
+      publishedBlogCategoryPaths: new Set([
+        "/en/blog/converters",
+        "/en/blog/finance",
+        "/en/blog/real-estate",
+        "/en/blog/legal-tax",
+        "/en/blog/health",
+      ]),
+    });
+
+    expect(
+      shouldIncludeInSitemap("https://calculadoras.tools/en/blog/finance"),
+    ).toBe(true);
+    expect(
+      shouldIncludeInSitemap("https://calculadoras.tools/en/blog/health"),
+    ).toBe(true);
+    expect(
+      shouldIncludeInSitemap(
+        "https://calculadoras.tools/en/blog/finance/untranslated-article",
+      ),
+    ).toBe(false);
+  });
 });

@@ -19,6 +19,10 @@ import {
   paginateItems,
   type BlogPost,
 } from "@lib/blog";
+import {
+  getCategory,
+  type CategoryId,
+} from "@lib/constants/categories";
 import { LOCALE_CONFIG, type Locale } from "@lib/i18n/config";
 import type { AlternateLink } from "@lib/i18n/routing";
 import { getBlogUi } from "@lib/i18n/blog";
@@ -45,7 +49,30 @@ const featuredPostCategoryHref = featuredPostCategoryId
   : undefined;
 const latestPosts = getBlogListingPosts(posts, featuredPost);
 const latestPostsPage = paginateItems(latestPosts, 1);
-const categories = getBlogCategories(posts, locale);
+const publishedCategories = getBlogCategories(posts, locale);
+const englishBlogCategoryIds: CategoryId[] = [
+  "conversores",
+  "finanzas",
+  "inmuebles",
+  "legal-impuestos",
+  "matematicas",
+  "salud",
+];
+const categories =
+  locale === "en"
+    ? englishBlogCategoryIds.map((categoryId) => {
+        const metadata = getCategory(categoryId, locale);
+
+        return {
+          id: categoryId,
+          label: metadata.label,
+          slug: metadata.slug,
+          count:
+            publishedCategories.find((category) => category.id === categoryId)
+              ?.count ?? 0,
+        };
+      })
+    : publishedCategories;
 const homeHref = LOCALE_CONFIG[locale].urlPrefix || "/";
 ---
 

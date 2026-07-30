@@ -855,6 +855,69 @@ const ENGLISH_CALCULATOR_METADATA: Partial<
     slug: "percentage-calculator",
     published: true,
   },
+  "conversor-de-medidas-culinarias": {
+    title: "Cooking measurement converter",
+    description:
+      "Convert cups, tablespoons, milliliters, grams and other common cooking measurements.",
+    slug: "cooking-measurement-converter",
+    published: true,
+  },
+  "conversor-de-temperatura-de-horno": {
+    title: "Oven temperature converter",
+    description:
+      "Convert oven temperatures between Celsius, Fahrenheit and gas mark, with fan-oven guidance.",
+    slug: "oven-temperature-converter",
+    published: true,
+  },
+  "calculadora-tiempo-coccion-por-peso": {
+    title: "Cooking time by weight calculator",
+    description:
+      "Estimate cooking time by kilogram or pound, including check, finish and serving times.",
+    slug: "cooking-time-by-weight-calculator",
+    published: true,
+  },
+  "escalar-receta-por-porciones": {
+    title: "Recipe scaler",
+    description:
+      "Adjust ingredient quantities for the original and desired number of servings.",
+    slug: "recipe-scaler",
+    published: true,
+  },
+  "calculadora-volumen-concreto-cemento": {
+    title: "Concrete volume calculator",
+    description:
+      "Calculate concrete volume by section, waste allowance, estimated bags and optional cost.",
+    slug: "concrete-volume-calculator",
+    published: true,
+  },
+  "calculadora-cantidad-ladrillos": {
+    title: "Brick calculator",
+    description:
+      "Estimate bricks or blocks from wall area, openings, joints, waste allowance, packages and optional cost.",
+    slug: "brick-calculator",
+    published: true,
+  },
+  "calculadora-piso-azulejo-superficie": {
+    title: "Floor and wall tile calculator",
+    description:
+      "Calculate tile boxes from area, tile size, waste allowance, surplus and optional cost.",
+    slug: "tile-calculator",
+    published: true,
+  },
+  "calculadora-presupuesto-remodelacion": {
+    title: "Renovation budget calculator",
+    description:
+      "Organize line items, contingency and taxes, calculate cost per m² and compare the total with your budget.",
+    slug: "renovation-budget-calculator",
+    published: true,
+  },
+  "metros-cuadrados-de-pintura": {
+    title: "Paint calculator",
+    description:
+      "Calculate wall or ceiling area and estimate paint from coats and coverage.",
+    slug: "paint-calculator",
+    published: true,
+  },
 };
 
 const getCalculatorSlugFromHref = (href: string) =>

@@ -7,11 +7,16 @@ import FaqSection from "@components/shared/FaqSection.astro";
 import PageHero from "@components/shared/PageHero.astro";
 import SectionIntro from "@components/shared/SectionIntro.astro";
 import { buildFaqJsonLd } from "@lib/seo";
+import { buildAlternateLinks } from "@lib/i18n/routing";
 
 const title = "Calculadora de volumen de concreto y cemento";
 const description =
   "Calcula metros cúbicos de concreto para losas, columnas, vigas y zapatas, con desperdicio, sacos estimados y costo opcional.";
 const canonical = "/construccion/calculadora-volumen-concreto-cemento";
+const alternates = buildAlternateLinks(
+  { es: canonical, en: "/en/construction/concrete-volume-calculator" },
+  Astro.site ?? Astro.url,
+);
 
 const faqs = [
   {
@@ -59,7 +64,7 @@ const faqs = [
 const faqJsonLd = buildFaqJsonLd(faqs);
 ---
 
-<BaseLayout title={title} description={description} canonical={canonical}>
+<BaseLayout title={title} description={description} canonical={canonical} alternates={alternates}>
   <Fragment slot="head">
     <script type="application/ld+json" set:html={JSON.stringify(faqJsonLd)} />
   </Fragment>

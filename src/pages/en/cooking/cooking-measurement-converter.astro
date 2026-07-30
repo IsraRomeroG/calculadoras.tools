@@ -1,0 +1,1108 @@
+---
+import BaseLayout from "@layouts/BaseLayout.astro";
+import AdSlot from "@components/ads/AdSlot.astro";
+import Container from "@components/layout/Container.astro";
+import PageShell from "@components/layout/PageShell.astro";
+import FaqSection from "@components/shared/FaqSection.astro";
+import PageHero from "@components/shared/PageHero.astro";
+import SectionIntro from "@components/shared/SectionIntro.astro";
+import {
+  COOKING_MASS_UNITS,
+  COOKING_MEASURE_UNIT_METADATA_EN,
+  COOKING_VOLUME_SYSTEM_METADATA_EN,
+  COOKING_VOLUME_SYSTEMS,
+  COOKING_VOLUME_UNITS,
+  type CookingMeasureUnit,
+} from "@lib/calculators/cocina/conversor-de-medidas-culinarias/cookingMeasures";
+import { buildFaqJsonLd } from "@lib/seo";
+import { buildAlternateLinks } from "@lib/i18n/routing";
+
+const title = "Cooking measurement converter";
+const description =
+  "Convert cups, tablespoons, milliliters, grams and other common cooking measurements for any recipe.";
+const canonical = "/en/cooking/cooking-measurement-converter";
+const spanishCanonical = "/cocina/conversor-de-medidas-culinarias";
+const alternates = buildAlternateLinks(
+  { es: spanishCanonical, en: canonical },
+  Astro.site ?? Astro.url,
+);
+
+const faqs = [
+  {
+    question: "How many milliliters are in a cup?",
+    answer:
+      "A metric cup contains 250 ml. A US cup contains 236.5882365 ml. Check the selected system before converting.",
+  },
+  {
+    question: "How many tablespoons are in a cup?",
+    answer:
+      "In the metric system, a 250 ml cup equals 16.67 tablespoons of 15 ml. In US recipes, one cup equals 16 US tablespoons.",
+  },
+  {
+    question: "How many grams are in an ounce?",
+    answer:
+      "One avoirdupois ounce equals exactly 28.349523125 grams.",
+  },
+  {
+    question: "Is a fluid ounce the same as a weight ounce?",
+    answer:
+      "No. A fluid ounce measures volume, while an ounce measures mass. This calculator keeps them separate to avoid confusion.",
+  },
+  {
+    question: "Can I convert cups of flour to grams?",
+    answer:
+      "Not in this version. Converting volume to weight requires selecting an ingredient because flour, sugar, butter and rice have different densities.",
+  },
+  {
+    question: "What is the difference between a metric cup and a US cup?",
+    answer:
+      "The metric cup used here equals 250 ml. A US cup equals 236.5882365 ml.",
+  },
+];
+
+const faqJsonLd = buildFaqJsonLd(faqs);
+
+const volumeUnits = COOKING_VOLUME_UNITS;
+const massUnits = COOKING_MASS_UNITS;
+const allUnits: CookingMeasureUnit[] = [...volumeUnits, ...massUnits];
+
+const shortcuts = [
+  {
+    label: "2 metric cups to ml",
+    value: "2",
+    type: "volume",
+    from: "cup",
+    to: "ml",
+    system: "metric",
+    result: "500 ml",
+  },
+  {
+    label: "1/2 metric cup to ml",
+    value: "1/2",
+    type: "volume",
+    from: "cup",
+    to: "ml",
+    system: "metric",
+    result: "125 ml",
+  },
+  {
+    label: "1 metric tbsp to tsp",
+    value: "1",
+    type: "volume",
+    from: "tbsp",
+    to: "tsp",
+    system: "metric",
+    result: "3 tsp",
+  },
+  {
+    label: "1 US cup to ml",
+    value: "1",
+    type: "volume",
+    from: "cup",
+    to: "ml",
+    system: "us",
+    result: "236.59 ml",
+  },
+  {
+    label: "500 g to oz",
+    value: "500",
+    type: "mass",
+    from: "g",
+    to: "oz",
+    system: "metric",
+    result: "17.64 oz",
+  },
+  {
+    label: "1 lb to g",
+    value: "1",
+    type: "mass",
+    from: "lb",
+    to: "g",
+    system: "metric",
+    result: "453.59 g",
+  },
+];
+---
+
+<BaseLayout
+  title={title}
+  description={description}
+  canonical={canonical}
+  locale="en"
+  alternates={alternates}
+>
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={JSON.stringify(faqJsonLd)} />
+  </Fragment>
+
+  <PageShell>
+    <PageHero
+      title="Cooking measurement converter"
+      description={description}
+      kicker="Cooking"
+      collapseBreadcrumbOnMobile
+      containerClass="py-6 md:py-8"
+      breadcrumbs={[
+        { label: "Home", href: "/en", ariaLabel: "Home" },
+        { label: "Cooking", href: "/en/cooking", optional: true },
+        { label: "Cooking measurements", truncate: true },
+      ]}
+    />
+
+    <Container as="section" class="py-5 md:py-8">
+      <section
+        id="cooking-measures-converter"
+        class="overflow-hidden rounded-lg border border-gray-700 bg-gray-950 shadow-xl shadow-gray-950/30"
+        aria-labelledby="calculator-heading"
+      >
+        <div
+          class="grid gap-0 lg:grid-cols-[minmax(0,1fr)_minmax(19rem,0.78fr)]"
+        >
+          <div class="p-4 sm:p-6">
+            <p class="text-sm font-semibold text-amber-300">
+              Quick conversion
+            </p>
+            <h2 id="calculator-heading" class="mt-2 text-2xl font-semibold">
+              What measurement do you want to convert?
+            </h2>
+            <p class="mt-2 text-sm leading-relaxed text-gray-400">
+              Enter decimals or fractions such as <span class="text-gray-200"
+                >1/2</span
+              >,
+              <span class="text-gray-200">3/4</span> or
+              <span class="text-gray-200">1 1/2</span>.
+            </p>
+
+            <div class="mt-5">
+              <label
+                for="cooking-value"
+                class="block text-sm font-semibold text-gray-200"
+              >
+                Amount
+              </label>
+              <input
+                id="cooking-value"
+                class="mt-2 min-h-14 w-full rounded-lg border border-gray-700 bg-gray-900 px-4 text-xl text-white outline-none placeholder:text-gray-600 transition focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15"
+                type="text"
+                inputmode="text"
+                autocomplete="off"
+                placeholder="e.g. 2, 1/2 or 1 1/2"
+                aria-describedby="cooking-error cooking-interpretation"
+                data-cooking-input
+              />
+              <p
+                id="cooking-error"
+                class="mt-2 hidden text-sm text-red-300"
+                data-cooking-error
+              >
+              </p>
+              <p
+                id="cooking-interpretation"
+                class="mt-2 min-h-5 text-sm text-gray-500"
+                data-interpretation
+              >
+              </p>
+            </div>
+
+            <div class="mt-5">
+              <label
+                for="measure-type"
+                class="block text-sm font-medium text-gray-200"
+              >
+                Measurement type
+              </label>
+              <div
+                class="mt-2 grid grid-cols-2 gap-2 rounded-lg bg-gray-900 p-1"
+                role="group"
+                aria-label="Measurement type"
+              >
+                <button
+                  class="min-h-12 rounded-md bg-amber-400 px-3 text-sm font-semibold text-gray-950 transition focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-300/40"
+                  type="button"
+                  data-type-button="volume"
+                  aria-pressed="true"
+                >
+                  Volume
+                </button>
+                <button
+                  class="min-h-12 rounded-md px-3 text-sm font-semibold text-gray-300 transition hover:bg-gray-800 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-300/40"
+                  type="button"
+                  data-type-button="mass"
+                  aria-pressed="false"
+                >
+                  Mass
+                </button>
+              </div>
+            </div>
+
+            <div
+              class="mt-5 grid gap-4 sm:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] sm:items-end"
+            >
+              <div>
+                <label
+                  for="origin-unit"
+                  class="block text-sm font-medium text-gray-200"
+                >
+                  From
+                </label>
+                <select
+                  id="origin-unit"
+                  class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-900 px-4 text-base text-white outline-none transition focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15"
+                  data-origin-select
+                >
+                  {
+                    allUnits.map((unit) => (
+                      <option
+                        value={unit}
+                        data-dimension={
+                          COOKING_MEASURE_UNIT_METADATA_EN[unit].dimension
+                        }
+                        selected={unit === "cup"}
+                      >
+                        {COOKING_MEASURE_UNIT_METADATA_EN[unit].shortLabel} -{" "}
+                        {COOKING_MEASURE_UNIT_METADATA_EN[unit].label}
+                      </option>
+                    ))
+                  }
+                </select>
+              </div>
+
+              <button
+                class="min-h-12 rounded-lg border border-gray-700 bg-gray-900 px-4 text-lg font-semibold text-amber-300 transition hover:border-amber-400 hover:bg-gray-800 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/30"
+                type="button"
+                aria-label="Swap source and destination units"
+                title="Swap units"
+                data-swap-units
+              >
+                ⇄
+              </button>
+
+              <div>
+                <label
+                  for="destination-unit"
+                  class="block text-sm font-medium text-gray-200"
+                >
+                  To
+                </label>
+                <select
+                  id="destination-unit"
+                  class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-900 px-4 text-base text-white outline-none transition focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15"
+                  data-destination-select
+                >
+                  {
+                    allUnits.map((unit) => (
+                      <option
+                        value={unit}
+                        data-dimension={
+                          COOKING_MEASURE_UNIT_METADATA_EN[unit].dimension
+                        }
+                        selected={unit === "ml"}
+                      >
+                        {COOKING_MEASURE_UNIT_METADATA_EN[unit].shortLabel} -{" "}
+                        {COOKING_MEASURE_UNIT_METADATA_EN[unit].label}
+                      </option>
+                    ))
+                  }
+                </select>
+              </div>
+            </div>
+
+            <div class="mt-5 grid gap-4 sm:grid-cols-2">
+              <div data-system-wrapper>
+                <label
+                  for="volume-system"
+                  class="block text-sm font-medium text-gray-200"
+                >
+                  Cooking system
+                </label>
+                <select
+                  id="volume-system"
+                  class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-900 px-4 text-base text-white outline-none transition focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15"
+                  data-system-select
+                >
+                  {
+                    COOKING_VOLUME_SYSTEMS.map((system) => (
+                      <option value={system}>
+                        {COOKING_VOLUME_SYSTEM_METADATA_EN[system].label}
+                      </option>
+                    ))
+                  }
+                </select>
+                <p class="mt-2 text-xs leading-relaxed text-gray-500">
+                  Cup and spoon sizes can vary by country or recipe.
+                </p>
+              </div>
+
+              <div>
+                <label
+                  for="visible-decimals"
+                  class="block text-sm font-medium text-gray-200"
+                >
+                  Displayed decimals
+                </label>
+                <select
+                  id="visible-decimals"
+                  class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-900 px-4 text-base text-white outline-none transition focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15"
+                  data-decimals-select
+                >
+                  <option value="0">0</option>
+                  <option value="1">1</option>
+                  <option value="2" selected>2</option>
+                  <option value="3">3</option>
+                  <option value="4">4</option>
+                  <option value="5">5</option>
+                  <option value="6">6</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="mt-5 flex flex-wrap gap-3">
+              <button
+                class="min-h-11 rounded-lg border border-gray-700 px-4 py-2 text-sm font-semibold text-gray-200 transition hover:border-gray-500 hover:bg-gray-900 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-gray-400/30"
+                type="button"
+                data-clear-calculator
+              >
+                Clear
+              </button>
+            </div>
+          </div>
+
+          <aside
+            class="border-t border-gray-800 bg-gray-900/65 p-4 sm:p-6 lg:border-l lg:border-t-0"
+          >
+            <p
+              class="text-xs font-semibold uppercase tracking-wide text-gray-500"
+            >
+              Main result
+            </p>
+            <p
+              class="mt-3 min-h-10 break-words text-3xl font-semibold text-amber-100"
+              data-main-result
+            >
+              Enter an amount
+            </p>
+            <p
+              class="mt-3 min-h-5 text-sm leading-relaxed text-gray-400"
+              data-result-note
+            >
+              The main conversion and related measurements will appear here.
+            </p>
+            <p
+              class="mt-3 hidden rounded-lg border border-red-400/25 bg-red-400/10 p-3 text-sm leading-relaxed text-red-100"
+              data-dimension-note
+            >
+              To convert volume to weight, you need to select an ingredient.
+              Flour, sugar, butter and rice have different densities.
+            </p>
+            <div class="mt-4 flex flex-wrap gap-2">
+              <button
+                class="hidden min-h-11 rounded-lg bg-amber-400 px-4 py-2 text-sm font-semibold text-gray-950 transition hover:bg-amber-300 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-300/40"
+                type="button"
+                data-copy-main
+              >
+                Copy result
+              </button>
+            </div>
+            <p
+              class="sr-only"
+              role="status"
+              aria-live="polite"
+              data-live-status
+            >
+            </p>
+            <p
+              class="mt-3 min-h-5 text-sm text-emerald-300"
+              role="status"
+              aria-live="polite"
+              data-copy-status
+            >
+            </p>
+          </aside>
+        </div>
+
+        <div class="border-t border-gray-800 p-4 sm:p-6">
+          <div
+            class="grid gap-6 lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)]"
+          >
+            <div>
+              <h3 class="text-lg font-semibold">Related conversions</h3>
+              <div
+                class="mt-3 divide-y divide-gray-800 overflow-hidden rounded-lg border border-gray-800 bg-gray-950"
+                data-equivalences-list
+              >
+                {
+                  allUnits.map((unit) => (
+                    <div
+                      class="flex min-h-14 items-center justify-between gap-3 px-4 py-3"
+                      data-equivalence-row={unit}
+                      data-dimension={
+                        COOKING_MEASURE_UNIT_METADATA_EN[unit].dimension
+                      }
+                    >
+                      <span class="min-w-0 text-sm font-medium text-gray-300">
+                        {COOKING_MEASURE_UNIT_METADATA_EN[unit].shortLabel}
+                        <span class="ml-1 text-xs text-gray-500">
+                          {COOKING_MEASURE_UNIT_METADATA_EN[unit].label}
+                        </span>
+                      </span>
+                      <span
+                        class="shrink-0 text-right text-sm font-semibold text-white"
+                        data-output={unit}
+                      >
+                        -
+                      </span>
+                    </div>
+                  ))
+                }
+              </div>
+            </div>
+
+            <div>
+              <h3 class="text-lg font-semibold">Formula used</h3>
+              <div
+                class="mt-3 rounded-lg border border-gray-800 bg-gray-900/70 p-4"
+              >
+                <p class="text-sm leading-relaxed text-gray-200" data-formula>
+                  The formula will appear after you enter an amount.
+                </p>
+                <details class="mt-3 hidden" data-procedure-panel>
+                  <summary
+                    class="min-h-11 cursor-pointer py-2 text-sm font-semibold text-amber-300"
+                  >
+                    Show steps
+                  </summary>
+                  <ol
+                    class="mt-2 space-y-2 text-sm leading-relaxed text-gray-400"
+                    data-procedure-list
+                  >
+                  </ol>
+                </details>
+              </div>
+              <p class="mt-3 text-xs leading-relaxed text-gray-500">
+                The calculation keeps full precision and rounds only the
+                displayed result.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+    </Container>
+
+    <AdSlot placement="calculator-after-tool" />
+
+    <Container as="section" class="py-6 md:py-8">
+      <SectionIntro
+        title="Common conversions"
+        description="Use these shortcuts to load common measurements without configuring the converter again."
+      />
+      <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        {
+          shortcuts.map((shortcut) => (
+            <button
+              class="min-h-20 rounded-lg border border-gray-800 bg-gray-950 p-4 text-left transition hover:border-amber-400/60 hover:bg-gray-900 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/30"
+              type="button"
+              data-shortcut-value={shortcut.value}
+              data-shortcut-type={shortcut.type}
+              data-shortcut-from={shortcut.from}
+              data-shortcut-to={shortcut.to}
+              data-shortcut-system={shortcut.system}
+            >
+              <span class="block text-sm font-semibold text-white">
+                {shortcut.label}
+              </span>
+              <span class="mt-2 block text-sm text-amber-300">
+                {shortcut.result}
+              </span>
+            </button>
+          ))
+        }
+      </div>
+    </Container>
+
+    <Container as="section" class="py-6 md:py-8">
+      <SectionIntro
+        title="Volume and mass are not the same"
+        description="A cup measures volume, while a gram measures mass. Converting between them requires knowing the ingredient."
+      />
+      <div class="grid gap-4 lg:grid-cols-2">
+        <article class="rounded-lg border border-gray-800 bg-gray-950 p-5">
+          <h3 class="text-lg font-semibold">
+            Why cups are not converted directly to grams
+          </h3>
+          <p class="mt-3 text-sm leading-relaxed text-gray-400">
+            A cup of flour, a cup of sugar and a cup of butter do not
+            weigh the same. This tool does not guess densities and only
+            converts compatible units.
+          </p>
+        </article>
+        <article class="rounded-lg border border-gray-800 bg-gray-950 p-5">
+          <h3 class="text-lg font-semibold">Metric and US cups</h3>
+          <p class="mt-3 text-sm leading-relaxed text-gray-400">
+            A metric cup equals 250 ml. A US cup equals
+            236.5882365 ml. Select the system that matches your recipe.
+          </p>
+        </article>
+      </div>
+    </Container>
+
+    <Container as="section" class="py-6 md:py-8">
+      <SectionIntro
+        title="Base conversions"
+        description="Reference values used by the calculator for volume and mass."
+      />
+      <div class="grid gap-4 lg:grid-cols-2">
+        <div class="rounded-lg border border-gray-800 bg-gray-950 p-4">
+          <h3 class="font-semibold">Volume</h3>
+          <div class="mt-4 grid gap-2 text-sm text-gray-300">
+            <p class="rounded-lg bg-gray-900 p-3">1 l = 1000 ml</p>
+            <p class="rounded-lg bg-gray-900 p-3">1 metric cup = 250 ml</p>
+            <p class="rounded-lg bg-gray-900 p-3">1 metric tbsp = 15 ml</p>
+            <p class="rounded-lg bg-gray-900 p-3">1 fl oz = 29.5735295625 ml</p>
+          </div>
+        </div>
+        <div class="rounded-lg border border-gray-800 bg-gray-950 p-4">
+          <h3 class="font-semibold">Mass</h3>
+          <div class="mt-4 grid gap-2 text-sm text-gray-300">
+            <p class="rounded-lg bg-gray-900 p-3">1 kg = 1000 g</p>
+            <p class="rounded-lg bg-gray-900 p-3">1 oz = 28.349523125 g</p>
+            <p class="rounded-lg bg-gray-900 p-3">1 lb = 453.59237 g</p>
+            <p class="rounded-lg bg-gray-900 p-3">
+              fl oz is not the same as oz
+            </p>
+          </div>
+        </div>
+      </div>
+    </Container>
+
+    <Container as="section" class="py-6 md:py-8">
+      <SectionIntro
+        title="Related calculators"
+        description="When you need to change serving sizes, use the dedicated recipe scaler."
+      />
+      <div class="rounded-lg border border-gray-800 bg-gray-950 p-5">
+        <p class="text-sm leading-relaxed text-gray-400">
+          This version converts compatible measurements. Scaling by servings
+          and ingredient-based conversion are separate tasks.
+        </p>
+        <a
+          href="/en/cooking/recipe-scaler"
+          class="mt-4 inline-flex min-h-11 items-center rounded-lg border border-amber-400/60 px-4 py-2 text-sm font-semibold text-amber-300 transition hover:bg-amber-400/10 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/30"
+        >
+          Open the recipe scaler
+        </a>
+      </div>
+    </Container>
+
+    <FaqSection faqs={faqs} />
+  </PageShell>
+</BaseLayout>
+
+<script>
+  import {
+    COOKING_MASS_UNITS,
+    COOKING_MEASURE_UNIT_METADATA_EN,
+    COOKING_VOLUME_UNITS,
+    buildCookingMeasureFormula,
+    convertCookingMeasure,
+    formatCookingMeasure,
+    formatPracticalCookingResult,
+    getCookingMeasureDimension,
+    isCookingMeasureUnit,
+    isCookingVolumeSystem,
+    parseCookingMeasureInput,
+  } from "@lib/calculators/cocina/conversor-de-medidas-culinarias/cookingMeasures";
+
+  const buildCookingMeasureFormulaEn = (conversion, decimals = 2) =>
+    buildCookingMeasureFormula(conversion, decimals, "en");
+  const formatCookingMeasureEn = (value, unit, decimals = 2, system = "metric") =>
+    formatCookingMeasure(value, unit, decimals, system, "en");
+  const formatPracticalCookingResultEn = (value, unit, system = "metric", decimals = 2) =>
+    formatPracticalCookingResult(value, unit, system, decimals, "en");
+  const parseCookingMeasureInputEn = (value) =>
+    parseCookingMeasureInput(value, "en");
+
+  const input = document.querySelector("[data-cooking-input]");
+  const errorElement = document.querySelector("[data-cooking-error]");
+  const interpretationElement = document.querySelector("[data-interpretation]");
+  const originSelect = document.querySelector("[data-origin-select]");
+  const destinationSelect = document.querySelector("[data-destination-select]");
+  const systemSelect = document.querySelector("[data-system-select]");
+  const systemWrapper = document.querySelector("[data-system-wrapper]");
+  const decimalsSelect = document.querySelector("[data-decimals-select]");
+  const mainResult = document.querySelector("[data-main-result]");
+  const resultNote = document.querySelector("[data-result-note]");
+  const dimensionNote = document.querySelector("[data-dimension-note]");
+  const formulaElement = document.querySelector("[data-formula]");
+  const procedurePanel = document.querySelector("[data-procedure-panel]");
+  const procedureList = document.querySelector("[data-procedure-list]");
+  const copyMainButton = document.querySelector("[data-copy-main]");
+  const copyStatus = document.querySelector("[data-copy-status]");
+  const liveStatus = document.querySelector("[data-live-status]");
+  const clearButton = document.querySelector("[data-clear-calculator]");
+  const swapButton = document.querySelector("[data-swap-units]");
+  const typeButtons = document.querySelectorAll("[data-type-button]");
+  const outputElements = new Map(
+    [...COOKING_VOLUME_UNITS, ...COOKING_MASS_UNITS].map((unit) => [
+      unit,
+      document.querySelector(`[data-output="${unit}"]`),
+    ]),
+  );
+
+  let measureType = "volume";
+  let currentCopyText = "";
+  let copyTimer = 0;
+  let urlTimer = 0;
+
+  function getOrigin() {
+    return isCookingMeasureUnit(originSelect.value)
+      ? originSelect.value
+      : "cup";
+  }
+
+  function getDestination() {
+    return isCookingMeasureUnit(destinationSelect.value)
+      ? destinationSelect.value
+      : "ml";
+  }
+
+  function getSystem() {
+    return isCookingVolumeSystem(systemSelect.value)
+      ? systemSelect.value
+      : "metric";
+  }
+
+  function getDecimals() {
+    const decimals = Number(decimalsSelect.value);
+
+    return Number.isInteger(decimals) && decimals >= 0 && decimals <= 6
+      ? decimals
+      : 2;
+  }
+
+  function getUnitsForType(type) {
+    return type === "mass" ? COOKING_MASS_UNITS : COOKING_VOLUME_UNITS;
+  }
+
+  function unitDependsOnSystem(unit) {
+    return Boolean(COOKING_MEASURE_UNIT_METADATA_EN[unit]?.dependsOnSystem);
+  }
+
+  function setError(message = "") {
+    errorElement.textContent = message;
+    errorElement.classList.toggle("hidden", !message);
+    input.setAttribute("aria-invalid", message ? "true" : "false");
+  }
+
+  function syncTypeControls() {
+    typeButtons.forEach((button) => {
+      const active = button.dataset.typeButton === measureType;
+
+      button.setAttribute("aria-pressed", active ? "true" : "false");
+      button.classList.toggle("bg-amber-400", active);
+      button.classList.toggle("text-gray-950", active);
+      button.classList.toggle("text-gray-300", !active);
+      button.classList.toggle("hover:bg-gray-800", !active);
+    });
+
+    const allowedUnits = new Set(getUnitsForType(measureType));
+
+    [originSelect, destinationSelect].forEach((select) => {
+      [...select.options].forEach((option) => {
+        option.hidden = !allowedUnits.has(option.value);
+        option.disabled = !allowedUnits.has(option.value);
+      });
+    });
+
+    if (!allowedUnits.has(originSelect.value)) {
+      originSelect.value = measureType === "volume" ? "cup" : "g";
+    }
+
+    if (!allowedUnits.has(destinationSelect.value)) {
+      destinationSelect.value = measureType === "volume" ? "ml" : "oz";
+    }
+
+    document.querySelectorAll("[data-equivalence-row]").forEach((row) => {
+      row.classList.toggle("hidden", row.dataset.dimension !== measureType);
+    });
+  }
+
+  function syncSystemVisibility() {
+    const shouldShow =
+      measureType === "volume" &&
+      (unitDependsOnSystem(getOrigin()) ||
+        unitDependsOnSystem(getDestination()));
+
+    systemWrapper.classList.toggle("hidden", !shouldShow);
+  }
+
+  function clearOutputs(
+    note = "The main conversion and related measurements will appear here.",
+  ) {
+    currentCopyText = "";
+    mainResult.textContent = "Enter an amount";
+    resultNote.textContent = note;
+    dimensionNote.classList.add("hidden");
+    formulaElement.textContent =
+      "The formula will appear after you enter an amount.";
+    procedurePanel.classList.add("hidden");
+    procedureList.replaceChildren();
+    copyMainButton.classList.add("hidden");
+    outputElements.forEach((element) => {
+      element.textContent = "-";
+    });
+  }
+
+  function syncUrl(value) {
+    const url = new URL(window.location.href);
+
+    url.searchParams.set("value", String(value));
+    url.searchParams.set("type", measureType);
+    url.searchParams.set("from", getOrigin());
+    url.searchParams.set("to", getDestination());
+
+    if (measureType === "volume") {
+      url.searchParams.set(
+        "system",
+        getSystem(),
+      );
+    } else {
+      url.searchParams.delete("system");
+    }
+
+    const decimals = getDecimals();
+
+    if (decimals === 2) {
+      url.searchParams.delete("decimals");
+    } else {
+      url.searchParams.set("decimals", String(decimals));
+    }
+
+    window.clearTimeout(urlTimer);
+    urlTimer = window.setTimeout(() => {
+      window.history.replaceState({}, "", url);
+    }, 250);
+  }
+
+  function clearUrl() {
+    const url = new URL(window.location.href);
+
+    ["value", "type", "from", "to", "system", "decimals"].forEach(
+      (parameter) => {
+        url.searchParams.delete(parameter);
+      },
+    );
+    window.clearTimeout(urlTimer);
+    window.history.replaceState({}, "", url);
+  }
+
+  function render(options = {}) {
+    const { updateUrl = true, announce = true } = options;
+
+    syncTypeControls();
+    syncSystemVisibility();
+
+    const parsed = parseCookingMeasureInputEn(input.value);
+
+    interpretationElement.textContent =
+      parsed.ok && parsed.interpretation ? parsed.interpretation : "";
+
+    if (!parsed.ok) {
+      if (parsed.error === "invalid") {
+        setError(
+          "Unable to interpret the amount. Use 2, 2.5, 1/2 or 1 1/2.",
+        );
+        clearOutputs("Check the format to see the conversions.");
+      } else {
+        setError();
+        clearOutputs();
+      }
+
+      if (updateUrl) {
+        clearUrl();
+      }
+
+      return;
+    }
+
+    const origin = getOrigin();
+    const destination = getDestination();
+    const system = getSystem();
+    const decimals = getDecimals();
+
+    try {
+      const conversion = convertCookingMeasure(
+        parsed.value,
+        origin,
+        destination,
+        system,
+      );
+      const formattedSource = formatCookingMeasureEn(
+        parsed.value,
+        origin,
+        decimals,
+        system,
+      );
+      const formattedDestination = formatCookingMeasureEn(
+        conversion.result,
+        destination,
+        decimals,
+        system,
+      );
+      const practical = formatPracticalCookingResultEn(
+        conversion.result,
+        destination,
+        system,
+        decimals,
+      );
+      const formula = buildCookingMeasureFormulaEn(conversion, decimals);
+      const relatedUnits = getUnitsForType(measureType);
+
+      setError();
+      dimensionNote.classList.add("hidden");
+      mainResult.textContent = `${formattedSource} = ${formattedDestination}`;
+      resultNote.textContent =
+        practical && practical !== formattedDestination
+          ? `Practical equivalent: ${practical}.`
+          : "The conversion uses compatible units and defined factors.";
+      formulaElement.textContent = `Formula: ${formula.formula}`;
+      procedurePanel.classList.remove("hidden");
+      procedureList.replaceChildren(
+        ...formula.steps.map((step) => {
+          const item = document.createElement("li");
+
+          item.textContent = step;
+
+          return item;
+        }),
+      );
+      currentCopyText =
+        `${formattedSource} = ${formattedDestination}` +
+        (measureType === "volume" &&
+        (unitDependsOnSystem(origin) || unitDependsOnSystem(destination))
+          ? ` (${system === "metric" ? "metric system" : "US system"})`
+          : "");
+      copyMainButton.classList.remove("hidden");
+
+      relatedUnits.forEach((unit) => {
+        const converted = convertCookingMeasure(
+          parsed.value,
+          origin,
+          unit,
+          system,
+        ).result;
+
+        outputElements.get(unit).textContent = formatCookingMeasureEn(
+          converted,
+          unit,
+          decimals,
+          system,
+        );
+      });
+
+      if (updateUrl) {
+        syncUrl(parsed.normalized);
+      }
+
+      if (announce) {
+        liveStatus.textContent = `Result: ${currentCopyText}`;
+      }
+    } catch (error) {
+      const originDimension = getCookingMeasureDimension(origin);
+      const destinationDimension = getCookingMeasureDimension(destination);
+      const dimensionMismatch = originDimension !== destinationDimension;
+
+      setError(
+        "Unable to convert this amount with the selected units.",
+      );
+      clearOutputs("Select compatible units to continue.");
+      dimensionNote.classList.toggle("hidden", !dimensionMismatch);
+
+      if (updateUrl) {
+        clearUrl();
+      }
+    }
+  }
+
+  async function copyText(text) {
+    if (!text) {
+      return;
+    }
+
+    try {
+      await navigator.clipboard.writeText(text);
+      copyStatus.textContent = `Copied: ${text}`;
+    } catch {
+      copyStatus.textContent = "Unable to copy automatically.";
+    }
+
+    window.clearTimeout(copyTimer);
+    copyTimer = window.setTimeout(() => {
+      copyStatus.textContent = "";
+    }, 2000);
+  }
+
+  function applyMeasureType(nextType) {
+    measureType = nextType === "mass" ? "mass" : "volume";
+    syncTypeControls();
+    syncSystemVisibility();
+  }
+
+  function loadUrlParameters() {
+    const parameters = new URLSearchParams(window.location.search);
+    const value = parameters.get("value");
+    const type = parameters.get("type");
+    const origin = parameters.get("from");
+    const destination = parameters.get("to");
+    const system = parameters.get("system");
+    const decimals = parameters.get("decimals");
+
+    applyMeasureType(type === "mass" ? "mass" : "volume");
+
+    if (origin && isCookingMeasureUnit(origin)) {
+      originSelect.value = origin;
+    }
+
+    if (destination && isCookingMeasureUnit(destination)) {
+      destinationSelect.value = destination;
+    }
+
+    const originDimension = getCookingMeasureDimension(getOrigin());
+    const destinationDimension = getCookingMeasureDimension(getDestination());
+
+    if (
+      originDimension !== measureType ||
+      destinationDimension !== measureType
+    ) {
+      originSelect.value = measureType === "volume" ? "cup" : "g";
+      destinationSelect.value = measureType === "volume" ? "ml" : "oz";
+    }
+
+    if (system === "us") {
+      systemSelect.value = "us";
+    } else if (system === "metric") {
+      systemSelect.value = "metric";
+    }
+
+    if (decimals && ["0", "1", "2", "3", "4", "5", "6"].includes(decimals)) {
+      decimalsSelect.value = decimals;
+    }
+
+    if (value && parseCookingMeasureInputEn(value).ok) {
+      input.value = value;
+      render({ updateUrl: false, announce: false });
+    } else {
+      syncTypeControls();
+      syncSystemVisibility();
+    }
+  }
+
+  input.addEventListener("input", () => {
+    render();
+  });
+
+  originSelect.addEventListener("change", () => {
+    render();
+  });
+
+  destinationSelect.addEventListener("change", () => {
+    render();
+  });
+
+  systemSelect.addEventListener("change", () => {
+    render();
+  });
+
+  decimalsSelect.addEventListener("change", () => {
+    render();
+  });
+
+  typeButtons.forEach((button) => {
+    button.addEventListener("click", () => {
+      applyMeasureType(button.dataset.typeButton);
+      render();
+    });
+  });
+
+  swapButton.addEventListener("click", () => {
+    const parsed = parseCookingMeasureInputEn(input.value);
+    const previousOrigin = getOrigin();
+    const previousDestination = getDestination();
+
+    originSelect.value = previousDestination;
+    destinationSelect.value = previousOrigin;
+
+    if (parsed.ok) {
+      try {
+        input.value = String(
+          convertCookingMeasure(
+            parsed.value,
+            previousOrigin,
+            previousDestination,
+            getSystem(),
+          ).result,
+        );
+      } catch {
+        // The normal render path presents the validation message.
+      }
+    }
+
+    render();
+  });
+
+  clearButton.addEventListener("click", () => {
+    input.value = "";
+    interpretationElement.textContent = "";
+    setError();
+    clearOutputs();
+    clearUrl();
+    input.focus();
+  });
+
+  copyMainButton.addEventListener("click", () => {
+    copyText(currentCopyText);
+  });
+
+  document.addEventListener("click", (event) => {
+    const shortcutButton = event.target.closest("[data-shortcut-value]");
+
+    if (!shortcutButton) {
+      return;
+    }
+
+    const {
+      shortcutValue,
+      shortcutType,
+      shortcutFrom,
+      shortcutTo,
+      shortcutSystem,
+    } = shortcutButton.dataset;
+
+    if (
+      typeof shortcutValue !== "string" ||
+      !isCookingMeasureUnit(shortcutFrom) ||
+      !isCookingMeasureUnit(shortcutTo)
+    ) {
+      return;
+    }
+
+    input.value = shortcutValue;
+    applyMeasureType(shortcutType === "mass" ? "mass" : "volume");
+    originSelect.value = shortcutFrom;
+    destinationSelect.value = shortcutTo;
+
+    if (isCookingVolumeSystem(shortcutSystem)) {
+      systemSelect.value = shortcutSystem;
+    }
+
+    render();
+    document.querySelector("#cooking-measures-converter")?.scrollIntoView({
+      behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches
+        ? "auto"
+        : "smooth",
+      block: "start",
+    });
+    input.focus();
+  });
+
+  loadUrlParameters();
+</script>

@@ -89,6 +89,23 @@ export const COOKING_VOLUME_SYSTEM_METADATA = {
   },
 } as const satisfies Record<CookingVolumeSystem, CookingVolumeSystemMetadata>;
 
+export const COOKING_VOLUME_SYSTEM_METADATA_EN = {
+  metric: {
+    label: "Metric",
+    adjective: "metric",
+    cupMl: 250,
+    tablespoonMl: 15,
+    teaspoonMl: 5,
+  },
+  us: {
+    label: "US customary",
+    adjective: "US",
+    cupMl: 236.5882365,
+    tablespoonMl: 14.78676478125,
+    teaspoonMl: 4.92892159375,
+  },
+} as const satisfies Record<CookingVolumeSystem, CookingVolumeSystemMetadata>;
+
 export const COOKING_MEASURE_UNIT_METADATA = {
   ml: {
     label: "Mililitro",
@@ -162,6 +179,82 @@ export const COOKING_MEASURE_UNIT_METADATA = {
     symbol: "lb",
     dimension: "mass",
     aliases: ["libra", "libras", "pound", "pounds"],
+  },
+} as const satisfies Record<CookingMeasureUnit, CookingMeasureUnitMetadata>;
+
+export const COOKING_MEASURE_UNIT_METADATA_EN = {
+  ml: {
+    label: "Milliliter",
+    shortLabel: "ml",
+    symbol: "ml",
+    dimension: "volume",
+    aliases: ["milliliter", "milliliters", "millilitre", "millilitres"],
+  },
+  l: {
+    label: "Liter",
+    shortLabel: "l",
+    symbol: "l",
+    dimension: "volume",
+    aliases: ["liter", "liters", "litre", "litres"],
+  },
+  cup: {
+    label: "Cup",
+    shortLabel: "cup",
+    symbol: "cup",
+    dimension: "volume",
+    aliases: ["cup", "cups"],
+    dependsOnSystem: true,
+  },
+  tbsp: {
+    label: "Tablespoon",
+    shortLabel: "tbsp",
+    symbol: "tbsp",
+    dimension: "volume",
+    aliases: ["tbsp", "tablespoon", "tablespoons"],
+    dependsOnSystem: true,
+  },
+  tsp: {
+    label: "Teaspoon",
+    shortLabel: "tsp",
+    symbol: "tsp",
+    dimension: "volume",
+    aliases: ["tsp", "teaspoon", "teaspoons"],
+    dependsOnSystem: true,
+  },
+  "us-fl-oz": {
+    label: "US fluid ounce",
+    shortLabel: "fl oz",
+    symbol: "fl oz",
+    dimension: "volume",
+    aliases: ["fl oz", "floz", "fluid ounce", "fluid ounces"],
+  },
+  g: {
+    label: "Gram",
+    shortLabel: "g",
+    symbol: "g",
+    dimension: "mass",
+    aliases: ["gram", "grams"],
+  },
+  kg: {
+    label: "Kilogram",
+    shortLabel: "kg",
+    symbol: "kg",
+    dimension: "mass",
+    aliases: ["kilogram", "kilograms", "kilo", "kilos"],
+  },
+  oz: {
+    label: "Weight ounce",
+    shortLabel: "oz",
+    symbol: "oz",
+    dimension: "mass",
+    aliases: ["ounce", "ounces"],
+  },
+  lb: {
+    label: "Pound",
+    shortLabel: "lb",
+    symbol: "lb",
+    dimension: "mass",
+    aliases: ["pound", "pounds"],
   },
 } as const satisfies Record<CookingMeasureUnit, CookingMeasureUnitMetadata>;
 
@@ -306,6 +399,7 @@ export function validateCookingMeasure(value: number): void {
 
 export function parseCookingMeasureInput(
   rawValue: string,
+  locale: "es" | "en" = "es",
 ): ParseCookingMeasureInputResult {
   const trimmed = rawValue.trim().replaceAll("−", "-");
 
@@ -333,7 +427,7 @@ export function parseCookingMeasureInput(
     };
   }
 
-  const normalized = normalizeLocalizedNumber(trimmed);
+  const normalized = normalizeLocalizedNumber(trimmed, locale);
 
   if (!normalized) {
     return { ok: false, error: "invalid" };
@@ -360,19 +454,37 @@ export function formatCookingMeasure(
   unit: CookingMeasureUnit,
   decimals = DEFAULT_DECIMALS,
   system: CookingVolumeSystem = "metric",
+  locale: "es" | "en" = "es",
 ): string {
-  const metadata = COOKING_MEASURE_UNIT_METADATA[unit];
+  const metadata: CookingMeasureUnitMetadata =
+    locale === "en"
+      ? COOKING_MEASURE_UNIT_METADATA_EN[unit]
+      : COOKING_MEASURE_UNIT_METADATA[unit];
+  const systemMetadata: Record<
+    CookingVolumeSystem,
+    CookingVolumeSystemMetadata
+  > =
+    locale === "en"
+      ? COOKING_VOLUME_SYSTEM_METADATA_EN
+      : COOKING_VOLUME_SYSTEM_METADATA;
   const suffix =
     metadata.dependsOnSystem && getCookingMeasureDimension(unit) === "volume"
-      ? ` ${COOKING_VOLUME_SYSTEM_METADATA[system].adjective}`
+      ? ` ${systemMetadata[system].adjective}`
       : "";
 
-  return `${formatCookingMeasureNumber(value, decimals)} ${metadata.symbol}${suffix}`;
+  const formattedValue = formatCookingMeasureNumber(value, decimals, locale);
+
+  if (locale === "en" && suffix) {
+    return `${formattedValue}${suffix} ${metadata.symbol}`;
+  }
+
+  return `${formattedValue} ${metadata.symbol}${suffix}`;
 }
 
 export function formatCookingMeasureNumber(
   value: number,
   decimals = DEFAULT_DECIMALS,
+  locale: "es" | "en" = "es",
 ): string {
   if (!Number.isFinite(value)) {
     throw new RangeError("La cantidad debe ser un numero finito.");
@@ -391,7 +503,7 @@ export function formatCookingMeasureNumber(
 
   const adaptiveDecimals = getAdaptiveDecimals(normalizedValue, safeDecimals);
 
-  return new Intl.NumberFormat("es-MX", {
+  return new Intl.NumberFormat(locale === "en" ? "en-US" : "es-MX", {
     maximumFractionDigits: adaptiveDecimals,
   }).format(roundToDecimals(normalizedValue, adaptiveDecimals));
 }
@@ -401,6 +513,7 @@ export function formatPracticalCookingResult(
   unit: CookingMeasureUnit,
   system: CookingVolumeSystem = "metric",
   decimals = DEFAULT_DECIMALS,
+  locale: "es" | "en" = "es",
 ): string | undefined {
   if (getCookingMeasureDimension(unit) !== "volume") {
     return undefined;
@@ -418,6 +531,7 @@ export function formatPracticalCookingResult(
         candidate.unit,
         decimals,
         system,
+        locale,
       );
     }
   }
@@ -428,6 +542,7 @@ export function formatPracticalCookingResult(
 export function buildCookingMeasureFormula(
   conversion: CookingMeasureConversion,
   decimals = DEFAULT_DECIMALS,
+  locale: "es" | "en" = "es",
 ): {
   formula: string;
   substitution: string;
@@ -447,20 +562,31 @@ export function buildCookingMeasureFormula(
     conversion.destination,
     decimals,
     conversion.system,
+    locale,
   );
-  const value = formatCookingMeasureNumber(conversion.value, decimals);
-  const formula = conversion.formula;
-  const substitution = `resultado = ${value} x ${formatFactor(originFactor)} / ${formatFactor(destinationFactor)}`;
+  const value = formatCookingMeasureNumber(
+    conversion.value,
+    decimals,
+    locale,
+  );
+  const formula =
+    locale === "en"
+      ? "result = value x sourceFactor / destinationFactor"
+      : conversion.formula;
+  const substitution = `${locale === "en" ? "result" : "resultado"} = ${value} x ${formatFactor(originFactor)} / ${formatFactor(destinationFactor)}`;
 
   if (conversion.origin === conversion.destination) {
     return {
       formula: `${conversion.destination} = ${conversion.origin}`,
       substitution: `${conversion.destination} = ${value}`,
       result,
-      steps: [
-        "La unidad de origen y destino es la misma.",
-        `Resultado: ${result}.`,
-      ],
+      steps:
+        locale === "en"
+          ? ["The source and destination units are the same.", `Result: ${result}.`]
+          : [
+              "La unidad de origen y destino es la misma.",
+              `Resultado: ${result}.`,
+            ],
     };
   }
 
@@ -468,11 +594,18 @@ export function buildCookingMeasureFormula(
     formula,
     substitution,
     result,
-    steps: [
-      `Usamos la formula: ${formula}.`,
-      `Sustituimos: ${substitution}.`,
-      `Resultado: ${result}.`,
-    ],
+    steps:
+      locale === "en"
+        ? [
+            `Use the formula: ${formula}.`,
+            `Substitute the values: ${substitution}.`,
+            `Result: ${result}.`,
+          ]
+        : [
+            `Usamos la formula: ${formula}.`,
+            `Sustituimos: ${substitution}.`,
+            `Resultado: ${result}.`,
+          ],
   };
 }
 
@@ -502,6 +635,7 @@ function isIncompleteCookingInput(value: string) {
 
 function normalizeLocalizedNumber(
   rawValue: string,
+  locale: "es" | "en",
 ): { value: string; interpretation?: string } | undefined {
   if (/^\+/.test(rawValue) || /-/.test(rawValue)) {
     return undefined;
@@ -550,7 +684,10 @@ function normalizeLocalizedNumber(
 
       return {
         value: interpreted,
-        interpretation: `Interpretado como ${interpreted}`,
+        interpretation:
+          locale === "en"
+            ? `Interpreted as ${interpreted}`
+            : `Interpretado como ${interpreted}`,
       };
     }
 
@@ -569,7 +706,10 @@ function normalizeLocalizedNumber(
 
       return {
         value: interpreted,
-        interpretation: `Interpretado como ${interpreted}`,
+        interpretation:
+          locale === "en"
+            ? `Interpreted as ${interpreted}`
+            : `Interpretado como ${interpreted}`,
       };
     }
 

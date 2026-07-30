@@ -6,7 +6,22 @@ export const BLOG_PUBLICATION_TIME_ZONE = "America/Mexico_City";
 
 const LOCALIZED_BLOG_CATEGORY_SLUGS = {
   en: {
+    finanzas: "finance",
+    inmuebles: "real-estate",
+    "legal-impuestos": "legal-tax",
     matematicas: "math",
+    "probabilidad-estadistica": "probability-statistics",
+    programacion: "programming",
+    geometria: "geometry",
+    salud: "health",
+    "fecha-tiempo": "date-time",
+    conversores: "converters",
+    mascotas: "pets",
+    cocina: "cooking",
+    eventos: "events",
+    restaurantes: "restaurants",
+    vehiculos: "vehicles",
+    construccion: "construction",
   },
 };
 

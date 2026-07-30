@@ -11,11 +11,16 @@ import {
   REMODEL_TEMPLATES,
 } from "@lib/calculators/construccion/calculadora-presupuesto-remodelacion/remodelBudget";
 import { buildFaqJsonLd } from "@lib/seo";
+import { buildAlternateLinks } from "@lib/i18n/routing";
 
 const title = "Calculadora de presupuesto de remodelación";
 const description =
   "Crea un presupuesto de remodelación por partidas, calcula imprevistos, costo por m² y compara el total contra tu presupuesto.";
 const canonical = REMODEL_BUDGET_CANONICAL_PATH;
+const alternates = buildAlternateLinks(
+  { es: canonical, en: "/en/construction/renovation-budget-calculator" },
+  Astro.site ?? Astro.url,
+);
 
 const faqs = [
   {
@@ -58,7 +63,7 @@ const faqs = [
 const faqJsonLd = buildFaqJsonLd(faqs);
 ---
 
-<BaseLayout title={title} description={description} canonical={canonical}>
+<BaseLayout title={title} description={description} canonical={canonical} alternates={alternates}>
   <Fragment slot="head">
     <script type="application/ld+json" set:html={JSON.stringify(faqJsonLd)} />
   </Fragment>

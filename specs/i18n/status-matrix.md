@@ -1,6 +1,6 @@
 # Inventario de traducción ES → EN
 
-> Seguimiento editorial del proyecto de traducción completa del sitio. Actualizado: 2026-07-28.
+> Seguimiento editorial del proyecto de traducción completa del sitio. Actualizado: 2026-07-29.
 
 ## Cómo usar este archivo
 
@@ -19,11 +19,11 @@ Criterio: se consideran páginas las superficies de contenido publicables. Las p
 | Superficie | Total | Traducidas / publicadas | Pendientes |
 | --- | ---: | ---: | ---: |
 | Institucionales, legales y error | 10 | 10 | 0 |
-| Hubs y categorías del blog | 7 | 2 | 5 |
-| Categorías de calculadoras | 16 | 1 | 15 |
-| Calculadoras | 91 | 1 | 90 |
+| Hubs y categorías del blog | 7 | 7 | 0 |
+| Categorías de calculadoras | 16 | 16 | 0 |
+| Calculadoras | 91 | 10 | 81 |
 | Artículos del blog ES | 118 | 3 equivalentes EN | 115 (+ 4 programados ES) |
-| **Total de unidades** | **242** | **17** | **225** |
+| **Total de unidades** | **242** | **46** | **196** |
 
 Nota: los 4 artículos españoles con fecha posterior al 2026-07-28 están incluidos como `🟡 Programada en ES`. Las tres traducciones EN existentes son artículos independientes publicados en `src/content/blog/en/math/`.
 
@@ -47,47 +47,59 @@ Nota: los 4 artículos españoles con fecha posterior al 2026-07-28 están inclu
 | Ruta ES | Ruta EN | Estado | Origen |
 | --- | --- | --- | --- |
 | /blog | /en/blog | ✅ Traducida / publicada | `src/pages/blog.astro + src/pages/en/blog.astro` |
-| /blog/conversores | Por definir | ⬜ Pendiente | `src/pages/blog/[category].astro + src/pages/en/blog/[category].astro` |
-| /blog/finanzas | Por definir | ⬜ Pendiente | `src/pages/blog/[category].astro + src/pages/en/blog/[category].astro` |
-| /blog/inmuebles | Por definir | ⬜ Pendiente | `src/pages/blog/[category].astro + src/pages/en/blog/[category].astro` |
-| /blog/legal-impuestos | Por definir | ⬜ Pendiente | `src/pages/blog/[category].astro + src/pages/en/blog/[category].astro` |
+| /blog/conversores | /en/blog/converters | ✅ Traducida / publicada | `src/pages/blog/[category].astro → src/pages/en/blog/converters.astro` |
+| /blog/finanzas | /en/blog/finance | ✅ Traducida / publicada | `src/pages/blog/[category].astro → src/pages/en/blog/finance.astro` |
+| /blog/inmuebles | /en/blog/real-estate | ✅ Traducida / publicada | `src/pages/blog/[category].astro → src/pages/en/blog/real-estate.astro` |
+| /blog/legal-impuestos | /en/blog/legal-tax | ✅ Traducida / publicada | `src/pages/blog/[category].astro → src/pages/en/blog/legal-tax.astro` |
 | /blog/matematicas | /en/blog/math | ✅ Traducida / publicada | `src/pages/blog/[category].astro + src/pages/en/blog/[category].astro` |
-| /blog/salud | Por definir | ⬜ Pendiente | `src/pages/blog/[category].astro + src/pages/en/blog/[category].astro` |
+| /blog/salud | /en/blog/health | ✅ Traducida / publicada | `src/pages/blog/[category].astro → src/pages/en/blog/health.astro` |
 
 ## 3. Categorías del directorio de calculadoras
 
 | Ruta ES | Ruta EN | Estado | Origen |
 | --- | --- | --- | --- |
-| /finanzas | /en/finance | ⬜ Pendiente | `src/lib/constants/categories.ts + src/pages/[category].astro` |
-| /inmuebles | /en/real-estate | ⬜ Pendiente | `src/lib/constants/categories.ts + src/pages/[category].astro` |
-| /legal-impuestos | /en/legal-tax | ⬜ Pendiente | `src/lib/constants/categories.ts + src/pages/[category].astro` |
+| /finanzas | /en/finance | ✅ Traducida / publicada | `src/pages/[category].astro → src/pages/en/finance.astro` |
+| /inmuebles | /en/real-estate | ✅ Traducida / publicada | `src/pages/[category].astro → src/pages/en/real-estate.astro` |
+| /legal-impuestos | /en/legal-tax | ✅ Traducida / publicada | `src/pages/[category].astro → src/pages/en/legal-tax.astro` |
 | /matematicas | /en/math | ✅ Traducida / publicada | `src/lib/constants/categories.ts + src/pages/[category].astro` |
-| /probabilidad-estadistica | /en/probability-statistics | ⬜ Pendiente | `src/lib/constants/categories.ts + src/pages/[category].astro` |
-| /programacion | /en/programming | ⬜ Pendiente | `src/lib/constants/categories.ts + src/pages/[category].astro` |
-| /geometria | /en/geometry | ⬜ Pendiente | `src/lib/constants/categories.ts + src/pages/[category].astro` |
-| /salud | /en/health | ⬜ Pendiente | `src/lib/constants/categories.ts + src/pages/[category].astro` |
-| /fecha-tiempo | /en/date-time | ⬜ Pendiente | `src/lib/constants/categories.ts + src/pages/[category].astro` |
-| /conversores | /en/converters | ⬜ Pendiente | `src/lib/constants/categories.ts + src/pages/[category].astro` |
-| /mascotas | /en/pets | ⬜ Pendiente | `src/lib/constants/categories.ts + src/pages/[category].astro` |
-| /cocina | /en/cooking | ⬜ Pendiente | `src/lib/constants/categories.ts + src/pages/[category].astro` |
-| /eventos | /en/events | ⬜ Pendiente | `src/lib/constants/categories.ts + src/pages/[category].astro` |
-| /restaurantes | /en/restaurants | ⬜ Pendiente | `src/lib/constants/categories.ts + src/pages/[category].astro` |
-| /vehiculos | /en/vehicles | ⬜ Pendiente | `src/lib/constants/categories.ts + src/pages/[category].astro` |
-| /construccion | /en/construction | ⬜ Pendiente | `src/lib/constants/categories.ts + src/pages/[category].astro` |
+| /probabilidad-estadistica | /en/probability-statistics | ✅ Traducida / publicada | `src/pages/[category].astro → src/pages/en/probability-statistics.astro` |
+| /programacion | /en/programming | ✅ Traducida / publicada | `src/pages/[category].astro → src/pages/en/programming.astro` |
+| /geometria | /en/geometry | ✅ Traducida / publicada | `src/pages/[category].astro → src/pages/en/geometry.astro` |
+| /salud | /en/health | ✅ Traducida / publicada | `src/pages/[category].astro → src/pages/en/health.astro` |
+| /fecha-tiempo | /en/date-time | ✅ Traducida / publicada | `src/pages/[category].astro → src/pages/en/date-time.astro` |
+| /conversores | /en/converters | ✅ Traducida / publicada | `src/pages/[category].astro → src/pages/en/converters.astro` |
+| /mascotas | /en/pets | ✅ Traducida / publicada | `src/pages/[category].astro → src/pages/en/pets.astro` |
+| /cocina | /en/cooking | ✅ Traducida / publicada | `src/pages/[category].astro → src/pages/en/cooking.astro` |
+| /eventos | /en/events | ✅ Traducida / publicada | `src/pages/[category].astro → src/pages/en/events.astro` |
+| /restaurantes | /en/restaurants | ✅ Traducida / publicada | `src/pages/[category].astro → src/pages/en/restaurants.astro` |
+| /vehiculos | /en/vehicles | ✅ Traducida / publicada | `src/pages/[category].astro → src/pages/en/vehicles.astro` |
+| /construccion | /en/construction | ✅ Traducida / publicada | `src/pages/[category].astro → src/pages/en/construction.astro` |
 
 ## 4. Calculadoras
 
+### Cocina
+
 | Ruta ES | Ruta EN | Estado | Origen |
 | --- | --- | --- | --- |
-| /cocina/calculadora-tiempo-coccion-por-peso | Por definir | ⬜ Pendiente | `src/pages/cocina/calculadora-tiempo-coccion-por-peso.astro` |
-| /cocina/conversor-de-medidas-culinarias | Por definir | ⬜ Pendiente | `src/pages/cocina/conversor-de-medidas-culinarias.astro` |
-| /cocina/conversor-de-temperatura-de-horno | Por definir | ⬜ Pendiente | `src/pages/cocina/conversor-de-temperatura-de-horno.astro` |
-| /cocina/escalar-receta-por-porciones | Por definir | ⬜ Pendiente | `src/pages/cocina/escalar-receta-por-porciones.astro` |
-| /construccion/calculadora-cantidad-ladrillos | Por definir | ⬜ Pendiente | `src/pages/construccion/calculadora-cantidad-ladrillos.astro` |
-| /construccion/calculadora-piso-azulejo-superficie | Por definir | ⬜ Pendiente | `src/pages/construccion/calculadora-piso-azulejo-superficie.astro` |
-| /construccion/calculadora-presupuesto-remodelacion | Por definir | ⬜ Pendiente | `src/pages/construccion/calculadora-presupuesto-remodelacion.astro` |
-| /construccion/calculadora-volumen-concreto-cemento | Por definir | ⬜ Pendiente | `src/pages/construccion/calculadora-volumen-concreto-cemento.astro` |
-| /construccion/metros-cuadrados-de-pintura | Por definir | ⬜ Pendiente | `src/pages/construccion/metros-cuadrados-de-pintura.astro` |
+| /cocina/calculadora-tiempo-coccion-por-peso | /en/cooking/cooking-time-by-weight-calculator | ✅ Traducida / publicada | `src/pages/cocina/calculadora-tiempo-coccion-por-peso.astro → src/pages/en/cooking/cooking-time-by-weight-calculator.astro` |
+| /cocina/conversor-de-medidas-culinarias | /en/cooking/cooking-measurement-converter | ✅ Traducida / publicada | `src/pages/cocina/conversor-de-medidas-culinarias.astro → src/pages/en/cooking/cooking-measurement-converter.astro` |
+| /cocina/conversor-de-temperatura-de-horno | /en/cooking/oven-temperature-converter | ✅ Traducida / publicada | `src/pages/cocina/conversor-de-temperatura-de-horno.astro → src/pages/en/cooking/oven-temperature-converter.astro` |
+| /cocina/escalar-receta-por-porciones | /en/cooking/recipe-scaler | ✅ Traducida / publicada | `src/pages/cocina/escalar-receta-por-porciones.astro → src/pages/en/cooking/recipe-scaler.astro` |
+
+### Construcción
+
+| Ruta ES | Ruta EN | Estado | Origen |
+| --- | --- | --- | --- |
+| /construccion/calculadora-cantidad-ladrillos | /en/construction/brick-calculator | ✅ Traducida / publicada | `src/pages/construccion/calculadora-cantidad-ladrillos.astro → src/pages/en/construction/brick-calculator.astro` |
+| /construccion/calculadora-piso-azulejo-superficie | /en/construction/tile-calculator | ✅ Traducida / publicada | `src/pages/construccion/calculadora-piso-azulejo-superficie.astro → src/pages/en/construction/tile-calculator.astro` |
+| /construccion/calculadora-presupuesto-remodelacion | /en/construction/renovation-budget-calculator | ✅ Traducida / publicada | `src/pages/construccion/calculadora-presupuesto-remodelacion.astro → src/pages/en/construction/renovation-budget-calculator.astro` |
+| /construccion/calculadora-volumen-concreto-cemento | /en/construction/concrete-volume-calculator | ✅ Traducida / publicada | `src/pages/construccion/calculadora-volumen-concreto-cemento.astro → src/pages/en/construction/concrete-volume-calculator.astro` |
+| /construccion/metros-cuadrados-de-pintura | /en/construction/paint-calculator | ✅ Traducida / publicada | `src/pages/construccion/metros-cuadrados-de-pintura.astro → src/pages/en/construction/paint-calculator.astro` |
+
+### Conversores
+
+| Ruta ES | Ruta EN | Estado | Origen |
+| --- | --- | --- | --- |
 | /conversores/conversor-de-area-m2-ft2-hectareas-acres | Por definir | ⬜ Pendiente | `src/pages/conversores/conversor-de-area-m2-ft2-hectareas-acres.astro` |
 | /conversores/conversor-de-peso | Por definir | ⬜ Pendiente | `src/pages/conversores/conversor-de-peso.astro` |
 | /conversores/conversor-de-temperatura | Por definir | ⬜ Pendiente | `src/pages/conversores/conversor-de-temperatura.astro` |
@@ -95,8 +107,18 @@ Nota: los 4 artículos españoles con fecha posterior al 2026-07-28 están inclu
 | /conversores/conversor-tallas-de-ropa | Por definir | ⬜ Pendiente | `src/pages/conversores/conversor-tallas-de-ropa.astro` |
 | /conversores/kilometros-a-millas | Por definir | ⬜ Pendiente | `src/pages/conversores/kilometros-a-millas.astro` |
 | /conversores/litros-a-galones | Por definir | ⬜ Pendiente | `src/pages/conversores/litros-a-galones.astro` |
+
+### Eventos
+
+| Ruta ES | Ruta EN | Estado | Origen |
+| --- | --- | --- | --- |
 | /eventos/calculadora-costo-por-persona-evento | Por definir | ⬜ Pendiente | `src/pages/eventos/calculadora-costo-por-persona-evento.astro` |
 | /eventos/calculadora-presupuesto-boda | Por definir | ⬜ Pendiente | `src/pages/eventos/calculadora-presupuesto-boda.astro` |
+
+### Fecha y tiempo
+
+| Ruta ES | Ruta EN | Estado | Origen |
+| --- | --- | --- | --- |
 | /fecha-tiempo/calculadora-costo-reunion | Por definir | ⬜ Pendiente | `src/pages/fecha-tiempo/calculadora-costo-reunion.astro` |
 | /fecha-tiempo/calculadora-de-edad | Por definir | ⬜ Pendiente | `src/pages/fecha-tiempo/calculadora-de-edad.astro` |
 | /fecha-tiempo/calculadora-de-horas-trabajadas | Por definir | ⬜ Pendiente | `src/pages/fecha-tiempo/calculadora-de-horas-trabajadas.astro` |
@@ -104,6 +126,11 @@ Nota: los 4 artículos españoles con fecha posterior al 2026-07-28 están inclu
 | /fecha-tiempo/calculadora-pomodoro | Por definir | ⬜ Pendiente | `src/pages/fecha-tiempo/calculadora-pomodoro.astro` |
 | /fecha-tiempo/calculadora-tiempo-de-lectura | Por definir | ⬜ Pendiente | `src/pages/fecha-tiempo/calculadora-tiempo-de-lectura.astro` |
 | /fecha-tiempo/diferencia-entre-fechas | Por definir | ⬜ Pendiente | `src/pages/fecha-tiempo/diferencia-entre-fechas.astro` |
+
+### Finanzas
+
+| Ruta ES | Ruta EN | Estado | Origen |
+| --- | --- | --- | --- |
 | /finanzas/calculadora-dca-costo-promedio | Por definir | ⬜ Pendiente | `src/pages/finanzas/calculadora-dca-costo-promedio.astro` |
 | /finanzas/calculadora-de-ahorro-para-un-objetivo | Por definir | ⬜ Pendiente | `src/pages/finanzas/calculadora-de-ahorro-para-un-objetivo.astro` |
 | /finanzas/calculadora-de-inflacion-poder-adquisitivo | Por definir | ⬜ Pendiente | `src/pages/finanzas/calculadora-de-inflacion-poder-adquisitivo.astro` |
@@ -116,8 +143,18 @@ Nota: los 4 artículos españoles con fecha posterior al 2026-07-28 están inclu
 | /finanzas/calculadora-de-roi | Por definir | ⬜ Pendiente | `src/pages/finanzas/calculadora-de-roi.astro` |
 | /finanzas/calculadora-de-tarifa-por-hora-freelance | Por definir | ⬜ Pendiente | `src/pages/finanzas/calculadora-de-tarifa-por-hora-freelance.astro` |
 | /finanzas/plan-de-pago-de-deudas | Por definir | ⬜ Pendiente | `src/pages/finanzas/plan-de-pago-de-deudas.astro` |
+
+### Geometría
+
+| Ruta ES | Ruta EN | Estado | Origen |
+| --- | --- | --- | --- |
 | /geometria/calculadora-de-area-y-perimetro | Por definir | ⬜ Pendiente | `src/pages/geometria/calculadora-de-area-y-perimetro.astro` |
 | /geometria/calculadora-del-teorema-de-pitagoras | Por definir | ⬜ Pendiente | `src/pages/geometria/calculadora-del-teorema-de-pitagoras.astro` |
+
+### Inmuebles
+
+| Ruta ES | Ruta EN | Estado | Origen |
+| --- | --- | --- | --- |
 | /inmuebles/calculadora-cap-rate-rentabilidad | Por definir | ⬜ Pendiente | `src/pages/inmuebles/calculadora-cap-rate-rentabilidad.astro` |
 | /inmuebles/calculadora-capacidad-compra-vivienda | Por definir | ⬜ Pendiente | `src/pages/inmuebles/calculadora-capacidad-compra-vivienda.astro` |
 | /inmuebles/calculadora-de-hipoteca | Por definir | ⬜ Pendiente | `src/pages/inmuebles/calculadora-de-hipoteca.astro` |
@@ -125,11 +162,26 @@ Nota: los 4 artículos españoles con fecha posterior al 2026-07-28 están inclu
 | /inmuebles/calculadora-plusvalia-estimada | Por definir | ⬜ Pendiente | `src/pages/inmuebles/calculadora-plusvalia-estimada.astro` |
 | /inmuebles/calculadora-precio-por-metro-cuadrado | Por definir | ⬜ Pendiente | `src/pages/inmuebles/calculadora-precio-por-metro-cuadrado.astro` |
 | /inmuebles/calculadora-renta-vs-compra | Por definir | ⬜ Pendiente | `src/pages/inmuebles/calculadora-renta-vs-compra.astro` |
+
+### Legal e impuestos
+
+| Ruta ES | Ruta EN | Estado | Origen |
+| --- | --- | --- | --- |
 | /legal-impuestos/calculadora-de-iva | Por definir | ⬜ Pendiente | `src/pages/legal-impuestos/calculadora-de-iva.astro` |
 | /legal-impuestos/calculadora-isr-irpf | Por definir | ⬜ Pendiente | `src/pages/legal-impuestos/calculadora-isr-irpf.astro` |
 | /legal-impuestos/calculadora-salario-neto | Por definir | ⬜ Pendiente | `src/pages/legal-impuestos/calculadora-salario-neto.astro` |
+
+### Mascotas
+
+| Ruta ES | Ruta EN | Estado | Origen |
+| --- | --- | --- | --- |
 | /mascotas/calorias-diarias-para-perro-o-gato | Por definir | ⬜ Pendiente | `src/pages/mascotas/calorias-diarias-para-perro-o-gato.astro` |
 | /mascotas/edad-de-mascota-en-anos-humanos | Por definir | ⬜ Pendiente | `src/pages/mascotas/edad-de-mascota-en-anos-humanos.astro` |
+
+### Matemáticas
+
+| Ruta ES | Ruta EN | Estado | Origen |
+| --- | --- | --- | --- |
 | /matematicas/calculadora-calificacion-ponderada | Por definir | ⬜ Pendiente | `src/pages/matematicas/calculadora-calificacion-ponderada.astro` |
 | /matematicas/calculadora-de-estadistica-basica | Por definir | ⬜ Pendiente | `src/pages/matematicas/calculadora-de-estadistica-basica.astro` |
 | /matematicas/calculadora-de-porcentajes | /en/math/percentage-calculator | ✅ Traducida / publicada | `src/pages/matematicas/calculadora-de-porcentajes.astro` |
@@ -141,15 +193,35 @@ Nota: los 4 artículos españoles con fecha posterior al 2026-07-28 están inclu
 | /matematicas/calculadora-porcentaje-asistencia-escolar | Por definir | ⬜ Pendiente | `src/pages/matematicas/calculadora-porcentaje-asistencia-escolar.astro` |
 | /matematicas/calculadora-promedio-escolar-gpa | Por definir | ⬜ Pendiente | `src/pages/matematicas/calculadora-promedio-escolar-gpa.astro` |
 | /matematicas/calculadora-sistema-ecuaciones-2x2 | Por definir | ⬜ Pendiente | `src/pages/matematicas/calculadora-sistema-ecuaciones-2x2.astro` |
+
+### Probabilidad y estadística
+
+| Ruta ES | Ruta EN | Estado | Origen |
+| --- | --- | --- | --- |
 | /probabilidad-estadistica/calculadora-combinaciones-permutaciones | Por definir | ⬜ Pendiente | `src/pages/probabilidad-estadistica/calculadora-combinaciones-permutaciones.astro` |
 | /probabilidad-estadistica/calculadora-distribucion-normal-z-score | Por definir | ⬜ Pendiente | `src/pages/probabilidad-estadistica/calculadora-distribucion-normal-z-score.astro` |
 | /probabilidad-estadistica/calculadora-probabilidad-basica | Por definir | ⬜ Pendiente | `src/pages/probabilidad-estadistica/calculadora-probabilidad-basica.astro` |
+
+### Programación
+
+| Ruta ES | Ruta EN | Estado | Origen |
+| --- | --- | --- | --- |
 | /programacion/calculadora-entropia-contrasena | Por definir | ⬜ Pendiente | `src/pages/programacion/calculadora-entropia-contrasena.astro` |
 | /programacion/calculadora-velocidad-descarga | Por definir | ⬜ Pendiente | `src/pages/programacion/calculadora-velocidad-descarga.astro` |
 | /programacion/conversor-de-bases-numericas | Por definir | ⬜ Pendiente | `src/pages/programacion/conversor-de-bases-numericas.astro` |
 | /programacion/paleta-hex-rgb-hsl | Por definir | ⬜ Pendiente | `src/pages/programacion/paleta-hex-rgb-hsl.astro` |
+
+### Restaurantes
+
+| Ruta ES | Ruta EN | Estado | Origen |
+| --- | --- | --- | --- |
 | /restaurantes/calculadora-de-propina | Por definir | ⬜ Pendiente | `src/pages/restaurantes/calculadora-de-propina.astro` |
 | /restaurantes/dividir-cuenta-en-restaurante | Por definir | ⬜ Pendiente | `src/pages/restaurantes/dividir-cuenta-en-restaurante.astro` |
+
+### Salud
+
+| Ruta ES | Ruta EN | Estado | Origen |
+| --- | --- | --- | --- |
 | /salud/calculadora-1rm-repeticion-maxima | Por definir | ⬜ Pendiente | `src/pages/salud/calculadora-1rm-repeticion-maxima.astro` |
 | /salud/calculadora-de-agua-diaria | Por definir | ⬜ Pendiente | `src/pages/salud/calculadora-de-agua-diaria.astro` |
 | /salud/calculadora-de-calorias-diarias-tdee | Por definir | ⬜ Pendiente | `src/pages/salud/calculadora-de-calorias-diarias-tdee.astro` |
@@ -166,6 +238,11 @@ Nota: los 4 artículos españoles con fecha posterior al 2026-07-28 están inclu
 | /salud/calculadora-prediccion-tiempo-carrera | Por definir | ⬜ Pendiente | `src/pages/salud/calculadora-prediccion-tiempo-carrera.astro` |
 | /salud/calculadora-vo2-max | Por definir | ⬜ Pendiente | `src/pages/salud/calculadora-vo2-max.astro` |
 | /salud/fecha-probable-de-parto | Por definir | ⬜ Pendiente | `src/pages/salud/fecha-probable-de-parto.astro` |
+
+### Vehículos
+
+| Ruta ES | Ruta EN | Estado | Origen |
+| --- | --- | --- | --- |
 | /vehiculos/calculadora-de-consumo-de-gasolina | Por definir | ⬜ Pendiente | `src/pages/vehiculos/calculadora-de-consumo-de-gasolina.astro` |
 | /vehiculos/calculadora-de-costo-por-kilometro | Por definir | ⬜ Pendiente | `src/pages/vehiculos/calculadora-de-costo-por-kilometro.astro` |
 | /vehiculos/calculadora-de-depreciacion-del-vehiculo | Por definir | ⬜ Pendiente | `src/pages/vehiculos/calculadora-de-depreciacion-del-vehiculo.astro` |
@@ -175,6 +252,8 @@ Todas las calculadoras ES listadas tienen implementación en `src/pages/` y est�
 
 ## 5. Artículos del blog
 
+### Conversores
+
 | Ruta ES | Ruta EN | Estado | Origen |
 | --- | --- | --- | --- |
 | /blog/conversores/como-convertir-kilometros-a-millas | Por definir | ⬜ Pendiente | `src/content/blog/conversores/como-convertir-kilometros-a-millas.md` |
@@ -183,6 +262,11 @@ Todas las calculadoras ES listadas tienen implementación en `src/pages/` y est�
 | /blog/conversores/milla-terrestre-vs-milla-nautica | Por definir | 🟡 Programada en ES | `src/content/blog/conversores/milla-terrestre-vs-milla-nautica.md` |
 | /blog/conversores/ritmo-por-kilometro-vs-ritmo-por-milla | Por definir | 🟡 Programada en ES | `src/content/blog/conversores/ritmo-por-kilometro-vs-ritmo-por-milla.md` |
 | /blog/conversores/tabla-kilometros-a-millas-distancias-comunes | Por definir | ⬜ Pendiente | `src/content/blog/conversores/tabla-kilometros-a-millas-distancias-comunes.md` |
+
+### Finanzas
+
+| Ruta ES | Ruta EN | Estado | Origen |
+| --- | --- | --- | --- |
 | /blog/finanzas/cagr-tasa-crecimiento-anual-compuesto | Por definir | ⬜ Pendiente | `src/content/blog/finanzas/cagr-tasa-crecimiento-anual-compuesto.md` |
 | /blog/finanzas/cat-vs-tasa-interes | Por definir | ⬜ Pendiente | `src/content/blog/finanzas/cat-vs-tasa-interes.md` |
 | /blog/finanzas/cetes-interes-compuesto-reinversion | Por definir | ⬜ Pendiente | `src/content/blog/finanzas/cetes-interes-compuesto-reinversion.md` |
@@ -216,6 +300,11 @@ Todas las calculadoras ES listadas tienen implementación en `src/pages/` y est�
 | /blog/finanzas/tabla-amortizacion-prestamo | Por definir | ⬜ Pendiente | `src/content/blog/finanzas/tabla-amortizacion-prestamo.md` |
 | /blog/finanzas/tasa-anual-mensual-diaria-prestamo | Por definir | ⬜ Pendiente | `src/content/blog/finanzas/tasa-anual-mensual-diaria-prestamo.md` |
 | /blog/finanzas/tasa-nominal-vs-tasa-efectiva | Por definir | ⬜ Pendiente | `src/content/blog/finanzas/tasa-nominal-vs-tasa-efectiva.md` |
+
+### Inmuebles
+
+| Ruta ES | Ruta EN | Estado | Origen |
+| --- | --- | --- | --- |
 | /blog/inmuebles/amortizacion-anticipada-reducir-plazo-o-cuota | Por definir | ⬜ Pendiente | `src/content/blog/inmuebles/amortizacion-anticipada-reducir-plazo-o-cuota.md` |
 | /blog/inmuebles/apoyo-infonavit-hipoteca-bancaria | Por definir | ⬜ Pendiente | `src/content/blog/inmuebles/apoyo-infonavit-hipoteca-bancaria.md` |
 | /blog/inmuebles/cat-vs-tasa-credito-hipotecario | Por definir | ⬜ Pendiente | `src/content/blog/inmuebles/cat-vs-tasa-credito-hipotecario.md` |
@@ -237,6 +326,11 @@ Todas las calculadoras ES listadas tienen implementación en `src/pages/` y est�
 | /blog/inmuebles/tasa-anual-a-mensual-hipoteca | Por definir | ⬜ Pendiente | `src/content/blog/inmuebles/tasa-anual-a-mensual-hipoteca.md` |
 | /blog/inmuebles/tasa-fija-vs-variable-hipoteca | Por definir | ⬜ Pendiente | `src/content/blog/inmuebles/tasa-fija-vs-variable-hipoteca.md` |
 | /blog/inmuebles/total-intereses-hipoteca | Por definir | ⬜ Pendiente | `src/content/blog/inmuebles/total-intereses-hipoteca.md` |
+
+### Legal e impuestos
+
+| Ruta ES | Ruta EN | Estado | Origen |
+| --- | --- | --- | --- |
 | /blog/legal-impuestos/como-calcular-iva | Por definir | ⬜ Pendiente | `src/content/blog/legal-impuestos/como-calcular-iva.md` |
 | /blog/legal-impuestos/como-desglosar-iva | Por definir | ⬜ Pendiente | `src/content/blog/legal-impuestos/como-desglosar-iva.md` |
 | /blog/legal-impuestos/como-sumar-iva-a-un-precio | Por definir | ⬜ Pendiente | `src/content/blog/legal-impuestos/como-sumar-iva-a-un-precio.md` |
@@ -247,6 +341,11 @@ Todas las calculadoras ES listadas tienen implementación en `src/pages/` y est�
 | /blog/legal-impuestos/iva-incluido-vs-sin-iva | Por definir | ⬜ Pendiente | `src/content/blog/legal-impuestos/iva-incluido-vs-sin-iva.md` |
 | /blog/legal-impuestos/iva-mexico | Por definir | ⬜ Pendiente | `src/content/blog/legal-impuestos/iva-mexico.md` |
 | /blog/legal-impuestos/tasas-de-iva-por-pais | Por definir | ⬜ Pendiente | `src/content/blog/legal-impuestos/tasas-de-iva-por-pais.md` |
+
+### Matemáticas
+
+| Ruta ES | Ruta EN | Estado | Origen |
+| --- | --- | --- | --- |
 | /blog/matematicas/aumento-porcentual | /en/blog/math/percentage-increase | ✅ Traducida / publicada | `src/content/blog/matematicas/aumento-porcentual.md → src/content/blog/en/math/percentage-increase.md` |
 | /blog/matematicas/calificaciones-con-porcentajes | Por definir | ⬜ Pendiente | `src/content/blog/matematicas/calificaciones-con-porcentajes.md` |
 | /blog/matematicas/como-calcular-porcentajes | /en/blog/math/how-to-calculate-percentages | ✅ Traducida / publicada | `src/content/blog/matematicas/como-calcular-porcentajes.md → src/content/blog/en/math/how-to-calculate-percentages.md` |
@@ -260,6 +359,11 @@ Todas las calculadoras ES listadas tienen implementación en `src/pages/` y est�
 | /blog/matematicas/porcentaje-vs-puntos-porcentuales | Por definir | ⬜ Pendiente | `src/content/blog/matematicas/porcentaje-vs-puntos-porcentuales.md` |
 | /blog/matematicas/que-porcentaje-es-una-cantidad-de-otra | /en/blog/math/what-percentage-is-one-number-of-another | ✅ Traducida / publicada | `src/content/blog/matematicas/que-porcentaje-es-una-cantidad-de-otra.md → src/content/blog/en/math/what-percentage-is-one-number-of-another.md` |
 | /blog/matematicas/regla-de-tres | Por definir | ⬜ Pendiente | `src/content/blog/matematicas/regla-de-tres.md` |
+
+### Salud
+
+| Ruta ES | Ruta EN | Estado | Origen |
+| --- | --- | --- | --- |
 | /blog/salud/bajar-subir-peso-segun-imc | Por definir | ⬜ Pendiente | `src/content/blog/salud/bajar-subir-peso-segun-imc.md` |
 | /blog/salud/bajo-peso-segun-imc-menor-18-5 | Por definir | ⬜ Pendiente | `src/content/blog/salud/bajo-peso-segun-imc-menor-18-5.md` |
 | /blog/salud/calcular-imc-libras-pies-pulgadas | Por definir | ⬜ Pendiente | `src/content/blog/salud/calcular-imc-libras-pies-pulgadas.md` |

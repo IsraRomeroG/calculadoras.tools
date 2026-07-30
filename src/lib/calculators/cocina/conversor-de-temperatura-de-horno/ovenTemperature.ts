@@ -24,6 +24,13 @@ export const OVEN_TEMPERATURE_UNIT_METADATA = {
   k: { label: "Kelvin", shortLabel: "K", symbol: "K", advanced: true },
 } as const satisfies Record<OvenTemperatureUnit, OvenTemperatureUnitMetadata>;
 
+export const OVEN_TEMPERATURE_UNIT_METADATA_EN = {
+  c: { label: "Celsius", shortLabel: "°C", symbol: "°C", advanced: false },
+  f: { label: "Fahrenheit", shortLabel: "°F", symbol: "°F", advanced: false },
+  gas: { label: "Gas mark", shortLabel: "Gas", symbol: "gas", advanced: false },
+  k: { label: "Kelvin", shortLabel: "K", symbol: "K", advanced: true },
+} as const satisfies Record<OvenTemperatureUnit, OvenTemperatureUnitMetadata>;
+
 export type ParseOvenTemperatureInputResult =
   | {
       ok: true;
@@ -301,11 +308,14 @@ export function getConvectionSuggestion(
 
 export function getOvenRangeWarning(
   reading: OvenTemperatureReading,
+  locale: "es" | "en" = "es",
 ): string | undefined {
   const base = getOvenBaseTemperature(reading);
 
   if (base.celsius < OVEN_RANGE_MIN_C || base.celsius > OVEN_RANGE_MAX_C) {
-    return "Esta temperatura esta fuera del rango habitual de un horno domestico; la conversion es matematica.";
+    return locale === "en"
+      ? "This temperature is outside the usual range of a home oven; the conversion is mathematical."
+      : "Esta temperatura esta fuera del rango habitual de un horno domestico; la conversion es matematica.";
   }
 
   return undefined;
@@ -315,26 +325,44 @@ export function formatOvenTemperature(
   value: number,
   unit: Exclude<OvenTemperatureUnit, "gas">,
   decimals = 2,
+  locale: "es" | "en" = "es",
 ): string {
-  return `${formatOvenNumber(value, decimals)} ${OVEN_TEMPERATURE_UNIT_METADATA[unit].symbol}`;
+  const metadata =
+    locale === "en"
+      ? OVEN_TEMPERATURE_UNIT_METADATA_EN
+      : OVEN_TEMPERATURE_UNIT_METADATA;
+
+  return `${formatOvenNumber(value, decimals, locale)} ${metadata[unit].symbol}`;
 }
 
-export function formatGasMark(entry: GasMarkEntry | null): string {
-  return entry ? `gas ${entry.mark}` : "sin marca de gas cercana";
+export function formatGasMark(
+  entry: GasMarkEntry | null,
+  locale: "es" | "en" = "es",
+): string {
+  return entry
+    ? `gas ${entry.mark}`
+    : locale === "en"
+      ? "no nearby gas mark"
+      : "sin marca de gas cercana";
 }
 
 export function formatOvenConversionResult(
   result: OvenConversionResult,
   decimals = 2,
+  locale: "es" | "en" = "es",
 ): string {
   if (result.unit === "gas") {
-    return formatGasMark(result.gasMark);
+    return formatGasMark(result.gasMark, locale);
   }
 
-  return formatOvenTemperature(result.value, result.unit, decimals);
+  return formatOvenTemperature(result.value, result.unit, decimals, locale);
 }
 
-export function formatOvenNumber(value: number, decimals = 2): string {
+export function formatOvenNumber(
+  value: number,
+  decimals = 2,
+  locale: "es" | "en" = "es",
+): string {
   if (!Number.isFinite(value)) {
     throw new RangeError("La temperatura debe ser un numero finito.");
   }
@@ -342,7 +370,7 @@ export function formatOvenNumber(value: number, decimals = 2): string {
   const safeDecimals = Math.min(3, Math.max(0, Math.trunc(decimals)));
   const normalizedValue = Object.is(value, -0) ? 0 : value;
 
-  return new Intl.NumberFormat("es-MX", {
+  return new Intl.NumberFormat(locale === "en" ? "en-US" : "es-MX", {
     maximumFractionDigits: safeDecimals,
   }).format(roundToDecimals(normalizedValue, safeDecimals));
 }
@@ -463,4 +491,3 @@ function roundToDecimals(value: number, decimals: number): number {
 
   return Math.round((value + Number.EPSILON) * factor) / factor;
 }
-

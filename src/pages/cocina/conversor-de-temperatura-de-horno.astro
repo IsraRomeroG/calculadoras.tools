@@ -17,11 +17,17 @@ import {
   SAFE_TEMPERATURE_SOURCE,
 } from "@lib/calculators/cocina/conversor-de-temperatura-de-horno/safeTemperatures";
 import { buildFaqJsonLd } from "@lib/seo";
+import { buildAlternateLinks } from "@lib/i18n/routing";
 
 const title = "Conversor de temperatura de horno: °C, °F y gas mark";
 const description =
   "Convierte temperaturas de horno entre Celsius, Fahrenheit y marca de gas. Consulta ajuste para ventilador y temperaturas internas seguras.";
 const canonical = "/cocina/conversor-de-temperatura-de-horno";
+const englishCanonical = "/en/cooking/oven-temperature-converter";
+const alternates = buildAlternateLinks(
+  { es: canonical, en: englishCanonical },
+  Astro.site ?? Astro.url,
+);
 
 const faqs = [
   {
@@ -71,7 +77,12 @@ const presets = [
 ];
 ---
 
-<BaseLayout title={title} description={description} canonical={canonical}>
+<BaseLayout
+  title={title}
+  description={description}
+  canonical={canonical}
+  alternates={alternates}
+>
   <Fragment slot="head">
     <script type="application/ld+json" set:html={JSON.stringify(faqJsonLd)} />
   </Fragment>
@@ -735,4 +746,3 @@ const presets = [
   setOriginUnit("c");
   loadUrlParameters();
 </script>
-

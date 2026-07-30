@@ -7,11 +7,16 @@ import FaqSection from "@components/shared/FaqSection.astro";
 import PageHero from "@components/shared/PageHero.astro";
 import SectionIntro from "@components/shared/SectionIntro.astro";
 import { buildFaqJsonLd } from "@lib/seo";
+import { buildAlternateLinks } from "@lib/i18n/routing";
 
 const title = "Metros cuadrados de pintura";
 const description =
   "Calcula la superficie de paredes o techo y estima cuantos litros de pintura necesitas segun manos, rendimiento y margen.";
 const canonical = "/construccion/metros-cuadrados-de-pintura";
+const alternates = buildAlternateLinks(
+  { es: canonical, en: "/en/construction/paint-calculator" },
+  Astro.site ?? Astro.url,
+);
 
 const faqs = [
   {
@@ -64,7 +69,7 @@ const faqs = [
 const faqJsonLd = buildFaqJsonLd(faqs);
 ---
 
-<BaseLayout title={title} description={description} canonical={canonical}>
+<BaseLayout title={title} description={description} canonical={canonical} alternates={alternates}>
   <Fragment slot="head">
     <script type="application/ld+json" set:html={JSON.stringify(faqJsonLd)} />
   </Fragment>

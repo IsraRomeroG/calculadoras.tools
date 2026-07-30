@@ -8,11 +8,17 @@ import PageHero from "@components/shared/PageHero.astro";
 import SectionIntro from "@components/shared/SectionIntro.astro";
 import { COOKING_PRESETS } from "@lib/calculators/cocina/calculadora-tiempo-coccion-por-peso/cookingPresets";
 import { buildFaqJsonLd } from "@lib/seo";
+import { buildAlternateLinks } from "@lib/i18n/routing";
 
 const title = "Calculadora de tiempo de coccion por peso";
 const description =
   "Estima tiempo de coccion por kilogramo o libra, usa referencias orientativas, anade reposo y calcula cuando revisar, terminar y servir.";
 const canonical = "/cocina/calculadora-tiempo-coccion-por-peso";
+const englishCanonical = "/en/cooking/cooking-time-by-weight-calculator";
+const alternates = buildAlternateLinks(
+  { es: canonical, en: englishCanonical },
+  Astro.site ?? Astro.url,
+);
 
 const defaultPreset = COOKING_PRESETS[0];
 
@@ -54,7 +60,12 @@ const faqs = [
 const faqJsonLd = buildFaqJsonLd(faqs);
 ---
 
-<BaseLayout title={title} description={description} canonical={canonical}>
+<BaseLayout
+  title={title}
+  description={description}
+  canonical={canonical}
+  alternates={alternates}
+>
   <Fragment slot="head">
     <script type="application/ld+json" set:html={JSON.stringify(faqJsonLd)} />
   </Fragment>

@@ -23,6 +23,14 @@ const publishedBlogArticlePaths =
   getPublishedBlogArticlePathsForSitemap(BLOG_CONTENT_DIR);
 const publishedBlogCategoryPaths =
   getPublishedBlogCategoryPathsForSitemap(BLOG_CONTENT_DIR);
+const translatedBlogCategoryPaths = new Set([
+  ...publishedBlogCategoryPaths,
+  '/en/blog/converters',
+  '/en/blog/finance',
+  '/en/blog/real-estate',
+  '/en/blog/legal-tax',
+  '/en/blog/health',
+]);
 const publishedBlogCategorySlugs =
   getPublishedBlogCategorySlugsForSitemap(BLOG_CONTENT_DIR);
 const excludedUtilityPaths = new Set([
@@ -33,7 +41,7 @@ const excludedUtilityPaths = new Set([
 const shouldIncludeInSitemap = createSitemapFilter({
   legacyBlogArticleSlugs,
   publishedBlogArticlePaths,
-  publishedBlogCategoryPaths,
+  publishedBlogCategoryPaths: translatedBlogCategoryPaths,
   publishedBlogCategorySlugs,
   excludedPaths: excludedUtilityPaths,
 });

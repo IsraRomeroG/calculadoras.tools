@@ -7,11 +7,17 @@ import FaqSection from "@components/shared/FaqSection.astro";
 import PageHero from "@components/shared/PageHero.astro";
 import SectionIntro from "@components/shared/SectionIntro.astro";
 import { buildFaqJsonLd } from "@lib/seo";
+import { buildAlternateLinks } from "@lib/i18n/routing";
 
 const title = "Escalar receta por porciones";
 const description =
   "Ajusta las cantidades de una receta segun las porciones que necesitas preparar y copia la nueva lista de ingredientes.";
 const canonical = "/cocina/escalar-receta-por-porciones";
+const englishCanonical = "/en/cooking/recipe-scaler";
+const alternates = buildAlternateLinks(
+  { es: canonical, en: englishCanonical },
+  Astro.site ?? Astro.url,
+);
 
 const faqs = [
   {
@@ -76,7 +82,12 @@ const unitSuggestions = [
 ];
 ---
 
-<BaseLayout title={title} description={description} canonical={canonical}>
+<BaseLayout
+  title={title}
+  description={description}
+  canonical={canonical}
+  alternates={alternates}
+>
   <Fragment slot="head">
     <script type="application/ld+json" set:html={JSON.stringify(faqJsonLd)} />
   </Fragment>

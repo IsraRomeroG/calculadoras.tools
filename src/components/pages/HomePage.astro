@@ -11,6 +11,10 @@ import {
   getCalculatorCategoryUrl,
   getPublishedCalculators,
 } from "@lib/calculator-directory";
+import {
+  CATEGORY_IDS,
+  getCategory,
+} from "@lib/constants/categories";
 
 interface Props {
   locale: Locale;
@@ -20,7 +24,22 @@ interface Props {
 
 const { locale, canonical, alternates } = Astro.props;
 const calculators = getPublishedCalculators(locale);
-const categories = getCalculatorCategories(calculators, locale);
+const categories =
+  locale === "en"
+    ? CATEGORY_IDS.map((categoryId) => {
+        const metadata = getCategory(categoryId, locale);
+
+        return {
+          id: categoryId,
+          slug: metadata.slug,
+          label: metadata.label,
+          description: metadata.description,
+          count: calculators.filter(
+            (calculator) => calculator.categoryId === categoryId,
+          ).length,
+        };
+      })
+    : getCalculatorCategories(calculators, locale);
 const categoryCards = categories.flatMap((category) => {
   const href = getCalculatorCategoryUrl(category.id, locale);
 

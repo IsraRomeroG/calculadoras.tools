@@ -1,0 +1,50 @@
+---
+import CategoryPage from "@components/pages/CategoryPage.astro";
+import {
+  getCalculatorsByCategoryId,
+  getCalculatorCategoryUrl,
+  getPublishedCalculators,
+  type CalculatorCategory,
+} from "@lib/calculator-directory";
+import {
+  getCategory,
+  type CategoryId,
+} from "@lib/constants/categories";
+import { buildAlternateLinks } from "@lib/i18n/routing";
+
+interface Props {
+  categoryId: CategoryId;
+}
+
+const { categoryId } = Astro.props;
+const metadata = getCategory(categoryId, "en");
+const calculators = getCalculatorsByCategoryId(
+  getPublishedCalculators("en"),
+  categoryId,
+);
+const category: CalculatorCategory = {
+  id: categoryId,
+  slug: metadata.slug,
+  label: metadata.label,
+  description: metadata.description,
+  count: calculators.length,
+};
+const canonical =
+  getCalculatorCategoryUrl(categoryId, "en") ?? `/en/${metadata.slug}`;
+const esCanonical = getCalculatorCategoryUrl(categoryId, "es");
+const alternates = buildAlternateLinks(
+  {
+    ...(esCanonical ? { es: esCanonical } : {}),
+    en: canonical,
+  },
+  Astro.site ?? Astro.url,
+);
+---
+
+<CategoryPage
+  locale="en"
+  category={category}
+  calculators={calculators}
+  canonical={canonical}
+  alternates={alternates}
+/>

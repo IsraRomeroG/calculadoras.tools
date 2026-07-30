@@ -15,11 +15,17 @@ import {
   type CookingMeasureUnit,
 } from "@lib/calculators/cocina/conversor-de-medidas-culinarias/cookingMeasures";
 import { buildFaqJsonLd } from "@lib/seo";
+import { buildAlternateLinks } from "@lib/i18n/routing";
 
 const title = "Conversor de medidas culinarias";
 const description =
   "Convierte tazas, cucharadas, mililitros, gramos y otras medidas habituales para seguir una receta con claridad.";
 const canonical = "/cocina/conversor-de-medidas-culinarias";
+const englishCanonical = "/en/cooking/cooking-measurement-converter";
+const alternates = buildAlternateLinks(
+  { es: canonical, en: englishCanonical },
+  Astro.site ?? Astro.url,
+);
 
 const faqs = [
   {
@@ -118,7 +124,12 @@ const shortcuts = [
 ];
 ---
 
-<BaseLayout title={title} description={description} canonical={canonical}>
+<BaseLayout
+  title={title}
+  description={description}
+  canonical={canonical}
+  alternates={alternates}
+>
   <Fragment slot="head">
     <script type="application/ld+json" set:html={JSON.stringify(faqJsonLd)} />
   </Fragment>
