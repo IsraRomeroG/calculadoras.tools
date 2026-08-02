@@ -4,6 +4,7 @@ seoTitle: "Kilómetros vs. millas: qué diferencia hay y cuándo usar cada unida
 description: "Conoce la diferencia entre kilómetros y millas, sus símbolos, contextos de uso y cómo convertir una unidad en otra."
 pubDate: 2026-07-29
 categorySlug: "conversores"
+translationKey: "kilometers-vs-miles"
 tags:
   - kilómetros vs millas
   - sistema métrico

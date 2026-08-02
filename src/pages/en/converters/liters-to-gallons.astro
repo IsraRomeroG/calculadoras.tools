@@ -1,0 +1,1133 @@
+---
+import AdSlot from "@components/ads/AdSlot.astro";
+import Container from "@components/layout/Container.astro";
+import PageShell from "@components/layout/PageShell.astro";
+import FaqSection from "@components/shared/FaqSection.astro";
+import PageHero from "@components/shared/PageHero.astro";
+import SectionIntro from "@components/shared/SectionIntro.astro";
+import BaseLayout from "@layouts/BaseLayout.astro";
+import {
+  IMPERIAL_GALLON_DIFFERENCE_PERCENT,
+  convertVolume,
+  formatVolume,
+} from "@lib/calculators/conversores/litros-a-galones/litersGallons.en";
+import { buildAlternateLinks } from "@lib/i18n/routing";
+import { buildFaqJsonLd } from "@lib/seo";
+
+const title = "Liters to US and Imperial gallons converter";
+const description =
+  "Convert liters to US and Imperial gallons, or gallons to liters. Compare both gallon types with clear formulas and equivalents.";
+const canonical = "/en/converters/liters-to-gallons";
+const spanishCanonical = "/conversores/litros-a-galones";
+const alternates = buildAlternateLinks({ es: spanishCanonical, en: canonical }, Astro.site ?? Astro.url);
+
+const faqs = [
+  {
+    question: "How many US gallons are in one liter?",
+    answer:
+      "One liter is approximately 0.264172 US gallons.",
+  },
+  {
+    question: "How many Imperial gallons are in one liter?",
+    answer:
+      "One liter is approximately 0.219969 Imperial gallons.",
+  },
+  {
+    question: "How many liters are in one US gallon?",
+    answer:
+      "One US gallon equals exactly 3.785411784 liters.",
+  },
+  {
+    question: "How many liters are in one Imperial gallon?",
+    answer: "One Imperial gallon equals exactly 4.54609 liters.",
+  },
+  {
+    question: "What is the difference between a US and an Imperial gallon?",
+    answer:
+      "The Imperial gallon contains approximately 20.1% more volume than the US gallon.",
+  },
+  {
+    question: "Which gallon type should you use?",
+    answer:
+      "Check the region, label, manual or original source. If it only says gallon, confirm whether it means US or Imperial.",
+  },
+  {
+    question: "How many gallons is 10 liters?",
+    answer:
+      "Ten liters is approximately 2.6417 US gallons or 2.1997 Imperial gallons.",
+  },
+];
+
+const faqJsonLd = buildFaqJsonLd(faqs);
+const commonLiterValues = [1, 5, 10, 20, 50, 100];
+const literShortcuts = commonLiterValues.map((value) => ({
+  label: `${value} L to gallons`,
+  value: String(value),
+  origin: "l",
+  us: formatVolume(convertVolume(value, "l", "us_gal"), "us_gal"),
+  imperial: formatVolume(
+    convertVolume(value, "l", "imp_gal"),
+    "imp_gal",
+  ),
+}));
+const gallonShortcuts = [
+  { label: "1 US gal to liters", value: "1", origin: "us_gal" },
+  { label: "5 US gal to liters", value: "5", origin: "us_gal" },
+  { label: "1 Imperial gal to liters", value: "1", origin: "imp_gal" },
+  { label: "5 Imperial gal to liters", value: "5", origin: "imp_gal" },
+].map((shortcut) => ({
+  ...shortcut,
+  result: formatVolume(
+    convertVolume(
+      Number(shortcut.value),
+      shortcut.origin as "us_gal" | "imp_gal",
+      "l",
+    ),
+    "l",
+  ),
+}));
+const differencePercentage = new Intl.NumberFormat("es-MX", {
+  maximumFractionDigits: 1,
+}).format(IMPERIAL_GALLON_DIFFERENCE_PERCENT);
+---
+
+<BaseLayout title={title} description={description} canonical={canonical} locale="en" alternates={alternates}>
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={JSON.stringify(faqJsonLd)} />
+  </Fragment>
+
+  <PageShell>
+    <PageHero
+      title="Liters to gallons converter"
+      description="Convert liters to US and Imperial gallons together, or convert either gallon type to liters."
+      kicker="Converters"
+      collapseBreadcrumbOnMobile
+      containerClass="py-6 md:py-8"
+      breadcrumbs={[
+        { label: "Home", href: "/en", ariaLabel: "Home" },
+        { label: "Converters", href: "/en/converters", optional: true },
+        { label: "Liters to gallons", truncate: true },
+      ]}
+    />
+
+    <Container as="section" class="py-6 md:py-8">
+      <section
+        id="liters-gallons-converter"
+        class="overflow-hidden rounded-lg border border-gray-700 bg-gray-950 shadow-xl shadow-gray-950/30"
+        aria-labelledby="calculator-heading"
+      >
+        <div
+          class="grid gap-0 lg:grid-cols-[minmax(0,1fr)_minmax(19rem,0.82fr)]"
+        >
+          <div class="p-4 sm:p-6">
+            <p class="text-sm font-semibold text-amber-300">
+              Quick conversion
+            </p>
+            <h2 id="calculator-heading" class="mt-2 text-2xl font-semibold">
+              What volume do you want to convert?
+            </h2>
+
+            <div class="mt-6">
+              <label
+                for="volume-value"
+                class="block text-sm font-semibold text-gray-200"
+              >
+                Volume
+              </label>
+              <div
+                class="mt-2 flex rounded-lg border border-gray-700 bg-gray-900 focus-within:border-amber-400 focus-within:ring-3 focus-within:ring-amber-400/15"
+              >
+                <input
+                  id="volume-value"
+                  class="min-h-14 w-full min-w-0 bg-transparent px-4 text-xl text-white outline-none placeholder:text-gray-600"
+                  type="text"
+                  inputmode="decimal"
+                  autocomplete="off"
+                  placeholder="Ej. 10 o 5 gal US"
+                  aria-describedby="volume-help volume-interpretation volume-error"
+                  data-volume-input
+                />
+                <span
+                  class="flex shrink-0 items-center px-4 text-sm text-gray-500"
+                  data-input-symbol
+                >
+                  L
+                </span>
+              </div>
+              <p
+                id="volume-help"
+                class="mt-2 text-xs leading-relaxed text-gray-500"
+              >
+                Accepts a decimal point or comma. You can also paste 10 L, 5 gal
+                US o 5 gal imperial.
+              </p>
+              <p
+                id="volume-interpretation"
+                class="mt-2 hidden text-xs leading-relaxed text-blue-200"
+                data-volume-interpretation
+              >
+              </p>
+              <p
+                id="volume-error"
+                class="mt-2 hidden text-sm text-red-300"
+                data-volume-error
+              >
+              </p>
+            </div>
+
+            <fieldset class="mt-5">
+              <legend class="text-sm font-semibold text-gray-200">
+                Direction
+              </legend>
+              <div class="mt-2 grid grid-cols-2 gap-2">
+                <button
+                  class="min-h-12 rounded-lg border border-amber-400 bg-amber-400/10 px-3 py-2 text-sm font-semibold text-amber-100 transition hover:border-amber-300 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/30"
+                  type="button"
+                  aria-pressed="true"
+                  data-direction-mode="liters"
+                >
+                  Liters → galones
+                </button>
+                <button
+                  class="min-h-12 rounded-lg border border-gray-700 bg-gray-900 px-3 py-2 text-sm font-semibold text-gray-200 transition hover:border-gray-500 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/30"
+                  type="button"
+                  aria-pressed="false"
+                  data-direction-mode="gallons"
+                >
+                  Gallons → liters
+                </button>
+              </div>
+            </fieldset>
+
+            <fieldset class="mt-5 hidden" data-gallon-kind-panel>
+              <legend class="text-sm font-semibold text-gray-200">
+                Source gallon type
+              </legend>
+              <div class="mt-2 grid grid-cols-2 gap-2">
+                <button
+                  class="min-h-12 rounded-lg border border-amber-400 bg-amber-400/10 px-3 py-2 text-sm font-semibold text-amber-100 transition hover:border-amber-300 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/30"
+                  type="button"
+                  aria-pressed="true"
+                  data-gallon-unit="us_gal"
+                >
+                  Estadounidense
+                </button>
+                <button
+                  class="min-h-12 rounded-lg border border-gray-700 bg-gray-900 px-3 py-2 text-sm font-semibold text-gray-200 transition hover:border-gray-500 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/30"
+                  type="button"
+                  aria-pressed="false"
+                  data-gallon-unit="imp_gal"
+                >
+                  Imperial
+                </button>
+              </div>
+            </fieldset>
+
+            <div class="mt-5 flex flex-wrap items-end gap-3">
+              <details data-precision-panel>
+                <summary
+                  class="flex min-h-11 cursor-pointer items-center rounded-lg border border-gray-700 bg-gray-900 px-4 py-2 text-sm font-semibold text-gray-200 transition hover:border-gray-500 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-gray-400/30"
+                  data-precision-summary
+                >
+                  Automatic precision
+                </summary>
+                <div
+                  class="mt-2 rounded-lg border border-gray-700 bg-gray-900 p-3"
+                >
+                  <label
+                    for="volume-precision"
+                    class="block text-xs font-semibold text-gray-400"
+                  >
+                    Decimales visibles
+                  </label>
+                  <select
+                    id="volume-precision"
+                    class="mt-2 min-h-11 w-full rounded-lg border border-gray-700 bg-gray-950 px-3 text-sm text-white outline-none transition focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15"
+                    data-precision-select
+                  >
+                    <option value="auto" selected>Automatic</option>
+                    {
+                      Array.from({ length: 9 }, (_, decimals) => (
+                        <option value={String(decimals)}>{decimals}</option>
+                      ))
+                    }
+                  </select>
+                </div>
+              </details>
+
+              <button
+                class="min-h-11 rounded-lg border border-gray-700 px-4 py-2 text-sm font-semibold text-gray-200 transition hover:border-gray-500 hover:bg-gray-900 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-gray-400/30"
+                type="button"
+                data-clear-calculator
+              >
+                Clear
+              </button>
+            </div>
+          </div>
+
+          <aside
+            class="border-t border-gray-800 bg-gray-900/65 p-4 sm:p-6 lg:border-l lg:border-t-0"
+          >
+            <p
+              class="text-xs font-semibold uppercase tracking-wide text-gray-500"
+            >
+              Result
+            </p>
+
+            <div data-empty-result>
+              <p class="mt-3 min-h-10 text-2xl font-semibold text-amber-100">
+                Enter an amount
+              </p>
+              <p class="mt-3 text-sm leading-relaxed text-gray-400">
+                You will see both relevant equivalents without leaving the page.
+              </p>
+            </div>
+
+            <div class="hidden" data-result-content>
+              <p
+                class="mt-3 text-sm font-medium text-gray-300"
+                data-source-result
+              >
+              </p>
+              <p
+                class="mt-2 min-h-10 break-words text-3xl font-semibold text-amber-100"
+                tabindex="-1"
+                data-main-result
+              >
+              </p>
+              <div
+                class="mt-4 rounded-lg border border-gray-700 bg-gray-950/70 p-4"
+              >
+                <p
+                  class="text-xs font-semibold uppercase tracking-wide text-gray-500"
+                >
+                  Also equals
+                </p>
+                <p
+                  class="mt-2 break-words text-lg font-semibold text-white"
+                  data-secondary-result
+                >
+                </p>
+              </div>
+              <p
+                class="mt-4 text-sm leading-relaxed text-blue-100"
+                data-result-note
+              >
+              </p>
+              <div
+                class="mt-4 space-y-1 text-xs leading-relaxed text-gray-400"
+              >
+                <p data-primary-rate></p>
+                <p data-secondary-rate></p>
+              </div>
+            </div>
+
+            <div class="mt-4 flex flex-wrap gap-2">
+              <button
+                class="hidden min-h-11 rounded-lg bg-amber-400 px-4 py-2 text-sm font-semibold text-gray-950 transition hover:bg-amber-300 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-300/40"
+                type="button"
+                data-copy-main
+              >
+                Copy resultado
+              </button>
+              <button
+                class="hidden min-h-11 rounded-lg border border-amber-400/60 px-4 py-2 text-sm font-semibold text-amber-200 transition hover:bg-amber-400/10 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-300/40"
+                type="button"
+                data-share-main
+              >
+                Share
+              </button>
+            </div>
+            <p
+              class="sr-only"
+              role="status"
+              aria-live="polite"
+              data-live-status
+            >
+            </p>
+            <p
+              class="mt-3 min-h-5 text-sm text-emerald-300"
+              role="status"
+              aria-live="polite"
+              data-copy-status
+            >
+            </p>
+          </aside>
+        </div>
+
+        <div class="border-t border-gray-800 p-4 sm:p-6">
+          <h3 class="text-lg font-semibold">Applied formulas</h3>
+          <p
+            class="mt-2 text-sm leading-relaxed text-gray-400"
+            data-formula-empty
+          >
+            The formulas and substitution will appear after you enter a volume.
+          </p>
+          <div
+            class="mt-4 hidden grid gap-3 lg:grid-cols-2"
+            data-formula-grid
+          >
+            <article
+              class="rounded-lg border border-gray-800 bg-gray-900/70 p-4"
+            >
+              <p class="text-sm leading-relaxed text-gray-200" data-formula-primary>
+              </p>
+            </article>
+            <article
+              class="rounded-lg border border-gray-800 bg-gray-900/70 p-4"
+            >
+              <p class="text-sm leading-relaxed text-gray-200" data-formula-secondary>
+              </p>
+            </article>
+          </div>
+        </div>
+      </section>
+    </Container>
+
+    <AdSlot placement="calculator-after-tool" />
+
+    <Container as="section" class="py-6 md:py-8">
+      <SectionIntro
+        title="Common conversions"
+        description="Load a common value and get both gallon types instantly."
+      />
+      <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        {
+          literShortcuts.map((shortcut) => (
+            <button
+              class="min-h-24 rounded-lg border border-gray-800 bg-gray-950 p-4 text-left transition hover:border-amber-400/60 hover:bg-gray-900 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/30"
+              type="button"
+              data-shortcut-value={shortcut.value}
+              data-shortcut-origin={shortcut.origin}
+            >
+              <span class="block text-sm font-semibold text-white">
+                {shortcut.label}
+              </span>
+              <span class="mt-2 block text-sm text-amber-300">
+                {shortcut.us}
+              </span>
+              <span class="mt-1 block text-xs text-gray-400">
+                {shortcut.imperial}
+              </span>
+            </button>
+          ))
+        }
+      </div>
+
+      <details class="mt-5 rounded-lg border border-gray-800 bg-gray-950">
+        <summary
+          class="flex min-h-12 cursor-pointer items-center px-4 py-3 text-sm font-semibold text-amber-300"
+        >
+          View gallon-to-liter conversions
+        </summary>
+        <div class="grid gap-3 border-t border-gray-800 p-4 sm:grid-cols-2">
+          {
+            gallonShortcuts.map((shortcut) => (
+              <button
+                class="min-h-20 rounded-lg border border-gray-800 bg-gray-900 p-4 text-left transition hover:border-amber-400/60 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/30"
+                type="button"
+                data-shortcut-value={shortcut.value}
+                data-shortcut-origin={shortcut.origin}
+              >
+                <span class="block text-sm font-semibold text-white">
+                  {shortcut.label}
+                </span>
+                <span class="mt-2 block text-sm text-amber-300">
+                  {shortcut.result}
+                </span>
+              </button>
+            ))
+          }
+        </div>
+      </details>
+    </Container>
+
+    <Container as="section" class="py-6 md:py-8">
+      <SectionIntro
+        title="Liters-to-gallons table"
+        description="Static equivalents for checking common values quickly."
+      />
+      <div class="overflow-hidden rounded-lg border border-gray-800 bg-gray-950">
+        <table class="w-full table-fixed text-left text-xs sm:text-sm">
+          <caption class="sr-only">
+            Liters equivalentes to gallons estadounidenses e imperiales
+          </caption>
+          <thead
+            class="bg-gray-900 text-[0.68rem] uppercase tracking-wide text-gray-500 sm:text-xs"
+          >
+            <tr>
+              <th class="px-2 py-3 sm:px-4">Liters</th>
+              <th class="px-2 py-3 sm:px-4">Gal US</th>
+              <th class="px-2 py-3 sm:px-4">Imperial gal</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-gray-800 text-gray-300">
+            {
+              commonLiterValues.map((value) => (
+                <tr>
+                  <th
+                    scope="row"
+                    class="px-2 py-3 font-semibold text-white sm:px-4"
+                  >
+                    {formatVolume(value, "l")}
+                  </th>
+                  <td class="break-words px-2 py-3 sm:px-4">
+                    {formatVolume(
+                      convertVolume(value, "l", "us_gal"),
+                      "us_gal",
+                    )}
+                  </td>
+                  <td class="break-words px-2 py-3 sm:px-4">
+                    {formatVolume(
+                      convertVolume(value, "l", "imp_gal"),
+                      "imp_gal",
+                    )}
+                  </td>
+                </tr>
+              ))
+            }
+          </tbody>
+        </table>
+      </div>
+    </Container>
+
+    <Container as="section" class="py-6 md:py-8">
+      <SectionIntro
+        title="US and Imperial gallons are not the same"
+        description="The names are similar, but they represent different volumes."
+      />
+      <div class="grid gap-4 lg:grid-cols-3">
+        <article class="rounded-lg border border-gray-800 bg-gray-950 p-5">
+          <p class="text-sm font-semibold text-amber-300">US gallon</p>
+          <p class="mt-3 text-2xl font-semibold">3.785411784 L</p>
+          <p class="mt-3 text-sm leading-relaxed text-gray-400">
+            Use this equivalent when the source specifies gallon
+            estadounidense, americano o US gallon.
+          </p>
+        </article>
+        <article class="rounded-lg border border-gray-800 bg-gray-950 p-5">
+          <p class="text-sm font-semibold text-amber-300">Imperial gallon</p>
+          <p class="mt-3 text-2xl font-semibold">4.54609 L</p>
+          <p class="mt-3 text-sm leading-relaxed text-gray-400">
+            The Imperial system uses a larger gallon and also changes its
+            pints and fluid ounces.
+          </p>
+        </article>
+        <article
+          class="rounded-lg border border-blue-400/25 bg-blue-400/10 p-5"
+        >
+          <p class="text-sm font-semibold text-blue-200">Practical difference</p>
+          <p class="mt-3 text-2xl font-semibold text-white">
+            {differencePercentage} % mayor
+          </p>
+          <p class="mt-3 text-sm leading-relaxed text-blue-100">
+            An Imperial gallon contains approximately 20.1% more volume than
+            uno estadounidense.
+          </p>
+        </article>
+      </div>
+    </Container>
+
+    <Container as="section" class="py-6 md:py-8">
+      <SectionIntro
+        title="How to convert liters and gallons"
+        description="Use the appropriate factor and keep full precision until the final result."
+      />
+      <div class="grid gap-4 lg:grid-cols-2">
+        <article class="rounded-lg border border-gray-800 bg-gray-950 p-5">
+          <h3 class="text-lg font-semibold">De litros to gallons</h3>
+          <div class="mt-4 space-y-2 text-sm leading-relaxed text-gray-300">
+            <p class="rounded-lg bg-gray-900 p-3">
+              gal US = litros ÷ 3.785411784
+            </p>
+            <p class="rounded-lg bg-gray-900 p-3">
+              gal imperial = litros ÷ 4.54609
+            </p>
+          </div>
+        </article>
+        <article class="rounded-lg border border-gray-800 bg-gray-950 p-5">
+          <h3 class="text-lg font-semibold">From gallons to liters</h3>
+          <div class="mt-4 space-y-2 text-sm leading-relaxed text-gray-300">
+            <p class="rounded-lg bg-gray-900 p-3">
+              litros = gal US × 3.785411784
+            </p>
+            <p class="rounded-lg bg-gray-900 p-3">
+              litros = gal imperial × 4.54609
+            </p>
+          </div>
+        </article>
+      </div>
+    </Container>
+
+    <Container as="section" class="py-6 md:py-8">
+      <SectionIntro
+        title="How to choose the gallon type"
+        description="The word gallon alone is not enough to identify the volume."
+      />
+      <div class="rounded-lg border border-gray-800 bg-gray-950 p-5">
+        <p class="text-sm leading-relaxed text-gray-300">
+          Check the region, label, manual or original document. Look for
+          terms such as <strong class="text-white">US gallon</strong>,
+          <strong class="text-white">US gallon</strong> o
+          <strong class="text-white">imperial gallon</strong>. The calculator
+          does not guess a variant when you paste only “gallon.”
+        </p>
+      </div>
+    </Container>
+
+    <Container as="section" class="py-6 md:py-8">
+      <SectionIntro
+        title="Related calculators"
+        description="These tools add context when volume is part of a trip, cost or recipe."
+      />
+      <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        <a
+          class="rounded-lg border border-gray-800 bg-gray-950 p-4 transition hover:border-amber-400/60 hover:bg-gray-900"
+          href="/en/vehicles"
+        >
+          <span class="block font-semibold text-white">Fuel consumption</span>
+          <span class="mt-2 block text-sm leading-relaxed text-gray-400">
+            Calcula rendimiento en km/L, L/100 km y mpg.
+          </span>
+        </a>
+        <a
+          class="rounded-lg border border-gray-800 bg-gray-950 p-4 transition hover:border-amber-400/60 hover:bg-gray-900"
+          href="/en/vehicles"
+        >
+          <span class="block font-semibold text-white">Cost per kilometer</span>
+          <span class="mt-2 block text-sm leading-relaxed text-gray-400">
+            Estimate fuel and trip cost.
+          </span>
+        </a>
+        <a
+          class="rounded-lg border border-gray-800 bg-gray-950 p-4 transition hover:border-amber-400/60 hover:bg-gray-900"
+          href="/en/cooking/cooking-measurement-converter"
+        >
+          <span class="block font-semibold text-white">Cooking measurements</span>
+          <span class="mt-2 block text-sm leading-relaxed text-gray-400">
+            Convert ml, liters, cups and spoons for recipes.
+          </span>
+        </a>
+      </div>
+    </Container>
+
+    <FaqSection faqs={faqs} />
+  </PageShell>
+</BaseLayout>
+
+<script>
+  import {
+    IMPERIAL_GALLON_DIFFERENCE_PERCENT,
+    VOLUME_UNIT_METADATA,
+    buildVolumeExplanation,
+    convertAllVolumes,
+    formatVolume,
+    formatVolumeRate,
+    isVolumeUnit,
+    parseVolumeInput,
+  } from "@lib/calculators/conversores/litros-a-galones/litersGallons.en";
+
+  const input = document.querySelector("[data-volume-input]");
+  const inputSymbol = document.querySelector("[data-input-symbol]");
+  const precisionSelect = document.querySelector("[data-precision-select]");
+  const precisionSummary = document.querySelector("[data-precision-summary]");
+  const gallonKindPanel = document.querySelector("[data-gallon-kind-panel]");
+  const errorElement = document.querySelector("[data-volume-error]");
+  const interpretationElement = document.querySelector(
+    "[data-volume-interpretation]",
+  );
+  const emptyResult = document.querySelector("[data-empty-result]");
+  const resultContent = document.querySelector("[data-result-content]");
+  const sourceResult = document.querySelector("[data-source-result]");
+  const mainResult = document.querySelector("[data-main-result]");
+  const secondaryResult = document.querySelector("[data-secondary-result]");
+  const resultNote = document.querySelector("[data-result-note]");
+  const primaryRate = document.querySelector("[data-primary-rate]");
+  const secondaryRate = document.querySelector("[data-secondary-rate]");
+  const formulaEmpty = document.querySelector("[data-formula-empty]");
+  const formulaGrid = document.querySelector("[data-formula-grid]");
+  const primaryFormula = document.querySelector("[data-formula-primary]");
+  const secondaryFormula = document.querySelector("[data-formula-secondary]");
+  const copyMainButton = document.querySelector("[data-copy-main]");
+  const shareMainButton = document.querySelector("[data-share-main]");
+  const copyStatus = document.querySelector("[data-copy-status]");
+  const liveStatus = document.querySelector("[data-live-status]");
+  const clearButton = document.querySelector("[data-clear-calculator]");
+
+  let origin = "l";
+  let selectedGallon = "us_gal";
+  let currentCopyText = "";
+  let currentShareText = "";
+  let currentShareUrl = window.location.href;
+  let copyTimer = 0;
+  let liveTimer = 0;
+  let urlTimer = 0;
+
+  function getPrecision() {
+    if (precisionSelect.value === "auto") {
+      return "auto";
+    }
+
+    const decimals = Number(precisionSelect.value);
+
+    return Number.isInteger(decimals) && decimals >= 0 && decimals <= 8
+      ? decimals
+      : "auto";
+  }
+
+  function getResultUnits() {
+    if (origin === "l") {
+      return ["us_gal", "imp_gal"];
+    }
+
+    return origin === "us_gal"
+      ? ["l", "imp_gal"]
+      : ["l", "us_gal"];
+  }
+
+  function getRateDecimals(from, to) {
+    if (from === "us_gal" && to === "l") {
+      return 9;
+    }
+
+    if (from === "imp_gal" && to === "l") {
+      return 5;
+    }
+
+    return 9;
+  }
+
+  function setButtonActive(button, active) {
+    button.setAttribute("aria-pressed", active ? "true" : "false");
+    button.classList.toggle("border-amber-400", active);
+    button.classList.toggle("bg-amber-400/10", active);
+    button.classList.toggle("text-amber-100", active);
+    button.classList.toggle("border-gray-700", !active);
+    button.classList.toggle("bg-gray-900", !active);
+    button.classList.toggle("text-gray-200", !active);
+  }
+
+  function updateControls() {
+    const mode = origin === "l" ? "liters" : "gallons";
+
+    document.querySelectorAll("[data-direction-mode]").forEach((button) => {
+      setButtonActive(button, button.dataset.directionMode === mode);
+    });
+
+    document.querySelectorAll("[data-gallon-unit]").forEach((button) => {
+      setButtonActive(button, button.dataset.gallonUnit === selectedGallon);
+    });
+
+    gallonKindPanel.classList.toggle("hidden", mode !== "gallons");
+    inputSymbol.textContent = VOLUME_UNIT_METADATA[origin].symbol;
+
+    const precision = getPrecision();
+    precisionSummary.textContent =
+      precision === "auto"
+        ? "Automatic precision"
+        : `Precision: ${precision} ${precision === 1 ? "decimal" : "decimal places"}`;
+  }
+
+  function setError(message = "") {
+    errorElement.textContent = message;
+    errorElement.classList.toggle("hidden", !message);
+    input.setAttribute("aria-invalid", message ? "true" : "false");
+  }
+
+  function setInterpretation(message = "") {
+    interpretationElement.textContent = message;
+    interpretationElement.classList.toggle("hidden", !message);
+  }
+
+  function clearOutputs() {
+    currentCopyText = "";
+    currentShareText = "";
+    window.clearTimeout(liveTimer);
+    liveStatus.textContent = "";
+    emptyResult.classList.remove("hidden");
+    resultContent.classList.add("hidden");
+    sourceResult.textContent = "";
+    mainResult.textContent = "";
+    secondaryResult.textContent = "";
+    resultNote.textContent = "";
+    primaryRate.textContent = "";
+    secondaryRate.textContent = "";
+    formulaEmpty.classList.remove("hidden");
+    formulaGrid.classList.add("hidden");
+    primaryFormula.textContent = "";
+    secondaryFormula.textContent = "";
+    copyMainButton.classList.add("hidden");
+    shareMainButton.classList.add("hidden");
+  }
+
+  function getInputError(error) {
+    switch (error) {
+      case "ambiguous":
+        return "Specify whether the gallon is US or Imperial.";
+      case "negative":
+        return "Volume cannot be negative.";
+      case "out_of_range":
+        return "Use a finite value between 0 and 1e15.";
+      case "invalid":
+        return "The volume could not be interpreted. Use a format such as 10 L, 5 US gal or 5 Imperial gal.";
+      default:
+        return "";
+    }
+  }
+
+  function buildUrl(value) {
+    const url = new URL(window.location.href);
+
+    url.searchParams.set("valor", String(value));
+    url.searchParams.set("origen", origin);
+
+    const precision = getPrecision();
+
+    if (precision === "auto") {
+      url.searchParams.delete("decimal places");
+    } else {
+      url.searchParams.set("decimal places", String(precision));
+    }
+
+    return url;
+  }
+
+  function scheduleUrlUpdate(value) {
+    const url = buildUrl(value);
+
+    currentShareUrl = url.toString();
+    window.clearTimeout(urlTimer);
+    urlTimer = window.setTimeout(() => {
+      window.history.replaceState({}, "", url);
+    }, 250);
+  }
+
+  function clearUrl() {
+    const url = new URL(window.location.href);
+
+    ["valor", "origen", "decimal places"].forEach((parameter) => {
+      url.searchParams.delete(parameter);
+    });
+
+    currentShareUrl = url.toString();
+    window.clearTimeout(urlTimer);
+    window.history.replaceState({}, "", url);
+  }
+
+  function scheduleAnnouncement(message) {
+    window.clearTimeout(liveTimer);
+    liveTimer = window.setTimeout(() => {
+      liveStatus.textContent = message;
+    }, 350);
+  }
+
+  function showStatus(message) {
+    copyStatus.textContent = message;
+    window.clearTimeout(copyTimer);
+    copyTimer = window.setTimeout(() => {
+      copyStatus.textContent = "";
+    }, 2200);
+  }
+
+  function applyDetectedUnit(unit) {
+    origin = unit;
+
+    if (unit !== "l") {
+      selectedGallon = unit;
+    }
+
+    updateControls();
+  }
+
+  function render(options = {}) {
+    const { updateUrl = true, announce = true } = options;
+    const parsed = parseVolumeInput(input.value);
+
+    updateControls();
+
+    if (!parsed.ok) {
+      const message = getInputError(parsed.error);
+
+      setError(message);
+      setInterpretation();
+      clearOutputs();
+
+      if (updateUrl) {
+        clearUrl();
+      }
+
+      return;
+    }
+
+    if (parsed.detectedUnit) {
+      applyDetectedUnit(parsed.detectedUnit);
+    }
+
+    try {
+      const precision = getPrecision();
+      const results = convertAllVolumes(parsed.value, origin);
+      const [primaryUnit, secondaryUnit] = getResultUnits();
+      const formattedSource = formatVolume(parsed.value, origin, precision);
+      const formattedPrimary = formatVolume(
+        results[primaryUnit],
+        primaryUnit,
+        precision,
+      );
+      const formattedSecondary = formatVolume(
+        results[secondaryUnit],
+        secondaryUnit,
+        precision,
+      );
+      const primaryExplanation = buildVolumeExplanation(
+        parsed.value,
+        origin,
+        primaryUnit,
+        precision,
+      );
+      const secondaryExplanation = buildVolumeExplanation(
+        parsed.value,
+        origin,
+        secondaryUnit,
+        precision,
+      );
+
+      setError();
+      setInterpretation(
+        parsed.detectedUnit
+          ? `Detected unit: ${VOLUME_UNIT_METADATA[parsed.detectedUnit].singularLabel}.`
+          : parsed.interpretation || "",
+      );
+      emptyResult.classList.add("hidden");
+      resultContent.classList.remove("hidden");
+      sourceResult.textContent = `${formattedSource} equivalen a`;
+      mainResult.textContent = formattedPrimary;
+      secondaryResult.textContent = formattedSecondary;
+      resultNote.textContent =
+        origin === "l"
+          ? `The Imperial gallon is approximately ${new Intl.NumberFormat(
+              "es-MX",
+              { maximumFractionDigits: 1 },
+            ).format(IMPERIAL_GALLON_DIFFERENCE_PERCENT)}% larger than the US gallon.`
+          : "The conversion keeps full precision and only rounds displayed values.";
+      primaryRate.textContent = formatVolumeRate(
+        origin,
+        primaryUnit,
+        getRateDecimals(origin, primaryUnit),
+      );
+      secondaryRate.textContent = formatVolumeRate(
+        origin,
+        secondaryUnit,
+        getRateDecimals(origin, secondaryUnit),
+      );
+      formulaEmpty.classList.add("hidden");
+      formulaGrid.classList.remove("hidden");
+      primaryFormula.textContent = `Formula: ${primaryExplanation.formula}. Substitution: ${primaryExplanation.substitution}.`;
+      secondaryFormula.textContent = `Formula: ${secondaryExplanation.formula}. Substitution: ${secondaryExplanation.substitution}.`;
+      copyMainButton.classList.remove("hidden");
+      shareMainButton.classList.remove("hidden");
+
+      currentShareText = `${formattedSource} = ${formattedPrimary} = ${formattedSecondary}`;
+      currentCopyText = `${currentShareText}\n${primaryRate.textContent}\n${secondaryRate.textContent}`;
+
+      if (updateUrl) {
+        scheduleUrlUpdate(parsed.value);
+      } else {
+        currentShareUrl = buildUrl(parsed.value).toString();
+      }
+
+      if (announce) {
+        scheduleAnnouncement(`Result: ${currentShareText}`);
+      }
+    } catch (error) {
+      setError(
+        error instanceof Error
+          ? error.message
+          : "This volume could not be converted.",
+      );
+      clearOutputs();
+
+      if (updateUrl) {
+        clearUrl();
+      }
+    }
+  }
+
+  async function copyText(text) {
+    if (!text) {
+      return false;
+    }
+
+    try {
+      await navigator.clipboard.writeText(text);
+      showStatus("Result copiado.");
+    } catch {
+      showStatus("The result could not be copied automatically.");
+
+      return false;
+    }
+
+    return true;
+  }
+
+  async function shareConversion() {
+    if (!currentShareText) {
+      return;
+    }
+
+    if ("share" in navigator) {
+      try {
+        await navigator.share({
+          title: "Liters and gallons conversion",
+          text: currentShareText,
+          url: currentShareUrl,
+        });
+        showStatus("Conversion compartida.");
+
+        return;
+      } catch (error) {
+        if (error instanceof DOMException && error.name === "AbortError") {
+          return;
+        }
+      }
+    }
+
+    await copyText(`${currentShareText}\n${currentShareUrl}`);
+  }
+
+  function loadUrlParameters() {
+    const parameters = new URLSearchParams(window.location.search);
+    const value = parameters.get("valor");
+    const urlOrigin = parameters.get("origen");
+    const decimals = parameters.get("decimal places");
+
+    if (urlOrigin && isVolumeUnit(urlOrigin)) {
+      origin = urlOrigin;
+
+      if (origin !== "l") {
+        selectedGallon = origin;
+      }
+    }
+
+    if (
+      decimals &&
+      ["0", "1", "2", "3", "4", "5", "6", "7", "8"].includes(decimals)
+    ) {
+      precisionSelect.value = decimals;
+    }
+
+    updateControls();
+
+    if (value && parseVolumeInput(value).ok) {
+      input.value = value;
+      render({ updateUrl: false, announce: false });
+    }
+  }
+
+  input.addEventListener("input", () => {
+    render();
+  });
+
+  input.addEventListener("blur", () => {
+    const parsed = parseVolumeInput(input.value);
+
+    if (parsed.ok && parsed.detectedUnit) {
+      input.value = parsed.normalized;
+      render({ announce: false });
+    }
+  });
+
+  precisionSelect.addEventListener("change", () => {
+    updateControls();
+    render();
+  });
+
+  clearButton.addEventListener("click", () => {
+    input.value = "";
+    origin = "l";
+    selectedGallon = "us_gal";
+    precisionSelect.value = "auto";
+    setError();
+    setInterpretation();
+    updateControls();
+    clearOutputs();
+    clearUrl();
+    input.focus();
+  });
+
+  copyMainButton.addEventListener("click", () => {
+    copyText(currentCopyText);
+  });
+
+  shareMainButton.addEventListener("click", () => {
+    shareConversion();
+  });
+
+  document.addEventListener("click", (event) => {
+    const directionButton = event.target.closest("[data-direction-mode]");
+
+    if (directionButton) {
+      origin =
+        directionButton.dataset.directionMode === "gallons"
+          ? selectedGallon
+          : "l";
+      updateControls();
+      render();
+
+      return;
+    }
+
+    const gallonButton = event.target.closest("[data-gallon-unit]");
+
+    if (gallonButton) {
+      const unit = gallonButton.dataset.gallonUnit;
+
+      if (!isVolumeUnit(unit) || unit === "l") {
+        return;
+      }
+
+      selectedGallon = unit;
+      origin = unit;
+      updateControls();
+      render();
+
+      return;
+    }
+
+    const shortcutButton = event.target.closest(
+      "[data-shortcut-value][data-shortcut-origin]",
+    );
+
+    if (!shortcutButton) {
+      return;
+    }
+
+    const { shortcutValue, shortcutOrigin } = shortcutButton.dataset;
+
+    if (
+      typeof shortcutValue !== "string" ||
+      !isVolumeUnit(shortcutOrigin)
+    ) {
+      return;
+    }
+
+    input.value = shortcutValue;
+    origin = shortcutOrigin;
+
+    if (origin !== "l") {
+      selectedGallon = origin;
+    }
+
+    updateControls();
+    render();
+    mainResult.focus();
+    document.querySelector("#liters-gallons-converter")?.scrollIntoView({
+      behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches
+        ? "auto"
+        : "smooth",
+      block: "start",
+    });
+  });
+
+  updateControls();
+  loadUrlParameters();
+</script>

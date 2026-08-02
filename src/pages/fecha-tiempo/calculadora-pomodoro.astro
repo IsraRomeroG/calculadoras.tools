@@ -6,12 +6,15 @@ import FaqSection from "@components/shared/FaqSection.astro";
 import PageHero from "@components/shared/PageHero.astro";
 import SectionIntro from "@components/shared/SectionIntro.astro";
 import BaseLayout from "@layouts/BaseLayout.astro";
+import { buildAlternateLinks } from "@lib/i18n/routing";
 import { buildFaqJsonLd } from "@lib/seo";
 
 const title = "Calculadora Pomodoro";
 const description =
   "Planifica sesiones Pomodoro con foco, descansos cortos, descansos largos, duración total, hora de finalización y pomodoros posibles en tu tiempo disponible.";
 const canonical = "/fecha-tiempo/calculadora-pomodoro";
+const englishCanonical = "/en/date-time/pomodoro-timer";
+const alternates = buildAlternateLinks({ es: canonical, en: englishCanonical }, Astro.site ?? Astro.url);
 
 const faqs = [
   {
@@ -49,7 +52,7 @@ const faqs = [
 const faqJsonLd = buildFaqJsonLd(faqs);
 ---
 
-<BaseLayout title={title} description={description} canonical={canonical}>
+<BaseLayout title={title} description={description} canonical={canonical} alternates={alternates}>
   <Fragment slot="head">
     <script type="application/ld+json" set:html={JSON.stringify(faqJsonLd)} />
   </Fragment>

@@ -13,11 +13,16 @@ import {
   formatArea,
 } from "@lib/calculators/conversores/conversor-de-area-m2-ft2-hectareas-acres/area";
 import { buildFaqJsonLd } from "@lib/seo";
+import { buildAlternateLinks } from "@lib/i18n/routing";
 
 const title = "Conversor de área: m², ft², hectáreas y acres";
 const description =
   "Convierte superficies entre metros cuadrados, pies cuadrados, hectáreas y acres, o calcula el área desde largo y ancho.";
 const canonical = "/conversores/conversor-de-area-m2-ft2-hectareas-acres";
+const alternates = buildAlternateLinks(
+  { es: canonical, en: "/en/converters/area-converter" },
+  Astro.site ?? Astro.url,
+);
 
 const faqs = [
   {
@@ -94,7 +99,7 @@ const equivalenceRows = [
 ];
 ---
 
-<BaseLayout title={title} description={description} canonical={canonical}>
+<BaseLayout title={title} description={description} canonical={canonical} alternates={alternates}>
   <Fragment slot="head">
     <script type="application/ld+json" set:html={JSON.stringify(faqJsonLd)} />
   </Fragment>

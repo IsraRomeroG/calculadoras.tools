@@ -1,0 +1,969 @@
+---
+import BaseLayout from "@layouts/BaseLayout.astro";
+import AdSlot from "@components/ads/AdSlot.astro";
+import Container from "@components/layout/Container.astro";
+import PageShell from "@components/layout/PageShell.astro";
+import FaqSection from "@components/shared/FaqSection.astro";
+import PageHero from "@components/shared/PageHero.astro";
+import SectionIntro from "@components/shared/SectionIntro.astro";
+import {
+  CLOTHING_GARMENTS,
+  CLOTHING_PROFILES,
+  CLOTHING_REGIONS,
+  DESTINATION_METADATA,
+  FIT_METADATA,
+  GARMENT_METADATA,
+  MEASUREMENT_METADATA,
+  MEASUREMENT_UNITS,
+  PROFILE_METADATA,
+  REGION_METADATA,
+  getAvailableSizes,
+  getRelevantMeasurementKeys,
+  type ClothingGarment,
+  type ClothingProfile,
+  type ClothingRegion,
+} from "@lib/calculators/conversores/conversor-tallas-de-ropa/sizeCharts.en";
+import { buildAlternateLinks } from "@lib/i18n/routing";
+import { buildFaqJsonLd } from "@lib/seo";
+
+const title = "Clothing size converter";
+const description =
+  "Convert clothing sizes between International, US, EU, UK and MX systems with approximate equivalents, neighboring sizes and measurement ranges.";
+const canonical = "/en/converters/clothing-size-converter";
+const spanishCanonical = "/conversores/conversor-tallas-de-ropa";
+const alternates = buildAlternateLinks({ es: spanishCanonical, en: canonical }, Astro.site ?? Astro.url);
+
+const defaultProfile: ClothingProfile = "mujer";
+const defaultGarment: ClothingGarment = "top";
+const defaultOriginRegion: ClothingRegion = "international";
+const defaultSizes = getAvailableSizes({
+  profile: defaultProfile,
+  garment: defaultGarment,
+  region: defaultOriginRegion,
+});
+
+const faqs = [
+  {
+    question: "How accurate is this clothing size converter?",
+    answer:
+      "It is a general guide. Equivalents vary by brand, cut, fabric and country, so use the result to choose which size to check first, not to replace the brand chart.",
+  },
+  {
+    question: "What should I do if I am between sizes?",
+    answer:
+      "Review the primary and neighboring sizes. For a relaxed fit or slim garment, also compare the larger size with the brand measurements.",
+  },
+  {
+    question: "What do women and men mean in this calculator?",
+    answer:
+      "It refers to the commercial sizing system used by many brands, not personal identity. Choose the chart that best matches the garment.",
+  },
+  {
+    question: "Can I estimate my size from body measurements?",
+    answer:
+      "Yes. Measurement mode accepts chest, waist, hips or inseam to find an approximate size within the available editorial charts.",
+  },
+  {
+    question: "Which regions are included?",
+    answer:
+      "The converter includes International, US, EU, UK and MX systems. Choose View all to compare regions in one view.",
+  },
+  {
+    question: "Why does my size change by brand?",
+    answer:
+      "Each brand defines its own patterns, cuts and ranges. Oversized, slim, petite, tall or stretch garments may fit differently even with the same label.",
+  },
+];
+
+const faqJsonLd = buildFaqJsonLd(faqs);
+
+const shortcuts = [
+  {
+    label: "International M to EU",
+    detail: "Camiseta/top, tabla mujer",
+    profile: "mujer",
+    garment: "top",
+    originRegion: "international",
+    originSize: "M",
+    destinationRegion: "eu",
+  },
+  {
+    label: "MX 29-30 to US",
+    detail: "Pants, women's chart",
+    profile: "mujer",
+    garment: "pantalon",
+    originRegion: "mx",
+    originSize: "29-30",
+    destinationRegion: "us",
+  },
+  {
+    label: "US 32 to MX",
+    detail: "Pants, men's chart",
+    profile: "hombre",
+    garment: "pantalon",
+    originRegion: "us",
+    originSize: "32",
+    destinationRegion: "mx",
+  },
+  {
+    label: "International L in all regions",
+    detail: "Vestido, tabla mujer",
+    profile: "mujer",
+    garment: "vestido",
+    originRegion: "international",
+    originSize: "L",
+    destinationRegion: "all",
+  },
+];
+---
+
+<BaseLayout title={title} description={description} canonical={canonical} locale="en" alternates={alternates}>
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={JSON.stringify(faqJsonLd)} />
+  </Fragment>
+
+  <PageShell>
+    <PageHero
+      title="Clothing size converter"
+      description="Convert a known size or estimate one from your measurements. See neighboring sizes, confidence and practical shopping guidance."
+      kicker="Converters"
+      collapseBreadcrumbOnMobile
+      containerClass="py-6 md:py-8"
+      breadcrumbs={[
+        { label: "Home", href: "/en", ariaLabel: "Home" },
+        { label: "Converters", href: "/en/converters", optional: true },
+        { label: "Clothing sizes", truncate: true },
+      ]}
+    />
+
+    <Container as="section" class="py-6 md:py-8">
+      <section
+        id="clothing-size-converter"
+        class="overflow-hidden rounded-lg border border-gray-700 bg-gray-950 shadow-xl shadow-gray-950/30"
+        aria-labelledby="calculator-heading"
+      >
+        <div class="grid gap-0 lg:grid-cols-[minmax(0,1fr)_minmax(19rem,0.82fr)]">
+          <div class="p-4 sm:p-6">
+            <p class="text-sm font-semibold text-amber-300">General guide</p>
+            <h2 id="calculator-heading" class="mt-2 text-2xl font-semibold">
+              Which size do you want to check?
+            </h2>
+            <p class="mt-2 text-sm leading-relaxed text-gray-400">
+              Choose a size you already own or use your measurements. Equivalents
+              are approximate and should be confirmed with each brand's chart.
+            </p>
+
+            <fieldset class="mt-6">
+              <legend class="text-sm font-semibold text-gray-200">Calculation mode</legend>
+              <div class="mt-2 grid gap-2 sm:grid-cols-2">
+                <button
+                  class="min-h-12 rounded-lg border border-amber-400 bg-amber-400/10 px-4 py-3 text-left text-sm font-semibold text-amber-100 transition focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/30"
+                  type="button"
+                  aria-pressed="true"
+                  data-mode-button
+                  data-mode="size"
+                >
+                  Convert a size
+                  <span class="mt-1 block text-xs font-normal text-gray-400">
+                    If you already know a size in one region.
+                  </span>
+                </button>
+                <button
+                  class="min-h-12 rounded-lg border border-gray-700 bg-gray-900 px-4 py-3 text-left text-sm font-semibold text-gray-200 transition hover:border-gray-500 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/30"
+                  type="button"
+                  aria-pressed="false"
+                  data-mode-button
+                  data-mode="measurements"
+                >
+                  Usar mis medidas
+                  <span class="mt-1 block text-xs font-normal text-gray-400">
+                    To find an approximate size.
+                  </span>
+                </button>
+              </div>
+            </fieldset>
+
+            <div class="mt-6 grid gap-4 sm:grid-cols-2">
+              <div>
+                <label for="clothing-garment" class="block text-sm font-medium text-gray-200">
+                  Garment type
+                </label>
+                <select
+                  id="clothing-garment"
+                  class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-900 px-4 text-base text-white outline-none transition focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15"
+                  data-garment-select
+                >
+                  {
+                    CLOTHING_GARMENTS.map((garment) => (
+                      <option value={garment} selected={garment === defaultGarment}>
+                        {GARMENT_METADATA[garment].label}
+                      </option>
+                    ))
+                  }
+                </select>
+              </div>
+
+              <div>
+                <label for="clothing-profile" class="block text-sm font-medium text-gray-200">
+                  Tabla comercial
+                </label>
+                <select
+                  id="clothing-profile"
+                  class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-900 px-4 text-base text-white outline-none transition focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15"
+                  data-profile-select
+                >
+                  {
+                    CLOTHING_PROFILES.map((profile) => (
+                      <option value={profile} selected={profile === defaultProfile}>
+                        {PROFILE_METADATA[profile].label}
+                      </option>
+                    ))
+                  }
+                </select>
+                <p class="mt-2 text-xs leading-relaxed text-gray-500">
+                  This refers to the brand's commercial system, not gender identity.
+                </p>
+              </div>
+            </div>
+
+            <div class="mt-4 grid gap-4 sm:grid-cols-2" data-size-mode-fields>
+              <div>
+                <label for="clothing-origin-region" class="block text-sm font-medium text-gray-200">
+                  Region origen
+                </label>
+                <select
+                  id="clothing-origin-region"
+                  class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-900 px-4 text-base text-white outline-none transition focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15"
+                  data-origin-region-select
+                >
+                  {
+                    CLOTHING_REGIONS.map((region) => (
+                      <option value={region} selected={region === defaultOriginRegion}>
+                        {REGION_METADATA[region].label}
+                      </option>
+                    ))
+                  }
+                </select>
+              </div>
+
+              <div>
+                <label for="clothing-origin-size" class="block text-sm font-medium text-gray-200">
+                  Source size
+                </label>
+                <select
+                  id="clothing-origin-size"
+                  class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-900 px-4 text-base text-white outline-none transition focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15"
+                  data-origin-size-select
+                >
+                  {
+                    defaultSizes.map((size) => (
+                      <option value={size} selected={size === "M"}>{size}</option>
+                    ))
+                  }
+                </select>
+              </div>
+            </div>
+
+            <div class="mt-4 grid gap-4 sm:grid-cols-3">
+              <div class="sm:col-span-1">
+                <label for="clothing-destination-region" class="block text-sm font-medium text-gray-200">
+                  Destination region
+                </label>
+                <select
+                  id="clothing-destination-region"
+                  class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-900 px-4 text-base text-white outline-none transition focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15"
+                  data-destination-region-select
+                >
+                  {
+                    Object.entries(DESTINATION_METADATA).map(([destination, metadata]) => (
+                      <option value={destination} selected={destination === "mx"}>
+                        {metadata.label}
+                      </option>
+                    ))
+                  }
+                </select>
+              </div>
+
+              <div>
+                <label for="clothing-measurement-unit" class="block text-sm font-medium text-gray-200">
+                  Unit
+                </label>
+                <select
+                  id="clothing-measurement-unit"
+                  class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-900 px-4 text-base text-white outline-none transition focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15"
+                  data-unit-select
+                >
+                  {
+                    MEASUREMENT_UNITS.map((unit) => (
+                      <option value={unit}>{unit}</option>
+                    ))
+                  }
+                </select>
+              </div>
+
+              <div>
+                <label for="clothing-fit" class="block text-sm font-medium text-gray-200">
+                  Ajuste preferido
+                </label>
+                <select
+                  id="clothing-fit"
+                  class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-900 px-4 text-base text-white outline-none transition focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15"
+                  data-fit-select
+                >
+                  {
+                    Object.entries(FIT_METADATA).map(([fit, label]) => (
+                      <option value={fit} selected={fit === "regular"}>{label}</option>
+                    ))
+                  }
+                </select>
+              </div>
+            </div>
+
+            <details class="mt-5 rounded-lg border border-gray-800 bg-gray-900/60" data-measurements-panel>
+              <summary class="flex min-h-12 cursor-pointer items-center justify-between gap-3 px-4 py-3 text-sm font-semibold text-amber-200">
+                <span data-measurements-summary>Refine with my measurements</span>
+                <span class="text-xs font-normal text-gray-500">Optional</span>
+              </summary>
+              <div class="grid gap-4 border-t border-gray-800 p-4 sm:grid-cols-2">
+                {
+                  Object.entries(MEASUREMENT_METADATA).map(([key, metadata]) => (
+                    <div data-measurement-field={key}>
+                      <label
+                        for={`measurement-${key}`}
+                        class="block text-sm font-medium text-gray-200"
+                      >
+                        {metadata.label}
+                      </label>
+                      <input
+                        id={`measurement-${key}`}
+                        class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-950 px-4 text-base text-white outline-none placeholder:text-gray-600 focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15"
+                        type="number"
+                        min="0"
+                        step="0.1"
+                        inputmode="decimal"
+                        placeholder="Ej. 92"
+                        data-measurement-input={key}
+                      />
+                      <p class="mt-1 text-xs leading-relaxed text-gray-500">{metadata.help}</p>
+                    </div>
+                  ))
+                }
+              </div>
+            </details>
+
+            <p
+              id="clothing-error"
+              class="mt-3 hidden text-sm text-red-300"
+              data-error-message
+            >
+            </p>
+
+            <div class="mt-5 flex flex-wrap gap-3">
+              <button
+                class="min-h-11 rounded-lg border border-gray-700 px-4 py-2 text-sm font-semibold text-gray-200 transition hover:border-gray-500 hover:bg-gray-900 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-gray-400/30"
+                type="button"
+                data-clear-calculator
+              >
+                Clear
+              </button>
+            </div>
+          </div>
+
+          <aside class="border-t border-gray-800 bg-gray-900/65 p-4 sm:p-6 lg:border-l lg:border-t-0">
+            <p class="text-xs font-semibold uppercase tracking-wide text-gray-500">
+              Result principal
+            </p>
+            <p class="mt-3 min-h-10 break-words text-3xl font-semibold text-amber-100" data-main-result>
+              Choose a size
+            </p>
+            <p class="mt-3 min-h-5 text-sm leading-relaxed text-gray-400" data-result-note>
+              You will see the approximate equivalent, neighboring sizes and measurement ranges.
+            </p>
+
+            <div class="mt-4 hidden rounded-lg border border-gray-700 bg-gray-950 p-3" data-confidence-panel>
+              <p class="text-xs font-semibold uppercase tracking-wide text-gray-500">
+                Confianza
+              </p>
+              <p class="mt-1 text-sm font-semibold text-white" data-confidence-label></p>
+              <p class="mt-1 text-xs leading-relaxed text-gray-400" data-confidence-reason></p>
+            </div>
+
+            <div class="mt-4 rounded-lg border border-amber-400/25 bg-amber-400/10 p-3">
+              <p class="text-sm font-semibold text-amber-100">Shopping guide</p>
+              <p class="mt-1 text-sm leading-relaxed text-amber-50/90" data-guide-text>
+                Use the result as a starting point and check the brand chart.
+              </p>
+            </div>
+
+            <p class="mt-4 rounded-lg border border-gray-700 bg-gray-950 p-3 text-xs leading-relaxed text-gray-400" data-warning-text>
+              Sizes vary by brand, cut, fabric and season.
+            </p>
+
+            <div class="mt-4 flex flex-wrap gap-2">
+              <button
+                class="hidden min-h-11 rounded-lg bg-amber-400 px-4 py-2 text-sm font-semibold text-gray-950 transition hover:bg-amber-300 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-300/40"
+                type="button"
+                data-copy-main
+              >
+                Copy resultado
+              </button>
+            </div>
+            <p class="sr-only" role="status" aria-live="polite" data-live-status></p>
+            <p class="mt-3 min-h-5 text-sm text-emerald-300" role="status" aria-live="polite" data-copy-status></p>
+          </aside>
+        </div>
+
+        <div class="border-t border-gray-800 p-4 sm:p-6">
+          <div class="grid gap-6 lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)]">
+            <div>
+              <h3 class="text-lg font-semibold">Comparison table</h3>
+              <p class="mt-2 text-sm leading-relaxed text-gray-400">
+                The table is secondary on mobile; use it to compare all regions in the same editorial record.
+              </p>
+              <div class="mt-3 overflow-x-auto rounded-lg border border-gray-800 bg-gray-950">
+                <table class="w-full min-w-[26rem] text-left text-sm">
+                  <thead class="bg-gray-900 text-xs uppercase tracking-wide text-gray-500">
+                    <tr>
+                      <th class="px-4 py-3">Region</th>
+                      <th class="px-4 py-3">Approximate size</th>
+                    </tr>
+                  </thead>
+                  <tbody class="divide-y divide-gray-800 text-gray-300">
+                    {
+                      CLOTHING_REGIONS.map((region) => (
+                        <tr>
+                          <th class="px-4 py-3 font-medium text-gray-300">
+                            {REGION_METADATA[region].label}
+                          </th>
+                          <td class="px-4 py-3 font-semibold text-white" data-region-output={region}>
+                            -
+                          </td>
+                        </tr>
+                      ))
+                    }
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <div>
+              <h3 class="text-lg font-semibold">Measurement ranges</h3>
+              <ul class="mt-3 divide-y divide-gray-800 overflow-hidden rounded-lg border border-gray-800 bg-gray-950" data-measurements-list>
+                <li class="px-4 py-3 text-sm text-gray-400">
+                  Calculate a size to view the available ranges.
+                </li>
+              </ul>
+              <p class="mt-3 text-xs leading-relaxed text-gray-500" data-revised-date>
+                The review date will appear with the result.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+    </Container>
+
+    <AdSlot placement="calculator-after-tool" />
+
+    <Container as="section" class="py-6 md:py-8">
+      <SectionIntro
+        title="Common conversions"
+        description="Load common examples to see how the converter works and compare commercial systems."
+      />
+      <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        {
+          shortcuts.map((shortcut) => (
+            <button
+              class="min-h-24 rounded-lg border border-gray-800 bg-gray-950 p-4 text-left transition hover:border-amber-400/60 hover:bg-gray-900 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/30"
+              type="button"
+              data-shortcut-profile={shortcut.profile}
+              data-shortcut-garment={shortcut.garment}
+              data-shortcut-origin-region={shortcut.originRegion}
+              data-shortcut-origin-size={shortcut.originSize}
+              data-shortcut-destination-region={shortcut.destinationRegion}
+            >
+              <span class="block text-sm font-semibold text-white">{shortcut.label}</span>
+              <span class="mt-2 block text-xs leading-relaxed text-gray-400">{shortcut.detail}</span>
+            </button>
+          ))
+        }
+      </div>
+    </Container>
+
+    <Container as="section" class="py-6 md:py-8">
+      <SectionIntro
+        title="How to measure yourself before comparing sizes"
+        description="Use a flexible tape and measure close to the body without tightening. If unsure, measure twice and compare with the brand guide."
+      />
+      <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        {
+          Object.entries(MEASUREMENT_METADATA).map(([, metadata]) => (
+            <article class="rounded-lg border border-gray-800 bg-gray-950 p-4">
+              <h3 class="font-semibold text-white">{metadata.label}</h3>
+              <p class="mt-2 text-sm leading-relaxed text-gray-400">{metadata.help}</p>
+            </article>
+          ))
+        }
+      </div>
+    </Container>
+
+    <Container as="section" class="py-6 md:py-8">
+      <SectionIntro
+        title="How to interpret the result"
+        description="The best output is not one rigid size, but practical guidance on what to check first."
+      />
+      <div class="grid gap-4 lg:grid-cols-3">
+        <article class="rounded-lg border border-gray-800 bg-gray-950 p-5">
+          <h3 class="text-lg font-semibold">Primary size</h3>
+          <p class="mt-3 text-sm leading-relaxed text-gray-400">
+            This is the direct equivalent from the editorial record. Use it as the
+            first comparison point against the brand chart.
+          </p>
+        </article>
+        <article class="rounded-lg border border-gray-800 bg-gray-950 p-5">
+          <h3 class="text-lg font-semibold">Neighboring sizes</h3>
+          <p class="mt-3 text-sm leading-relaxed text-gray-400">
+            They help when a brand runs small, the garment is slim or you prefer a
+            relaxed fit, or your measurements are near the range limit.
+          </p>
+        </article>
+        <article class="rounded-lg border border-gray-800 bg-gray-950 p-5">
+          <h3 class="text-lg font-semibold">Confidence level</h3>
+          <p class="mt-3 text-sm leading-relaxed text-gray-400">
+            It decreases if the chart is partial, you use few measurements, or the
+            garment is less standardized across brands.
+          </p>
+        </article>
+      </div>
+    </Container>
+
+    <Container as="section" class="py-6 md:py-8">
+      <SectionIntro
+        title="Related calculators"
+        description="Other useful converters when comparing measurements or buying products in different units."
+      />
+      <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        <a class="rounded-lg border border-gray-800 bg-gray-950 p-4 transition hover:border-amber-400/60 hover:bg-gray-900" href="/en/converters/weight-converter">
+          <span class="block font-semibold text-white">Weight converter</span>
+          <span class="mt-2 block text-sm leading-relaxed text-gray-400">Convert kg, lb, grams, ounces and stone.</span>
+        </a>
+        <a class="rounded-lg border border-gray-800 bg-gray-950 p-4 transition hover:border-amber-400/60 hover:bg-gray-900" href="/en/converters/kilometers-to-miles">
+          <span class="block font-semibold text-white">Kilometers to miles</span>
+          <span class="mt-2 block text-sm leading-relaxed text-gray-400">Convert distances between km and mi.</span>
+        </a>
+        <a class="rounded-lg border border-gray-800 bg-gray-950 p-4 transition hover:border-amber-400/60 hover:bg-gray-900" href="/en/converters/temperature-converter">
+          <span class="block font-semibold text-white">Temperature converter</span>
+          <span class="mt-2 block text-sm leading-relaxed text-gray-400">Convert °C, °F, Kelvin and other scales.</span>
+        </a>
+      </div>
+    </Container>
+
+    <FaqSection faqs={faqs} />
+  </PageShell>
+</BaseLayout>
+
+<script>
+  import {
+    CLOTHING_REGIONS,
+    DESTINATION_METADATA,
+    GARMENT_METADATA,
+    MEASUREMENT_METADATA,
+    REGION_METADATA,
+    convertClothingSize,
+    estimateClothingSize,
+    formatAllRegionLabels,
+    getAvailableSizes,
+    getRelevantMeasurementKeys,
+    isClothingDestination,
+    isClothingGarment,
+    isClothingProfile,
+    isClothingRegion,
+    isFitPreference,
+    isMeasurementUnit,
+  } from "@lib/calculators/conversores/conversor-tallas-de-ropa/sizeCharts.en";
+
+  const profileSelect = document.querySelector("[data-profile-select]");
+  const garmentSelect = document.querySelector("[data-garment-select]");
+  const originRegionSelect = document.querySelector("[data-origin-region-select]");
+  const originSizeSelect = document.querySelector("[data-origin-size-select]");
+  const destinationRegionSelect = document.querySelector(
+    "[data-destination-region-select]",
+  );
+  const unitSelect = document.querySelector("[data-unit-select]");
+  const fitSelect = document.querySelector("[data-fit-select]");
+  const sizeModeFields = document.querySelector("[data-size-mode-fields]");
+  const measurementsPanel = document.querySelector("[data-measurements-panel]");
+  const measurementsSummary = document.querySelector("[data-measurements-summary]");
+  const measurementInputs = Array.from(
+    document.querySelectorAll("[data-measurement-input]"),
+  );
+  const measurementFields = Array.from(
+    document.querySelectorAll("[data-measurement-field]"),
+  );
+  const errorMessage = document.querySelector("[data-error-message]");
+  const mainResult = document.querySelector("[data-main-result]");
+  const resultNote = document.querySelector("[data-result-note]");
+  const confidencePanel = document.querySelector("[data-confidence-panel]");
+  const confidenceLabel = document.querySelector("[data-confidence-label]");
+  const confidenceReason = document.querySelector("[data-confidence-reason]");
+  const guideText = document.querySelector("[data-guide-text]");
+  const warningText = document.querySelector("[data-warning-text]");
+  const copyButton = document.querySelector("[data-copy-main]");
+  const copyStatus = document.querySelector("[data-copy-status]");
+  const liveStatus = document.querySelector("[data-live-status]");
+  const clearButton = document.querySelector("[data-clear-calculator]");
+  const measurementsList = document.querySelector("[data-measurements-list]");
+  const revisedDate = document.querySelector("[data-revised-date]");
+
+  let mode = "size";
+  let currentCopyText = "";
+  let copyTimer = 0;
+
+  function getProfile() {
+    return isClothingProfile(profileSelect.value) ? profileSelect.value : "mujer";
+  }
+
+  function getGarment() {
+    return isClothingGarment(garmentSelect.value) ? garmentSelect.value : "top";
+  }
+
+  function getOriginRegion() {
+    return isClothingRegion(originRegionSelect.value)
+      ? originRegionSelect.value
+      : "international";
+  }
+
+  function getDestinationRegion() {
+    return isClothingDestination(destinationRegionSelect.value)
+      ? destinationRegionSelect.value
+      : "mx";
+  }
+
+  function getMeasurementUnit() {
+    return isMeasurementUnit(unitSelect.value) ? unitSelect.value : "cm";
+  }
+
+  function getFitPreference() {
+    return isFitPreference(fitSelect.value) ? fitSelect.value : "regular";
+  }
+
+  function setError(message = "") {
+    errorMessage.textContent = message;
+    errorMessage.classList.toggle("hidden", !message);
+  }
+
+  function updateModeButtons() {
+    document.querySelectorAll("[data-mode-button]").forEach((button) => {
+      const isActive = button.dataset.mode === mode;
+
+      button.setAttribute("aria-pressed", isActive ? "true" : "false");
+      button.classList.toggle("border-amber-400", isActive);
+      button.classList.toggle("bg-amber-400/10", isActive);
+      button.classList.toggle("text-amber-100", isActive);
+      button.classList.toggle("border-gray-700", !isActive);
+      button.classList.toggle("bg-gray-900", !isActive);
+      button.classList.toggle("text-gray-200", !isActive);
+    });
+
+    sizeModeFields.classList.toggle("hidden", mode === "measurements");
+    originRegionSelect.disabled = mode === "measurements";
+    originSizeSelect.disabled = mode === "measurements";
+    measurementsSummary.textContent =
+      mode === "measurements" ? "Enter your measurements" : "Refine with my measurements";
+
+    if (mode === "measurements") {
+      measurementsPanel.setAttribute("open", "");
+    }
+  }
+
+  function updateMeasurementFields() {
+    const relevantKeys = getRelevantMeasurementKeys(getGarment());
+
+    measurementFields.forEach((field) => {
+      const key = field.dataset.measurementField;
+      const isRelevant = relevantKeys.includes(key);
+      const input = field.querySelector("[data-measurement-input]");
+
+      field.classList.toggle("hidden", !isRelevant);
+
+      if (input) {
+        input.disabled = !isRelevant;
+        input.placeholder = getMeasurementUnit() === "cm" ? "Ej. 92" : "Ej. 36";
+      }
+    });
+  }
+
+  function updateSizeOptions(preferredSize) {
+    const sizes = getAvailableSizes({
+      profile: getProfile(),
+      garment: getGarment(),
+      region: getOriginRegion(),
+    });
+    const currentSize = preferredSize ?? originSizeSelect.value;
+
+    originSizeSelect.replaceChildren(
+      ...sizes.map((size) => {
+        const option = document.createElement("option");
+
+        option.value = size;
+        option.textContent = size;
+
+        return option;
+      }),
+    );
+
+    originSizeSelect.disabled = mode === "measurements" || sizes.length === 0;
+
+    if (sizes.includes(currentSize)) {
+      originSizeSelect.value = currentSize;
+    } else if (sizes.includes("M")) {
+      originSizeSelect.value = "M";
+    } else if (sizes[0]) {
+      originSizeSelect.value = sizes[0];
+    }
+  }
+
+  function collectMeasurements() {
+    const measurements = {};
+
+    measurementInputs.forEach((input) => {
+      if (input.disabled || !input.dataset.measurementInput) {
+        return;
+      }
+
+      const rawValue = input.value.trim().replace(",", ".");
+
+      if (!rawValue) {
+        return;
+      }
+
+      measurements[input.dataset.measurementInput] = Number(rawValue);
+    });
+
+    return measurements;
+  }
+
+  function clearRegionOutputs() {
+    CLOTHING_REGIONS.forEach((region) => {
+      const element = document.querySelector(`[data-region-output="${region}"]`);
+
+      if (element) {
+        element.textContent = "-";
+      }
+    });
+  }
+
+  function clearMeasurementsList() {
+    measurementsList.replaceChildren();
+
+    const item = document.createElement("li");
+
+    item.className = "px-4 py-3 text-sm text-gray-400";
+    item.textContent = "Calculate a size to view the available ranges.";
+    measurementsList.append(item);
+  }
+
+  function clearResult(note = "You will see the approximate equivalent, neighboring sizes and measurement ranges.") {
+    currentCopyText = "";
+    mainResult.textContent = "Choose a size";
+    resultNote.textContent = note;
+    confidencePanel.classList.add("hidden");
+    confidenceLabel.textContent = "";
+    confidenceReason.textContent = "";
+    guideText.textContent =
+      "Use the result as a starting point and check the brand chart.";
+    warningText.textContent = "Sizes vary by brand, cut, fabric and season.";
+    copyButton.classList.add("hidden");
+    revisedDate.textContent = "The review date will appear with the result.";
+    liveStatus.textContent = "";
+    clearRegionOutputs();
+    clearMeasurementsList();
+  }
+
+  function renderMeasurements(measurements) {
+    measurementsList.replaceChildren(
+      ...measurements.map((measurement) => {
+        const item = document.createElement("li");
+
+        item.className = "flex items-center justify-between gap-3 px-4 py-3 text-sm";
+        item.innerHTML = `<span class="text-gray-300">${measurement.label}</span><span class="font-semibold text-white">${measurement.value}</span>`;
+
+        return item;
+      }),
+    );
+  }
+
+  function renderResult(result) {
+    if (!result.ok) {
+      currentCopyText = "";
+      setError(result.message);
+      clearResult(result.suggestion);
+      mainResult.textContent = "Sin equivalencia confiable";
+      guideText.textContent = result.suggestion;
+
+      return;
+    }
+
+    setError();
+    currentCopyText = result.copyText;
+    mainResult.textContent = `Approximate size: ${result.primaryLabel}`;
+    resultNote.textContent = `Equivalencias: ${formatAllRegionLabels(result.allLabels)}`;
+    confidencePanel.classList.remove("hidden");
+    confidenceLabel.textContent = result.confidence.toLocaleUpperCase("es-MX");
+    confidenceReason.textContent = result.confidenceReason;
+    guideText.textContent = result.guide;
+    warningText.textContent = result.warning;
+    copyButton.classList.remove("hidden");
+    revisedDate.textContent = `Chart editorially reviewed on ${result.record.revisedAt}.`;
+
+    CLOTHING_REGIONS.forEach((region) => {
+      const element = document.querySelector(`[data-region-output="${region}"]`);
+
+      if (element) {
+        element.textContent = result.allLabels[region] ?? "Sin dato confiable";
+      }
+    });
+
+    renderMeasurements(result.measurements);
+    liveStatus.textContent = `Result: ${result.primaryLabel}`;
+  }
+
+  function render() {
+    updateModeButtons();
+    updateMeasurementFields();
+
+    const commonInput = {
+      profile: getProfile(),
+      garment: getGarment(),
+      destinationRegion: getDestinationRegion(),
+      measurementUnit: getMeasurementUnit(),
+      fitPreference: getFitPreference(),
+      measurements: collectMeasurements(),
+    };
+
+    const result =
+      mode === "size"
+        ? convertClothingSize({
+            ...commonInput,
+            originRegion: getOriginRegion(),
+            originSize: originSizeSelect.value,
+          })
+        : estimateClothingSize(commonInput);
+
+    renderResult(result);
+  }
+
+  function clearCalculator() {
+    mode = "size";
+    profileSelect.value = "mujer";
+    garmentSelect.value = "top";
+    originRegionSelect.value = "international";
+    destinationRegionSelect.value = "mx";
+    unitSelect.value = "cm";
+    fitSelect.value = "regular";
+    measurementInputs.forEach((input) => {
+      input.value = "";
+    });
+    updateSizeOptions("M");
+    measurementsPanel.removeAttribute("open");
+    setError();
+    clearResult();
+    render();
+  }
+
+  function showCopyStatus(message) {
+    copyStatus.textContent = message;
+    window.clearTimeout(copyTimer);
+    copyTimer = window.setTimeout(() => {
+      copyStatus.textContent = "";
+    }, 2200);
+  }
+
+  async function copyResult() {
+    if (!currentCopyText) {
+      return;
+    }
+
+    try {
+      await navigator.clipboard.writeText(currentCopyText);
+      showCopyStatus("Result copiado.");
+    } catch {
+      showCopyStatus("The result could not be copied automatically.");
+    }
+  }
+
+  document.addEventListener("click", (event) => {
+    const modeButton = event.target.closest("[data-mode-button]");
+
+    if (modeButton) {
+      mode = modeButton.dataset.mode === "measurements" ? "measurements" : "size";
+      updateSizeOptions();
+      render();
+
+      return;
+    }
+
+    const shortcutButton = event.target.closest("[data-shortcut-profile]");
+
+    if (!shortcutButton) {
+      return;
+    }
+
+    mode = "size";
+    profileSelect.value = isClothingProfile(shortcutButton.dataset.shortcutProfile)
+      ? shortcutButton.dataset.shortcutProfile
+      : "mujer";
+    garmentSelect.value = isClothingGarment(shortcutButton.dataset.shortcutGarment)
+      ? shortcutButton.dataset.shortcutGarment
+      : "top";
+    originRegionSelect.value = isClothingRegion(
+      shortcutButton.dataset.shortcutOriginRegion,
+    )
+      ? shortcutButton.dataset.shortcutOriginRegion
+      : "international";
+    destinationRegionSelect.value = isClothingDestination(
+      shortcutButton.dataset.shortcutDestinationRegion,
+    )
+      ? shortcutButton.dataset.shortcutDestinationRegion
+      : "mx";
+    updateSizeOptions(shortcutButton.dataset.shortcutOriginSize);
+    render();
+    document.querySelector("#clothing-size-converter")?.scrollIntoView({
+      behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches
+        ? "auto"
+        : "smooth",
+      block: "start",
+    });
+  });
+
+  [
+    profileSelect,
+    garmentSelect,
+    originRegionSelect,
+    destinationRegionSelect,
+    unitSelect,
+    fitSelect,
+  ].forEach((element) => {
+    element.addEventListener("change", () => {
+      if (
+        element === profileSelect ||
+        element === garmentSelect ||
+        element === originRegionSelect
+      ) {
+        updateSizeOptions();
+      }
+
+      render();
+    });
+  });
+
+  originSizeSelect.addEventListener("change", render);
+  measurementInputs.forEach((input) => {
+    input.addEventListener("input", render);
+    input.addEventListener("change", render);
+  });
+  clearButton.addEventListener("click", clearCalculator);
+  copyButton.addEventListener("click", copyResult);
+
+  updateSizeOptions("M");
+  render();
+</script>

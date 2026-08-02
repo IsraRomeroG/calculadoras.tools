@@ -1,0 +1,1666 @@
+---
+import BaseLayout from "@layouts/BaseLayout.astro";
+import AdSlot from "@components/ads/AdSlot.astro";
+import Container from "@components/layout/Container.astro";
+import PageShell from "@components/layout/PageShell.astro";
+import FaqSection from "@components/shared/FaqSection.astro";
+import PageHero from "@components/shared/PageHero.astro";
+import SectionIntro from "@components/shared/SectionIntro.astro";
+import { buildAlternateLinks } from "@lib/i18n/routing";
+import { buildFaqJsonLd } from "@lib/seo";
+
+const title = "Date difference calculator — Days, weeks, and months";
+const description =
+  "Calculate the days between two dates, the days remaining until an event, or the date after a given number of days. Includes weekdays excluding weekends.";
+const canonical = "/en/date-time/date-difference-calculator";
+const spanishCanonical = "/fecha-tiempo/diferencia-entre-fechas";
+const alternates = buildAlternateLinks({ es: spanishCanonical, en: canonical }, Astro.site ?? Astro.url);
+
+const faqs = [
+  {
+    question: "How do I calculate the difference between two dates in days?",
+    answer:
+      "Enter the start and end dates. The calculator shows the calendar days between them and, if selected, weekdays excluding Saturdays and Sundays.",
+  },
+  {
+    question: "Is the start day counted when calculating days between dates?",
+    answer:
+      "By default, the start date is not counted. January 1 to January 2 is one day. Enable inclusive counting if you need to count both endpoints.",
+  },
+  {
+    question: "What is the difference between calendar days and weekdays?",
+    answer:
+      "Calendar days include every day. Weekdays in this version exclude Saturdays and Sundays, but do not exclude holidays.",
+  },
+  {
+    question: "How do I calculate the date 30 days from now?",
+    answer:
+      "Use Add or subtract mode, choose a start date, enter 30, and select days. The result shows the date, day of the week, week of the year, and day of the year.",
+  },
+  {
+    question: "How do I calculate 30 weekdays after a date?",
+    answer:
+      "In Add or subtract mode, select the weekdays unit. The calculator advances Monday through Friday and skips Saturdays and Sundays.",
+  },
+  {
+    question: "Does the calculator exclude holidays?",
+    answer:
+      "Not in this version. Weekdays only exclude Saturdays and Sundays. Country-specific holidays may be added later with a maintainable local dataset.",
+  },
+  {
+    question: "Can I use it for legal or employment deadlines?",
+    answer:
+      "It is a calculation aid, but it does not replace legal, labor, tax, or contractual rules. Always verify the criteria that apply to your situation.",
+  },
+];
+
+const faqJsonLd = buildFaqJsonLd(faqs);
+
+const monthOptions = [
+  { value: "1", label: "January" },
+  { value: "2", label: "February" },
+  { value: "3", label: "March" },
+  { value: "4", label: "April" },
+  { value: "5", label: "May" },
+  { value: "6", label: "June" },
+  { value: "7", label: "July" },
+  { value: "8", label: "August" },
+  { value: "9", label: "September" },
+  { value: "10", label: "October" },
+  { value: "11", label: "November" },
+  { value: "12", label: "December" },
+];
+
+const modeButtons = [
+  { value: "difference", label: "Between dates" },
+  { value: "add", label: "Add or subtract" },
+  { value: "event", label: "Until event" },
+];
+
+const dateUnits = [
+  { value: "days", label: "Days" },
+  { value: "businessDays", label: "Weekdays" },
+  { value: "weeks", label: "Weeks" },
+  { value: "months", label: "Months" },
+  { value: "years", label: "Years" },
+];
+---
+
+<BaseLayout title={title} description={description} canonical={canonical} locale="en" alternates={alternates}>
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={JSON.stringify(faqJsonLd)} />
+  </Fragment>
+
+  <PageShell>
+    <PageHero
+      title="Date difference calculator"
+      description="Count days between dates, add or subtract time, and review weekdays excluding weekends."
+      kicker="Date and time"
+      collapseBreadcrumbOnMobile
+      containerClass="py-5 md:py-7"
+      breadcrumbs={[
+        { label: "Home", href: "/en", ariaLabel: "Home" },
+        { label: "Date and time", href: "/en/date-time", optional: true },
+        { label: "Date difference", truncate: true },
+      ]}
+    />
+
+    <Container as="section" class="py-6 md:py-8">
+      <section
+        id="date-difference-calculator"
+        class="overflow-hidden rounded-lg border border-gray-700 bg-gray-950 shadow-xl shadow-gray-950/30"
+        aria-labelledby="calculator-heading"
+      >
+        <div
+          class="grid gap-0 xl:grid-cols-[minmax(0,1.08fr)_minmax(21rem,0.82fr)]"
+        >
+          <div class="p-4 sm:p-6">
+            <div>
+              <p class="text-sm font-semibold text-amber-400">
+                Main calculation
+              </p>
+              <h2 id="calculator-heading" class="mt-2 text-2xl font-semibold">
+                Dates and deadlines
+              </h2>
+            </div>
+
+            <div
+              class="mt-5 grid gap-2 rounded-lg border border-gray-800 bg-gray-900/70 p-2 sm:grid-cols-3"
+              role="group"
+              aria-label="Calculation mode"
+            >
+              {
+                modeButtons.map((mode) => (
+                  <button
+                    class="min-h-11 rounded-md px-3 py-2 text-sm font-semibold text-gray-300 transition hover:bg-gray-800 hover:text-white focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/40 data-[active=true]:bg-amber-400 data-[active=true]:text-gray-950"
+                    type="button"
+                    data-mode-button={mode.value}
+                    data-active={mode.value === "difference" ? "true" : "false"}
+                    aria-pressed={mode.value === "difference" ? "true" : "false"}
+                  >
+                    {mode.label}
+                  </button>
+                ))
+
+              }
+            </div>
+
+            <div class="mt-6 space-y-6">
+              <div data-mode-panel="difference">
+                <div class="grid gap-4 lg:grid-cols-2">
+                  <fieldset class="rounded-lg border border-gray-800 bg-gray-900/60 p-4">
+                    <div class="flex flex-wrap items-center justify-between gap-3">
+                      <legend class="text-sm font-semibold text-gray-200">
+                        Start date
+                      </legend>
+                      <button
+                        class="inline-flex min-h-10 items-center justify-center rounded-md border border-gray-700 px-3 py-2 text-sm font-semibold text-gray-200 transition hover:border-amber-400 hover:text-white focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/40"
+                        type="button"
+                        data-use-today="difference-start"
+                      >
+                        Today
+                      </button>
+                    </div>
+
+                    <div class="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-[0.65fr_1fr_0.8fr]">
+                      <div>
+                        <label
+                          for="difference-start-day"
+                          class="block text-sm text-gray-300"
+                        >
+                          Day
+                        </label>
+                        <input
+                          id="difference-start-day"
+                          class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-950 px-4 text-base text-white outline-none transition placeholder:text-gray-600 focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15"
+                          type="text"
+                          inputmode="numeric"
+                          maxlength="2"
+                          placeholder="15"
+                          data-date-input="difference-start-day"
+                        />
+                      </div>
+
+                      <div>
+                        <label
+                          for="difference-start-month"
+                          class="block text-sm text-gray-300"
+                        >
+                          Month
+                        </label>
+                        <select
+                          id="difference-start-month"
+                          class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-950 px-4 text-base text-white outline-none transition focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15"
+                          data-date-input="difference-start-month"
+                        >
+                          {
+                            monthOptions.map((month) => (
+                              <option value={month.value}>{month.label}</option>
+                            ))
+                          }
+                        </select>
+                      </div>
+
+                      <div class="col-span-2 sm:col-span-1">
+                        <label
+                          for="difference-start-year"
+                          class="block text-sm text-gray-300"
+                        >
+                          Year
+                        </label>
+                        <input
+                          id="difference-start-year"
+                          class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-950 px-4 text-base text-white outline-none transition placeholder:text-gray-600 focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15"
+                          type="text"
+                          inputmode="numeric"
+                          maxlength="4"
+                          placeholder="2026"
+                          data-date-input="difference-start-year"
+                        />
+                      </div>
+                    </div>
+                  </fieldset>
+
+                  <fieldset class="rounded-lg border border-gray-800 bg-gray-900/60 p-4">
+                    <div class="flex flex-wrap items-center justify-between gap-3">
+                      <legend class="text-sm font-semibold text-gray-200">
+                        End date
+                      </legend>
+                      <button
+                        class="inline-flex min-h-10 items-center justify-center rounded-md border border-gray-700 px-3 py-2 text-sm font-semibold text-gray-200 transition hover:border-amber-400 hover:text-white focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/40"
+                        type="button"
+                        data-use-today="difference-end"
+                      >
+                        Today
+                      </button>
+                    </div>
+
+                    <div class="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-[0.65fr_1fr_0.8fr]">
+                      <div>
+                        <label
+                          for="difference-end-day"
+                          class="block text-sm text-gray-300"
+                        >
+                          Day
+                        </label>
+                        <input
+                          id="difference-end-day"
+                          class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-950 px-4 text-base text-white outline-none transition placeholder:text-gray-600 focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15"
+                          type="text"
+                          inputmode="numeric"
+                          maxlength="2"
+                          placeholder="30"
+                          data-date-input="difference-end-day"
+                        />
+                      </div>
+
+                      <div>
+                        <label
+                          for="difference-end-month"
+                          class="block text-sm text-gray-300"
+                        >
+                          Month
+                        </label>
+                        <select
+                          id="difference-end-month"
+                          class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-950 px-4 text-base text-white outline-none transition focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15"
+                          data-date-input="difference-end-month"
+                        >
+                          <option value="">Month</option>
+                          {
+                            monthOptions.map((month) => (
+                              <option value={month.value}>{month.label}</option>
+                            ))
+                          }
+                        </select>
+                      </div>
+
+                      <div class="col-span-2 sm:col-span-1">
+                        <label
+                          for="difference-end-year"
+                          class="block text-sm text-gray-300"
+                        >
+                          Year
+                        </label>
+
+                        <input
+                          id="difference-end-year"
+                          class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-950 px-4 text-base text-white outline-none transition placeholder:text-gray-600 focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15"
+                          type="text"
+                          inputmode="numeric"
+                          maxlength="4"
+                          placeholder="2026"
+                          data-date-input="difference-end-year"
+                        />
+                      </div>
+                    </div>
+                  </fieldset>
+                </div>
+
+                <p
+                  id="difference-error"
+                  class="mt-3 hidden text-sm text-red-300"
+                  data-error="difference"
+                >
+                </p>
+
+                <div class="mt-5 grid gap-4 lg:grid-cols-2">
+                  <fieldset>
+                    <legend class="text-sm font-semibold text-gray-200">
+                      Counting
+                    </legend>
+                    <div class="mt-2 grid gap-2 sm:grid-cols-2">
+                      <label class="flex min-h-11 items-center rounded-lg border border-gray-700 bg-gray-900 px-3 text-sm text-gray-200">
+                        <input
+                          class="mr-2 accent-amber-400"
+                          type="radio"
+                          name="difference-count-mode"
+                          value="standard"
+                          checked
+                          data-option-input
+                        />
+                        Standard
+                      </label>
+                      <label class="flex min-h-11 items-center rounded-lg border border-gray-700 bg-gray-900 px-3 text-sm text-gray-200">
+                        <input
+                          class="mr-2 accent-amber-400"
+                          type="radio"
+                          name="difference-count-mode"
+                          value="inclusive"
+                          data-option-input
+                        />
+                        Inclusive
+                      </label>
+                    </div>
+                  </fieldset>
+
+                  <fieldset>
+                    <legend class="text-sm font-semibold text-gray-200">
+                      Day type
+                    </legend>
+                    <div class="mt-2 grid gap-2 sm:grid-cols-2">
+                      <label class="flex min-h-11 items-center rounded-lg border border-gray-700 bg-gray-900 px-3 text-sm text-gray-200">
+                        <input
+                          class="mr-2 accent-amber-400"
+                          type="radio"
+                          name="difference-day-type"
+                          value="calendar"
+                          checked
+                          data-option-input
+                        />
+                        All days
+                      </label>
+                      <label class="flex min-h-11 items-center rounded-lg border border-gray-700 bg-gray-900 px-3 text-sm text-gray-200">
+                        <input
+                          class="mr-2 accent-amber-400"
+                          type="radio"
+                          name="difference-day-type"
+                          value="business"
+                          data-option-input
+                        />
+                        Weekdays
+                      </label>
+                    </div>
+                  </fieldset>
+                </div>
+
+                <div class="mt-5 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+                  <button
+                    class="inline-flex min-h-11 items-center justify-center rounded-lg border border-gray-700 px-4 py-2 text-sm font-semibold text-gray-200 transition hover:border-amber-400 hover:text-white focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/40"
+                    type="button"
+                    data-swap-dates
+                  >
+                    Swap dates
+                  </button>
+                </div>
+              </div>
+
+              <div class="hidden" data-mode-panel="add">
+                <fieldset class="rounded-lg border border-gray-800 bg-gray-900/60 p-4">
+                  <div class="flex flex-wrap items-center justify-between gap-3">
+                    <legend class="text-sm font-semibold text-gray-200">
+                      Start date
+                    </legend>
+                    <button
+                      class="inline-flex min-h-10 items-center justify-center rounded-md border border-gray-700 px-3 py-2 text-sm font-semibold text-gray-200 transition hover:border-amber-400 hover:text-white focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/40"
+                      type="button"
+                      data-use-today="operation-start"
+                    >
+                      Today
+                    </button>
+                  </div>
+
+                  <div class="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-[0.65fr_1fr_0.8fr]">
+                    <div>
+                      <label
+                        for="operation-start-day"
+                        class="block text-sm text-gray-300"
+                      >
+                        Day
+                      </label>
+                      <input
+                        id="operation-start-day"
+                        class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-950 px-4 text-base text-white outline-none transition placeholder:text-gray-600 focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15"
+                        type="text"
+                        inputmode="numeric"
+                        maxlength="2"
+                        placeholder="1"
+                        data-date-input="operation-start-day"
+                      />
+                    </div>
+
+                    <div>
+                      <label
+                        for="operation-start-month"
+                        class="block text-sm text-gray-300"
+                      >
+                        Month
+                      </label>
+                      <select
+                        id="operation-start-month"
+                        class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-950 px-4 text-base text-white outline-none transition focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15"
+                        data-date-input="operation-start-month"
+                      >
+                        {
+                          monthOptions.map((month) => (
+
+                            <option value={month.value}>{month.label}</option>
+                          ))
+                        }
+                      </select>
+                    </div>
+
+                    <div class="col-span-2 sm:col-span-1">
+                      <label
+                        for="operation-start-year"
+                        class="block text-sm text-gray-300"
+                      >
+                        Year
+                      </label>
+                      <input
+                        id="operation-start-year"
+                        class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-950 px-4 text-base text-white outline-none transition placeholder:text-gray-600 focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15"
+                        type="text"
+                        inputmode="numeric"
+                        maxlength="4"
+                        placeholder="2026"
+                        data-date-input="operation-start-year"
+                      />
+                    </div>
+                  </div>
+                </fieldset>
+
+                <div class="mt-5 grid gap-4 lg:grid-cols-[0.8fr_0.8fr_1fr]">
+                  <fieldset>
+                    <legend class="text-sm font-semibold text-gray-200">
+                      Operation
+                    </legend>
+                    <div class="mt-2 grid gap-2 sm:grid-cols-2 lg:grid-cols-1">
+                      <label class="flex min-h-11 items-center rounded-lg border border-gray-700 bg-gray-900 px-3 text-sm text-gray-200">
+                        <input
+                          class="mr-2 accent-amber-400"
+                          type="radio"
+                          name="date-operation"
+                          value="add"
+                          checked
+                          data-option-input
+                        />
+                        Add
+                      </label>
+                      <label class="flex min-h-11 items-center rounded-lg border border-gray-700 bg-gray-900 px-3 text-sm text-gray-200">
+                        <input
+                          class="mr-2 accent-amber-400"
+                          type="radio"
+                          name="date-operation"
+                          value="subtract"
+                          data-option-input
+                        />
+                        Subtract
+                      </label>
+                    </div>
+                  </fieldset>
+
+                  <div>
+                    <label
+                      for="operation-amount"
+                      class="block text-sm font-semibold text-gray-200"
+                    >
+                      Amount
+                    </label>
+                    <input
+                      id="operation-amount"
+                      class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-900 px-4 text-base text-white outline-none transition placeholder:text-gray-600 focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15"
+                      type="text"
+                      inputmode="numeric"
+                      placeholder="90"
+                      data-operation-amount
+                    />
+                  </div>
+
+                  <div>
+                    <label
+                      for="operation-unit"
+                      class="block text-sm font-semibold text-gray-200"
+                    >
+                      Unit
+                    </label>
+                    <select
+                      id="operation-unit"
+                      class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-900 px-4 text-base text-white outline-none transition focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15"
+                      data-operation-unit
+                    >
+                      {
+                        dateUnits.map((unit) => (
+                          <option value={unit.value}>{unit.label}</option>
+                        ))
+                      }
+                    </select>
+                  </div>
+                </div>
+                <p
+                  class="mt-3 hidden text-sm text-red-300"
+                  data-error="operation"
+                >
+                </p>
+              </div>
+
+              <div class="hidden" data-mode-panel="event">
+                <div class="grid gap-4 lg:grid-cols-2">
+                  <fieldset class="rounded-lg border border-gray-800 bg-gray-900/60 p-4">
+                    <legend class="text-sm font-semibold text-gray-200">
+                      Event date
+                    </legend>
+
+                    <div class="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-[0.65fr_1fr_0.8fr]">
+                      <div>
+                        <label
+                          for="event-day"
+                          class="block text-sm text-gray-300"
+                        >
+                          Day
+                        </label>
+                        <input
+                          id="event-day"
+                          class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-950 px-4 text-base text-white outline-none transition placeholder:text-gray-600 focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15"
+                          type="text"
+                          inputmode="numeric"
+                          maxlength="2"
+                          placeholder="31"
+                          data-date-input="event-day"
+                        />
+                      </div>
+
+                      <div>
+                        <label
+                          for="event-month"
+                          class="block text-sm text-gray-300"
+                        >
+                          Month
+                        </label>
+                        <select
+                          id="event-month"
+                          class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-950 px-4 text-base text-white outline-none transition focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15"
+                          data-date-input="event-month"
+                        >
+                          <option value="">Month</option>
+                          {
+                            monthOptions.map((month) => (
+                              <option value={month.value}>{month.label}</option>
+                            ))
+                          }
+                        </select>
+                      </div>
+
+                      <div class="col-span-2 sm:col-span-1">
+                        <label
+                          for="event-year"
+                          class="block text-sm text-gray-300"
+                        >
+                          Year
+                        </label>
+                        <input
+                          id="event-year"
+                          class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-950 px-4 text-base text-white outline-none transition placeholder:text-gray-600 focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15"
+                          type="text"
+                          inputmode="numeric"
+                          maxlength="4"
+                          placeholder="2026"
+                          data-date-input="event-year"
+                        />
+                      </div>
+                    </div>
+
+                    <div class="mt-4">
+                      <label
+                        for="event-label"
+                        class="block text-sm text-gray-300"
+                      >
+                        Name
+                      </label>
+                      <input
+                        id="event-label"
+                        class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-950 px-4 text-base text-white outline-none transition placeholder:text-gray-600 focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15"
+                        type="text"
+                        maxlength="40"
+                        placeholder="Year end"
+                        data-event-label
+                      />
+                    </div>
+                  </fieldset>
+
+                  <fieldset class="rounded-lg border border-gray-800 bg-gray-900/60 p-4">
+                    <div class="flex flex-wrap items-center justify-between gap-3">
+                      <legend class="text-sm font-semibold text-gray-200">
+                        Base date
+                      </legend>
+                      <button
+                        class="inline-flex min-h-10 items-center justify-center rounded-md border border-gray-700 px-3 py-2 text-sm font-semibold text-gray-200 transition hover:border-amber-400 hover:text-white focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/40"
+                        type="button"
+                        data-use-today="event-base"
+                      >
+                        Today
+                      </button>
+                    </div>
+
+                    <div class="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-[0.65fr_1fr_0.8fr]">
+                      <div>
+                        <label
+                          for="event-base-day"
+                          class="block text-sm text-gray-300"
+                        >
+                          Day
+                        </label>
+                        <input
+                          id="event-base-day"
+                          class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-950 px-4 text-base text-white outline-none transition placeholder:text-gray-600 focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15"
+                          type="text"
+                          inputmode="numeric"
+                          maxlength="2"
+                          data-date-input="event-base-day"
+                        />
+                      </div>
+
+                      <div>
+                        <label
+                          for="event-base-month"
+                          class="block text-sm text-gray-300"
+                        >
+                          Month
+                        </label>
+                        <select
+                          id="event-base-month"
+                          class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-950 px-4 text-base text-white outline-none transition focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15"
+                          data-date-input="event-base-month"
+                        >
+                          {
+                            monthOptions.map((month) => (
+                              <option value={month.value}>{month.label}</option>
+                            ))
+                          }
+                        </select>
+                      </div>
+
+                      <div class="col-span-2 sm:col-span-1">
+                        <label
+                          for="event-base-year"
+                          class="block text-sm text-gray-300"
+                        >
+                          Year
+                        </label>
+                        <input
+                          id="event-base-year"
+                          class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-950 px-4 text-base text-white outline-none transition placeholder:text-gray-600 focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15"
+                          type="text"
+                          inputmode="numeric"
+                          maxlength="4"
+                          data-date-input="event-base-year"
+                        />
+                      </div>
+                    </div>
+                  </fieldset>
+                </div>
+
+                <div class="mt-5 grid gap-4 lg:grid-cols-2">
+                  <fieldset>
+                    <legend class="text-sm font-semibold text-gray-200">
+                      Counting
+                    </legend>
+                    <div class="mt-2 grid gap-2 sm:grid-cols-2">
+                      <label class="flex min-h-11 items-center rounded-lg border border-gray-700 bg-gray-900 px-3 text-sm text-gray-200">
+                        <input
+                          class="mr-2 accent-amber-400"
+                          type="radio"
+                          name="event-count-mode"
+                          value="standard"
+                          checked
+                          data-option-input
+                        />
+                        Standard
+                      </label>
+                      <label class="flex min-h-11 items-center rounded-lg border border-gray-700 bg-gray-900 px-3 text-sm text-gray-200">
+                        <input
+                          class="mr-2 accent-amber-400"
+                          type="radio"
+                          name="event-count-mode"
+                          value="inclusive"
+                          data-option-input
+                        />
+                        Inclusive
+                      </label>
+                    </div>
+                  </fieldset>
+
+                  <fieldset>
+                    <legend class="text-sm font-semibold text-gray-200">
+                      Day type
+                    </legend>
+                    <div class="mt-2 grid gap-2 sm:grid-cols-2">
+                      <label class="flex min-h-11 items-center rounded-lg border border-gray-700 bg-gray-900 px-3 text-sm text-gray-200">
+                        <input
+                          class="mr-2 accent-amber-400"
+                          type="radio"
+                          name="event-day-type"
+                          value="calendar"
+                          checked
+                          data-option-input
+                        />
+                        All days
+                      </label>
+                      <label class="flex min-h-11 items-center rounded-lg border border-gray-700 bg-gray-900 px-3 text-sm text-gray-200">
+                        <input
+                          class="mr-2 accent-amber-400"
+                          type="radio"
+                          name="event-day-type"
+                          value="business"
+                          data-option-input
+                        />
+                        Weekdays
+                      </label>
+                    </div>
+                  </fieldset>
+                </div>
+
+                <p class="mt-3 hidden text-sm text-red-300" data-error="event">
+                </p>
+              </div>
+            </div>
+
+            <div
+              class="mt-6 flex flex-col gap-3 border-t border-gray-800 pt-5 sm:flex-row sm:flex-wrap"
+            >
+              <button
+                class="inline-flex min-h-11 items-center justify-center rounded-lg border border-gray-700 px-4 py-2 text-sm font-semibold text-gray-200 transition hover:border-amber-400 hover:text-white focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/40"
+                type="button"
+                data-fill-example
+              >
+                Use example
+              </button>
+              <button
+                class="inline-flex min-h-11 items-center justify-center rounded-lg border border-gray-700 px-4 py-2 text-sm font-semibold text-gray-200 transition hover:border-amber-400 hover:text-white focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/40"
+                type="button"
+                data-clear-calculator
+              >
+                Limpiar
+              </button>
+              <button
+                class="hidden min-h-11 items-center justify-center rounded-lg bg-amber-400 px-4 py-2 text-sm font-semibold text-gray-950 transition hover:bg-amber-300 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/40"
+                type="button"
+                data-copy-result
+              >
+                <span data-copy-label>Copy result</span>
+              </button>
+              <p class="sr-only" aria-live="polite" data-copy-status></p>
+            </div>
+          </div>
+
+          <aside
+            class="border-t border-gray-800 bg-gray-900/70 p-4 sm:p-6 xl:border-l xl:border-t-0"
+            aria-live="polite"
+            data-result-region
+          >
+            <p class="text-sm font-semibold text-amber-400" data-result-kicker>
+              Result
+            </p>
+            <p
+              class="mt-3 break-words text-3xl font-bold leading-tight text-white md:text-4xl"
+              data-main-result
+            >
+              Enter the dates
+            </p>
+            <p class="mt-3 text-sm leading-relaxed text-gray-400" data-result-note>
+              Complete the fields to see the calculation.
+            </p>
+
+            <div
+              class="mt-5 hidden rounded-lg border border-amber-400/40 bg-amber-400/10 p-4"
+              data-warning-panel
+            >
+              <p class="text-sm font-semibold text-amber-200">
+                Review this detail
+              </p>
+              <ul
+                class="mt-2 space-y-2 text-sm leading-relaxed text-amber-100"
+                data-warning-list
+              >
+              </ul>
+            </div>
+
+            <div class="mt-5 grid gap-3" data-detail-list></div>
+          </aside>
+        </div>
+      </section>
+    </Container>
+
+    <AdSlot placement="calculator-after-tool" />
+
+    <Container as="section" class="py-6 md:py-8">
+      <SectionIntro
+        title="How days are counted"
+        description="Standard counting does not include the start date. Inclusive counting adds the start date when you need to count both endpoints of the period."
+      />
+
+      <div class="grid gap-4 md:grid-cols-3">
+        <div class="rounded-lg border border-gray-800 bg-gray-950 p-5">
+          <h3 class="text-lg font-semibold">Standard</h3>
+          <p class="mt-3 text-sm leading-relaxed text-gray-400">
+            January 1 to January 2 is one day. This is the most common
+            convention for measuring elapsed time.
+          </p>
+        </div>
+        <div class="rounded-lg border border-gray-800 bg-gray-950 p-5">
+          <h3 class="text-lg font-semibold">Inclusive</h3>
+          <p class="mt-3 text-sm leading-relaxed text-gray-400">
+            Includes the start date. This is useful for stays, reports, or
+            counts where both endpoints are part of the period.
+          </p>
+        </div>
+        <div class="rounded-lg border border-gray-800 bg-gray-950 p-5">
+          <h3 class="text-lg font-semibold">Weekdays</h3>
+          <p class="mt-3 text-sm leading-relaxed text-gray-400">
+            This version excludes Saturdays and Sundays. Country-specific
+            holidays are not included.
+          </p>
+        </div>
+      </div>
+    </Container>
+
+    <Container as="section" class="py-6 md:py-8">
+      <div class="rounded-lg border border-gray-700 bg-gray-950 p-5">
+        <h2 class="text-xl font-semibold">Notice</h2>
+        <p class="mt-3 text-sm leading-relaxed text-gray-400">
+          This calculator helps count dates, but it does not replace legal,
+          labor, tax, or contractual rules. Always verify the criteria that
+          apply to your situation.
+        </p>
+      </div>
+    </Container>
+
+    <FaqSection faqs={faqs} />
+  </PageShell>
+</BaseLayout>
+
+<script>
+  import {
+    DEFAULT_COUNT_MODE,
+    DEFAULT_DAY_COUNT_TYPE,
+    MAX_AMOUNT,
+    MAX_YEAR,
+    MIN_YEAR,
+    buildDateDifferenceCopyText,
+    calculateDateDifference,
+    calculateDateOperation,
+    comparePlainDates,
+    formatCompactDuration,
+    formatFullPlainDate,
+    formatNumber,
+    formatPlainDate,
+    formatWeekDuration,
+    parseDateParts,
+    todayInLocalTimeZone,
+  } from "@lib/calculators/fecha-tiempo/diferencia-entre-fechas/date-difference.en";
+
+  const ERROR_MESSAGES = {
+    required: "Enter the day, month, and year.",
+    invalid: "Enter a valid date.",
+    year_four_digits: "Enter a four-digit year.",
+    date_invalid: "That date does not exist on the calendar.",
+    year_range: "The date is outside the allowed range.",
+    amount_required: "Enter an amount.",
+    amount_invalid: "Enter a whole number greater than zero.",
+    amount_too_large: "The maximum amount is 36,500.",
+    result_out_of_range: "The calculated date is outside the supported range.",
+  };
+
+  const DATE_GROUPS = {
+    "difference-start": {
+      day: document.querySelector('[data-date-input="difference-start-day"]'),
+      month: document.querySelector('[data-date-input="difference-start-month"]'),
+      year: document.querySelector('[data-date-input="difference-start-year"]'),
+    },
+    "difference-end": {
+      day: document.querySelector('[data-date-input="difference-end-day"]'),
+      month: document.querySelector('[data-date-input="difference-end-month"]'),
+      year: document.querySelector('[data-date-input="difference-end-year"]'),
+    },
+    "operation-start": {
+      day: document.querySelector('[data-date-input="operation-start-day"]'),
+      month: document.querySelector('[data-date-input="operation-start-month"]'),
+      year: document.querySelector('[data-date-input="operation-start-year"]'),
+    },
+    event: {
+      day: document.querySelector('[data-date-input="event-day"]'),
+      month: document.querySelector('[data-date-input="event-month"]'),
+      year: document.querySelector('[data-date-input="event-year"]'),
+    },
+    "event-base": {
+      day: document.querySelector('[data-date-input="event-base-day"]'),
+      month: document.querySelector('[data-date-input="event-base-month"]'),
+      year: document.querySelector('[data-date-input="event-base-year"]'),
+    },
+  };
+
+  const modeButtons = document.querySelectorAll("[data-mode-button]");
+  const modePanels = document.querySelectorAll("[data-mode-panel]");
+  const allDateInputs = document.querySelectorAll("[data-date-input]");
+  const optionInputs = document.querySelectorAll("[data-option-input]");
+  const errors = {
+    difference: document.querySelector('[data-error="difference"]'),
+    operation: document.querySelector('[data-error="operation"]'),
+    event: document.querySelector('[data-error="event"]'),
+  };
+  const amountInput = document.querySelector("[data-operation-amount]");
+  const unitSelect = document.querySelector("[data-operation-unit]");
+  const eventLabelInput = document.querySelector("[data-event-label]");
+  const resultKicker = document.querySelector("[data-result-kicker]");
+  const mainResult = document.querySelector("[data-main-result]");
+  const resultNote = document.querySelector("[data-result-note]");
+  const detailList = document.querySelector("[data-detail-list]");
+  const warningPanel = document.querySelector("[data-warning-panel]");
+  const warningList = document.querySelector("[data-warning-list]");
+  const copyButton = document.querySelector("[data-copy-result]");
+  const copyLabel = document.querySelector("[data-copy-label]");
+  const copyStatus = document.querySelector("[data-copy-status]");
+  const clearButton = document.querySelector("[data-clear-calculator]");
+  const exampleButton = document.querySelector("[data-fill-example]");
+  const swapButton = document.querySelector("[data-swap-dates]");
+  const todayButtons = document.querySelectorAll("[data-use-today]");
+
+  let currentMode = "difference";
+  let currentCopyText = "";
+  let copiedTimeout = 0;
+  let differenceStartUsesToday = true;
+  let operationStartUsesToday = true;
+  let eventBaseUsesToday = true;
+
+  function getToday() {
+    return todayInLocalTimeZone();
+  }
+
+  function setDateInputs(group, date) {
+    group.day.value = String(date.day);
+    group.month.value = String(date.month);
+    group.year.value = String(date.year);
+  }
+
+  function parseDateFromGroup(group) {
+    return parseDateParts({
+      day: group.day?.value ?? "",
+      month: group.month?.value ?? "",
+      year: group.year?.value ?? "",
+      minYear: MIN_YEAR,
+      maxYear: MAX_YEAR,
+    });
+  }
+
+  function getCheckedValue(name, fallback) {
+    return (
+      document.querySelector(`input[name="${name}"]:checked`)?.value ?? fallback
+    );
+  }
+
+  function hasGroupStarted(group) {
+    return [group.day, group.month, group.year].some(
+      (input) => input?.value.trim() !== "",
+    );
+  }
+
+
+  function hasCurrentModeStarted() {
+    if (currentMode === "difference") {
+      return (
+        !differenceStartUsesToday ||
+        hasGroupStarted(DATE_GROUPS["difference-end"])
+      );
+    }
+
+    if (currentMode === "add") {
+      return (
+        !operationStartUsesToday ||
+        amountInput?.value.trim() !== ""
+      );
+    }
+
+    return (
+      hasGroupStarted(DATE_GROUPS.event) ||
+      !eventBaseUsesToday ||
+      eventLabelInput?.value.trim() !== ""
+    );
+  }
+
+  function setNeutralState() {
+    currentCopyText = "";
+    resultKicker.textContent = "Result";
+    mainResult.textContent = "Enter the dates";
+    resultNote.textContent = "Complete the fields to see the calculation.";
+    renderDetails([]);
+    renderWarnings([]);
+    setCopyVisible(false);
+  }
+
+  function setInvalidState(mode, message) {
+    currentCopyText = "";
+    resultKicker.textContent = "Check the fields";
+    mainResult.textContent = "Cannot calculate yet";
+    resultNote.textContent = message;
+    renderDetails([]);
+    renderWarnings([]);
+    setCopyVisible(false);
+    showError(errors[mode], message);
+  }
+
+  function updateCalculator() {
+    clearErrors();
+
+    if (!hasCurrentModeStarted()) {
+      setNeutralState();
+      return;
+    }
+
+    if (currentMode === "difference") {
+      renderDifferenceMode();
+      return;
+    }
+
+    if (currentMode === "add") {
+      renderOperationMode();
+      return;
+    }
+
+    renderEventMode();
+  }
+
+  function renderDifferenceMode() {
+    const start = parseDateFromGroup(DATE_GROUPS["difference-start"]);
+    const end = parseDateFromGroup(DATE_GROUPS["difference-end"]);
+    const countMode = getCheckedValue(
+      "difference-count-mode",
+      DEFAULT_COUNT_MODE,
+    );
+    const dayType = getCheckedValue(
+      "difference-day-type",
+      DEFAULT_DAY_COUNT_TYPE,
+    );
+
+    if (!start.ok || !end.ok) {
+      setInvalidState(
+        "difference",
+        "Enter valid dates to calculate the difference.",
+      );
+      return;
+    }
+
+    const result = calculateDateDifference({
+      startDate: start.value,
+      endDate: end.value,
+      countMode,
+    });
+    const primaryDays =
+      dayType === "business" ? result.businessDays : result.totalDays;
+    const primaryText = formatUnit(
+      primaryDays,
+      dayType === "business" ? "weekday" : "day",
+      dayType === "business" ? "weekdays" : "days",
+    );
+
+    resultKicker.textContent =
+      dayType === "business" ? "Weekdays" : "Days between dates";
+    mainResult.textContent = buildDifferenceHeadline(result.sign, primaryText);
+    resultNote.textContent = buildDifferenceNote(countMode, dayType);
+    renderDetails([
+      ["Start date", formatFullPlainDate(start.value)],
+      ["End date", formatFullPlainDate(end.value)],
+      ["Calendar equivalent", formatCompactDuration(result.calendar)],
+      ["Weeks", formatWeekDuration(result.weeks)],
+      ["Calendar days", formatUnit(result.totalDays, "day", "days")],
+      [
+        "Weekdays excluding holidays",
+        formatUnit(result.businessDays, "weekday", "weekdays"),
+      ],
+      ["Weekend days", formatUnit(result.weekendDays, "day", "days")],
+      ["Approx. hours", `${formatNumber(result.totalDays * 24)} h`],
+      ["Approx. minutes", `${formatNumber(result.totalDays * 24 * 60)} min`],
+    ]);
+    renderWarnings(buildDateWarnings(result, dayType, countMode));
+    setCopyVisible(true);
+    currentCopyText = buildDateDifferenceCopyText({
+      startDate: start.value,
+      endDate: end.value,
+      countMode,
+      result,
+    });
+  }
+
+  function renderOperationMode() {
+    const start = parseDateFromGroup(DATE_GROUPS["operation-start"]);
+    const amountResult = parseAmount();
+    const operation = getCheckedValue("date-operation", "add");
+    const unit = unitSelect?.value ?? "days";
+
+    if (!start.ok) {
+      setInvalidState(
+        "operation",
+        "Enter a valid start date to calculate.",
+      );
+      return;
+    }
+
+
+    if (!amountResult.ok) {
+      setInvalidState("operation", ERROR_MESSAGES[amountResult.error]);
+      return;
+    }
+
+    let result;
+
+    try {
+      result = calculateDateOperation({
+        startDate: start.value,
+        operation,
+        amount: amountResult.value,
+        unit,
+      });
+    } catch {
+      setInvalidState("operation", ERROR_MESSAGES.result_out_of_range);
+      return;
+    }
+
+    const unitLabel = formatAmountUnit(amountResult.value, unit);
+    const directionLabel = operation === "add" ? "after" : "before";
+
+    resultKicker.textContent = "Calculated date";
+    mainResult.textContent = `${unitLabel} ${directionLabel} will be ${formatFullPlainDate(
+      result.date,
+    )}.`;
+    resultNote.textContent = `Start date: ${formatPlainDate(start.value)}.`;
+    renderDetails([
+      ["Start date", formatFullPlainDate(start.value)],
+      ["Result date", formatFullPlainDate(result.date)],
+      ["Day of the week", result.weekday],
+      ["ISO week", `week ${formatNumber(result.isoWeek)}`],
+      ["Day of the year", `day ${formatNumber(result.dayOfYear)}`],
+      ["Quarter", `Q${result.quarter}`],
+      [
+        "Next weekday",
+        result.nextBusinessDay
+          ? formatFullPlainDate(result.nextBusinessDay)
+          : "Not applicable",
+      ],
+    ]);
+    renderWarnings(buildOperationWarnings(result, unit));
+    setCopyVisible(true);
+    currentCopyText = [
+      "Date difference calculator - calculadoras.tools",
+      `Start date: ${formatFullPlainDate(start.value)}`,
+      `Operation: ${operation === "add" ? "add" : "subtract"} ${unitLabel}`,
+      `Result: ${formatFullPlainDate(result.date)}`,
+      `ISO week: ${formatNumber(result.isoWeek)}`,
+      `Day of the year: ${formatNumber(result.dayOfYear)}`,
+    ].join("\n");
+  }
+
+  function renderEventMode() {
+    const eventDate = parseDateFromGroup(DATE_GROUPS.event);
+    const baseDate = parseDateFromGroup(DATE_GROUPS["event-base"]);
+    const countMode = getCheckedValue("event-count-mode", DEFAULT_COUNT_MODE);
+    const dayType = getCheckedValue("event-day-type", DEFAULT_DAY_COUNT_TYPE);
+    const label = eventLabelInput?.value.trim() || "the date";
+
+    if (!eventDate.ok || !baseDate.ok) {
+      setInvalidState(
+        "event",
+        "Enter the event date and a valid base date.",
+      );
+      return;
+    }
+
+    const result = calculateDateDifference({
+      startDate: baseDate.value,
+      endDate: eventDate.value,
+      countMode,
+    });
+    const primaryDays =
+      dayType === "business" ? result.businessDays : result.totalDays;
+    const primaryText = formatUnit(
+      primaryDays,
+      dayType === "business" ? "weekday" : "day",
+      dayType === "business" ? "weekdays" : "days",
+    );
+
+    resultKicker.textContent = "Countdown to event";
+    mainResult.textContent = buildEventHeadline(result.sign, primaryText, label);
+    resultNote.textContent = `Event: ${formatFullPlainDate(eventDate.value)}.`;
+    renderDetails([
+      ["Base date", formatFullPlainDate(baseDate.value)],
+      ["Event date", formatFullPlainDate(eventDate.value)],
+      ["Calendar equivalent", formatCompactDuration(result.calendar)],
+      ["Weeks", formatWeekDuration(result.weeks)],
+      ["Calendar days", formatUnit(result.totalDays, "day", "days")],
+      [
+        "Weekdays excluding holidays",
+        formatUnit(result.businessDays, "weekday", "weekdays"),
+      ],
+      ["Weekend days", formatUnit(result.weekendDays, "day", "days")],
+    ]);
+    renderWarnings(buildDateWarnings(result, dayType, countMode));
+    setCopyVisible(true);
+    currentCopyText = [
+      "Date difference calculator - calculadoras.tools",
+      `Event: ${label}`,
+      `Base date: ${formatFullPlainDate(baseDate.value)}`,
+      `Event date: ${formatFullPlainDate(eventDate.value)}`,
+      `Result: ${mainResult.textContent}`,
+      `Weeks: ${formatWeekDuration(result.weeks)}`,
+      `Weekdays excluding holidays: ${formatNumber(result.businessDays)}`,
+    ].join("\n");
+  }
+
+  function buildDifferenceHeadline(sign, primaryText) {
+    if (sign > 0) {
+      return `There are ${primaryText}.`;
+    }
+
+    if (sign < 0) {
+      return `The end date is ${primaryText} before the start date.`;
+    }
+
+    return `The dates are the same: ${primaryText}.`;
+  }
+
+  function buildEventHeadline(sign, primaryText, label) {
+    if (sign > 0) {
+      return `There are ${primaryText} until ${label}.`;
+    }
+
+    if (sign < 0) {
+      return `${capitalize(label)} was ${primaryText}.`;
+    }
+
+    return `${capitalize(label)} is today.`;
+  }
+
+  function buildDifferenceNote(countMode, dayType) {
+    const notes = [
+      countMode === "inclusive"
+        ? "Inclusive counting includes the start date."
+        : "Standard counting does not include the start date.",
+    ];
+
+
+    if (dayType === "business") {
+      notes.push("Weekdays exclude Saturdays and Sundays, but not holidays.");
+    }
+
+    notes.push("Hours and minutes are approximate because no time is used.");
+
+    return notes.join(" ");
+  }
+
+  function buildDateWarnings(result, dayType, countMode) {
+    const warnings = [];
+
+    if (result.startIsWeekend) {
+      warnings.push(`The start date falls on ${result.startWeekday}.`);
+    }
+
+    if (result.endIsWeekend && result.nextBusinessDayAfterEnd) {
+      warnings.push(
+        `The end date falls on ${result.endWeekday}. The next weekday is ${formatFullPlainDate(
+          result.nextBusinessDayAfterEnd,
+        )}.`,
+      );
+    }
+
+    if (dayType === "business") {
+      warnings.push(
+        "Weekdays in this version exclude Saturdays and Sundays, but not holidays.",
+      );
+    }
+
+    if (countMode === "inclusive") {
+      warnings.push("Inclusive counting adds the start date to the period.");
+    }
+
+    return warnings;
+  }
+
+  function buildOperationWarnings(result, unit) {
+    const warnings = [];
+
+    if (unit === "businessDays") {
+      warnings.push(
+        "Weekdays in this version exclude Saturdays and Sundays, but not holidays.",
+      );
+    }
+
+    if (result.isWeekend && result.nextBusinessDay) {
+      warnings.push(
+        `The calculated date falls on ${result.weekday}. The next weekday is ${formatFullPlainDate(
+          result.nextBusinessDay,
+        )}.`,
+      );
+    }
+
+    return warnings;
+  }
+
+  function parseAmount() {
+    const value = amountInput?.value.trim() ?? "";
+
+    if (!value) {
+      return { ok: false, error: "amount_required" };
+    }
+
+    if (!/^\d+$/.test(value)) {
+      return { ok: false, error: "amount_invalid" };
+    }
+
+    const amount = Number(value);
+
+    if (amount <= 0) {
+      return { ok: false, error: "amount_invalid" };
+    }
+
+    if (amount > MAX_AMOUNT) {
+      return { ok: false, error: "amount_too_large" };
+    }
+
+    return { ok: true, value: amount };
+  }
+
+  function renderDetails(rows) {
+    detailList.innerHTML = "";
+
+    rows.forEach(([label, value]) => {
+      const item = document.createElement("div");
+      item.className = "rounded-lg border border-gray-800 bg-gray-950/70 p-4";
+
+      const labelElement = document.createElement("span");
+      labelElement.className =
+        "block text-xs font-semibold text-gray-500";
+      labelElement.textContent = label;
+
+      const valueElement = document.createElement("span");
+      valueElement.className =
+        "mt-2 block break-words text-lg font-semibold text-white";
+      valueElement.textContent = value;
+
+      item.append(labelElement, valueElement);
+      detailList.append(item);
+    });
+  }
+
+  function renderWarnings(warnings) {
+    warningList.innerHTML = "";
+
+    warnings.forEach((warning) => {
+      const item = document.createElement("li");
+      item.textContent = warning;
+      warningList.append(item);
+    });
+
+    warningPanel.classList.toggle("hidden", warnings.length === 0);
+  }
+
+  function clearErrors() {
+    Object.values(errors).forEach((element) => {
+      element.textContent = "";
+      element.classList.add("hidden");
+    });
+  }
+
+  function showError(element, message) {
+    element.textContent = message;
+    element.classList.remove("hidden");
+  }
+
+  function setCopyVisible(isVisible) {
+    copyButton.classList.toggle("hidden", !isVisible);
+    copyButton.classList.toggle("inline-flex", isVisible);
+  }
+
+  function setMode(mode) {
+    currentMode = mode;
+
+    modeButtons.forEach((button) => {
+      const isActive = button.dataset.modeButton === mode;
+      button.dataset.active = isActive ? "true" : "false";
+      button.setAttribute("aria-pressed", isActive ? "true" : "false");
+    });
+
+
+    modePanels.forEach((panel) => {
+      panel.classList.toggle("hidden", panel.dataset.modePanel !== mode);
+    });
+
+    updateCalculator();
+  }
+
+  function setDateGroupToToday(groupKey) {
+    const today = getToday();
+    setDateInputs(DATE_GROUPS[groupKey], today);
+
+    if (groupKey === "difference-start") {
+      differenceStartUsesToday = true;
+    }
+
+    if (groupKey === "operation-start") {
+      operationStartUsesToday = true;
+    }
+
+    if (groupKey === "event-base") {
+      eventBaseUsesToday = true;
+    }
+
+    updateCalculator();
+  }
+
+  function swapDifferenceDates() {
+    const start = {
+      day: DATE_GROUPS["difference-start"].day.value,
+      month: DATE_GROUPS["difference-start"].month.value,
+      year: DATE_GROUPS["difference-start"].year.value,
+    };
+    const end = {
+      day: DATE_GROUPS["difference-end"].day.value,
+      month: DATE_GROUPS["difference-end"].month.value,
+      year: DATE_GROUPS["difference-end"].year.value,
+    };
+
+    DATE_GROUPS["difference-start"].day.value = end.day;
+    DATE_GROUPS["difference-start"].month.value = end.month;
+    DATE_GROUPS["difference-start"].year.value = end.year;
+    DATE_GROUPS["difference-end"].day.value = start.day;
+    DATE_GROUPS["difference-end"].month.value = start.month;
+    DATE_GROUPS["difference-end"].year.value = start.year;
+    differenceStartUsesToday = false;
+    updateCalculator();
+  }
+
+  function fillExample() {
+    if (currentMode === "difference") {
+      setDateInputs(DATE_GROUPS["difference-start"], {
+        year: 2026,
+        month: 1,
+        day: 15,
+      });
+      setDateInputs(DATE_GROUPS["difference-end"], {
+        year: 2026,
+        month: 9,
+        day: 30,
+      });
+      setRadioValue("difference-count-mode", "standard");
+      setRadioValue("difference-day-type", "calendar");
+      differenceStartUsesToday = false;
+    } else if (currentMode === "add") {
+      setDateInputs(DATE_GROUPS["operation-start"], {
+        year: 2026,
+        month: 5,
+        day: 1,
+      });
+      amountInput.value = "90";
+      unitSelect.value = "days";
+      setRadioValue("date-operation", "add");
+      operationStartUsesToday = false;
+    } else {
+      setDateInputs(DATE_GROUPS["event-base"], {
+        year: 2026,
+        month: 4,
+        day: 25,
+      });
+      setDateInputs(DATE_GROUPS.event, {
+        year: 2026,
+        month: 12,
+        day: 31,
+      });
+      eventLabelInput.value = "Year end";
+      setRadioValue("event-count-mode", "standard");
+      setRadioValue("event-day-type", "calendar");
+      eventBaseUsesToday = false;
+    }
+
+    updateCalculator();
+  }
+
+  function clearCalculator() {
+    allDateInputs.forEach((input) => {
+      input.value = "";
+    });
+    amountInput.value = "";
+    eventLabelInput.value = "";
+    setRadioValue("difference-count-mode", "standard");
+    setRadioValue("difference-day-type", "calendar");
+    setRadioValue("date-operation", "add");
+    setRadioValue("event-count-mode", "standard");
+    setRadioValue("event-day-type", "calendar");
+    unitSelect.value = "days";
+    setDefaultTodayInputs();
+    clearErrors();
+    setNeutralState();
+  }
+
+  function setDefaultTodayInputs() {
+    const today = getToday();
+    setDateInputs(DATE_GROUPS["difference-start"], today);
+    setDateInputs(DATE_GROUPS["operation-start"], today);
+    setDateInputs(DATE_GROUPS["event-base"], today);
+    differenceStartUsesToday = true;
+    operationStartUsesToday = true;
+    eventBaseUsesToday = true;
+  }
+
+  function setRadioValue(name, value) {
+    const input = document.querySelector(`input[name="${name}"][value="${value}"]`);
+
+    if (input) {
+      input.checked = true;
+    }
+  }
+
+  async function copyResult() {
+    if (!currentCopyText) {
+      return;
+    }
+
+    try {
+      if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(currentCopyText);
+      } else {
+        const textArea = document.createElement("textarea");
+        textArea.value = currentCopyText;
+
+        textArea.setAttribute("readonly", "");
+        textArea.style.position = "fixed";
+        textArea.style.opacity = "0";
+        document.body.append(textArea);
+        textArea.select();
+        document.execCommand("copy");
+        textArea.remove();
+      }
+
+      window.clearTimeout(copiedTimeout);
+      copyLabel.textContent = "Copied";
+      copyStatus.textContent = "Result copied.";
+      copiedTimeout = window.setTimeout(() => {
+        copyLabel.textContent = "Copy result";
+        copyStatus.textContent = "";
+      }, 2000);
+    } catch {
+      copyStatus.textContent = "The result could not be copied.";
+    }
+  }
+
+  function scheduleMidnightRefresh() {
+    const now = new Date();
+    const nextMidnight = new Date(now);
+    nextMidnight.setHours(24, 0, 1, 0);
+
+    window.setTimeout(() => {
+      const today = getToday();
+
+      if (differenceStartUsesToday) {
+        setDateInputs(DATE_GROUPS["difference-start"], today);
+      }
+
+      if (operationStartUsesToday) {
+        setDateInputs(DATE_GROUPS["operation-start"], today);
+      }
+
+      if (eventBaseUsesToday) {
+        setDateInputs(DATE_GROUPS["event-base"], today);
+      }
+
+      updateCalculator();
+      scheduleMidnightRefresh();
+    }, nextMidnight.getTime() - now.getTime());
+  }
+
+  function formatUnit(value, singular, plural) {
+    return `${formatNumber(value)} ${value === 1 ? singular : plural}`;
+  }
+
+  function formatAmountUnit(value, unit) {
+    const labels = {
+      days: ["day", "days"],
+      businessDays: ["weekday", "weekdays"],
+      weeks: ["week", "weeks"],
+      months: ["month", "months"],
+      years: ["year", "years"],
+    };
+    const [singular, plural] = labels[unit] ?? labels.days;
+
+    return formatUnit(value, singular, plural);
+  }
+
+  function capitalize(value) {
+    return value ? value.charAt(0).toUpperCase() + value.slice(1) : value;
+  }
+
+  modeButtons.forEach((button) => {
+    button.addEventListener("click", () => {
+      setMode(button.dataset.modeButton);
+    });
+  });
+
+  allDateInputs.forEach((input) => {
+    input.addEventListener("input", () => {
+      const key = input.dataset.dateInput ?? "";
+
+      if (key.startsWith("difference-start")) {
+        differenceStartUsesToday = false;
+      }
+
+      if (key.startsWith("operation-start")) {
+        operationStartUsesToday = false;
+      }
+
+      if (key.startsWith("event-base")) {
+        eventBaseUsesToday = false;
+      }
+
+      updateCalculator();
+    });
+    input.addEventListener("change", updateCalculator);
+  });
+
+  optionInputs.forEach((input) => {
+    input.addEventListener("change", updateCalculator);
+  });
+
+  todayButtons.forEach((button) => {
+    button.addEventListener("click", () => {
+      setDateGroupToToday(button.dataset.useToday);
+    });
+  });
+
+  amountInput?.addEventListener("input", updateCalculator);
+  unitSelect?.addEventListener("change", updateCalculator);
+  eventLabelInput?.addEventListener("input", updateCalculator);
+  swapButton?.addEventListener("click", swapDifferenceDates);
+  exampleButton?.addEventListener("click", fillExample);
+  clearButton?.addEventListener("click", clearCalculator);
+  copyButton?.addEventListener("click", copyResult);
+
+  setDefaultTodayInputs();
+  setNeutralState();
+  scheduleMidnightRefresh();
+</script>

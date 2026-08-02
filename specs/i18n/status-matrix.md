@@ -1,6 +1,6 @@
 # Inventario de traducción ES → EN
 
-> Seguimiento editorial del proyecto de traducción completa del sitio. Actualizado: 2026-07-29.
+> Seguimiento editorial del proyecto de traducción completa del sitio. Actualizado: 2026-08-01.
 
 ## Cómo usar este archivo
 
@@ -21,11 +21,11 @@ Criterio: se consideran páginas las superficies de contenido publicables. Las p
 | Institucionales, legales y error | 10 | 10 | 0 |
 | Hubs y categorías del blog | 7 | 7 | 0 |
 | Categorías de calculadoras | 16 | 16 | 0 |
-| Calculadoras | 91 | 10 | 81 |
-| Artículos del blog ES | 118 | 3 equivalentes EN | 115 (+ 4 programados ES) |
-| **Total de unidades** | **242** | **46** | **196** |
+| Calculadoras | 91 | 29 | 62 |
+| Artículos del blog ES | 118 | 9 equivalentes EN | 109 |
+| **Total de unidades** | **242** | **71** | **171** |
 
-Nota: los 4 artículos españoles con fecha posterior al 2026-07-28 están incluidos como `🟡 Programada en ES`. Las tres traducciones EN existentes son artículos independientes publicados en `src/content/blog/en/math/`.
+Nota: las nueve traducciones EN publicadas están distribuidas entre `src/content/blog/en/math/` (3) y `src/content/blog/en/converters/` (6).
 
 ## 1. Páginas institucionales, legales y de error
 
@@ -100,32 +100,32 @@ Nota: los 4 artículos españoles con fecha posterior al 2026-07-28 están inclu
 
 | Ruta ES | Ruta EN | Estado | Origen |
 | --- | --- | --- | --- |
-| /conversores/conversor-de-area-m2-ft2-hectareas-acres | Por definir | ⬜ Pendiente | `src/pages/conversores/conversor-de-area-m2-ft2-hectareas-acres.astro` |
-| /conversores/conversor-de-peso | Por definir | ⬜ Pendiente | `src/pages/conversores/conversor-de-peso.astro` |
-| /conversores/conversor-de-temperatura | Por definir | ⬜ Pendiente | `src/pages/conversores/conversor-de-temperatura.astro` |
-| /conversores/conversor-de-volumen | Por definir | ⬜ Pendiente | `src/pages/conversores/conversor-de-volumen.astro` |
-| /conversores/conversor-tallas-de-ropa | Por definir | ⬜ Pendiente | `src/pages/conversores/conversor-tallas-de-ropa.astro` |
-| /conversores/kilometros-a-millas | Por definir | ⬜ Pendiente | `src/pages/conversores/kilometros-a-millas.astro` |
-| /conversores/litros-a-galones | Por definir | ⬜ Pendiente | `src/pages/conversores/litros-a-galones.astro` |
+| /conversores/conversor-de-area-m2-ft2-hectareas-acres | /en/converters/area-converter | ✅ Traducida / publicada | `src/pages/conversores/conversor-de-area-m2-ft2-hectareas-acres.astro → src/pages/en/converters/area-converter.astro` |
+| /conversores/conversor-de-peso | /en/converters/weight-converter | ✅ Traducida / publicada | `src/pages/conversores/conversor-de-peso.astro → src/pages/en/converters/weight-converter.astro` |
+| /conversores/conversor-de-temperatura | /en/converters/temperature-converter | ✅ Traducida / publicada | `src/pages/conversores/conversor-de-temperatura.astro → src/pages/en/converters/temperature-converter.astro` |
+| /conversores/conversor-de-volumen | /en/converters/volume-converter | ✅ Traducida / publicada | `src/pages/conversores/conversor-de-volumen.astro → src/pages/en/converters/volume-converter.astro` |
+| /conversores/conversor-tallas-de-ropa | /en/converters/clothing-size-converter | ✅ Traducida / publicada | `src/pages/conversores/conversor-tallas-de-ropa.astro → src/pages/en/converters/clothing-size-converter.astro` |
+| /conversores/kilometros-a-millas | /en/converters/kilometers-to-miles | ✅ Traducida / publicada | `src/pages/conversores/kilometros-a-millas.astro → src/pages/en/converters/kilometers-to-miles.astro` |
+| /conversores/litros-a-galones | /en/converters/liters-to-gallons | ✅ Traducida / publicada | `src/pages/conversores/litros-a-galones.astro → src/pages/en/converters/liters-to-gallons.astro` |
 
 ### Eventos
 
 | Ruta ES | Ruta EN | Estado | Origen |
 | --- | --- | --- | --- |
-| /eventos/calculadora-costo-por-persona-evento | Por definir | ⬜ Pendiente | `src/pages/eventos/calculadora-costo-por-persona-evento.astro` |
-| /eventos/calculadora-presupuesto-boda | Por definir | ⬜ Pendiente | `src/pages/eventos/calculadora-presupuesto-boda.astro` |
+| /eventos/calculadora-costo-por-persona-evento | /en/events/event-cost-per-person-calculator | ✅ Traducida / publicada | `src/pages/eventos/calculadora-costo-por-persona-evento.astro → src/pages/en/events/event-cost-per-person-calculator.astro` |
+| /eventos/calculadora-presupuesto-boda | /en/events/wedding-budget-calculator | ✅ Traducida / publicada | `src/pages/eventos/calculadora-presupuesto-boda.astro → src/pages/en/events/wedding-budget-calculator.astro` |
 
 ### Fecha y tiempo
 
 | Ruta ES | Ruta EN | Estado | Origen |
 | --- | --- | --- | --- |
-| /fecha-tiempo/calculadora-costo-reunion | Por definir | ⬜ Pendiente | `src/pages/fecha-tiempo/calculadora-costo-reunion.astro` |
-| /fecha-tiempo/calculadora-de-edad | Por definir | ⬜ Pendiente | `src/pages/fecha-tiempo/calculadora-de-edad.astro` |
-| /fecha-tiempo/calculadora-de-horas-trabajadas | Por definir | ⬜ Pendiente | `src/pages/fecha-tiempo/calculadora-de-horas-trabajadas.astro` |
-| /fecha-tiempo/calculadora-fecha-limite-countdown | Por definir | ⬜ Pendiente | `src/pages/fecha-tiempo/calculadora-fecha-limite-countdown.astro` |
-| /fecha-tiempo/calculadora-pomodoro | Por definir | ⬜ Pendiente | `src/pages/fecha-tiempo/calculadora-pomodoro.astro` |
-| /fecha-tiempo/calculadora-tiempo-de-lectura | Por definir | ⬜ Pendiente | `src/pages/fecha-tiempo/calculadora-tiempo-de-lectura.astro` |
-| /fecha-tiempo/diferencia-entre-fechas | Por definir | ⬜ Pendiente | `src/pages/fecha-tiempo/diferencia-entre-fechas.astro` |
+| /fecha-tiempo/calculadora-costo-reunion | /en/date-time/meeting-cost-calculator | ✅ Traducida / publicada | `src/pages/fecha-tiempo/calculadora-costo-reunion.astro → src/pages/en/date-time/meeting-cost-calculator.astro` |
+| /fecha-tiempo/calculadora-de-edad | /en/date-time/age-calculator | ✅ Traducida / publicada | `src/pages/fecha-tiempo/calculadora-de-edad.astro → src/pages/en/date-time/age-calculator.astro` |
+| /fecha-tiempo/calculadora-de-horas-trabajadas | /en/date-time/work-hours-calculator | ✅ Traducida / publicada | `src/pages/fecha-tiempo/calculadora-de-horas-trabajadas.astro → src/pages/en/date-time/work-hours-calculator.astro` |
+| /fecha-tiempo/calculadora-fecha-limite-countdown | /en/date-time/deadline-countdown-calculator | ✅ Traducida / publicada | `src/pages/fecha-tiempo/calculadora-fecha-limite-countdown.astro → src/pages/en/date-time/deadline-countdown-calculator.astro` |
+| /fecha-tiempo/calculadora-pomodoro | /en/date-time/pomodoro-timer | ✅ Traducida / publicada | `src/pages/fecha-tiempo/calculadora-pomodoro.astro → src/pages/en/date-time/pomodoro-timer.astro` |
+| /fecha-tiempo/calculadora-tiempo-de-lectura | /en/date-time/reading-time-calculator | ✅ Traducida / publicada | `src/pages/fecha-tiempo/calculadora-tiempo-de-lectura.astro → src/pages/en/date-time/reading-time-calculator.astro` |
+| /fecha-tiempo/diferencia-entre-fechas | /en/date-time/date-difference-calculator | ✅ Traducida / publicada | `src/pages/fecha-tiempo/diferencia-entre-fechas.astro → src/pages/en/date-time/date-difference-calculator.astro` |
 
 ### Finanzas
 
@@ -167,9 +167,9 @@ Nota: los 4 artículos españoles con fecha posterior al 2026-07-28 están inclu
 
 | Ruta ES | Ruta EN | Estado | Origen |
 | --- | --- | --- | --- |
-| /legal-impuestos/calculadora-de-iva | Por definir | ⬜ Pendiente | `src/pages/legal-impuestos/calculadora-de-iva.astro` |
-| /legal-impuestos/calculadora-isr-irpf | Por definir | ⬜ Pendiente | `src/pages/legal-impuestos/calculadora-isr-irpf.astro` |
-| /legal-impuestos/calculadora-salario-neto | Por definir | ⬜ Pendiente | `src/pages/legal-impuestos/calculadora-salario-neto.astro` |
+| /legal-impuestos/calculadora-de-iva | /en/legal-tax/vat-calculator | ✅ Traducida / publicada | `src/pages/legal-impuestos/calculadora-de-iva.astro → src/pages/en/legal-tax/vat-calculator.astro` |
+| /legal-impuestos/calculadora-isr-irpf | /en/legal-tax/income-tax-calculator | ✅ Traducida / publicada | `src/pages/legal-impuestos/calculadora-isr-irpf.astro → src/pages/en/legal-tax/income-tax-calculator.astro` |
+| /legal-impuestos/calculadora-salario-neto | /en/legal-tax/net-salary-calculator | ✅ Traducida / publicada | `src/pages/legal-impuestos/calculadora-salario-neto.astro → src/pages/en/legal-tax/net-salary-calculator.astro` |
 
 ### Mascotas
 
@@ -256,12 +256,12 @@ Todas las calculadoras ES listadas tienen implementación en `src/pages/` y est�
 
 | Ruta ES | Ruta EN | Estado | Origen |
 | --- | --- | --- | --- |
-| /blog/conversores/como-convertir-kilometros-a-millas | Por definir | ⬜ Pendiente | `src/content/blog/conversores/como-convertir-kilometros-a-millas.md` |
-| /blog/conversores/como-convertir-kilometros-a-millas-en-excel | Por definir | 🟡 Programada en ES | `src/content/blog/conversores/como-convertir-kilometros-a-millas-en-excel.md` |
-| /blog/conversores/kilometros-vs-millas-diferencias | Por definir | 🟡 Programada en ES | `src/content/blog/conversores/kilometros-vs-millas-diferencias.md` |
-| /blog/conversores/milla-terrestre-vs-milla-nautica | Por definir | 🟡 Programada en ES | `src/content/blog/conversores/milla-terrestre-vs-milla-nautica.md` |
-| /blog/conversores/ritmo-por-kilometro-vs-ritmo-por-milla | Por definir | 🟡 Programada en ES | `src/content/blog/conversores/ritmo-por-kilometro-vs-ritmo-por-milla.md` |
-| /blog/conversores/tabla-kilometros-a-millas-distancias-comunes | Por definir | ⬜ Pendiente | `src/content/blog/conversores/tabla-kilometros-a-millas-distancias-comunes.md` |
+| /blog/conversores/como-convertir-kilometros-a-millas | /en/blog/converters/how-to-convert-kilometers-to-miles | ✅ Traducida / publicada | `src/content/blog/conversores/como-convertir-kilometros-a-millas.md → src/content/blog/en/converters/how-to-convert-kilometers-to-miles.md` |
+| /blog/conversores/como-convertir-kilometros-a-millas-en-excel | /en/blog/converters/how-to-convert-kilometers-to-miles-in-excel | ✅ Traducida / publicada | `src/content/blog/conversores/como-convertir-kilometros-a-millas-en-excel.md → src/content/blog/en/converters/how-to-convert-kilometers-to-miles-in-excel.md` |
+| /blog/conversores/kilometros-vs-millas-diferencias | /en/blog/converters/kilometers-vs-miles | ✅ Traducida / publicada | `src/content/blog/conversores/kilometros-vs-millas-diferencias.md → src/content/blog/en/converters/kilometers-vs-miles.md` |
+| /blog/conversores/milla-terrestre-vs-milla-nautica | /en/blog/converters/statute-mile-vs-nautical-mile | ✅ Traducida / publicada | `src/content/blog/conversores/milla-terrestre-vs-milla-nautica.md → src/content/blog/en/converters/statute-mile-vs-nautical-mile.md` |
+| /blog/conversores/ritmo-por-kilometro-vs-ritmo-por-milla | /en/blog/converters/pace-per-kilometer-vs-mile | ✅ Traducida / publicada | `src/content/blog/conversores/ritmo-por-kilometro-vs-ritmo-por-milla.md → src/content/blog/en/converters/pace-per-kilometer-vs-mile.md` |
+| /blog/conversores/tabla-kilometros-a-millas-distancias-comunes | /en/blog/converters/kilometers-to-miles-table | ✅ Traducida / publicada | `src/content/blog/conversores/tabla-kilometros-a-millas-distancias-comunes.md → src/content/blog/en/converters/kilometers-to-miles-table.md` |
 
 ### Finanzas
 

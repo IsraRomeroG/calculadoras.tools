@@ -4,6 +4,7 @@ seoTitle: "Convertir km a millas en Excel: fórmula y ejemplos"
 description: "Aprende a convertir una columna de kilómetros a millas en Excel o Google Sheets con fórmulas, redondeo y conversión inversa."
 pubDate: 2026-08-01
 categorySlug: "conversores"
+translationKey: "kilometers-to-miles-spreadsheet"
 tags:
   - kilómetros a millas en Excel
   - Google Sheets

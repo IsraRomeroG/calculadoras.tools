@@ -7,12 +7,15 @@ import FaqSection from "@components/shared/FaqSection.astro";
 import PageHero from "@components/shared/PageHero.astro";
 import SectionIntro from "@components/shared/SectionIntro.astro";
 import { VAT_COUNTRY_PRESETS, formatRate } from "@lib/calculators/legal-impuestos/calculadora-de-iva/vat";
+import { buildAlternateLinks } from "@lib/i18n/routing";
 import { buildFaqJsonLd } from "@lib/seo";
 
 const title = "Calculadora de IVA Online — Agrega o Desglosa el IVA al Instante";
 const description =
   "Calcula el IVA de cualquier precio en segundos. Suma o desglosa IVA, elige tu país y obtén el detalle completo gratis.";
 const canonical = "/legal-impuestos/calculadora-de-iva";
+const englishCanonical = "/en/legal-tax/vat-calculator";
+const alternates = buildAlternateLinks({ es: canonical, en: englishCanonical }, Astro.site ?? Astro.url);
 
 const defaultCountry = VAT_COUNTRY_PRESETS[0];
 
@@ -67,7 +70,7 @@ const examples = [
 ];
 ---
 
-<BaseLayout title={title} description={description} canonical={canonical}>
+<BaseLayout title={title} description={description} canonical={canonical} alternates={alternates}>
   <Fragment slot="head">
     <script type="application/ld+json" set:html={JSON.stringify(faqJsonLd)} />
   </Fragment>

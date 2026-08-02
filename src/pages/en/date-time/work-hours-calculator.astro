@@ -1,0 +1,993 @@
+---
+import BaseLayout from "@layouts/BaseLayout.astro";
+import AdSlot from "@components/ads/AdSlot.astro";
+import Container from "@components/layout/Container.astro";
+import PageShell from "@components/layout/PageShell.astro";
+import FaqSection from "@components/shared/FaqSection.astro";
+import PageHero from "@components/shared/PageHero.astro";
+import SectionIntro from "@components/shared/SectionIntro.astro";
+import { buildAlternateLinks } from "@lib/i18n/routing";
+import { buildFaqJsonLd } from "@lib/seo";
+
+const title = "Work hours and hourly pay calculator";
+const description =
+  "Add shifts, subtract breaks, and calculate regular hours, overtime, and estimated pay—even when you work past midnight.";
+const canonical = "/en/date-time/work-hours-calculator";
+const spanishCanonical = "/fecha-tiempo/calculadora-de-horas-trabajadas";
+const alternates = buildAlternateLinks({ es: spanishCanonical, en: canonical }, Astro.site ?? Astro.url);
+
+const faqs = [
+  {
+    question: "How do I calculate my hours worked?",
+    answer:
+      "Add each shift with its start time, end time, and break. The calculator adds gross time, subtracts breaks, and shows total net time worked.",
+  },
+  {
+    question: "How are breaks subtracted?",
+    answer:
+      "Enter each shift's break in minutes. It is subtracted from that shift's gross duration before the workday total is calculated.",
+  },
+  {
+    question: "How does it calculate a shift that crosses midnight?",
+    answer:
+      "If the end time is earlier than the start time, the shift is treated as ending the next day. Identical start and end times are ambiguous and produce an error.",
+  },
+  {
+    question: "How do I convert hours and minutes to decimal hours?",
+    answer:
+      "Divide the minutes by 60 and add them to the complete hours. For example, 8 hours and 30 minutes equals 8.50 decimal hours.",
+  },
+  {
+    question: "How is overtime calculated?",
+    answer:
+      "The calculator first adds all net work time, then compares that total with the configured regular-hours limit.",
+  },
+  {
+    question: "Can I estimate my hourly pay?",
+    answer:
+      "Yes. Add an hourly rate and, if needed, adjust the regular-hours limit and overtime multiplier. The result separates regular pay, overtime pay, and total pay.",
+  },
+  {
+    question: "Does the calculator apply my country's labor laws?",
+    answer:
+      "No. Overtime and pay are estimates based only on the values you configure. Check the applicable labor, tax, and payroll rules.",
+  },
+];
+
+const faqJsonLd = buildFaqJsonLd(faqs);
+---
+
+<BaseLayout title={title} description={description} canonical={canonical} locale="en" alternates={alternates}>
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={JSON.stringify(faqJsonLd)} />
+  </Fragment>
+
+  <PageShell>
+    <PageHero
+      title="Work hours calculator"
+      description="Add shifts, subtract breaks, and review overtime and estimated pay for one workday."
+      kicker="Date and time"
+      collapseBreadcrumbOnMobile
+      containerClass="py-5 md:py-7"
+      breadcrumbs={[
+        { label: "Home", href: "/en", ariaLabel: "Home" },
+        { label: "Date and time", href: "/en/date-time", optional: true },
+        { label: "Work hours", truncate: true },
+      ]}
+    />
+
+    <Container as="section" class="py-4 md:py-7">
+      <section
+        id="work-hours-calculator"
+        class="overflow-hidden rounded-lg border border-gray-700 bg-gray-950 shadow-xl shadow-gray-950/30"
+        aria-labelledby="calculator-heading"
+      >
+        <div class="grid gap-0 lg:grid-cols-[minmax(0,1.1fr)_minmax(20rem,0.8fr)]">
+          <div class="p-4 sm:p-6">
+            <p class="text-sm font-semibold uppercase tracking-wide text-amber-400">
+              One workday, one or more shifts
+            </p>
+            <h2 id="calculator-heading" class="mt-2 text-2xl font-semibold">
+              Enter your shifts
+            </h2>
+            <p class="mt-2 text-sm leading-relaxed text-gray-400">
+              All entries belong to the same workday. If an end time is earlier than its start time, it is treated as occurring the next day.
+            </p>
+
+            <form class="mt-6" novalidate data-work-form>
+              <div
+                class="hidden rounded-lg border border-red-400/40 bg-red-400/10 p-4 text-sm leading-relaxed text-red-100"
+                role="alert"
+                tabindex="-1"
+                data-errors
+              ></div>
+
+              <div class="flex flex-wrap items-center justify-between gap-3">
+                <div>
+                  <h3 class="text-lg font-semibold text-white">Shifts</h3>
+                  <p class="mt-1 text-sm text-gray-500" data-shift-count></p>
+                </div>
+                <button class="secondary-button" type="button" data-add-shift>
+                  Add another shift
+                </button>
+              </div>
+
+              <div class="mt-4 space-y-4" data-shift-list></div>
+
+              <details class="mt-5 rounded-lg border border-gray-700 bg-gray-900/60 p-4">
+                <summary class="cursor-pointer font-semibold text-white">
+                  Pay and overtime
+                </summary>
+                <p class="mt-2 text-xs leading-relaxed text-gray-400" data-settings-summary>
+                  Regular limit: 8 hr · Overtime: 1.5× · No rate
+                </p>
+
+                <div class="mt-4 grid gap-4 sm:grid-cols-2">
+                  <div class="sm:col-span-2">
+                    <label class="field-label" for="work-hourly-rate">
+                      Hourly rate <span class="text-gray-500">(optional)</span>
+                    </label>
+                    <div class="field-shell">
+                      <span class="field-affix">$</span>
+                      <input
+                        id="work-hourly-rate"
+                        class="field-input"
+                        type="text"
+                        inputmode="decimal"
+                        autocomplete="off"
+                        placeholder="100"
+                        data-setting="hourlyRate"
+                        aria-describedby="hourly-rate-help hourly-rate-error"
+                      />
+                      <span class="field-affix">/ hour</span>
+
+                    </div>
+                    <p id="hourly-rate-help" class="field-help">
+                      Leave it blank if you only want to calculate time.
+                    </p>
+                    <p id="hourly-rate-error" class="field-error" data-setting-error="hourlyRate"></p>
+                  </div>
+
+                  <div>
+                    <label class="field-label" for="work-regular-limit">
+                      Regular-hours limit
+                    </label>
+                    <div class="field-shell">
+                      <input
+                        id="work-regular-limit"
+                        class="field-input field-input-leading"
+                        type="text"
+                        inputmode="decimal"
+                        autocomplete="off"
+                        value="8"
+                        data-setting="regularHoursLimit"
+                        aria-describedby="regular-limit-help regular-limit-error"
+                      />
+                      <span class="field-affix">hours</span>
+                    </div>
+                    <p id="regular-limit-help" class="field-help">
+                      It is applied once to the total net time.
+                    </p>
+                    <p id="regular-limit-error" class="field-error" data-setting-error="regularHoursLimit"></p>
+                  </div>
+
+                  <div>
+                    <label class="field-label" for="work-overtime-multiplier">
+                      Overtime multiplier
+                    </label>
+                    <div class="field-shell">
+                      <input
+                        id="work-overtime-multiplier"
+                        class="field-input field-input-leading"
+                        type="text"
+                        inputmode="decimal"
+                        autocomplete="off"
+                        value="1.5"
+                        data-setting="overtimeMultiplier"
+                        aria-describedby="overtime-multiplier-help overtime-multiplier-error"
+                      />
+                      <span class="field-affix">×</span>
+                    </div>
+                    <p id="overtime-multiplier-help" class="field-help">
+                      Only changes the estimated overtime pay.
+                    </p>
+                    <p id="overtime-multiplier-error" class="field-error" data-setting-error="overtimeMultiplier"></p>
+                  </div>
+                </div>
+              </details>
+
+              <div class="mt-6 flex flex-col gap-3 border-t border-gray-800 pt-5 sm:flex-row sm:flex-wrap">
+                <button class="primary-button w-full sm:w-auto sm:min-w-48" type="submit">
+                  Calculate workday
+                </button>
+                <button class="secondary-button" type="button" data-example>
+                  Try example
+                </button>
+                <button class="secondary-button" type="button" data-clear>
+                  Clear
+                </button>
+                <button class="secondary-button hidden" type="button" data-copy>
+                  <span data-copy-label>Copy summary</span>
+                </button>
+                <p class="sr-only" aria-live="polite" data-copy-status></p>
+              </div>
+            </form>
+          </div>
+
+          <aside
+            class="border-t border-gray-800 bg-gray-900/70 p-4 sm:p-6 lg:border-l lg:border-t-0"
+            aria-live="polite"
+            tabindex="-1"
+            data-result-region
+          >
+            <div
+              class="hidden rounded-lg border border-amber-400/40 bg-amber-400/10 p-3 text-sm text-amber-100"
+              data-stale-notice
+            >
+              You changed the data. Calculate again to update this result.
+            </div>
+
+            <p class="mt-1 text-xs font-semibold uppercase tracking-wide text-amber-400" data-result-kicker>
+              Total worked
+            </p>
+            <p class="mt-3 break-words text-4xl font-bold leading-tight text-white" data-main-result>
+              Add your hours
+            </p>
+            <p class="mt-2 text-sm font-semibold text-amber-100" data-decimal-result>
+              The net total will appear here.
+            </p>
+            <p class="mt-3 text-sm leading-relaxed text-gray-400" data-limit-note>
+              You will also see gross time, breaks, and estimated overtime.
+            </p>
+
+            <div class="mt-5 grid grid-cols-2 gap-3" data-summary-grid>
+              <div class="col-span-2 rounded-lg border border-gray-800 bg-gray-950/70 p-4 text-sm text-gray-400">
+                Complete at least one shift to calculate the workday.
+              </div>
+            </div>
+
+            <section
+              class="mt-4 hidden rounded-lg border border-emerald-400/35 bg-emerald-400/10 p-4"
+              aria-labelledby="payment-heading"
+              data-payment-panel
+            >
+              <p class="text-xs font-semibold uppercase tracking-wide text-emerald-200">
+                Estimated pay
+              </p>
+              <h3 id="payment-heading" class="mt-2 text-2xl font-bold text-white" data-total-pay></h3>
+              <div class="mt-3 space-y-2 text-sm text-emerald-50" data-payment-details></div>
+            </section>
+
+            <div
+              class="mt-4 hidden rounded-lg border border-amber-400/40 bg-amber-400/10 p-4 text-sm leading-relaxed text-amber-100"
+              data-warning-panel
+            ></div>
+
+            <p class="mt-4 text-xs leading-relaxed text-gray-500">
+              Estimate based on your settings. It does not automatically apply labor, tax, or payroll rules.
+            </p>
+          </aside>
+        </div>
+      </section>
+
+      <div class="sticky bottom-3 z-20 mt-4 lg:hidden">
+        <button class="primary-button w-full shadow-lg shadow-gray-950/50" type="button" data-mobile-calculate>
+          Calculate workday
+        </button>
+      </div>
+    </Container>
+
+    <div class="hidden" data-results>
+      <Container as="section" class="py-6 md:py-8">
+        <SectionIntro
+
+          title="Breakdown by shift"
+          description="See how the total is calculated without relying on a wide table."
+          class="mb-5"
+        />
+        <div class="grid gap-4 md:grid-cols-2 xl:grid-cols-3" data-shift-results></div>
+      </Container>
+
+      <Container as="section" class="py-6 md:py-8">
+        <section class="rounded-lg border border-gray-700 bg-gray-950 p-5 sm:p-6">
+          <p class="text-sm font-semibold uppercase tracking-wide text-amber-400">
+            Ready for your timesheet
+          </p>
+          <h2 class="mt-2 text-2xl font-semibold">Workday summary</h2>
+          <p class="mt-3 whitespace-pre-line text-sm leading-relaxed text-gray-400" data-copy-preview></p>
+          <button class="primary-button mt-5 w-full sm:w-auto" type="button" data-copy>
+            <span data-copy-label>Copy summary</span>
+          </button>
+        </section>
+      </Container>
+    </div>
+
+    <AdSlot placement="calculator-after-tool" />
+
+    <Container as="section" class="py-8">
+      <SectionIntro
+        title="How to read your workday"
+        description="The result separates recorded time, breaks, and pay estimates so you can review every part."
+        class="mb-5"
+      />
+      <div class="grid gap-4 md:grid-cols-3">
+        <article class="info-card">
+          <h2 class="font-semibold text-white">Gross and net</h2>
+          <p class="mt-2 text-sm leading-relaxed text-gray-400">
+            Gross time runs from start to end. Net time subtracts breaks and is
+            used to calculate regular hours, overtime, and pay.
+          </p>
+        </article>
+        <article class="info-card">
+          <h2 class="font-semibold text-white">Decimal hours</h2>
+          <p class="mt-2 text-sm leading-relaxed text-gray-400">
+            They are useful for timesheets and billing. Thirty minutes equals
+            0.50 hours; five minutes is approximately 0.08.
+          </p>
+        </article>
+        <article class="info-card">
+          <h2 class="font-semibold text-white">Crossing midnight</h2>
+          <p class="mt-2 text-sm leading-relaxed text-gray-400">
+            An end time earlier than the start time is treated as the next day and clearly identified in the result.
+          </p>
+        </article>
+      </div>
+    </Container>
+
+    <Container as="section" class="py-8">
+      <section class="rounded-lg border border-gray-700 bg-gray-950 p-5 sm:p-6">
+        <h2 class="text-2xl font-semibold">Estimates, not payroll rules</h2>
+        <div class="mt-4 grid gap-4 text-sm leading-relaxed text-gray-400 md:grid-cols-2">
+          <p>
+            The regular limit and overtime multiplier are configurable. The calculator does not account for contracts, collective agreements, holidays, or specific labor rules.
+          </p>
+          <p>
+            Pay is calculated from exact minutes and rounded only for display. Taxes, deductions, and payroll rounding are not included.
+          </p>
+        </div>
+        <div class="mt-5 flex flex-wrap gap-3">
+          <a class="secondary-button" href="/en/date-time/meeting-cost-calculator">
+            Calculate meeting cost
+          </a>
+          <a class="secondary-button" href="/en/date-time/date-difference-calculator">
+            Calculate date difference
+          </a>
+        </div>
+      </section>
+    </Container>
+
+    <FaqSection faqs={faqs} />
+  </PageShell>
+</BaseLayout>
+
+<style is:global>
+  .field-label { display: block; font-size: .875rem; font-weight: 600; color: rgb(229 231 235); }
+  .field, .field-shell { margin-top: .5rem; min-height: 3rem; min-width: 0; width: 100%; border-radius: .5rem; border: 1px solid rgb(55 65 81); background: rgb(17 24 39); color: white; outline: none; }
+  .field { padding: 0 1rem; }
+  .field-shell { display: flex; align-items: center; }
+  .field-input { min-height: 2.875rem; min-width: 0; width: 100%; background: transparent; padding: 0 .25rem; color: white; outline: none; }
+  .field-input-leading { padding-left: .75rem; }
+  .field-affix { flex: none; padding: 0 .75rem; font-size: .875rem; color: rgb(156 163 175); }
+  .field:focus, .field-shell:focus-within { border-color: rgb(251 191 36); box-shadow: 0 0 0 3px rgb(251 191 36 / .15); }
+  .field[aria-invalid="true"], .field-shell:has(.field-input[aria-invalid="true"]) { border-color: rgb(248 113 113); }
+  .field-help { margin-top: .4rem; display: block; font-size: .75rem; line-height: 1.4; color: rgb(107 114 128); }
+  .field-error { min-height: 1.1rem; margin-top: .25rem; font-size: .75rem; line-height: 1.35; color: rgb(252 165 165); }
+  .primary-button, .secondary-button, .shift-action, .break-preset { display: inline-flex; min-height: 2.75rem; align-items: center; justify-content: center; border-radius: .5rem; padding: .5rem 1rem; font-size: .875rem; font-weight: 700; transition: border-color .15s, background-color .15s, color .15s; }
+  .primary-button { background: rgb(251 191 36); color: rgb(3 7 18); }
+  .primary-button:hover { background: rgb(252 211 77); }
+  .secondary-button, .shift-action, .break-preset { border: 1px solid rgb(55 65 81); color: rgb(229 231 235); }
+  .secondary-button:hover, .shift-action:hover, .break-preset:hover { border-color: rgb(251 191 36 / .7); color: white; }
+  .break-preset[aria-pressed="true"] { border-color: rgb(251 191 36); background: rgb(251 191 36 / .15); color: rgb(253 230 138); }
+  .shift-action { padding: .4rem .75rem; font-size: .75rem; }
+  .shift-action-danger { border-color: rgb(248 113 113 / .4); color: rgb(254 202 202); }
+  .info-card { border-radius: .5rem; border: 1px solid rgb(55 65 81); background: rgb(3 7 18); padding: 1.25rem; }
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+  }
+</style>
+
+<script>
+  import {
+    MAX_SHIFTS,
+    WorkHoursValidationError,
+    buildWorkHoursSummary,
+    calculateWorkHours,
+    formatDecimalHours,
+    formatDuration,
+    formatWorkCurrency,
+    parseTimeToMinutes,
+    parseWorkNumber,
+  } from "@lib/calculators/fecha-tiempo/calculadora-de-horas-trabajadas/workHours.en";
+
+  const get = (selector) => document.querySelector(selector);
+  const form = get("[data-work-form]");
+  const shiftList = get("[data-shift-list]");
+  const resultRegion = get("[data-result-region]");
+  const mobileCalculate = get("[data-mobile-calculate]");
+  const warningMessages = {
+    overnight_shift: "One or more end times were interpreted as occurring the next day.",
+    long_day: "The net workday exceeds 16 hours. Check start times, end times, and breaks.",
+    long_break: "A break is more than half of its shift. Confirm the value.",
+    zero_regular_limit: "All worked time is calculated as estimated overtime.",
+    zero_rate: "Estimated pay is $0.00 with the configured rate.",
+    legal_estimate: "Overtime and pay are configurable estimates; they do not automatically apply labor or payroll rules.",
+  };
+  let sequence = 0;
+  let shifts = [newShift()];
+  let currentResult = null;
+  let copyText = "";
+
+
+  function newShift(values = {}) {
+    sequence += 1;
+    return {
+      id: `shift-${sequence}`,
+      label: values.label ?? `Shift ${sequence}`,
+      start: values.start ?? "",
+      end: values.end ?? "",
+      breakMinutes: values.breakMinutes ?? "0",
+      open: values.open ?? true,
+    };
+  }
+
+  function renderShifts(focusLast = false) {
+    get("[data-shift-count]").textContent = `${shifts.length} ${shifts.length === 1 ? "shift" : "shifts"} in this workday`;
+    shiftList.innerHTML = shifts.map((shift, index) => `
+      <details class="rounded-lg border border-gray-700 bg-gray-900/70 p-4" data-shift-card="${shift.id}" ${shift.open ? "open" : ""}>
+        <summary class="cursor-pointer list-none">
+          <div class="flex items-center justify-between gap-3">
+            <div class="min-w-0">
+              <p class="truncate text-sm font-semibold text-amber-300">${escapeHtml(shift.label || `Shift ${index + 1}`)}</p>
+              <p class="mt-1 truncate text-xs text-gray-500" data-shift-preview="${shift.id}">${escapeHtml(shiftPreview(shift))}</p>
+            </div>
+            <span class="text-xs font-semibold text-gray-400">Edit</span>
+          </div>
+        </summary>
+
+        <div class="mt-4">
+          <label class="field-label" for="${shift.id}-label">Optional name</label>
+          <input
+            id="${shift.id}-label"
+            class="field"
+            type="text"
+            maxlength="40"
+            value="${escapeHtml(shift.label)}"
+            data-shift-field="label"
+            data-id="${shift.id}"
+            aria-describedby="${shift.id}-error"
+          />
+        </div>
+
+        <div class="mt-4 grid grid-cols-2 gap-3">
+          <div class="min-w-0">
+            <label class="field-label" for="${shift.id}-start">Start time</label>
+            <input
+              id="${shift.id}-start"
+              class="field"
+              type="time"
+              value="${escapeHtml(shift.start)}"
+              data-shift-field="start"
+              data-id="${shift.id}"
+              aria-describedby="${shift.id}-next-day ${shift.id}-error"
+            />
+          </div>
+          <div class="min-w-0">
+            <label class="field-label" for="${shift.id}-end">End time</label>
+            <input
+              id="${shift.id}-end"
+              class="field"
+              type="time"
+              value="${escapeHtml(shift.end)}"
+              data-shift-field="end"
+              data-id="${shift.id}"
+              aria-describedby="${shift.id}-next-day ${shift.id}-error"
+            />
+          </div>
+        </div>
+
+        <p id="${shift.id}-next-day" class="mt-2 hidden text-xs font-semibold text-sky-300" data-next-day="${shift.id}">
+          Ends the next day
+        </p>
+
+        <div class="mt-4">
+          <label class="field-label" for="${shift.id}-break">Break</label>
+          <div class="field-shell">
+            <input
+              id="${shift.id}-break"
+              class="field-input field-input-leading"
+              type="text"
+              inputmode="numeric"
+              autocomplete="off"
+              value="${escapeHtml(shift.breakMinutes)}"
+              data-shift-field="breakMinutes"
+              data-id="${shift.id}"
+              aria-describedby="${shift.id}-error"
+            />
+            <span class="field-affix">min</span>
+          </div>
+          <div class="mt-3 grid grid-cols-4 gap-2" aria-label="Quick break presets">
+            ${[0, 30, 45, 60].map((minutes) => `
+              <button
+                class="break-preset px-2 text-xs"
+                type="button"
+                data-break-preset="${minutes}"
+                data-id="${shift.id}"
+                aria-pressed="${String(shift.breakMinutes === String(minutes))}"
+              >
+                ${minutes} min
+              </button>
+            `).join("")}
+          </div>
+        </div>
+
+        <p id="${shift.id}-error" class="mt-3 hidden text-sm leading-relaxed text-red-200" data-shift-error="${shift.id}"></p>
+
+        <div class="mt-4 flex flex-wrap justify-end gap-2">
+          <button class="shift-action" type="button" data-shift-action="duplicate" data-id="${shift.id}">Duplicate</button>
+          <button class="shift-action shift-action-danger" type="button" data-shift-action="remove" data-id="${shift.id}">
+            ${shifts.length === 1 ? "Clear shift" : "Remove"}
+          </button>
+        </div>
+      </details>
+    `).join("");
+
+    shifts.forEach((shift) => updateShiftIndicators(shift));
+
+    if (focusLast) {
+      shiftList.querySelector("details:last-child [data-shift-field='start']")?.focus();
+    }
+  }
+
+  function shiftPreview(shift) {
+    const start = parseTimeToMinutes(shift.start);
+    const end = parseTimeToMinutes(shift.end);
+    const rest = parseWorkNumber(shift.breakMinutes, { integer: true });
+
+    if (start === null || end === null || start === end || !rest.ok) {
+      return "Times pending";
+    }
+
+    const gross = (end < start ? end + 1440 : end) - start;
+
+    if (rest.value >= gross) return "Check the break";
+
+    const nextDay = end < start ? " · ends the next day" : "";
+    return `${formatDuration(gross - rest.value)} net${nextDay}`;
+  }
+
+  function updateShiftIndicators(shift) {
+    const start = parseTimeToMinutes(shift.start);
+
+    const end = parseTimeToMinutes(shift.end);
+    const nextDay = get(`[data-next-day="${shift.id}"]`);
+    const preview = get(`[data-shift-preview="${shift.id}"]`);
+    const crossesMidnight = start !== null && end !== null && end < start;
+
+    nextDay?.classList.toggle("hidden", !crossesMidnight);
+    if (preview) preview.textContent = shiftPreview(shift);
+    updateBreakPresetStates(shift);
+  }
+
+  function updateBreakPresetStates(shift) {
+    shiftList.querySelectorAll(`[data-break-preset][data-id="${shift.id}"]`).forEach((button) => {
+      button.setAttribute("aria-pressed", String(button.dataset.breakPreset === shift.breakMinutes.trim()));
+    });
+  }
+
+  function readInput() {
+    clearValidation();
+    const errors = [];
+    const parsedShifts = [];
+
+    shifts.forEach((shift, index) => {
+      const shiftErrors = [];
+      const start = parseTimeToMinutes(shift.start);
+      const end = parseTimeToMinutes(shift.end);
+      const rest = parseWorkNumber(shift.breakMinutes, { integer: true });
+
+      if (!shift.start || !shift.end) {
+        shiftErrors.push("enter a start and end time");
+      } else if (start === null || end === null) {
+        shiftErrors.push("use valid times");
+      } else if (start === end) {
+        shiftErrors.push("start and end times cannot be the same");
+      }
+
+      if (!rest.ok) {
+        shiftErrors.push("the break must be a whole number of minutes");
+      } else if (start !== null && end !== null && start !== end) {
+        const gross = (end < start ? end + 1440 : end) - start;
+        if (rest.value >= gross) shiftErrors.push("the break must be shorter than the shift");
+      }
+
+      setShiftError(shift.id, shiftErrors.join(". "));
+      if (shiftErrors.length) {
+        errors.push(`Shift ${index + 1}: ${shiftErrors.join("; ")}.`);
+      } else if (rest.ok) {
+        parsedShifts.push({
+          label: shift.label.trim() || `Shift ${index + 1}`,
+          start: shift.start,
+          end: shift.end,
+          breakMinutes: rest.value,
+        });
+      }
+    });
+
+    const regularHoursLimit = readSetting(
+      "regularHoursLimit",
+      "The regular limit must be a number from 0 to 24.",
+      errors,
+      (value) => value >= 0 && value <= 24,
+    );
+    const overtimeMultiplier = readSetting(
+      "overtimeMultiplier",
+      "The overtime multiplier must be a number from 1 to 5.",
+      errors,
+      (value) => value >= 1 && value <= 5,
+    );
+    const hourlyRate = readOptionalRate(errors);
+
+    return {
+      errors,
+      input: {
+        shifts: parsedShifts,
+        regularHoursLimit,
+        overtimeMultiplier,
+        hourlyRate,
+      },
+    };
+  }
+
+  function readSetting(field, message, errors, isValid) {
+    const input = get(`[data-setting="${field}"]`);
+    const parsed = parseWorkNumber(input.value);
+
+    if (!parsed.ok || !isValid(parsed.value)) {
+      setSettingError(field, message);
+      input.setAttribute("aria-invalid", "true");
+      errors.push(message);
+      return 0;
+    }
+
+    return parsed.value;
+  }
+
+  function readOptionalRate(errors) {
+    const input = get('[data-setting="hourlyRate"]');
+
+    if (!input.value.trim()) return undefined;
+
+    const parsed = parseWorkNumber(input.value);
+    const message = "The rate must be zero or greater.";
+
+    if (!parsed.ok || parsed.value < 0) {
+      setSettingError("hourlyRate", message);
+      input.setAttribute("aria-invalid", "true");
+      errors.push(message);
+      return undefined;
+    }
+
+    return parsed.value;
+  }
+
+  function calculate() {
+    const parsed = readInput();
+
+    if (parsed.errors.length) {
+      showErrors(parsed.errors);
+      markStale();
+      get("[data-errors]").focus();
+      return;
+    }
+
+    try {
+      currentResult = calculateWorkHours(parsed.input);
+      copyText = buildWorkHoursSummary(currentResult);
+      showErrors([]);
+      renderResult(currentResult);
+      get("[data-results]").classList.remove("hidden");
+      get("[data-copy-preview]").textContent = copyText;
+      document.querySelectorAll("[data-copy]").forEach((button) => button.classList.remove("hidden"));
+      setCopyEnabled(true);
+      get("[data-stale-notice]").classList.add("hidden");
+      resultRegion.focus({ preventScroll: true });
+      resultRegion.scrollIntoView({
+        behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth",
+        block: "start",
+      });
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Could not calculate. Check the data.";
+      if (error instanceof WorkHoursValidationError) {
+
+        error.shiftIndexes.forEach((index) => setShiftError(shifts[index]?.id, message));
+      }
+      showErrors([message]);
+      markStale();
+      get("[data-errors]").focus();
+    }
+  }
+
+  function renderResult(result) {
+    get("[data-result-kicker]").textContent = "Total worked";
+    get("[data-main-result]").textContent = formatDuration(result.netMinutes);
+    get("[data-decimal-result]").textContent = `${formatDecimalHours(result.decimalHours)} hours decimales`;
+    get("[data-limit-note]").textContent = limitNote(result.differenceFromRegularLimitMinutes);
+    get("[data-summary-grid]").innerHTML = [
+      ["Gross time", formatDuration(result.grossMinutes)],
+      ["Breaks", formatDuration(result.breakMinutes)],
+      ["Regular hours", formatDuration(result.regularMinutes)],
+      ["Estimated overtime", formatDuration(result.overtimeMinutes)],
+    ].map(([label, value]) => summaryCard(label, value)).join("");
+
+    const paymentPanel = get("[data-payment-panel]");
+    paymentPanel.classList.toggle("hidden", !result.payment);
+
+    if (result.payment) {
+      get("[data-total-pay]").textContent = formatWorkCurrency(result.payment.totalPay);
+      get("[data-payment-details]").innerHTML = [
+        ["Regular pay", formatWorkCurrency(result.payment.regularPay)],
+        ["Overtime pay", formatWorkCurrency(result.payment.overtimePay)],
+        ["Rate used", `${formatWorkCurrency(result.payment.hourlyRate)} / hour`],
+      ].map(([label, value]) => definitionRow(label, value)).join("");
+    }
+
+    const messages = result.warnings.map((warning) => warningMessages[warning.code]);
+    const warningPanel = get("[data-warning-panel]");
+    warningPanel.innerHTML = messages.map((message) => `<p>${escapeHtml(message)}</p>`).join("");
+    warningPanel.classList.toggle("hidden", !messages.length);
+
+    get("[data-shift-results]").innerHTML = result.shifts.map((shift) => `
+      <article class="rounded-lg border border-gray-700 bg-gray-950 p-5">
+        <div class="flex items-start justify-between gap-3">
+          <div class="min-w-0">
+            <p class="truncate text-sm font-semibold text-amber-300">${escapeHtml(shift.label)}</p>
+            <p class="mt-2 text-2xl font-bold text-white">${escapeHtml(formatDuration(shift.netMinutes))}</p>
+          </div>
+          ${shift.crossesMidnight ? '<span class="rounded-full bg-sky-400/10 px-2 py-1 text-xs font-semibold text-sky-200">Next day</span>' : ""}
+        </div>
+        <dl class="mt-4 space-y-2 text-sm">
+          ${definitionRow("Schedule", `${shift.start}-${shift.end}`)}
+          ${definitionRow("Gross time", formatDuration(shift.grossMinutes))}
+          ${definitionRow("Break", formatDuration(shift.breakMinutes))}
+          ${definitionRow("Net time", formatDuration(shift.netMinutes))}
+        </dl>
+      </article>
+    `).join("");
+  }
+
+  function limitNote(difference) {
+    if (difference === 0) return "The workday matches the configured regular limit.";
+    if (difference > 0) return `The workday exceeds the regular limit by ${formatDuration(difference)}.`;
+    return `There are ${formatDuration(Math.abs(difference))} left to reach the configured regular limit.`;
+  }
+
+  function fillExample() {
+    sequence = 0;
+    shifts = [
+      newShift({ label: "Morning", start: "09:00", end: "14:00", breakMinutes: "30", open: false }),
+      newShift({ label: "Afternoon", start: "15:00", end: "20:00", breakMinutes: "0", open: true }),
+    ];
+    setSetting("hourlyRate", "100");
+    setSetting("regularHoursLimit", "8");
+    setSetting("overtimeMultiplier", "1.5");
+    renderShifts();
+    updateSettingsSummary();
+    calculate();
+  }
+
+  function clearAll() {
+    sequence = 0;
+    shifts = [newShift()];
+    setSetting("hourlyRate", "");
+    setSetting("regularHoursLimit", "8");
+    setSetting("overtimeMultiplier", "1.5");
+    currentResult = null;
+    copyText = "";
+    renderShifts();
+    clearValidation();
+    showErrors([]);
+    get("[data-results]").classList.add("hidden");
+    document.querySelectorAll("[data-copy]").forEach((button) => button.classList.add("hidden"));
+    get("[data-stale-notice]").classList.add("hidden");
+    setCopyEnabled(false);
+    setInitialResult();
+    updateSettingsSummary();
+    shiftList.querySelector("[data-shift-field='start']")?.focus();
+  }
+
+  function setInitialResult() {
+    get("[data-result-kicker]").textContent = "Total worked";
+    get("[data-main-result]").textContent = "Add your hours";
+    get("[data-decimal-result]").textContent = "The net total will appear here.";
+    get("[data-limit-note]").textContent = "You will also see gross time, breaks, and estimated overtime.";
+    get("[data-summary-grid]").innerHTML = '<div class="col-span-2 rounded-lg border border-gray-800 bg-gray-950/70 p-4 text-sm text-gray-400">Complete at least one shift to calculate the workday.</div>';
+    get("[data-payment-panel]").classList.add("hidden");
+    get("[data-warning-panel]").classList.add("hidden");
+  }
+
+  function updateSettingsSummary() {
+    const rate = get('[data-setting="hourlyRate"]').value.trim();
+    const limit = get('[data-setting="regularHoursLimit"]').value.trim() || "—";
+    const multiplier = get('[data-setting="overtimeMultiplier"]').value.trim() || "—";
+    get("[data-settings-summary]").textContent = `Regular limit: ${limit} h · Overtime: ${multiplier}× · ${rate ? `Rate $${rate}` : "No rate"}`;
+  }
+
+  function setShiftError(id, message = "") {
+    if (!id) return;
+    const error = get(`[data-shift-error="${id}"]`);
+    error.textContent = message;
+    error.classList.toggle("hidden", !message);
+    shiftList.querySelectorAll(`[data-shift-field][data-id="${id}"]`).forEach((input) => {
+      input.setAttribute("aria-invalid", String(Boolean(message)));
+    });
+  }
+
+  function setSettingError(field, message = "") {
+    const error = get(`[data-setting-error="${field}"]`);
+    error.textContent = message;
+  }
+
+  function clearValidation() {
+    shifts.forEach((shift) => setShiftError(shift.id));
+    document.querySelectorAll("[data-setting-error]").forEach((error) => error.textContent = "");
+    document.querySelectorAll('[aria-invalid="true"]').forEach((input) => input.removeAttribute("aria-invalid"));
+  }
+
+  function showErrors(messages) {
+    const box = get("[data-errors]");
+    box.innerHTML = messages.map((message) => `<p>${escapeHtml(message)}</p>`).join("");
+    box.classList.toggle("hidden", !messages.length);
+  }
+
+
+  function markStale() {
+    if (currentResult) {
+      get("[data-stale-notice]").classList.remove("hidden");
+      setCopyEnabled(false);
+    }
+  }
+
+  function setCopyEnabled(enabled) {
+    document.querySelectorAll("[data-copy]").forEach((button) => {
+      button.disabled = !enabled;
+      button.classList.toggle("opacity-50", !enabled);
+      button.classList.toggle("cursor-not-allowed", !enabled);
+    });
+  }
+
+  async function copyResult() {
+    if (!copyText || !get("[data-stale-notice]").classList.contains("hidden")) return;
+
+    try {
+      if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(copyText);
+      } else {
+        const textArea = document.createElement("textarea");
+        textArea.value = copyText;
+        textArea.setAttribute("readonly", "");
+        textArea.style.position = "fixed";
+        textArea.style.opacity = "0";
+        document.body.append(textArea);
+        textArea.select();
+        document.execCommand("copy");
+        textArea.remove();
+      }
+      document.querySelectorAll("[data-copy-label]").forEach((label) => label.textContent = "Copied");
+      get("[data-copy-status]").textContent = "Summary copied.";
+      window.setTimeout(() => {
+        document.querySelectorAll("[data-copy-label]").forEach((label) => label.textContent = "Copy summary");
+        get("[data-copy-status]").textContent = "";
+      }, 2000);
+    } catch {
+      get("[data-copy-status]").textContent = "The summary could not be copied.";
+    }
+  }
+
+  function setSetting(field, value) {
+    get(`[data-setting="${field}"]`).value = value;
+  }
+
+  function summaryCard(label, value) {
+    return `<div class="rounded-lg border border-gray-800 bg-gray-950/70 p-3"><span class="block text-xs font-semibold uppercase tracking-wide text-gray-500">${escapeHtml(label)}</span><span class="mt-2 block break-words text-base font-semibold text-white">${escapeHtml(value)}</span></div>`;
+  }
+
+  function definitionRow(label, value) {
+    return `<div class="flex items-start justify-between gap-3"><dt class="text-gray-500">${escapeHtml(label)}</dt><dd class="break-words text-right font-semibold text-gray-200">${escapeHtml(value)}</dd></div>`;
+  }
+
+  function escapeHtml(value) {
+    return String(value).replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;").replaceAll("'", "&#039;");
+  }
+
+  shiftList.addEventListener("input", (event) => {
+    const input = event.target.closest("[data-shift-field]");
+    if (!input) return;
+    const shift = shifts.find((item) => item.id === input.dataset.id);
+    if (!shift) return;
+    shift[input.dataset.shiftField] = input.value;
+    updateShiftIndicators(shift);
+    markStale();
+  });
+
+  shiftList.addEventListener("change", (event) => {
+    const input = event.target.closest("[data-shift-field]");
+    if (!input) return;
+    const shift = shifts.find((item) => item.id === input.dataset.id);
+    if (shift) updateShiftIndicators(shift);
+  });
+
+  shiftList.addEventListener("toggle", (event) => {
+    const card = event.target.closest("[data-shift-card]");
+    if (!card) return;
+    const shift = shifts.find((item) => item.id === card.dataset.shiftCard);
+    if (shift) shift.open = card.open;
+  }, true);
+
+  shiftList.addEventListener("click", (event) => {
+    const preset = event.target.closest("[data-break-preset]");
+    if (preset) {
+      const shift = shifts.find((item) => item.id === preset.dataset.id);
+      if (!shift) return;
+      shift.breakMinutes = preset.dataset.breakPreset;
+      const input = shiftList.querySelector(`[data-shift-field="breakMinutes"][data-id="${shift.id}"]`);
+      input.value = shift.breakMinutes;
+      updateShiftIndicators(shift);
+      markStale();
+      return;
+    }
+
+    const action = event.target.closest("[data-shift-action]");
+    if (!action) return;
+    const index = shifts.findIndex((shift) => shift.id === action.dataset.id);
+
+    if (action.dataset.shiftAction === "duplicate") {
+      if (shifts.length >= MAX_SHIFTS) {
+        showErrors([`The workday allows a maximum of ${MAX_SHIFTS} shifts.`]);
+        return;
+      }
+      const source = shifts[index];
+      shifts.splice(index + 1, 0, newShift({ ...source, label: `${source.label} copy`, open: true }));
+    }
+
+    if (action.dataset.shiftAction === "remove") {
+      if (shifts.length === 1) {
+        shifts.splice(0, 1, newShift({ label: "Shift 1" }));
+      } else {
+        shifts.splice(index, 1);
+      }
+    }
+
+    renderShifts();
+    markStale();
+  });
+
+  get("[data-add-shift]").addEventListener("click", () => {
+    if (shifts.length >= MAX_SHIFTS) {
+      showErrors([`The workday allows a maximum of ${MAX_SHIFTS} shifts.`]);
+      return;
+    }
+    shifts.push(newShift());
+    renderShifts(true);
+    markStale();
+  });
+
+  form.addEventListener("submit", (event) => {
+    event.preventDefault();
+    calculate();
+  });
+
+  form.addEventListener("input", (event) => {
+    if (event.target.matches("[data-setting]")) {
+      updateSettingsSummary();
+      markStale();
+
+    }
+  });
+
+  document.querySelectorAll("[data-copy]").forEach((button) => button.addEventListener("click", copyResult));
+  get("[data-example]").addEventListener("click", fillExample);
+  get("[data-clear]").addEventListener("click", clearAll);
+  mobileCalculate.addEventListener("click", calculate);
+  renderShifts();
+  updateSettingsSummary();
+</script>

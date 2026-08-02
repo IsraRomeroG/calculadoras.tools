@@ -10,12 +10,18 @@ import {
   WEDDING_BUDGET_CANONICAL_PATH,
   WEDDING_TEMPLATES,
 } from "@lib/calculators/eventos/calculadora-presupuesto-boda/weddingBudget";
+import { buildAlternateLinks } from "@lib/i18n/routing";
 import { buildFaqJsonLd } from "@lib/seo";
 
 const title = "Calculadora de presupuesto de boda";
 const description =
   "Crea un presupuesto de boda con invitados, partidas, depósitos, contingencia, costo por persona y comparación contra tu presupuesto.";
 const canonical = WEDDING_BUDGET_CANONICAL_PATH;
+const englishCanonical = "/en/events/wedding-budget-calculator";
+const alternates = buildAlternateLinks(
+  { es: canonical, en: englishCanonical },
+  Astro.site ?? Astro.url,
+);
 
 const faqs = [
   {
@@ -53,7 +59,7 @@ const faqs = [
 const faqJsonLd = buildFaqJsonLd(faqs);
 ---
 
-<BaseLayout title={title} description={description} canonical={canonical}>
+<BaseLayout title={title} description={description} canonical={canonical} alternates={alternates}>
   <Fragment slot="head">
     <script type="application/ld+json" set:html={JSON.stringify(faqJsonLd)} />
   </Fragment>

@@ -4,6 +4,7 @@ seoTitle: "Milla terrestre vs. milla náutica: cuánto mide cada una"
 description: "Conoce la diferencia entre milla terrestre y milla náutica, sus factores en kilómetros y cuándo se usa cada unidad."
 pubDate: 2026-07-31
 categorySlug: "conversores"
+translationKey: "statute-mile-vs-nautical-mile"
 tags:
   - milla terrestre
   - milla náutica

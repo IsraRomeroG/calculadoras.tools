@@ -11,11 +11,16 @@ import {
   type TemperatureScale,
 } from "@lib/calculators/conversores/conversor-de-temperatura/temperature";
 import { buildFaqJsonLd } from "@lib/seo";
+import { buildAlternateLinks } from "@lib/i18n/routing";
 
 const title = "Conversor de temperatura °C a °F y Kelvin";
 const description =
   "Convierte temperaturas entre Celsius, Fahrenheit y Kelvin al instante. Consulta fórmulas, equivalencias y referencias prácticas para clima, cocina y ciencia.";
 const canonical = "/conversores/conversor-de-temperatura";
+const alternates = buildAlternateLinks(
+  { es: canonical, en: "/en/converters/temperature-converter" },
+  Astro.site ?? Astro.url,
+);
 
 const faqs = [
   {
@@ -75,7 +80,7 @@ const shortcuts = [
 ];
 ---
 
-<BaseLayout title={title} description={description} canonical={canonical}>
+<BaseLayout title={title} description={description} canonical={canonical} alternates={alternates}>
   <Fragment slot="head">
     <script type="application/ld+json" set:html={JSON.stringify(faqJsonLd)} />
   </Fragment>

@@ -6,12 +6,15 @@ import PageShell from "@components/layout/PageShell.astro";
 import FaqSection from "@components/shared/FaqSection.astro";
 import PageHero from "@components/shared/PageHero.astro";
 import SectionIntro from "@components/shared/SectionIntro.astro";
+import { buildAlternateLinks } from "@lib/i18n/routing";
 import { buildFaqJsonLd } from "@lib/seo";
 
 const title = "Calculadora de Diferencia entre Fechas - Días, Semanas y Meses";
 const description =
   "Calcula cuántos días hay entre dos fechas, cuántos días faltan para un evento o qué fecha será dentro de X días. Incluye días hábiles sin fines de semana.";
 const canonical = "/fecha-tiempo/diferencia-entre-fechas";
+const englishCanonical = "/en/date-time/date-difference-calculator";
+const alternates = buildAlternateLinks({ es: canonical, en: englishCanonical }, Astro.site ?? Astro.url);
 
 const faqs = [
   {
@@ -83,7 +86,7 @@ const dateUnits = [
 ];
 ---
 
-<BaseLayout title={title} description={description} canonical={canonical}>
+<BaseLayout title={title} description={description} canonical={canonical} alternates={alternates}>
   <Fragment slot="head">
     <script type="application/ld+json" set:html={JSON.stringify(faqJsonLd)} />
   </Fragment>

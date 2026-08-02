@@ -15,11 +15,16 @@ import {
   type VolumeUnit,
 } from "@lib/calculators/conversores/conversor-de-volumen/volume";
 import { buildFaqJsonLd } from "@lib/seo";
+import { buildAlternateLinks } from "@lib/i18n/routing";
 
 const title = "Conversor de volumen y capacidad: ml, L, m³ y más";
 const description =
   "Convierte volumen entre mililitros, litros, metros cúbicos, onzas líquidas, pintas, cuartos y galones US o imperiales.";
 const canonical = "/conversores/conversor-de-volumen";
+const alternates = buildAlternateLinks(
+  { es: canonical, en: "/en/converters/volume-converter" },
+  Astro.site ?? Astro.url,
+);
 
 const faqs = [
   {
@@ -88,7 +93,7 @@ const referenceRows = [
 ];
 ---
 
-<BaseLayout title={title} description={description} canonical={canonical}>
+<BaseLayout title={title} description={description} canonical={canonical} alternates={alternates}>
   <Fragment slot="head">
     <script type="application/ld+json" set:html={JSON.stringify(faqJsonLd)} />
   </Fragment>
@@ -1199,4 +1204,3 @@ const referenceRows = [
   clearOutputs();
   loadUrlParameters();
 </script>
-

@@ -855,6 +855,76 @@ const ENGLISH_CALCULATOR_METADATA: Partial<
     slug: "percentage-calculator",
     published: true,
   },
+  "calculadora-de-iva": {
+    title: "VAT calculator",
+    description:
+      "Add VAT to a base price or extract the tax included in a total using editable rates and country presets.",
+    slug: "vat-calculator",
+    published: true,
+  },
+  "calculadora-isr-irpf": {
+    title: "Income tax calculator",
+    description:
+      "Estimate Mexican income tax by pay period or year, view the effective rate and compare withholding.",
+    slug: "income-tax-calculator",
+    published: true,
+  },
+  "calculadora-salario-neto": {
+    title: "Net salary calculator",
+    description:
+      "Estimate net salary in Mexico after income tax, subsidies and entered deductions with a clear breakdown.",
+    slug: "net-salary-calculator",
+    published: true,
+  },
+  "calculadora-de-edad": {
+    title: "Age calculator",
+    description:
+      "Calculate exact age in years, months and days, days lived and time until the next birthday.",
+    slug: "age-calculator",
+    published: true,
+  },
+  "diferencia-entre-fechas": {
+    title: "Date difference calculator",
+    description:
+      "Calculate days between dates, add or subtract time and count weekdays excluding weekends.",
+    slug: "date-difference-calculator",
+    published: true,
+  },
+  "calculadora-fecha-limite-countdown": {
+    title: "Deadline countdown calculator",
+    description:
+      "Calculate time remaining until a deadline, follow a live countdown and add the event to your calendar.",
+    slug: "deadline-countdown-calculator",
+    published: true,
+  },
+  "calculadora-de-horas-trabajadas": {
+    title: "Work hours calculator",
+    description:
+      "Add shifts, subtract breaks and estimate regular hours, overtime and hourly pay.",
+    slug: "work-hours-calculator",
+    published: true,
+  },
+  "calculadora-pomodoro": {
+    title: "Pomodoro timer",
+    description:
+      "Plan Pomodoro focus blocks, short and long breaks, total duration and estimated end time.",
+    slug: "pomodoro-timer",
+    published: true,
+  },
+  "calculadora-costo-reunion": {
+    title: "Meeting cost calculator",
+    description:
+      "Estimate meeting cost, person-hours, recurring cost and potential savings.",
+    slug: "meeting-cost-calculator",
+    published: true,
+  },
+  "calculadora-tiempo-de-lectura": {
+    title: "Reading time calculator",
+    description:
+      "Estimate reading time from word count and reading speed without sending text to a server.",
+    slug: "reading-time-calculator",
+    published: true,
+  },
   "conversor-de-medidas-culinarias": {
     title: "Cooking measurement converter",
     description:
@@ -881,6 +951,20 @@ const ENGLISH_CALCULATOR_METADATA: Partial<
     description:
       "Adjust ingredient quantities for the original and desired number of servings.",
     slug: "recipe-scaler",
+    published: true,
+  },
+  "calculadora-presupuesto-boda": {
+    title: "Wedding budget calculator",
+    description:
+      "Organize wedding expenses, deposits and contingency, then estimate the total and cost per guest.",
+    slug: "wedding-budget-calculator",
+    published: true,
+  },
+  "calculadora-costo-por-persona-evento": {
+    title: "Event cost per person calculator",
+    description:
+      "Calculate total event cost, cost per guest, a suggested contribution or how many guests fit the budget.",
+    slug: "event-cost-per-person-calculator",
     published: true,
   },
   "calculadora-volumen-concreto-cemento": {
@@ -916,6 +1000,55 @@ const ENGLISH_CALCULATOR_METADATA: Partial<
     description:
       "Calculate wall or ceiling area and estimate paint from coats and coverage.",
     slug: "paint-calculator",
+    published: true,
+  },
+  "conversor-de-temperatura": {
+    title: "Temperature converter",
+    description:
+      "Convert temperatures between Celsius, Fahrenheit, Kelvin and other scales.",
+    slug: "temperature-converter",
+    published: true,
+  },
+  "kilometros-a-millas": {
+    title: "Kilometers to miles converter",
+    description:
+      "Convert kilometers to statute miles and miles to kilometers with formulas and common equivalents.",
+    slug: "kilometers-to-miles",
+    published: true,
+  },
+  "litros-a-galones": {
+    title: "Liters to gallons converter",
+    description:
+      "Convert liters to US and Imperial gallons, or either gallon type to liters.",
+    slug: "liters-to-gallons",
+    published: true,
+  },
+  "conversor-de-area-m2-ft2-hectareas-acres": {
+    title: "Area converter",
+    description:
+      "Convert square meters, square feet, hectares and acres, or calculate area from dimensions.",
+    slug: "area-converter",
+    published: true,
+  },
+  "conversor-de-volumen": {
+    title: "Volume converter",
+    description:
+      "Convert metric, US and Imperial volume and capacity units.",
+    slug: "volume-converter",
+    published: true,
+  },
+  "conversor-de-peso": {
+    title: "Weight converter",
+    description:
+      "Convert kilograms, pounds, grams, ounces and stone with formulas and common equivalents.",
+    slug: "weight-converter",
+    published: true,
+  },
+  "conversor-tallas-de-ropa": {
+    title: "Clothing size converter",
+    description:
+      "Compare International, US, EU, UK and MX clothing sizes and measurement ranges.",
+    slug: "clothing-size-converter",
     published: true,
   },
 };

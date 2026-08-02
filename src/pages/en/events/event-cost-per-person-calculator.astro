@@ -1,0 +1,1424 @@
+---
+import AdSlot from "@components/ads/AdSlot.astro";
+import Container from "@components/layout/Container.astro";
+import PageShell from "@components/layout/PageShell.astro";
+import FaqSection from "@components/shared/FaqSection.astro";
+import PageHero from "@components/shared/PageHero.astro";
+import SectionIntro from "@components/shared/SectionIntro.astro";
+import BaseLayout from "@layouts/BaseLayout.astro";
+import {
+  EVENT_COST_CANONICAL_PATH,
+  EVENT_COST_CATEGORIES,
+  EVENT_COST_CATEGORY_LABELS,
+  EVENT_ROUNDING_OPTIONS,
+  EVENT_TYPES,
+  EVENT_TYPE_LABELS,
+} from "@lib/calculators/eventos/calculadora-costo-por-persona-evento/eventCost.en";
+import { buildAlternateLinks } from "@lib/i18n/routing";
+import { buildFaqJsonLd } from "@lib/seo";
+
+const title = "Event cost per person calculator";
+const description =
+  "Calculate the total cost, cost per guest, suggested contribution, or how many guests fit within an event budget.";
+const canonical = EVENT_COST_CANONICAL_PATH;
+const spanishCanonical = "/eventos/calculadora-costo-por-persona-evento";
+const alternates = buildAlternateLinks(
+  { es: spanishCanonical, en: canonical },
+  Astro.site ?? Astro.url,
+);
+
+const faqs = [
+  {
+    question: "How do you calculate the cost per person for an event?",
+    answer:
+      "Add fixed expenses to per-guest costs multiplied by attendance. Then apply the contingency and divide the total by the number of guests.",
+  },
+  {
+    question: "Which expenses are fixed and which are per guest?",
+    answer:
+      "A fixed expense is usually paid once, such as venue rental, music, or furniture. A per-guest cost changes with attendance, such as food, drinks, or favors.",
+  },
+  {
+    question: "What is the suggested contribution for?",
+    answer:
+      "The suggested contribution rounds the cost per guest up, making it easier to collect or recover the total without falling short.",
+  },
+  {
+    question: "How does it calculate how many guests fit my budget?",
+    answer:
+      "It first removes the contingency from the budget, subtracts fixed expenses, and divides the remainder by the variable cost per guest.",
+  },
+  {
+    question: "Does the calculator use average prices?",
+    answer:
+      "No. The user enters every price. Actual costs depend on location, season, vendors, scope, and event type.",
+  },
+];
+
+const faqJsonLd = buildFaqJsonLd(faqs);
+---
+
+<BaseLayout title={title} description={description} canonical={canonical} locale="en" alternates={alternates}>
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={JSON.stringify(faqJsonLd)} />
+  </Fragment>
+
+  <PageShell>
+    <PageHero
+      title={title}
+      description="Estimate the total, separate fixed and per-guest costs, review scenarios, and calculate a rounded contribution for your event."
+      kicker="Events"
+      collapseBreadcrumbOnMobile
+      containerClass="py-5 md:py-7"
+      breadcrumbs={[
+        { label: "Home", href: "/en", ariaLabel: "Home" },
+        { label: "Events", href: "/en/events", optional: true },
+        { label: "Cost per person", truncate: true },
+      ]}
+    />
+
+    <Container as="section" class="py-4 md:py-8">
+      <section
+        id="event-cost-calculator"
+        class="overflow-hidden rounded-lg border border-gray-700 bg-gray-950 shadow-xl shadow-gray-950/30"
+        aria-labelledby="calculator-heading"
+      >
+        <form
+          class="grid lg:grid-cols-[minmax(0,1.08fr)_minmax(21rem,0.92fr)]"
+          novalidate
+          data-event-form
+        >
+          <aside
+            class="order-first border-b border-gray-800 bg-gray-900/70 p-4 sm:p-6 lg:order-last lg:sticky lg:top-4 lg:min-h-screen lg:border-b-0 lg:border-l"
+            aria-live="polite"
+            data-result-region
+          >
+            <p class="text-xs font-semibold uppercase tracking-wide text-cyan-300" data-result-kicker>
+              Result
+            </p>
+            <p class="mt-3 min-h-[3.25rem] break-words text-4xl font-bold leading-tight text-white" data-main-result>
+              Add expenses
+            </p>
+            <p class="mt-2 text-sm font-semibold text-cyan-100" data-result-subtitle>
+              Enter guests and expenses to estimate.
+            </p>
+            <p class="mt-3 text-sm leading-relaxed text-gray-400" data-result-note>
+              Prices are entered manually and are not stored on servers.
+            </p>
+            <p class="sr-only" role="status" aria-live="polite" data-live-summary></p>
+
+            <div class="mt-5 hidden" data-budget-progress>
+              <div class="mb-2 flex items-center justify-between text-xs font-semibold text-gray-400">
+                <span>Budget used</span>
+                <span class="text-white" data-budget-progress-label></span>
+              </div>
+              <div class="h-2 overflow-hidden rounded-full bg-gray-800">
+                <div class="h-full rounded-full transition-[width,background-color]" data-budget-progress-bar></div>
+              </div>
+            </div>
+
+            <div class="mt-5 grid grid-cols-2 gap-3" data-summary-grid></div>
+
+            <section class="mt-5 hidden border-t border-gray-800 pt-5" data-scenario-section>
+              <h3 class="text-sm font-semibold text-white">Quick scenarios</h3>
+              <div class="mt-3 grid gap-2" data-scenario-list></div>
+            </section>
+
+            <section class="mt-5 hidden border-t border-gray-800 pt-5" data-breakdown-section>
+              <h3 class="text-sm font-semibold text-white">Categories</h3>
+              <div class="mt-3 grid gap-2" data-category-breakdown></div>
+              <h3 class="mt-5 text-sm font-semibold text-white">Largest expenses</h3>
+              <div class="mt-3 grid gap-2" data-top-items></div>
+            </section>
+
+            <div
+              class="mt-5 hidden rounded-lg border border-red-300/30 bg-red-300/10 p-3 text-sm leading-relaxed text-red-100"
+              role="alert"
+              data-errors
+            ></div>
+
+            <div class="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-1">
+              <button class="event-primary-button" type="button" disabled data-copy-result>
+                <span data-copy-label>Copy summary</span>
+              </button>
+              <button class="event-secondary-button" type="button" disabled data-export-csv>
+                Exportar CSV
+              </button>
+              <button class="event-secondary-button" type="button" data-example>
+                Try an example
+              </button>
+              <button class="event-quiet-button" type="button" data-clear>
+                Clear form
+              </button>
+            </div>
+            <p class="mt-3 min-h-5 text-sm text-emerald-100" role="status" aria-live="polite" data-action-status></p>
+          </aside>
+
+          <section class="p-4 sm:p-6 lg:col-start-1 lg:row-start-1">
+            <p class="text-sm font-semibold uppercase tracking-wide text-cyan-300">
+              Event details
+            </p>
+            <h2 id="calculator-heading" class="mt-2 text-2xl font-semibold text-white">
+              Set the budget and attendance
+            </h2>
+            <p class="mt-2 text-sm leading-relaxed text-gray-400">
+              Separate one-time expenses from costs that grow with attendance.
+            </p>
+
+            <fieldset class="mt-5">
+              <legend class="event-field-label">Modo</legend>
+              <div class="mt-2 grid grid-cols-2 gap-2 rounded-lg border border-gray-800 bg-gray-900/70 p-1">
+                <label class="event-segmented-option" data-mode-label="costo_por_persona" data-active="true">
+                  <input class="sr-only" type="radio" name="event-mode" value="costo_por_persona" checked />
+                  Cost per person
+                </label>
+                <label class="event-segmented-option" data-mode-label="invitados_posibles">
+                  <input class="sr-only" type="radio" name="event-mode" value="invitados_posibles" />
+                  Possible guests
+                </label>
+              </div>
+            </fieldset>
+
+            <div class="mt-5 grid gap-4 sm:grid-cols-2">
+              <div>
+                <label class="event-field-label" for="event-name">Event name</label>
+                <input
+                  id="event-name"
+                  class="event-field mt-2"
+                  type="text"
+                  maxlength="80"
+                  autocomplete="off"
+                  placeholder="Graduation dinner"
+                  data-project-field="eventName"
+                />
+              </div>
+
+              <div>
+                <label class="event-field-label" for="event-type">Event type</label>
+                <select id="event-type" class="event-field mt-2" data-project-field="eventType">
+                  {
+                    EVENT_TYPES.map((eventType) => (
+                      <option value={eventType}>{EVENT_TYPE_LABELS[eventType]}</option>
+                    ))
+                  }
+                </select>
+              </div>
+
+              <div data-guests-field>
+                <label class="event-field-label" for="event-guests">Guests</label>
+                <input
+                  id="event-guests"
+                  class="event-field mt-2 text-xl font-semibold"
+                  type="text"
+                  inputmode="numeric"
+                  autocomplete="off"
+                  placeholder="100"
+                  data-project-field="guests"
+                  data-field-error-target="guests"
+                />
+                <p class="event-field-error" data-field-error="guests"></p>
+              </div>
+
+              <div>
+                <label class="event-field-label" for="event-budget">
+                  Available budget
+                  <span class="font-normal text-gray-500" data-budget-hint>(optional)</span>
+                </label>
+                <div class="event-field-shell">
+                  <span class="event-field-affix">$</span>
+                  <input
+                    id="event-budget"
+                    class="event-field-input"
+                    type="text"
+                    inputmode="decimal"
+                    autocomplete="off"
+                    placeholder="130,000"
+                    data-project-field="budget"
+                    data-field-error-target="budget"
+                  />
+                  <span class="event-field-affix">MXN</span>
+                </div>
+                <p class="event-field-error" data-field-error="budget"></p>
+              </div>
+
+              <div>
+                <label class="event-field-label" for="event-contingency">Contingency</label>
+                <div class="event-field-shell">
+                  <input
+                    id="event-contingency"
+                    class="event-field-input"
+                    type="text"
+                    inputmode="decimal"
+                    autocomplete="off"
+                    value="10"
+                    data-project-field="contingency"
+                    data-field-error-target="contingency"
+                  />
+                  <span class="event-field-affix">%</span>
+                </div>
+                <p class="event-field-error" data-field-error="contingency"></p>
+              </div>
+
+              <div>
+                <label class="event-field-label" for="event-rounding">Contribution rounding</label>
+                <select id="event-rounding" class="event-field mt-2" data-project-field="rounding">
+                  {
+                    EVENT_ROUNDING_OPTIONS.map((option) => (
+                      <option value={option}>
+                        {option === 0 ? "No rounding" : `$${option}`}
+                      </option>
+                    ))
+                  }
+                </select>
+              </div>
+            </div>
+
+            <div class="mt-7 grid gap-5">
+              <section class="event-item-section">
+                <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                  <div>
+                    <h3 class="text-lg font-semibold text-white">Fixed expenses</h3>
+                    <p class="mt-1 text-sm text-gray-400">Rent, music, decor, or any other one-time expense.</p>
+                  </div>
+                  <button class="event-secondary-button shrink-0" type="button" data-add-item="fijo">
+                    Add fixed expense
+                  </button>
+                </div>
+                <div class="mt-4 grid gap-3" data-item-list="fijo"></div>
+              </section>
+
+              <section class="event-item-section">
+                <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                  <div>
+                    <h3 class="text-lg font-semibold text-white">Costs per guest</h3>
+                    <p class="mt-1 text-sm text-gray-400">Food, drinks, favors, or any cost that changes with attendance.</p>
+                  </div>
+                  <button class="event-secondary-button shrink-0" type="button" data-add-item="por_invitado">
+                    Add per-guest cost
+                  </button>
+                </div>
+                <div class="mt-4 grid gap-3" data-item-list="por_invitado"></div>
+              </section>
+            </div>
+          </section>
+        </form>
+      </section>
+    </Container>
+
+    <AdSlot placement="calculator-after-tool" />
+
+    <Container as="section" class="py-6 md:py-8">
+      <SectionIntro
+        title="How to use the result"
+        description="The total supports budgeting; the cost per guest helps you decide attendance, contributions, or cuts."
+        class="mb-5"
+      />
+      <div class="grid gap-4 md:grid-cols-3">
+        <article class="event-info-card">
+          <h2 class="font-semibold text-white">Separate fixed and variable costs</h2>
+          <p class="mt-2 text-sm leading-relaxed text-gray-400">
+            A venue may cost the same for 50 or 100 guests, while the menu usually grows per person.
+          </p>
+        </article>
+        <article class="event-info-card">
+          <h2 class="font-semibold text-white">Review scenarios</h2>
+          <p class="mt-2 text-sm leading-relaxed text-gray-400">
+            With fewer guests, fixed expenses are spread across fewer people, raising the per-person cost.
+          </p>
+        </article>
+        <article class="event-info-card">
+          <h2 class="font-semibold text-white">Round without falling short</h2>
+          <p class="mt-2 text-sm leading-relaxed text-gray-400">
+            The suggested contribution rounds up to cover the total with an easy amount to collect.
+          </p>
+        </article>
+      </div>
+    </Container>
+
+    <Container as="section" class="py-6 md:py-8">
+      <section class="rounded-lg border border-gray-700 bg-gray-950 p-5 sm:p-6">
+        <h2 class="text-2xl font-semibold text-white">Expenses to consider</h2>
+        <div class="mt-4 grid gap-4 text-sm leading-relaxed text-gray-400 md:grid-cols-2">
+          <p>
+            For a more complete estimate, review the venue, food, drinks,
+            furniture, staff, entertainment, cleaning, transportation,
+            invitations, service charges, and a contingency reserve.
+          </p>
+          <p>
+            The calculator does not use average prices: every location, season,
+            vendor, and event type varies too much to assume one universal
+            cost.
+          </p>
+        </div>
+        <div class="mt-5 flex flex-wrap gap-3">
+          <a class="event-secondary-button" href="/en/events/wedding-budget-calculator">
+            Wedding budget
+          </a>
+          <a class="event-secondary-button" href="/en/restaurants">
+            Restaurant calculators
+          </a>
+        </div>
+      </section>
+    </Container>
+
+    <FaqSection faqs={faqs} />
+  </PageShell>
+
+  <div class="fixed inset-x-0 bottom-0 z-40 border-t border-gray-700 bg-gray-950/95 px-3 py-3 shadow-2xl shadow-gray-950/60 backdrop-blur lg:hidden" data-mobile-summary>
+    <div class="mx-auto flex max-w-5xl items-center justify-between gap-3">
+      <div class="min-w-0">
+        <p class="text-xs font-semibold uppercase tracking-wide text-gray-500" data-mobile-kicker>Result</p>
+        <p class="truncate text-lg font-bold text-white" data-mobile-total>Add expenses</p>
+      </div>
+      <p class="max-w-[48%] text-right text-xs font-semibold leading-snug text-gray-300" data-mobile-status>
+        Complete the key details.
+      </p>
+    </div>
+  </div>
+  <div class="h-20 lg:hidden"></div>
+</BaseLayout>
+
+<style is:global>
+  .event-field-label {
+    display: block;
+    font-size: 0.875rem;
+    font-weight: 700;
+    color: rgb(229 231 235);
+  }
+
+  .event-field,
+  .event-field-shell {
+    min-height: 3rem;
+    width: 100%;
+    min-width: 0;
+    border-radius: 0.5rem;
+    border: 1px solid rgb(55 65 81);
+    background: rgb(17 24 39);
+    color: white;
+    outline: none;
+  }
+
+  .event-field {
+    padding: 0 0.875rem;
+  }
+
+  .event-field-shell {
+    display: flex;
+    align-items: center;
+    margin-top: 0.5rem;
+  }
+
+  .event-field-input {
+    min-height: 2.875rem;
+    min-width: 0;
+    width: 100%;
+    background: transparent;
+    padding: 0 0.25rem;
+    color: white;
+    outline: none;
+  }
+
+  .event-field-affix {
+    flex: none;
+    padding: 0 0.75rem;
+    color: rgb(156 163 175);
+    font-size: 0.875rem;
+    font-weight: 700;
+  }
+
+  .event-field:focus,
+  .event-field-shell:focus-within {
+    border-color: rgb(103 232 249);
+    box-shadow: 0 0 0 3px rgb(103 232 249 / 0.14);
+  }
+
+  .event-field[aria-invalid="true"],
+  .event-field-input[aria-invalid="true"] {
+    border-color: rgb(252 165 165);
+  }
+
+  .event-field-error {
+    min-height: 1.125rem;
+    margin-top: 0.25rem;
+    font-size: 0.75rem;
+    line-height: 1.35;
+    color: rgb(252 165 165);
+  }
+
+  .event-segmented-option,
+  .event-primary-button,
+  .event-secondary-button,
+  .event-quiet-button,
+  .event-item-action {
+    display: inline-flex;
+    min-height: 2.75rem;
+    align-items: center;
+    justify-content: center;
+    border-radius: 0.5rem;
+    padding: 0.55rem 0.9rem;
+    text-align: center;
+    font-size: 0.875rem;
+    font-weight: 700;
+    transition: border-color 150ms, background-color 150ms, color 150ms, opacity 150ms;
+  }
+
+  .event-segmented-option {
+    cursor: pointer;
+    color: rgb(209 213 219);
+  }
+
+  .event-segmented-option[data-active="true"] {
+    background: rgb(103 232 249);
+    color: rgb(3 7 18);
+  }
+
+  .event-primary-button {
+    background: rgb(103 232 249);
+    color: rgb(3 7 18);
+  }
+
+  .event-primary-button:hover {
+    background: rgb(165 243 252);
+  }
+
+  .event-secondary-button,
+  .event-item-action {
+    border: 1px solid rgb(75 85 99);
+    color: rgb(229 231 235);
+  }
+
+  .event-secondary-button:hover,
+  .event-item-action:hover {
+    border-color: rgb(103 232 249 / 0.8);
+    color: white;
+  }
+
+  .event-quiet-button {
+    color: rgb(156 163 175);
+  }
+
+  .event-quiet-button:hover {
+    color: rgb(254 202 202);
+  }
+
+  .event-primary-button:disabled,
+  .event-secondary-button:disabled {
+    cursor: not-allowed;
+    opacity: 0.45;
+  }
+
+  .event-item-action-danger {
+    border-color: rgb(248 113 113 / 0.45);
+    color: rgb(254 202 202);
+  }
+
+  .event-item-section,
+  .event-info-card {
+    border-radius: 0.5rem;
+    border: 1px solid rgb(55 65 81);
+    background: rgb(3 7 18);
+    padding: 1rem;
+  }
+
+  @media (min-width: 640px) {
+    .event-item-section,
+    .event-info-card {
+      padding: 1.25rem;
+    }
+  }
+</style>
+
+<script>
+  import {
+    EVENT_COST_CATEGORIES,
+    EVENT_COST_CATEGORY_LABELS,
+    EVENT_COST_ITEM_TYPE_LABELS,
+    EVENT_COST_ITEM_TYPES,
+    EVENT_TYPE_LABELS,
+    EVENT_TYPES,
+    buildEventCostCsv,
+    buildEventCostShareText,
+    calculateEventCost,
+    formatEventCostCurrency,
+    formatEventCostNumber,
+    getPossibleGuestLabel,
+    parseEventCostNumberInput,
+  } from "@lib/calculators/eventos/calculadora-costo-por-persona-evento/eventCost.en";
+
+  const MAX_ITEMS = 100;
+  const defaultProject = {
+    mode: "costo_por_persona",
+    eventName: "",
+    eventType: "otro",
+    guests: "",
+    budget: "",
+    contingency: "10",
+    rounding: "50",
+  };
+  const form = document.querySelector("[data-event-form]");
+  const projectFields = Object.fromEntries(
+    [...document.querySelectorAll("[data-project-field]")].map((field) => [
+      field.dataset.projectField,
+      field,
+    ]),
+  );
+  const modeInputs = [...document.querySelectorAll('input[name="event-mode"]')];
+  const modeLabels = [...document.querySelectorAll("[data-mode-label]")];
+  const guestsField = document.querySelector("[data-guests-field]");
+  const budgetHint = document.querySelector("[data-budget-hint]");
+  const errorsBox = document.querySelector("[data-errors]");
+  const mainResult = document.querySelector("[data-main-result]");
+  const resultKicker = document.querySelector("[data-result-kicker]");
+  const resultSubtitle = document.querySelector("[data-result-subtitle]");
+  const resultNote = document.querySelector("[data-result-note]");
+  const liveSummary = document.querySelector("[data-live-summary]");
+  const summaryGrid = document.querySelector("[data-summary-grid]");
+  const scenarioSection = document.querySelector("[data-scenario-section]");
+  const scenarioList = document.querySelector("[data-scenario-list]");
+  const breakdownSection = document.querySelector("[data-breakdown-section]");
+  const categoryBreakdown = document.querySelector("[data-category-breakdown]");
+  const topItems = document.querySelector("[data-top-items]");
+  const budgetProgress = document.querySelector("[data-budget-progress]");
+  const budgetProgressLabel = document.querySelector("[data-budget-progress-label]");
+  const budgetProgressBar = document.querySelector("[data-budget-progress-bar]");
+  const copyButton = document.querySelector("[data-copy-result]");
+  const exportButton = document.querySelector("[data-export-csv]");
+  const copyLabel = document.querySelector("[data-copy-label]");
+  const actionStatus = document.querySelector("[data-action-status]");
+  const mobileKicker = document.querySelector("[data-mobile-kicker]");
+  const mobileTotal = document.querySelector("[data-mobile-total]");
+  const mobileStatus = document.querySelector("[data-mobile-status]");
+  const lists = {
+    fijo: document.querySelector('[data-item-list="fijo"]'),
+    por_invitado: document.querySelector('[data-item-list="por_invitado"]'),
+  };
+  let project = { ...defaultProject };
+  let sequence = 0;
+  let items = [
+    createBlankItem("fijo", { name: "Venue or rental" }),
+    createBlankItem("por_invitado", { name: "Food per guest" }),
+  ];
+  let currentInput = null;
+  let currentResult = null;
+  let statusTimer = 0;
+
+  function createBlankItem(type, values = {}) {
+    sequence += 1;
+
+    return {
+      id: `event-item-${sequence}`,
+      type,
+      name:
+        values.name ??
+        (type === "fijo" ? `Fixed expense ${sequence}` : `Per guest ${sequence}`),
+      category: values.category ?? (type === "fijo" ? "lugar" : "comida"),
+      amount: values.amount ?? "",
+      notes: values.notes ?? "",
+      expanded: values.expanded ?? true,
+    };
+  }
+
+  function getMode() {
+    return modeInputs.find((input) => input.checked)?.value ?? "costo_por_persona";
+  }
+
+  function syncProjectFromFields() {
+    project = {
+      ...project,
+      mode: getMode(),
+      eventName: projectFields.eventName.value,
+      eventType: projectFields.eventType.value,
+      guests: projectFields.guests.value,
+      budget: projectFields.budget.value,
+      contingency: projectFields.contingency.value,
+      rounding: projectFields.rounding.value,
+    };
+  }
+
+  function syncProjectFields() {
+    modeInputs.forEach((input) => {
+      input.checked = input.value === project.mode;
+    });
+    projectFields.eventName.value = project.eventName;
+    projectFields.eventType.value = project.eventType;
+    projectFields.guests.value = project.guests;
+    projectFields.budget.value = project.budget;
+    projectFields.contingency.value = project.contingency;
+    projectFields.rounding.value = project.rounding;
+    updateModeUi();
+  }
+
+  function updateModeUi() {
+    const mode = getMode();
+
+    modeLabels.forEach((label) => {
+      label.dataset.active = String(label.dataset.modeLabel === mode);
+    });
+    guestsField.classList.toggle("hidden", mode !== "costo_por_persona");
+    budgetHint.textContent = mode === "invitados_posibles" ? "(required)" : "(optional)";
+  }
+
+  function renderItems(focusId) {
+    Object.values(lists).forEach((list) => {
+      list.innerHTML = "";
+    });
+
+    items.forEach((item, index) => {
+      lists[item.type].insertAdjacentHTML("beforeend", renderItemCard(item, index));
+    });
+
+    Object.entries(lists).forEach(([type, list]) => {
+      if (!items.some((item) => item.type === type)) {
+        list.innerHTML =
+          '<div class="rounded-lg border border-dashed border-gray-700 p-4 text-sm leading-relaxed text-gray-500">There are no items in this section.</div>';
+      }
+    });
+
+    if (focusId) {
+      document.querySelector(`[data-item-id="${focusId}"] [data-item-field="amount"]`)?.focus();
+    }
+  }
+
+  function renderItemCard(item, index) {
+    const label = EVENT_COST_ITEM_TYPE_LABELS[item.type];
+    const title = item.name.trim() || label;
+    const preview = item.amount.trim()
+      ? `${label} · ${item.amount}`
+      : `${label} · no amount`;
+
+    return `
+      <details
+        class="rounded-lg border border-gray-800 bg-gray-900/60 p-4"
+        data-item-id="${escapeAttribute(item.id)}"
+        ${item.expanded ? "open" : ""}
+      >
+        <summary class="cursor-pointer list-none">
+          <div class="flex items-start justify-between gap-3">
+            <div class="min-w-0">
+              <span class="block truncate text-sm font-semibold text-white" data-item-title="${escapeAttribute(item.id)}">
+                ${escapeHtml(title)}
+              </span>
+              <span class="mt-1 block text-xs text-gray-400" data-item-preview="${escapeAttribute(item.id)}">
+                ${escapeHtml(preview)}
+              </span>
+            </div>
+            <span class="text-xs font-semibold text-cyan-300">Edit</span>
+          </div>
+        </summary>
+
+        <div class="mt-4 grid gap-4 sm:grid-cols-2">
+          <div class="sm:col-span-2">
+            <label class="event-field-label" for="${item.id}-name">Name</label>
+            <input
+              id="${item.id}-name"
+              class="event-field mt-2"
+              type="text"
+              maxlength="80"
+              value="${escapeAttribute(item.name)}"
+              data-item-field="name"
+              data-id="${escapeAttribute(item.id)}"
+            />
+          </div>
+
+          <div>
+            <label class="event-field-label" for="${item.id}-category">Category</label>
+            <select
+              id="${item.id}-category"
+              class="event-field mt-2"
+              data-item-field="category"
+              data-id="${escapeAttribute(item.id)}"
+            >
+              ${EVENT_COST_CATEGORIES.map(
+                (category) =>
+                  `<option value="${category}" ${category === item.category ? "selected" : ""}>${escapeHtml(EVENT_COST_CATEGORY_LABELS[category])}</option>`,
+              ).join("")}
+            </select>
+          </div>
+
+          <div>
+            <label class="event-field-label" for="${item.id}-amount">Amount</label>
+            <div class="event-field-shell">
+              <span class="event-field-affix">$</span>
+              <input
+                id="${item.id}-amount"
+                class="event-field-input"
+                type="text"
+                inputmode="decimal"
+                autocomplete="off"
+                placeholder="${item.type === "fijo" ? "50,000" : "700"}"
+                value="${escapeAttribute(item.amount)}"
+                data-item-field="amount"
+                data-id="${escapeAttribute(item.id)}"
+              />
+              <span class="event-field-affix">${item.type === "fijo" ? "MXN" : "/guest"}</span>
+            </div>
+          </div>
+
+          <div class="sm:col-span-2">
+            <label class="event-field-label" for="${item.id}-notes">Notes</label>
+            <input
+              id="${item.id}-notes"
+              class="event-field mt-2"
+              type="text"
+              maxlength="140"
+              placeholder="Vendor, scope, or assumption"
+              value="${escapeAttribute(item.notes)}"
+              data-item-field="notes"
+              data-id="${escapeAttribute(item.id)}"
+            />
+          </div>
+        </div>
+
+        <p class="mt-3 hidden text-sm leading-relaxed text-red-200" data-item-error="${escapeAttribute(item.id)}"></p>
+
+        <div class="mt-4 flex flex-col gap-2 sm:flex-row sm:justify-end">
+          <button class="event-item-action" type="button" data-item-action="duplicate" data-id="${escapeAttribute(item.id)}">
+            Duplicate
+          </button>
+          <button class="event-item-action event-item-action-danger" type="button" data-item-action="delete" data-id="${escapeAttribute(item.id)}">
+            Delete
+          </button>
+        </div>
+      </details>
+    `;
+  }
+
+  function readInput() {
+    clearValidation();
+    const errors = [];
+    const mode = getMode();
+    const eventName = project.eventName.trim();
+    const eventType = EVENT_TYPES.includes(project.eventType) ? project.eventType : "otro";
+    const contingency = readNumberField(
+      project.contingency,
+      "contingency",
+      "Contingency must be between 0 and 100%.",
+      errors,
+      { required: true, min: 0, max: 100 },
+    );
+    const rounding = Number(project.rounding);
+    const input = {
+      mode,
+      eventName,
+      eventType,
+      contingencyPercentage: contingency,
+      roundingIncrement: Number.isFinite(rounding) ? rounding : 0,
+      items: readItems(errors),
+    };
+
+    if (mode === "costo_por_persona") {
+      input.guestCount = readNumberField(
+        project.guests,
+        "guests",
+        "Guests must be a whole number between 1 and 10,000.",
+        errors,
+        { required: true, integer: true, min: 1, max: 10_000 },
+      );
+
+      const budget = readNumberField(
+        project.budget,
+        "budget",
+        "The budget must be zero or greater.",
+        errors,
+        { required: false, min: 0 },
+      );
+      if (typeof budget === "number") input.availableBudget = budget;
+    } else {
+      input.availableBudget = readNumberField(
+        project.budget,
+        "budget",
+        "The budget must be greater than zero.",
+        errors,
+        { required: true, min: 0.01 },
+      );
+    }
+
+    if (eventName.length > 80) {
+      errors.push("The event name must be 80 characters or fewer.");
+    }
+
+    return { input, errors };
+  }
+
+  function readItems(errors) {
+    return items.map((item) => {
+      const itemErrors = [];
+      const parsedAmount = item.amount.trim()
+        ? parseEventCostNumberInput(item.amount)
+        : { ok: true, value: 0 };
+
+      if (!parsedAmount.ok) {
+        itemErrors.push("invalid amount");
+      }
+
+      if (item.name.trim().length > 80) {
+        itemErrors.push("name is too long");
+      }
+
+      if (item.notes.trim().length > 140) {
+        itemErrors.push("notes are too long");
+      }
+
+      setItemError(item.id, itemErrors.join(". "));
+
+      if (itemErrors.length) {
+        errors.push(`${item.name.trim() || "Item"}: ${itemErrors.join(", ")}.`);
+      }
+
+      return {
+        id: item.id,
+        type: EVENT_COST_ITEM_TYPES.includes(item.type) ? item.type : "fijo",
+        name: item.name,
+        category: EVENT_COST_CATEGORIES.includes(item.category)
+          ? item.category
+          : "otro",
+        amount: parsedAmount.ok ? parsedAmount.value : 0,
+        notes: item.notes,
+      };
+    });
+  }
+
+  function readNumberField(value, field, message, errors, options) {
+    if (!value.trim()) {
+      if (options.required) {
+        setFieldError(field, message);
+        errors.push(message);
+        return 0;
+      }
+      return undefined;
+    }
+
+    const parsed = parseEventCostNumberInput(value);
+    const invalid =
+      !parsed.ok ||
+      (options.integer && !Number.isInteger(parsed.value)) ||
+      parsed.value < options.min ||
+      (typeof options.max === "number" && parsed.value > options.max);
+
+    if (invalid) {
+      setFieldError(field, message);
+      errors.push(message);
+      return 0;
+    }
+
+    return parsed.value;
+  }
+
+  function updateCalculator() {
+    syncProjectFromFields();
+    updateModeUi();
+    updateItemPreviews();
+
+    const parsed = readInput();
+
+    if (parsed.errors.length) {
+      currentInput = null;
+      currentResult = null;
+      renderErrors(parsed.errors);
+      renderNeutral("Review the highlighted fields.", "The estimate could not be calculated yet.");
+      setActionsEnabled(false);
+      return;
+    }
+
+    try {
+      const result = calculateEventCost(parsed.input);
+      currentInput = parsed.input;
+      currentResult = result;
+      renderErrors([]);
+
+      if (result.isEmptyEstimate) {
+        renderNeutral(
+          parsed.input.mode === "invitados_posibles"
+            ? "Add fixed expenses or per-guest costs."
+            : "Add at least one amount.",
+          "Blank amounts count as zero.",
+        );
+        setActionsEnabled(false);
+        return;
+      }
+
+      renderResult(result, parsed.input);
+      setActionsEnabled(true);
+    } catch (error) {
+      currentInput = null;
+      currentResult = null;
+      renderErrors([error instanceof Error ? error.message : "The estimate could not be calculated."]);
+      renderNeutral("The estimate could not be calculated.", "Review the entered data.");
+      setActionsEnabled(false);
+    }
+  }
+
+  function renderNeutral(title, subtitle) {
+    resultKicker.textContent = "Result";
+    mainResult.textContent = "Add expenses";
+    resultSubtitle.textContent = title;
+    resultNote.textContent = subtitle;
+    liveSummary.textContent = `${title} ${subtitle}`;
+    mobileKicker.textContent = "Result";
+    mobileTotal.textContent = "Add expenses";
+    mobileStatus.textContent = title;
+    summaryGrid.innerHTML = [
+      summaryCard("Fixed expenses", "$0.00"),
+      summaryCard("Per guest", "$0.00"),
+      summaryCard("Contingency", "0"),
+      summaryCard("Items", String(items.length)),
+    ].join("");
+    scenarioSection.classList.add("hidden");
+    breakdownSection.classList.add("hidden");
+    budgetProgress.classList.add("hidden");
+  }
+
+  function renderResult(result, input) {
+    if (input.mode === "costo_por_persona") {
+      resultKicker.textContent = "Cost per person";
+      mainResult.textContent = formatEventCostCurrency(result.costPerPerson ?? 0);
+      resultSubtitle.textContent = `Suggested contribution: ${formatEventCostCurrency(result.suggestedContribution ?? 0)}`;
+      resultNote.textContent = buildCostModeNote(result);
+      mobileKicker.textContent = "Per person";
+      mobileTotal.textContent = mainResult.textContent;
+      mobileStatus.textContent = resultSubtitle.textContent;
+    } else {
+      resultKicker.textContent = "Possible guests";
+      mainResult.textContent = getPossibleGuestLabel(result);
+      resultSubtitle.textContent = buildPossibleSubtitle(result);
+      resultNote.textContent = buildPossibleNote(result);
+      mobileKicker.textContent = "Guests";
+      mobileTotal.textContent = mainResult.textContent;
+      mobileStatus.textContent = resultSubtitle.textContent;
+    }
+
+    liveSummary.textContent = `${mainResult.textContent}. ${resultSubtitle.textContent}`;
+    summaryGrid.innerHTML = buildSummaryMetrics(result, input)
+      .map(([label, value]) => summaryCard(label, value))
+      .join("");
+    renderProgress(result);
+    renderScenarios(result, input);
+    renderBreakdowns(result);
+  }
+
+  function buildCostModeNote(result) {
+    if (typeof result.budgetDifference === "number") {
+      return result.budgetDifference >= 0
+        ? `${formatEventCostCurrency(result.budgetDifference)} remains in the budget.`
+        : `The budget is short by ${formatEventCostCurrency(Math.abs(result.budgetDifference))}.`;
+    }
+
+    return `Estimated total: ${formatEventCostCurrency(result.total ?? 0)}.`;
+  }
+
+  function buildPossibleSubtitle(result) {
+    if (result.possibleGuestState === "budget_below_fixed_costs") {
+      return "The budget does not cover fixed expenses plus contingency.";
+    }
+
+    if (result.possibleGuestState === "unlimited_by_variable_cost") {
+      return "There is no variable cost per guest.";
+    }
+
+    return `Estimated amount remaining: ${formatEventCostCurrency(result.possibleGuestsBudgetRemaining ?? 0)}.`;
+  }
+
+  function buildPossibleNote(result) {
+    if (result.possibleGuestState === "unlimited_by_variable_cost") {
+      return "The budget covers fixed expenses; the actual limit will depend on venue capacity or logistics.";
+    }
+
+    if (result.possibleGuestState === "budget_below_fixed_costs") {
+      return `The budget is short by ${formatEventCostCurrency(Math.abs(result.possibleGuestsBudgetRemaining ?? 0))} for fixed expenses.`;
+    }
+
+    return `Total for those guests: ${formatEventCostCurrency(result.possibleGuestsTotal ?? 0)}.`;
+  }
+
+  function buildSummaryMetrics(result, input) {
+    const metrics = [
+      ["Fixed expenses", formatEventCostCurrency(result.fixedTotal)],
+      ["Per guest", formatEventCostCurrency(result.variableUnitCost)],
+    ];
+
+    if (typeof result.total === "number") {
+      metrics.push(
+        ["Total", formatEventCostCurrency(result.total)],
+        [`Contingency (${formatEventCostNumber(input.contingencyPercentage)}%)`, formatEventCostCurrency(result.contingencyAmount ?? 0)],
+        ["Contribution surplus", formatEventCostCurrency(result.contributionSurplus ?? 0)],
+      );
+    }
+
+    if (input.mode === "invitados_posibles") {
+      metrics.push(
+        ["Budget", formatEventCostCurrency(input.availableBudget ?? 0)],
+        ["Amount remaining", formatEventCostCurrency(result.possibleGuestsBudgetRemaining ?? 0)],
+      );
+    }
+
+    if (typeof result.budgetDifference === "number") {
+      metrics.push(["Difference", formatEventCostCurrency(result.budgetDifference)]);
+    }
+
+    return metrics;
+  }
+
+  function renderProgress(result) {
+    if (typeof result.budgetUsedPercentage !== "number") {
+      budgetProgress.classList.add("hidden");
+      return;
+    }
+
+    const used = result.budgetUsedPercentage;
+    budgetProgress.classList.remove("hidden");
+    budgetProgressLabel.textContent = `${formatEventCostNumber(used, 1)}%`;
+    budgetProgressBar.style.width = `${Math.min(used, 100)}%`;
+    budgetProgressBar.className = `h-full rounded-full transition-[width,background-color] ${
+      used <= 100 ? "bg-emerald-300" : "bg-red-300"
+    }`;
+  }
+
+  function renderScenarios(result, input) {
+    if (input.mode !== "costo_por_persona" || !result.scenarios.length) {
+      scenarioSection.classList.add("hidden");
+      return;
+    }
+
+    scenarioSection.classList.remove("hidden");
+    scenarioList.innerHTML = result.scenarios
+      .map(
+        (scenario) => `
+          <div class="rounded-lg border border-gray-800 bg-gray-950/70 p-3 text-sm">
+            <div class="flex items-start justify-between gap-3">
+              <span class="font-semibold text-gray-300">${formatEventCostNumber(scenario.factor * 100, 0)}% · ${formatEventCostNumber(scenario.guestCount, 0)} guests</span>
+              <strong class="text-right text-white">${formatEventCostCurrency(scenario.costPerPerson)}</strong>
+            </div>
+            <p class="mt-1 text-xs text-gray-500">Total ${formatEventCostCurrency(scenario.total)} · contribution ${formatEventCostCurrency(scenario.suggestedContribution)}</p>
+          </div>
+        `,
+      )
+      .join("");
+  }
+
+  function renderBreakdowns(result) {
+    if (!result.categoryBreakdown.length && !result.topItems.length) {
+      breakdownSection.classList.add("hidden");
+      return;
+    }
+
+    breakdownSection.classList.remove("hidden");
+    categoryBreakdown.innerHTML = result.categoryBreakdown
+      .map((category) =>
+        breakdownRow(
+          category.label,
+          formatEventCostCurrency(category.subtotal),
+          `${formatEventCostNumber(category.percentageOfSubtotal, 1)}%`,
+        ),
+      )
+      .join("");
+    topItems.innerHTML = result.topItems
+      .map((item) =>
+        breakdownRow(
+          item.name,
+          formatEventCostCurrency(item.totalAtReferenceGuests),
+          `${formatEventCostNumber(item.percentageOfSubtotal, 1)}%`,
+        ),
+      )
+      .join("");
+  }
+
+  function summaryCard(label, value) {
+    return `
+      <div class="rounded-lg border border-gray-800 bg-gray-950/70 p-3">
+        <span class="block text-xs font-semibold uppercase tracking-wide text-gray-500">${escapeHtml(label)}</span>
+        <strong class="mt-2 block break-words text-base font-semibold text-white">${escapeHtml(value)}</strong>
+      </div>
+    `;
+  }
+
+  function breakdownRow(label, value, note) {
+    return `
+      <div class="flex items-start justify-between gap-3 rounded-lg border border-gray-800 bg-gray-950/70 p-3 text-sm">
+        <div class="min-w-0">
+          <span class="block break-words text-gray-300">${escapeHtml(label)}</span>
+          <span class="mt-1 block text-xs text-gray-500">${escapeHtml(note)} of subtotal</span>
+        </div>
+        <strong class="shrink-0 text-right text-white">${escapeHtml(value)}</strong>
+      </div>
+    `;
+  }
+
+  function renderErrors(errors) {
+    errorsBox.innerHTML = errors.map((error) => `<p>${escapeHtml(error)}</p>`).join("");
+    errorsBox.classList.toggle("hidden", !errors.length);
+  }
+
+  function clearValidation() {
+    document.querySelectorAll("[data-field-error]").forEach((error) => {
+      error.textContent = "";
+    });
+    document.querySelectorAll("[data-field-error-target]").forEach((field) => {
+      field.removeAttribute("aria-invalid");
+    });
+    items.forEach((item) => setItemError(item.id));
+  }
+
+  function setFieldError(field, message) {
+    const error = document.querySelector(`[data-field-error="${field}"]`);
+    const target = document.querySelector(`[data-field-error-target="${field}"]`);
+
+    if (error) error.textContent = message;
+    if (target) target.setAttribute("aria-invalid", "true");
+  }
+
+  function setItemError(id, message = "") {
+    const error = document.querySelector(`[data-item-error="${id}"]`);
+
+    if (!error) return;
+    error.textContent = message;
+    error.classList.toggle("hidden", !message);
+  }
+
+  function updateItemPreviews() {
+    items.forEach((item) => {
+      const title = document.querySelector(`[data-item-title="${item.id}"]`);
+      const preview = document.querySelector(`[data-item-preview="${item.id}"]`);
+      const label = EVENT_COST_ITEM_TYPE_LABELS[item.type];
+
+      if (title) title.textContent = item.name.trim() || label;
+      if (preview) {
+        preview.textContent = item.amount.trim()
+          ? `${label} · ${item.amount}`
+          : `${label} · no amount`;
+      }
+    });
+  }
+
+  function setActionsEnabled(enabled) {
+    copyButton.disabled = !enabled;
+    exportButton.disabled = !enabled;
+  }
+
+  function addItem(type) {
+    if (items.length >= MAX_ITEMS) {
+      setActionStatus(`The limit is ${MAX_ITEMS} items.`, true);
+      return;
+    }
+
+    const item = createBlankItem(type);
+    items.push(item);
+    renderItems(item.id);
+    updateCalculator();
+  }
+
+  function duplicateItem(id) {
+    if (items.length >= MAX_ITEMS) {
+      setActionStatus(`The limit is ${MAX_ITEMS} items.`, true);
+      return;
+    }
+
+    const index = items.findIndex((item) => item.id === id);
+    if (index < 0) return;
+    const source = items[index];
+    const duplicate = {
+      ...source,
+      id: `event-item-${Date.now()}-${Math.random().toString(16).slice(2)}`,
+      name: `${source.name.trim() || EVENT_COST_ITEM_TYPE_LABELS[source.type]} copy`.slice(0, 80),
+      expanded: true,
+    };
+    items.splice(index + 1, 0, duplicate);
+    renderItems(duplicate.id);
+    updateCalculator();
+  }
+
+  function deleteItem(id) {
+    items = items.filter((item) => item.id !== id);
+    renderItems();
+    updateCalculator();
+  }
+
+  function fillExample() {
+    project = {
+      mode: "costo_por_persona",
+      eventName: "Graduation dinner",
+      eventType: "cena",
+      guests: "100",
+      budget: "150000",
+      contingency: "10",
+      rounding: "50",
+    };
+    sequence = 0;
+    items = [
+      createBlankItem("fijo", {
+        name: "Venue",
+        category: "lugar",
+        amount: "50000",
+        expanded: false,
+      }),
+      createBlankItem("fijo", {
+        name: "Music",
+        category: "entretenimiento",
+        amount: "15000",
+        expanded: false,
+      }),
+      createBlankItem("por_invitado", {
+        name: "Menu per guest",
+        category: "comida",
+        amount: "700",
+        expanded: false,
+      }),
+    ];
+    syncProjectFields();
+    renderItems();
+    updateCalculator();
+    setActionStatus("Example loaded.");
+  }
+
+  function clearAll() {
+    project = { ...defaultProject };
+    sequence = 0;
+    items = [
+      createBlankItem("fijo", { name: "Venue or rental" }),
+      createBlankItem("por_invitado", { name: "Food per guest" }),
+    ];
+    currentInput = null;
+    currentResult = null;
+    syncProjectFields();
+    renderItems();
+    updateCalculator();
+    setActionStatus("Form cleared.");
+  }
+
+  async function copyResult() {
+    if (!currentInput || !currentResult) return;
+    const text = buildEventCostShareText(currentResult, currentInput);
+
+    try {
+      if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(text);
+      } else {
+        const textArea = document.createElement("textarea");
+        textArea.value = text;
+        textArea.setAttribute("readonly", "");
+        textArea.style.position = "fixed";
+        textArea.style.opacity = "0";
+        document.body.append(textArea);
+        textArea.select();
+        document.execCommand("copy");
+        textArea.remove();
+      }
+
+      copyLabel.textContent = "Copied";
+      setActionStatus("Summary copied.");
+      window.setTimeout(() => {
+        copyLabel.textContent = "Copy summary";
+      }, 2000);
+    } catch {
+      setActionStatus("The summary could not be copied automatically.", true);
+    }
+  }
+
+  function exportCsv() {
+    if (!currentInput || !currentResult) return;
+    const csv = buildEventCostCsv(currentResult, currentInput);
+    const url = URL.createObjectURL(
+      new Blob([`\uFEFF${csv}`], { type: "text/csv;charset=utf-8" }),
+    );
+    const link = document.createElement("a");
+
+    link.href = url;
+    link.download = "event-cost-per-person.csv";
+    document.body.append(link);
+    link.click();
+    link.remove();
+    URL.revokeObjectURL(url);
+    setActionStatus("CSV generated.");
+  }
+
+  function setActionStatus(message, isError = false) {
+    window.clearTimeout(statusTimer);
+    actionStatus.textContent = message;
+    actionStatus.className = `mt-3 min-h-5 text-sm ${isError ? "text-red-200" : "text-emerald-100"}`;
+    statusTimer = window.setTimeout(() => {
+      actionStatus.textContent = "";
+    }, 3500);
+  }
+
+  function escapeHtml(value) {
+    return String(value)
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;")
+      .replaceAll("'", "&#039;");
+  }
+
+  function escapeAttribute(value) {
+    return escapeHtml(value);
+  }
+
+  form.addEventListener("submit", (event) => event.preventDefault());
+
+  form.addEventListener("input", (event) => {
+    const projectField = event.target.closest("[data-project-field]");
+    if (projectField) {
+      updateCalculator();
+      return;
+    }
+
+    const itemField = event.target.closest("[data-item-field]");
+    if (!itemField) return;
+    const item = items.find((entry) => entry.id === itemField.dataset.id);
+    if (!item) return;
+    item[itemField.dataset.itemField] = itemField.value;
+    updateCalculator();
+  });
+
+  form.addEventListener("change", (event) => {
+    const projectField = event.target.closest("[data-project-field]");
+    if (projectField) {
+      updateCalculator();
+      return;
+    }
+
+    const itemField = event.target.closest("[data-item-field]");
+    if (!itemField) return;
+    const item = items.find((entry) => entry.id === itemField.dataset.id);
+    if (!item) return;
+    item[itemField.dataset.itemField] = itemField.value;
+    updateCalculator();
+  });
+
+  form.addEventListener("toggle", (event) => {
+    const card = event.target.closest("[data-item-id]");
+    if (!card) return;
+    const item = items.find((entry) => entry.id === card.dataset.itemId);
+    if (item) item.expanded = card.open;
+  }, true);
+
+  form.addEventListener("click", (event) => {
+    const addButton = event.target.closest("[data-add-item]");
+    if (addButton) {
+      addItem(addButton.dataset.addItem);
+      return;
+    }
+
+    const action = event.target.closest("[data-item-action]");
+    if (!action) return;
+
+    if (action.dataset.itemAction === "duplicate") {
+      duplicateItem(action.dataset.id);
+    }
+
+    if (action.dataset.itemAction === "delete") {
+      deleteItem(action.dataset.id);
+    }
+  });
+
+  modeInputs.forEach((input) => {
+    input.addEventListener("change", updateCalculator);
+  });
+  document.querySelector("[data-example]").addEventListener("click", fillExample);
+  document.querySelector("[data-clear]").addEventListener("click", clearAll);
+  copyButton.addEventListener("click", copyResult);
+  exportButton.addEventListener("click", exportCsv);
+
+  syncProjectFields();
+  renderItems();
+  updateCalculator();
+</script>

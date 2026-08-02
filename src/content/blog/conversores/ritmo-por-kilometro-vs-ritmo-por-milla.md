@@ -4,6 +4,7 @@ seoTitle: "Ritmo por km a ritmo por milla: fórmula y tabla para correr"
 description: "Convierte tu ritmo de carrera entre minutos por kilómetro y minutos por milla con ejemplos, tabla y calculadora de pace."
 pubDate: 2026-07-30
 categorySlug: "conversores"
+translationKey: "pace-per-kilometer-vs-mile"
 tags:
   - ritmo por kilómetro
   - ritmo por milla

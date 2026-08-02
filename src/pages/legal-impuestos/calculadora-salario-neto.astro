@@ -10,12 +10,15 @@ import {
   MEXICO_SALARY_PRESET,
   formatMoney,
 } from "@lib/calculators/legal-impuestos/calculadora-de-salario-neto/netSalary";
+import { buildAlternateLinks } from "@lib/i18n/routing";
 import { buildFaqJsonLd } from "@lib/seo";
 
 const title = "Calculadora de salario neto en México 2026";
 const description =
   "Estima tu salario neto en México después de ISR, subsidios y deducciones, con desglose, supuestos y fuentes oficiales.";
 const canonical = "/legal-impuestos/calculadora-salario-neto";
+const englishCanonical = "/en/legal-tax/net-salary-calculator";
+const alternates = buildAlternateLinks({ es: canonical, en: englishCanonical }, Astro.site ?? Astro.url);
 
 const faqs = [
   {
@@ -52,7 +55,7 @@ const selectClass =
   "mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-900 px-4 text-base text-white outline-none transition focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15";
 ---
 
-<BaseLayout title={title} description={description} canonical={canonical}>
+<BaseLayout title={title} description={description} canonical={canonical} alternates={alternates}>
   <Fragment slot="head">
     <script type="application/ld+json" set:html={JSON.stringify(faqJsonLd)} />
   </Fragment>

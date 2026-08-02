@@ -12,11 +12,16 @@ import {
   formatVolume,
 } from "@lib/calculators/conversores/litros-a-galones/litersGallons";
 import { buildFaqJsonLd } from "@lib/seo";
+import { buildAlternateLinks } from "@lib/i18n/routing";
 
 const title = "Litros a galones US e imperiales - Conversor";
 const description =
   "Convierte litros a galones estadounidenses e imperiales, o galones a litros. Compara ambos tipos de galón con fórmulas y equivalencias claras.";
 const canonical = "/conversores/litros-a-galones";
+const alternates = buildAlternateLinks(
+  { es: canonical, en: "/en/converters/liters-to-gallons" },
+  Astro.site ?? Astro.url,
+);
 
 const faqs = [
   {
@@ -88,7 +93,7 @@ const differencePercentage = new Intl.NumberFormat("es-MX", {
 }).format(IMPERIAL_GALLON_DIFFERENCE_PERCENT);
 ---
 
-<BaseLayout title={title} description={description} canonical={canonical}>
+<BaseLayout title={title} description={description} canonical={canonical} alternates={alternates}>
   <Fragment slot="head">
     <script type="application/ld+json" set:html={JSON.stringify(faqJsonLd)} />
   </Fragment>

@@ -4,6 +4,7 @@ seoTitle: "Cómo convertir kilómetros a millas: fórmula y calculadora"
 description: "Aprende a convertir kilómetros a millas y millas a kilómetros con la fórmula, ejemplos y una calculadora de distancias."
 pubDate: 2026-07-27
 categorySlug: "conversores"
+translationKey: "kilometers-to-miles-guide"
 tags:
   - kilómetros a millas
   - millas a kilómetros

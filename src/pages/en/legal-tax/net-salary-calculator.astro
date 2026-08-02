@@ -1,0 +1,583 @@
+---
+import BaseLayout from "@layouts/BaseLayout.astro";
+import AdSlot from "@components/ads/AdSlot.astro";
+import Container from "@components/layout/Container.astro";
+import PageShell from "@components/layout/PageShell.astro";
+import FaqSection from "@components/shared/FaqSection.astro";
+import PageHero from "@components/shared/PageHero.astro";
+import SectionIntro from "@components/shared/SectionIntro.astro";
+import { buildAlternateLinks } from "@lib/i18n/routing";
+import {
+  MEXICO_SALARY_PRESET,
+  formatMoney,
+} from "@lib/calculators/legal-impuestos/calculadora-de-salario-neto/netSalary.en";
+import { buildFaqJsonLd } from "@lib/seo";
+
+const title = "Mexico net salary calculator 2026";
+const description =
+  "Estimate net salary in Mexico after income tax, subsidies, and deductions, with a detailed breakdown and official sources."
+const canonical = "/en/legal-tax/net-salary-calculator";
+const spanishCanonical = "/legal-impuestos/calculadora-salario-neto";
+const alternates = buildAlternateLinks({ es: spanishCanonical, en: canonical }, Astro.site ?? Astro.url);
+
+const faqs = [
+  {
+    question: "What is the difference between gross and net salary?",
+    answer:
+      "Gross salary is the amount before taxes and deductions. Net salary is the estimated amount remaining after income tax and entered deductions, such as employee contributions or other discounts.",
+  },
+  {
+    question: "Does the calculator include IMSS?",
+    answer:
+      "This version does not automatically calculate IMSS, INFONAVIT, or other social-security contributions because they depend on the contribution base and specific circumstances. You can enter employee contributions manually to make the estimate closer to your payslip.",
+  },
+  {
+    question: "What is the employment subsidy?",
+    answer:
+      "It is a credit that may offset income tax on certain salary income. When applicable, it reduces estimated tax and is not treated as a salary deduction.",
+  },
+  {
+    question: "Can I switch from monthly to biweekly?",
+    answer:
+      "Yes. First indicate whether the salary is monthly, annual, or for the selected period. Then choose the pay frequency. The calculator normalizes the salary and selects the corresponding income-tax table.",
+  },
+  {
+    question: "Is the result an official payroll calculation?",
+    answer:
+      "No. It is an informational estimate based on the selected rules and entered data. Actual payroll may differ because of benefits, contribution base, deductions, residence, contract terms, incidents, and other income.",
+  },
+];
+
+const faqJsonLd = buildFaqJsonLd(faqs);
+const inputClass =
+  "mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-900 px-4 text-base text-white outline-none transition placeholder:text-gray-600 focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15";
+const selectClass =
+  "mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-900 px-4 text-base text-white outline-none transition focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15";
+---
+
+<BaseLayout title={title} description={description} canonical={canonical} locale="en" alternates={alternates}>
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={JSON.stringify(faqJsonLd)} />
+  </Fragment>
+
+  <PageShell>
+    <PageHero
+      title="Mexico net salary calculator"
+      description="Convert gross salary to estimated net pay, review applied income tax, and inspect every item in the calculation."
+      kicker="Legal & Tax"
+      collapseBreadcrumbOnMobile
+      containerClass="py-6 md:py-8"
+      breadcrumbs={[
+        { label: "Home", href: "/en", ariaLabel: "Home" },
+        { label: "Legal & Taxes", href: "/en/legal-tax", optional: true },
+        { label: "Net salary", truncate: true },
+      ]}
+    />
+
+    <Container as="section" class="py-6 md:py-8">
+      <div class="grid gap-6 lg:grid-cols-[minmax(0,1fr)_21rem]">
+        <section
+          id="salary-calculator"
+          class="overflow-hidden rounded-lg border border-gray-700 bg-gray-950 shadow-xl shadow-gray-950/30"
+          aria-labelledby="salary-calculator-heading"
+        >
+          <div class="border-b border-gray-700 p-4 sm:p-6">
+            <p class="text-sm font-semibold uppercase tracking-wide text-amber-400">
+              Step 1 · Your salary
+            </p>
+            <h2 id="salary-calculator-heading" class="mt-2 text-xl font-semibold">
+              Enter the gross amount
+            </h2>
+            <p class="mt-2 text-sm leading-relaxed text-gray-400">
+              Choose the salary basis before entering the amount so you can change
+              the pay frequency without changing what the amount represents.
+            </p>
+          </div>
+
+          <form class="p-4 sm:p-6" data-salary-form novalidate>
+            <div class="grid gap-4 sm:grid-cols-2">
+              <div>
+                <label for="salary-country" class="block text-sm font-medium text-gray-200">
+                  Country
+                </label>
+                <select id="salary-country" class={selectClass} disabled>
+                  <option>Mexico</option>
+                </select>
+                <p class="mt-2 text-xs leading-relaxed text-gray-500">
+                  Primer preset disponible: Mexico.
+                </p>
+              </div>
+
+              <div>
+                <label for="salary-period" class="block text-sm font-medium text-gray-200">
+                  Tax year
+                </label>
+                <select id="salary-period" class={selectClass} disabled>
+                  <option>{MEXICO_SALARY_PRESET.period}</option>
+                </select>
+                <p class="mt-2 text-xs leading-relaxed text-gray-500">
+                  Rules effective since January 2026.
+                </p>
+              </div>
+            </div>
+
+            <div class="mt-5 grid gap-4 sm:grid-cols-2">
+              <div>
+                <label for="salary-basis" class="block text-sm font-medium text-gray-200">
+                  The entered salary is
+                </label>
+                <select id="salary-basis" class={selectClass} data-select="salaryBasis">
+                  <option value="monthly">Monthly</option>
+                  <option value="annual">Annual</option>
+                  <option value="period">For the selected period</option>
+                </select>
+              </div>
+
+              <div>
+                <label for="salary-frequency" class="block text-sm font-medium text-gray-200">
+                  Pay frequency
+                </label>
+                <select id="salary-frequency" class={selectClass} data-select="frequency">
+                  {
+                    MEXICO_SALARY_PRESET.frequencies.map((frequency) => (
+                      <option value={frequency.id} selected={frequency.id === "monthly"}>
+                        {frequency.label}
+                      </option>
+                    ))
+                  }
+                </select>
+              </div>
+            </div>
+
+            <div class="mt-5">
+              <label for="salary-gross" class="block text-sm font-medium text-gray-200">
+                Gross salary
+              </label>
+              <div class="mt-2 flex rounded-lg border border-gray-700 bg-gray-900 focus-within:border-amber-400 focus-within:ring-3 focus-within:ring-amber-400/15">
+                <span class="flex items-center pl-4 text-gray-500">$</span>
+                <input
+                  id="salary-gross"
+                  class="min-h-12 w-full bg-transparent px-3 pr-4 text-base text-white outline-none placeholder:text-gray-600"
+                  type="text"
+                  inputmode="decimal"
+                  autocomplete="off"
+                  placeholder="20,000"
+                  aria-describedby="salary-gross-error salary-gross-help"
+                  data-input="gross"
+                />
+              </div>
+              <p id="salary-gross-help" class="mt-2 text-xs leading-relaxed text-gray-500">
+                Amount before income tax and deductions. Enter an amount greater than zero.
+              </p>
+              <p id="salary-gross-error" class="mt-2 hidden text-sm text-red-300" data-error-for="gross"></p>
+            </div>
+
+            <details class="mt-6 rounded-lg border border-gray-800 bg-gray-900/50 p-4" data-advanced>
+              <summary class="cursor-pointer list-none text-sm font-semibold text-white">
+                <span class="flex items-center justify-between gap-4">
+                  <span>Advanced settings</span>
+                  <span class="text-xs font-normal text-gray-500">Optional</span>
+                </span>
+              </summary>
+
+              <div class="mt-5 grid gap-4 sm:grid-cols-2">
+                <div>
+                  <label for="salary-taxable-bonus" class="block text-sm font-medium text-gray-200">
+                    Taxable recurring bonuses
+                  </label>
+                  <input id="salary-taxable-bonus" class={inputClass} type="text" inputmode="decimal" autocomplete="off" placeholder="0" data-input="taxableBonus" aria-describedby="salary-taxable-bonus-error" />
+                  <p id="salary-taxable-bonus-error" class="mt-2 hidden text-sm text-red-300" data-error-for="taxableBonus"></p>
+                </div>
+
+                <div>
+                  <label for="salary-unique-bonus" class="block text-sm font-medium text-gray-200">
+                    One-time bonus for this payment
+                  </label>
+                  <input id="salary-unique-bonus" class={inputClass} type="text" inputmode="decimal" autocomplete="off" placeholder="0" data-input="uniqueBonus" aria-describedby="salary-unique-bonus-error" />
+                  <p id="salary-unique-bonus-error" class="mt-2 hidden text-sm text-red-300" data-error-for="uniqueBonus"></p>
+                </div>
+
+                <div>
+                  <label for="salary-taxable-benefits" class="block text-sm font-medium text-gray-200">
+                    Taxable benefits for the period
+                  </label>
+                  <input id="salary-taxable-benefits" class={inputClass} type="text" inputmode="decimal" autocomplete="off" placeholder="0" data-input="taxableBenefits" aria-describedby="salary-taxable-benefits-error" />
+                  <p id="salary-taxable-benefits-error" class="mt-2 hidden text-sm text-red-300" data-error-for="taxableBenefits"></p>
+                </div>
+
+                <div>
+                  <label for="salary-exempt-benefits" class="block text-sm font-medium text-gray-200">
+                    Tax-exempt benefits received
+                  </label>
+                  <input id="salary-exempt-benefits" class={inputClass} type="text" inputmode="decimal" autocomplete="off" placeholder="0" data-input="exemptBenefits" aria-describedby="salary-exempt-benefits-error" />
+                  <p id="salary-exempt-benefits-error" class="mt-2 hidden text-sm text-red-300" data-error-for="exemptBenefits"></p>
+                </div>
+
+                <div>
+                  <label for="salary-pre-tax" class="block text-sm font-medium text-gray-200">
+                    Pre-tax deductions
+                  </label>
+                  <input id="salary-pre-tax" class={inputClass} type="text" inputmode="decimal" autocomplete="off" placeholder="0" data-input="preTaxDeductions" aria-describedby="salary-pre-tax-error" />
+                  <p id="salary-pre-tax-error" class="mt-2 hidden text-sm text-red-300" data-error-for="preTaxDeductions"></p>
+                </div>
+
+                <div>
+                  <label for="salary-contributions" class="block text-sm font-medium text-gray-200">
+                    Employee contributions
+                  </label>
+                  <input id="salary-contributions" class={inputClass} type="text" inputmode="decimal" autocomplete="off" placeholder="0" data-input="employeeContributions" aria-describedby="salary-contributions-help salary-contributions-error" />
+                  <p id="salary-contributions-help" class="mt-2 text-xs leading-relaxed text-gray-500">
+                    Enter IMSS or other payslip deductions here if known.
+                  </p>
+                  <p id="salary-contributions-error" class="mt-2 hidden text-sm text-red-300" data-error-for="employeeContributions"></p>
+                </div>
+
+                <div class="sm:col-span-2">
+                  <label for="salary-post-tax" class="block text-sm font-medium text-gray-200">
+                    Other post-tax deductions
+                  </label>
+                  <input id="salary-post-tax" class={inputClass} type="text" inputmode="decimal" autocomplete="off" placeholder="0" data-input="postTaxDeductions" aria-describedby="salary-post-tax-error" />
+                  <p id="salary-post-tax-error" class="mt-2 hidden text-sm text-red-300" data-error-for="postTaxDeductions"></p>
+                </div>
+              </div>
+            </details>
+
+            <div class="mt-6 flex flex-col gap-3 border-t border-gray-800 pt-5 sm:flex-row">
+              <button
+                class="inline-flex min-h-11 items-center justify-center rounded-lg bg-amber-400 px-5 py-2 text-sm font-semibold text-gray-950 transition hover:bg-amber-300 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/40"
+                type="submit"
+              >
+                Calculate net salary
+              </button>
+              <button
+                class="inline-flex min-h-11 items-center justify-center rounded-lg border border-gray-700 px-5 py-2 text-sm font-semibold text-gray-200 transition hover:border-amber-400 hover:text-white focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/40"
+                type="button"
+                data-clear
+              >
+                Clear
+              </button>
+              <p class="sr-only" aria-live="polite" data-form-status></p>
+            </div>
+          </form>
+        </section>
+
+        <aside
+          class="h-fit rounded-lg border border-gray-700 bg-gray-900/80 p-4 shadow-xl shadow-gray-950/20 sm:p-6 lg:sticky lg:top-6"
+          aria-labelledby="salary-result-heading"
+          data-result-region
+        >
+          <p class="text-sm font-semibold uppercase tracking-wide text-amber-400" data-result-status>
+            Result
+          </p>
+          <h2 id="salary-result-heading" class="mt-2 text-xl font-semibold" data-main-label>
+            Estimated net pay
+          </h2>
+          <p class="mt-3 break-words text-4xl font-bold tracking-tight text-white sm:text-5xl" data-main-result>
+            —
+          </p>
+          <p class="mt-3 text-sm leading-relaxed text-gray-400" data-result-context>
+            Enter gross salary to see an estimate.
+          </p>
+
+          <div class="mt-6 hidden grid-cols-2 gap-3" data-result-metrics>
+            <div class="rounded-lg border border-gray-800 bg-gray-950/70 p-3">
+              <span class="block text-xs text-gray-500">Monthly equivalent</span>
+              <strong class="mt-1 block break-words text-sm text-white" data-monthly-result>—</strong>
+            </div>
+            <div class="rounded-lg border border-gray-800 bg-gray-950/70 p-3">
+              <span class="block text-xs text-gray-500">Annual projection</span>
+              <strong class="mt-1 block break-words text-sm text-white" data-annual-result>—</strong>
+            </div>
+            <div class="rounded-lg border border-gray-800 bg-gray-950/70 p-3">
+              <span class="block text-xs text-gray-500">Effective income-tax rate</span>
+              <strong class="mt-1 block break-words text-sm text-white" data-tax-rate>—</strong>
+            </div>
+            <div class="rounded-lg border border-gray-800 bg-gray-950/70 p-3">
+              <span class="block text-xs text-gray-500">Marginal rate</span>
+              <strong class="mt-1 block break-words text-sm text-white" data-marginal-rate>—</strong>
+            </div>
+          </div>
+
+          <div class="mt-6 hidden space-y-2" data-breakdown-list></div>
+
+          <div class="mt-5 hidden rounded-lg border border-amber-400/30 bg-amber-400/10 p-4 text-sm leading-relaxed text-amber-100" role="note" data-warning></div>
+
+          <button
+            class="mt-5 hidden min-h-11 w-full items-center justify-center rounded-lg border border-gray-700 px-4 py-2 text-sm font-semibold text-gray-200 transition hover:border-amber-400 hover:text-white focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/40"
+            type="button"
+            data-copy
+          >
+            <span data-copy-label>Copy breakdown</span>
+          </button>
+          <p class="sr-only" aria-live="polite" data-copy-status></p>
+        </aside>
+      </div>
+
+      <div class="mt-6 rounded-lg border border-gray-800 bg-gray-950/70 p-4 text-sm leading-relaxed text-gray-400 sm:p-5">
+        <p>
+          <strong class="text-gray-200">Scope of this version:</strong> the preset
+          uses Mexico's 2026 income-tax tables and employment subsidy when applicable.
+          Social security contributions are not calculated automatically; enter your
+          contributions to obtain an estimate closer to your pay stub.
+        </p>
+        <p class="mt-3">
+          Source: <a class="font-semibold text-amber-400 hover:text-amber-300 hover:underline" href={MEXICO_SALARY_PRESET.sourceUrl} target="_blank" rel="noreferrer">{MEXICO_SALARY_PRESET.sourceName}</a> · Reviewed July 21, 2026.
+        </p>
+      </div>
+    </Container>
+
+    <AdSlot placement="calculator-after-tool" />
+
+    <Container as="section" class="py-8">
+      <SectionIntro
+        title="How to interpret the result"
+        description="The calculator keeps each item separate so you can compare the amount with a job offer or payslip."
+      />
+      <div class="grid gap-4 sm:grid-cols-3">
+        <article class="rounded-lg border border-gray-700 bg-gray-950 p-5">
+          <h3 class="font-semibold text-white">Net pay</h3>
+          <p class="mt-2 text-sm leading-relaxed text-gray-400">This is the estimated amount after income tax and the deductions entered for the selected frequency.</p>
+        </article>
+        <article class="rounded-lg border border-gray-700 bg-gray-950 p-5">
+          <h3 class="font-semibold text-white">Effective income-tax rate</h3>
+          <p class="mt-2 text-sm leading-relaxed text-gray-400">Shows final income tax as a percentage of the taxable base after applying the corresponding subsidy.</p>
+        </article>
+        <article class="rounded-lg border border-gray-700 bg-gray-950 p-5">
+          <h3 class="font-semibold text-white">Annual projection</h3>
+          <p class="mt-2 text-sm leading-relaxed text-gray-400">This is a projection of recurring payments. One-time bonuses are counted once, and it is not equivalent to an annual tax return.</p>
+        </article>
+      </div>
+    </Container>
+
+    <FaqSection faqs={faqs} />
+  </PageShell>
+</BaseLayout>
+
+<script>
+  import {
+    calculateNetSalary,
+    formatMoney,
+    formatPercent,
+    MEXICO_SALARY_PRESET,
+    parseMoneyInput,
+    parseOptionalMoneyInput,
+  } from "@lib/calculators/legal-impuestos/calculadora-de-salario-neto/netSalary.en";
+
+  const form = document.querySelector("[data-salary-form]");
+  const resultStatus = document.querySelector("[data-result-status]");
+  const mainLabel = document.querySelector("[data-main-label]");
+  const mainResult = document.querySelector("[data-main-result]");
+  const resultContext = document.querySelector("[data-result-context]");
+  const resultMetrics = document.querySelector("[data-result-metrics]");
+  const monthlyResult = document.querySelector("[data-monthly-result]");
+  const annualResult = document.querySelector("[data-annual-result]");
+  const taxRate = document.querySelector("[data-tax-rate]");
+  const marginalRate = document.querySelector("[data-marginal-rate]");
+  const breakdownList = document.querySelector("[data-breakdown-list]");
+  const warning = document.querySelector("[data-warning]");
+  const formStatus = document.querySelector("[data-form-status]");
+  const clearButton = document.querySelector("[data-clear]");
+  const copyButton = document.querySelector("[data-copy]");
+  const copyLabel = document.querySelector("[data-copy-label]");
+  const copyStatus = document.querySelector("[data-copy-status]");
+  const inputs = Array.from(document.querySelectorAll("[data-input]"));
+  const selects = Array.from(document.querySelectorAll("[data-select]"));
+  let copyText = "";
+  let copyTimeout = 0;
+
+  const errorMessages = {
+    required: "Enter gross salary.",
+    invalid: "Use only numbers and valid decimal separators.",
+    negative: "The amount cannot be negative.",
+    too_many_decimals: "Use no more than four decimal places.",
+  };
+
+  function getInput(name) {
+    return document.querySelector(`[data-input="${name}"]`);
+  }
+
+  function setError(name, message = "") {
+    const input = getInput(name);
+    const error = document.querySelector(`[data-error-for="${name}"]`);
+
+    if (input) {
+      input.setAttribute("aria-invalid", message ? "true" : "false");
+    }
+
+    if (error) {
+      error.textContent = message;
+      error.classList.toggle("hidden", !message);
+    }
+  }
+
+  function clearErrors() {
+    inputs.forEach((input) => setError(input.dataset.input));
+  }
+
+  function readInput(name, required = false) {
+    const input = getInput(name);
+    const parsed = required
+      ? parseMoneyInput(input?.value ?? "")
+      : parseOptionalMoneyInput(input?.value ?? "");
+
+    if (!parsed.ok) {
+      setError(name, errorMessages[parsed.error]);
+      return null;
+    }
+
+    setError(name);
+    return parsed.value;
+  }
+
+  function resetResult() {
+    resultStatus.textContent = "Result";
+    mainLabel.textContent = "Estimated net pay";
+    mainResult.textContent = "—";
+    resultContext.textContent = "Enter gross salary to see an estimate.";
+    resultMetrics.classList.add("hidden");
+    resultMetrics.classList.remove("grid");
+    breakdownList.classList.add("hidden");
+    breakdownList.innerHTML = "";
+    warning.classList.add("hidden");
+    warning.textContent = "";
+    copyButton.classList.add("hidden");
+    copyButton.classList.remove("inline-flex");
+    formStatus.textContent = "";
+    copyText = "";
+  }
+
+  function escapeHtml(value) {
+    return String(value)
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;")
+      .replaceAll("'", "&#039;");
+  }
+
+  function renderBreakdown(result) {
+    breakdownList.innerHTML = result.breakdown
+      .map((row) => {
+        const note = row.note
+          ? `<p class="mt-2 text-xs leading-relaxed text-gray-500">${escapeHtml(row.note)}</p>`
+          : "";
+
+        return `<details class="rounded-lg border border-gray-800 bg-gray-950/70 p-3">
+          <summary class="flex cursor-pointer list-none items-center justify-between gap-3 text-sm">
+            <span class="min-w-0 text-gray-400">${escapeHtml(row.label)}</span>
+            <strong class="shrink-0 text-right text-white">${escapeHtml(formatMoney(row.value))}</strong>
+          </summary>
+          ${note}
+        </details>`;
+      })
+      .join("");
+    breakdownList.classList.remove("hidden");
+  }
+
+  function updateCalculator(showRequired = false) {
+    clearErrors();
+    const gross = readInput("gross", showRequired || Boolean(getInput("gross")?.value.trim()));
+
+    if (gross === null) {
+      if (!getInput("gross")?.value.trim()) {
+        resetResult();
+      }
+      return;
+    }
+
+    const optionalNames = [
+      "taxableBonus",
+      "uniqueBonus",
+      "taxableBenefits",
+      "exemptBenefits",
+      "preTaxDeductions",
+      "employeeContributions",
+      "postTaxDeductions",
+    ];
+    const optionalValues = {};
+
+    for (const name of optionalNames) {
+      const value = readInput(name);
+      if (value === null) {
+        return;
+      }
+      optionalValues[name] = value;
+    }
+
+    const result = calculateNetSalary({
+      gross,
+      salaryBasis: document.querySelector('[data-select="salaryBasis"]').value,
+      frequency: document.querySelector('[data-select="frequency"]').value,
+      ...optionalValues,
+    });
+
+    resultStatus.textContent = result.status === "partial" ? "Partial result" : "Result with entered contributions";
+    mainLabel.textContent = result.status === "partial" ? "Estimated net pay*" : "Estimated net pay";
+    mainResult.textContent = formatMoney(result.netPeriod);
+    resultContext.textContent = `${result.frequency.label} · Reglas ISR Mexico ${MEXICO_SALARY_PRESET.period}`;
+    resultMetrics.classList.remove("hidden");
+    resultMetrics.classList.add("grid");
+    monthlyResult.textContent = formatMoney(result.monthlyEquivalent);
+    annualResult.textContent = formatMoney(result.annualNetProjection);
+    taxRate.textContent = formatPercent(result.effectiveTaxRate);
+    marginalRate.textContent = formatPercent(result.marginalRate / 100);
+    renderBreakdown(result);
+    warning.textContent = result.warnings.join(" ");
+    warning.classList.remove("hidden");
+    copyButton.classList.remove("hidden");
+    copyButton.classList.add("inline-flex");
+    copyText = [
+      `Estimated net pay: ${formatMoney(result.netPeriod)}`,
+      `Frequency: ${result.frequency.label}`,
+      `Monthly equivalent: ${formatMoney(result.monthlyEquivalent)}`,
+      `Annual projection: ${formatMoney(result.annualNetProjection)}`,
+      `Estimated income tax: ${formatMoney(result.tax)}`,
+      `Employee contributions: ${formatMoney(result.employeeContributions)}`,
+      `Country and period: Mexico ${MEXICO_SALARY_PRESET.period}`,
+      "Informational estimate; it does not replace an official payroll calculation.",
+    ].join("\n");
+    formStatus.textContent = `Updated result: ${formatMoney(result.netPeriod)} per payment.`;
+  }
+
+  form?.addEventListener("submit", (event) => {
+    event.preventDefault();
+    updateCalculator(true);
+  });
+
+  inputs.forEach((input) => {
+    input.addEventListener("input", () => updateCalculator(false));
+    input.addEventListener("blur", () => updateCalculator(input.dataset.input === "gross"));
+  });
+
+  selects.forEach((select) => {
+    select.addEventListener("change", () => updateCalculator(false));
+  });
+
+  clearButton?.addEventListener("click", () => {
+    form?.reset();
+    clearErrors();
+    resetResult();
+  });
+
+  copyButton?.addEventListener("click", async () => {
+    if (!copyText) {
+      return;
+    }
+
+    try {
+      await navigator.clipboard.writeText(copyText);
+      copyLabel.textContent = "Copied";
+      copyStatus.textContent = "Breakdown copied.";
+    } catch {
+      copyStatus.textContent = "The breakdown could not be copied.";
+    }
+
+    window.clearTimeout(copyTimeout);
+    copyTimeout = window.setTimeout(() => {
+      copyLabel.textContent = "Copy breakdown";
+      copyStatus.textContent = "";
+    }, 2000);
+  });
+
+  resetResult();
+</script>

@@ -1,0 +1,1204 @@
+---
+import AdSlot from "@components/ads/AdSlot.astro";
+import Container from "@components/layout/Container.astro";
+import PageShell from "@components/layout/PageShell.astro";
+import FaqSection from "@components/shared/FaqSection.astro";
+import PageHero from "@components/shared/PageHero.astro";
+import SectionIntro from "@components/shared/SectionIntro.astro";
+import BaseLayout from "@layouts/BaseLayout.astro";
+import {
+  VOLUME_UNIT_GROUPS,
+  VOLUME_UNIT_METADATA,
+  convertVolume,
+  formatVolume,
+  formatVolumeRate,
+  type VolumeUnit,
+} from "@lib/calculators/conversores/conversor-de-volumen/volume.en";
+import { buildAlternateLinks } from "@lib/i18n/routing";
+import { buildFaqJsonLd } from "@lib/seo";
+
+const title = "Volume and capacity converter: ml, L, m³ and more";
+const description =
+  "Convert volume between milliliters, liters, cubic meters, fluid ounces, pints, quarts and US or Imperial gallons.";
+const canonical = "/en/converters/volume-converter";
+const spanishCanonical = "/conversores/conversor-de-volumen";
+const alternates = buildAlternateLinks({ es: spanishCanonical, en: canonical }, Astro.site ?? Astro.url);
+
+const faqs = [
+  {
+    question: "How many milliliters are in a liter?",
+    answer: "One liter equals exactly 1,000 milliliters.",
+  },
+  {
+    question: "How many liters are in a cubic meter?",
+    answer: "One cubic meter equals exactly 1,000 liters.",
+  },
+  {
+    question: "Is one milliliter equal to one cubic centimeter?",
+    answer: "Yes. One milliliter occupies the same volume as one cubic centimeter.",
+  },
+  {
+    question: "What is the difference between an ounce and a fluid ounce?",
+    answer:
+      "A fluid ounce measures volume. An ounce without “fl” usually measures mass, so this calculator specifies US or Imperial fl oz.",
+  },
+  {
+    question: "Are US and Imperial pints the same?",
+    answer:
+      "No. A US pint equals 0.473176473 L and an Imperial pint equals 0.56826125 L.",
+  },
+  {
+    question: "Are US and Imperial quarts the same?",
+    answer:
+      "No. A US quart equals 0.946352946 L and an Imperial quart equals 1.1365225 L.",
+  },
+  {
+    question: "How can you tell whether a measure is US or Imperial?",
+    answer:
+      "Check the label, country, data sheet or original document. If it only says fl oz, pt, qt or gal, confirm the system before converting.",
+  },
+];
+
+const faqJsonLd = buildFaqJsonLd(faqs);
+
+const shortcuts = [
+  { label: "Small can", value: "330", unit: "ml", to: "l" },
+  { label: "Individual bottle", value: "500", unit: "ml", to: "l" },
+  { label: "Bottle", value: "750", unit: "ml", to: "l" },
+  { label: "Un litro", value: "1", unit: "l", to: "ml" },
+  { label: "Large bottle", value: "1.5", unit: "l", to: "ml" },
+  { label: "Family bottle", value: "2", unit: "l", to: "ml" },
+  { label: "Container", value: "5", unit: "l", to: "ml" },
+  { label: "Large jug or tank", value: "20", unit: "l", to: "ml" },
+  { label: "Cubic meter", value: "1", unit: "m3", to: "l" },
+] as const satisfies readonly {
+  label: string;
+  value: string;
+  unit: VolumeUnit;
+  to: VolumeUnit;
+}[];
+
+const referenceRows = [
+  { label: "Milliliter and cubic centimeter", value: "1 ml = 1 cm³" },
+  { label: "Liter to milliliters", value: formatVolumeRate("l", "ml") },
+  { label: "Cubic meter a litros", value: formatVolumeRate("m3", "l") },
+  { label: "US fluid ounce to liters", value: formatVolumeRate("us_fl_oz", "l") },
+  {
+    label: "Imperial fluid ounce to liters",
+    value: formatVolumeRate("imp_fl_oz", "l"),
+  },
+  { label: "US quart to liters", value: formatVolumeRate("us_qt", "l") },
+];
+---
+
+<BaseLayout title={title} description={description} canonical={canonical} locale="en" alternates={alternates}>
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={JSON.stringify(faqJsonLd)} />
+  </Fragment>
+
+  <PageShell>
+    <PageHero
+      title="Volume and capacity converter"
+      description="Convert ml, L, cm³, m³ and US or Imperial liquid measures with the regional system always visible."
+      kicker="Converters"
+      collapseBreadcrumbOnMobile
+      containerClass="py-6 md:py-8"
+      breadcrumbs={[
+        { label: "Home", href: "/en", ariaLabel: "Home" },
+        { label: "Converters", href: "/en/converters", optional: true },
+        { label: "Volume", truncate: true },
+      ]}
+    />
+
+    <Container as="section" class="py-6 md:py-8">
+      <section
+        id="volume-converter"
+        class="overflow-hidden rounded-lg border border-gray-700 bg-gray-950 shadow-xl shadow-gray-950/30"
+        aria-labelledby="calculator-heading"
+      >
+        <div
+          class="grid gap-0 lg:grid-cols-[minmax(0,1fr)_minmax(19rem,0.84fr)]"
+        >
+          <div class="p-4 sm:p-6">
+            <p class="text-sm font-semibold text-amber-300">
+              Quick conversion
+            </p>
+            <h2 id="calculator-heading" class="mt-2 text-2xl font-semibold">
+              What volume do you want to convert?
+            </h2>
+
+            <div class="mt-6">
+              <label
+                for="volume-value"
+                class="block text-sm font-semibold text-gray-200"
+              >
+                Cantidad
+              </label>
+              <div
+                class="mt-2 flex rounded-lg border border-gray-700 bg-gray-900 focus-within:border-amber-400 focus-within:ring-3 focus-within:ring-amber-400/15"
+              >
+                <input
+                  id="volume-value"
+                  class="min-h-14 w-full min-w-0 bg-transparent px-4 text-xl text-white outline-none placeholder:text-gray-600"
+                  type="text"
+                  inputmode="decimal"
+                  autocomplete="off"
+                  placeholder="Ej. 2, 750 ml o 32 fl oz US"
+                  aria-describedby="volume-help volume-interpretation volume-error"
+                  data-volume-input
+                />
+                <span
+                  class="flex shrink-0 items-center px-4 text-sm text-gray-500"
+                  data-input-symbol
+                >
+                  L
+                </span>
+              </div>
+              <p
+                id="volume-help"
+                class="mt-2 text-xs leading-relaxed text-gray-500"
+              >
+                Accepts a decimal point or comma, scientific notation and units
+                before or after the number.
+              </p>
+              <p
+                id="volume-interpretation"
+                class="mt-2 hidden text-xs leading-relaxed text-blue-200"
+                data-volume-interpretation
+              >
+              </p>
+              <p
+                id="volume-error"
+                class="mt-2 hidden text-sm text-red-300"
+                data-volume-error
+              >
+              </p>
+            </div>
+
+            <div
+              class="mt-5 grid gap-4 sm:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] sm:items-end"
+            >
+              <div>
+                <label
+                  for="origin-unit"
+                  class="block text-sm font-semibold text-gray-200"
+                >
+                  Unit origen
+                </label>
+                <select
+                  id="origin-unit"
+                  class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-900 px-3 text-sm text-white outline-none transition focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15"
+                  data-origin-select
+                >
+                  {
+                    VOLUME_UNIT_GROUPS.map((group) => (
+                      <optgroup label={group.label}>
+                        {group.units.map((unit) => (
+                          <option value={unit} selected={unit === "l"}>
+                            {VOLUME_UNIT_METADATA[unit].symbol} · {VOLUME_UNIT_METADATA[
+                              unit
+                            ].label.toLocaleLowerCase("es-MX")}
+                          </option>
+                        ))}
+                      </optgroup>
+                    ))
+                  }
+                </select>
+              </div>
+
+              <button
+                class="min-h-12 rounded-lg border border-gray-700 bg-gray-900 px-4 text-sm font-semibold text-amber-300 transition hover:border-amber-400 hover:bg-gray-800 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/30 sm:mt-7"
+                type="button"
+                aria-label="Swap units while preserving volume"
+                data-swap-units
+              >
+                Intercambiar
+              </button>
+
+              <div>
+                <label
+                  for="destination-unit"
+                  class="block text-sm font-semibold text-gray-200"
+                >
+                  Unit destino
+                </label>
+                <select
+                  id="destination-unit"
+                  class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-900 px-3 text-sm text-white outline-none transition focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15"
+                  data-destination-select
+                >
+                  {
+                    VOLUME_UNIT_GROUPS.map((group) => (
+                      <optgroup label={group.label}>
+                        {group.units.map((unit) => (
+                          <option value={unit} selected={unit === "ml"}>
+                            {VOLUME_UNIT_METADATA[unit].symbol} · {VOLUME_UNIT_METADATA[
+                              unit
+                            ].label.toLocaleLowerCase("es-MX")}
+                          </option>
+                        ))}
+                      </optgroup>
+                    ))
+                  }
+                </select>
+              </div>
+            </div>
+
+            <div class="mt-5 flex flex-wrap items-end gap-3">
+              <details data-precision-panel>
+                <summary
+                  class="flex min-h-11 cursor-pointer items-center rounded-lg border border-gray-700 bg-gray-900 px-4 py-2 text-sm font-semibold text-gray-200 transition hover:border-gray-500 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-gray-400/30"
+                  data-precision-summary
+                >
+                  More options
+                </summary>
+                <div
+                  class="mt-2 rounded-lg border border-gray-700 bg-gray-900 p-3"
+                >
+                  <label
+                    for="volume-precision"
+                    class="block text-xs font-semibold text-gray-400"
+                  >
+                    Precision
+                  </label>
+                  <select
+                    id="volume-precision"
+                    class="mt-2 min-h-11 w-full rounded-lg border border-gray-700 bg-gray-950 px-3 text-sm text-white outline-none transition focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15"
+                    data-precision-select
+                  >
+                    <option value="auto" selected>Automatic</option>
+                    {
+                      Array.from({ length: 9 }, (_, decimals) => (
+                        <option value={String(decimals)}>{decimals}</option>
+                      ))
+                    }
+                  </select>
+                </div>
+              </details>
+
+              <button
+                class="min-h-11 rounded-lg border border-gray-700 px-4 py-2 text-sm font-semibold text-gray-200 transition hover:border-gray-500 hover:bg-gray-900 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-gray-400/30"
+                type="button"
+                data-clear-calculator
+              >
+                Clear
+              </button>
+            </div>
+          </div>
+
+          <aside
+            class="border-t border-gray-800 bg-gray-900/65 p-4 sm:p-6 lg:border-l lg:border-t-0"
+          >
+            <p
+              class="text-xs font-semibold uppercase tracking-wide text-gray-500"
+            >
+              Result principal
+            </p>
+
+            <div data-empty-result>
+              <p class="mt-3 min-h-10 text-2xl font-semibold text-amber-100">
+                Enter an amount to convert its volume
+              </p>
+              <p class="mt-3 text-sm leading-relaxed text-gray-400">
+                Choose source and destination; the equivalents below remain as
+                apoyo.
+              </p>
+            </div>
+
+            <div class="hidden" data-result-content>
+              <p
+                class="mt-3 text-sm font-medium text-gray-300"
+                data-source-result
+              >
+              </p>
+              <p
+                class="mt-2 min-h-10 break-words text-3xl font-semibold text-amber-100"
+                tabindex="-1"
+                data-main-result
+              >
+              </p>
+              <p
+                class="mt-3 text-sm leading-relaxed text-blue-100"
+                data-context-note
+              >
+              </p>
+              <div
+                class="mt-4 space-y-1 text-xs leading-relaxed text-gray-400"
+              >
+                <p data-direct-rate></p>
+                <p data-formula-line></p>
+                <p data-substitution-line></p>
+              </div>
+            </div>
+
+            <div class="mt-4 flex flex-wrap gap-2">
+              <button
+                class="hidden min-h-11 rounded-lg bg-amber-400 px-4 py-2 text-sm font-semibold text-gray-950 transition hover:bg-amber-300 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-300/40"
+                type="button"
+                data-copy-main
+              >
+                Copy resultado
+              </button>
+              <button
+                class="hidden min-h-11 rounded-lg border border-amber-400/60 px-4 py-2 text-sm font-semibold text-amber-200 transition hover:bg-amber-400/10 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-300/40"
+                type="button"
+                data-share-main
+              >
+                Share
+              </button>
+            </div>
+            <p
+              class="sr-only"
+              role="status"
+              aria-live="polite"
+              data-live-status
+            >
+            </p>
+            <p
+              class="mt-3 min-h-5 text-sm text-emerald-300"
+              role="status"
+              aria-live="polite"
+              data-copy-status
+            >
+            </p>
+          </aside>
+        </div>
+
+        <div class="border-t border-gray-800 p-4 sm:p-6">
+          <div
+            class="grid gap-6 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)]"
+          >
+            <div>
+              <h3 class="text-lg font-semibold">All equivalents</h3>
+              <div class="mt-3 grid gap-3" data-equivalence-panel>
+                {
+                  VOLUME_UNIT_GROUPS.map((group) => (
+                    <details
+                      class="rounded-lg border border-gray-800 bg-gray-950"
+                      data-equivalence-group={group.id}
+                      open={group.id === "metric"}
+                    >
+                      <summary class="flex min-h-12 cursor-pointer items-center px-4 py-3 text-sm font-semibold text-amber-300">
+                        {group.label}
+                      </summary>
+                      <div class="divide-y divide-gray-800 border-t border-gray-800">
+                        {group.units.map((unit) => (
+                          <article
+                            class="grid gap-2 px-4 py-3 sm:grid-cols-[minmax(0,1fr)_minmax(0,0.72fr)_auto] sm:items-center"
+                            data-equivalence-row={unit}
+                          >
+                            <button
+                              class="min-h-11 text-left text-sm font-semibold text-white transition hover:text-amber-200 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/30"
+                              type="button"
+                              data-select-destination={unit}
+                            >
+                              <span class="block">
+                                {VOLUME_UNIT_METADATA[unit].symbol}
+                              </span>
+                              <span class="mt-1 block text-xs font-normal leading-relaxed text-gray-400">
+                                {VOLUME_UNIT_METADATA[unit].label} · {VOLUME_UNIT_METADATA[
+                                  unit
+                                ].systemLabel}
+                              </span>
+                            </button>
+                            <span
+                              class="break-words text-sm font-semibold text-amber-100 sm:text-right"
+                              data-equivalence-value={unit}
+                            >
+                              -
+                            </span>
+                            <button
+                              class="hidden min-h-10 rounded-md border border-gray-700 px-3 text-xs font-semibold text-gray-200 transition hover:border-amber-400 hover:text-amber-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400/40"
+                              type="button"
+                              data-copy-unit={unit}
+                            >
+                              Copy
+                            </button>
+                          </article>
+                        ))}
+                      </div>
+                    </details>
+                  ))
+                }
+              </div>
+            </div>
+
+            <div>
+              <h3 class="text-lg font-semibold">Formula and precision</h3>
+              <div
+                class="mt-3 rounded-lg border border-gray-800 bg-gray-900/70 p-4"
+              >
+                <p class="text-sm leading-relaxed text-gray-200" data-formula>
+                  The formula will appear after you enter a volume.
+                </p>
+                <details class="mt-3 hidden" data-procedure-panel>
+                  <summary
+                    class="min-h-11 cursor-pointer py-2 text-sm font-semibold text-amber-300"
+                  >
+                    Ver procedimiento
+                  </summary>
+                  <ol
+                    class="mt-2 space-y-2 text-sm leading-relaxed text-gray-400"
+                    data-procedure-list
+                  >
+                  </ol>
+                </details>
+              </div>
+              <p class="mt-3 text-xs leading-relaxed text-gray-500">
+                Calculations use liters as the internal base and only round the
+                display.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+    </Container>
+
+    <AdSlot placement="calculator-after-tool" />
+
+    <Container as="section" class="py-6 md:py-8">
+      <SectionIntro
+        title="Capacity shortcuts"
+        description="Load common container and tank values without leaving the page."
+      />
+      <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        {
+          shortcuts.map((shortcut) => (
+            <button
+              class="min-h-20 rounded-lg border border-gray-800 bg-gray-950 p-4 text-left transition hover:border-amber-400/60 hover:bg-gray-900 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/30"
+              type="button"
+              data-shortcut-value={shortcut.value}
+              data-shortcut-unit={shortcut.unit}
+              data-shortcut-to={shortcut.to}
+            >
+              <span class="block text-sm font-semibold text-white">
+                {shortcut.label}
+              </span>
+              <span class="mt-2 block text-sm text-amber-300">
+                {formatVolume(Number(shortcut.value), shortcut.unit)}
+              </span>
+              <span class="mt-1 block text-xs text-gray-400">
+                {formatVolume(
+                  convertVolume(Number(shortcut.value), shortcut.unit, shortcut.to),
+                  shortcut.to,
+                )}
+              </span>
+            </button>
+          ))
+        }
+      </div>
+    </Container>
+
+    <Container as="section" class="py-6 md:py-8">
+      <SectionIntro
+        title="Quick references"
+        description="Visible factors even when JavaScript is unavailable."
+      />
+      <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        {
+          referenceRows.map((row) => (
+            <article class="rounded-lg border border-gray-800 bg-gray-950 p-4">
+              <h3 class="text-sm font-semibold text-gray-200">{row.label}</h3>
+              <p class="mt-2 break-words text-base font-semibold text-amber-200">
+                {row.value}
+              </p>
+            </article>
+          ))
+        }
+      </div>
+    </Container>
+
+    <Container as="section" class="py-6 md:py-8">
+      <SectionIntro
+        title="Volume, capacity and systems"
+        description="The correct unit depends on the document, region and original symbol."
+      />
+      <div class="grid gap-4 lg:grid-cols-2">
+        <article class="rounded-lg border border-gray-800 bg-gray-950 p-5">
+          <h3 class="text-lg font-semibold">Volume and capacity</h3>
+          <p class="mt-3 text-sm leading-relaxed text-gray-400">
+            Volume and capacity describe space. In everyday use,
+            capacity usually refers to the contents a
+            recipiente.
+          </p>
+        </article>
+        <article class="rounded-lg border border-gray-800 bg-gray-950 p-5">
+          <h3 class="text-lg font-semibold">Metric relationships</h3>
+          <div class="mt-3 space-y-2 text-sm leading-relaxed text-gray-300">
+            <p class="rounded-lg bg-gray-900 p-3">1 ml = 1 cm³</p>
+            <p class="rounded-lg bg-gray-900 p-3">1 L = 1,000 ml</p>
+            <p class="rounded-lg bg-gray-900 p-3">1 m³ = 1,000 L</p>
+          </div>
+        </article>
+        <article class="rounded-lg border border-gray-800 bg-gray-950 p-5">
+          <h3 class="text-lg font-semibold">US and Imperial</h3>
+          <p class="mt-3 text-sm leading-relaxed text-gray-400">
+            Some units have similar names but do not represent the
+            same volume in every system. To compare gallons in more
+            detail, use the
+            <a
+              class="text-amber-300 transition hover:text-amber-200 hover:underline"
+              href="/en/converters/liters-to-gallons"
+            >
+              liters-to-gallons converter
+            </a>.
+          </p>
+        </article>
+        <article class="rounded-lg border border-gray-800 bg-gray-950 p-5">
+          <h3 class="text-lg font-semibold">Fluid ounces and mass</h3>
+          <p class="mt-3 text-sm leading-relaxed text-gray-400">
+            fl oz measures volume. oz without fl usually means mass, so this
+            tool does not convert it as capacity.
+          </p>
+        </article>
+      </div>
+    </Container>
+
+    <Container as="section" class="py-6 md:py-8">
+      <SectionIntro
+        title="How to choose the correct unit"
+        description="Before converting, confirm the regional system and original symbol."
+      />
+      <div class="rounded-lg border border-gray-800 bg-gray-950 p-5">
+        <p class="text-sm leading-relaxed text-gray-300">
+          Check the label, data sheet, country and data source. If a measure
+          regional unit appears without US or Imperial, avoid guessing and confirm the
+          system before using it for a purchase, tank or technical document.
+        </p>
+      </div>
+    </Container>
+
+    <Container as="section" class="py-6 md:py-8">
+      <SectionIntro
+        title="Related calculators"
+        description="Useful tools when volume is part of another calculation."
+      />
+      <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        <a
+          class="rounded-lg border border-gray-800 bg-gray-950 p-4 transition hover:border-amber-400/60 hover:bg-gray-900"
+          href="/en/converters/liters-to-gallons"
+        >
+          <span class="block font-semibold text-white">Liters to gallons</span>
+          <span class="mt-2 block text-sm leading-relaxed text-gray-400">
+            Compare US and Imperial gallons with a dedicated tool.
+          </span>
+        </a>
+        <a
+          class="rounded-lg border border-gray-800 bg-gray-950 p-4 transition hover:border-amber-400/60 hover:bg-gray-900"
+          href="/en/cooking/cooking-measurement-converter"
+        >
+          <span class="block font-semibold text-white">Cooking measurements</span>
+          <span class="mt-2 block text-sm leading-relaxed text-gray-400">
+            Use that converter when following a recipe.
+          </span>
+        </a>
+        <a
+          class="rounded-lg border border-gray-800 bg-gray-950 p-4 transition hover:border-amber-400/60 hover:bg-gray-900"
+          href="/en/vehicles"
+        >
+          <span class="block font-semibold text-white">Fuel consumption</span>
+          <span class="mt-2 block text-sm leading-relaxed text-gray-400">
+            Calcula rendimiento en km/L, L/100 km y mpg.
+          </span>
+        </a>
+      </div>
+    </Container>
+
+    <FaqSection faqs={faqs} />
+  </PageShell>
+</BaseLayout>
+
+<script>
+  import {
+    VOLUME_UNIT_METADATA,
+    VOLUME_UNITS,
+    buildVolumeExplanation,
+    convertAllVolumes,
+    convertVolume,
+    formatVolume,
+    formatVolumeRate,
+    isVolumeUnit,
+    parseVolumeInput,
+  } from "@lib/calculators/conversores/conversor-de-volumen/volume.en";
+
+  const input = document.querySelector("[data-volume-input]");
+  const inputSymbol = document.querySelector("[data-input-symbol]");
+  const originSelect = document.querySelector("[data-origin-select]");
+  const destinationSelect = document.querySelector("[data-destination-select]");
+  const precisionSelect = document.querySelector("[data-precision-select]");
+  const precisionSummary = document.querySelector("[data-precision-summary]");
+  const errorElement = document.querySelector("[data-volume-error]");
+  const interpretationElement = document.querySelector(
+    "[data-volume-interpretation]",
+  );
+  const emptyResult = document.querySelector("[data-empty-result]");
+  const resultContent = document.querySelector("[data-result-content]");
+  const sourceResult = document.querySelector("[data-source-result]");
+  const mainResult = document.querySelector("[data-main-result]");
+  const contextNote = document.querySelector("[data-context-note]");
+  const directRate = document.querySelector("[data-direct-rate]");
+  const formulaLine = document.querySelector("[data-formula-line]");
+  const substitutionLine = document.querySelector("[data-substitution-line]");
+  const formula = document.querySelector("[data-formula]");
+  const procedurePanel = document.querySelector("[data-procedure-panel]");
+  const procedureList = document.querySelector("[data-procedure-list]");
+  const copyMainButton = document.querySelector("[data-copy-main]");
+  const shareMainButton = document.querySelector("[data-share-main]");
+  const clearButton = document.querySelector("[data-clear-calculator]");
+  const swapButton = document.querySelector("[data-swap-units]");
+  const copyStatus = document.querySelector("[data-copy-status]");
+  const liveStatus = document.querySelector("[data-live-status]");
+
+  let origin = "l";
+  let destination = "ml";
+  let currentCopyText = "";
+  let currentShareText = "";
+  let currentShareUrl = window.location.href;
+  let currentCopyByUnit = {};
+  let copyTimer = 0;
+  let liveTimer = 0;
+  let urlTimer = 0;
+
+  function getPrecision() {
+    if (precisionSelect.value === "auto") {
+      return "auto";
+    }
+
+    const decimals = Number(precisionSelect.value);
+
+    return Number.isInteger(decimals) && decimals >= 0 && decimals <= 8
+      ? decimals
+      : "auto";
+  }
+
+  function getDefaultDestination(from) {
+    return from === "l" ? "ml" : "l";
+  }
+
+  function updateControls() {
+    originSelect.value = origin;
+    destinationSelect.value = destination;
+    inputSymbol.textContent = VOLUME_UNIT_METADATA[origin].symbol;
+
+    const precision = getPrecision();
+
+    precisionSummary.textContent =
+      precision === "auto"
+        ? "More options"
+        : `Precision: ${precision} ${precision === 1 ? "decimal" : "decimal places"}`;
+  }
+
+  function openDestinationGroup() {
+    const destinationSystem = VOLUME_UNIT_METADATA[destination].system;
+
+    document.querySelectorAll("[data-equivalence-group]").forEach((group) => {
+      if (group.dataset.equivalenceGroup === destinationSystem) {
+        group.open = true;
+      }
+    });
+  }
+
+  function setError(message = "") {
+    errorElement.textContent = message;
+    errorElement.classList.toggle("hidden", !message);
+    input.setAttribute("aria-invalid", message ? "true" : "false");
+  }
+
+  function setInterpretation(message = "") {
+    interpretationElement.textContent = message;
+    interpretationElement.classList.toggle("hidden", !message);
+  }
+
+  function getInputError(error) {
+    switch (error) {
+      case "ambiguous":
+        return "Specify whether the unit is US or Imperial before converting.";
+      case "mass_unit":
+        return "For volume, use US fl oz or Imperial fl oz; oz without fl usually measures mass.";
+      case "negative":
+        return "Volume cannot be negative.";
+      case "out_of_range":
+        return "Use a finite value between 0 and 1e15.";
+      case "invalid":
+        return "The volume could not be interpreted. Use a format such as 750 ml, 1.5 m³ or 32 US fl oz.";
+      default:
+        return "";
+    }
+  }
+
+  function clearOutputs(note = "Choose source and destination; the equivalents below provide additional context.") {
+    currentCopyText = "";
+    currentShareText = "";
+    currentCopyByUnit = {};
+    window.clearTimeout(liveTimer);
+    liveStatus.textContent = "";
+    emptyResult.classList.remove("hidden");
+    resultContent.classList.add("hidden");
+    sourceResult.textContent = "";
+    mainResult.textContent = "";
+    contextNote.textContent = note;
+    directRate.textContent = "";
+    formulaLine.textContent = "";
+    substitutionLine.textContent = "";
+    formula.textContent = "The formula will appear after you enter a volume.";
+    procedurePanel.classList.add("hidden");
+    procedureList.replaceChildren();
+    copyMainButton.classList.add("hidden");
+    shareMainButton.classList.add("hidden");
+
+    VOLUME_UNITS.forEach((unit) => {
+      const valueElement = document.querySelector(
+        `[data-equivalence-value="${unit}"]`,
+      );
+
+      if (valueElement) {
+        valueElement.textContent = "-";
+      }
+    });
+
+    document.querySelectorAll("[data-copy-unit]").forEach((button) => {
+      button.classList.add("hidden");
+    });
+  }
+
+  function buildUrl(value) {
+    const url = new URL(window.location.href);
+
+    url.searchParams.set("valor", String(value));
+    url.searchParams.set("origen", origin);
+    url.searchParams.set("destino", destination);
+
+    const precision = getPrecision();
+
+    if (precision === "auto") {
+      url.searchParams.delete("precision");
+    } else {
+      url.searchParams.set("precision", String(precision));
+    }
+
+    return url;
+  }
+
+  function scheduleUrlUpdate(value) {
+    const url = buildUrl(value);
+
+    currentShareUrl = url.toString();
+    window.clearTimeout(urlTimer);
+    urlTimer = window.setTimeout(() => {
+      window.history.replaceState({}, "", url);
+    }, 250);
+  }
+
+  function clearUrl() {
+    const url = new URL(window.location.href);
+
+    ["valor", "origen", "destino", "precision"].forEach((parameter) => {
+      url.searchParams.delete(parameter);
+    });
+
+    currentShareUrl = url.toString();
+    window.clearTimeout(urlTimer);
+    window.history.replaceState({}, "", url);
+  }
+
+  function scheduleAnnouncement(message) {
+    window.clearTimeout(liveTimer);
+    liveTimer = window.setTimeout(() => {
+      liveStatus.textContent = message;
+    }, 350);
+  }
+
+  function showStatus(message) {
+    copyStatus.textContent = message;
+    window.clearTimeout(copyTimer);
+    copyTimer = window.setTimeout(() => {
+      copyStatus.textContent = "";
+    }, 2200);
+  }
+
+  function applyDetectedUnit(unit) {
+    const previousOrigin = origin;
+
+    origin = unit;
+
+    if (origin === destination) {
+      destination =
+        previousOrigin !== origin ? previousOrigin : getDefaultDestination(origin);
+    }
+
+    updateControls();
+  }
+
+  function isUsefulWhole(value) {
+    const rounded = Math.round(value);
+
+    return (
+      rounded > 0 &&
+      rounded <= 1000 &&
+      Math.abs(value - rounded) < 1e-10
+    );
+  }
+
+  function buildContextNote(results, precision) {
+    if (origin === "l" && destination === "ml" && results.cm3 > 0) {
+      return `Contextual equivalent: ${formatVolume(results.cm3, "cm3", precision)}.`;
+    }
+
+    const contextualUnit = VOLUME_UNITS.find(
+      (unit) =>
+        unit !== origin &&
+        unit !== destination &&
+        results[unit] > 0 &&
+        isUsefulWhole(results[unit]),
+    );
+
+    if (contextualUnit) {
+      return `Contextual equivalent: ${formatVolume(
+        results[contextualUnit],
+        contextualUnit,
+        precision,
+      )}.`;
+    }
+
+    return "The regional system is preserved in results, copied text and shared links.";
+  }
+
+  function renderEquivalences(formattedSource, results, precision) {
+    currentCopyByUnit = {};
+
+    VOLUME_UNITS.forEach((unit) => {
+      const formatted = formatVolume(results[unit], unit, precision);
+      const row = document.querySelector(`[data-equivalence-row="${unit}"]`);
+      const valueElement = document.querySelector(
+        `[data-equivalence-value="${unit}"]`,
+      );
+      const copyButton = document.querySelector(`[data-copy-unit="${unit}"]`);
+
+      currentCopyByUnit[unit] = `${formattedSource} = ${formatted}`;
+
+      if (valueElement) {
+        valueElement.textContent = formatted;
+      }
+
+      if (copyButton) {
+        copyButton.classList.remove("hidden");
+      }
+
+      if (row) {
+        row.classList.toggle("bg-amber-400/10", unit === destination);
+      }
+    });
+
+    openDestinationGroup();
+  }
+
+  function render(options = {}) {
+    const { updateUrl = true, announce = true } = options;
+    const parsed = parseVolumeInput(input.value);
+
+    updateControls();
+
+    if (!parsed.ok) {
+      const message = ["empty", "incomplete"].includes(parsed.error)
+        ? ""
+        : getInputError(parsed.error);
+
+      setError(message);
+      setInterpretation();
+      clearOutputs();
+
+      if (updateUrl) {
+        clearUrl();
+      }
+
+      return;
+    }
+
+    if (parsed.detectedUnit) {
+      applyDetectedUnit(parsed.detectedUnit);
+    }
+
+    try {
+      const precision = getPrecision();
+      const results = convertAllVolumes(parsed.value, origin);
+      const formattedSource = formatVolume(parsed.value, origin, precision);
+      const formattedDestination = formatVolume(
+        results[destination],
+        destination,
+        precision,
+      );
+      const explanation = buildVolumeExplanation(
+        parsed.value,
+        origin,
+        destination,
+        precision,
+      );
+      const rate = formatVolumeRate(origin, destination);
+
+      setError();
+      setInterpretation(
+        parsed.detectedUnit
+          ? `Unit detectada: ${VOLUME_UNIT_METADATA[
+              parsed.detectedUnit
+            ].singularLabel}.`
+          : parsed.interpretation || "",
+      );
+      emptyResult.classList.add("hidden");
+      resultContent.classList.remove("hidden");
+      sourceResult.textContent = `${formattedSource} equivalen a`;
+      mainResult.textContent = formattedDestination;
+      contextNote.textContent = buildContextNote(results, precision);
+      directRate.textContent = rate;
+      formulaLine.textContent = `Formula: ${explanation.formula}.`;
+      substitutionLine.textContent = `Substitution: ${explanation.substitution}.`;
+      formula.textContent = `Formula: ${explanation.formula}`;
+      procedurePanel.classList.remove("hidden");
+      procedureList.replaceChildren(
+        ...explanation.steps.map((step) => {
+          const item = document.createElement("li");
+
+          item.textContent = step;
+
+          return item;
+        }),
+      );
+      copyMainButton.classList.remove("hidden");
+      shareMainButton.classList.remove("hidden");
+      renderEquivalences(formattedSource, results, precision);
+
+      currentShareText = `${formattedSource} = ${formattedDestination}`;
+      currentCopyText = `${currentShareText}\n${rate}\n${explanation.substitution}`;
+
+      if (updateUrl) {
+        scheduleUrlUpdate(parsed.normalized);
+      } else {
+        currentShareUrl = buildUrl(parsed.normalized).toString();
+      }
+
+      if (announce) {
+        scheduleAnnouncement(`Result: ${currentShareText}`);
+      }
+    } catch (error) {
+      setError(
+        error instanceof Error
+          ? error.message
+          : "This volume could not be converted.",
+      );
+      clearOutputs("Correct the value to continue.");
+
+      if (updateUrl) {
+        clearUrl();
+      }
+    }
+  }
+
+  async function copyText(text) {
+    if (!text) {
+      return false;
+    }
+
+    try {
+      await navigator.clipboard.writeText(text);
+      showStatus("Result copiado.");
+    } catch {
+      showStatus("The result could not be copied automatically.");
+
+      return false;
+    }
+
+    return true;
+  }
+
+  async function shareConversion() {
+    if (!currentShareText) {
+      return;
+    }
+
+    if ("share" in navigator) {
+      try {
+        await navigator.share({
+          title: "Volume conversion",
+          text: currentShareText,
+          url: currentShareUrl,
+        });
+        showStatus("Conversion shared.");
+
+        return;
+      } catch (error) {
+        if (error instanceof DOMException && error.name === "AbortError") {
+          return;
+        }
+      }
+    }
+
+    await copyText(`${currentShareText}\n${currentShareUrl}`);
+  }
+
+  function loadUrlParameters() {
+    const parameters = new URLSearchParams(window.location.search);
+    const value = parameters.get("valor");
+    const urlOrigin = parameters.get("origen");
+    const urlDestination = parameters.get("destino");
+    const urlPrecision = parameters.get("precision");
+
+    if (urlOrigin && isVolumeUnit(urlOrigin)) {
+      origin = urlOrigin;
+    }
+
+    if (urlDestination && isVolumeUnit(urlDestination)) {
+      destination = urlDestination;
+    }
+
+    if (
+      urlPrecision &&
+      ["0", "1", "2", "3", "4", "5", "6", "7", "8"].includes(urlPrecision)
+    ) {
+      precisionSelect.value = urlPrecision;
+    }
+
+    updateControls();
+
+    if (value && parseVolumeInput(value).ok) {
+      input.value = value;
+      render({ updateUrl: false, announce: false });
+    }
+  }
+
+  input.addEventListener("input", () => {
+    render();
+  });
+
+  input.addEventListener("blur", () => {
+    const parsed = parseVolumeInput(input.value);
+
+    if (parsed.ok) {
+      input.value = parsed.normalized;
+      render({ announce: false });
+    }
+  });
+
+  originSelect.addEventListener("change", () => {
+    if (isVolumeUnit(originSelect.value)) {
+      origin = originSelect.value;
+      updateControls();
+      render();
+    }
+  });
+
+  destinationSelect.addEventListener("change", () => {
+    if (isVolumeUnit(destinationSelect.value)) {
+      destination = destinationSelect.value;
+      updateControls();
+      render();
+    }
+  });
+
+  precisionSelect.addEventListener("change", () => {
+    updateControls();
+    render();
+  });
+
+  swapButton.addEventListener("click", () => {
+    const parsed = parseVolumeInput(input.value);
+    const previousOrigin =
+      parsed.ok && parsed.detectedUnit ? parsed.detectedUnit : origin;
+    const previousDestination = destination;
+
+    origin = previousDestination;
+    destination = previousOrigin;
+
+    if (parsed.ok) {
+      try {
+        input.value = String(
+          convertVolume(parsed.value, previousOrigin, previousDestination),
+        );
+      } catch {
+        // The normal render path presents the validation message.
+      }
+    }
+
+    updateControls();
+    render();
+  });
+
+  clearButton.addEventListener("click", () => {
+    input.value = "";
+    origin = "l";
+    destination = "ml";
+    precisionSelect.value = "auto";
+    setError();
+    setInterpretation();
+    updateControls();
+    clearOutputs();
+    clearUrl();
+    input.focus();
+  });
+
+  copyMainButton.addEventListener("click", () => {
+    copyText(currentCopyText);
+  });
+
+  shareMainButton.addEventListener("click", () => {
+    shareConversion();
+  });
+
+  document.addEventListener("click", (event) => {
+    const destinationButton = event.target.closest("[data-select-destination]");
+
+    if (destinationButton) {
+      const unit = destinationButton.dataset.selectDestination;
+
+      if (isVolumeUnit(unit)) {
+        destination = unit;
+        updateControls();
+        render();
+      }
+
+      return;
+    }
+
+    const copyButton = event.target.closest("[data-copy-unit]");
+
+    if (copyButton) {
+      const unit = copyButton.dataset.copyUnit;
+
+      if (isVolumeUnit(unit)) {
+        copyText(currentCopyByUnit[unit]);
+      }
+
+      return;
+    }
+
+    const shortcutButton = event.target.closest(
+      "[data-shortcut-value][data-shortcut-unit]",
+    );
+
+    if (!shortcutButton) {
+      return;
+    }
+
+    const { shortcutValue, shortcutUnit, shortcutTo } = shortcutButton.dataset;
+
+    if (
+      typeof shortcutValue !== "string" ||
+      !isVolumeUnit(shortcutUnit) ||
+      !isVolumeUnit(shortcutTo)
+    ) {
+      return;
+    }
+
+    input.value = shortcutValue;
+    origin = shortcutUnit;
+    destination = shortcutTo;
+    updateControls();
+    render();
+
+    if (typeof mainResult.focus === "function") {
+      mainResult.focus({ preventScroll: true });
+    }
+  });
+
+  updateControls();
+  clearOutputs();
+  loadUrlParameters();
+</script>

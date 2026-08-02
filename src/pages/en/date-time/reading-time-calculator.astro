@@ -1,0 +1,775 @@
+
+---
+import AdSlot from "@components/ads/AdSlot.astro";
+import Container from "@components/layout/Container.astro";
+import PageShell from "@components/layout/PageShell.astro";
+import FaqSection from "@components/shared/FaqSection.astro";
+import PageHero from "@components/shared/PageHero.astro";
+import SectionIntro from "@components/shared/SectionIntro.astro";
+import BaseLayout from "@layouts/BaseLayout.astro";
+import { buildAlternateLinks } from "@lib/i18n/routing";
+import { buildFaqJsonLd } from "@lib/seo";
+
+const title = "Reading time calculator";
+const description =
+  "Calculate how long a text takes to read based on its word count and reading speed. Estimate a range, finish time, and text metrics without sending the text to a server.";
+const canonical = "/en/date-time/reading-time-calculator";
+const spanishCanonical = "/fecha-tiempo/calculadora-tiempo-de-lectura";
+const alternates = buildAlternateLinks({ es: spanishCanonical, en: canonical }, Astro.site ?? Astro.url);
+
+const faqs = [
+  {
+    question: "How many words per minute does a person read?",
+    answer:
+      "As a simple reference, this calculator uses 150 words per minute for slow reading, 220 for average reading, and 300 for fast reading. You can edit the speed if you know your pace.",
+  },
+  {
+    question: "Is the text saved or sent anywhere?",
+    answer:
+      "No. The count is calculated in your browser. The tool does not send the text to servers or save it in local storage.",
+  },
+  {
+    question: "Can I calculate reading time aloud?",
+    answer:
+      "This calculator is designed for silent reading. For reading aloud, use a lower speed.",
+  },
+  {
+    question: "How are words counted?",
+    answer:
+      "The calculator uses the browser’s word segmentation when available, with a Unicode pattern as a fallback for letters, numbers, and hyphenated or apostrophized words.",
+  },
+  {
+    question: "Why does the time change with slow or fast reading?",
+    answer:
+      "Time is calculated by dividing words by words per minute. A slower speed increases the time; a faster speed reduces it.",
+  },
+  {
+    question: "How can I know when I will finish reading?",
+    answer:
+      "The tool adds the estimated duration to your device’s current time and rounds up to the next minute to show a practical finish time.",
+  },
+];
+
+const faqJsonLd = buildFaqJsonLd(faqs);
+---
+
+<BaseLayout title={title} description={description} canonical={canonical} locale="en" alternates={alternates}>
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={JSON.stringify(faqJsonLd)} />
+  </Fragment>
+
+  <PageShell>
+    <PageHero
+      title="Reading time calculator"
+      description="Paste text or enter a word count to estimate duration, range, and approximate finish time."
+      kicker="Date and time"
+      collapseBreadcrumbOnMobile
+      containerClass="py-5 md:py-7"
+      breadcrumbs={[
+        { label: "Home", href: "/en", ariaLabel: "Home" },
+        { label: "Date and time", href: "/en/date-time", optional: true },
+        { label: "Reading time", truncate: true },
+      ]}
+    />
+
+    <Container as="section" class="py-4 md:py-8">
+      <section
+        id="reading-time-calculator"
+        class="overflow-hidden rounded-lg border border-gray-700 bg-gray-950 shadow-xl shadow-gray-950/30"
+        aria-labelledby="calculator-heading"
+      >
+        <div class="grid gap-0 lg:grid-cols-[minmax(0,1fr)_minmax(22rem,0.9fr)]">
+          <form class="p-4 sm:p-6" novalidate data-reading-form>
+            <div>
+              <p class="text-sm font-semibold uppercase tracking-wide text-amber-400">
+                Reading and planning
+              </p>
+              <h2 id="calculator-heading" class="mt-2 text-2xl font-semibold">
+                Enter your text
+              </h2>
+              <p class="mt-2 text-sm leading-relaxed text-gray-400">
+                Content is processed locally in your browser. The pasted text
+                is not saved.
+              </p>
+            </div>
+
+            <fieldset class="mt-5">
+              <legend class="reading-field-label">Input mode</legend>
+              <div class="mt-2 grid grid-cols-2 gap-2 rounded-lg border border-gray-800 bg-gray-900/70 p-1">
+                <label class="reading-segmented-option" data-mode-label="text" data-active="true">
+                  <input class="sr-only" type="radio" name="reading-mode" value="text" checked />
+                  Text
+                </label>
+                <label class="reading-segmented-option" data-mode-label="words">
+                  <input class="sr-only" type="radio" name="reading-mode" value="words" />
+                  Words
+                </label>
+              </div>
+            </fieldset>
+
+            <div class="mt-5" data-text-field-group>
+              <label class="reading-field-label" for="reading-text">Text</label>
+              <textarea
+                id="reading-text"
+                class="reading-textarea"
+                rows="8"
+                placeholder="Paste an article, essay, script, or document here..."
+                data-field="text"
+              ></textarea>
+              <p class="mt-2 text-xs leading-relaxed text-gray-500">
+                Up to 100,000 characters without a warning. You can paste
+                longer text if your browser handles it well.
+              </p>
+            </div>
+
+            <div class="mt-5 hidden" data-word-field-group>
+              <label class="reading-field-label" for="manual-words">Word count</label>
+              <div class="reading-field-shell">
+                <input
+                  id="manual-words"
+                  class="reading-field-input reading-field-input-leading"
+                  type="text"
+                  inputmode="numeric"
+                  autocomplete="off"
+                  placeholder="1,200"
+                  data-field="manualWords"
+                />
+                <span class="reading-field-affix">words</span>
+              </div>
+              <p class="mt-2 text-xs leading-relaxed text-gray-500">
+                Accepts whole numbers with grouping separators, such as 1,200.
+              </p>
+            </div>
+
+            <fieldset class="mt-5">
+              <legend class="reading-field-label">Speed</legend>
+              <div class="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-4">
+                <button class="reading-preset" type="button" data-preset="slow" aria-pressed="false">
+                  Slow
+                </button>
+                <button class="reading-preset" type="button" data-preset="average" aria-pressed="true">
+                  Average
+                </button>
+                <button class="reading-preset" type="button" data-preset="fast" aria-pressed="false">
+                  Fast
+
+                </button>
+                <button class="reading-preset" type="button" data-preset="custom" aria-pressed="false">
+                  Custom
+                </button>
+              </div>
+            </fieldset>
+
+            <div class="mt-5 grid gap-4 sm:grid-cols-[minmax(0,16rem)_1fr] sm:items-end">
+              <div>
+                <label class="reading-field-label" for="words-per-minute">Words per minute</label>
+                <div class="reading-field-shell">
+                  <input
+                    id="words-per-minute"
+                    class="reading-field-input reading-field-input-leading"
+                    type="text"
+                    inputmode="numeric"
+                    autocomplete="off"
+                    value="220"
+                    data-field="wordsPerMinute"
+                  />
+                  <span class="reading-field-affix">wpm</span>
+                </div>
+              </div>
+              <div>
+                <label class="sr-only" for="words-per-minute-range">Adjust words per minute</label>
+                <input
+                  id="words-per-minute-range"
+                  class="reading-range"
+                  type="range"
+                  min="50"
+                  max="1000"
+                  step="10"
+                  value="220"
+                  data-field="wordsPerMinuteRange"
+                />
+              </div>
+            </div>
+
+            <label class="mt-5 flex items-start gap-3 rounded-lg border border-gray-800 bg-gray-900/60 p-3 text-sm leading-relaxed text-gray-300">
+              <input
+                class="mt-1 h-4 w-4 rounded border-gray-600 bg-gray-950 text-amber-400"
+                type="checkbox"
+                data-remember-velocity
+              />
+              <span>
+                Remember only my preferred speed in this browser. The text is
+                never saved.
+              </span>
+            </label>
+
+            <div
+              class="mt-5 hidden rounded-lg border border-red-400/40 bg-red-400/10 p-3 text-sm leading-relaxed text-red-100"
+              role="alert"
+              tabindex="-1"
+              data-errors
+            ></div>
+
+            <textarea
+              class="mt-5 hidden min-h-28 w-full rounded-lg border border-amber-400/40 bg-amber-400/10 p-3 text-sm text-amber-50"
+              readonly
+              data-copy-fallback
+            ></textarea>
+
+            <div class="mt-6 flex flex-col gap-3 border-t border-gray-800 pt-5 sm:flex-row sm:flex-wrap">
+              <button class="reading-primary-button w-full sm:w-auto sm:min-w-44" type="button" data-copy-result disabled>
+                <span data-copy-label>Copy summary</span>
+              </button>
+              <button class="reading-secondary-button" type="button" data-clear>
+                Clear
+              </button>
+              <p class="sr-only" aria-live="polite" data-copy-status></p>
+            </div>
+          </form>
+
+          <aside
+            class="order-first border-b border-gray-800 bg-gray-900/70 p-4 sm:p-6 lg:order-last lg:border-b-0 lg:border-l"
+            aria-live="polite"
+            tabindex="-1"
+            data-result-region
+          >
+            <p class="text-xs font-semibold uppercase tracking-wide text-amber-400" data-result-kicker>
+              Estimated time
+            </p>
+            <p class="mt-3 min-h-[3rem] break-words text-4xl font-bold leading-tight text-white" data-main-result>
+              Ready to calculate
+            </p>
+            <p class="mt-2 text-sm font-semibold text-amber-100" data-result-subtitle>
+              Paste text or enter a word count.
+            </p>
+            <p class="mt-3 text-sm leading-relaxed text-gray-400" data-result-note>
+              You will see the duration, range, and approximate finish time.
+            </p>
+
+            <div class="mt-5 grid grid-cols-2 gap-3" data-summary-grid></div>
+
+            <div
+              class="mt-4 hidden rounded-lg border border-amber-400/40 bg-amber-400/10 p-4 text-sm leading-relaxed text-amber-100"
+              data-warning-panel
+            ></div>
+
+            <section
+              class="mt-5 rounded-lg border border-gray-800 bg-gray-950/70 p-4"
+              aria-labelledby="preset-comparison-heading"
+            >
+              <h3 id="preset-comparison-heading" class="text-sm font-semibold text-white">
+                Speed comparison
+              </h3>
+              <div class="mt-3 space-y-2 text-sm" data-preset-comparison></div>
+            </section>
+          </aside>
+        </div>
+      </section>
+    </Container>
+
+    <AdSlot placement="calculator-after-tool" />
+
+    <Container as="section" class="py-6 md:py-8">
+      <SectionIntro
+        title="For better planning"
+        description="The exact duration helps, but the range and finish time make the estimate useful in a real schedule."
+        class="mb-5"
+      />
+      <div class="grid gap-4 md:grid-cols-3">
+        <article class="reading-info-card">
+          <h2 class="font-semibold text-white">Fast reading</h2>
+          <p class="mt-2 text-sm leading-relaxed text-gray-400">
+            Use the fast preset to estimate a quick pass or an initial
+            familiarization read.
+          </p>
+        </article>
+        <article class="reading-info-card">
+          <h2 class="font-semibold text-white">Study and notes</h2>
+          <p class="mt-2 text-sm leading-relaxed text-gray-400">
+            Lower the speed when you need to highlight, take notes, or review
+            dense concepts.
+          </p>
+        </article>
+        <article class="reading-info-card">
+          <h2 class="font-semibold text-white">Copyable summary</h2>
+          <p class="mt-2 text-sm leading-relaxed text-gray-400">
+            Copy the word count, time, range, and finish time into a note, CMS,
+            or work plan.
+          </p>
+        </article>
+      </div>
+    </Container>
+
+    <Container as="section" class="py-6 md:py-8">
+      <section class="rounded-lg border border-gray-700 bg-gray-950 p-5 sm:p-6">
+        <h2 class="text-2xl font-semibold">Privacy by design</h2>
+
+        <div class="mt-4 grid gap-4 text-sm leading-relaxed text-gray-400 md:grid-cols-2">
+          <p>
+            Text is counted in the browser. It is not sent to an API, kept as a
+            draft, or saved automatically.
+          </p>
+          <p>
+            If you enable remembering the speed, only the words-per-minute
+            value is stored for future visits.
+          </p>
+        </div>
+      </section>
+    </Container>
+
+    <FaqSection faqs={faqs} />
+  </PageShell>
+</BaseLayout>
+
+<style is:global>
+  .reading-field-label { display: block; font-size: .875rem; font-weight: 600; color: rgb(229 231 235); }
+  .reading-field-shell { margin-top: .5rem; display: flex; min-height: 3rem; min-width: 0; width: 100%; align-items: center; border-radius: .5rem; border: 1px solid rgb(55 65 81); background: rgb(17 24 39); color: white; outline: none; }
+  .reading-field-input { min-height: 2.875rem; min-width: 0; width: 100%; background: transparent; padding: 0 .25rem; color: white; outline: none; }
+  .reading-field-input-leading { padding-left: .75rem; }
+  .reading-field-affix { flex: none; padding: 0 .75rem; font-size: .875rem; color: rgb(156 163 175); }
+  .reading-field-shell:focus-within { border-color: rgb(251 191 36); box-shadow: 0 0 0 3px rgb(251 191 36 / .15); }
+  .reading-field-shell:has(.reading-field-input[aria-invalid="true"]) { border-color: rgb(248 113 113); }
+  .reading-textarea { margin-top: .5rem; min-height: 10rem; max-height: 22rem; width: 100%; resize: vertical; border-radius: .5rem; border: 1px solid rgb(55 65 81); background: rgb(17 24 39); padding: .875rem 1rem; color: white; outline: none; }
+  .reading-textarea:focus { border-color: rgb(251 191 36); box-shadow: 0 0 0 3px rgb(251 191 36 / .15); }
+  .reading-textarea[aria-invalid="true"] { border-color: rgb(248 113 113); }
+  .reading-range { min-height: 3rem; width: 100%; accent-color: rgb(251 191 36); }
+  .reading-segmented-option, .reading-preset, .reading-primary-button, .reading-secondary-button { display: inline-flex; min-height: 2.75rem; align-items: center; justify-content: center; border-radius: .5rem; padding: .5rem .75rem; text-align: center; font-size: .875rem; font-weight: 700; transition: border-color .15s, background-color .15s, color .15s; }
+  .reading-segmented-option { cursor: pointer; color: rgb(209 213 219); }
+  .reading-segmented-option[data-active="true"] { background: rgb(251 191 36); color: rgb(3 7 18); }
+  .reading-preset, .reading-secondary-button { border: 1px solid rgb(55 65 81); color: rgb(229 231 235); }
+  .reading-preset:hover, .reading-secondary-button:hover { border-color: rgb(251 191 36 / .7); color: white; }
+  .reading-preset[aria-pressed="true"] { border-color: rgb(251 191 36); background: rgb(251 191 36 / .15); color: rgb(253 230 138); }
+  .reading-primary-button { background: rgb(251 191 36); color: rgb(3 7 18); }
+  .reading-primary-button:hover { background: rgb(252 211 77); }
+  .reading-primary-button:disabled, .reading-secondary-button:disabled { cursor: not-allowed; opacity: .5; }
+  .reading-info-card { border-radius: .5rem; border: 1px solid rgb(55 65 81); background: rgb(3 7 18); padding: 1.25rem; }
+  @media (min-width: 640px) {
+    .reading-textarea { min-height: 13rem; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+  }
+</style>
+
+<script>
+  import {
+    DEFAULT_WORDS_PER_MINUTE,
+    MAX_MANUAL_WORDS,
+    MAX_TEXT_CHARACTERS,
+    MAX_WORDS_PER_MINUTE,
+    MIN_WORDS_PER_MINUTE,
+    READING_PRESETS,
+    ReadingTimeValidationError,
+    buildReadingSummary,
+    calculateReadingTime,
+    formatReadingNumber,
+    parseReadingInteger,
+  } from "@lib/calculators/fecha-tiempo/calculadora-tiempo-de-lectura/readingTime.en";
+
+  const STORAGE_KEY = "calculadoras.tools.reading-time.velocity.v1";
+
+  const form = document.querySelector("[data-reading-form]");
+  const modeInputs = Array.from(document.querySelectorAll('input[name="reading-mode"]'));
+  const modeLabels = Array.from(document.querySelectorAll("[data-mode-label]"));
+  const presetButtons = Array.from(document.querySelectorAll("[data-preset]"));
+  const textGroup = document.querySelector("[data-text-field-group]");
+  const wordGroup = document.querySelector("[data-word-field-group]");
+  const errorBox = document.querySelector("[data-errors]");
+  const warningPanel = document.querySelector("[data-warning-panel]");
+  const copyButton = document.querySelector("[data-copy-result]");
+  const copyLabel = document.querySelector("[data-copy-label]");
+  const copyStatus = document.querySelector("[data-copy-status]");
+  const copyFallback = document.querySelector("[data-copy-fallback]");
+  const rememberVelocity = document.querySelector("[data-remember-velocity]");
+
+  let currentSummary = "";
+
+  function get(selector) {
+    return document.querySelector(selector);
+  }
+
+  function getField(name) {
+    return get(`[data-field="${name}"]`);
+  }
+
+  function getMode() {
+    return modeInputs.find((input) => input.checked)?.value ?? "text";
+  }
+
+  function updateModeUi() {
+    const mode = getMode();
+
+    modeLabels.forEach((label) => {
+      label.dataset.active = String(label.dataset.modeLabel === mode);
+    });
+    textGroup.classList.toggle("hidden", mode !== "text");
+    wordGroup.classList.toggle("hidden", mode !== "words");
+    calculate();
+  }
+
+  function readInput() {
+    clearValidation();
+    const errors = [];
+    const mode = getMode();
+    const wordsPerMinute = readWordsPerMinute(errors);
+    const input = {
+      mode,
+      text: getField("text").value,
+      wordsPerMinute,
+      now: new Date(),
+    };
+    let empty = false;
+
+    if (mode === "text") {
+      empty = input.text.trim().length === 0;
+    } else {
+      const rawManualWords = getField("manualWords").value;
+
+      if (!rawManualWords.trim()) {
+        empty = true;
+      } else {
+        const parsedWords = parseReadingInteger(rawManualWords);
+
+        if (!parsedWords.ok) {
+          setFieldInvalid("manualWords", true);
+          errors.push("Enter a whole-number word count, such as 1,200.");
+        } else if (parsedWords.value > MAX_MANUAL_WORDS) {
+          setFieldInvalid("manualWords", true);
+          errors.push(`The word count must be less than or equal to ${formatReadingNumber(MAX_MANUAL_WORDS)}.`);
+        } else {
+          input.manualWords = parsedWords.value;
+          empty = parsedWords.value === 0;
+        }
+      }
+    }
+
+    return { input, errors, empty };
+  }
+
+  function readWordsPerMinute(errors) {
+    const input = getField("wordsPerMinute");
+    const parsed = parseReadingInteger(input.value);
+
+    if (!parsed.ok) {
+      setFieldInvalid("wordsPerMinute", true);
+      errors.push("Reading speed must be a whole number.");
+      return DEFAULT_WORDS_PER_MINUTE;
+
+    }
+
+    if (parsed.value < MIN_WORDS_PER_MINUTE || parsed.value > MAX_WORDS_PER_MINUTE) {
+      setFieldInvalid("wordsPerMinute", true);
+      errors.push(`Reading speed must be between ${MIN_WORDS_PER_MINUTE} and ${MAX_WORDS_PER_MINUTE} wpm.`);
+      return DEFAULT_WORDS_PER_MINUTE;
+    }
+
+    setFieldInvalid("wordsPerMinute", false);
+    return parsed.value;
+  }
+
+  function calculate() {
+    const parsed = readInput();
+
+    if (parsed.errors.length) {
+      showErrors(parsed.errors);
+      renderEmpty("Review the highlighted fields.");
+      setCopyEnabled(false);
+      return;
+    }
+
+    if (parsed.empty) {
+      showErrors([]);
+      renderEmpty("Paste text or enter a word count.");
+      setCopyEnabled(false);
+      persistVelocityPreference();
+      return;
+    }
+
+    try {
+      const result = calculateReadingTime(parsed.input);
+      currentSummary = buildReadingSummary(result);
+
+      showErrors([]);
+      renderResult(result);
+      setCopyEnabled(result.words > 0);
+      persistVelocityPreference();
+    } catch (error) {
+      const message =
+        error instanceof ReadingTimeValidationError
+          ? error.message
+          : "The estimate could not be calculated. Review the entered data.";
+
+      showErrors([message]);
+      renderEmpty("The estimate could not be calculated.");
+      setCopyEnabled(false);
+    }
+  }
+
+  function renderResult(result) {
+    get("[data-result-kicker]").textContent =
+      result.mode === "words" ? "Time from word count" : "Time from text";
+    get("[data-main-result]").textContent = result.formattedDuration;
+    get("[data-result-subtitle]").textContent =
+      `${formatReadingNumber(result.words)} words | ${result.wordsPerMinute} wpm`;
+    get("[data-result-note]").textContent =
+      `Approximate finish: ${result.finishTime}. Range: ${result.formattedRange}.`;
+    get("[data-summary-grid]").innerHTML = [
+      ["Range", result.formattedRange],
+      ["Estimated finish", result.finishTime],
+      ["Characters", characterLabel(result)],
+      ["Sentences", sentenceLabel(result)],
+    ].map(([label, value]) => summaryCard(label, value)).join("");
+    get("[data-preset-comparison]").innerHTML = result.presetEstimates
+      .map((estimate) => definitionRow(
+        `${estimate.preset.label} (${estimate.preset.wordsPerMinute} wpm)`,
+        estimate.formattedDuration,
+      ))
+      .join("");
+
+    const warnings = [];
+
+    if (result.warnings.includes("text_too_long")) {
+      warnings.push(
+        `The text exceeds ${formatReadingNumber(MAX_TEXT_CHARACTERS)} characters. The calculation ran in your browser, but it may feel slower on some devices.`,
+      );
+    }
+
+    warningPanel.innerHTML = warnings.map((message) => `<p>${escapeHtml(message)}</p>`).join("");
+    warningPanel.classList.toggle("hidden", warnings.length === 0);
+    copyFallback.classList.add("hidden");
+  }
+
+  function renderEmpty(note) {
+    currentSummary = "";
+    get("[data-result-kicker]").textContent = "Estimated time";
+    get("[data-main-result]").textContent = "Ready to calculate";
+    get("[data-result-subtitle]").textContent = note;
+    get("[data-result-note]").textContent =
+      "You will see the duration, range, and approximate finish time.";
+    get("[data-summary-grid]").innerHTML = [
+      ["Words", "0"],
+      ["Range", "0 s"],
+      ["Estimated finish", "-"],
+      ["Privacy", "Local"],
+    ].map(([label, value]) => summaryCard(label, value)).join("");
+    get("[data-preset-comparison]").innerHTML = READING_PRESETS
+      .map((preset) => definitionRow(`${preset.label} (${preset.wordsPerMinute} wpm)`, "0 s"))
+      .join("");
+    warningPanel.classList.add("hidden");
+    copyFallback.classList.add("hidden");
+  }
+
+  function characterLabel(result) {
+    if (result.mode === "words") return "No text";
+
+    return `${formatReadingNumber(result.metrics.charactersWithSpaces)} including spaces`;
+  }
+
+  function sentenceLabel(result) {
+    if (result.metrics.sentences === 0) return "No text";
+
+    const average =
+      result.metrics.wordsPerSentence === null
+        ? ""
+        : ` | ${formatReadingNumber(result.metrics.wordsPerSentence)} words/sentence`;
+
+    return `${formatReadingNumber(result.metrics.sentences)}${average}`;
+  }
+
+  function setPreset(presetId) {
+    if (presetId !== "custom") {
+      const preset = READING_PRESETS.find((item) => item.id === presetId);
+
+      if (preset) {
+        setWordsPerMinute(preset.wordsPerMinute);
+      }
+    }
+
+    setPresetState(presetId);
+    calculate();
+  }
+
+  function setPresetFromWordsPerMinute() {
+    const parsed = parseReadingInteger(getField("wordsPerMinute").value);
+    const preset = parsed.ok
+      ? READING_PRESETS.find((item) => item.wordsPerMinute === parsed.value)
+      : undefined;
+
+    setPresetState(preset?.id ?? "custom");
+  }
+
+  function setPresetState(activePreset) {
+    presetButtons.forEach((button) => {
+      button.setAttribute("aria-pressed", String(button.dataset.preset === activePreset));
+    });
+  }
+
+  function setWordsPerMinute(value) {
+
+    getField("wordsPerMinute").value = String(value);
+    getField("wordsPerMinuteRange").value = String(value);
+  }
+
+  function clearValidation() {
+    document.querySelectorAll('[aria-invalid="true"]').forEach((input) => {
+      input.removeAttribute("aria-invalid");
+    });
+  }
+
+  function setFieldInvalid(field, invalid) {
+    const element = getField(field);
+
+    if (invalid) {
+      element.setAttribute("aria-invalid", "true");
+    } else {
+      element.removeAttribute("aria-invalid");
+    }
+  }
+
+  function showErrors(messages) {
+    errorBox.innerHTML = messages.map((message) => `<p>${escapeHtml(message)}</p>`).join("");
+    errorBox.classList.toggle("hidden", messages.length === 0);
+
+    if (messages.length) {
+      errorBox.focus();
+    }
+  }
+
+  function setCopyEnabled(enabled) {
+    copyButton.disabled = !enabled;
+  }
+
+  async function copyResult() {
+    if (!currentSummary) return;
+
+    try {
+      if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(currentSummary);
+      } else {
+        const textArea = document.createElement("textarea");
+        textArea.value = currentSummary;
+        textArea.setAttribute("readonly", "");
+        textArea.style.position = "fixed";
+        textArea.style.opacity = "0";
+        document.body.append(textArea);
+        textArea.select();
+        document.execCommand("copy");
+        textArea.remove();
+      }
+
+      copyLabel.textContent = "Copied";
+      copyStatus.textContent = "Summary copied.";
+      copyFallback.classList.add("hidden");
+      window.setTimeout(() => {
+        copyLabel.textContent = "Copy summary";
+        copyStatus.textContent = "";
+      }, 2000);
+    } catch {
+      copyFallback.value = currentSummary;
+      copyFallback.classList.remove("hidden");
+      copyFallback.focus();
+      copyFallback.select();
+      copyStatus.textContent = "The summary could not be copied automatically. It has been selected for you.";
+    }
+  }
+
+  function clearForm() {
+    getField("text").value = "";
+    getField("manualWords").value = "";
+    showErrors([]);
+    renderEmpty("Paste text or enter a word count.");
+    setCopyEnabled(false);
+    getMode() === "text" ? getField("text").focus() : getField("manualWords").focus();
+  }
+
+  function loadVelocityPreference() {
+    try {
+      const raw = window.localStorage.getItem(STORAGE_KEY);
+      if (!raw) return;
+
+      const data = JSON.parse(raw);
+      const parsed = parseReadingInteger(String(data.wordsPerMinute ?? ""));
+
+      if (
+        parsed.ok &&
+        parsed.value >= MIN_WORDS_PER_MINUTE &&
+        parsed.value <= MAX_WORDS_PER_MINUTE
+      ) {
+        setWordsPerMinute(parsed.value);
+        rememberVelocity.checked = true;
+        setPresetFromWordsPerMinute();
+      }
+    } catch {
+      window.localStorage.removeItem(STORAGE_KEY);
+    }
+  }
+
+  function persistVelocityPreference() {
+    if (!rememberVelocity.checked) {
+      window.localStorage.removeItem(STORAGE_KEY);
+      return;
+    }
+
+    const parsed = parseReadingInteger(getField("wordsPerMinute").value);
+
+    if (
+      parsed.ok &&
+      parsed.value >= MIN_WORDS_PER_MINUTE &&
+      parsed.value <= MAX_WORDS_PER_MINUTE
+    ) {
+      window.localStorage.setItem(
+        STORAGE_KEY,
+        JSON.stringify({ wordsPerMinute: parsed.value }),
+      );
+    }
+  }
+
+  function summaryCard(label, value) {
+    return `<div class="rounded-lg border border-gray-800 bg-gray-950/70 p-3"><span class="block text-xs font-semibold uppercase tracking-wide text-gray-500">${escapeHtml(label)}</span><span class="mt-2 block break-words text-base font-semibold text-white">${escapeHtml(value)}</span></div>`;
+  }
+
+  function definitionRow(label, value) {
+    return `<div class="flex items-start justify-between gap-3"><span class="text-gray-400">${escapeHtml(label)}</span><strong class="shrink-0 text-right text-white">${escapeHtml(value)}</strong></div>`;
+  }
+
+  function escapeHtml(value) {
+    return String(value)
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;")
+      .replaceAll("'", "&#039;");
+  }
+
+  modeInputs.forEach((input) => {
+    input.addEventListener("change", updateModeUi);
+  });
+  presetButtons.forEach((button) => {
+    button.addEventListener("click", () => setPreset(button.dataset.preset));
+  });
+  getField("wordsPerMinute").addEventListener("input", () => {
+    getField("wordsPerMinuteRange").value = getField("wordsPerMinute").value;
+    setPresetFromWordsPerMinute();
+    calculate();
+  });
+  getField("wordsPerMinuteRange").addEventListener("input", () => {
+    setWordsPerMinute(getField("wordsPerMinuteRange").value);
+    setPresetFromWordsPerMinute();
+    calculate();
+
+  });
+  form.addEventListener("input", (event) => {
+    if (event.target.matches('[data-field="text"], [data-field="manualWords"]')) {
+      calculate();
+    }
+  });
+  rememberVelocity.addEventListener("change", () => {
+    persistVelocityPreference();
+  });
+  copyButton.addEventListener("click", copyResult);
+  get("[data-clear]").addEventListener("click", clearForm);
+
+  loadVelocityPreference();
+  updateModeUi();
+  calculate();
+</script>

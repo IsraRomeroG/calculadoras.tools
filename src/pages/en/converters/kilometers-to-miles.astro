@@ -1,0 +1,1094 @@
+---
+import BaseLayout from "@layouts/BaseLayout.astro";
+import AdSlot from "@components/ads/AdSlot.astro";
+import Container from "@components/layout/Container.astro";
+import PageShell from "@components/layout/PageShell.astro";
+import FaqSection from "@components/shared/FaqSection.astro";
+import PageHero from "@components/shared/PageHero.astro";
+import SectionIntro from "@components/shared/SectionIntro.astro";
+import { buildAlternateLinks } from "@lib/i18n/routing";
+import { buildFaqJsonLd } from "@lib/seo";
+
+const title = "Kilometers to miles converter";
+const description =
+  "Convert kilometers to miles and miles to kilometers instantly, with formulas and examples for roads or races.";
+const canonical = "/en/converters/kilometers-to-miles";
+const spanishCanonical = "/conversores/kilometros-a-millas";
+const alternates = buildAlternateLinks({ es: spanishCanonical, en: canonical }, Astro.site ?? Astro.url);
+
+const faqs = [
+  {
+    question: "How many miles are in one kilometer?",
+    answer: "One kilometer is approximately 0.62137 statute miles.",
+  },
+  {
+    question: "How many kilometers are in one mile?",
+    answer: "One statute mile equals exactly 1.609344 kilometers.",
+  },
+  {
+    question: "How do you convert kilometers to miles?",
+    answer:
+      "Divide kilometers by 1.609344, or multiply by 0.621371192237334.",
+  },
+  {
+    question: "How do you convert miles to kilometers?",
+    answer:
+      "Multiply statute miles by 1.609344 to obtain kilometers.",
+  },
+  {
+    question: "How many miles is 5 kilometers?",
+    answer: "5 kilometers is approximately 3.11 statute miles.",
+  },
+  {
+    question: "How many miles is 10 kilometers?",
+    answer: "10 kilometers is approximately 6.21 statute miles.",
+  },
+  {
+    question: "How many kilometers is 100 miles?",
+    answer: "100 statute miles equals 160.9344 kilometers.",
+  },
+  {
+    question: "Is a statute mile the same as a nautical mile?",
+    answer:
+      "No. The statute mile used here equals 1.609344 km. A nautical mile equals 1.852 km.",
+  },
+  {
+    question: "How many miles are in a marathon?",
+    answer:
+      "A marathon is 42.195 km, approximately 26.22 statute miles.",
+  },
+];
+
+const faqJsonLd = buildFaqJsonLd(faqs);
+
+const shortcutGroups = [
+  {
+    title: "Carreras",
+    description: "Distancias habituales en eventos deportivos.",
+    visible: true,
+    items: [
+      { label: "5K", value: "5", from: "km", to: "mi", result: "3.11 mi" },
+      { label: "10K", value: "10", from: "km", to: "mi", result: "6.21 mi" },
+      {
+        label: "Half marathon",
+        value: "21.0975",
+        from: "km",
+        to: "mi",
+        result: "13.11 mi",
+      },
+      {
+        label: "Marathon",
+        value: "42.195",
+        from: "km",
+        to: "mi",
+        result: "26.22 mi",
+      },
+    ],
+  },
+  {
+    title: "Common searches",
+    description: "Values that are commonly looked up.",
+    visible: true,
+    items: [
+      {
+        label: "1 km to miles",
+        value: "1",
+        from: "km",
+        to: "mi",
+        result: "0.62 mi",
+      },
+      {
+        label: "1 mi to km",
+        value: "1",
+        from: "mi",
+        to: "km",
+        result: "1.61 km",
+      },
+      {
+        label: "5 mi to km",
+        value: "5",
+        from: "mi",
+        to: "km",
+        result: "8.05 km",
+      },
+      {
+        label: "10 mi to km",
+        value: "10",
+        from: "mi",
+        to: "km",
+        result: "16.09 km",
+      },
+    ],
+  },
+  {
+    title: "Carretera y viajes",
+    description: "Compact references for long routes.",
+    visible: false,
+    items: [
+      {
+        label: "50 km to miles",
+        value: "50",
+        from: "km",
+        to: "mi",
+        result: "31.07 mi",
+      },
+      {
+        label: "100 km to miles",
+        value: "100",
+        from: "km",
+        to: "mi",
+        result: "62.14 mi",
+      },
+      {
+        label: "50 mi to km",
+        value: "50",
+        from: "mi",
+        to: "km",
+        result: "80.47 km",
+      },
+      {
+        label: "100 mi to km",
+        value: "100",
+        from: "mi",
+        to: "km",
+        result: "160.93 km",
+      },
+    ],
+  },
+];
+
+const visibleShortcutGroups = shortcutGroups.filter((group) => group.visible);
+const extraShortcutGroups = shortcutGroups.filter((group) => !group.visible);
+---
+
+<BaseLayout title={title} description={description} canonical={canonical} locale="en" alternates={alternates}>
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={JSON.stringify(faqJsonLd)} />
+  </Fragment>
+
+  <PageShell>
+    <PageHero
+      title="Kilometers to miles"
+      description="Convert kilometers and statute miles instantly. Copy or share the result and review common road and race equivalents."
+      kicker="Converters"
+      collapseBreadcrumbOnMobile
+      containerClass="py-6 md:py-8"
+      breadcrumbs={[
+        { label: "Home", href: "/en", ariaLabel: "Home" },
+        { label: "Converters", href: "/en/converters", optional: true },
+        { label: "Kilometers to miles", truncate: true },
+      ]}
+    />
+
+    <Container as="section" class="py-6 md:py-8">
+      <section
+        id="distance-converter"
+        class="overflow-hidden rounded-lg border border-gray-700 bg-gray-950 shadow-xl shadow-gray-950/30"
+        aria-labelledby="calculator-heading"
+      >
+        <div
+          class="grid gap-0 lg:grid-cols-[minmax(0,1fr)_minmax(19rem,0.78fr)]"
+        >
+          <div class="p-4 sm:p-6">
+            <p class="text-sm font-semibold text-amber-300">
+              Quick conversion
+            </p>
+            <h2 id="calculator-heading" class="mt-2 text-2xl font-semibold">
+              What distance do you want to convert?
+            </h2>
+
+            <div class="mt-6">
+              <label
+                for="distance-value"
+                class="block text-sm font-semibold text-gray-200"
+              >
+                Distancia
+              </label>
+              <div
+                class="mt-2 flex rounded-lg border border-gray-700 bg-gray-900 focus-within:border-amber-400 focus-within:ring-3 focus-within:ring-amber-400/15"
+              >
+                <input
+                  id="distance-value"
+                  class="min-h-14 w-full min-w-0 bg-transparent px-4 text-xl text-white outline-none placeholder:text-gray-600"
+                  type="text"
+                  inputmode="decimal"
+                  autocomplete="off"
+                  placeholder="Ej. 10 o 26,2 mi"
+                  aria-describedby="distance-help distance-error"
+                  data-distance-input
+                />
+                <span
+                  class="flex items-center px-4 text-sm text-gray-500"
+                  data-input-symbol
+                >
+                  km
+                </span>
+              </div>
+              <p
+                id="distance-help"
+                class="mt-2 text-xs leading-relaxed text-gray-500"
+              >
+                You can also paste values such as 42.195 km or 8 miles. To
+                tres decimal places usa punto: 1.609.
+              </p>
+              <p
+                id="distance-error"
+                class="mt-2 hidden text-sm text-red-300"
+                data-distance-error
+              >
+              </p>
+            </div>
+
+            <fieldset class="mt-5">
+              <legend class="text-sm font-semibold text-gray-200"
+                >Direction</legend
+              >
+              <div class="mt-2 grid grid-cols-2 gap-2">
+                <button
+                  class="min-h-12 rounded-lg border border-amber-400 bg-amber-400/10 px-3 py-2 text-sm font-semibold text-amber-100 transition hover:border-amber-300 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/30"
+                  type="button"
+                  aria-pressed="true"
+                  data-direction-from="km"
+                  data-direction-to="mi"
+                >
+                  km -> mi
+                </button>
+                <button
+                  class="min-h-12 rounded-lg border border-gray-700 bg-gray-900 px-3 py-2 text-sm font-semibold text-gray-200 transition hover:border-gray-500 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/30"
+                  type="button"
+                  aria-pressed="false"
+                  data-direction-from="mi"
+                  data-direction-to="km"
+                >
+                  mi -> km
+                </button>
+              </div>
+            </fieldset>
+
+            <div class="mt-5 flex flex-wrap items-end gap-3">
+              <button
+                class="min-h-11 rounded-lg border border-gray-700 bg-gray-900 px-4 py-2 text-sm font-semibold text-amber-300 transition hover:border-amber-400 hover:bg-gray-800 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/30"
+                type="button"
+                aria-label="Swap kilometers and statute miles"
+                title="Swap units"
+                data-swap-units
+              >
+                Intercambiar
+              </button>
+
+              <details class="relative" data-precision-panel>
+                <summary
+                  class="flex min-h-11 cursor-pointer items-center rounded-lg border border-gray-700 bg-gray-900 px-4 py-2 text-sm font-semibold text-gray-200 transition hover:border-gray-500 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-gray-400/30"
+                  data-precision-summary
+                >
+                  Precision: 2 decimal places
+                </summary>
+                <div
+                  class="mt-2 rounded-lg border border-gray-700 bg-gray-900 p-3"
+                >
+                  <label
+                    for="distance-decimals"
+                    class="block text-xs font-semibold text-gray-400"
+                  >
+                    Decimales visibles
+                  </label>
+                  <select
+                    id="distance-decimals"
+                    class="mt-2 min-h-11 w-full rounded-lg border border-gray-700 bg-gray-950 px-3 text-sm text-white outline-none transition focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15"
+                    data-decimals-select
+                  >
+                    <option value="0">0</option>
+                    <option value="1">1</option>
+                    <option value="2" selected>2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                    <option value="5">5</option>
+                  </select>
+                </div>
+              </details>
+
+              <button
+                class="min-h-11 rounded-lg border border-gray-700 px-4 py-2 text-sm font-semibold text-gray-200 transition hover:border-gray-500 hover:bg-gray-900 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-gray-400/30"
+                type="button"
+                data-clear-calculator
+              >
+                Clear
+              </button>
+            </div>
+          </div>
+
+          <aside
+            class="border-t border-gray-800 bg-gray-900/65 p-4 sm:p-6 lg:border-l lg:border-t-0"
+          >
+            <p
+              class="text-xs font-semibold uppercase tracking-wide text-gray-500"
+            >
+              Result principal
+            </p>
+            <p
+              class="mt-3 min-h-10 break-words text-3xl font-semibold text-amber-100"
+              data-main-result
+            >
+              Enter a distance
+            </p>
+            <p
+              class="mt-3 min-h-5 text-sm leading-relaxed text-gray-400"
+              data-result-note
+            >
+              You will see the highlighted equivalent as you type.
+            </p>
+            <div
+              class="mt-4 hidden space-y-1 text-xs leading-relaxed text-gray-400"
+              data-rate-panel
+            >
+              <p data-rate-direct></p>
+              <p data-rate-inverse></p>
+            </div>
+            <div class="mt-4 flex flex-wrap gap-2">
+              <button
+                class="hidden min-h-11 rounded-lg bg-amber-400 px-4 py-2 text-sm font-semibold text-gray-950 transition hover:bg-amber-300 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-300/40"
+                type="button"
+                data-copy-main
+              >
+                Copy resultado
+              </button>
+              <button
+                class="hidden min-h-11 rounded-lg border border-amber-400/60 px-4 py-2 text-sm font-semibold text-amber-200 transition hover:bg-amber-400/10 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-300/40"
+                type="button"
+                data-share-main
+              >
+                Share
+              </button>
+            </div>
+            <p
+              class="sr-only"
+              role="status"
+              aria-live="polite"
+              data-live-status
+            >
+            </p>
+            <p
+              class="mt-3 min-h-5 text-sm text-emerald-300"
+              role="status"
+              aria-live="polite"
+              data-copy-status
+            >
+            </p>
+          </aside>
+        </div>
+
+        <div class="border-t border-gray-800 p-4 sm:p-6">
+          <div
+            class="grid gap-6 lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)]"
+          >
+            <div>
+              <h3 class="text-lg font-semibold">Equivalent and formula</h3>
+              <div
+                class="mt-3 rounded-lg border border-gray-800 bg-gray-900/70 p-4"
+              >
+                <p class="text-sm leading-relaxed text-gray-200" data-formula>
+                  The formula will appear after you enter a distance.
+                </p>
+                <details class="mt-3 hidden" data-procedure-panel>
+                  <summary
+                    class="min-h-11 cursor-pointer py-2 text-sm font-semibold text-amber-300"
+                  >
+                    Ver procedimiento
+                  </summary>
+                  <ol
+                    class="mt-2 space-y-2 text-sm leading-relaxed text-gray-400"
+                    data-procedure-list
+                  >
+                  </ol>
+                </details>
+              </div>
+            </div>
+
+            <div>
+              <h3 class="text-lg font-semibold">Note about miles</h3>
+              <p
+                class="mt-3 rounded-lg border border-blue-400/25 bg-blue-400/10 p-4 text-sm leading-relaxed text-blue-100"
+              >
+                This calculator uses statute miles (mi). Nautical miles
+                (nmi), used in maritime and air navigation have another
+                equivalencia: 1 nmi = 1.852 km.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+    </Container>
+
+    <AdSlot placement="calculator-after-tool" />
+
+    <Container as="section" class="py-6 md:py-8">
+      <SectionIntro
+        title="Common conversions"
+        description="Load a common distance while keeping the same calculator, URL and shareable result."
+      />
+      <div class="grid gap-5 lg:grid-cols-2">
+        {
+          visibleShortcutGroups.map((group) => (
+            <section>
+              <h3 class="text-lg font-semibold">{group.title}</h3>
+              <p class="mt-1 text-sm leading-relaxed text-gray-400">
+                {group.description}
+              </p>
+              <div class="mt-3 grid gap-3 sm:grid-cols-2">
+                {group.items.map((shortcut) => (
+                  <button
+                    class="min-h-20 rounded-lg border border-gray-800 bg-gray-950 p-4 text-left transition hover:border-amber-400/60 hover:bg-gray-900 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/30"
+                    type="button"
+                    data-shortcut-value={shortcut.value}
+                    data-shortcut-from={shortcut.from}
+                    data-shortcut-to={shortcut.to}
+                  >
+                    <span class="block text-sm font-semibold text-white">
+                      {shortcut.label}
+                    </span>
+                    <span class="mt-2 block text-sm text-amber-300">
+                      {shortcut.result}
+                    </span>
+                  </button>
+                ))}
+              </div>
+            </section>
+          ))
+        }
+      </div>
+      {
+        extraShortcutGroups.length > 0 && (
+          <details class="mt-5 rounded-lg border border-gray-800 bg-gray-950">
+            <summary class="flex min-h-12 cursor-pointer items-center px-4 py-3 text-sm font-semibold text-amber-300">
+              View more conversions
+            </summary>
+            <div class="grid gap-5 border-t border-gray-800 p-4 lg:grid-cols-2">
+              {extraShortcutGroups.map((group) => (
+                <section>
+                  <h3 class="text-base font-semibold">{group.title}</h3>
+                  <p class="mt-1 text-sm leading-relaxed text-gray-400">
+                    {group.description}
+                  </p>
+                  <div class="mt-3 grid gap-3 sm:grid-cols-2">
+                    {group.items.map((shortcut) => (
+                      <button
+                        class="min-h-20 rounded-lg border border-gray-800 bg-gray-900 p-4 text-left transition hover:border-amber-400/60 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/30"
+                        type="button"
+                        data-shortcut-value={shortcut.value}
+                        data-shortcut-from={shortcut.from}
+                        data-shortcut-to={shortcut.to}
+                      >
+                        <span class="block text-sm font-semibold text-white">
+                          {shortcut.label}
+                        </span>
+                        <span class="mt-2 block text-sm text-amber-300">
+                          {shortcut.result}
+                        </span>
+                      </button>
+                    ))}
+                  </div>
+                </section>
+              ))}
+            </div>
+          </details>
+        )
+      }
+    </Container>
+
+    <Container as="section" class="py-6 md:py-8">
+      <SectionIntro
+        title="Short conversion table"
+        description="Quick references for checking common distances without leaving the page."
+      />
+      <div
+        class="overflow-x-auto rounded-lg border border-gray-800 bg-gray-950"
+      >
+        <table class="w-full min-w-[30rem] text-left text-sm">
+          <thead
+            class="bg-gray-900 text-xs uppercase tracking-wide text-gray-500"
+          >
+            <tr>
+              <th class="px-4 py-3">Kilometers</th>
+              <th class="px-4 py-3">Approximate statute miles</th>
+              <th class="px-4 py-3">Statute miles</th>
+              <th class="px-4 py-3">Kilometers aproximados</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-gray-800 text-gray-300">
+            <tr
+              ><td class="px-4 py-3">1 km</td><td class="px-4 py-3">0.62 mi</td
+              ><td class="px-4 py-3">1 mi</td><td class="px-4 py-3">1.61 km</td
+              ></tr
+            >
+            <tr
+              ><td class="px-4 py-3">5 km</td><td class="px-4 py-3">3.11 mi</td
+              ><td class="px-4 py-3">5 mi</td><td class="px-4 py-3">8.05 km</td
+              ></tr
+            >
+            <tr
+              ><td class="px-4 py-3">10 km</td><td class="px-4 py-3">6.21 mi</td
+              ><td class="px-4 py-3">10 mi</td><td class="px-4 py-3"
+                >16.09 km</td
+              ></tr
+            >
+            <tr
+              ><td class="px-4 py-3">20 km</td><td class="px-4 py-3"
+                >12.43 mi</td
+              ><td class="px-4 py-3">50 mi</td><td class="px-4 py-3"
+                >80.47 km</td
+              ></tr
+            >
+            <tr
+              ><td class="px-4 py-3">50 km</td><td class="px-4 py-3"
+                >31.07 mi</td
+              ><td class="px-4 py-3">100 mi</td><td class="px-4 py-3"
+                >160.93 km</td
+              ></tr
+            >
+            <tr
+              ><td class="px-4 py-3">100 km</td><td class="px-4 py-3"
+                >62.14 mi</td
+              ><td class="px-4 py-3">500 mi</td><td class="px-4 py-3"
+                >804.67 km</td
+              ></tr
+            >
+          </tbody>
+        </table>
+      </div>
+    </Container>
+
+    <Container as="section" class="py-6 md:py-8">
+      <SectionIntro
+        title="How to convert kilometers and miles"
+        description="The calculator keeps full precision and only rounds the displayed value."
+      />
+      <div class="grid gap-4 lg:grid-cols-2">
+        <article class="rounded-lg border border-gray-800 bg-gray-950 p-5">
+          <h3 class="text-lg font-semibold">Kilometers to miles</h3>
+          <p class="mt-3 text-sm leading-relaxed text-gray-400">
+            Divide kilometers by <span class="text-gray-200"
+              >1.609344</span
+            >. La equivalencia aproximada es <span class="text-gray-200"
+              >1 km = 0.62137 mi</span
+            >.
+          </p>
+          <p class="mt-4 rounded-lg bg-gray-900 p-3 text-sm text-amber-200">
+            miles = kilometers / 1.609344
+          </p>
+        </article>
+        <article class="rounded-lg border border-gray-800 bg-gray-950 p-5">
+          <h3 class="text-lg font-semibold">Miles to kilometers</h3>
+          <p class="mt-3 text-sm leading-relaxed text-gray-400">
+            Multiply statute miles by <span class="text-gray-200"
+              >1.609344</span
+            >. This equivalent uses the international statute mile.
+          </p>
+          <p class="mt-4 rounded-lg bg-gray-900 p-3 text-sm text-amber-200">
+            kilometers = miles × 1.609344
+          </p>
+        </article>
+      </div>
+      <p class="mt-5 text-sm leading-relaxed text-gray-400">
+        For a quick estimate, 5 km is approximately 3.1 mi, and 10 mi is
+        approximately 16 km.
+      </p>
+    </Container>
+
+    <Container as="section" class="py-6 md:py-8">
+      <SectionIntro
+        title="Race references"
+        description="Popular distances in both systems."
+      />
+      <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        <article class="rounded-lg border border-gray-800 bg-gray-950 p-4">
+          <h3 class="font-semibold text-white">5K</h3>
+          <p class="mt-2 text-sm text-amber-300">5 km = 3.11 mi</p>
+        </article>
+        <article class="rounded-lg border border-gray-800 bg-gray-950 p-4">
+          <h3 class="font-semibold text-white">10K</h3>
+          <p class="mt-2 text-sm text-amber-300">10 km = 6.21 mi</p>
+        </article>
+        <article class="rounded-lg border border-gray-800 bg-gray-950 p-4">
+          <h3 class="font-semibold text-white">Half marathon</h3>
+          <p class="mt-2 text-sm text-amber-300">21.0975 km = 13.11 mi</p>
+        </article>
+        <article class="rounded-lg border border-gray-800 bg-gray-950 p-4">
+          <h3 class="font-semibold text-white">Marathon</h3>
+          <p class="mt-2 text-sm text-amber-300">42.195 km = 26.22 mi</p>
+        </article>
+      </div>
+    </Container>
+
+    <Container as="section" class="py-6 md:py-8">
+      <SectionIntro
+        title="Related calculators"
+        description="These tools add context when distance is part of a larger estimate."
+      />
+      <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        <a
+          class="rounded-lg border border-gray-800 bg-gray-950 p-4 transition hover:border-amber-400/60 hover:bg-gray-900"
+          href="/en/converters/weight-converter"
+        >
+          <span class="block font-semibold text-white">Weight converter</span>
+          <span class="mt-2 block text-sm leading-relaxed text-gray-400"
+            >Convert kg, lb, grams, ounces and stone.</span
+          >
+        </a>
+        <a
+          class="rounded-lg border border-gray-800 bg-gray-950 p-4 transition hover:border-amber-400/60 hover:bg-gray-900"
+          href="/en/converters/temperature-converter"
+        >
+          <span class="block font-semibold text-white"
+            >Temperature converter</span
+          >
+          <span class="mt-2 block text-sm leading-relaxed text-gray-400"
+            >Convert Celsius, Fahrenheit and Kelvin.</span
+          >
+        </a>
+      </div>
+    </Container>
+
+    <FaqSection faqs={faqs} />
+  </PageShell>
+</BaseLayout>
+
+<script>
+  import {
+    DISTANCE_UNIT_METADATA,
+    buildDistanceExplanation,
+    convertDistance,
+    formatDistance,
+    formatDistanceRate,
+    isDistanceUnit,
+    parseDistanceInput,
+  } from "@lib/calculators/conversores/kilometros-a-millas/distance.en";
+
+  const input = document.querySelector("[data-distance-input]");
+  const inputSymbol = document.querySelector("[data-input-symbol]");
+  const decimalsSelect = document.querySelector("[data-decimals-select]");
+  const precisionSummary = document.querySelector("[data-precision-summary]");
+  const errorElement = document.querySelector("[data-distance-error]");
+  const mainResult = document.querySelector("[data-main-result]");
+  const resultNote = document.querySelector("[data-result-note]");
+  const ratePanel = document.querySelector("[data-rate-panel]");
+  const directRate = document.querySelector("[data-rate-direct]");
+  const inverseRate = document.querySelector("[data-rate-inverse]");
+  const formula = document.querySelector("[data-formula]");
+  const procedurePanel = document.querySelector("[data-procedure-panel]");
+  const procedureList = document.querySelector("[data-procedure-list]");
+  const copyMainButton = document.querySelector("[data-copy-main]");
+  const shareMainButton = document.querySelector("[data-share-main]");
+  const copyStatus = document.querySelector("[data-copy-status]");
+  const liveStatus = document.querySelector("[data-live-status]");
+  const clearButton = document.querySelector("[data-clear-calculator]");
+  const swapButton = document.querySelector("[data-swap-units]");
+
+  let origin = "km";
+  let destination = "mi";
+  let currentMainCopyText = "";
+  let currentShareText = "";
+  let currentShareUrl = window.location.href;
+  let copyTimer = 0;
+  let liveTimer = 0;
+  let urlTimer = 0;
+
+  function getDecimals() {
+    const decimals = Number(decimalsSelect.value);
+
+    return Number.isInteger(decimals) && decimals >= 0 && decimals <= 5
+      ? decimals
+      : 2;
+  }
+
+  function getOtherUnit(unit) {
+    return unit === "km" ? "mi" : "km";
+  }
+
+  function getRateDecimals(from, to) {
+    return from === "mi" && to === "km" ? 6 : 5;
+  }
+
+  function updateDirectionControls() {
+    document
+      .querySelectorAll("[data-direction-from][data-direction-to]")
+      .forEach((button) => {
+        const active =
+          button.dataset.directionFrom === origin &&
+          button.dataset.directionTo === destination;
+
+        button.setAttribute("aria-pressed", active ? "true" : "false");
+        button.classList.toggle("border-amber-400", active);
+        button.classList.toggle("bg-amber-400/10", active);
+        button.classList.toggle("text-amber-100", active);
+        button.classList.toggle("border-gray-700", !active);
+        button.classList.toggle("bg-gray-900", !active);
+        button.classList.toggle("text-gray-200", !active);
+      });
+
+    inputSymbol.textContent = DISTANCE_UNIT_METADATA[origin].symbol;
+    precisionSummary.textContent = `Precision: ${getDecimals()} decimal places`;
+  }
+
+  function setDirection(from, to) {
+    origin = from;
+    destination = to;
+    updateDirectionControls();
+  }
+
+  function setError(message = "") {
+    errorElement.textContent = message;
+    errorElement.classList.toggle("hidden", !message);
+    input.setAttribute("aria-invalid", message ? "true" : "false");
+  }
+
+  function clearOutputs(note = "You will see the highlighted equivalent as you type.") {
+    currentMainCopyText = "";
+    currentShareText = "";
+    window.clearTimeout(liveTimer);
+    liveStatus.textContent = "";
+    mainResult.textContent = "Enter a distance";
+    resultNote.textContent = note;
+    ratePanel.classList.add("hidden");
+    directRate.textContent = "";
+    inverseRate.textContent = "";
+    formula.textContent = "The formula will appear after you enter a distance.";
+    procedurePanel.classList.add("hidden");
+    procedureList.replaceChildren();
+    copyMainButton.classList.add("hidden");
+    shareMainButton.classList.add("hidden");
+  }
+
+  function buildContextNote() {
+    if (origin === destination) {
+      return "The source and destination units are the same; the equivalent is 1:1.";
+    }
+
+    return "The conversion uses full precision and only rounds the display.";
+  }
+
+  function buildUrl(value) {
+    const url = new URL(window.location.href);
+
+    url.searchParams.set("valor", String(value));
+    url.searchParams.set("origen", origin);
+    url.searchParams.set("destino", destination);
+    url.searchParams.set("decimal places", String(getDecimals()));
+
+    return url;
+  }
+
+  function scheduleUrlUpdate(value) {
+    const url = buildUrl(value);
+
+    currentShareUrl = url.toString();
+    window.clearTimeout(urlTimer);
+    urlTimer = window.setTimeout(() => {
+      window.history.replaceState({}, "", url);
+    }, 250);
+  }
+
+  function clearUrl() {
+    const url = new URL(window.location.href);
+
+    ["valor", "origen", "destino", "decimal places"].forEach((parameter) => {
+      url.searchParams.delete(parameter);
+    });
+
+    currentShareUrl = url.toString();
+    window.clearTimeout(urlTimer);
+    window.history.replaceState({}, "", url);
+  }
+
+  function scheduleAnnouncement(message) {
+    window.clearTimeout(liveTimer);
+    liveTimer = window.setTimeout(() => {
+      liveStatus.textContent = message;
+    }, 350);
+  }
+
+  function showStatus(message) {
+    copyStatus.textContent = message;
+    window.clearTimeout(copyTimer);
+    copyTimer = window.setTimeout(() => {
+      copyStatus.textContent = "";
+    }, 2000);
+  }
+
+  function render(options = {}) {
+    const {
+      normalizeDetectedUnit = false,
+      updateUrl = true,
+      announce = true,
+    } = options;
+    const parsed = parseDistanceInput(input.value);
+
+    updateDirectionControls();
+
+    if (!parsed.ok) {
+      if (parsed.error === "invalid") {
+        setError(
+          "The distance could not be interpreted. Use a format such as 10.5 km or 6.2 mi.",
+        );
+        clearOutputs("Check the format to see the equivalent.");
+      } else if (parsed.error === "nautical") {
+        setError(
+          "This calculator converts statute miles (mi), not nautical miles (nmi).",
+        );
+        clearOutputs("Use km or mi to continue.");
+      } else {
+        setError();
+        clearOutputs();
+      }
+
+      if (updateUrl) {
+        clearUrl();
+      }
+
+      return;
+    }
+
+    if (normalizeDetectedUnit && parsed.detectedUnit) {
+      origin = parsed.detectedUnit;
+      destination = getOtherUnit(origin);
+      input.value = parsed.normalized;
+      updateDirectionControls();
+    }
+
+    try {
+      const decimals = getDecimals();
+      const resultValue = convertDistance(parsed.value, origin, destination);
+      const explanation = buildDistanceExplanation(
+        parsed.value,
+        origin,
+        destination,
+        decimals,
+      );
+      const formattedSource = formatDistance(parsed.value, origin, decimals);
+      const formattedDestination = formatDistance(
+        resultValue,
+        destination,
+        decimals,
+      );
+      const inverseRateText = formatDistanceRate(
+        destination,
+        origin,
+        getRateDecimals(destination, origin),
+      );
+
+      setError();
+      currentShareText = `${formattedSource} = ${formattedDestination}`;
+      currentMainCopyText = `${currentShareText}\nEquivalencia: ${inverseRateText}`;
+      mainResult.textContent = currentShareText;
+      resultNote.textContent = buildContextNote();
+      directRate.textContent = formatDistanceRate(
+        origin,
+        destination,
+        getRateDecimals(origin, destination),
+      );
+      inverseRate.textContent = inverseRateText;
+      ratePanel.classList.remove("hidden");
+      formula.textContent = `Formula: ${explanation.formula}`;
+      procedurePanel.classList.remove("hidden");
+      procedureList.replaceChildren(
+        ...explanation.steps.map((step) => {
+          const item = document.createElement("li");
+
+          item.textContent = step;
+
+          return item;
+        }),
+      );
+      copyMainButton.classList.remove("hidden");
+      shareMainButton.classList.remove("hidden");
+
+      if (updateUrl) {
+        scheduleUrlUpdate(parsed.value);
+      } else {
+        currentShareUrl = buildUrl(parsed.value).toString();
+      }
+
+      if (announce) {
+        scheduleAnnouncement(`Result: ${currentShareText}`);
+      }
+    } catch (error) {
+      setError(
+        error instanceof Error
+          ? error.message
+          : "This distance could not be converted.",
+      );
+      clearOutputs("Correct the value to continue.");
+
+      if (updateUrl) {
+        clearUrl();
+      }
+    }
+  }
+
+  async function copyText(text) {
+    if (!text) {
+      return false;
+    }
+
+    try {
+      await navigator.clipboard.writeText(text);
+      showStatus(`Copiado: ${text}`);
+    } catch {
+      showStatus("The result could not be copied automatically.");
+
+      return false;
+    }
+
+    return true;
+  }
+
+  async function shareConversion() {
+    if (!currentShareText) {
+      return;
+    }
+
+    if ("share" in navigator) {
+      try {
+        await navigator.share({
+          title: "Kilometers and miles conversion",
+          text: currentShareText,
+          url: currentShareUrl,
+        });
+        showStatus("Conversion shared.");
+
+        return;
+      } catch (error) {
+        if (error instanceof DOMException && error.name === "AbortError") {
+          return;
+        }
+      }
+    }
+
+    await copyText(currentShareUrl);
+  }
+
+  function loadUrlParameters() {
+    const parameters = new URLSearchParams(window.location.search);
+    const value = parameters.get("valor");
+    const urlOrigin = parameters.get("origen");
+    const urlDestination = parameters.get("destino");
+    const decimals = parameters.get("decimal places");
+
+    if (urlOrigin && isDistanceUnit(urlOrigin)) {
+      origin = urlOrigin;
+    }
+
+    if (urlDestination && isDistanceUnit(urlDestination)) {
+      destination = urlDestination;
+    } else {
+      destination = getOtherUnit(origin);
+    }
+
+    if (decimals && ["0", "1", "2", "3", "4", "5"].includes(decimals)) {
+      decimalsSelect.value = decimals;
+    }
+
+    updateDirectionControls();
+
+    if (value && parseDistanceInput(value).ok) {
+      input.value = value;
+      render({ updateUrl: false, announce: false });
+    }
+  }
+
+  input.addEventListener("input", () => {
+    render({ normalizeDetectedUnit: true });
+  });
+
+  decimalsSelect.addEventListener("change", () => {
+    updateDirectionControls();
+    render();
+  });
+
+  swapButton.addEventListener("click", () => {
+    const parsed = parseDistanceInput(input.value);
+    const previousOrigin = origin;
+    const previousDestination = destination;
+
+    origin = previousDestination;
+    destination = previousOrigin;
+
+    if (parsed.ok) {
+      try {
+        input.value = String(
+          convertDistance(parsed.value, previousOrigin, previousDestination),
+        );
+      } catch {
+        // The normal render path presents the validation message.
+      }
+    }
+
+    updateDirectionControls();
+    render();
+  });
+
+  clearButton.addEventListener("click", () => {
+    input.value = "";
+    setError();
+    clearOutputs();
+    clearUrl();
+    input.focus();
+  });
+
+  copyMainButton.addEventListener("click", () => {
+    copyText(currentMainCopyText);
+  });
+
+  shareMainButton.addEventListener("click", () => {
+    shareConversion();
+  });
+
+  document.addEventListener("click", (event) => {
+    const directionButton = event.target.closest(
+      "[data-direction-from][data-direction-to]",
+    );
+
+    if (directionButton) {
+      const { directionFrom, directionTo } = directionButton.dataset;
+
+      if (!isDistanceUnit(directionFrom) || !isDistanceUnit(directionTo)) {
+        return;
+      }
+
+      setDirection(directionFrom, directionTo);
+      render();
+
+      return;
+    }
+
+    const shortcutButton = event.target.closest("[data-shortcut-value]");
+
+    if (!shortcutButton) {
+      return;
+    }
+
+    const { shortcutValue, shortcutFrom, shortcutTo } = shortcutButton.dataset;
+
+    if (
+      typeof shortcutValue !== "string" ||
+      !isDistanceUnit(shortcutFrom) ||
+      !isDistanceUnit(shortcutTo)
+    ) {
+      return;
+    }
+
+    input.value = shortcutValue;
+    setDirection(shortcutFrom, shortcutTo);
+    render();
+    mainResult.setAttribute("tabindex", "-1");
+    mainResult.focus();
+    document.querySelector("#distance-converter")?.scrollIntoView({
+      behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches
+        ? "auto"
+        : "smooth",
+      block: "start",
+    });
+  });
+
+  updateDirectionControls();
+  loadUrlParameters();
+</script>

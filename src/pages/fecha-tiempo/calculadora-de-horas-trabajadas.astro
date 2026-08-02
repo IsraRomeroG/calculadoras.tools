@@ -6,12 +6,15 @@ import PageShell from "@components/layout/PageShell.astro";
 import FaqSection from "@components/shared/FaqSection.astro";
 import PageHero from "@components/shared/PageHero.astro";
 import SectionIntro from "@components/shared/SectionIntro.astro";
+import { buildAlternateLinks } from "@lib/i18n/routing";
 import { buildFaqJsonLd } from "@lib/seo";
 
 const title = "Calculadora de horas trabajadas y pago por hora";
 const description =
   "Suma turnos, resta descansos y calcula horas normales, horas extra y pago estimado, incluso si trabajas después de medianoche.";
 const canonical = "/fecha-tiempo/calculadora-de-horas-trabajadas";
+const englishCanonical = "/en/date-time/work-hours-calculator";
+const alternates = buildAlternateLinks({ es: canonical, en: englishCanonical }, Astro.site ?? Astro.url);
 
 const faqs = [
   {
@@ -54,7 +57,7 @@ const faqs = [
 const faqJsonLd = buildFaqJsonLd(faqs);
 ---
 
-<BaseLayout title={title} description={description} canonical={canonical}>
+<BaseLayout title={title} description={description} canonical={canonical} alternates={alternates}>
   <Fragment slot="head">
     <script type="application/ld+json" set:html={JSON.stringify(faqJsonLd)} />
   </Fragment>

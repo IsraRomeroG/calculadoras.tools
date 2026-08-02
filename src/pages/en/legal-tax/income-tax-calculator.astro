@@ -1,0 +1,833 @@
+---
+import AdSlot from "@components/ads/AdSlot.astro";
+import Container from "@components/layout/Container.astro";
+import PageShell from "@components/layout/PageShell.astro";
+import FaqSection from "@components/shared/FaqSection.astro";
+import PageHero from "@components/shared/PageHero.astro";
+import SectionIntro from "@components/shared/SectionIntro.astro";
+import { buildAlternateLinks } from "@lib/i18n/routing";
+import BaseLayout from "@layouts/BaseLayout.astro";
+import {
+  ISR_CANONICAL_PATH,
+  MEXICO_ISR_FREQUENCIES,
+  MEXICO_ISR_PRESET,
+} from "@lib/calculators/legal-impuestos/calculadora-isr-irpf/incomeTax.en";
+import { buildFaqJsonLd } from "@lib/seo";
+
+const title = "Mexico income tax (ISR) calculator 2026";
+const description =
+  "Estimate income tax (ISR) in Mexico by pay period or year, review the effective rate, and compare tax with withholding."
+const canonical = ISR_CANONICAL_PATH;
+const spanishCanonical = "/legal-impuestos/calculadora-isr-irpf";
+const alternates = buildAlternateLinks({ es: spanishCanonical, en: canonical }, Astro.site ?? Astro.url);
+
+const faqs = [
+  {
+    question: "What does this tool calculate?",
+    answer:
+      "It calculates an informational income-tax estimate using the selected official Mexico 2026 table. You can estimate payroll withholding or annual tax.",
+  },
+  {
+    question: "What taxable base should I enter?",
+    answer:
+      "Enter the taxable base for the pay period or tax year—the amount already subject to the income-tax calculation. Do not subtract deductions from that base again.",
+  },
+  {
+    question: "What is the difference between withholding and annual tax?",
+    answer:
+      "Withholding is the estimated income tax on a specific payment based on its frequency. Annual tax uses the tax-year table and is compared with accumulated withholding.",
+  },
+  {
+    question: "Does the balance show how much I owe SAT?",
+    answer:
+      "No. The balance is an informational comparison between calculated tax and the withholding entered. Your final liability may change because of deductions, additional income, credits, and other circumstances.",
+  },
+  {
+    question: "Does the calculator include personal deductions or IMSS?",
+    answer:
+      "Not automatically. This version calculates basic income tax and does not include personal deductions, IMSS, INFONAVIT, or other items not entered or requiring additional rules.",
+  },
+];
+
+const faqJsonLd = buildFaqJsonLd(faqs);
+const fieldClass =
+  "mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-900 px-4 text-base text-white outline-none transition placeholder:text-gray-600 focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15";
+---
+
+<BaseLayout title={title} description={description} canonical={canonical} locale="en" alternates={alternates}>
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={JSON.stringify(faqJsonLd)} />
+  </Fragment>
+
+  <PageShell>
+    <PageHero
+      title="Mexico income tax (ISR) calculator"
+      description="Estimate payroll withholding or annual income tax and understand the bracket applied to your taxable base."
+      kicker="Legal & Tax"
+      collapseBreadcrumbOnMobile
+      containerClass="py-6 md:py-8"
+      breadcrumbs={[
+        { label: "Home", href: "/en", ariaLabel: "Home" },
+        { label: "Legal & Taxes", href: "/en/legal-tax", optional: true },
+        { label: "Mexico income tax", truncate: true },
+      ]}
+    />
+
+    <Container as="section" class="py-5 md:py-8">
+      <div class="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(20rem,0.82fr)]">
+        <section
+          class="order-1 overflow-hidden rounded-lg border border-gray-700 bg-gray-950 shadow-xl shadow-gray-950/30"
+          aria-labelledby="income-tax-heading"
+        >
+          <div class="border-b border-gray-800 p-4 sm:p-6">
+            <p class="text-sm font-semibold uppercase tracking-wide text-amber-400">
+              Mexico income tax · 2026
+            </p>
+            <h2 id="income-tax-heading" class="mt-2 text-2xl font-semibold text-white">
+              Enter your taxable base
+            </h2>
+            <p class="mt-2 text-sm leading-relaxed text-gray-400">
+              The amount must be the taxable base for the selected scope.
+              The calculator does not automatically subtract deductions from it.
+            </p>
+          </div>
+
+          <form class="p-4 sm:p-6" data-income-tax-form novalidate>
+            <div class="grid gap-4 sm:grid-cols-2">
+              <div>
+                <label class="income-tax-label" for="tax-country">Country</label>
+                <select id="tax-country" class={fieldClass} disabled>
+                  <option>Mexico</option>
+                </select>
+                <p class="income-tax-help">Federal preset available.</p>
+              </div>
+
+              <div>
+                <label class="income-tax-label" for="tax-period">Tax year</label>
+                <select id="tax-period" class={fieldClass} disabled>
+                  <option>{MEXICO_ISR_PRESET.period}</option>
+                </select>
+                <p class="income-tax-help">Table reviewed July 21, 2026.</p>
+              </div>
+            </div>
+
+            <div class="mt-5 grid gap-4 sm:grid-cols-2">
+              <div>
+                <label class="income-tax-label" for="tax-mode">What do you want to estimate?</label>
+                <select id="tax-mode" class={fieldClass} data-tax-mode>
+                  <option value="payroll-withholding">Payroll withholding</option>
+                  <option value="annual-estimate">Annual tax</option>
+                </select>
+                <p class="income-tax-help" data-mode-help>
+                  Compare a payment with withholding for the same period.
+                </p>
+              </div>
+
+              <div>
+                <label class="income-tax-label" for="tax-frequency">Frequency</label>
+                <select id="tax-frequency" class={fieldClass} data-tax-frequency>
+                  {
+                    MEXICO_ISR_FREQUENCIES.map((frequency) => (
+                      <option value={frequency.id}>{frequency.label}</option>
+                    ))
+                  }
+                </select>
+                <p class="income-tax-help" data-frequency-help>
+                  The corresponding official table is selected.
+                </p>
+              </div>
+            </div>
+
+            <div class="mt-5">
+              <label class="income-tax-label" for="tax-base" data-base-label>
+                Taxable base for the period
+              </label>
+              <div class="income-tax-money-shell">
+                <span class="pl-4 text-gray-500" aria-hidden="true">$</span>
+                <input
+                  id="tax-base"
+                  class="income-tax-money-input"
+                  type="text"
+                  inputmode="decimal"
+                  autocomplete="off"
+                  placeholder="20,000"
+                  aria-describedby="tax-base-help tax-base-error"
+                  data-tax-base
+                />
+              </div>
+              <p id="tax-base-help" class="income-tax-help">
+                Enter an amount that is zero or greater. Example: 20,000.
+              </p>
+              <p id="tax-base-error" class="income-tax-error" data-error-for="base"></p>
+            </div>
+
+            <div class="mt-5">
+              <label class="income-tax-label" for="tax-retention" data-retention-label>
+                Income-tax withholding for the period <span class="font-normal text-gray-500">(opcional)</span>
+              </label>
+              <div class="income-tax-money-shell">
+                <span class="pl-4 text-gray-500" aria-hidden="true">$</span>
+                <input
+                  id="tax-retention"
+                  class="income-tax-money-input"
+                  type="text"
+                  inputmode="decimal"
+                  autocomplete="off"
+                  placeholder="2,000"
+                  aria-describedby="tax-retention-help tax-retention-error"
+                  data-tax-retention
+                />
+              </div>
+              <p id="tax-retention-help" class="income-tax-help" data-retention-help>
+                If entered, the estimated amount due or refund will be shown.
+              </p>
+              <p id="tax-retention-error" class="income-tax-error" data-error-for="retention"></p>
+            </div>
+
+            <details class="mt-6 rounded-lg border border-gray-800 bg-gray-900/50 p-4" data-advanced>
+              <summary class="cursor-pointer list-none text-sm font-semibold text-white">
+                <span class="flex items-center justify-between gap-4">
+                  <span>Advanced options</span>
+                  <span class="text-xs font-normal text-gray-500">Manual simulation</span>
+                </span>
+              </summary>
+
+              <div class="mt-5">
+                <label class="income-tax-label" for="tax-rule-mode">Table source</label>
+                <select id="tax-rule-mode" class={fieldClass} data-tax-rule-mode>
+                  <option value="official">Official Mexico preset</option>
+                  <option value="manual">Single manual rate</option>
+                </select>
+                <p class="income-tax-help">
+                  The manual rate is a simulation and has no official source or tax-year validity.
+                </p>
+              </div>
+
+              <div class="mt-4 hidden" data-manual-rate-wrap>
+                <label class="income-tax-label" for="tax-manual-rate">
+                  Manual rate (%)
+                </label>
+                <div class="income-tax-money-shell">
+                  <input
+                    id="tax-manual-rate"
+                    class="income-tax-money-input pl-4"
+                    type="text"
+                    inputmode="decimal"
+                    autocomplete="off"
+                    placeholder="10"
+                    aria-describedby="tax-manual-rate-error"
+                    data-tax-manual-rate
+                  />
+                  <span class="pr-4 text-gray-500">%</span>
+                </div>
+                <p id="tax-manual-rate-error" class="income-tax-error" data-error-for="manual-rate"></p>
+              </div>
+            </details>
+
+            <div class="mt-6 flex flex-col gap-3 border-t border-gray-800 pt-5 sm:flex-row">
+              <button class="income-tax-primary-button" type="submit">
+                Calculate income tax
+              </button>
+              <button class="income-tax-secondary-button" type="button" data-example>
+                Load example
+              </button>
+              <button class="income-tax-quiet-button" type="button" data-clear>
+                Clear
+              </button>
+              <p class="sr-only" role="status" aria-live="polite" data-form-status></p>
+            </div>
+          </form>
+        </section>
+
+        <aside
+          class="order-2 h-fit rounded-lg border border-gray-700 bg-gray-900/80 p-4 shadow-xl shadow-gray-950/20 sm:p-6 lg:sticky lg:top-6"
+          aria-labelledby="tax-result-heading"
+          aria-live="polite"
+          data-result-region
+        >
+          <p class="text-sm font-semibold uppercase tracking-wide text-amber-400" data-result-status>
+            Result
+          </p>
+          <h2 id="tax-result-heading" class="mt-2 text-xl font-semibold text-white" data-main-label>
+            Estimated income tax
+          </h2>
+          <p class="mt-3 break-words text-4xl font-bold tracking-tight text-white sm:text-5xl" data-main-result>
+            Enter your taxable base
+          </p>
+          <p class="mt-3 text-sm leading-relaxed text-gray-400" data-result-context>
+            The breakdown will appear here after calculation.
+          </p>
+
+          <div class="mt-5 hidden rounded-lg border border-amber-400/30 bg-amber-400/10 p-4" data-balance-card>
+            <p class="text-xs font-semibold uppercase tracking-wide text-amber-200" data-balance-label>
+              Estimated balance
+            </p>
+            <p class="mt-2 break-words text-2xl font-bold text-white" data-balance-result>—</p>
+            <p class="mt-1 text-sm text-amber-100" data-balance-note></p>
+          </div>
+
+          <div class="mt-5 hidden grid-cols-2 gap-3" data-result-metrics>
+            <div class="income-tax-metric-card">
+              <span>Taxable base</span>
+              <strong data-metric-base>—</strong>
+            </div>
+            <div class="income-tax-metric-card">
+              <span>Effective rate</span>
+              <strong data-metric-effective>—</strong>
+            </div>
+            <div class="income-tax-metric-card">
+              <span>Marginal rate</span>
+              <strong data-metric-marginal>—</strong>
+            </div>
+            <div class="income-tax-metric-card">
+              <span>Bracket</span>
+              <strong data-metric-bracket>—</strong>
+            </div>
+          </div>
+
+          <details class="mt-5 hidden rounded-lg border border-gray-800 bg-gray-950/70 p-4" data-breakdown-details>
+            <summary class="cursor-pointer list-none text-sm font-semibold text-white">
+              How was it calculated?
+            </summary>
+            <div class="mt-3 grid gap-2" data-breakdown-list></div>
+          </details>
+
+          <div class="mt-5 hidden rounded-lg border border-red-300/25 bg-red-300/10 p-3 text-sm leading-relaxed text-red-100" role="alert" data-errors></div>
+          <div class="mt-5 hidden rounded-lg border border-amber-400/25 bg-amber-400/10 p-3 text-sm leading-relaxed text-amber-100" role="note" data-warning></div>
+
+          <button class="income-tax-secondary-button mt-5 hidden w-full" type="button" data-copy>
+            <span data-copy-label>Copy result</span>
+          </button>
+          <p class="sr-only" role="status" aria-live="polite" data-copy-status></p>
+
+          <div class="mt-5 border-t border-gray-800 pt-4 text-xs leading-relaxed text-gray-500" data-source-box>
+            Source and validity will appear with the result.
+          </div>
+        </aside>
+      </div>
+
+      <div class="mt-6 rounded-lg border border-gray-800 bg-gray-950/70 p-4 text-sm leading-relaxed text-gray-400 sm:p-5">
+        <p>
+          <strong class="text-gray-200">Scope of this version:</strong> it uses
+          Mexico's 2026 income-tax tables and does not automatically apply personal
+          deductions, IMSS, INFONAVIT, or other items outside the entered taxable base.
+        </p>
+        <p class="mt-3">
+          Always check your pay stub, tax records, and tax situation with the relevant
+          authority or a professional when you need an official determination.
+        </p>
+      </div>
+    </Container>
+
+    <AdSlot placement="calculator-after-tool" />
+
+    <Container as="section" class="py-8">
+      <SectionIntro
+        title="How to interpret the result"
+        description="A progressive table does not apply the marginal rate to all income: it uses a fixed amount plus the bracket rate on the excess above its lower bound."
+      />
+      <div class="mt-5 grid gap-4 sm:grid-cols-3">
+        <article class="rounded-lg border border-gray-700 bg-gray-950 p-5">
+          <h3 class="font-semibold text-white">Estimated income tax</h3>
+          <p class="mt-2 text-sm leading-relaxed text-gray-400">
+            This is the tax calculated for the selected pay frequency or tax year.
+          </p>
+        </article>
+        <article class="rounded-lg border border-gray-700 bg-gray-950 p-5">
+          <h3 class="font-semibold text-white">Effective rate</h3>
+          <p class="mt-2 text-sm leading-relaxed text-gray-400">
+            This is the estimated income tax divided by your taxable base; it is not the same as the marginal rate.
+          </p>
+        </article>
+        <article class="rounded-lg border border-gray-700 bg-gray-950 p-5">
+          <h3 class="font-semibold text-white">Balance</h3>
+          <p class="mt-2 text-sm leading-relaxed text-gray-400">
+            It only compares the calculation with the withholding entered. It is not an official assessment.
+          </p>
+        </article>
+      </div>
+    </Container>
+
+    <FaqSection faqs={faqs} />
+  </PageShell>
+
+  <div class="fixed inset-x-0 bottom-0 z-40 border-t border-gray-700 bg-gray-950/95 px-3 py-3 shadow-2xl shadow-gray-950/60 backdrop-blur lg:hidden" data-mobile-summary>
+    <div class="mx-auto flex max-w-5xl items-center justify-between gap-3">
+      <div class="min-w-0">
+        <p class="text-xs font-semibold uppercase tracking-wide text-gray-500" data-mobile-kicker>Estimated income tax</p>
+        <p class="truncate text-lg font-bold text-white" data-mobile-total>Enter your taxable base</p>
+      </div>
+      <p class="max-w-[48%] text-right text-xs font-semibold leading-snug text-gray-300" data-mobile-status>
+        Complete the fields.
+      </p>
+    </div>
+  </div>
+  <div class="h-20 lg:hidden"></div>
+</BaseLayout>
+
+<style is:global>
+  .income-tax-label {
+    display: block;
+    color: rgb(229 231 235);
+    font-size: 0.875rem;
+    font-weight: 700;
+  }
+
+  .income-tax-help {
+    min-height: 1.125rem;
+    margin-top: 0.5rem;
+    color: rgb(156 163 175);
+    font-size: 0.75rem;
+    line-height: 1.45;
+  }
+
+  .income-tax-error {
+    min-height: 1.25rem;
+    margin-top: 0.5rem;
+    color: rgb(252 165 165);
+    font-size: 0.875rem;
+  }
+
+  .income-tax-money-shell {
+    display: flex;
+    min-height: 3rem;
+    margin-top: 0.5rem;
+    align-items: center;
+    overflow: hidden;
+    border: 1px solid rgb(55 65 81);
+    border-radius: 0.5rem;
+    background: rgb(17 24 39);
+  }
+
+  .income-tax-money-shell:focus-within {
+    border-color: rgb(251 191 36);
+    box-shadow: 0 0 0 3px rgb(251 191 36 / 0.15);
+  }
+
+  .income-tax-money-input {
+    min-height: 2.875rem;
+    min-width: 0;
+    width: 100%;
+    background: transparent;
+    padding: 0 1rem 0 0.75rem;
+    color: white;
+    font-size: 1rem;
+    outline: none;
+  }
+
+  .income-tax-money-input[aria-invalid="true"] {
+    box-shadow: inset 0 0 0 1px rgb(252 165 165);
+  }
+
+  .income-tax-primary-button,
+  .income-tax-secondary-button,
+  .income-tax-quiet-button {
+    display: inline-flex;
+    min-height: 2.75rem;
+    align-items: center;
+    justify-content: center;
+    border-radius: 0.5rem;
+    padding: 0.55rem 0.9rem;
+    text-align: center;
+    font-size: 0.875rem;
+    font-weight: 700;
+    transition: border-color 150ms, background-color 150ms, color 150ms;
+  }
+
+  .income-tax-primary-button {
+    background: rgb(251 191 36);
+    color: rgb(17 24 39);
+  }
+
+  .income-tax-primary-button:hover {
+    background: rgb(252 211 77);
+  }
+
+  .income-tax-secondary-button {
+    border: 1px solid rgb(75 85 99);
+    color: rgb(229 231 235);
+  }
+
+  .income-tax-secondary-button:hover {
+    border-color: rgb(251 191 36);
+    color: white;
+  }
+
+  .income-tax-quiet-button {
+    color: rgb(156 163 175);
+  }
+
+  .income-tax-quiet-button:hover {
+    color: rgb(254 202 202);
+  }
+
+  .income-tax-metric-card {
+    min-width: 0;
+    border: 1px solid rgb(31 41 55);
+    border-radius: 0.5rem;
+    background: rgb(3 7 18 / 0.7);
+    padding: 0.75rem;
+  }
+
+  .income-tax-metric-card span {
+    display: block;
+    color: rgb(156 163 175);
+    font-size: 0.75rem;
+  }
+
+  .income-tax-metric-card strong {
+    display: block;
+    margin-top: 0.25rem;
+    overflow-wrap: anywhere;
+    color: white;
+    font-size: 0.875rem;
+  }
+</style>
+
+<script>
+  import {
+    buildIncomeTaxShareText,
+    calculateIncomeTax,
+    formatIncomeTaxMoney,
+    formatIncomeTaxPercent,
+    MEXICO_ISR_FREQUENCIES,
+    MEXICO_ISR_PRESET,
+    parseIncomeTaxMoneyInput,
+    parseIncomeTaxRateInput,
+    parseOptionalIncomeTaxMoneyInput,
+  } from "@lib/calculators/legal-impuestos/calculadora-isr-irpf/incomeTax.en";
+
+  const form = document.querySelector("[data-income-tax-form]");
+  const modeSelect = document.querySelector("[data-tax-mode]");
+  const frequencySelect = document.querySelector("[data-tax-frequency]");
+  const ruleModeSelect = document.querySelector("[data-tax-rule-mode]");
+  const baseInput = document.querySelector("[data-tax-base]");
+  const retentionInput = document.querySelector("[data-tax-retention]");
+  const manualRateInput = document.querySelector("[data-tax-manual-rate]");
+  const manualRateWrap = document.querySelector("[data-manual-rate-wrap]");
+  const baseLabel = document.querySelector("[data-base-label]");
+  const retentionLabel = document.querySelector("[data-retention-label]");
+  const retentionHelp = document.querySelector("[data-retention-help]");
+  const modeHelp = document.querySelector("[data-mode-help]");
+  const frequencyHelp = document.querySelector("[data-frequency-help]");
+  const resultStatus = document.querySelector("[data-result-status]");
+  const mainLabel = document.querySelector("[data-main-label]");
+  const mainResult = document.querySelector("[data-main-result]");
+  const resultContext = document.querySelector("[data-result-context]");
+  const balanceCard = document.querySelector("[data-balance-card]");
+  const balanceLabel = document.querySelector("[data-balance-label]");
+  const balanceResult = document.querySelector("[data-balance-result]");
+  const balanceNote = document.querySelector("[data-balance-note]");
+  const resultMetrics = document.querySelector("[data-result-metrics]");
+  const breakdownDetails = document.querySelector("[data-breakdown-details]");
+  const breakdownList = document.querySelector("[data-breakdown-list]");
+  const errorsBox = document.querySelector("[data-errors]");
+  const warningBox = document.querySelector("[data-warning]");
+  const sourceBox = document.querySelector("[data-source-box]");
+  const copyButton = document.querySelector("[data-copy]");
+  const copyLabel = document.querySelector("[data-copy-label]");
+  const copyStatus = document.querySelector("[data-copy-status]");
+  const formStatus = document.querySelector("[data-form-status]");
+  const mobileKicker = document.querySelector("[data-mobile-kicker]");
+  const mobileTotal = document.querySelector("[data-mobile-total]");
+  const mobileStatus = document.querySelector("[data-mobile-status]");
+
+  let currentResult = null;
+  let copiedTimeout = 0;
+
+  const errorMessages = {
+    required: "This field is required.",
+    invalid: "Enter a valid number.",
+    negative: "Enter an amount that is zero or greater.",
+    too_large: "The amount is too high for this calculation.",
+  };
+
+  function updateFormOptions() {
+    const annual = modeSelect.value === "annual-estimate";
+    const current = frequencySelect.value;
+    const frequencies = annual
+      ? MEXICO_ISR_FREQUENCIES.filter((frequency) => frequency.id === "annual")
+      : MEXICO_ISR_FREQUENCIES.filter((frequency) => frequency.id !== "annual");
+
+    frequencySelect.innerHTML = frequencies
+      .map((frequency) => `<option value="${frequency.id}">${frequency.label}</option>`)
+      .join("");
+    const fallbackFrequency = annual ? "annual" : "monthly";
+    frequencySelect.value = frequencies.some((frequency) => frequency.id === current)
+      ? current
+      : fallbackFrequency;
+    frequencySelect.disabled = annual;
+
+    baseLabel.textContent = annual ? "Annual taxable base" : "Taxable base for the period";
+    retentionLabel.innerHTML = annual
+      ? 'Accumulated income-tax withholding <span class="font-normal text-gray-500">(optional)</span>'
+      : 'Income-tax withholding for the period <span class="font-normal text-gray-500">(optional)</span>';
+    retentionHelp.textContent = annual
+      ? "Enter accumulated withholding for the year to estimate the balance."
+      : "If entered, the estimated amount due or refund will be shown.";
+    modeHelp.textContent = annual
+      ? "Use the annual taxable base and accumulated withholding for the year."
+      : "Compare a payment with withholding for the same period.";
+    frequencyHelp.textContent = annual
+      ? "Annual mode uses the official 2026 tax-year table."
+      : "The selected frequency determines the official table.";
+    baseInput.placeholder = annual ? "240,000" : "20,000";
+    manualRateWrap.classList.toggle("hidden", ruleModeSelect.value !== "manual");
+  }
+
+  function clearErrors() {
+    document.querySelectorAll("[data-error-for]").forEach((element) => {
+      element.textContent = "";
+    });
+    [baseInput, retentionInput, manualRateInput].forEach((input) => {
+      input.removeAttribute("aria-invalid");
+    });
+    errorsBox.classList.add("hidden");
+    errorsBox.textContent = "";
+  }
+
+  function showFieldError(field, message) {
+    const error = document.querySelector(`[data-error-for="${field}"]`);
+    const input = field === "base" ? baseInput : field === "retention" ? retentionInput : manualRateInput;
+    if (error) error.textContent = message;
+    if (input) input.setAttribute("aria-invalid", "true");
+  }
+
+  function renderNeutral(message = "The breakdown will appear here after calculation.") {
+    currentResult = null;
+    resultStatus.textContent = "Result";
+    mainLabel.textContent = "Estimated income tax";
+    mainResult.textContent = "Enter your taxable base";
+    resultContext.textContent = message;
+    balanceCard.classList.add("hidden");
+    resultMetrics.classList.add("hidden");
+    breakdownDetails.classList.add("hidden");
+    breakdownList.innerHTML = "";
+    warningBox.classList.add("hidden");
+    warningBox.textContent = "";
+    sourceBox.textContent = "Source and validity will appear with the result.";
+    copyButton.classList.add("hidden");
+    copyStatus.textContent = "";
+    mobileKicker.textContent = "Estimated income tax";
+    mobileTotal.textContent = "Enter your taxable base";
+    mobileStatus.textContent = "Complete the fields.";
+  }
+
+  function renderInvalid(message) {
+    renderNeutral("Correct the highlighted data to obtain an estimate.");
+    resultStatus.textContent = "Check the fields";
+    mainResult.textContent = "Cannot calculate";
+    errorsBox.textContent = message;
+    errorsBox.classList.remove("hidden");
+    mobileTotal.textContent = "Check the fields";
+    mobileStatus.textContent = "One value is invalid.";
+  }
+
+  function renderResult(result) {
+    currentResult = result;
+    const isAnnual = result.mode === "annual-estimate";
+    const amount = formatIncomeTaxMoney(result.tax);
+
+    resultStatus.textContent = result.status === "manual" ? "Manual simulation" : "Current preset";
+    mainLabel.textContent = isAnnual ? "Estimated annual income tax" : "Estimated income tax for the period";
+    mainResult.textContent = amount;
+    resultContext.textContent = `${result.scopeLabel} · ${result.frequency.tableLabel}.`;
+    mobileKicker.textContent = mainLabel.textContent;
+    mobileTotal.textContent = amount;
+    mobileStatus.textContent = result.balanceLabel === "no withholding"
+      ? "No comparable withholding"
+      : `Balance ${result.balanceLabel}`;
+
+    resultMetrics.classList.remove("hidden");
+    resultMetrics.classList.add("grid");
+    document.querySelector("[data-metric-base]").textContent = formatIncomeTaxMoney(result.taxableBase);
+    document.querySelector("[data-metric-effective]").textContent = formatIncomeTaxPercent(result.effectiveRate);
+    document.querySelector("[data-metric-marginal]").textContent = formatIncomeTaxPercent(result.marginalRate / 100);
+    document.querySelector("[data-metric-bracket]").textContent = result.bracket
+      ? formatIncomeTaxMoney(result.bracket.lowerBound)
+      : "Manual rate";
+
+    if (result.comparableRetention === null) {
+      balanceCard.classList.add("hidden");
+    } else {
+      balanceCard.classList.remove("hidden");
+      balanceLabel.textContent = `Estimated balance ${result.balanceLabel}`;
+      balanceResult.textContent = formatIncomeTaxMoney(Math.abs(result.balance));
+      balanceNote.textContent = result.balanceLabel === "no difference"
+        ? "Withholding matches the estimated tax."
+        : `Compared with ${formatIncomeTaxMoney(result.comparableRetention)} in withholding.`;
+    }
+
+    const rows = result.bracket
+      ? [
+          ["Taxable base", formatIncomeTaxMoney(result.taxableBase)],
+          ["Lower bound", formatIncomeTaxMoney(result.bracket.lowerBound)],
+          ["Fixed amount", formatIncomeTaxMoney(result.bracket.fixedAmount)],
+          ["Excess over lower bound", formatIncomeTaxMoney(result.excess)],
+          ["Marginal rate", formatIncomeTaxPercent(result.marginalRate / 100)],
+          ["Income tax before credits", formatIncomeTaxMoney(result.taxBeforeCredits)],
+          ["Credits applied", formatIncomeTaxMoney(result.creditsApplied)],
+          ["Estimated income tax", formatIncomeTaxMoney(result.tax)],
+        ]
+      : [
+          ["Taxable base", formatIncomeTaxMoney(result.taxableBase)],
+          ["Manual rate", formatIncomeTaxPercent(result.marginalRate / 100)],
+          ["Income tax before credits", formatIncomeTaxMoney(result.taxBeforeCredits)],
+          ["Credits applied", formatIncomeTaxMoney(result.creditsApplied)],
+          ["Estimated income tax", formatIncomeTaxMoney(result.tax)],
+        ];
+
+    breakdownList.innerHTML = rows
+      .map(([label, value]) => `
+        <div class="flex items-start justify-between gap-3 rounded-lg border border-gray-800 bg-gray-900 p-3 text-sm">
+          <span class="min-w-0 text-gray-400">${escapeHtml(label)}</span>
+          <strong class="shrink-0 text-right text-white">${escapeHtml(value)}</strong>
+        </div>
+      `)
+      .join("");
+    breakdownDetails.classList.remove("hidden");
+
+    warningBox.innerHTML = result.warnings.map((warning) => `<p>${escapeHtml(warning)}</p>`).join("");
+    warningBox.classList.remove("hidden");
+    sourceBox.innerHTML = result.sourceUrl
+      ? `Source: <a class="font-semibold text-amber-400 hover:text-amber-300 hover:underline" href="${result.sourceUrl}" target="_blank" rel="noreferrer">${escapeHtml(result.sourceName)}</a> · Reviewed ${MEXICO_ISR_PRESET.reviewedAt}.`
+      : "Source: manual simulation. No official tax table is used.";
+    copyButton.classList.remove("hidden");
+  }
+
+  function calculate() {
+    clearErrors();
+
+    const base = parseIncomeTaxMoneyInput(baseInput.value);
+    if (!base.ok) {
+      showFieldError("base", errorMessages[base.error]);
+      renderInvalid(errorMessages[base.error]);
+      return;
+    }
+
+    const retention = parseOptionalIncomeTaxMoneyInput(retentionInput.value);
+    if (!retention.ok) {
+      showFieldError("retention", errorMessages[retention.error]);
+      renderInvalid(errorMessages[retention.error]);
+      return;
+    }
+
+    const ruleMode = ruleModeSelect.value;
+    let manualRate;
+    if (ruleMode === "manual") {
+      const parsedRate = parseIncomeTaxRateInput(manualRateInput.value);
+      if (!parsedRate.ok) {
+        showFieldError("manual-rate", parsedRate.error === "too_large" ? "Use a rate between 0% and 100%." : errorMessages[parsedRate.error]);
+        renderInvalid("Enter a manual rate between 0% and 100%.");
+        return;
+      }
+      manualRate = parsedRate.value;
+    }
+
+    try {
+      const result = calculateIncomeTax({
+        mode: modeSelect.value,
+        frequency: frequencySelect.value,
+        ruleMode,
+        taxableBase: base.value,
+        comparableRetention: retentionInput.value.trim() ? retention.value : undefined,
+        manualRate,
+      });
+      renderResult(result);
+      formStatus.textContent = "Income tax calculated.";
+    } catch (error) {
+      renderInvalid(error instanceof Error ? error.message : "Income tax could not be calculated.");
+    }
+  }
+
+  function clearForm() {
+    modeSelect.value = "payroll-withholding";
+    ruleModeSelect.value = "official";
+    baseInput.value = "";
+    retentionInput.value = "";
+    manualRateInput.value = "";
+    updateFormOptions();
+    clearErrors();
+    formStatus.textContent = "Form cleared.";
+    renderNeutral();
+  }
+
+  function loadExample() {
+    modeSelect.value = "payroll-withholding";
+    ruleModeSelect.value = "official";
+    updateFormOptions();
+    frequencySelect.value = "monthly";
+    baseInput.value = "20,000";
+    retentionInput.value = "2,000";
+    manualRateInput.value = "";
+    calculate();
+  }
+
+  async function copyResult() {
+    if (!currentResult) return;
+
+    try {
+      const text = buildIncomeTaxShareText(currentResult);
+      if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(text);
+      } else {
+        const textArea = document.createElement("textarea");
+        textArea.value = text;
+        textArea.setAttribute("readonly", "");
+        textArea.style.position = "fixed";
+        textArea.style.opacity = "0";
+        document.body.append(textArea);
+        textArea.select();
+        document.execCommand("copy");
+        textArea.remove();
+      }
+      copyLabel.textContent = "Copied";
+      copyStatus.textContent = "Result copied.";
+      window.clearTimeout(copiedTimeout);
+      copiedTimeout = window.setTimeout(() => {
+        copyLabel.textContent = "Copy result";
+        copyStatus.textContent = "";
+      }, 2000);
+    } catch {
+      copyStatus.textContent = "The result could not be copied automatically.";
+    }
+  }
+
+  function escapeHtml(value) {
+    return String(value)
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;")
+      .replaceAll("'", "&#039;");
+  }
+
+  form.addEventListener("submit", (event) => {
+    event.preventDefault();
+    calculate();
+  });
+
+  modeSelect.addEventListener("change", () => {
+    updateFormOptions();
+    renderNeutral("The mode changed. Calculate again to update the result.");
+  });
+
+  frequencySelect.addEventListener("change", () => {
+    renderNeutral("The frequency changed. Calculate again to update the result.");
+  });
+
+  ruleModeSelect.addEventListener("change", () => {
+    updateFormOptions();
+    renderNeutral("The table source changed. Calculate again to update the result.");
+  });
+
+  baseInput.addEventListener("input", () => baseInput.removeAttribute("aria-invalid"));
+  retentionInput.addEventListener("input", () => retentionInput.removeAttribute("aria-invalid"));
+  manualRateInput.addEventListener("input", () => manualRateInput.removeAttribute("aria-invalid"));
+  document.querySelector("[data-example]").addEventListener("click", loadExample);
+  document.querySelector("[data-clear]").addEventListener("click", clearForm);
+  copyButton.addEventListener("click", copyResult);
+
+  updateFormOptions();
+  renderNeutral();
+</script>

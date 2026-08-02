@@ -1,0 +1,939 @@
+---
+import BaseLayout from "@layouts/BaseLayout.astro";
+import AdSlot from "@components/ads/AdSlot.astro";
+import Container from "@components/layout/Container.astro";
+import PageShell from "@components/layout/PageShell.astro";
+import FaqSection from "@components/shared/FaqSection.astro";
+import PageHero from "@components/shared/PageHero.astro";
+import SectionIntro from "@components/shared/SectionIntro.astro";
+import {
+  WEIGHT_UNIT_METADATA,
+  type WeightUnit,
+} from "@lib/calculators/conversores/conversor-de-peso/weight.en";
+import { buildAlternateLinks } from "@lib/i18n/routing";
+import { buildFaqJsonLd } from "@lib/seo";
+
+const title = "Kilograms to pounds converter";
+const description =
+  "Convert kilograms to pounds and pounds to kilograms instantly, with formulas and equivalents in grams, ounces and stone.";
+const canonical = "/en/converters/weight-converter";
+const spanishCanonical = "/conversores/conversor-de-peso";
+const alternates = buildAlternateLinks({ es: spanishCanonical, en: canonical }, Astro.site ?? Astro.url);
+
+const faqs = [
+  {
+    question: "How many pounds are in a kilogram?",
+    answer:
+      "One kilogram is approximately 2.20462 pounds. The calculator keeps full internal precision and only rounds the displayed value.",
+  },
+  {
+    question: "How do you convert kilograms to pounds?",
+    answer:
+      "Divide kilograms by 0.45359237. For example, 70 kg is approximately 154.32 lb.",
+  },
+  {
+    question: "How do you convert pounds to kilograms?",
+    answer:
+      "Multiply pounds by 0.45359237. For example, 150 lb is approximately 68.04 kg.",
+  },
+  {
+    question: "How many pounds is 70 kg?",
+    answer: "70 kg is approximately 154.32 lb.",
+  },
+  {
+    question: "How many kilograms is 150 pounds?",
+    answer: "150 lb is approximately 68.04 kg.",
+  },
+  {
+    question: "What is the difference between kg and lb?",
+    answer:
+      "The kilogram is the SI base unit of mass. This calculator uses the international avoirdupois pound.",
+  },
+  {
+    question: "Do kilograms and pounds measure mass or weight?",
+    answer:
+      "Technically, kilograms and pounds measure mass. In everyday language, both are commonly called weight.",
+  },
+  {
+    question: "How many ounces are in a pound?",
+    answer: "One international avoirdupois pound equals exactly 16 ounces.",
+  },
+];
+
+const faqJsonLd = buildFaqJsonLd(faqs);
+
+const primaryUnits: WeightUnit[] = ["kg", "lb"];
+const secondaryUnits: WeightUnit[] = ["g", "oz", "st"];
+const allUnits: WeightUnit[] = [...primaryUnits, ...secondaryUnits];
+
+const shortcuts = [
+  { label: "1 kg in pounds", value: "1", from: "kg", to: "lb", result: "2.20 lb" },
+  { label: "10 kg in pounds", value: "10", from: "kg", to: "lb", result: "22.05 lb" },
+  { label: "23 kg in pounds", value: "23", from: "kg", to: "lb", result: "50.71 lb" },
+  { label: "70 kg in pounds", value: "70", from: "kg", to: "lb", result: "154.32 lb" },
+  { label: "50 lb in kilograms", value: "50", from: "lb", to: "kg", result: "22.68 kg" },
+  { label: "150 lb in kilograms", value: "150", from: "lb", to: "kg", result: "68.04 kg" },
+  { label: "5 kg in pounds", value: "5", from: "kg", to: "lb", result: "11.02 lb" },
+  { label: "20 kg in pounds", value: "20", from: "kg", to: "lb", result: "44.09 lb" },
+  { label: "50 kg in pounds", value: "50", from: "kg", to: "lb", result: "110.23 lb" },
+  { label: "100 kg in pounds", value: "100", from: "kg", to: "lb", result: "220.46 lb" },
+  { label: "100 lb in kilograms", value: "100", from: "lb", to: "kg", result: "45.36 kg" },
+  { label: "200 lb in kilograms", value: "200", from: "lb", to: "kg", result: "90.72 kg" },
+];
+
+const visibleShortcuts = shortcuts.slice(0, 6);
+const extraShortcuts = shortcuts.slice(6);
+---
+
+<BaseLayout title={title} description={description} canonical={canonical} locale="en" alternates={alternates}>
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={JSON.stringify(faqJsonLd)} />
+  </Fragment>
+
+  <PageShell>
+    <PageHero
+      title="Weight converter"
+      description="Convert kilograms and pounds instantly. Review equivalents and the formula, then copy or share the result."
+      kicker="Converters"
+      collapseBreadcrumbOnMobile
+      containerClass="py-6 md:py-8"
+      breadcrumbs={[
+        { label: "Home", href: "/en", ariaLabel: "Home" },
+        { label: "Converters", href: "/en/converters", optional: true },
+        { label: "Weight", truncate: true },
+      ]}
+    />
+
+    <Container as="section" class="py-6 md:py-8">
+      <section
+        id="weight-converter"
+        class="overflow-hidden rounded-lg border border-gray-700 bg-gray-950 shadow-xl shadow-gray-950/30"
+        aria-labelledby="calculator-heading"
+      >
+        <div class="grid gap-0 lg:grid-cols-[minmax(0,1fr)_minmax(19rem,0.78fr)]">
+          <div class="p-4 sm:p-6">
+            <p class="text-sm font-semibold text-amber-300">Quick conversion</p>
+            <h2 id="calculator-heading" class="mt-2 text-2xl font-semibold">
+              What weight do you want to convert?
+            </h2>
+            <p class="mt-2 text-sm leading-relaxed text-gray-400">
+              Enter a value with a decimal point or comma. You can also paste
+              values such as <span class="text-gray-200">70 kg</span> or
+              <span class="text-gray-200">150 libras</span>.
+            </p>
+
+            <div class="mt-6">
+              <label for="weight-value" class="block text-sm font-semibold text-gray-200">
+                Weight
+              </label>
+              <div
+                class="mt-2 flex rounded-lg border border-gray-700 bg-gray-900 focus-within:border-amber-400 focus-within:ring-3 focus-within:ring-amber-400/15"
+              >
+                <input
+                  id="weight-value"
+                  class="min-h-14 w-full min-w-0 bg-transparent px-4 text-xl text-white outline-none placeholder:text-gray-600"
+                  type="text"
+                  inputmode="decimal"
+                  autocomplete="off"
+                  placeholder="Ej. 70 o 154,3 lb"
+                  aria-describedby="weight-error"
+                  data-weight-input
+                />
+                <span class="flex items-center px-4 text-sm text-gray-500" data-input-symbol>
+                  kg
+                </span>
+              </div>
+              <p id="weight-error" class="mt-2 hidden text-sm text-red-300" data-weight-error></p>
+            </div>
+
+            <div class="mt-5 grid gap-4 sm:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] sm:items-start">
+              <fieldset>
+                <legend class="text-sm font-medium text-gray-200">From</legend>
+                <div class="mt-2 grid grid-cols-2 gap-2">
+                  {
+                    primaryUnits.map((unit) => (
+                      <button
+                        class={`min-h-12 rounded-lg border px-3 py-2 text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/30 ${
+                          unit === "kg"
+                            ? "border-amber-400 bg-amber-400/10 text-amber-100"
+                            : "border-gray-700 bg-gray-900 text-gray-200 hover:border-gray-500"
+                        }`}
+                        type="button"
+                        aria-pressed={unit === "kg" ? "true" : "false"}
+                        aria-label={`Select ${WEIGHT_UNIT_METADATA[unit].label} as source unit`}
+                        data-unit-group="origin"
+                        data-unit={unit}
+                      >
+                        {WEIGHT_UNIT_METADATA[unit].symbol}
+                      </button>
+                    ))
+                  }
+                </div>
+                <details class="mt-2" data-more-units="origin">
+                  <summary class="flex min-h-11 cursor-pointer items-center rounded-lg border border-gray-700 bg-gray-900 px-3 py-2 text-sm font-semibold text-gray-300 transition hover:border-gray-500">
+                    <span data-unit-summary="origin">More units</span>
+                  </summary>
+                  <div class="mt-2 grid grid-cols-3 gap-2">
+                    {
+                      secondaryUnits.map((unit) => (
+                        <button
+                          class="min-h-11 rounded-lg border border-gray-700 bg-gray-900 px-2 py-2 text-xs font-semibold text-gray-300 transition hover:border-gray-500 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/30"
+                          type="button"
+                          aria-pressed="false"
+                          aria-label={`Select ${WEIGHT_UNIT_METADATA[unit].label} as source unit`}
+                          data-unit-group="origin"
+                          data-unit={unit}
+                        >
+                          {WEIGHT_UNIT_METADATA[unit].symbol}
+                        </button>
+                      ))
+                    }
+                  </div>
+                </details>
+              </fieldset>
+
+              <button
+                class="min-h-12 rounded-lg border border-gray-700 bg-gray-900 px-4 text-lg font-semibold text-amber-300 transition hover:border-amber-400 hover:bg-gray-800 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/30 sm:mt-7"
+                type="button"
+                aria-label="Swap source and destination units"
+                title="Swap units"
+                data-swap-units
+              >
+                ⇄
+              </button>
+
+              <fieldset>
+                <legend class="text-sm font-medium text-gray-200">To</legend>
+                <div class="mt-2 grid grid-cols-2 gap-2">
+                  {
+                    primaryUnits.map((unit) => (
+                      <button
+                        class={`min-h-12 rounded-lg border px-3 py-2 text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/30 ${
+                          unit === "lb"
+                            ? "border-amber-400 bg-amber-400/10 text-amber-100"
+                            : "border-gray-700 bg-gray-900 text-gray-200 hover:border-gray-500"
+                        }`}
+                        type="button"
+                        aria-pressed={unit === "lb" ? "true" : "false"}
+                        aria-label={`Select ${WEIGHT_UNIT_METADATA[unit].label} as destination unit`}
+                        data-unit-group="destination"
+                        data-unit={unit}
+                      >
+                        {WEIGHT_UNIT_METADATA[unit].symbol}
+                      </button>
+                    ))
+                  }
+                </div>
+                <details class="mt-2" data-more-units="destination">
+                  <summary class="flex min-h-11 cursor-pointer items-center rounded-lg border border-gray-700 bg-gray-900 px-3 py-2 text-sm font-semibold text-gray-300 transition hover:border-gray-500">
+                    <span data-unit-summary="destination">More units</span>
+                  </summary>
+                  <div class="mt-2 grid grid-cols-3 gap-2">
+                    {
+                      secondaryUnits.map((unit) => (
+                        <button
+                          class="min-h-11 rounded-lg border border-gray-700 bg-gray-900 px-2 py-2 text-xs font-semibold text-gray-300 transition hover:border-gray-500 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/30"
+                          type="button"
+                          aria-pressed="false"
+                          aria-label={`Select ${WEIGHT_UNIT_METADATA[unit].label} as destination unit`}
+                          data-unit-group="destination"
+                          data-unit={unit}
+                        >
+                          {WEIGHT_UNIT_METADATA[unit].symbol}
+                        </button>
+                      ))
+                    }
+                  </div>
+                </details>
+              </fieldset>
+            </div>
+
+            <button
+              class="mt-5 min-h-11 rounded-lg border border-gray-700 px-4 py-2 text-sm font-semibold text-gray-200 transition hover:border-gray-500 hover:bg-gray-900 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-gray-400/30"
+              type="button"
+              data-clear-calculator
+            >
+              Clear
+            </button>
+          </div>
+
+          <aside class="border-t border-gray-800 bg-gray-900/65 p-4 sm:p-6 lg:border-l lg:border-t-0">
+            <p class="text-xs font-semibold uppercase tracking-wide text-gray-500">
+              Result principal
+            </p>
+            <p class="mt-3 min-h-10 break-words text-3xl font-semibold text-amber-100" data-main-result>
+              Enter a weight
+            </p>
+            <p class="mt-3 min-h-5 text-sm leading-relaxed text-gray-400" data-result-note>
+              You will see the highlighted equivalent and the remaining units.
+            </p>
+            <div class="mt-4 hidden space-y-1 text-xs leading-relaxed text-gray-400" data-rate-panel>
+              <p data-rate-direct></p>
+              <p data-rate-inverse></p>
+            </div>
+            <div class="mt-4 flex flex-wrap gap-2">
+              <button
+                class="hidden min-h-11 rounded-lg bg-amber-400 px-4 py-2 text-sm font-semibold text-gray-950 transition hover:bg-amber-300 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-300/40"
+                type="button"
+                data-copy-main
+              >
+                Copy resultado
+              </button>
+              <button
+                class="hidden min-h-11 rounded-lg border border-amber-400/60 px-4 py-2 text-sm font-semibold text-amber-200 transition hover:bg-amber-400/10 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-300/40"
+                type="button"
+                data-share-main
+              >
+                Share conversion
+              </button>
+            </div>
+            <p class="sr-only" role="status" aria-live="polite" data-live-status></p>
+            <p class="mt-3 min-h-5 text-sm text-emerald-300" role="status" aria-live="polite" data-copy-status></p>
+          </aside>
+        </div>
+
+        <div class="border-t border-gray-800 p-4 sm:p-6">
+          <div class="grid gap-6 lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)]">
+            <div>
+              <h3 class="text-lg font-semibold">All equivalents</h3>
+              <div class="mt-3 divide-y divide-gray-800 overflow-hidden rounded-lg border border-gray-800 bg-gray-950">
+                {
+                  allUnits.map((unit) => (
+                    <div class="flex min-h-14 flex-wrap items-center justify-between gap-2 px-4 py-3">
+                      <span class="text-sm font-medium text-gray-300">
+                        {WEIGHT_UNIT_METADATA[unit].label}
+                      </span>
+                      <span class="ml-auto text-right text-sm font-semibold text-white" data-output={unit}>
+                        -
+                      </span>
+                      <button
+                        class="hidden min-h-11 rounded-md px-2 py-1 text-xs font-semibold text-amber-300 transition hover:bg-amber-400/10 hover:text-amber-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400/40"
+                        type="button"
+                        aria-label={`Copy resultado en ${WEIGHT_UNIT_METADATA[unit].label}`}
+                        data-copy-unit={unit}
+                      >
+                        Copy
+                      </button>
+                    </div>
+                  ))
+                }
+              </div>
+            </div>
+
+            <div>
+              <h3 class="text-lg font-semibold">Formula used</h3>
+              <div class="mt-3 rounded-lg border border-gray-800 bg-gray-900/70 p-4">
+                <p class="text-sm leading-relaxed text-gray-200" data-formula>
+                  The formula will appear after you enter a weight.
+                </p>
+                <details class="mt-3 hidden" data-procedure-panel>
+                  <summary class="min-h-11 cursor-pointer py-2 text-sm font-semibold text-amber-300">
+                    Ver procedimiento
+                  </summary>
+                  <ol class="mt-2 space-y-2 text-sm leading-relaxed text-gray-400" data-procedure-list></ol>
+                </details>
+              </div>
+              <p class="mt-3 text-xs leading-relaxed text-gray-500">
+                The calculation keeps full internal precision and adapts
+                visible decimals and never rounds a nonzero value to zero.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+    </Container>
+
+    <AdSlot placement="calculator-after-tool" />
+
+    <Container as="section" class="py-6 md:py-8">
+      <SectionIntro
+        title="Common conversions"
+        description="Use a shortcut for common body weight, luggage and everyday object equivalents."
+      />
+      <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        {
+          visibleShortcuts.map((shortcut) => (
+            <button
+              class="min-h-20 rounded-lg border border-gray-800 bg-gray-950 p-4 text-left transition hover:border-amber-400/60 hover:bg-gray-900 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/30"
+              type="button"
+              data-shortcut-value={shortcut.value}
+              data-shortcut-from={shortcut.from}
+              data-shortcut-to={shortcut.to}
+            >
+              <span class="block text-sm font-semibold text-white">{shortcut.label}</span>
+              <span class="mt-2 block text-sm text-amber-300">{shortcut.result}</span>
+            </button>
+          ))
+        }
+      </div>
+      <details class="mt-4 rounded-lg border border-gray-800 bg-gray-950">
+        <summary class="flex min-h-12 cursor-pointer items-center px-4 py-3 text-sm font-semibold text-amber-300">
+          View more conversions
+        </summary>
+        <div class="grid gap-3 border-t border-gray-800 p-3 sm:grid-cols-2 lg:grid-cols-3">
+          {
+            extraShortcuts.map((shortcut) => (
+              <button
+                class="min-h-20 rounded-lg border border-gray-800 bg-gray-900 p-4 text-left transition hover:border-amber-400/60 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/30"
+                type="button"
+                data-shortcut-value={shortcut.value}
+                data-shortcut-from={shortcut.from}
+                data-shortcut-to={shortcut.to}
+              >
+                <span class="block text-sm font-semibold text-white">{shortcut.label}</span>
+                <span class="mt-2 block text-sm text-amber-300">{shortcut.result}</span>
+              </button>
+            ))
+          }
+        </div>
+      </details>
+    </Container>
+
+    <Container as="section" class="py-6 md:py-8">
+      <SectionIntro
+        title="Quick equivalents"
+        description="Compact references for estimating common values before entering an exact figure."
+      />
+      <div class="overflow-x-auto rounded-lg border border-gray-800 bg-gray-950">
+        <table class="w-full min-w-[28rem] text-left text-sm">
+          <thead class="bg-gray-900 text-xs uppercase tracking-wide text-gray-500">
+            <tr>
+              <th class="px-4 py-3">Kilograms</th>
+              <th class="px-4 py-3">Approximate pounds</th>
+              <th class="px-4 py-3">Pounds</th>
+              <th class="px-4 py-3">Kilograms aproximados</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-gray-800 text-gray-300">
+            <tr><td class="px-4 py-3">1 kg</td><td class="px-4 py-3">2.20 lb</td><td class="px-4 py-3">50 lb</td><td class="px-4 py-3">22.68 kg</td></tr>
+            <tr><td class="px-4 py-3">10 kg</td><td class="px-4 py-3">22.05 lb</td><td class="px-4 py-3">100 lb</td><td class="px-4 py-3">45.36 kg</td></tr>
+            <tr><td class="px-4 py-3">23 kg</td><td class="px-4 py-3">50.71 lb</td><td class="px-4 py-3">150 lb</td><td class="px-4 py-3">68.04 kg</td></tr>
+            <tr><td class="px-4 py-3">70 kg</td><td class="px-4 py-3">154.32 lb</td><td class="px-4 py-3">200 lb</td><td class="px-4 py-3">90.72 kg</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </Container>
+
+    <Container as="section" class="py-6 md:py-8">
+      <SectionIntro
+        title="How to convert kg and lb"
+        description="The calculator uses the international avoirdupois pound and maintains full precision through each operation."
+      />
+      <div class="grid gap-4 lg:grid-cols-2">
+        <article class="rounded-lg border border-gray-800 bg-gray-950 p-5">
+          <h3 class="text-lg font-semibold">Kilograms a libras</h3>
+          <p class="mt-3 text-sm leading-relaxed text-gray-400">
+            Divide kilograms by <span class="text-gray-200">0.45359237</span>.
+            The inverse equivalent is approximately
+            <span class="text-gray-200">1 kg = 2.20462 lb</span>.
+          </p>
+          <p class="mt-4 rounded-lg bg-gray-900 p-3 text-sm text-amber-200">
+            lb = kg ÷ 0.45359237
+          </p>
+        </article>
+        <article class="rounded-lg border border-gray-800 bg-gray-950 p-5">
+          <h3 class="text-lg font-semibold">Pounds a kilogramos</h3>
+          <p class="mt-3 text-sm leading-relaxed text-gray-400">
+            Multiply pounds by <span class="text-gray-200">0.45359237</span>.
+            This equivalent is defined exactly for the
+            avoirdupois internacional.
+          </p>
+          <p class="mt-4 rounded-lg bg-gray-900 p-3 text-sm text-amber-200">
+            kg = lb × 0.45359237
+          </p>
+        </article>
+      </div>
+      <article class="mt-5 rounded-lg border border-gray-800 bg-gray-950 p-5">
+        <h3 class="text-lg font-semibold">Mass and weight in everyday use</h3>
+        <p class="mt-3 text-sm leading-relaxed text-gray-400">
+          In everyday language, we use “weight” when discussing kilograms and
+          pounds. Technically, these units measure mass. Physical weight is a
+          force and depends on gravity.
+        </p>
+        <p class="mt-3 text-sm leading-relaxed text-gray-400">
+          The kilogram is the SI base unit of mass.
+          See the references from
+          <a class="text-amber-300 hover:underline" href="https://www.bipm.org/en/si-base-units/kilogram" rel="noreferrer">BIPM</a>
+          and the unit tables from
+          <a class="text-amber-300 hover:underline" href="https://www.nist.gov/pml/owm/nist-handbook-44-current-edition" rel="noreferrer">NIST</a>.
+        </p>
+      </article>
+    </Container>
+
+    <Container as="section" class="py-6 md:py-8">
+      <SectionIntro
+        title="Related calculators"
+        description="These tools add context when analyzing personal measurements, not just converting units."
+      />
+      <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        <a class="rounded-lg border border-gray-800 bg-gray-950 p-4 transition hover:border-amber-400/60 hover:bg-gray-900" href="/en/health">
+          <span class="block font-semibold text-white">BMI calculator</span>
+          <span class="mt-2 block text-sm leading-relaxed text-gray-400">Relates weight and height as a general reference.</span>
+        </a>
+        <a class="rounded-lg border border-gray-800 bg-gray-950 p-4 transition hover:border-amber-400/60 hover:bg-gray-900" href="/en/health">
+          <span class="block font-semibold text-white">Macro calculator</span>
+          <span class="mt-2 block text-sm leading-relaxed text-gray-400">Estimates protein, carbohydrates and fat by goal.</span>
+        </a>
+        <a class="rounded-lg border border-gray-800 bg-gray-950 p-4 transition hover:border-amber-400/60 hover:bg-gray-900" href="/salud/calculadora-deficit-calorico">
+          <span class="block font-semibold text-white">Calorie deficit</span>
+          <span class="mt-2 block text-sm leading-relaxed text-gray-400">Explore a planning estimate for weight loss.</span>
+        </a>
+      </div>
+    </Container>
+
+    <FaqSection faqs={faqs} />
+  </PageShell>
+</BaseLayout>
+
+<script>
+  import {
+    WEIGHT_UNIT_METADATA,
+    WEIGHT_UNITS,
+    buildWeightExplanation,
+    convertAllWeights,
+    convertWeight,
+    formatPoundsAndOunces,
+    formatStoneAndPounds,
+    formatWeight,
+    formatWeightRate,
+    isWeightUnit,
+    parseWeightInput,
+  } from "@lib/calculators/conversores/conversor-de-peso/weight.en";
+
+  const input = document.querySelector("[data-weight-input]");
+  const inputSymbol = document.querySelector("[data-input-symbol]");
+  const errorElement = document.querySelector("[data-weight-error]");
+  const mainResult = document.querySelector("[data-main-result]");
+  const resultNote = document.querySelector("[data-result-note]");
+  const ratePanel = document.querySelector("[data-rate-panel]");
+  const directRate = document.querySelector("[data-rate-direct]");
+  const inverseRate = document.querySelector("[data-rate-inverse]");
+  const formula = document.querySelector("[data-formula]");
+  const procedurePanel = document.querySelector("[data-procedure-panel]");
+  const procedureList = document.querySelector("[data-procedure-list]");
+  const copyMainButton = document.querySelector("[data-copy-main]");
+  const shareMainButton = document.querySelector("[data-share-main]");
+  const copyStatus = document.querySelector("[data-copy-status]");
+  const liveStatus = document.querySelector("[data-live-status]");
+  const clearButton = document.querySelector("[data-clear-calculator]");
+  const swapButton = document.querySelector("[data-swap-units]");
+  const outputElements = new Map(
+    WEIGHT_UNITS.map((unit) => [
+      unit,
+      document.querySelector(`[data-output="${unit}"]`),
+    ]),
+  );
+
+  let origin = "kg";
+  let destination = "lb";
+  let currentResults = null;
+  let currentMainCopyText = "";
+  let currentShareText = "";
+  let currentShareUrl = window.location.href;
+  let copyTimer = 0;
+  let liveTimer = 0;
+  let urlTimer = 0;
+
+  function getRateDecimals(from, to) {
+    if (from === "kg" && to === "lb") {
+      return 5;
+    }
+
+    return 8;
+  }
+
+  function updateUnitControls() {
+    document.querySelectorAll("[data-unit-group][data-unit]").forEach((button) => {
+      const active =
+        (button.dataset.unitGroup === "origin" && button.dataset.unit === origin) ||
+        (button.dataset.unitGroup === "destination" &&
+          button.dataset.unit === destination);
+
+      button.setAttribute("aria-pressed", active ? "true" : "false");
+      button.classList.toggle("border-amber-400", active);
+      button.classList.toggle("bg-amber-400/10", active);
+      button.classList.toggle("text-amber-100", active);
+      button.classList.toggle("border-gray-700", !active);
+      button.classList.toggle("bg-gray-900", !active);
+      button.classList.toggle("text-gray-200", !active);
+    });
+
+    document.querySelectorAll("[data-unit-summary]").forEach((summary) => {
+      const unit = summary.dataset.unitSummary === "origin" ? origin : destination;
+
+      summary.textContent = WEIGHT_UNIT_METADATA[unit].secondary
+        ? `${WEIGHT_UNIT_METADATA[unit].label} (${unit})`
+        : "More units";
+    });
+
+    inputSymbol.textContent = WEIGHT_UNIT_METADATA[origin].symbol;
+  }
+
+  function setError(message = "") {
+    errorElement.textContent = message;
+    errorElement.classList.toggle("hidden", !message);
+    input.setAttribute("aria-invalid", message ? "true" : "false");
+  }
+
+  function clearOutputs(note = "You will see the highlighted equivalent and the remaining units.") {
+    currentResults = null;
+    currentMainCopyText = "";
+    currentShareText = "";
+    window.clearTimeout(liveTimer);
+    liveStatus.textContent = "";
+    mainResult.textContent = "Enter a weight";
+    resultNote.textContent = note;
+    ratePanel.classList.add("hidden");
+    directRate.textContent = "";
+    inverseRate.textContent = "";
+    formula.textContent = "The formula will appear after you enter a weight.";
+    procedurePanel.classList.add("hidden");
+    procedureList.replaceChildren();
+    copyMainButton.classList.add("hidden");
+    shareMainButton.classList.add("hidden");
+
+    outputElements.forEach((element) => {
+      element.textContent = "-";
+    });
+
+    document.querySelectorAll("[data-copy-unit]").forEach((button) => {
+      button.classList.add("hidden");
+    });
+  }
+
+  function buildContextNote(results) {
+    if (destination === "lb" && results.lb > 0) {
+      return `Breakdown: ${formatPoundsAndOunces(results.lb)} approximately.`;
+    }
+
+    if (destination === "st" && results.st > 0) {
+      return `Breakdown: ${formatStoneAndPounds(results.st)} approximately.`;
+    }
+
+    return "The conversion uses full precision and only adapts the display.";
+  }
+
+  function buildUrl(value) {
+    const url = new URL(window.location.href);
+
+    url.searchParams.set("valor", String(value));
+    url.searchParams.set("origen", origin);
+    url.searchParams.set("destino", destination);
+
+    return url;
+  }
+
+  function scheduleUrlUpdate(value) {
+    const url = buildUrl(value);
+
+    currentShareUrl = url.toString();
+    window.clearTimeout(urlTimer);
+    urlTimer = window.setTimeout(() => {
+      window.history.replaceState({}, "", url);
+    }, 250);
+  }
+
+  function clearUrl() {
+    const url = new URL(window.location.href);
+
+    ["valor", "origen", "destino"].forEach((parameter) => {
+      url.searchParams.delete(parameter);
+    });
+
+    currentShareUrl = url.toString();
+    window.clearTimeout(urlTimer);
+    window.history.replaceState({}, "", url);
+  }
+
+  function scheduleAnnouncement(message) {
+    window.clearTimeout(liveTimer);
+    liveTimer = window.setTimeout(() => {
+      liveStatus.textContent = message;
+    }, 350);
+  }
+
+  function showStatus(message) {
+    copyStatus.textContent = message;
+    window.clearTimeout(copyTimer);
+    copyTimer = window.setTimeout(() => {
+      copyStatus.textContent = "";
+    }, 2000);
+  }
+
+  function render(options = {}) {
+    const { normalizeDetectedUnit = false, updateUrl = true, announce = true } = options;
+    const parsed = parseWeightInput(input.value);
+
+    updateUnitControls();
+
+    if (!parsed.ok) {
+      if (parsed.error === "invalid") {
+        setError("The weight could not be interpreted. Use a format such as 70 kg or 154.3 lb.");
+        clearOutputs("Check the format to see equivalents.");
+      } else {
+        setError();
+        clearOutputs();
+      }
+
+      if (updateUrl) {
+        clearUrl();
+      }
+
+      return;
+    }
+
+    if (normalizeDetectedUnit && parsed.detectedUnit) {
+      const previousOrigin = origin;
+
+      origin = parsed.detectedUnit;
+
+      if (origin === destination && previousOrigin !== origin) {
+        destination = previousOrigin;
+      }
+
+      input.value = parsed.normalized;
+      updateUnitControls();
+    }
+
+    try {
+      const results = convertAllWeights(parsed.value, origin);
+      const explanation = buildWeightExplanation(parsed.value, origin, destination);
+      const formattedSource = formatWeight(parsed.value, origin);
+      const formattedDestination = formatWeight(results[destination], destination);
+      const rate = formatWeightRate(
+        destination,
+        origin,
+        getRateDecimals(destination, origin),
+      );
+
+      setError();
+      currentResults = results;
+      currentShareText = `${formattedSource} = ${formattedDestination}`;
+      currentMainCopyText = `${currentShareText}\nEquivalent: ${rate}`;
+      mainResult.textContent = currentShareText;
+      resultNote.textContent = buildContextNote(results);
+      directRate.textContent = formatWeightRate(
+        origin,
+        destination,
+        getRateDecimals(origin, destination),
+      );
+      inverseRate.textContent = rate;
+      ratePanel.classList.remove("hidden");
+      formula.textContent = `Formula: ${explanation.formula}`;
+      procedurePanel.classList.remove("hidden");
+      procedureList.replaceChildren(
+        ...explanation.steps.map((step) => {
+          const item = document.createElement("li");
+
+          item.textContent = step;
+
+          return item;
+        }),
+      );
+      copyMainButton.classList.remove("hidden");
+      shareMainButton.classList.remove("hidden");
+
+      WEIGHT_UNITS.forEach((unit) => {
+        outputElements.get(unit).textContent = formatWeight(results[unit], unit);
+      });
+
+      document.querySelectorAll("[data-copy-unit]").forEach((button) => {
+        button.classList.remove("hidden");
+      });
+
+      if (updateUrl) {
+        scheduleUrlUpdate(parsed.value);
+      }
+
+      if (announce) {
+        scheduleAnnouncement(`Result: ${currentShareText}`);
+      }
+    } catch (error) {
+      setError(
+        error instanceof Error ? error.message : "This weight could not be converted.",
+      );
+      clearOutputs("Correct the value to continue.");
+
+      if (updateUrl) {
+        clearUrl();
+      }
+    }
+  }
+
+  async function copyText(text) {
+    if (!text) {
+      return false;
+    }
+
+    try {
+      await navigator.clipboard.writeText(text);
+      showStatus(`Copied: ${text}`);
+    } catch {
+      showStatus("The result could not be copied automatically.");
+
+      return false;
+    }
+
+    return true;
+  }
+
+  async function shareConversion() {
+    if (!currentShareText) {
+      return;
+    }
+
+    if ("share" in navigator) {
+      try {
+        await navigator.share({
+          title: "Weight conversion",
+          text: currentShareText,
+          url: currentShareUrl,
+        });
+        showStatus("Conversion shared.");
+
+        return;
+      } catch (error) {
+        if (error instanceof DOMException && error.name === "AbortError") {
+          return;
+        }
+      }
+    }
+
+    await copyText(currentShareUrl);
+  }
+
+  function loadUrlParameters() {
+    const parameters = new URLSearchParams(window.location.search);
+    const value = parameters.get("valor");
+    const urlOrigin = parameters.get("origen");
+    const urlDestination = parameters.get("destino");
+
+    if (urlOrigin && isWeightUnit(urlOrigin)) {
+      origin = urlOrigin;
+    }
+
+    if (urlDestination && isWeightUnit(urlDestination)) {
+      destination = urlDestination;
+    }
+
+    updateUnitControls();
+
+    if (value && parseWeightInput(value).ok) {
+      input.value = value;
+      render({ updateUrl: false, announce: false });
+    }
+  }
+
+  input.addEventListener("input", () => {
+    render({ normalizeDetectedUnit: true });
+  });
+
+  swapButton.addEventListener("click", () => {
+    const parsed = parseWeightInput(input.value);
+    const previousOrigin = origin;
+    const previousDestination = destination;
+
+    origin = previousDestination;
+    destination = previousOrigin;
+
+    if (parsed.ok) {
+      try {
+        input.value = String(
+          convertWeight(parsed.value, previousOrigin, previousDestination),
+        );
+      } catch {
+        // The normal render path presents the validation message.
+      }
+    }
+
+    updateUnitControls();
+    render();
+  });
+
+  clearButton.addEventListener("click", () => {
+    input.value = "";
+    setError();
+    clearOutputs();
+    clearUrl();
+    input.focus();
+  });
+
+  copyMainButton.addEventListener("click", () => {
+    copyText(currentMainCopyText);
+  });
+
+  shareMainButton.addEventListener("click", () => {
+    shareConversion();
+  });
+
+  document.addEventListener("click", (event) => {
+    const unitButton = event.target.closest("[data-unit-group][data-unit]");
+
+    if (unitButton) {
+      const { unitGroup, unit } = unitButton.dataset;
+
+      if (!isWeightUnit(unit)) {
+        return;
+      }
+
+      if (unitGroup === "origin") {
+        origin = unit;
+      } else if (unitGroup === "destination") {
+        destination = unit;
+      }
+
+      document
+        .querySelector(`[data-more-units="${unitGroup}"]`)
+        ?.removeAttribute("open");
+      updateUnitControls();
+      render();
+
+      return;
+    }
+
+    const copyButton = event.target.closest("[data-copy-unit]");
+
+    if (copyButton) {
+      const unit = copyButton.dataset.copyUnit;
+
+      if (currentResults && isWeightUnit(unit)) {
+        copyText(formatWeight(currentResults[unit], unit));
+      }
+
+      return;
+    }
+
+    const shortcutButton = event.target.closest("[data-shortcut-value]");
+
+    if (!shortcutButton) {
+      return;
+    }
+
+    const { shortcutValue, shortcutFrom, shortcutTo } = shortcutButton.dataset;
+
+    if (
+      typeof shortcutValue !== "string" ||
+      !isWeightUnit(shortcutFrom) ||
+      !isWeightUnit(shortcutTo)
+    ) {
+      return;
+    }
+
+    input.value = shortcutValue;
+    origin = shortcutFrom;
+    destination = shortcutTo;
+    updateUnitControls();
+    render();
+    mainResult.setAttribute("tabindex", "-1");
+    mainResult.focus();
+    document.querySelector("#weight-converter")?.scrollIntoView({
+      behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches
+        ? "auto"
+        : "smooth",
+      block: "start",
+    });
+  });
+
+  updateUnitControls();
+  loadUrlParameters();
+</script>

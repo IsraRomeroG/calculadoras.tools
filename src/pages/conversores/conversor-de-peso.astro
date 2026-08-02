@@ -11,11 +11,16 @@ import {
   type WeightUnit,
 } from "@lib/calculators/conversores/conversor-de-peso/weight";
 import { buildFaqJsonLd } from "@lib/seo";
+import { buildAlternateLinks } from "@lib/i18n/routing";
 
 const title = "Conversor de kg a lb y libras a kilogramos";
 const description =
   "Convierte kilogramos a libras y libras a kilogramos al instante. Consulta la fórmula, equivalencias frecuentes y resultados en gramos, onzas y stone.";
 const canonical = "/conversores/conversor-de-peso";
+const alternates = buildAlternateLinks(
+  { es: canonical, en: "/en/converters/weight-converter" },
+  Astro.site ?? Astro.url,
+);
 
 const faqs = [
   {
@@ -82,7 +87,7 @@ const visibleShortcuts = shortcuts.slice(0, 6);
 const extraShortcuts = shortcuts.slice(6);
 ---
 
-<BaseLayout title={title} description={description} canonical={canonical}>
+<BaseLayout title={title} description={description} canonical={canonical} alternates={alternates}>
   <Fragment slot="head">
     <script type="application/ld+json" set:html={JSON.stringify(faqJsonLd)} />
   </Fragment>

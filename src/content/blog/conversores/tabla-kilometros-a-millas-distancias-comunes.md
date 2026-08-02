@@ -4,6 +4,7 @@ seoTitle: "Tabla de kilómetros a millas y millas a kilómetros"
 description: "Consulta equivalencias frecuentes entre kilómetros y millas, incluidas distancias de carretera, 5K, 10K, medio maratón y maratón."
 pubDate: 2026-07-28
 categorySlug: "conversores"
+translationKey: "kilometers-to-miles-table"
 tags:
   - tabla kilómetros a millas
   - equivalencias de distancia

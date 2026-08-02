@@ -1,0 +1,1611 @@
+---
+import BaseLayout from "@layouts/BaseLayout.astro";
+import AdSlot from "@components/ads/AdSlot.astro";
+import Container from "@components/layout/Container.astro";
+import PageShell from "@components/layout/PageShell.astro";
+import FaqSection from "@components/shared/FaqSection.astro";
+import PageHero from "@components/shared/PageHero.astro";
+import SectionIntro from "@components/shared/SectionIntro.astro";
+import {
+  WEDDING_BUDGET_CANONICAL_PATH,
+  WEDDING_TEMPLATES,
+} from "@lib/calculators/eventos/calculadora-presupuesto-boda/weddingBudget.en";
+import { buildAlternateLinks } from "@lib/i18n/routing";
+import { buildFaqJsonLd } from "@lib/seo";
+
+const title = "Wedding budget calculator";
+const description =
+  "Create a wedding budget with guests, line items, deposits, contingency, cost per person, and a comparison with your available budget.";
+const canonical = WEDDING_BUDGET_CANONICAL_PATH;
+const spanishCanonical = "/eventos/calculadora-presupuesto-boda";
+const alternates = buildAlternateLinks(
+  { es: spanishCanonical, en: canonical },
+  Astro.site ?? Astro.url,
+);
+
+const faqs = [
+  {
+    question: "Which expenses should a wedding budget include?",
+    answer:
+      "Include the venue, catering, drinks, photography and video, music, decor, ceremony, attire, beauty, invitations, transportation, accommodation, favors, and a contingency reserve. Not every category applies to every wedding.",
+  },
+  {
+    question: "How is the cost per guest calculated?",
+    answer:
+      "Divide the estimated total, including contingency, by the number of guests. This helps compare attendance scenarios, but it does not replace vendor quotes.",
+  },
+  {
+    question: "What is the contingency for?",
+    answer:
+      "The contingency is a reserve for scope changes, vendor adjustments, or expenses that are not final yet. It does not represent a payment already made.",
+  },
+  {
+    question: "Does the calculator use average prices?",
+    answer:
+      "No. Prices depend on location, season, vendors, guest count, and event style. Templates only add item names and never preset prices.",
+  },
+  {
+    question: "What is the difference between paid and outstanding balance?",
+    answer:
+      "The amount entered as paid is the deposit you typed. Applied payments are capped at each item’s cost to avoid negative balances. Contingency is shown separately from item balances.",
+  },
+  {
+    question: "Where is my budget saved?",
+    answer:
+      "It is saved automatically in this browser’s local storage on this device. It is not sent to servers, and you can delete it with the clear button.",
+  },
+];
+
+const faqJsonLd = buildFaqJsonLd(faqs);
+---
+
+<BaseLayout title={title} description={description} canonical={canonical} locale="en" alternates={alternates}>
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={JSON.stringify(faqJsonLd)} />
+  </Fragment>
+
+  <PageShell>
+    <PageHero
+      title={title}
+      description="Organize items, deposits, and contingency to estimate the total, cost per guest, and how far above or below your budget you are."
+      kicker="Events"
+      collapseBreadcrumbOnMobile
+      containerClass="py-5 md:py-7"
+      breadcrumbs={[
+        { label: "Home", href: "/en", ariaLabel: "Home" },
+        { label: "Events", href: "/en/events", optional: true },
+        { label: "Wedding budget", truncate: true },
+      ]}
+    />
+
+    <Container as="section" class="py-4 md:py-7">
+      <section
+        id="wedding-budget-calculator"
+        class="overflow-hidden rounded-lg border border-gray-700 bg-gray-950 shadow-xl shadow-gray-950/30"
+        aria-labelledby="calculator-heading"
+      >
+        <form
+          class="grid lg:grid-cols-[minmax(0,1.12fr)_minmax(21rem,0.88fr)]"
+          novalidate
+          data-wedding-form
+        >
+          <section class="p-4 sm:p-6 lg:col-start-1 lg:row-start-1">
+            <p class="text-sm font-semibold uppercase tracking-wide text-rose-300">
+              Main details
+            </p>
+            <h2 id="calculator-heading" class="mt-2 text-2xl font-semibold text-white">
+              Set the guest count and budget
+            </h2>
+            <p class="mt-2 text-sm leading-relaxed text-gray-400">
+              Enter your own quotes. Incomplete items are saved, but they are not
+              included until they have enough information.
+            </p>
+
+            <div class="mt-6 grid gap-4 sm:grid-cols-2">
+              <div>
+                <label for="wedding-guests" class="block text-sm font-semibold text-gray-200">
+                  Guests
+                </label>
+                <input
+                  id="wedding-guests"
+                  class="wedding-input mt-2 text-xl font-semibold"
+                  type="text"
+                  inputmode="numeric"
+                  autocomplete="off"
+                  placeholder="120"
+                  data-project-field="guests"
+                  aria-describedby="wedding-guests-error"
+                />
+                <p id="wedding-guests-error" class="wedding-field-error" data-error-for="guests"></p>
+              </div>
+
+              <div>
+                <label for="wedding-budget" class="block text-sm font-semibold text-gray-200">
+                  Available budget
+                  <span class="font-normal text-gray-500">(optional)</span>
+                </label>
+                <div class="wedding-input-group">
+                  <span aria-hidden="true">$</span>
+                  <input
+                    id="wedding-budget"
+                    class="wedding-input wedding-input-with-prefix wedding-input-with-suffix"
+                    type="text"
+                    inputmode="decimal"
+                    autocomplete="off"
+                    placeholder="400,000"
+                    data-project-field="budget"
+                    aria-describedby="wedding-budget-error"
+                  />
+                  <span class="wedding-input-suffix">MXN</span>
+                </div>
+                <p id="wedding-budget-error" class="wedding-field-error" data-error-for="budget"></p>
+              </div>
+
+              <div>
+                <label for="wedding-guests-per-table" class="block text-sm font-semibold text-gray-200">
+                  Guests per table
+                </label>
+                <input
+                  id="wedding-guests-per-table"
+                  class="wedding-input mt-2"
+                  type="text"
+                  inputmode="numeric"
+                  autocomplete="off"
+                  value="10"
+                  data-project-field="guestsPerTable"
+                  aria-describedby="wedding-guests-per-table-error"
+                />
+                <p id="wedding-guests-per-table-error" class="wedding-field-error" data-error-for="guestsPerTable"></p>
+              </div>
+
+              <div>
+                <label for="wedding-contingency" class="block text-sm font-semibold text-gray-200">
+                  Contingency
+                </label>
+                <div class="wedding-input-group">
+                  <input
+                    id="wedding-contingency"
+                    class="wedding-input wedding-input-with-suffix"
+                    type="text"
+                    inputmode="decimal"
+                    autocomplete="off"
+                    value="10"
+                    data-project-field="contingency"
+                    aria-describedby="wedding-contingency-error"
+                  />
+                  <span class="wedding-input-suffix">%</span>
+                </div>
+                <p id="wedding-contingency-error" class="wedding-field-error" data-error-for="contingency"></p>
+              </div>
+            </div>
+
+            <section class="mt-6 rounded-lg border border-gray-800 bg-gray-900/60 p-4">
+              <div class="flex flex-col gap-3 sm:flex-row sm:items-end">
+                <div class="min-w-0 flex-1">
+                  <label for="wedding-template" class="block text-sm font-semibold text-gray-200">
+                    Start with a template
+                  </label>
+                  <select
+                    id="wedding-template"
+                    class="wedding-input mt-2"
+                    data-project-field="template"
+                    aria-describedby="wedding-template-description"
+                  >
+                    {
+                      Object.entries(WEDDING_TEMPLATES).map(([id, template]) => (
+                        <option value={id}>{template.label}</option>
+                      ))
+                    }
+                  </select>
+                </div>
+                <button class="wedding-secondary-button shrink-0" type="button" data-apply-template>
+                  Load
+                </button>
+              </div>
+              <p id="wedding-template-description" class="mt-3 text-xs leading-relaxed text-gray-400" data-template-description>
+                Start with one blank item.
+              </p>
+              <p class="mt-2 text-xs leading-relaxed text-gray-500">
+                Templates add common items, never prices.
+              </p>
+            </section>
+
+            <div class="mt-6 flex flex-col gap-3 rounded-lg border border-emerald-400/20 bg-emerald-400/5 p-4 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <p class="text-sm font-semibold text-emerald-100">Local save</p>
+                <p class="mt-1 text-xs leading-relaxed text-emerald-100/70" data-storage-status>
+                  Changes will be saved on this device.
+                </p>
+              </div>
+              <button class="wedding-quiet-button hidden" type="button" data-discard-saved>
+                Delete saved data
+              </button>
+            </div>
+
+            <div class="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <h3 class="text-xl font-semibold text-white">Items</h3>
+                <p class="mt-1 text-sm leading-relaxed text-gray-400" data-item-count>
+                  Add an item to get started.
+                </p>
+              </div>
+              <button class="wedding-primary-button shrink-0" type="button" data-add-item>
+                Add item
+              </button>
+            </div>
+
+            <div class="mt-4 grid gap-4" data-item-list></div>
+
+            <button class="wedding-secondary-button mt-5 w-full" type="button" data-add-item-bottom>
+              Add another item
+            </button>
+          </section>
+
+          <aside class="border-t border-gray-800 bg-gray-900/45 p-4 sm:p-6 lg:sticky lg:top-4 lg:col-start-2 lg:row-start-1 lg:min-h-screen lg:border-l lg:border-t-0">
+            <p class="text-sm font-semibold uppercase tracking-wide text-rose-300">
+              Summary
+            </p>
+            <p class="mt-3 text-3xl font-bold leading-tight text-white" data-main-total>
+              No estimate yet
+            </p>
+            <p class="mt-2 text-sm leading-relaxed text-gray-400" data-budget-status>
+              Enter the guest count and at least one complete item.
+            </p>
+            <p class="sr-only" role="status" aria-live="polite" data-live-summary></p>
+
+            <div class="mt-5 hidden" data-budget-progress>
+              <div class="mb-2 flex items-center justify-between text-xs font-semibold text-gray-400">
+                <span>Budget used</span>
+                <span class="text-white" data-budget-progress-label></span>
+              </div>
+              <div class="h-2 overflow-hidden rounded-full bg-gray-800">
+                <div class="h-full rounded-full transition-[width,background-color]" data-budget-progress-bar></div>
+              </div>
+            </div>
+
+            <div class="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-1" data-summary-grid>
+              <div class="rounded-lg border border-gray-800 bg-gray-950/70 p-4 text-sm leading-relaxed text-gray-400">
+                The total, cost per guest, and balance will appear here.
+              </div>
+            </div>
+
+            <p class="mt-4 hidden rounded-lg border border-amber-400/30 bg-amber-400/10 p-3 text-sm leading-relaxed text-amber-100" data-incomplete-notice></p>
+            <div class="mt-4 hidden rounded-lg border border-red-300/30 bg-red-300/10 p-3 text-sm leading-relaxed text-red-100" data-warning-list></div>
+
+            <section class="mt-5 hidden border-t border-gray-800 pt-5" data-breakdowns>
+              <h3 class="text-sm font-semibold text-white">Categories</h3>
+              <div class="mt-3 grid gap-2" data-category-breakdown></div>
+              <h3 class="mt-5 text-sm font-semibold text-white">Largest expenses</h3>
+              <div class="mt-3 grid gap-2" data-top-items></div>
+            </section>
+
+            <div class="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-1">
+              <button class="wedding-primary-button" type="button" disabled data-copy-result>
+                Copy summary
+              </button>
+              <button class="wedding-secondary-button" type="button" disabled data-export-csv>
+                Export CSV
+              </button>
+              <button class="wedding-quiet-button sm:col-span-2 lg:col-span-1" type="button" data-clear-calculator>
+                Clear form
+              </button>
+            </div>
+            <p class="mt-3 min-h-5 text-sm text-emerald-100" role="status" aria-live="polite" data-action-status></p>
+          </aside>
+        </form>
+      </section>
+    </Container>
+
+    <AdSlot placement="calculator-after-tool" />
+
+    <Container as="section" class="py-8">
+      <SectionIntro
+        title="How to build a useful budget"
+        description="The final figure matters, but it also helps to understand what is driving it."
+        class="mb-5"
+      />
+      <div class="grid gap-4 md:grid-cols-3">
+        <article class="wedding-info-card">
+          <p class="text-sm font-semibold text-rose-300">1. Separate by vendor</p>
+          <h2 class="mt-2 text-lg font-semibold text-white">One item per decision</h2>
+          <p class="mt-2 text-sm leading-relaxed text-gray-400">
+            Venue, catering, music, and decor are usually negotiated separately. Keeping
+            them separate helps identify which change would have the greatest impact.
+          </p>
+        </article>
+        <article class="wedding-info-card">
+          <p class="text-sm font-semibold text-rose-300">2. Use the right type</p>
+          <h2 class="mt-2 text-lg font-semibold text-white">Fixed, per guest, or per table</h2>
+          <p class="mt-2 text-sm leading-relaxed text-gray-400">
+            Catering usually grows per guest, centerpieces per table, while photography
+            may be fixed. The calculation type avoids manual math outside the tool.
+          </p>
+        </article>
+        <article class="wedding-info-card">
+          <p class="text-sm font-semibold text-rose-300">3. Keep reserves separate</p>
+          <h2 class="mt-2 text-lg font-semibold text-white">Payments and contingency</h2>
+          <p class="mt-2 text-sm leading-relaxed text-gray-400">
+            A deposit reduces an item’s balance. Contingency is a separate reserve
+            for changes, missing expenses, or scope adjustments.
+          </p>
+        </article>
+      </div>
+    </Container>
+
+    <Container as="section" class="py-8">
+      <div class="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(18rem,0.55fr)]">
+        <article class="rounded-lg border border-gray-700 bg-gray-950 p-5 sm:p-6">
+          <h2 class="text-2xl font-semibold text-white">Common wedding expenses</h2>
+          <p class="mt-3 text-sm leading-relaxed text-gray-400">
+            Check whether you included the ceremony, permits, catering, drinks, corkage,
+            music, photography, video, decor, flowers, makeup, transportation,
+            accommodation, invitations, favors, tips, and service charges.
+          </p>
+          <p class="mt-3 text-sm leading-relaxed text-gray-400">
+            The calculator does not include average prices because they vary too much
+            by location, season, vendor, and celebration style.
+          </p>
+        </article>
+
+        <aside class="rounded-lg border border-rose-300/30 bg-rose-300/5 p-5 sm:p-6">
+          <h2 class="text-lg font-semibold text-white">Next review</h2>
+          <p class="mt-3 text-sm leading-relaxed text-gray-400">
+            When you receive quotes, update deposits and switch items between
+            fixed, per guest, and per table to compare attendance scenarios.
+          </p>
+        </aside>
+      </div>
+    </Container>
+
+    <FaqSection faqs={faqs} />
+  </PageShell>
+
+  <div class="fixed inset-x-0 bottom-0 z-40 border-t border-gray-700 bg-gray-950/95 px-3 py-3 shadow-2xl shadow-gray-950/60 backdrop-blur lg:hidden" data-mobile-summary>
+    <div class="mx-auto flex max-w-5xl items-center justify-between gap-3">
+      <div class="min-w-0">
+        <p class="text-xs font-semibold uppercase tracking-wide text-gray-500">Estimated total</p>
+        <p class="truncate text-lg font-bold text-white" data-mobile-total>No total yet</p>
+      </div>
+      <p class="max-w-[48%] text-right text-xs font-semibold leading-snug text-gray-300" data-mobile-status>
+        Complete an item.
+      </p>
+    </div>
+  </div>
+  <div class="h-20 lg:hidden"></div>
+</BaseLayout>
+
+<style is:global>
+  .wedding-input {
+    min-height: 3rem;
+    width: 100%;
+    border-radius: 0.5rem;
+    border: 1px solid rgb(55 65 81);
+    background: rgb(17 24 39);
+    padding: 0 0.875rem;
+    font-size: 1rem;
+    color: white;
+    outline: none;
+  }
+
+  .wedding-input:focus {
+    border-color: rgb(251 113 133);
+    box-shadow: 0 0 0 3px rgb(251 113 133 / 0.16);
+  }
+
+  .wedding-input[aria-invalid="true"] {
+    border-color: rgb(252 165 165);
+  }
+
+  .wedding-input-group {
+    position: relative;
+    margin-top: 0.5rem;
+  }
+
+  .wedding-input-group > span:first-child {
+    pointer-events: none;
+    position: absolute;
+    left: 0.875rem;
+    top: 50%;
+    z-index: 1;
+    transform: translateY(-50%);
+    color: rgb(156 163 175);
+  }
+
+  .wedding-input-with-prefix {
+    padding-left: 2rem;
+    padding-right: 4.25rem;
+  }
+
+  .wedding-input-with-suffix {
+    padding-right: 4rem;
+  }
+
+  .wedding-input-suffix {
+    pointer-events: none;
+    position: absolute;
+    right: 0.875rem;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: rgb(156 163 175);
+  }
+
+  .wedding-field-error {
+    min-height: 1.25rem;
+    padding-top: 0.25rem;
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+    color: rgb(252 165 165);
+  }
+
+  .wedding-primary-button,
+  .wedding-secondary-button,
+  .wedding-quiet-button {
+    display: inline-flex;
+    min-height: 2.75rem;
+    align-items: center;
+    justify-content: center;
+    border-radius: 0.5rem;
+    padding: 0.55rem 1rem;
+    font-size: 0.875rem;
+    font-weight: 700;
+    transition: border-color 150ms, background-color 150ms, color 150ms, opacity 150ms;
+  }
+
+  .wedding-primary-button {
+    background: rgb(251 113 133);
+    color: rgb(3 7 18);
+  }
+
+  .wedding-primary-button:hover {
+    background: rgb(253 164 175);
+  }
+
+  .wedding-secondary-button {
+    border: 1px solid rgb(75 85 99);
+    color: rgb(229 231 235);
+  }
+
+  .wedding-secondary-button:hover {
+    border-color: rgb(251 113 133);
+    color: white;
+  }
+
+  .wedding-quiet-button {
+    color: rgb(156 163 175);
+  }
+
+  .wedding-quiet-button:hover {
+    color: rgb(254 202 202);
+  }
+
+  .wedding-primary-button:focus-visible,
+  .wedding-secondary-button:focus-visible,
+  .wedding-quiet-button:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 3px rgb(251 113 133 / 0.25);
+  }
+
+  .wedding-primary-button:disabled,
+  .wedding-secondary-button:disabled {
+    cursor: not-allowed;
+    opacity: 0.4;
+  }
+
+  .wedding-info-card {
+    border-radius: 0.5rem;
+    border: 1px solid rgb(55 65 81);
+    background: rgb(3 7 18);
+    padding: 1.25rem;
+  }
+</style>
+
+<script>
+  import {
+    WEDDING_BUDGET_CATEGORIES,
+    WEDDING_BUDGET_CATEGORY_LABELS,
+    WEDDING_CALCULATION_TYPES,
+    WEDDING_CALCULATION_TYPE_LABELS,
+    WEDDING_TEMPLATE_IDS,
+    WEDDING_TEMPLATES,
+    buildWeddingCsv,
+    buildWeddingShareText,
+    calculateWeddingBudget,
+    createWeddingTemplateItems,
+    formatWeddingCurrency,
+    formatWeddingNumber,
+    parseWeddingNumberInput,
+  } from "@lib/calculators/eventos/calculadora-presupuesto-boda/weddingBudget.en";
+
+  const STORAGE_KEY = "calculadoras-tools:wedding-budget:v1";
+  const STORAGE_VERSION = 1;
+  const MAX_ITEMS = 100;
+  const defaultProject = {
+    guests: "",
+    budget: "",
+    guestsPerTable: "10",
+    contingency: "10",
+    template: "blank",
+  };
+
+  const form = document.querySelector("[data-wedding-form]");
+  const itemList = document.querySelector("[data-item-list]");
+  const addButtons = document.querySelectorAll("[data-add-item], [data-add-item-bottom]");
+  const applyTemplateButton = document.querySelector("[data-apply-template]");
+  const templateDescription = document.querySelector("[data-template-description]");
+  const storageStatus = document.querySelector("[data-storage-status]");
+  const discardSavedButton = document.querySelector("[data-discard-saved]");
+  const clearButton = document.querySelector("[data-clear-calculator]");
+  const itemCount = document.querySelector("[data-item-count]");
+  const mainTotal = document.querySelector("[data-main-total]");
+  const budgetStatus = document.querySelector("[data-budget-status]");
+  const liveSummary = document.querySelector("[data-live-summary]");
+  const summaryGrid = document.querySelector("[data-summary-grid]");
+  const incompleteNotice = document.querySelector("[data-incomplete-notice]");
+  const warningList = document.querySelector("[data-warning-list]");
+  const breakdowns = document.querySelector("[data-breakdowns]");
+  const categoryBreakdown = document.querySelector("[data-category-breakdown]");
+  const topItems = document.querySelector("[data-top-items]");
+  const budgetProgress = document.querySelector("[data-budget-progress]");
+  const budgetProgressLabel = document.querySelector("[data-budget-progress-label]");
+  const budgetProgressBar = document.querySelector("[data-budget-progress-bar]");
+  const copyButton = document.querySelector("[data-copy-result]");
+  const exportButton = document.querySelector("[data-export-csv]");
+  const actionStatus = document.querySelector("[data-action-status]");
+  const mobileTotal = document.querySelector("[data-mobile-total]");
+  const mobileStatus = document.querySelector("[data-mobile-status]");
+  const projectFields = Object.fromEntries(
+    [...document.querySelectorAll("[data-project-field]")].map((field) => [
+      field.dataset.projectField,
+      field,
+    ]),
+  );
+
+  let project = { ...defaultProject };
+  let items = [];
+  let currentResult = null;
+  let currentInput = null;
+  let saveTimer;
+  let statusTimer;
+
+  function createId() {
+    if (globalThis.crypto?.randomUUID) {
+      return globalThis.crypto.randomUUID();
+    }
+
+    return `item-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+  }
+
+  function createBlankItem(index = items.length) {
+    return {
+      id: createId(),
+      name: `Item ${index + 1}`,
+      category: "otro",
+      calculationType: "fijo",
+      fixedAmount: "",
+      unitCost: "",
+      quantity: "1",
+      manualTables: "",
+      deposit: "0",
+      responsible: "",
+      notes: "",
+      expanded: true,
+    };
+  }
+
+  function createDraftFromTemplate(templateItem, index) {
+    return {
+      ...createBlankItem(index),
+      name: templateItem.name,
+      category: templateItem.category,
+      expanded: index === 0,
+    };
+  }
+
+  function renderItems(focusId = "") {
+    itemList.textContent = "";
+
+    items.forEach((item, index) => {
+      const article = document.createElement("article");
+      article.className =
+        "rounded-lg border border-gray-700 bg-gray-900/60 p-4 transition-colors";
+      article.dataset.itemId = item.id;
+      article.innerHTML = renderItemCard(item, index);
+      itemList.appendChild(article);
+      updateItemCard(article, item);
+    });
+
+    updateItemCount();
+    addButtons.forEach((button) => {
+      button.disabled = items.length >= MAX_ITEMS;
+    });
+
+    if (focusId) {
+      requestAnimationFrame(() => {
+        document.getElementById(`wedding-item-${focusId}-name`)?.focus();
+      });
+    }
+  }
+
+  function renderItemCard(item, index) {
+    const bodyHidden = item.expanded ? "" : "hidden";
+    const categoryOptions = WEDDING_BUDGET_CATEGORIES.map(
+      (category) =>
+        `<option value="${category}" ${item.category === category ? "selected" : ""}>${escapeHtml(WEDDING_BUDGET_CATEGORY_LABELS[category])}</option>`,
+    ).join("");
+    const typeOptions = WEDDING_CALCULATION_TYPES.map(
+      (type) =>
+        `<option value="${type}" ${item.calculationType === type ? "selected" : ""}>${escapeHtml(WEDDING_CALCULATION_TYPE_LABELS[type])}</option>`,
+    ).join("");
+
+    return `
+      <div class="flex items-start justify-between gap-3">
+        <button
+          class="min-w-0 flex-1 rounded-lg text-left focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-rose-300/25"
+          type="button"
+          data-item-action="toggle"
+          aria-expanded="${item.expanded}"
+          aria-controls="wedding-item-${escapeAttribute(item.id)}-body"
+        >
+          <span class="block text-xs font-semibold uppercase tracking-wide text-gray-500">Item ${index + 1}</span>
+          <span class="mt-1 block break-words text-base font-semibold text-white" data-item-title>${escapeHtml(item.name || `Item ${index + 1}`)}</span>
+          <span class="mt-2 flex flex-wrap items-center gap-2">
+            <span class="rounded-full border px-2 py-1 text-xs font-semibold" data-item-badge></span>
+            <span class="text-sm font-semibold text-rose-100" data-item-subtotal>Not included</span>
+          </span>
+        </button>
+        <span class="text-xl text-gray-500" aria-hidden="true">${item.expanded ? "-" : "+"}</span>
+      </div>
+
+      <div id="wedding-item-${escapeAttribute(item.id)}-body" class="mt-4 ${bodyHidden}" data-item-body>
+        <div class="grid gap-4 sm:grid-cols-2">
+          ${renderItemInput(item, "name", "Name", "e.g., catering", "text", "sm:col-span-2", 80)}
+          <div>
+            <label for="wedding-item-${escapeAttribute(item.id)}-category" class="block text-sm font-semibold text-gray-200">Category</label>
+            <select id="wedding-item-${escapeAttribute(item.id)}-category" class="wedding-input mt-2" data-item-field="category">
+              ${categoryOptions}
+            </select>
+          </div>
+          <div>
+            <label for="wedding-item-${escapeAttribute(item.id)}-calculationType" class="block text-sm font-semibold text-gray-200">Calculation type</label>
+            <select id="wedding-item-${escapeAttribute(item.id)}-calculationType" class="wedding-input mt-2" data-item-field="calculationType">
+              ${typeOptions}
+            </select>
+          </div>
+          <div data-cost-field="fixed">
+            <label for="wedding-item-${escapeAttribute(item.id)}-fixedAmount" class="block text-sm font-semibold text-gray-200">Fixed amount</label>
+            <div class="wedding-input-group">
+              <span aria-hidden="true">$</span>
+              <input
+                id="wedding-item-${escapeAttribute(item.id)}-fixedAmount"
+                class="wedding-input wedding-input-with-prefix wedding-input-with-suffix"
+                type="text"
+                inputmode="decimal"
+                autocomplete="off"
+                placeholder="0.00"
+                value="${escapeAttribute(item.fixedAmount)}"
+                data-item-field="fixedAmount"
+              />
+              <span class="wedding-input-suffix">MXN</span>
+            </div>
+          </div>
+          <div data-cost-field="unit">
+            <label for="wedding-item-${escapeAttribute(item.id)}-unitCost" class="block text-sm font-semibold text-gray-200">Unit cost</label>
+            <div class="wedding-input-group">
+              <span aria-hidden="true">$</span>
+              <input
+                id="wedding-item-${escapeAttribute(item.id)}-unitCost"
+                class="wedding-input wedding-input-with-prefix wedding-input-with-suffix"
+                type="text"
+                inputmode="decimal"
+                autocomplete="off"
+                placeholder="0.00"
+                value="${escapeAttribute(item.unitCost)}"
+                data-item-field="unitCost"
+              />
+              <span class="wedding-input-suffix">MXN</span>
+            </div>
+          </div>
+          ${renderItemInput(item, "quantity", "Quantity", "1", "decimal", "", undefined, "quantity")}
+          ${renderItemInput(item, "manualTables", "Manual tables", "Optional", "numeric", "", undefined, "manualTables")}
+          <div>
+            <label for="wedding-item-${escapeAttribute(item.id)}-deposit" class="block text-sm font-semibold text-gray-200">Deposit paid</label>
+            <div class="wedding-input-group">
+              <span aria-hidden="true">$</span>
+              <input
+                id="wedding-item-${escapeAttribute(item.id)}-deposit"
+                class="wedding-input wedding-input-with-prefix wedding-input-with-suffix"
+                type="text"
+                inputmode="decimal"
+                autocomplete="off"
+                placeholder="0"
+                value="${escapeAttribute(item.deposit)}"
+                data-item-field="deposit"
+              />
+              <span class="wedding-input-suffix">MXN</span>
+            </div>
+          </div>
+          ${renderItemInput(item, "responsible", "Responsible person", "Optional", "text", "", 80)}
+          ${renderItemInput(item, "notes", "Notes", "Optional", "text", "sm:col-span-2", 140)}
+        </div>
+
+        <p class="mt-3 min-h-5 text-sm leading-relaxed" data-item-message></p>
+
+        <div class="mt-4 flex flex-wrap gap-2 border-t border-gray-800 pt-4">
+          <button class="min-h-11 rounded-lg border border-gray-700 px-3 text-sm font-semibold text-gray-200 hover:border-rose-300" type="button" data-item-action="duplicate">
+            Duplicate
+          </button>
+          <button class="min-h-11 rounded-lg border border-red-300/30 px-3 text-sm font-semibold text-red-200 hover:border-red-300" type="button" data-item-action="delete">
+            Delete
+          </button>
+        </div>
+      </div>
+    `;
+  }
+
+  function renderItemInput(
+    item,
+    field,
+    label,
+    placeholder,
+    inputMode = "text",
+    wrapperClass = "",
+    maxLength,
+    costField = "",
+  ) {
+    const id = `wedding-item-${item.id}-${field}`;
+    const value = item[field] ?? "";
+    const fieldAttribute = costField ? ` data-cost-field="${costField}"` : "";
+
+    return `
+      <div class="${wrapperClass}"${fieldAttribute}>
+        <label for="${escapeAttribute(id)}" class="block text-sm font-semibold text-gray-200">${escapeHtml(label)}</label>
+        <input
+          id="${escapeAttribute(id)}"
+          class="wedding-input mt-2"
+          type="text"
+          inputmode="${escapeAttribute(inputMode)}"
+          autocomplete="off"
+          placeholder="${escapeAttribute(placeholder)}"
+          value="${escapeAttribute(value)}"
+          data-item-field="${escapeAttribute(field)}"
+          ${maxLength ? `maxlength="${maxLength}"` : ""}
+        />
+      </div>
+    `;
+  }
+
+  function updateItemCard(article, item) {
+    const projectResult = parseProject(false);
+    const state = getDraftState(item, projectResult.ok ? projectResult.values : null);
+    const title = article.querySelector("[data-item-title]");
+    const badge = article.querySelector("[data-item-badge]");
+    const subtotal = article.querySelector("[data-item-subtotal]");
+    const message = article.querySelector("[data-item-message]");
+
+    title.textContent = item.name.trim() || "Unnamed item";
+    badge.textContent = state.complete
+      ? WEDDING_BUDGET_CATEGORY_LABELS[item.category]
+      : state.errors.length
+        ? "Review"
+        : "Incomplete";
+    badge.className = `rounded-full border px-2 py-1 text-xs font-semibold ${
+      state.complete
+        ? "border-emerald-300/30 bg-emerald-300/10 text-emerald-100"
+        : state.errors.length
+          ? "border-red-300/30 bg-red-300/10 text-red-100"
+          : "border-amber-300/30 bg-amber-300/10 text-amber-100"
+    }`;
+    subtotal.textContent = state.complete
+      ? formatWeddingCurrency(state.item.fixedAmount ?? state.item.unitCost ?? 0)
+      : "Not included";
+
+    if (state.complete && state.previewCost !== undefined) {
+      subtotal.textContent = formatWeddingCurrency(state.previewCost);
+    }
+
+    if (state.errors.length) {
+      message.textContent = state.errors.join(" ");
+      message.className = "mt-3 min-h-5 text-sm leading-relaxed text-red-200";
+    } else if (state.missing.length) {
+      message.textContent = `Missing: ${state.missing.join(", ")}.`;
+      message.className = "mt-3 min-h-5 text-sm leading-relaxed text-amber-100";
+    } else {
+      message.textContent = "Item included in the total.";
+      message.className = "mt-3 min-h-5 text-sm leading-relaxed text-emerald-100";
+    }
+
+    toggleCostFields(article, item.calculationType);
+    article.querySelectorAll("[data-item-field]").forEach((field) => {
+      field.setAttribute(
+        "aria-invalid",
+        String(state.invalidFields.includes(field.dataset.itemField)),
+      );
+    });
+  }
+
+  function toggleCostFields(article, calculationType) {
+    article.querySelector('[data-cost-field="fixed"]')?.classList.toggle(
+      "hidden",
+      calculationType !== "fijo",
+    );
+    article.querySelector('[data-cost-field="unit"]')?.classList.toggle(
+      "hidden",
+      calculationType === "fijo",
+    );
+    article.querySelector('[data-cost-field="quantity"]')?.classList.toggle(
+      "hidden",
+      calculationType !== "cantidad_x_unitario",
+    );
+    article.querySelector('[data-cost-field="manualTables"]')?.classList.toggle(
+      "hidden",
+      calculationType !== "por_mesa",
+    );
+  }
+
+  function getDraftState(item, projectValues) {
+    const missing = [];
+    const errors = [];
+    const invalidFields = [];
+    const name = item.name.trim();
+
+    if (!name) missing.push("name");
+    if (!WEDDING_BUDGET_CATEGORIES.includes(item.category)) {
+      errors.push("Select a valid category.");
+      invalidFields.push("category");
+    }
+    if (!WEDDING_CALCULATION_TYPES.includes(item.calculationType)) {
+      errors.push("Select a valid calculation type.");
+      invalidFields.push("calculationType");
+    }
+
+    const deposit = parseOptionalDraftNumber(item.deposit, 0);
+    if (!deposit.ok) {
+      errors.push("Review the deposit paid.");
+      invalidFields.push("deposit");
+    }
+
+    if (name.length > 80) {
+      errors.push("The name cannot exceed 80 characters.");
+      invalidFields.push("name");
+    }
+    if (item.responsible.trim().length > 80) {
+      errors.push("The responsible person cannot exceed 80 characters.");
+      invalidFields.push("responsible");
+    }
+    if (item.notes.trim().length > 140) {
+      errors.push("Notes cannot exceed 140 characters.");
+      invalidFields.push("notes");
+    }
+
+    const itemBase = {
+      id: item.id,
+      name,
+      category: item.category,
+      calculationType: item.calculationType,
+      deposit: deposit.ok ? deposit.value : 0,
+      ...(item.responsible.trim() ? { responsible: item.responsible.trim() } : {}),
+      ...(item.notes.trim() ? { notes: item.notes.trim() } : {}),
+    };
+
+    let numericFields = {};
+
+    if (item.calculationType === "fijo") {
+      const fixedAmount = parseRequiredDraftNumber(item.fixedAmount);
+      if (fixedAmount.ok) {
+        numericFields = { fixedAmount: fixedAmount.value };
+      } else if (fixedAmount.error === "required") {
+        missing.push("fixed amount");
+      } else {
+        errors.push("Review the fixed amount.");
+        invalidFields.push("fixedAmount");
+      }
+    } else {
+      if (!projectValues) {
+        errors.push("Complete the guest count and global settings to calculate this item.");
+      }
+
+      const unitCost = parseRequiredDraftNumber(item.unitCost);
+      if (unitCost.ok) {
+        numericFields = { unitCost: unitCost.value };
+      } else if (unitCost.error === "required") {
+        missing.push("unit cost");
+      } else {
+        errors.push("Review the unit cost.");
+        invalidFields.push("unitCost");
+      }
+
+      if (item.calculationType === "cantidad_x_unitario") {
+        const quantity = parseRequiredDraftNumber(item.quantity);
+        if (quantity.ok) {
+          numericFields = { ...numericFields, quantity: quantity.value };
+        } else if (quantity.error === "required") {
+          missing.push("quantity");
+        } else {
+          errors.push("Review the quantity.");
+          invalidFields.push("quantity");
+        }
+      }
+
+      if (item.calculationType === "por_mesa" && item.manualTables.trim()) {
+        const manualTables = parseIntegerDraftNumber(item.manualTables);
+        if (manualTables.ok && manualTables.value >= 1) {
+          numericFields = { ...numericFields, manualTables: manualTables.value };
+        } else {
+          errors.push("Manual tables must be a positive integer.");
+          invalidFields.push("manualTables");
+        }
+      }
+    }
+
+    const complete = !missing.length && !errors.length && Boolean(name);
+    const completeItem = complete ? { ...itemBase, ...numericFields } : null;
+
+    return {
+      complete,
+      missing,
+      errors,
+      invalidFields,
+      ...(complete ? { item: completeItem } : {}),
+      ...(complete && projectValues
+        ? {
+            previewCost: calculateWeddingBudget({
+              ...projectValues,
+              items: [completeItem],
+            }).subtotal,
+          }
+        : {}),
+    };
+  }
+
+  function parseProject(showErrors = true) {
+    if (showErrors) clearProjectErrors();
+    const errors = {};
+    const guests = parseRequiredInteger(
+      project.guests,
+      "Enter between 1 and 10,000 guests.",
+      errors,
+      "guests",
+      1,
+      10000,
+    );
+    const availableBudget = parseOptionalNumber(
+      project.budget,
+      "Enter a valid budget.",
+      errors,
+      "budget",
+    );
+    const guestsPerTable = parseRequiredInteger(
+      project.guestsPerTable,
+      "Enter between 1 and 50 guests per table.",
+      errors,
+      "guestsPerTable",
+      1,
+      50,
+    );
+    const contingencyPercentage = parsePercentage(
+      project.contingency,
+      "Contingency must be between 0 and 100.",
+      errors,
+      "contingency",
+    );
+
+    if (showErrors) {
+      Object.entries(errors).forEach(([key, message]) => {
+        const element = document.querySelector(`[data-error-for="${key}"]`);
+        if (element) element.textContent = message;
+        projectFields[key]?.setAttribute("aria-invalid", "true");
+      });
+    }
+
+    if (Object.keys(errors).length) {
+      return { ok: false };
+    }
+
+    return {
+      ok: true,
+      values: {
+        guestCount: guests,
+        ...(typeof availableBudget === "number" ? { availableBudget } : {}),
+        guestsPerTable,
+        contingencyPercentage,
+      },
+    };
+  }
+
+  function parseRequiredInteger(value, message, errors, key, min, max) {
+    const parsed = parseWeddingNumberInput(value);
+
+    if (!parsed.ok || !Number.isInteger(parsed.value) || parsed.value < min || parsed.value > max) {
+      errors[key] = message;
+      return 0;
+    }
+
+    return parsed.value;
+  }
+
+  function parseOptionalNumber(value, message, errors, key) {
+    if (!value.trim()) return undefined;
+    const parsed = parseWeddingNumberInput(value);
+
+    if (!parsed.ok) {
+      errors[key] = message;
+      return undefined;
+    }
+
+    return parsed.value;
+  }
+
+  function parsePercentage(value, message, errors, key) {
+    const parsed = parseWeddingNumberInput(value);
+
+    if (!parsed.ok || parsed.value > 100) {
+      errors[key] = message;
+      return 0;
+    }
+
+    return parsed.value;
+  }
+
+  function parseRequiredDraftNumber(value) {
+    const parsed = parseWeddingNumberInput(value);
+    return parsed.ok ? { ok: true, value: parsed.value } : parsed;
+  }
+
+  function parseOptionalDraftNumber(value, fallback) {
+    if (!String(value).trim()) return { ok: true, value: fallback };
+    const parsed = parseWeddingNumberInput(value);
+    return parsed.ok ? { ok: true, value: parsed.value } : parsed;
+  }
+
+  function parseIntegerDraftNumber(value) {
+    const parsed = parseWeddingNumberInput(value);
+    if (!parsed.ok || !Number.isInteger(parsed.value)) {
+      return { ok: false };
+    }
+
+    return { ok: true, value: parsed.value };
+  }
+
+  function clearProjectErrors() {
+    document.querySelectorAll("[data-error-for]").forEach((element) => {
+      element.textContent = "";
+    });
+    Object.values(projectFields).forEach((field) => {
+      field.setAttribute("aria-invalid", "false");
+    });
+  }
+
+  function updateCalculator() {
+    const projectResult = parseProject();
+    const draftStates = items.map((item) =>
+      getDraftState(item, projectResult.ok ? projectResult.values : null),
+    );
+    const validItems = draftStates
+      .filter((state) => state.complete)
+      .map((state) => state.item);
+    const incompleteCount = items.length - validItems.length;
+
+    items.forEach((item) => {
+      const article = [...itemList.querySelectorAll("[data-item-id]")].find(
+        (row) => row.dataset.itemId === item.id,
+      );
+      if (article) updateItemCard(article, item);
+    });
+    updateItemCount(validItems.length);
+
+    if (!projectResult.ok) {
+      setNeutralResult("Review guests, tables, or contingency to continue.");
+      renderIncompleteNotice(incompleteCount);
+      return;
+    }
+
+    if (!validItems.length) {
+      setNeutralResult(
+        items.length
+          ? "Complete the cost for at least one item."
+          : "Add an item to get started.",
+      );
+      renderIncompleteNotice(incompleteCount);
+      return;
+    }
+
+    try {
+      currentInput = {
+        ...projectResult.values,
+        items: validItems,
+      };
+      currentResult = calculateWeddingBudget(currentInput);
+      renderResult(currentResult, currentInput);
+      renderIncompleteNotice(incompleteCount);
+      copyButton.disabled = false;
+      exportButton.disabled = false;
+    } catch (error) {
+      setNeutralResult(
+        error instanceof Error ? error.message : "The estimate could not be calculated.",
+      );
+      renderIncompleteNotice(incompleteCount);
+    }
+  }
+
+  function updateItemCount(completeCount = items.filter((item) => getDraftState(item, null).complete).length) {
+    itemCount.textContent = items.length
+      ? `${items.length} ${items.length === 1 ? "item" : "items"} · ${completeCount} ${completeCount === 1 ? "complete" : "complete"}`
+      : "There are no items yet. Add one to get started.";
+  }
+
+  function setNeutralResult(message) {
+    currentInput = null;
+    currentResult = null;
+    mainTotal.textContent = "No estimate yet";
+    budgetStatus.textContent = message;
+    budgetStatus.className = "mt-2 text-sm leading-relaxed text-gray-400";
+    liveSummary.textContent = message;
+    summaryGrid.innerHTML =
+      '<div class="rounded-lg border border-gray-800 bg-gray-950/70 p-4 text-sm leading-relaxed text-gray-400">Incomplete items are kept, but they are not silently included in the total.</div>';
+    budgetProgress.classList.add("hidden");
+    breakdowns.classList.add("hidden");
+    warningList.classList.add("hidden");
+    copyButton.disabled = true;
+    exportButton.disabled = true;
+    mobileTotal.textContent = "No total yet";
+    mobileStatus.textContent = message;
+  }
+
+  function renderResult(result, input) {
+    mainTotal.textContent = formatWeddingCurrency(result.total);
+    mobileTotal.textContent = formatWeddingCurrency(result.total);
+
+    if (
+      typeof input.availableBudget === "number" &&
+      typeof result.budgetDifference === "number"
+    ) {
+      if (result.budgetDifference >= 0) {
+        budgetStatus.textContent = `Within budget: ${formatWeddingCurrency(result.budgetDifference)} remains.`;
+        budgetStatus.className = "mt-2 text-sm font-semibold leading-relaxed text-emerald-200";
+      } else {
+        budgetStatus.textContent = `The estimate is ${formatWeddingCurrency(Math.abs(result.budgetDifference))} over budget.`;
+        budgetStatus.className = "mt-2 text-sm font-semibold leading-relaxed text-red-200";
+      }
+    } else {
+      budgetStatus.textContent = `Estimate based on ${result.items.length} complete ${result.items.length === 1 ? "item" : "items"}.`;
+      budgetStatus.className = "mt-2 text-sm leading-relaxed text-gray-400";
+    }
+
+    mobileStatus.textContent = budgetStatus.textContent;
+    liveSummary.textContent = `${mainTotal.textContent}. ${budgetStatus.textContent}`;
+
+    const metrics = [
+      ["Cost per guest", formatWeddingCurrency(result.costPerGuest)],
+      ["Subtotal", formatWeddingCurrency(result.subtotal)],
+      [`Contingency (${formatWeddingNumber(input.contingencyPercentage)}%)`, formatWeddingCurrency(result.contingencyAmount)],
+      ["Payments applied", formatWeddingCurrency(result.paidApplied)],
+      ["Outstanding item balance", formatWeddingCurrency(result.itemBalance)],
+      ["Estimated amount still due", formatWeddingCurrency(result.pendingTotalEstimated)],
+    ];
+
+    if (typeof result.budgetPerGuest === "number") {
+      metrics.push(["Budget per guest", formatWeddingCurrency(result.budgetPerGuest)]);
+    }
+
+    if (result.depositSurplus > 0) {
+      metrics.push(["Excess deposits", formatWeddingCurrency(result.depositSurplus)]);
+    }
+
+    summaryGrid.innerHTML = metrics.map(([label, value]) => summaryCard(label, value)).join("");
+    renderProgress(result, input);
+    renderBreakdowns(result);
+    renderWarnings(result);
+  }
+
+  function renderProgress(result, input) {
+    if (
+      typeof input.availableBudget !== "number" ||
+      input.availableBudget <= 0 ||
+      typeof result.budgetUsedPercentage !== "number"
+    ) {
+      budgetProgress.classList.add("hidden");
+      return;
+    }
+
+    const used = result.budgetUsedPercentage;
+    budgetProgress.classList.remove("hidden");
+    budgetProgressLabel.textContent = `${formatWeddingNumber(used, 1)}%`;
+    budgetProgressBar.style.width = `${Math.min(used, 100)}%`;
+    budgetProgressBar.className = `h-full rounded-full transition-[width,background-color] ${
+      used <= 100 ? "bg-emerald-300" : "bg-red-300"
+    }`;
+  }
+
+  function renderIncompleteNotice(count) {
+    if (!count) {
+      incompleteNotice.classList.add("hidden");
+      incompleteNotice.textContent = "";
+      return;
+    }
+
+    incompleteNotice.textContent = `${count} ${count === 1 ? "incomplete item is not included" : "incomplete items are not included"} in the total.`;
+    incompleteNotice.classList.remove("hidden");
+  }
+
+  function renderBreakdowns(result) {
+    breakdowns.classList.remove("hidden");
+    categoryBreakdown.innerHTML = result.categoryBreakdown
+      .map((category) =>
+        breakdownRow(
+          category.label,
+          formatWeddingCurrency(category.subtotal),
+          `${formatWeddingNumber(category.percentageOfSubtotal, 1)}%`,
+        ),
+      )
+      .join("");
+
+    topItems.innerHTML = result.topItems
+      .map((item) =>
+        breakdownRow(
+          item.name,
+          formatWeddingCurrency(item.cost),
+          `${formatWeddingNumber(item.percentageOfSubtotal, 1)}%`,
+        ),
+      )
+      .join("");
+  }
+
+  function renderWarnings(result) {
+    if (!result.warnings.length) {
+      warningList.classList.add("hidden");
+      warningList.textContent = "";
+      return;
+    }
+
+    warningList.innerHTML = result.warnings.map((warning) => `<p>${escapeHtml(warning)}</p>`).join("");
+    warningList.classList.remove("hidden");
+  }
+
+  function summaryCard(label, value) {
+    return `
+      <div class="rounded-lg border border-gray-800 bg-gray-950/70 p-4">
+        <span class="block text-xs font-semibold uppercase tracking-wide text-gray-500">${escapeHtml(label)}</span>
+        <strong class="mt-2 block break-words text-base font-semibold text-white">${escapeHtml(value)}</strong>
+      </div>
+    `;
+  }
+
+  function breakdownRow(label, value, note = "") {
+    return `
+      <div class="flex items-start justify-between gap-3 rounded-lg border border-gray-800 bg-gray-950/70 p-3 text-sm">
+        <div class="min-w-0">
+          <span class="block break-words text-gray-300">${escapeHtml(label)}</span>
+          ${note ? `<span class="mt-1 block text-xs text-gray-500">${escapeHtml(note)} of subtotal</span>` : ""}
+        </div>
+        <strong class="shrink-0 text-right text-white">${escapeHtml(value)}</strong>
+      </div>
+    `;
+  }
+
+  function addItem() {
+    if (items.length >= MAX_ITEMS) {
+      setActionStatus(`The limit is ${MAX_ITEMS} items.`, true);
+      return;
+    }
+
+    const item = createBlankItem();
+    items.push(item);
+    renderItems(item.id);
+    updateCalculator();
+    scheduleSave();
+  }
+
+  function duplicateItem(index) {
+    if (items.length >= MAX_ITEMS) {
+      setActionStatus(`The limit is ${MAX_ITEMS} items.`, true);
+      return;
+    }
+
+    const source = items[index];
+    const duplicate = {
+      ...source,
+      id: createId(),
+      name: `${source.name.trim() || `Item ${index + 1}`} copy`.slice(0, 80),
+      expanded: true,
+    };
+    items.splice(index + 1, 0, duplicate);
+    renderItems(duplicate.id);
+    updateCalculator();
+    scheduleSave();
+  }
+
+  function deleteItem(index) {
+    items.splice(index, 1);
+    renderItems();
+    updateCalculator();
+    scheduleSave();
+  }
+
+  function applyTemplate() {
+    const templateId = project.template;
+
+    if (!WEDDING_TEMPLATE_IDS.includes(templateId)) return;
+
+    if (
+      hasMeaningfulData() &&
+      !window.confirm("The template will replace the current items. Do you want to continue?")
+    ) {
+      return;
+    }
+
+    const templateItems = createWeddingTemplateItems(templateId);
+    items = templateItems.length
+      ? templateItems.map(createDraftFromTemplate)
+      : [createBlankItem(0)];
+    renderItems(items[0]?.id);
+    updateCalculator();
+    scheduleSave();
+    setActionStatus(`${WEDDING_TEMPLATES[templateId].label} template loaded.`);
+  }
+
+  function hasMeaningfulData() {
+    return items.some(
+      (item) =>
+        item.fixedAmount.trim() ||
+        item.unitCost.trim() ||
+        item.deposit.trim() !== "0" ||
+        (item.name.trim() && !/^Item \d+$/.test(item.name.trim())),
+    );
+  }
+
+  function syncProjectFromFields() {
+    Object.entries(projectFields).forEach(([key, field]) => {
+      project[key] = field.value;
+    });
+    updateTemplateDescription();
+  }
+
+  function syncProjectFields() {
+    Object.entries(projectFields).forEach(([key, field]) => {
+      field.value = project[key] ?? defaultProject[key] ?? "";
+    });
+    updateTemplateDescription();
+  }
+
+  function updateTemplateDescription() {
+    const template = WEDDING_TEMPLATES[project.template] ?? WEDDING_TEMPLATES.blank;
+    templateDescription.textContent = template.description;
+  }
+
+  function scheduleSave() {
+    window.clearTimeout(saveTimer);
+    storageStatus.textContent = "Saving changes...";
+    saveTimer = window.setTimeout(saveState, 350);
+  }
+
+  function saveState() {
+    try {
+      localStorage.setItem(
+        STORAGE_KEY,
+        JSON.stringify({
+          version: STORAGE_VERSION,
+          project,
+          items,
+        }),
+      );
+      storageStatus.textContent = "Changes saved on this device.";
+    } catch {
+      storageStatus.textContent = "Changes could not be saved on this device.";
+    }
+  }
+
+  function restoreState() {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) return false;
+      const saved = JSON.parse(raw);
+
+      if (
+        saved?.version !== STORAGE_VERSION ||
+        !saved.project ||
+        !Array.isArray(saved.items)
+      ) {
+        return false;
+      }
+
+      project = {
+        guests: stringValue(saved.project.guests),
+        budget: stringValue(saved.project.budget),
+        guestsPerTable: stringValue(saved.project.guestsPerTable) || "10",
+        contingency: stringValue(saved.project.contingency) || "10",
+        template: WEDDING_TEMPLATE_IDS.includes(saved.project.template)
+          ? saved.project.template
+          : "blank",
+      };
+      items = saved.items.slice(0, MAX_ITEMS).map((item, index) => ({
+        id: typeof item.id === "string" && item.id ? item.id : createId(),
+        name: stringValue(item.name).slice(0, 80) || `Item ${index + 1}`,
+        category: WEDDING_BUDGET_CATEGORIES.includes(item.category)
+          ? item.category
+          : "otro",
+        calculationType: WEDDING_CALCULATION_TYPES.includes(item.calculationType)
+          ? item.calculationType
+          : "fijo",
+        fixedAmount: stringValue(item.fixedAmount),
+        unitCost: stringValue(item.unitCost),
+        quantity: stringValue(item.quantity) || "1",
+        manualTables: stringValue(item.manualTables),
+        deposit: stringValue(item.deposit) || "0",
+        responsible: stringValue(item.responsible).slice(0, 80),
+        notes: stringValue(item.notes).slice(0, 140),
+        expanded: Boolean(item.expanded),
+      }));
+
+      if (!items.length) items = [createBlankItem(0)];
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  function resetCalculator(requireConfirmation = true) {
+    if (
+      requireConfirmation &&
+      hasMeaningfulData() &&
+      !window.confirm("Do you want to delete all items and start over?")
+    ) {
+      return;
+    }
+
+    window.clearTimeout(saveTimer);
+    try {
+      localStorage.removeItem(STORAGE_KEY);
+    } catch {
+      // The calculator can continue without storage.
+    }
+
+    project = { ...defaultProject };
+    items = [createBlankItem(0)];
+    currentInput = null;
+    currentResult = null;
+    syncProjectFields();
+    renderItems(items[0].id);
+    updateCalculator();
+    discardSavedButton.classList.add("hidden");
+    storageStatus.textContent = "Budget cleared. Future changes will be saved here.";
+    setActionStatus("Budget cleared.");
+  }
+
+  async function copyResult() {
+    if (!currentResult || !currentInput) return;
+
+    try {
+      await navigator.clipboard.writeText(
+        buildWeddingShareText(currentResult, currentInput),
+      );
+      setActionStatus("Summary copied.");
+    } catch {
+      setActionStatus("The summary could not be copied automatically.", true);
+    }
+  }
+
+  function exportCsv() {
+    if (!currentResult || !currentInput) return;
+
+    const csv = buildWeddingCsv(currentResult, currentInput);
+    const url = URL.createObjectURL(
+      new Blob([`\uFEFF${csv}`], { type: "text/csv;charset=utf-8" }),
+    );
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "wedding-budget.csv";
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    URL.revokeObjectURL(url);
+    setActionStatus("CSV generated.");
+  }
+
+  function setActionStatus(message, isError = false) {
+    window.clearTimeout(statusTimer);
+    actionStatus.textContent = message;
+    actionStatus.className = `mt-3 min-h-5 text-sm ${isError ? "text-red-200" : "text-emerald-100"}`;
+    statusTimer = window.setTimeout(() => {
+      actionStatus.textContent = "";
+    }, 3500);
+  }
+
+  function stringValue(value) {
+    return typeof value === "string" || typeof value === "number"
+      ? String(value)
+      : "";
+  }
+
+  function escapeHtml(value) {
+    return String(value)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;");
+  }
+
+  function escapeAttribute(value) {
+    return escapeHtml(value)
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
+  }
+
+  form.addEventListener("submit", (event) => event.preventDefault());
+
+  form.addEventListener("input", (event) => {
+    const projectField = event.target.closest("[data-project-field]");
+    if (projectField) {
+      syncProjectFromFields();
+      updateCalculator();
+      scheduleSave();
+      return;
+    }
+
+    const itemField = event.target.closest("[data-item-field]");
+    const article = event.target.closest("[data-item-id]");
+    if (!itemField || !article) return;
+    const item = items.find((entry) => entry.id === article.dataset.itemId);
+    if (!item) return;
+    item[itemField.dataset.itemField] = itemField.value;
+    updateItemCard(article, item);
+    updateCalculator();
+    scheduleSave();
+  });
+
+  form.addEventListener("change", (event) => {
+    const projectField = event.target.closest("[data-project-field]");
+    if (projectField) {
+      syncProjectFromFields();
+      updateCalculator();
+      scheduleSave();
+      return;
+    }
+
+    const itemField = event.target.closest("[data-item-field]");
+    const article = event.target.closest("[data-item-id]");
+    if (!itemField || !article) return;
+    const item = items.find((entry) => entry.id === article.dataset.itemId);
+    if (!item) return;
+    item[itemField.dataset.itemField] = itemField.value;
+    updateItemCard(article, item);
+    updateCalculator();
+    scheduleSave();
+  });
+
+  itemList.addEventListener("click", (event) => {
+    const button = event.target.closest("[data-item-action]");
+    const article = event.target.closest("[data-item-id]");
+    if (!button || !article) return;
+    const index = items.findIndex((item) => item.id === article.dataset.itemId);
+    if (index < 0) return;
+
+    if (button.dataset.itemAction === "toggle") {
+      items[index].expanded = !items[index].expanded;
+      renderItems();
+      scheduleSave();
+    } else if (button.dataset.itemAction === "duplicate") {
+      duplicateItem(index);
+    } else if (button.dataset.itemAction === "delete") {
+      deleteItem(index);
+    }
+  });
+
+  addButtons.forEach((button) => button.addEventListener("click", addItem));
+  applyTemplateButton.addEventListener("click", applyTemplate);
+  clearButton.addEventListener("click", () => resetCalculator(true));
+  discardSavedButton.addEventListener("click", () => resetCalculator(false));
+  copyButton.addEventListener("click", copyResult);
+  exportButton.addEventListener("click", exportCsv);
+
+  const restored = restoreState();
+  if (!restored) items = [createBlankItem(0)];
+  syncProjectFields();
+  renderItems();
+  updateCalculator();
+
+  if (restored) {
+    storageStatus.textContent = "The last budget saved on this device was restored.";
+    discardSavedButton.classList.remove("hidden");
+  }
+</script>

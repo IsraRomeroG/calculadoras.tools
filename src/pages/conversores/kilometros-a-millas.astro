@@ -7,11 +7,16 @@ import FaqSection from "@components/shared/FaqSection.astro";
 import PageHero from "@components/shared/PageHero.astro";
 import SectionIntro from "@components/shared/SectionIntro.astro";
 import { buildFaqJsonLd } from "@lib/seo";
+import { buildAlternateLinks } from "@lib/i18n/routing";
 
 const title = "Kilómetros a Millas - Convertir km a mi";
 const description =
   "Convierte kilómetros a millas y millas a kilómetros al instante. Consulta la fórmula, equivalencias frecuentes y ejemplos para carretera o carrera.";
 const canonical = "/conversores/kilometros-a-millas";
+const alternates = buildAlternateLinks(
+  { es: canonical, en: "/en/converters/kilometers-to-miles" },
+  Astro.site ?? Astro.url,
+);
 
 const faqs = [
   {
@@ -158,7 +163,7 @@ const visibleShortcutGroups = shortcutGroups.filter((group) => group.visible);
 const extraShortcutGroups = shortcutGroups.filter((group) => !group.visible);
 ---
 
-<BaseLayout title={title} description={description} canonical={canonical}>
+<BaseLayout title={title} description={description} canonical={canonical} alternates={alternates}>
   <Fragment slot="head">
     <script type="application/ld+json" set:html={JSON.stringify(faqJsonLd)} />
   </Fragment>

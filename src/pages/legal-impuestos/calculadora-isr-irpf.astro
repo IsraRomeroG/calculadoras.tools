@@ -11,12 +11,15 @@ import {
   MEXICO_ISR_FREQUENCIES,
   MEXICO_ISR_PRESET,
 } from "@lib/calculators/legal-impuestos/calculadora-isr-irpf/incomeTax";
+import { buildAlternateLinks } from "@lib/i18n/routing";
 import { buildFaqJsonLd } from "@lib/seo";
 
 const title = "Calculadora de ISR en México 2026";
 const description =
   "Estima tu ISR en México por periodo o por año, consulta tu tasa efectiva y compara el impuesto con tus retenciones.";
 const canonical = ISR_CANONICAL_PATH;
+const englishCanonical = "/en/legal-tax/income-tax-calculator";
+const alternates = buildAlternateLinks({ es: canonical, en: englishCanonical }, Astro.site ?? Astro.url);
 
 const faqs = [
   {
@@ -51,7 +54,7 @@ const fieldClass =
   "mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-900 px-4 text-base text-white outline-none transition placeholder:text-gray-600 focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15";
 ---
 
-<BaseLayout title={title} description={description} canonical={canonical}>
+<BaseLayout title={title} description={description} canonical={canonical} alternates={alternates}>
   <Fragment slot="head">
     <script type="application/ld+json" set:html={JSON.stringify(faqJsonLd)} />
   </Fragment>

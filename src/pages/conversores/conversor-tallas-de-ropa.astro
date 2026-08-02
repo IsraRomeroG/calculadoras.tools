@@ -24,11 +24,16 @@ import {
   type ClothingRegion,
 } from "@lib/calculators/conversores/conversor-tallas-de-ropa/sizeCharts";
 import { buildFaqJsonLd } from "@lib/seo";
+import { buildAlternateLinks } from "@lib/i18n/routing";
 
 const title = "Conversor de tallas de ropa";
 const description =
   "Convierte tallas de ropa entre sistemas internacionales, US, EU, UK y MX con equivalencias orientativas, tallas vecinas y rangos de medidas.";
 const canonical = "/conversores/conversor-tallas-de-ropa";
+const alternates = buildAlternateLinks(
+  { es: canonical, en: "/en/converters/clothing-size-converter" },
+  Astro.site ?? Astro.url,
+);
 
 const defaultProfile: ClothingProfile = "mujer";
 const defaultGarment: ClothingGarment = "top";
@@ -114,7 +119,7 @@ const shortcuts = [
 ];
 ---
 
-<BaseLayout title={title} description={description} canonical={canonical}>
+<BaseLayout title={title} description={description} canonical={canonical} alternates={alternates}>
   <Fragment slot="head">
     <script type="application/ld+json" set:html={JSON.stringify(faqJsonLd)} />
   </Fragment>
