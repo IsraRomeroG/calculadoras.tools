@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import { calculateMarginalTax, validateMarginalBrackets } from "./brackets";
 import { completedYears, inclusiveCivilDays } from "./civilDates";
 import { addIndirectTax, extractAdditiveIndirectTax } from "./indirectTax";
+import { roundMoney } from "./money";
 
 const rounding = { mode: "half-up", precision: 2, stage: "component" } as const;
 
@@ -27,5 +28,10 @@ describe("legal-tax shared primitives", () => {
     expect(inclusiveCivilDays("2024-02-28", "2024-03-01")).toBe(3);
     expect(completedYears("2020-02-29", "2024-02-28")).toBe(3);
     expect(completedYears("2020-02-29", "2024-02-29")).toBe(4);
+  });
+
+  it("rounds monetary components to the declared precision", () => {
+    expect(roundMoney(2_741.2175, rounding)).toBe(2_741.22);
+    expect(roundMoney(1.005, rounding)).toBe(1.01);
   });
 });

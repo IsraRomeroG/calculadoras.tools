@@ -24,7 +24,7 @@ export function roundMoney(value: number, policy: RoundingPolicy): number {
       ? (lower % 2 === 0 ? lower : lower + 1)
       : Math.round(scaled);
   } else {
-    rounded = Math.round((scaled + Number.EPSILON) * 1e10) / 1e10;
+    rounded = Math.round(scaled + Number.EPSILON * Math.abs(scaled));
   }
 
   return rounded / factor;

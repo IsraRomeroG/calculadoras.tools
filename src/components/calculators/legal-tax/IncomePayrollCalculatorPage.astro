@@ -1,0 +1,218 @@
+---
+import Container from "@components/layout/Container.astro";
+import PageShell from "@components/layout/PageShell.astro";
+import PageHero from "@components/shared/PageHero.astro";
+import BaseLayout from "@layouts/BaseLayout.astro";
+import { MARKET_DEFINITIONS } from "@lib/calculators/legal-tax/markets";
+import { INCOME_TAX_PAGE_DEFINITIONS, PAYROLL_PAGE_DEFINITIONS } from "@lib/calculators/legal-tax/incomeTax/variants";
+import type { MarketId } from "@lib/calculators/legal-tax/types";
+import { buildRegionalAlternateLinks } from "@lib/i18n/routing";
+
+interface Props { family: "income-tax" | "take-home-pay"; marketId?: MarketId }
+const { family, marketId } = Astro.props;
+const isPayroll = family === "take-home-pay";
+const pages = isPayroll ? PAYROLL_PAGE_DEFINITIONS : INCOME_TAX_PAGE_DEFINITIONS;
+const page = pages.find((item) => item.marketId === marketId);
+const hubPath = isPayroll ? "/en/legal-tax/take-home-pay-calculators" : "/en/legal-tax/income-tax-calculators";
+const canonical = page?.path ?? hubPath;
+const title = page?.title ?? (isPayroll ? "Take-home pay calculators by country" : "Income tax calculators by country");
+const heading = page?.heading ?? (isPayroll ? "Take-home pay calculators by country" : "Income tax calculators by country");
+const description = page?.description ?? (isPayroll ? "Choose the country, jurisdiction and 2026 rule period before projecting tax, employee contributions and net pay." : "Choose the country, jurisdiction and 2026 rule period before estimating annual income tax.");
+const marketIds = pages.map((item) => item.marketId);
+const alternates = buildRegionalAlternateLinks(Object.fromEntries(pages.map((item) => [MARKET_DEFINITIONS[item.marketId].locale, item.path])), Astro.site ?? Astro.url, hubPath);
+const inputClass = "mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-900 px-4 text-base text-white outline-none transition focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15 disabled:cursor-not-allowed disabled:opacity-70";
+const jsonLd = { "@context": "https://schema.org", "@type": "WebApplication", name: heading, applicationCategory: "FinanceApplication", operatingSystem: "Any", inLanguage: page ? MARKET_DEFINITIONS[page.marketId].locale : "en", url: new URL(canonical, Astro.site ?? Astro.url).toString(), ...(page ? { spatialCoverage: MARKET_DEFINITIONS[page.marketId].countryName } : {}) };
+---
+
+<BaseLayout title={title} description={description} canonical={canonical} locale="en" htmlLang={page ? MARKET_DEFINITIONS[page.marketId].locale : "en"} alternates={alternates}>
+  <Fragment slot="head"><script type="application/ld+json" set:html={JSON.stringify(jsonLd)} /></Fragment>
+  <PageShell>
+    <PageHero title={heading} description={description} kicker="Legal & Tax" breadcrumbs={[
+      { label: "Home", href: "/en", ariaLabel: "Home" },
+      { label: "Legal & Taxes", href: "/en/legal-tax", optional: true },
+      { label: page ? MARKET_DEFINITIONS[page.marketId].countryName : isPayroll ? "Take-home pay" : "Income tax", truncate: true },
+    ]} />
+    <Container as="section" class="py-6 md:py-10">
+      <div data-income-payroll-root data-family={family} data-fixed-market={marketId ?? ""} class="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(20rem,0.8fr)]">
+        <form class="rounded-lg border border-gray-700 bg-gray-950 p-4 sm:p-6" data-form novalidate>
+          <p class="text-sm font-semibold uppercase tracking-wide text-amber-400">{isPayroll ? "Partial take-home pay projection" : "Annual income-tax estimate"}</p>
+          <h2 class="mt-2 text-2xl font-semibold text-white">Select the rules before entering income</h2>
+          <p class="mt-2 text-sm leading-relaxed text-gray-400">The locale formats the result; country, jurisdiction, profile and period select the law and currency.</p>
+          <div class="mt-6 grid gap-4 sm:grid-cols-2">
+            <div>
+              <label class="text-sm font-semibold text-gray-200" for={`${family}-market`}>Country</label>
+              <select id={`${family}-market`} class={inputClass} data-market disabled={Boolean(marketId)} aria-describedby={`${family}-market-error`}>
+                {!marketId && <option value="">Choose a country</option>}
+                {(marketId ? [marketId] : marketIds).map((id) => <option value={id} selected={id === marketId}>{MARKET_DEFINITIONS[id].countryName}</option>)}
+              </select>
+              <p id={`${family}-market-error`} class="mt-2 hidden text-sm text-red-300" data-error="market"></p>
+            </div>
+            <div>
+              <label class="text-sm font-semibold text-gray-200" for={`${family}-rules`}>Jurisdiction and rule period</label>
+              <select id={`${family}-rules`} class={inputClass} data-rule-set disabled aria-describedby={`${family}-rules-error`}><option value="">Choose a country first</option></select>
+              <p id={`${family}-rules-error`} class="mt-2 hidden text-sm text-red-300" data-error="ruleSet"></p>
+            </div>
+          </div>
+          <div class="mt-4">
+            <label class="text-sm font-semibold text-gray-200" for={`${family}-profile`}>Filing / regional profile</label>
+            <select id={`${family}-profile`} class={inputClass} data-profile disabled aria-describedby={`${family}-profile-error`}><option value="">Choose a rule period first</option></select>
+            <p id={`${family}-profile-error`} class="mt-2 hidden text-sm text-red-300" data-error="profile"></p>
+          </div>
+          <div class="mt-5">
+            <label class="text-sm font-semibold text-gray-200" for={`${family}-income`}>Annual gross taxable employment income</label>
+            <input id={`${family}-income`} class={inputClass} type="number" min="0" step="0.01" inputmode="decimal" autocomplete="off" placeholder="60000" data-income aria-describedby={`${family}-income-error`} />
+            <p id={`${family}-income-error`} class="mt-2 hidden text-sm text-red-300" data-error="income"></p>
+          </div>
+          {isPayroll && (
+            <>
+              <div class="mt-4 grid gap-4 sm:grid-cols-2">
+                <div>
+                  <label class="text-sm font-semibold text-gray-200" for="payroll-frequency">Result frequency</label>
+                  <select id="payroll-frequency" class={inputClass} data-frequency><option value="annual">Annual</option><option value="monthly" selected>Monthly</option><option value="biweekly">Biweekly (26)</option><option value="weekly">Weekly</option></select>
+                </div>
+                <div>
+                  <label class="text-sm font-semibold text-gray-200" for="payroll-deductions">Annual post-tax deductions</label>
+                  <input id="payroll-deductions" class={inputClass} type="number" min="0" step="0.01" value="0" data-deductions aria-describedby="payroll-deductions-error" />
+                  <p id="payroll-deductions-error" class="mt-2 hidden text-sm text-red-300" data-error="deductions"></p>
+                </div>
+              </div>
+              <div class="mt-4 hidden" data-contribution-variant-wrap>
+                <label class="text-sm font-semibold text-gray-200" for="payroll-contribution-variant">Contribution period</label>
+                <select id="payroll-contribution-variant" class={inputClass} data-contribution-variant aria-describedby="payroll-contribution-error"></select>
+                <p id="payroll-contribution-error" class="mt-2 hidden text-sm text-red-300" data-error="contribution"></p>
+              </div>
+            </>
+          )}
+          <div class="mt-6 flex flex-col gap-3 border-t border-gray-800 pt-5 sm:flex-row">
+            <button class="min-h-11 rounded-lg bg-amber-400 px-5 py-2 text-sm font-bold text-gray-950 hover:bg-amber-300" type="submit">{isPayroll ? "Estimate take-home pay" : "Estimate annual income tax"}</button>
+            <button class="min-h-11 rounded-lg border border-gray-700 px-5 py-2 text-sm font-semibold text-gray-200 hover:border-amber-400" type="button" data-clear>Clear</button>
+          </div>
+        </form>
+
+        <aside class="h-fit rounded-lg border border-gray-700 bg-gray-900/80 p-4 sm:p-6 lg:sticky lg:top-6" aria-labelledby={`${family}-result-heading`}>
+          <p class="text-sm font-semibold uppercase tracking-wide text-amber-400" data-status>Result</p>
+          <h2 id={`${family}-result-heading`} class="mt-2 text-xl font-semibold text-white">{isPayroll ? "Estimated net pay" : "Estimated annual income tax"}</h2>
+          <p class="mt-3 break-words text-4xl font-bold text-white" data-total>—</p>
+          <p class="mt-3 text-sm leading-relaxed text-gray-400" data-context>Choose a country and complete the required fields.</p>
+          <div class="mt-5 hidden rounded-lg border border-amber-400/25 bg-amber-400/10 p-3 text-sm text-amber-100" data-coverage></div>
+          <dl class="mt-5 hidden space-y-3" data-breakdown></dl>
+          <div class="mt-5 hidden text-sm leading-relaxed text-gray-400" data-missing></div>
+          <div class="mt-5 hidden border-t border-gray-800 pt-4 text-xs leading-relaxed text-gray-500" data-source></div>
+          <p class="sr-only" role="status" aria-live="polite" data-live></p>
+        </aside>
+      </div>
+
+      {!page && (
+        <section class="mt-10" aria-labelledby={`${family}-countries-heading`}>
+          <h2 id={`${family}-countries-heading`} class="text-2xl font-semibold text-white">Country-specific calculators</h2>
+          <div class="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {pages.map((item) => <a class="rounded-lg border border-gray-700 bg-gray-950 p-5 transition hover:border-amber-400" href={item.path}><strong class="text-white">{item.heading}</strong><span class="mt-2 block text-sm leading-relaxed text-gray-400">{item.description}</span></a>)}
+            <a class="rounded-lg border border-gray-700 bg-gray-950 p-5 transition hover:border-amber-400" href={isPayroll ? "/en/legal-tax/mexico-net-salary-calculator" : "/en/legal-tax/mexico-income-tax-calculator"}><strong class="text-white">Mexico {isPayroll ? "net salary" : "income tax"} calculator</strong><span class="mt-2 block text-sm leading-relaxed text-gray-400">Separate English-language variant using Mexico rules and MXN.</span></a>
+          </div>
+        </section>
+      )}
+      <div class="mt-8 rounded-lg border border-gray-800 bg-gray-950/70 p-4 text-sm leading-relaxed text-gray-400">This is an estimate based on the selected jurisdiction and rule period. It is not an official assessment or payslip. Excluded components appear beside the result; check the official authority or a qualified professional.</div>
+    </Container>
+  </PageShell>
+</BaseLayout>
+
+<script>
+  import { calculateAnnualIncomeTax, calculateTakeHomePay } from "@lib/calculators/legal-tax/incomeTax/calculator";
+  import { INCOME_TAX_RULE_SETS, PAYROLL_RULE_SETS } from "@lib/calculators/legal-tax/incomeTax/rules";
+  import { MARKET_DEFINITIONS } from "@lib/calculators/legal-tax/markets";
+
+  const root = document.querySelector("[data-income-payroll-root]");
+  if (root instanceof HTMLElement) {
+    const isPayroll = root.dataset.family === "take-home-pay";
+    const market = root.querySelector("[data-market]");
+    const ruleSetSelect = root.querySelector("[data-rule-set]");
+    const profile = root.querySelector("[data-profile]");
+    const income = root.querySelector("[data-income]");
+    const frequency = root.querySelector("[data-frequency]");
+    const deductions = root.querySelector("[data-deductions]");
+    const contributionVariant = root.querySelector("[data-contribution-variant]");
+    const contributionWrap = root.querySelector("[data-contribution-variant-wrap]");
+    const form = root.querySelector("[data-form]");
+    const total = root.querySelector("[data-total]");
+    const context = root.querySelector("[data-context]");
+    const status = root.querySelector("[data-status]");
+    const coverage = root.querySelector("[data-coverage]");
+    const breakdown = root.querySelector("[data-breakdown]");
+    const missing = root.querySelector("[data-missing]");
+    const source = root.querySelector("[data-source]");
+    const live = root.querySelector("[data-live]");
+    const activeEnvelope = () => (isPayroll ? PAYROLL_RULE_SETS : INCOME_TAX_RULE_SETS).find((item) => item.id === ruleSetSelect?.value);
+    const activeTaxEnvelope = () => isPayroll ? INCOME_TAX_RULE_SETS.find((item) => item.id === activeEnvelope()?.rules.taxRuleSetRef) : activeEnvelope();
+    const setError = (name, message = "") => { const node = root.querySelector(`[data-error="${name}"]`); if (node) { node.textContent = message; node.classList.toggle("hidden", !message); } };
+    const clearErrors = () => ["market", "ruleSet", "profile", "income", "deductions", "contribution"].forEach((name) => setError(name));
+    const resetResult = (message = "Complete the required fields.") => { if (status) status.textContent = "Result"; if (total) total.textContent = "—"; if (context) context.textContent = message; [coverage, breakdown, missing, source].forEach((node) => node?.classList.add("hidden")); if (live) live.textContent = ""; };
+    const money = (value, envelope) => new Intl.NumberFormat(MARKET_DEFINITIONS[envelope.marketId].locale, { style: "currency", currency: envelope.currency }).format(value);
+    const escapeHtml = (value) => String(value).replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;").replaceAll("'", "&#039;");
+    const rowHtml = (label, value, envelope) => `<div class="flex items-start justify-between gap-4 border-b border-gray-800 pb-2"><dt class="text-gray-400">${escapeHtml(label)}</dt><dd class="text-right font-semibold text-white">${escapeHtml(money(value, envelope))}</dd></div>`;
+
+    const populateProfiles = () => {
+      const taxSet = activeTaxEnvelope();
+      if (!(profile instanceof HTMLSelectElement)) return;
+      profile.innerHTML = '<option value="">Choose a profile</option>';
+      taxSet?.rules.profiles.forEach((item) => { const option = document.createElement("option"); option.value = item.id; option.textContent = item.label; profile.append(option); });
+      profile.disabled = !taxSet;
+      if (taxSet?.rules.profiles.length === 1) profile.value = taxSet.rules.profiles[0].id;
+      if (contributionVariant instanceof HTMLSelectElement) {
+        contributionVariant.innerHTML = '<option value="">Choose a pay-date phase</option>';
+        const rule = activeEnvelope()?.rules.contributionRule;
+        const variants = rule?.kind === "ie-usc-prsi" ? rule.prsiVariants : [];
+        variants.forEach((item) => { const option = document.createElement("option"); option.value = item.id; option.textContent = item.label; contributionVariant.append(option); });
+        contributionWrap?.classList.toggle("hidden", variants.length === 0);
+      }
+      resetResult("Choose a profile and enter annual income.");
+    };
+    const populateRuleSets = (clearIncome = false) => {
+      if (!(market instanceof HTMLSelectElement) || !(ruleSetSelect instanceof HTMLSelectElement)) return;
+      const sets = (isPayroll ? PAYROLL_RULE_SETS : INCOME_TAX_RULE_SETS).filter((item) => item.marketId === market.value);
+      ruleSetSelect.innerHTML = '<option value="">Choose a jurisdiction and period</option>';
+      sets.forEach((item) => { const option = document.createElement("option"); option.value = item.id; option.textContent = `${item.jurisdictionCode} · ${item.periodId}`; ruleSetSelect.append(option); });
+      ruleSetSelect.disabled = sets.length === 0; if (sets.length === 1) ruleSetSelect.value = sets[0].id;
+      if (clearIncome && income instanceof HTMLInputElement) income.value = "";
+      populateProfiles();
+    };
+    market?.addEventListener("change", () => { clearErrors(); populateRuleSets(true); });
+    ruleSetSelect?.addEventListener("change", () => { clearErrors(); populateProfiles(); });
+    profile?.addEventListener("change", () => resetResult("Enter annual income and calculate."));
+
+    form?.addEventListener("submit", (event) => {
+      event.preventDefault(); clearErrors(); let invalid = false;
+      if (!market?.value) { setError("market", "Choose a country."); invalid = true; }
+      if (!ruleSetSelect?.value) { setError("ruleSet", "Choose a jurisdiction and period."); invalid = true; }
+      if (!profile?.value) { setError("profile", "Choose a supported profile."); invalid = true; }
+      const annualIncome = Number(income?.value); if (!income?.value || !Number.isFinite(annualIncome) || annualIncome < 0) { setError("income", "Enter a non-negative annual amount."); invalid = true; }
+      const annualDeductions = isPayroll ? Number(deductions?.value || 0) : 0; if (!Number.isFinite(annualDeductions) || annualDeductions < 0) { setError("deductions", "Enter non-negative deductions."); invalid = true; }
+      const envelope = activeEnvelope(); const taxEnvelope = activeTaxEnvelope();
+      const contributionRule = isPayroll ? envelope?.rules.contributionRule : undefined;
+      if (contributionRule?.kind === "ie-usc-prsi" && !contributionVariant?.value) { setError("contribution", "Choose the PRSI pay-date phase."); invalid = true; }
+      if (invalid || !envelope || !taxEnvelope) { if (live) live.textContent = "Correct the highlighted fields."; return; }
+      try {
+        if (isPayroll) {
+          const result = calculateTakeHomePay({ payrollRuleSetId: envelope.id, ruleSetId: taxEnvelope.id, profileId: profile.value, annualIncome, frequency: frequency?.value ?? "monthly", annualPostTaxDeductions: annualDeductions, contributionVariantId: contributionVariant?.value || undefined });
+          if (status) status.textContent = "Partial take-home pay estimate";
+          if (total) total.textContent = money(result.netPerPeriod, envelope);
+          if (context) context.textContent = `${result.periodsPerYear} payments/year · ${result.jurisdictionCode} · ${result.periodId}`;
+          if (breakdown) { breakdown.innerHTML = [rowHtml("Gross annual pay", result.grossAnnual, envelope), rowHtml("Income tax projection", result.incomeTax, envelope), ...result.contributions.map((item) => rowHtml(item.label, item.amount, envelope)), rowHtml("Post-tax deductions", result.deductions, envelope), rowHtml("Net annual pay", result.netAnnual, envelope)].join(""); breakdown.classList.remove("hidden"); }
+          if (live) live.textContent = `Take-home pay estimate: ${money(result.netPerPeriod, envelope)} per selected period.`;
+        } else {
+          const result = calculateAnnualIncomeTax({ ruleSetId: envelope.id, profileId: profile.value, annualIncome });
+          if (status) status.textContent = "Annual income-tax estimate";
+          if (total) total.textContent = money(result.tax, envelope);
+          if (context) context.textContent = `${result.jurisdictionCode} · ${result.periodId} · effective rate ${(result.effectiveRate * 100).toFixed(2)}%`;
+          if (breakdown) { breakdown.innerHTML = [rowHtml("Gross income", result.grossIncome, envelope), rowHtml("Allowance/deduction", result.allowance, envelope), rowHtml("Taxable income", result.taxableIncome, envelope), ...result.components.map((item) => rowHtml(item.label, item.amount, envelope))].join(""); breakdown.classList.remove("hidden"); }
+          if (live) live.textContent = `Annual income-tax estimate: ${money(result.tax, envelope)}.`;
+        }
+        if (coverage) { coverage.textContent = "Partial coverage — excluded items are listed below the result."; coverage.classList.remove("hidden"); }
+        if (missing) { missing.innerHTML = `<strong class="text-gray-200">Not included:</strong> ${escapeHtml(envelope.missingConcepts.join("; "))}.`; missing.classList.remove("hidden"); }
+        if (source) { const first = envelope.sources[0]; source.innerHTML = `Rule set <strong class="text-gray-300">${escapeHtml(envelope.id)}</strong> · reviewed ${escapeHtml(envelope.reviewedAt)} · <a class="text-amber-400 hover:underline" href="${escapeHtml(first.url)}" target="_blank" rel="noreferrer">${escapeHtml(first.authority)}</a>`; source.classList.remove("hidden"); }
+      } catch (error) { if (live) live.textContent = error instanceof Error ? error.message : "The estimate could not be completed."; }
+    });
+    root.querySelector("[data-clear]")?.addEventListener("click", () => { form?.reset(); clearErrors(); if (root.dataset.fixedMarket && market instanceof HTMLSelectElement) market.value = root.dataset.fixedMarket; populateRuleSets(true); resetResult(root.dataset.fixedMarket ? "Choose a profile and enter annual income." : "Choose a country."); });
+    if (root.dataset.fixedMarket && market instanceof HTMLSelectElement) market.value = root.dataset.fixedMarket;
+    populateRuleSets(); resetResult(root.dataset.fixedMarket ? "Choose a profile and enter annual income." : "Choose a country.");
+  }
+</script>
