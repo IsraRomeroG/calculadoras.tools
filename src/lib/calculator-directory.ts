@@ -11,6 +11,7 @@ import {
 } from "@lib/constants/categories";
 import { DEFAULT_LOCALE, LOCALE_CONFIG, type Locale } from "@lib/i18n/config";
 import { prefixLocalePath } from "@lib/i18n/routing";
+import { LEGAL_TAX_MARKET_DIRECTORY_ITEMS } from "@lib/calculators/legal-tax/catalog";
 
 export type CalculatorCategorySlug = CategorySlug;
 
@@ -86,9 +87,8 @@ export const sortCalculators = (
 
 export const getPublishedCalculators = (
   locale: Locale = DEFAULT_LOCALE,
-): CalculatorDirectoryItem[] =>
-  sortCalculators(
-    CALCULATOR_DEFINITIONS.flatMap((calculator) => {
+): CalculatorDirectoryItem[] => {
+  const localizedCalculators = CALCULATOR_DEFINITIONS.flatMap((calculator) => {
       const metadata = calculator.locales[locale];
       const href = getCalculatorUrl(calculator, locale);
 
@@ -108,9 +108,16 @@ export const getPublishedCalculators = (
           ...(calculator.draft ? { draft: calculator.draft } : {}),
         },
       ];
-    }),
+    });
+
+  return sortCalculators(
+    [
+      ...localizedCalculators,
+      ...(locale === "en" ? LEGAL_TAX_MARKET_DIRECTORY_ITEMS : []),
+    ],
     locale,
   );
+};
 
 export const getCalculatorsByCategorySlug = (
   items: CalculatorDirectoryItem[],

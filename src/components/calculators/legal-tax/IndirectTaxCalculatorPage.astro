@@ -1,0 +1,251 @@
+---
+import Container from "@components/layout/Container.astro";
+import PageShell from "@components/layout/PageShell.astro";
+import PageHero from "@components/shared/PageHero.astro";
+import BaseLayout from "@layouts/BaseLayout.astro";
+import { MARKET_DEFINITIONS } from "@lib/calculators/legal-tax/markets";
+import { INDIRECT_TAX_MARKET_ORDER } from "@lib/calculators/legal-tax/indirectTax/rules";
+import { INDIRECT_TAX_PAGE_DEFINITIONS } from "@lib/calculators/legal-tax/indirectTax/variants";
+import type { MarketId } from "@lib/calculators/legal-tax/types";
+import { buildRegionalAlternateLinks } from "@lib/i18n/routing";
+
+interface Props { marketId?: MarketId }
+const { marketId } = Astro.props;
+const page = INDIRECT_TAX_PAGE_DEFINITIONS.find((item) => item.marketId === marketId);
+const canonical = page?.path ?? "/en/legal-tax/indirect-tax-calculator";
+const title = page?.title ?? "VAT, GST and sales tax calculator by country";
+const heading = page?.heading ?? "VAT, GST and sales tax calculator by country";
+const description = page?.description ?? "Choose the country and jurisdiction whose indirect-tax rules apply before calculating an arithmetic estimate.";
+const visibleMarkets = marketId ? [marketId] : INDIRECT_TAX_MARKET_ORDER;
+const alternates = buildRegionalAlternateLinks(
+  Object.fromEntries(INDIRECT_TAX_PAGE_DEFINITIONS.map((item) => [MARKET_DEFINITIONS[item.marketId].locale, item.path])),
+  Astro.site ?? Astro.url,
+  "/en/legal-tax/indirect-tax-calculator",
+);
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  name: heading,
+  applicationCategory: "FinanceApplication",
+  operatingSystem: "Any",
+  inLanguage: page ? MARKET_DEFINITIONS[page.marketId].locale : "en",
+  url: new URL(canonical, Astro.site ?? Astro.url).toString(),
+  ...(page ? { spatialCoverage: MARKET_DEFINITIONS[page.marketId].countryName } : {}),
+};
+const inputClass = "mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-900 px-4 text-base text-white outline-none transition focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15 disabled:cursor-not-allowed disabled:opacity-70";
+---
+
+<BaseLayout title={title} description={description} canonical={canonical} locale="en" htmlLang={page ? MARKET_DEFINITIONS[page.marketId].locale : "en"} alternates={alternates}>
+  <Fragment slot="head"><script type="application/ld+json" set:html={JSON.stringify(jsonLd)} /></Fragment>
+  <PageShell>
+    <PageHero
+      title={heading}
+      description={description}
+      kicker="Legal & Tax"
+      breadcrumbs={[
+        { label: "Home", href: "/en", ariaLabel: "Home" },
+        { label: "Legal & Taxes", href: "/en/legal-tax", optional: true },
+        { label: page ? MARKET_DEFINITIONS[page.marketId].countryName : "Indirect tax", truncate: true },
+      ]}
+    />
+
+    <Container as="section" class="py-6 md:py-10">
+      <div data-indirect-tax-root data-fixed-market={marketId ?? ""} class="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(20rem,0.8fr)]">
+        <form class="rounded-lg border border-gray-700 bg-gray-950 p-4 sm:p-6" data-tax-form novalidate>
+          <p class="text-sm font-semibold uppercase tracking-wide text-amber-400">Arithmetic estimate</p>
+          <h2 class="mt-2 text-2xl font-semibold text-white">Choose the applicable tax system</h2>
+          <p class="mt-2 text-sm leading-relaxed text-gray-400">Country and jurisdiction select the rule set. Language and currency formatting do not select a rate.</p>
+
+          <div class="mt-6 grid gap-4 sm:grid-cols-2">
+            <div>
+              <label class="text-sm font-semibold text-gray-200" for="indirect-market">Country</label>
+              <select id="indirect-market" class={inputClass} data-market disabled={Boolean(marketId)} aria-describedby="indirect-market-error">
+                {!marketId && <option value="">Choose a country</option>}
+                {visibleMarkets.map((id) => <option value={id} selected={id === marketId}>{MARKET_DEFINITIONS[id].countryName}</option>)}
+              </select>
+              <p id="indirect-market-error" class="mt-2 hidden text-sm text-red-300" data-error="market"></p>
+            </div>
+            <div>
+              <label class="text-sm font-semibold text-gray-200" for="indirect-jurisdiction">Jurisdiction / place of supply</label>
+              <select id="indirect-jurisdiction" class={inputClass} data-jurisdiction disabled aria-describedby="indirect-jurisdiction-error"><option value="">Choose a country first</option></select>
+              <p id="indirect-jurisdiction-error" class="mt-2 hidden text-sm text-red-300" data-error="jurisdiction"></p>
+            </div>
+          </div>
+
+          <div class="mt-4">
+            <label class="text-sm font-semibold text-gray-200" for="indirect-rate">Tax treatment</label>
+            <select id="indirect-rate" class={inputClass} data-rate disabled aria-describedby="indirect-rate-help indirect-rate-error"><option value="">Choose a jurisdiction first</option></select>
+            <p id="indirect-rate-help" class="mt-2 text-xs leading-relaxed text-gray-500">You must determine the correct legal classification; this tool does not infer it from the item.</p>
+            <p id="indirect-rate-error" class="mt-2 hidden text-sm text-red-300" data-error="rate"></p>
+          </div>
+
+          <fieldset class="mt-5">
+            <legend class="text-sm font-semibold text-gray-200">Calculation</legend>
+            <div class="mt-2 grid gap-3 sm:grid-cols-2">
+              <label class="flex min-h-12 cursor-pointer items-center gap-3 rounded-lg border border-gray-700 bg-gray-900 px-4 text-sm text-gray-200"><input type="radio" name="indirect-mode" value="add" checked data-mode /> Add tax to a base amount</label>
+              <label class="flex min-h-12 cursor-pointer items-center gap-3 rounded-lg border border-gray-700 bg-gray-900 px-4 text-sm text-gray-200"><input type="radio" name="indirect-mode" value="extract" data-mode /> Extract tax from an inclusive total</label>
+            </div>
+          </fieldset>
+
+          <div class="mt-5">
+            <label class="text-sm font-semibold text-gray-200" for="indirect-amount">Amount</label>
+            <input id="indirect-amount" class={inputClass} type="number" min="0" step="0.01" inputmode="decimal" autocomplete="off" placeholder="100.00" data-amount aria-describedby="indirect-amount-error" />
+            <p id="indirect-amount-error" class="mt-2 hidden text-sm text-red-300" data-error="amount"></p>
+          </div>
+
+          <div class="mt-5 hidden rounded-lg border border-gray-700 bg-gray-900/60 p-4" data-manual-wrap>
+            <label class="text-sm font-semibold text-gray-200" for="indirect-manual-rate">District/local rate from the official address lookup (%)</label>
+            <input id="indirect-manual-rate" class={inputClass} type="number" min="0" max="100" step="0.001" inputmode="decimal" placeholder="Optional" data-manual-rate aria-describedby="indirect-manual-help indirect-manual-error" />
+            <p id="indirect-manual-help" class="mt-2 text-xs leading-relaxed text-gray-500">This component is a manual simulation and is never labelled an official preset.</p>
+            <p id="indirect-manual-error" class="mt-2 hidden text-sm text-red-300" data-error="manual"></p>
+          </div>
+
+          <div class="mt-6 flex flex-col gap-3 border-t border-gray-800 pt-5 sm:flex-row">
+            <button class="min-h-11 rounded-lg bg-amber-400 px-5 py-2 text-sm font-bold text-gray-950 hover:bg-amber-300" type="submit">Calculate tax</button>
+            <button class="min-h-11 rounded-lg border border-gray-700 px-5 py-2 text-sm font-semibold text-gray-200 hover:border-amber-400" type="button" data-clear>Clear</button>
+          </div>
+        </form>
+
+        <aside class="h-fit rounded-lg border border-gray-700 bg-gray-900/80 p-4 sm:p-6 lg:sticky lg:top-6" aria-labelledby="indirect-result-heading">
+          <p class="text-sm font-semibold uppercase tracking-wide text-amber-400" data-result-status>Result</p>
+          <h2 id="indirect-result-heading" class="mt-2 text-xl font-semibold text-white">Tax estimate</h2>
+          <p class="mt-3 break-words text-4xl font-bold text-white" data-result-total>Choose a country</p>
+          <p class="mt-3 text-sm leading-relaxed text-gray-400" data-result-context>No rule set has been selected.</p>
+          <div class="mt-5 hidden rounded-lg border border-amber-400/25 bg-amber-400/10 p-3 text-sm text-amber-100" data-coverage></div>
+          <dl class="mt-5 hidden space-y-3" data-breakdown></dl>
+          <div class="mt-5 hidden text-sm leading-relaxed text-gray-400" data-exclusions></div>
+          <div class="mt-5 hidden border-t border-gray-800 pt-4 text-xs leading-relaxed text-gray-500" data-source></div>
+          <p class="sr-only" role="status" aria-live="polite" data-live></p>
+        </aside>
+      </div>
+
+      {!page && (
+        <section class="mt-10" aria-labelledby="country-pages-heading">
+          <h2 id="country-pages-heading" class="text-2xl font-semibold text-white">Country-specific calculators</h2>
+          <div class="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {INDIRECT_TAX_PAGE_DEFINITIONS.map((item) => (
+              <a class="rounded-lg border border-gray-700 bg-gray-950 p-5 transition hover:border-amber-400" href={item.path}>
+                <strong class="text-white">{item.heading}</strong>
+                <span class="mt-2 block text-sm leading-relaxed text-gray-400">{item.description}</span>
+              </a>
+            ))}
+          </div>
+        </section>
+      )}
+
+      <div class="mt-8 rounded-lg border border-gray-800 bg-gray-950/70 p-4 text-sm leading-relaxed text-gray-400">
+        This calculator does not determine classification, nexus, place-of-supply exceptions, registration, exemptions, filing, invoice compliance or input-tax credits. Confirm the transaction with the linked authority or a qualified professional.
+      </div>
+    </Container>
+  </PageShell>
+</BaseLayout>
+
+<script>
+  import { calculateIndirectTax } from "@lib/calculators/legal-tax/indirectTax/calculator";
+  import { INDIRECT_TAX_RULE_SETS } from "@lib/calculators/legal-tax/indirectTax/rules";
+  import { MARKET_DEFINITIONS } from "@lib/calculators/legal-tax/markets";
+
+  const root = document.querySelector("[data-indirect-tax-root]");
+  if (root instanceof HTMLElement) {
+    const market = root.querySelector("[data-market]");
+    const jurisdiction = root.querySelector("[data-jurisdiction]");
+    const rate = root.querySelector("[data-rate]");
+    const amount = root.querySelector("[data-amount]");
+    const manualRate = root.querySelector("[data-manual-rate]");
+    const manualWrap = root.querySelector("[data-manual-wrap]");
+    const form = root.querySelector("[data-tax-form]");
+    const total = root.querySelector("[data-result-total]");
+    const context = root.querySelector("[data-result-context]");
+    const resultStatus = root.querySelector("[data-result-status]");
+    const coverage = root.querySelector("[data-coverage]");
+    const breakdown = root.querySelector("[data-breakdown]");
+    const exclusions = root.querySelector("[data-exclusions]");
+    const source = root.querySelector("[data-source]");
+    const live = root.querySelector("[data-live]");
+
+    const setError = (name, message = "") => {
+      const node = root.querySelector(`[data-error="${name}"]`);
+      if (node) { node.textContent = message; node.classList.toggle("hidden", !message); }
+    };
+    const clearErrors = () => ["market", "jurisdiction", "rate", "amount", "manual"].forEach((name) => setError(name));
+    const resetResult = (message = "Complete the required fields.") => {
+      if (resultStatus) resultStatus.textContent = "Result";
+      if (total) total.textContent = "—";
+      if (context) context.textContent = message;
+      [coverage, breakdown, exclusions, source].forEach((node) => node?.classList.add("hidden"));
+      if (live) live.textContent = "";
+    };
+    const selectedRule = () => INDIRECT_TAX_RULE_SETS.find((item) => item.id === jurisdiction?.value);
+    const formatMoney = (value, ruleSet) => new Intl.NumberFormat(MARKET_DEFINITIONS[ruleSet.marketId].locale, { style: "currency", currency: ruleSet.currency }).format(value);
+    const escapeHtml = (value) => String(value).replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;").replaceAll("'", "&#039;");
+
+    const populateRate = () => {
+      const ruleSet = selectedRule();
+      if (!(rate instanceof HTMLSelectElement)) return;
+      rate.innerHTML = '<option value="">Choose a tax treatment</option>';
+      ruleSet?.rules.components.flatMap((component) => component.rates).forEach((item) => {
+        const option = document.createElement("option"); option.value = item.id; option.textContent = item.label; rate.append(option);
+      });
+      rate.disabled = !ruleSet;
+      manualWrap?.classList.toggle("hidden", !ruleSet?.rules.allowManualAdditionalRate);
+      if (!ruleSet?.rules.allowManualAdditionalRate && manualRate instanceof HTMLInputElement) manualRate.value = "";
+      resetResult("Select a tax treatment and enter an amount.");
+    };
+
+    const populateJurisdiction = (clearAmount = false) => {
+      if (!(market instanceof HTMLSelectElement) || !(jurisdiction instanceof HTMLSelectElement)) return;
+      jurisdiction.innerHTML = '<option value="">Choose a jurisdiction</option>';
+      const matches = INDIRECT_TAX_RULE_SETS.filter((item) => item.marketId === market.value);
+      matches.forEach((item) => { const option = document.createElement("option"); option.value = item.id; option.textContent = `${item.rules.jurisdictionLabel} · ${item.periodId}`; jurisdiction.append(option); });
+      jurisdiction.disabled = matches.length === 0;
+      if (matches.length === 1) jurisdiction.value = matches[0].id;
+      if (clearAmount && amount instanceof HTMLInputElement) amount.value = "";
+      populateRate();
+    };
+
+    market?.addEventListener("change", () => { clearErrors(); populateJurisdiction(true); });
+    jurisdiction?.addEventListener("change", () => { clearErrors(); populateRate(); });
+    rate?.addEventListener("change", () => resetResult("Enter an amount and calculate."));
+    root.querySelectorAll("[data-mode]").forEach((node) => node.addEventListener("change", () => resetResult("Calculate again for the selected mode.")));
+
+    form?.addEventListener("submit", (event) => {
+      event.preventDefault(); clearErrors();
+      let invalid = false;
+      if (!market?.value) { setError("market", "Choose a country."); invalid = true; }
+      if (!jurisdiction?.value) { setError("jurisdiction", "Choose the applicable jurisdiction or place of supply."); invalid = true; }
+      if (!rate?.value) { setError("rate", "Choose a tax treatment."); invalid = true; }
+      const numericAmount = Number(amount?.value);
+      if (!amount?.value || !Number.isFinite(numericAmount) || numericAmount < 0) { setError("amount", "Enter a non-negative amount."); invalid = true; }
+      const manualValue = manualRate?.value === "" ? undefined : Number(manualRate?.value);
+      if (manualValue !== undefined && (!Number.isFinite(manualValue) || manualValue < 0 || manualValue > 100)) { setError("manual", "Enter a rate from 0 to 100."); invalid = true; }
+      if (invalid) { if (live) live.textContent = "Correct the highlighted fields."; return; }
+
+      try {
+        const ruleSet = selectedRule();
+        const mode = root.querySelector('[data-mode]:checked')?.value ?? "add";
+        const result = calculateIndirectTax({ ruleSetId: jurisdiction.value, rateId: rate.value, mode, amount: numericAmount, ...(manualValue === undefined ? {} : { manualAdditionalRatePercent: manualValue }) });
+        if (!ruleSet) return;
+        if (resultStatus) resultStatus.textContent = result.coverage === "complete" ? "Arithmetic estimate" : "Partial arithmetic estimate";
+        if (total) total.textContent = formatMoney(result.total, ruleSet);
+        if (context) context.textContent = `${ruleSet.rules.jurisdictionLabel} · ${ruleSet.periodId} · ${ruleSet.rules.system.toUpperCase()}`;
+        if (coverage) { coverage.textContent = result.coverage === "complete" ? "Published simple-transaction components included. Classification still requires confirmation." : `Partial coverage — ${result.missingConcepts.join("; ")}.`; coverage.classList.remove("hidden"); }
+        if (breakdown) { breakdown.innerHTML = [
+          ["Base", result.base], ...result.components.map((item) => [`${item.label}${item.status === "manual" ? " (manual)" : ""}`, item.amount]), ["Total", result.total],
+        ].map(([label, value]) => `<div class="flex items-start justify-between gap-4 border-b border-gray-800 pb-2"><dt class="text-gray-400">${escapeHtml(label)}</dt><dd class="text-right font-semibold text-white">${escapeHtml(formatMoney(value, ruleSet))}</dd></div>`).join(""); breakdown.classList.remove("hidden"); }
+        if (exclusions) { exclusions.innerHTML = `<strong class="text-gray-200">Not determined:</strong> ${escapeHtml(ruleSet.rules.excludedComponents.join("; ") || "Legal classification and filing obligations")}.`; exclusions.classList.remove("hidden"); }
+        if (source) { const first = ruleSet.sources[0]; source.innerHTML = `Rule set <strong class="text-gray-300">${escapeHtml(ruleSet.id)}</strong> · reviewed ${escapeHtml(ruleSet.reviewedAt)} · <a class="text-amber-400 hover:underline" href="${escapeHtml(first.url)}" target="_blank" rel="noreferrer">${escapeHtml(first.authority)}</a>`; source.classList.remove("hidden"); }
+        if (live) live.textContent = `Tax estimate calculated: ${formatMoney(result.tax, ruleSet)}.`;
+      } catch (error) { if (live) live.textContent = error instanceof Error ? error.message : "The calculation could not be completed."; }
+    });
+
+    root.querySelector("[data-clear]")?.addEventListener("click", () => {
+      form?.reset(); clearErrors();
+      if (root.dataset.fixedMarket && market instanceof HTMLSelectElement) market.value = root.dataset.fixedMarket;
+      populateJurisdiction(true); resetResult(root.dataset.fixedMarket ? "Select a tax treatment and enter an amount." : "Choose a country.");
+    });
+
+    if (root.dataset.fixedMarket && market instanceof HTMLSelectElement) market.value = root.dataset.fixedMarket;
+    populateJurisdiction();
+    resetResult(root.dataset.fixedMarket ? "Select a tax treatment and enter an amount." : "Choose a country.");
+  }
+</script>

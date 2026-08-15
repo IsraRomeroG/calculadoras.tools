@@ -7,6 +7,7 @@ import {
   getCategoryBySlugOrLegacySlug,
 } from "./constants/categories";
 import { CALCULATOR_DEFINITIONS, CALCULATORS } from "./constants/calculators";
+import { LEGAL_TAX_MARKET_DIRECTORY_ITEMS } from "./calculators/legal-tax/catalog";
 import {
   getCalculatorCategories,
   getCalculatorCategoryUrl,
@@ -458,7 +459,9 @@ describe("calculator category directory", () => {
         categoryId: "construccion",
       }),
     ]));
-    expect(englishCalculators).toHaveLength(CALCULATORS.length - 2);
+    expect(englishCalculators).toHaveLength(
+      CALCULATORS.length - 2 + LEGAL_TAX_MARKET_DIRECTORY_ITEMS.length,
+    );
     expect(englishCalculators.map((calculator) => calculator.id)).not.toContain(
       "calculadora-aguinaldo-proporcional",
     );
@@ -491,7 +494,7 @@ describe("calculator category directory", () => {
           id: "construccion",
           slug: "construction",
           label: "Construction",
-          count: 6,
+          count: 5,
         }),
         expect.objectContaining({
           id: "conversores",
@@ -539,7 +542,7 @@ describe("calculator category directory", () => {
           id: "legal-impuestos",
           slug: "legal-tax",
           label: "Legal & Taxes",
-          count: 5,
+          count: 11,
         }),
       ]),
     );
