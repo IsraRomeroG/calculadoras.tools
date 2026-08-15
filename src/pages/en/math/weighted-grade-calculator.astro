@@ -1,0 +1,1165 @@
+
+
+
+
+---
+import BaseLayout from "@layouts/BaseLayout.astro";
+import { buildAlternateLinks } from "@lib/i18n/routing";
+import AdSlot from "@components/ads/AdSlot.astro";
+import Container from "@components/layout/Container.astro";
+import PageShell from "@components/layout/PageShell.astro";
+import FaqSection from "@components/shared/FaqSection.astro";
+import PageHero from "@components/shared/PageHero.astro";
+import SectionIntro from "@components/shared/SectionIntro.astro";
+import {
+  WEIGHTED_GRADE_CANONICAL_PATH,
+  WEIGHTED_GRADE_EXAMPLES,
+} from "@lib/calculators/matematicas/calculadora-calificacion-ponderada/weightedGrade.en";
+import { buildFaqJsonLd } from "@lib/seo";
+
+const title = "Weighted grade calculator";
+const description =
+  "Calculate your final grade from assignments, exams and projects with different percentage weights.";
+const canonical = "/en/math/weighted-grade-calculator";
+const spanishCanonical = "/matematicas/calculadora-calificacion-ponderada";
+const alternates = buildAlternateLinks(
+  { es: spanishCanonical, en: canonical },
+  Astro.site ?? Astro.url,
+);
+
+const faqs = [
+  {
+    question: "What does weighted grade mean?",
+    answer:
+      "Each activity contributes according to its weight. An assignment worth 10% has less influence than an exam worth 40%, even when both use the same scale.",
+  },
+  {
+    question: "Do the weights have to add up to 100%?",
+    answer:
+      "Ideally, yes. If they add up to less, the calculator shows the unassigned weight; if they exceed 100%, it shows the excess so you can correct it.",
+  },
+  {
+    question: "What if I have pending assessments?",
+    answer:
+      "Mark them as pending and enter an optional estimated grade. You can also calculate the average needed across all remaining weight to reach a target.",
+  },
+  {
+    question: "How do I calculate the grade needed on the final exam?",
+    answer:
+      "Enter graded assessments, mark the exam as pending and add your target grade. The calculator divides the remaining points by the remaining weight.",
+  },
+  {
+    question: "Can I use a 0-to-100 scale?",
+    answer:
+      "Yes. Use a 0–10, 0–100 or custom scale with your school's maximum grade.",
+  },
+];
+
+const faqJsonLd = buildFaqJsonLd(faqs);
+---
+
+<BaseLayout title={title} description={description} canonical={canonical} locale="en" alternates={alternates}>
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={JSON.stringify(faqJsonLd)} />
+  </Fragment>
+
+  <PageShell>
+    <PageHero
+      title="Weighted grade calculator"
+      description="Calculate your accumulated grade, review pending weight and estimate what you need to reach your target."
+      kicker="Math"
+      collapseBreadcrumbOnMobile
+      containerClass="py-6 md:py-8"
+      breadcrumbs={[
+        { label: "Home", href: "/en", ariaLabel: "Home" },
+        { label: "Math", href: "/en/math", optional: true },
+        { label: "Weighted grade", truncate: true },
+      ]}
+    />
+
+    <Container as="section" class="py-6 md:py-8">
+      <div
+        id="weighted-grade-calculator"
+        class="overflow-hidden rounded-lg border border-gray-700 bg-gray-950 shadow-xl shadow-gray-950/30"
+      >
+        <div class="grid gap-0 lg:grid-cols-[minmax(0,1fr)_minmax(20rem,0.74fr)]">
+          <aside
+            class="border-b border-gray-800 bg-gray-900/60 p-4 sm:p-6 lg:order-2 lg:border-b-0 lg:border-l"
+            aria-live="polite"
+          >
+            <div class="lg:sticky lg:top-4">
+              <p class="text-sm font-semibold uppercase text-amber-400">
+                Result
+              </p>
+
+              <div class="mt-4 rounded-lg border border-gray-700 bg-gray-950 p-5">
+                <p class="text-xs font-semibold uppercase text-gray-400">
+                  Accumulated grade
+                </p>
+                <p
+                  class="mt-2 break-words text-4xl font-bold leading-tight text-white"
+                  data-result-accumulated
+                >
+                  -
+                </p>
+                <p
+                  class="mt-2 text-sm leading-relaxed text-gray-400"
+                  data-result-note
+                >
+                  Add assessments to calculate.
+                </p>
+              </div>
+
+              <div class="mt-3 grid grid-cols-2 gap-3">
+                <div class="rounded-lg border border-gray-800 bg-gray-950 p-4">
+                  <p class="text-xs font-semibold uppercase text-gray-500">
+                    Graded weight
+                  </p>
+                  <p class="mt-2 break-words text-2xl font-semibold text-white" data-result-evaluated-weight>
+                    -
+                  </p>
+                </div>
+                <div class="rounded-lg border border-gray-800 bg-gray-950 p-4">
+                  <p class="text-xs font-semibold uppercase text-gray-500">
+                    Pending weight
+                  </p>
+                  <p class="mt-2 break-words text-2xl font-semibold text-white" data-result-pending-weight>
+                    -
+                  </p>
+                </div>
+                <div class="rounded-lg border border-gray-800 bg-gray-950 p-4">
+                  <p class="text-xs font-semibold uppercase text-gray-500">
+                    Graded average
+                  </p>
+                  <p class="mt-2 break-words text-2xl font-semibold text-white" data-result-average>
+                    -
+                  </p>
+                </div>
+                <div class="rounded-lg border border-gray-800 bg-gray-950 p-4">
+                  <p class="text-xs font-semibold uppercase text-gray-500">
+                    Projection
+                  </p>
+                  <p class="mt-2 break-words text-2xl font-semibold text-white" data-result-projected>
+                    -
+                  </p>
+                </div>
+              </div>
+
+              <div class="mt-3 rounded-lg border border-gray-800 bg-gray-950 p-4">
+                <p class="text-xs font-semibold uppercase text-gray-500">Target</p>
+                <p class="mt-2 text-lg font-semibold text-white" data-result-goal>
+                  No target
+                </p>
+                <p class="mt-2 text-sm leading-relaxed text-gray-400" data-result-goal-detail>
+                  Enter a target to see the average you need.
+                </p>
+              </div>
+
+              <div
+                class="mt-3 hidden rounded-lg border border-sky-400/30 bg-sky-400/10 p-4 text-sm leading-relaxed text-sky-100"
+                data-result-messages
+              >
+              </div>
+            </div>
+          </aside>
+
+          <section class="p-4 sm:p-6 lg:order-1" aria-labelledby="calculator-heading">
+            <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+              <div>
+                <h2 id="calculator-heading" class="text-xl font-semibold">
+                  Assessments
+                </h2>
+                <p class="mt-2 text-sm leading-relaxed text-gray-400">
+                  Enter course grades, weights and pending assessments.
+                </p>
+              </div>
+              <button
+                class="inline-flex min-h-11 items-center justify-center rounded-lg bg-amber-400 px-4 py-2 text-sm font-semibold text-gray-950 transition hover:bg-amber-300 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/40"
+                type="button"
+                data-add-evaluation
+              >
+                + Assessment
+              </button>
+            </div>
+
+            <div class="mt-5 grid gap-4 sm:grid-cols-2">
+              <div>
+                <label for="weighted-grade-scale" class="block text-sm font-medium text-gray-200">
+                  Scale
+                </label>
+                <select
+                  id="weighted-grade-scale"
+                  class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-900 px-3 text-base text-white outline-none transition focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15"
+                  data-scale
+                >
+                  <option value="0-10">0-10</option>
+                  <option value="0-100">0-100</option>
+                  <option value="custom">Custom</option>
+                </select>
+              </div>
+
+              <div class="hidden" data-custom-scale-wrapper>
+                <label
+                  for="weighted-grade-custom-scale"
+                  class="block text-sm font-medium text-gray-200"
+                >
+                  Custom maximum
+                </label>
+                <input
+                  id="weighted-grade-custom-scale"
+                  class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-900 px-4 text-base text-white outline-none transition placeholder:text-gray-600 focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15"
+                  type="text"
+                  inputmode="decimal"
+                  autocomplete="off"
+                  placeholder="20"
+                  data-custom-scale
+                />
+                <p class="mt-2 hidden text-sm text-red-300" data-option-error="customScale"></p>
+              </div>
+
+              <div>
+                <label for="weighted-grade-target" class="block text-sm font-medium text-gray-200">
+                  Target grade
+                </label>
+                <input
+                  id="weighted-grade-target"
+                  class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-900 px-4 text-base text-white outline-none transition placeholder:text-gray-600 focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15"
+                  type="text"
+                  inputmode="decimal"
+                  autocomplete="off"
+                  value="8"
+                  data-target-grade
+                />
+                <p class="mt-2 hidden text-sm text-red-300" data-option-error="targetGrade"></p>
+              </div>
+            </div>
+
+            <div class="mt-5 flex flex-wrap gap-2">
+              <button
+                class="min-h-10 rounded-lg border border-gray-700 px-3 py-2 text-sm font-semibold text-gray-200 transition hover:border-amber-400 hover:text-white focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/40"
+                type="button"
+                data-split-pending
+              >
+                Split pending weight
+              </button>
+              {
+                WEIGHTED_GRADE_EXAMPLES.map((example) => (
+                  <button
+                    class="min-h-10 rounded-lg border border-gray-700 px-3 py-2 text-sm font-semibold text-gray-200 transition hover:border-amber-400 hover:text-white focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/40"
+                    type="button"
+                    data-example-id={example.id}
+                  >
+                    {example.label}
+                  </button>
+                ))
+              }
+            </div>
+
+            <div class="mt-5 grid gap-3" data-evaluation-list></div>
+
+            <div class="mt-5 flex flex-wrap gap-3">
+              <button
+                class="inline-flex min-h-11 items-center justify-center rounded-lg border border-gray-700 px-4 py-2 text-sm font-semibold text-gray-200 transition hover:border-amber-400 hover:text-white focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/40"
+                type="button"
+                data-copy-summary
+              >
+                Copy summary
+              </button>
+              <button
+                class="inline-flex min-h-11 items-center justify-center rounded-lg border border-gray-700 px-4 py-2 text-sm font-semibold text-gray-200 transition hover:border-amber-400 hover:text-white focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/40"
+                type="button"
+                data-export-csv
+              >
+                Export CSV
+              </button>
+              <button
+                class="inline-flex min-h-11 items-center justify-center rounded-lg border border-gray-700 px-4 py-2 text-sm font-semibold text-gray-200 transition hover:border-amber-400 hover:text-white focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/40"
+                type="button"
+                data-clear
+              >
+                Clear
+              </button>
+            </div>
+            <p class="mt-3 min-h-5 text-sm text-emerald-300" data-action-status></p>
+          </section>
+        </div>
+
+        <div class="border-t border-gray-800 p-4 sm:p-6">
+          <h2 class="text-lg font-semibold">Contribution details</h2>
+          <div class="mt-4 grid gap-3 md:grid-cols-2" data-evaluation-results>
+            <p class="text-sm text-gray-400">Details will appear after a valid calculation.</p>
+          </div>
+        </div>
+      </div>
+    </Container>
+
+    <AdSlot placement="calculator-after-tool" />
+
+    <Container as="section" class="py-6 md:py-8">
+      <SectionIntro
+        title="Quick example"
+        description="Assignments worth 30% with a 9, an exam worth 40% with an 8 and a project worth 30% with a 10 produce a final grade of 8.9."
+      />
+
+      <div class="grid gap-4 md:grid-cols-3">
+        <article class="rounded-lg border border-gray-700 bg-gray-950 p-5">
+          <h3 class="text-lg font-semibold text-white">Accumulated</h3>
+          <p class="mt-3 text-sm leading-relaxed text-gray-400">
+            This is the contribution already made to 100% of the course. If little weight has been graded,
+            this number may look low even when your performance is good.
+          </p>
+        </article>
+        <article class="rounded-lg border border-gray-700 bg-gray-950 p-5">
+          <h3 class="text-lg font-semibold text-white">Graded average</h3>
+          <p class="mt-3 text-sm leading-relaxed text-gray-400">
+            Summarizes only graded work. It helps assess current performance
+            without penalizing pending work.
+          </p>
+        </article>
+        <article class="rounded-lg border border-gray-700 bg-gray-950 p-5">
+          <h3 class="text-lg font-semibold text-white">Target</h3>
+          <p class="mt-3 text-sm leading-relaxed text-gray-400">
+            Calculates the average needed on remaining work to finish with the
+            target grade.
+          </p>
+        </article>
+      </div>
+    </Container>
+
+    <Container as="section" class="py-6 md:py-8">
+      <SectionIntro
+        title="Related calculators"
+        description="You can also review one pending assessment or credit-weighted averages."
+      />
+
+      <div class="grid gap-4 md:grid-cols-2">
+        <a
+          class="rounded-lg border border-gray-700 bg-gray-950 p-5 transition hover:border-amber-400/70"
+          href="/en/math/minimum-grade-calculator"
+        >
+          <h3 class="text-lg font-semibold text-white">
+            Minimum grade to pass
+          </h3>
+          <p class="mt-3 text-sm leading-relaxed text-gray-400">
+            Calculate one pending assessment or the entire remaining block.
+          </p>
+        </a>
+        <a
+          class="rounded-lg border border-gray-700 bg-gray-950 p-5 transition hover:border-amber-400/70"
+          href="/en/math/gpa-calculator"
+        >
+          <h3 class="text-lg font-semibold text-white">
+            Grade average and GPA
+          </h3>
+          <p class="mt-3 text-sm leading-relaxed text-gray-400">
+            Calculate a simple average, weighted average and credit-based target.
+          </p>
+        </a>
+      </div>
+    </Container>
+
+    <FaqSection faqs={faqs} />
+  </PageShell>
+</BaseLayout>
+
+<script>
+  import {
+    WEIGHTED_GRADE_EXAMPLES,
+    buildWeightedGradeCsv,
+    buildWeightedGradeSummary,
+    calculateWeightedGrade,
+    formatFlexibleWeightedGradeNumber,
+    formatWeightedGradeNumber,
+    formatWeightedGradePercent,
+    getGoalStatusLabel,
+    getWeightedGradeScaleMaxFromPreset,
+    parseWeightedGradeNumber,
+  } from "@lib/calculators/matematicas/calculadora-calificacion-ponderada/weightedGrade.en";
+
+  const ERROR_MESSAGES = {
+    required: "This field is required.",
+    invalid: "Enter a valid number.",
+    negative: "Use a number greater than or equal to zero.",
+    zero: "Must be greater than zero.",
+    too_many_decimals: "Use no more than 4 decimal places.",
+    scale: "Must be within the selected scale.",
+    weight: "Must be between 0 and 100.",
+  };
+
+  const evaluationList = document.querySelector("[data-evaluation-list]");
+  const scaleSelect = document.querySelector("[data-scale]");
+  const customScaleWrapper = document.querySelector("[data-custom-scale-wrapper]");
+  const customScaleInput = document.querySelector("[data-custom-scale]");
+  const targetGradeInput = document.querySelector("[data-target-grade]");
+  const splitPendingButton = document.querySelector("[data-split-pending]");
+  const addEvaluationButton = document.querySelector("[data-add-evaluation]");
+  const copySummaryButton = document.querySelector("[data-copy-summary]");
+  const exportCsvButton = document.querySelector("[data-export-csv]");
+  const clearButton = document.querySelector("[data-clear]");
+  const actionStatus = document.querySelector("[data-action-status]");
+  const resultAccumulated = document.querySelector("[data-result-accumulated]");
+  const resultNote = document.querySelector("[data-result-note]");
+  const resultEvaluatedWeight = document.querySelector("[data-result-evaluated-weight]");
+  const resultPendingWeight = document.querySelector("[data-result-pending-weight]");
+  const resultAverage = document.querySelector("[data-result-average]");
+  const resultProjected = document.querySelector("[data-result-projected]");
+  const resultGoal = document.querySelector("[data-result-goal]");
+  const resultGoalDetail = document.querySelector("[data-result-goal-detail]");
+  const resultMessages = document.querySelector("[data-result-messages]");
+  const evaluationResults = document.querySelector("[data-evaluation-results]");
+  const exampleButtons = Array.from(document.querySelectorAll("[data-example-id]"));
+
+  let evaluations = WEIGHTED_GRADE_EXAMPLES[0].evaluations.map((evaluation, index) => ({
+    id: `evaluation-${index + 1}`,
+    name: evaluation.name,
+    status: evaluation.status,
+    grade: evaluation.grade,
+    estimatedGrade: evaluation.estimatedGrade,
+    weight: evaluation.weight,
+  }));
+  let evaluationCounter = evaluations.length;
+  let currentSummary = "";
+  let currentCsv = "";
+  let statusTimeout = 0;
+
+  function renderEvaluationInputs() {
+    if (!evaluationList) {
+      return;
+    }
+
+    evaluationList.innerHTML = "";
+
+    evaluations.forEach((evaluation, index) => {
+      const isPending = evaluation.status === "pending";
+      const card = document.createElement("article");
+      card.className = "rounded-lg border border-gray-800 bg-gray-900/70 p-4";
+      card.dataset.evaluationId = evaluation.id;
+      card.innerHTML = `
+        <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+          <p class="text-sm font-semibold text-white">Assessment ${index + 1}</p>
+          <div class="flex flex-wrap gap-2">
+            <button class="min-h-10 rounded-lg border border-gray-700 px-3 text-sm font-semibold text-gray-200 transition hover:border-amber-400 hover:text-white focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/40" type="button" data-use-remaining="${escapeHtml(evaluation.id)}">Remaining weight</button>
+            <button class="min-h-10 rounded-lg border border-gray-700 px-3 text-sm font-semibold text-gray-200 transition hover:border-amber-400 hover:text-white focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/40" type="button" data-duplicate-evaluation="${escapeHtml(evaluation.id)}">Duplicate</button>
+            <button class="min-h-10 rounded-lg border border-gray-700 px-3 text-sm font-semibold text-gray-200 transition hover:border-red-300 hover:text-red-200 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-red-300/30" type="button" data-remove-evaluation="${escapeHtml(evaluation.id)}">Remove</button>
+          </div>
+        </div>
+        <div class="mt-4 grid gap-4 sm:grid-cols-[minmax(0,1.15fr)_minmax(0,0.75fr)]">
+          <div>
+            <label class="block text-sm font-medium text-gray-200" for="${evaluation.id}-name">Name</label>
+            <input id="${evaluation.id}-name" class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-950 px-4 text-base text-white outline-none transition placeholder:text-gray-600 focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15" type="text" maxlength="60" autocomplete="off" placeholder="Assessment ${index + 1}" value="${escapeHtml(evaluation.name)}" data-evaluation-field="name" />
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-200" for="${evaluation.id}-status">Status</label>
+            <select id="${evaluation.id}-status" class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-950 px-3 text-base text-white outline-none transition focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15" data-evaluation-field="status">
+              <option value="graded" ${evaluation.status === "graded" ? "selected" : ""}>Graded</option>
+              <option value="pending" ${evaluation.status === "pending" ? "selected" : ""}>Pending</option>
+            </select>
+          </div>
+        </div>
+        <div class="mt-4 grid gap-4 sm:grid-cols-2">
+          <div class="${isPending ? "hidden" : ""}" data-grade-wrapper>
+            <label class="block text-sm font-medium text-gray-200" for="${evaluation.id}-grade">Grade</label>
+            <input id="${evaluation.id}-grade" class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-950 px-4 text-base text-white outline-none transition placeholder:text-gray-600 focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15" type="text" inputmode="decimal" autocomplete="off" placeholder="9" value="${escapeHtml(evaluation.grade)}" data-evaluation-field="grade" />
+            <p class="mt-2 hidden text-sm text-red-300" data-evaluation-error="grade"></p>
+          </div>
+          <div class="${isPending ? "" : "hidden"}" data-estimated-wrapper>
+            <label class="block text-sm font-medium text-gray-200" for="${evaluation.id}-estimated">Estimated grade</label>
+            <input id="${evaluation.id}-estimated" class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-950 px-4 text-base text-white outline-none transition placeholder:text-gray-600 focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15" type="text" inputmode="decimal" autocomplete="off" placeholder="8.5" value="${escapeHtml(evaluation.estimatedGrade)}" data-evaluation-field="estimatedGrade" />
+            <p class="mt-2 hidden text-sm text-red-300" data-evaluation-error="estimatedGrade"></p>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-200" for="${evaluation.id}-weight">Weight (%)</label>
+            <input id="${evaluation.id}-weight" class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-950 px-4 text-base text-white outline-none transition placeholder:text-gray-600 focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15" type="text" inputmode="decimal" autocomplete="off" placeholder="30" value="${escapeHtml(evaluation.weight)}" data-evaluation-field="weight" />
+            <p class="mt-2 hidden text-sm text-red-300" data-evaluation-error="weight"></p>
+          </div>
+        </div>
+      `;
+      evaluationList.append(card);
+    });
+  }
+
+  function syncEvaluationState() {
+    if (!evaluationList) {
+      return;
+    }
+
+    evaluations = Array.from(evaluationList.querySelectorAll("[data-evaluation-id]")).map((card) => ({
+      id: card.dataset.evaluationId,
+      name: getEvaluationFieldValue(card, "name"),
+      status: getEvaluationFieldValue(card, "status") === "pending" ? "pending" : "graded",
+      grade: getEvaluationFieldValue(card, "grade"),
+      estimatedGrade: getEvaluationFieldValue(card, "estimatedGrade"),
+      weight: getEvaluationFieldValue(card, "weight"),
+    }));
+  }
+
+  function readOptions() {
+    clearOptionErrors();
+    const errors = [];
+    const scalePreset = scaleSelect?.value ?? "0-10";
+    let customMax = null;
+
+    customScaleWrapper?.classList.toggle("hidden", scalePreset !== "custom");
+
+    if (scalePreset === "custom") {
+      const parsedCustom = parseWeightedGradeNumber(customScaleInput?.value ?? "", {
+        allowZero: false,
+      });
+
+      if (!parsedCustom.ok) {
+        setOptionError("customScale", getErrorMessage(parsedCustom.error));
+        errors.push("customScale");
+      } else {
+        customMax = parsedCustom.value;
+      }
+    }
+
+    let scaleMax = 10;
+
+    if (errors.length === 0) {
+      scaleMax = getWeightedGradeScaleMaxFromPreset(scalePreset, customMax);
+    }
+
+    const target = readOptionalOption("targetGrade", targetGradeInput, scaleMax);
+
+    if (!target.ok) {
+      errors.push("targetGrade");
+    }
+
+    return {
+      ok: errors.length === 0,
+      scaleMax,
+      targetGrade: target.value,
+    };
+  }
+
+  function readOptionalOption(field, input, scaleMax) {
+    const parsed = parseWeightedGradeNumber(input?.value ?? "", {
+      required: false,
+    });
+
+    if (!parsed.ok) {
+      setOptionError(field, getErrorMessage(parsed.error));
+      return { ok: false, value: null };
+    }
+
+    if (Number.isNaN(parsed.value)) {
+      return { ok: true, value: null };
+    }
+
+    if (parsed.value > scaleMax) {
+      setOptionError(field, ERROR_MESSAGES.scale);
+      return { ok: false, value: null };
+    }
+
+    return { ok: true, value: parsed.value };
+  }
+
+  function readEvaluations(scaleMax) {
+    if (!evaluationList) {
+      return { ok: false, evaluations: [], hasErrors: false };
+    }
+
+    let hasErrors = false;
+    const parsedEvaluations = [];
+
+    Array.from(evaluationList.querySelectorAll("[data-evaluation-id]")).forEach((card) => {
+      clearEvaluationErrors(card);
+      const name = getEvaluationFieldValue(card, "name");
+      const status = getEvaluationFieldValue(card, "status") === "pending" ? "pending" : "graded";
+      const rawGrade = getEvaluationFieldValue(card, "grade");
+      const rawEstimatedGrade = getEvaluationFieldValue(card, "estimatedGrade");
+      const rawWeight = getEvaluationFieldValue(card, "weight");
+      const hasAnyValue = Boolean(name.trim() || rawGrade.trim() || rawEstimatedGrade.trim() || rawWeight.trim());
+
+      if (!hasAnyValue) {
+        return;
+      }
+
+      const parsedWeight = parseWeightedGradeNumber(rawWeight);
+
+      if (!parsedWeight.ok) {
+        setEvaluationError(card, "weight", getErrorMessage(parsedWeight.error));
+        hasErrors = true;
+        return;
+      }
+
+      if (parsedWeight.value > 100) {
+        setEvaluationError(card, "weight", ERROR_MESSAGES.weight);
+        hasErrors = true;
+        return;
+      }
+
+      let grade = null;
+      let estimatedGrade = null;
+
+      if (status === "graded") {
+        const parsedGrade = parseWeightedGradeNumber(rawGrade);
+
+        if (!parsedGrade.ok) {
+          setEvaluationError(card, "grade", getErrorMessage(parsedGrade.error));
+          hasErrors = true;
+          return;
+        }
+
+        if (parsedGrade.value > scaleMax) {
+          setEvaluationError(card, "grade", ERROR_MESSAGES.scale);
+          hasErrors = true;
+          return;
+        }
+
+        grade = parsedGrade.value;
+      } else {
+        const parsedEstimated = parseWeightedGradeNumber(rawEstimatedGrade, {
+          required: false,
+        });
+
+        if (!parsedEstimated.ok) {
+          setEvaluationError(card, "estimatedGrade", getErrorMessage(parsedEstimated.error));
+          hasErrors = true;
+          return;
+        }
+
+        if (!Number.isNaN(parsedEstimated.value)) {
+          if (parsedEstimated.value > scaleMax) {
+            setEvaluationError(card, "estimatedGrade", ERROR_MESSAGES.scale);
+            hasErrors = true;
+            return;
+          }
+
+          estimatedGrade = parsedEstimated.value;
+        }
+      }
+
+      parsedEvaluations.push({
+        name,
+        status,
+        grade,
+        estimatedGrade,
+        weightPercent: parsedWeight.value,
+      });
+    });
+
+    return {
+      ok: !hasErrors && parsedEvaluations.length > 0,
+      evaluations: parsedEvaluations,
+      hasErrors,
+    };
+  }
+
+  function updateCalculator() {
+    syncEvaluationState();
+    const options = readOptions();
+    const parsedEvaluations = readEvaluations(options.scaleMax);
+
+    if (!options.ok || parsedEvaluations.hasErrors) {
+      renderInvalidState("Check the marked fields to continue.");
+      return;
+    }
+
+    if (!parsedEvaluations.ok) {
+      renderInvalidState("Add at least one assessment with weight.");
+      return;
+    }
+
+    try {
+      const result = calculateWeightedGrade({
+        scaleMax: options.scaleMax,
+        targetGrade: options.targetGrade,
+        evaluations: parsedEvaluations.evaluations,
+      });
+
+      currentSummary = buildWeightedGradeSummary(result);
+      currentCsv = buildWeightedGradeCsv(result);
+      renderResult(result);
+    } catch (error) {
+      renderInvalidState(error instanceof Error ? error.message : "Could not calculate.");
+    }
+  }
+
+  function renderResult(result) {
+    setText(resultAccumulated, formatWeightedGradeNumber(result.accumulatedGrade));
+    setText(
+      resultNote,
+      result.weightState === "complete"
+        ? "Weights add up to 100%."
+        : result.weightState === "under"
+          ? `${formatWeightedGradePercent(result.weightUnassignedPercent)} remains unassigned.`
+          : `Weight exceeds 100% by ${formatWeightedGradePercent(result.weightExcessPercent)}.`,
+    );
+    setText(resultEvaluatedWeight, formatWeightedGradePercent(result.weightEvaluatedPercent));
+    setText(
+      resultPendingWeight,
+      formatWeightedGradePercent(result.weightRemainingEvaluablePercent),
+    );
+    setText(
+      resultAverage,
+      result.evaluatedAverage === null
+        ? "-"
+        : formatWeightedGradeNumber(result.evaluatedAverage),
+    );
+    setText(
+      resultProjected,
+      result.projectedGrade === null
+        ? "-"
+        : formatWeightedGradeNumber(result.projectedGrade),
+    );
+    renderGoal(result);
+    renderMessages(result.messages);
+    renderEvaluationResults(result);
+    setActionButtonsEnabled(true);
+  }
+
+  function renderGoal(result) {
+    const goal = result.goal;
+
+    if (!goal) {
+      setText(resultGoal, "No target");
+      setText(resultGoalDetail, "Enter a target to see the average you need.");
+      return;
+    }
+
+    setText(resultGoal, getGoalStatusLabel(goal.status));
+
+    if (goal.status === "reachable" && goal.requiredAverage !== null) {
+      setText(
+        resultGoalDetail,
+        `You need an average of ${formatWeightedGradeNumber(goal.requiredAverage)} on the remaining ${formatWeightedGradePercent(result.weightRemainingEvaluablePercent)}.`,
+      );
+      return;
+    }
+
+    if (goal.status === "unreachable") {
+      setText(
+        resultGoalDetail,
+        `Even with ${formatWeightedGradeNumber(result.scaleMax)}, you would reach ${formatWeightedGradeNumber(goal.maximumFinalGrade)}.`,
+      );
+      return;
+    }
+
+    setText(
+      resultGoalDetail,
+      `Even with 0 on the remaining work, you would keep ${formatWeightedGradeNumber(goal.minimumFinalGrade)}.`,
+    );
+  }
+
+  function renderMessages(messages) {
+    if (!resultMessages) {
+      return;
+    }
+
+    resultMessages.classList.toggle("hidden", messages.length === 0);
+    resultMessages.innerHTML = messages.map((message) => `<p>${escapeHtml(message)}</p>`).join("");
+  }
+
+  function renderEvaluationResults(result) {
+    if (!evaluationResults) {
+      return;
+    }
+
+    evaluationResults.innerHTML = "";
+
+    result.evaluations.forEach((evaluation) => {
+      const card = document.createElement("article");
+      const contribution =
+        evaluation.status === "graded"
+          ? evaluation.contribution
+          : evaluation.projectedContribution;
+      const grade =
+        evaluation.status === "graded"
+          ? evaluation.grade
+          : evaluation.estimatedGrade;
+      card.className = "rounded-lg border border-gray-800 bg-gray-900/70 p-4";
+      card.innerHTML = `
+        <div class="flex items-start justify-between gap-3">
+          <div>
+            <h3 class="break-words text-base font-semibold text-white">${escapeHtml(evaluation.name)}</h3>
+            <p class="mt-1 text-sm text-gray-400">${evaluation.status === "graded" ? "Graded" : "Pending"} - weight ${formatWeightedGradePercent(evaluation.weightPercent)}</p>
+          </div>
+          <span class="shrink-0 rounded-lg border border-gray-700 px-2 py-1 text-xs font-semibold text-gray-300">${evaluation.status === "graded" ? "Graded" : "Estimated"}</span>
+        </div>
+        <dl class="mt-4 grid grid-cols-2 gap-3 text-sm">
+          <div>
+            <dt class="text-gray-500">Grade</dt>
+            <dd class="font-semibold text-gray-100">${grade === null ? "-" : formatFlexibleWeightedGradeNumber(grade)}</dd>
+          </div>
+          <div>
+            <dt class="text-gray-500">Contribution</dt>
+            <dd class="font-semibold text-gray-100">${contribution === null ? "-" : formatWeightedGradeNumber(contribution)}</dd>
+          </div>
+        </dl>
+        ${evaluation.message ? `<p class="mt-3 text-sm leading-relaxed text-sky-200">${escapeHtml(evaluation.message)}</p>` : ""}
+      `;
+      evaluationResults.append(card);
+    });
+  }
+
+  function renderInvalidState(message) {
+    currentSummary = "";
+    currentCsv = "";
+    setText(resultAccumulated, "-");
+    setText(resultNote, message);
+    setText(resultEvaluatedWeight, "-");
+    setText(resultPendingWeight, "-");
+    setText(resultAverage, "-");
+    setText(resultProjected, "-");
+    setText(resultGoal, "No calculation");
+    setText(resultGoalDetail, "Correct the inputs to continue.");
+    renderMessages([]);
+
+    if (evaluationResults) {
+      evaluationResults.innerHTML = `<p class="text-sm text-gray-400">${escapeHtml(message)}</p>`;
+    }
+
+    setActionButtonsEnabled(false);
+  }
+
+  function setActionButtonsEnabled(isEnabled) {
+    [copySummaryButton, exportCsvButton].forEach((button) => {
+      button?.toggleAttribute("disabled", !isEnabled);
+      button?.classList.toggle("opacity-50", !isEnabled);
+      button?.classList.toggle("cursor-not-allowed", !isEnabled);
+    });
+  }
+
+  function addEvaluation(evaluation = null) {
+    syncEvaluationState();
+    evaluationCounter += 1;
+    evaluations.push(
+      evaluation ?? {
+        id: `evaluation-${evaluationCounter}`,
+        name: "",
+        status: "graded",
+        grade: "",
+        estimatedGrade: "",
+        weight: "",
+      },
+    );
+    renderEvaluationInputs();
+    updateCalculator();
+  }
+
+  function duplicateEvaluation(evaluationId) {
+    syncEvaluationState();
+    const source = evaluations.find((evaluation) => evaluation.id === evaluationId);
+
+    if (!source) {
+      return;
+    }
+
+    evaluationCounter += 1;
+    evaluations.push({
+      ...source,
+      id: `evaluation-${evaluationCounter}`,
+      name: source.name ? `${source.name} copy` : "",
+    });
+    renderEvaluationInputs();
+    updateCalculator();
+  }
+
+  function removeEvaluation(evaluationId) {
+    syncEvaluationState();
+    evaluations = evaluations.filter((evaluation) => evaluation.id !== evaluationId);
+
+    if (evaluations.length === 0) {
+      evaluations = [
+        {
+          id: "evaluation-1",
+          name: "",
+          status: "graded",
+          grade: "",
+          estimatedGrade: "",
+          weight: "",
+        },
+      ];
+      evaluationCounter = 1;
+    }
+
+    renderEvaluationInputs();
+    updateCalculator();
+  }
+
+  function useRemainingWeight(evaluationId) {
+    syncEvaluationState();
+    const usedByOthers = evaluations.reduce((total, evaluation) => {
+      if (evaluation.id === evaluationId) {
+        return total;
+      }
+
+      const parsed = parseWeightedGradeNumber(evaluation.weight, {
+        required: false,
+      });
+
+      return parsed.ok && !Number.isNaN(parsed.value) ? total + parsed.value : total;
+    }, 0);
+    const remaining = Math.max(0, 100 - usedByOthers);
+
+    evaluations = evaluations.map((evaluation) =>
+      evaluation.id === evaluationId
+        ? { ...evaluation, weight: formatFlexibleWeightedGradeNumber(remaining) }
+        : evaluation,
+    );
+    renderEvaluationInputs();
+    updateCalculator();
+  }
+
+  function splitPendingWeight() {
+    syncEvaluationState();
+    const pendingEvaluations = evaluations.filter((evaluation) => evaluation.status === "pending");
+
+    if (pendingEvaluations.length === 0) {
+      setStatus("There are no pending assessments to split.");
+      return;
+    }
+
+    const gradedWeight = evaluations.reduce((total, evaluation) => {
+      if (evaluation.status !== "graded") {
+        return total;
+      }
+
+      const parsed = parseWeightedGradeNumber(evaluation.weight, {
+        required: false,
+      });
+
+      return parsed.ok && !Number.isNaN(parsed.value) ? total + parsed.value : total;
+    }, 0);
+    const share = Math.max(0, (100 - gradedWeight) / pendingEvaluations.length);
+
+    evaluations = evaluations.map((evaluation) =>
+      evaluation.status === "pending"
+        ? { ...evaluation, weight: formatFlexibleWeightedGradeNumber(share) }
+        : evaluation,
+    );
+    renderEvaluationInputs();
+    updateCalculator();
+    setStatus("Pending weight dividido.");
+  }
+
+  function loadExample(exampleId) {
+    const example = WEIGHTED_GRADE_EXAMPLES.find((item) => item.id === exampleId);
+
+    if (!example) {
+      return;
+    }
+
+    if (scaleSelect) {
+      scaleSelect.value = example.scale;
+    }
+
+    if (customScaleInput) {
+      customScaleInput.value = "";
+    }
+
+    if (targetGradeInput) {
+      targetGradeInput.value = example.targetGrade;
+    }
+
+    evaluationCounter = example.evaluations.length;
+    evaluations = example.evaluations.map((evaluation, index) => ({
+      id: `evaluation-${index + 1}`,
+      name: evaluation.name,
+      status: evaluation.status,
+      grade: evaluation.grade,
+      estimatedGrade: evaluation.estimatedGrade,
+      weight: evaluation.weight,
+    }));
+    renderEvaluationInputs();
+    updateCalculator();
+  }
+
+  function clearCalculator() {
+    evaluations = [
+      {
+        id: "evaluation-1",
+        name: "",
+        status: "graded",
+        grade: "",
+        estimatedGrade: "",
+        weight: "",
+      },
+    ];
+    evaluationCounter = 1;
+
+    if (scaleSelect) {
+      scaleSelect.value = "0-10";
+    }
+
+    if (customScaleInput) {
+      customScaleInput.value = "";
+    }
+
+    if (targetGradeInput) {
+      targetGradeInput.value = "";
+    }
+
+    renderEvaluationInputs();
+    updateCalculator();
+  }
+
+  async function copySummary() {
+    if (!currentSummary) {
+      setStatus("There is no summary to copy.");
+      return;
+    }
+
+    await copyText(currentSummary, "Summary copied.");
+  }
+
+  function exportCsv() {
+    if (!currentCsv) {
+      setStatus("There is no CSV to export.");
+      return;
+    }
+
+    const blob = new Blob([currentCsv], { type: "text/csv;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "weighted-grade.csv";
+    document.body.append(link);
+    link.click();
+    link.remove();
+    URL.revokeObjectURL(url);
+    setStatus("CSV generated.");
+  }
+
+  async function copyText(text, successMessage) {
+    try {
+      if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(text);
+      } else {
+        const textArea = document.createElement("textarea");
+        textArea.value = text;
+        textArea.setAttribute("readonly", "");
+        textArea.style.position = "fixed";
+        textArea.style.opacity = "0";
+        document.body.append(textArea);
+        textArea.select();
+        document.execCommand("copy");
+        textArea.remove();
+      }
+
+      setStatus(successMessage);
+    } catch {
+      setStatus("Could not copy.");
+    }
+  }
+
+  function getEvaluationFieldValue(card, field) {
+    return card.querySelector(`[data-evaluation-field="${field}"]`)?.value ?? "";
+  }
+
+  function setEvaluationError(card, field, message) {
+    const error = card.querySelector(`[data-evaluation-error="${field}"]`);
+
+    if (error) {
+      error.textContent = message;
+      error.classList.remove("hidden");
+    }
+  }
+
+  function clearEvaluationErrors(card) {
+    card.querySelectorAll("[data-evaluation-error]").forEach((error) => {
+      error.textContent = "";
+      error.classList.add("hidden");
+    });
+  }
+
+  function setOptionError(field, message) {
+    const error = document.querySelector(`[data-option-error="${field}"]`);
+
+    if (error) {
+      error.textContent = message;
+      error.classList.remove("hidden");
+    }
+  }
+
+  function clearOptionErrors() {
+    document.querySelectorAll("[data-option-error]").forEach((error) => {
+      error.textContent = "";
+      error.classList.add("hidden");
+    });
+  }
+
+  function getErrorMessage(error) {
+    return ERROR_MESSAGES[error] ?? ERROR_MESSAGES.invalid;
+  }
+
+  function setText(element, value) {
+    if (element) {
+      element.textContent = value;
+    }
+  }
+
+  function setStatus(message) {
+    setText(actionStatus, message);
+    window.clearTimeout(statusTimeout);
+    statusTimeout = window.setTimeout(() => setText(actionStatus, ""), 2500);
+  }
+
+  function escapeHtml(value) {
+    return String(value)
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;")
+      .replaceAll("'", "&#039;");
+  }
+
+  evaluationList?.addEventListener("input", updateCalculator);
+  evaluationList?.addEventListener("change", (event) => {
+    const target = event.target;
+
+    if (target instanceof Element && target.getAttribute("data-evaluation-field") === "status") {
+      syncEvaluationState();
+      renderEvaluationInputs();
+    }
+
+    updateCalculator();
+  });
+  evaluationList?.addEventListener("click", (event) => {
+    const target = event.target;
+
+    if (!(target instanceof Element)) {
+      return;
+    }
+
+    const button = target.closest("button");
+
+    if (!button) {
+      return;
+    }
+
+    if (button.dataset.useRemaining) {
+      useRemainingWeight(button.dataset.useRemaining);
+    }
+
+    if (button.dataset.duplicateEvaluation) {
+      duplicateEvaluation(button.dataset.duplicateEvaluation);
+    }
+
+    if (button.dataset.removeEvaluation) {
+      removeEvaluation(button.dataset.removeEvaluation);
+    }
+  });
+
+  [scaleSelect, customScaleInput, targetGradeInput].forEach((input) =>
+    input?.addEventListener("input", updateCalculator),
+  );
+  scaleSelect?.addEventListener("change", updateCalculator);
+  addEvaluationButton?.addEventListener("click", () => addEvaluation());
+  splitPendingButton?.addEventListener("click", splitPendingWeight);
+  copySummaryButton?.addEventListener("click", copySummary);
+  exportCsvButton?.addEventListener("click", exportCsv);
+  clearButton?.addEventListener("click", clearCalculator);
+  exampleButtons.forEach((button) => {
+    button.addEventListener("click", () => loadExample(button.dataset.exampleId));
+  });
+
+  renderEvaluationInputs();
+  updateCalculator();
+</script>
+
+
+
+

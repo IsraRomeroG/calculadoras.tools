@@ -4,6 +4,7 @@ seoTitle: "Préstamo personal vs tarjeta de crédito: CAT, intereses y pagos"
 description: "Compara un préstamo personal contra una tarjeta de crédito considerando tasa, CAT, pagos fijos, plazo y costo total."
 pubDate: 2026-05-30
 categorySlug: "finanzas"
+translationKey: "personal-loan-vs-credit-card"
 tags:
   - préstamo personal
   - tarjeta de crédito

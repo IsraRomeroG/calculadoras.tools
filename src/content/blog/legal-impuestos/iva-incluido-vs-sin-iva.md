@@ -3,6 +3,7 @@ title: "IVA incluido vs. sin IVA: cuál es la diferencia"
 description: "Entiende la diferencia entre precio con IVA incluido y precio sin IVA para evitar confusiones al comparar costos."
 pubDate: 2026-03-14
 categorySlug: "legal-impuestos"
+translationKey: "vat-inclusive-vs-exclusive"
 tags:
   - iva incluido
   - precio sin iva

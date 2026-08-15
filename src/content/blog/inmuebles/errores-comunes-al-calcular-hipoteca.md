@@ -4,6 +4,7 @@ seoTitle: "Errores al calcular una hipoteca: tasa, enganche, plazo y costos"
 description: "Evita errores frecuentes al estimar una hipoteca: confundir precio con monto financiado, olvidar el enganche o ignorar costos adicionales."
 pubDate: 2026-05-18
 categorySlug: "inmuebles"
+translationKey: "common-mortgage-calculation-mistakes"
 tags:
   - errores hipoteca
   - calculadora de hipoteca

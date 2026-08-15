@@ -3,6 +3,7 @@ title: "Cómo sumar IVA a un precio sin impuesto"
 description: "Calcula el IVA de un precio base y obtén el total final con ejemplos para cotizaciones y ventas."
 pubDate: 2026-03-17
 categorySlug: "legal-impuestos"
+translationKey: "add-vat-to-a-price"
 tags:
   - sumar iva
   - precio sin iva

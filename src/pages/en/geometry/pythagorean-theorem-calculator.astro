@@ -1,0 +1,1148 @@
+---
+import Container from "@components/layout/Container.astro";
+import PageShell from "@components/layout/PageShell.astro";
+import FaqSection from "@components/shared/FaqSection.astro";
+import PageHero from "@components/shared/PageHero.astro";
+import SectionIntro from "@components/shared/SectionIntro.astro";
+import BaseLayout from "@layouts/BaseLayout.astro";
+import AdSlot from "@components/ads/AdSlot.astro";
+import { buildAlternateLinks } from "@lib/i18n/routing";
+import { buildFaqJsonLd } from "@lib/seo";
+import {
+  PYTHAGOREAN_CANONICAL,
+  PYTHAGOREAN_PRESETS,
+  PYTHAGOREAN_UNIT_METADATA,
+  PYTHAGOREAN_UNITS,
+} from "@lib/calculators/geometria/calculadora-del-teorema-de-pitagoras/pythagoreanTheorem.en";
+
+const title = "Pythagorean Theorem Calculator — Hypotenuse and Legs";
+const description =
+  "Calculate a right triangle’s hypotenuse or missing leg with the Pythagorean theorem, including the formula, steps and solved examples.";
+const canonical = PYTHAGOREAN_CANONICAL;
+const spanishCanonical = "/geometria/calculadora-del-teorema-de-pitagoras";
+const alternates = buildAlternateLinks(
+  { es: spanishCanonical, en: canonical },
+  Astro.site ?? Astro.url,
+);
+
+const decimalOptions = [
+  { value: "auto", label: "Automatic" },
+  { value: "0", label: "0 decimals" },
+  { value: "1", label: "1 decimal" },
+  { value: "2", label: "2 decimals" },
+  { value: "3", label: "3 decimals" },
+  { value: "4", label: "4 decimals" },
+  { value: "5", label: "5 decimals" },
+  { value: "6", label: "6 decimals" },
+];
+
+const faqs = [
+  {
+    question: "What is the Pythagorean theorem?",
+    answer:
+      "It is a relationship for right triangles: the sum of the squares of the legs equals the square of the hypotenuse.",
+  },
+  {
+    question: "How do I calculate the hypotenuse?",
+    answer:
+      "Square each leg, add the values and take the square root. The formula is c = √(a² + b²).",
+  },
+  {
+    question: "How do I calculate a missing leg?",
+    answer:
+      "Subtract the square of the known leg from the square of the hypotenuse and take the square root. This calculator uses b = √(c² - a²).",
+  },
+  {
+    question: "What is the hypotenuse of a triangle with legs 3 and 4?",
+    answer:
+      "The hypotenuse is 5 because 3² + 4² = 9 + 16 = 25 and √25 = 5.",
+  },
+  {
+    question: "Does the Pythagorean theorem work for any triangle?",
+    answer:
+      "No. It applies only to right triangles, meaning triangles with a 90° angle.",
+  },
+  {
+    question: "Why must the hypotenuse be the longest side?",
+    answer:
+      "Because it is opposite the right angle. In a right triangle, it is always longer than either leg.",
+  },
+];
+
+const faqJsonLd = buildFaqJsonLd(faqs);
+---
+
+<BaseLayout title={title} description={description} canonical={canonical} locale="en" alternates={alternates}>
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={JSON.stringify(faqJsonLd)} />
+  </Fragment>
+
+  <PageShell>
+    <PageHero
+      title="Pythagorean theorem calculator"
+      description="Calculate the hypotenuse or a missing leg of a right triangle and review the formula step by step."
+      kicker="Geometry"
+      collapseBreadcrumbOnMobile
+      containerClass="py-5 md:py-7"
+      titleClass="mt-2 text-3xl font-bold leading-tight md:text-5xl"
+      descriptionClass="mt-3 text-base leading-relaxed text-gray-400"
+      breadcrumbs={[
+        { label: "Home", href: "/en", ariaLabel: "Home" },
+        { label: "Geometry", href: "/en/geometry", optional: true },
+        { label: "Pythagorean theorem calculator", truncate: true },
+      ]}
+    />
+
+    <Container as="section" class="py-5 md:py-8">
+      <div
+        id="pythagorean-calculator"
+        class="grid gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(19rem,0.85fr)]"
+      >
+        <section
+          class="rounded-lg border border-gray-700 bg-gray-950 shadow-xl shadow-gray-950/30"
+          aria-labelledby="pythagorean-input-heading"
+        >
+          <div class="border-b border-gray-800 p-4 sm:p-5">
+            <h2 id="pythagorean-input-heading" class="text-xl font-semibold">
+              Triangle inputs
+            </h2>
+            <p class="mt-2 text-sm leading-relaxed text-gray-400">
+              Use the same unit for every side of the right triangle.
+            </p>
+          </div>
+
+          <div class="p-4 sm:p-5">
+            <div class="grid grid-cols-1 gap-2 sm:grid-cols-2" role="group" aria-label="Known measurements">
+              <button
+                type="button"
+                class="min-h-12 rounded-lg border border-amber-400 bg-amber-400 px-3 py-2 text-left text-sm font-semibold text-gray-950 transition focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/40"
+                data-mode-option="hypotenuse"
+                aria-pressed="true"
+              >
+                <span class="block">I know both legs</span>
+                <span class="mt-1 block text-xs font-medium text-gray-800">Calculate c</span>
+              </button>
+              <button
+                type="button"
+                class="min-h-12 rounded-lg border border-gray-700 px-3 py-2 text-left text-sm font-semibold text-gray-200 transition hover:border-amber-400 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/40"
+                data-mode-option="leg"
+                aria-pressed="false"
+              >
+                <span class="block">I know the hypotenuse and one leg</span>
+                <span class="mt-1 block text-xs font-medium text-gray-400">Calculate b</span>
+              </button>
+            </div>
+
+            <div class="mt-5 grid gap-4 sm:grid-cols-2">
+              <label class="block text-sm font-semibold text-gray-200">
+                Unit
+                <select
+                  class="mt-2 min-h-11 w-full rounded-lg border border-gray-700 bg-gray-900 px-3 py-2 text-base text-white focus:border-amber-400 focus:outline-none focus:ring-3 focus:ring-amber-400/30"
+                  data-unit-select
+                >
+                  {
+                    PYTHAGOREAN_UNITS.map((unit) => (
+                      <option value={unit}>
+                        {PYTHAGOREAN_UNIT_METADATA[unit].label}
+                      </option>
+                    ))
+                  }
+                </select>
+              </label>
+
+              <label class="block text-sm font-semibold text-gray-200">
+                Rounding
+                <select
+                  class="mt-2 min-h-11 w-full rounded-lg border border-gray-700 bg-gray-900 px-3 py-2 text-base text-white focus:border-amber-400 focus:outline-none focus:ring-3 focus:ring-amber-400/30"
+                  data-decimals-select
+                >
+                  {
+                    decimalOptions.map((option) => (
+                      <option value={option.value}>{option.label}</option>
+                    ))
+                  }
+                </select>
+              </label>
+            </div>
+
+            <div class="mt-5" data-mode-panel="hypotenuse">
+              <div class="grid gap-4 sm:grid-cols-2">
+                <div>
+                  <label for="pythagorean-a" class="block text-sm font-semibold text-gray-200">
+                    Leg a
+                  </label>
+                  <input
+                    id="pythagorean-a"
+                    type="text"
+                    inputmode="decimal"
+                    autocomplete="off"
+                    placeholder="3"
+                    class="mt-2 min-h-11 w-full rounded-lg border border-gray-700 bg-gray-900 px-3 py-2 text-base text-white placeholder:text-gray-600 focus:border-amber-400 focus:outline-none focus:ring-3 focus:ring-amber-400/30"
+                    data-length-input
+                    data-field="a"
+                    aria-describedby="pythagorean-a-error"
+                  />
+                  <p id="pythagorean-a-error" class="mt-2 min-h-5 text-sm text-red-300" data-error-for="a"></p>
+                </div>
+
+                <div>
+                  <label for="pythagorean-b" class="block text-sm font-semibold text-gray-200">
+                    Leg b
+                  </label>
+                  <input
+                    id="pythagorean-b"
+                    type="text"
+                    inputmode="decimal"
+                    autocomplete="off"
+                    placeholder="4"
+                    class="mt-2 min-h-11 w-full rounded-lg border border-gray-700 bg-gray-900 px-3 py-2 text-base text-white placeholder:text-gray-600 focus:border-amber-400 focus:outline-none focus:ring-3 focus:ring-amber-400/30"
+                    data-length-input
+                    data-field="b"
+                    aria-describedby="pythagorean-b-error"
+                  />
+                  <p id="pythagorean-b-error" class="mt-2 min-h-5 text-sm text-red-300" data-error-for="b"></p>
+                </div>
+              </div>
+            </div>
+
+            <div class="mt-5 hidden" data-mode-panel="leg">
+              <div class="grid gap-4 sm:grid-cols-2">
+                <div>
+                  <label for="pythagorean-c" class="block text-sm font-semibold text-gray-200">
+                    Hypotenuse c
+                  </label>
+                  <input
+                    id="pythagorean-c"
+                    type="text"
+                    inputmode="decimal"
+                    autocomplete="off"
+                    placeholder="13"
+                    class="mt-2 min-h-11 w-full rounded-lg border border-gray-700 bg-gray-900 px-3 py-2 text-base text-white placeholder:text-gray-600 focus:border-amber-400 focus:outline-none focus:ring-3 focus:ring-amber-400/30"
+                    data-length-input
+                    data-field="c"
+                    aria-describedby="pythagorean-c-error"
+                  />
+                  <p id="pythagorean-c-error" class="mt-2 min-h-5 text-sm text-red-300" data-error-for="c"></p>
+                </div>
+
+                <div>
+                  <label for="pythagorean-known-a" class="block text-sm font-semibold text-gray-200">
+                    Known leg a
+                  </label>
+                  <input
+                    id="pythagorean-known-a"
+                    type="text"
+                    inputmode="decimal"
+                    autocomplete="off"
+                    placeholder="5"
+                    class="mt-2 min-h-11 w-full rounded-lg border border-gray-700 bg-gray-900 px-3 py-2 text-base text-white placeholder:text-gray-600 focus:border-amber-400 focus:outline-none focus:ring-3 focus:ring-amber-400/30"
+                    data-length-input
+                    data-field="a"
+                    aria-describedby="pythagorean-known-a-error"
+                  />
+                  <p id="pythagorean-known-a-error" class="mt-2 min-h-5 text-sm text-red-300" data-error-for="a"></p>
+                </div>
+              </div>
+            </div>
+
+            <p class="mt-1 min-h-5 text-sm text-amber-200" data-normalization-note></p>
+
+            <div class="mt-5 rounded-lg border border-gray-800 bg-gray-900 p-3">
+              <p class="text-sm font-semibold text-gray-200">Quick examples</p>
+              <div class="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4">
+                {
+                  PYTHAGOREAN_PRESETS.map((preset, index) => (
+                    <button
+                      type="button"
+                      class="min-h-11 rounded-lg border border-gray-700 px-3 py-2 text-sm font-semibold text-gray-200 transition hover:border-amber-400 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/40"
+                      data-preset-index={index}
+                    >
+                      {preset.a}, {preset.b} → {preset.c}
+                    </button>
+                  ))
+                }
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section
+          class="rounded-lg border border-gray-700 bg-gray-950 p-4 shadow-xl shadow-gray-950/30 sm:p-5 lg:col-start-2 lg:row-span-2 lg:row-start-1"
+          aria-labelledby="pythagorean-result-heading"
+        >
+          <div aria-live="polite" data-result-region>
+            <p class="text-sm font-semibold uppercase tracking-wide text-amber-400" data-result-kicker>
+              Pending
+            </p>
+            <h2 id="pythagorean-result-heading" class="mt-2 text-2xl font-bold" data-main-result>
+              Enter two lengths
+            </h2>
+            <p class="mt-2 text-sm leading-relaxed text-gray-400" data-result-note>
+              The result will appear here with the formula and check.
+            </p>
+          </div>
+
+          <dl class="mt-5 divide-y divide-gray-800 rounded-lg border border-gray-800 bg-gray-900">
+            <div class="grid gap-1 p-3 sm:grid-cols-[5rem_1fr]">
+              <dt class="text-sm text-gray-400">Leg a</dt>
+              <dd class="text-base font-semibold text-white" data-side-a-summary>—</dd>
+            </div>
+            <div class="grid gap-1 p-3 sm:grid-cols-[5rem_1fr]">
+              <dt class="text-sm text-gray-400">Leg b</dt>
+              <dd class="text-base font-semibold text-white" data-side-b-summary>—</dd>
+            </div>
+            <div class="grid gap-1 p-3 sm:grid-cols-[5rem_1fr]">
+              <dt class="text-sm text-gray-400">Hipotenusa</dt>
+              <dd class="text-base font-semibold text-white" data-side-c-summary>—</dd>
+            </div>
+          </dl>
+
+          <div class="mt-5 grid gap-3 sm:grid-cols-3">
+            <button
+              type="button"
+              class="inline-flex min-h-11 items-center justify-center rounded-lg bg-amber-400 px-4 py-2 text-sm font-semibold text-gray-950 transition hover:bg-amber-300 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/40 disabled:cursor-not-allowed disabled:bg-gray-700 disabled:text-gray-400"
+              data-copy-result
+              disabled
+            >
+              Copy result
+            </button>
+            <button
+              type="button"
+              class="inline-flex min-h-11 items-center justify-center rounded-lg border border-gray-700 px-4 py-2 text-sm font-semibold text-gray-200 transition hover:border-amber-400 hover:text-white focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/40"
+              data-copy-link
+            >
+              Copy link
+            </button>
+            <button
+              type="button"
+              class="inline-flex min-h-11 items-center justify-center rounded-lg border border-gray-700 px-4 py-2 text-sm font-semibold text-gray-200 transition hover:border-amber-400 hover:text-white focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/40"
+              data-clear-calculator
+            >
+              Clear
+            </button>
+          </div>
+          <p class="mt-3 min-h-5 text-sm text-emerald-300" role="status" aria-live="polite" data-copy-status></p>
+
+          <details class="mt-5 rounded-lg border border-gray-800 bg-gray-900 p-4" data-procedure-detail>
+            <summary class="cursor-pointer list-none text-sm font-semibold text-white">
+              Show calculation
+            </summary>
+            <div class="mt-4 space-y-3 text-sm leading-relaxed text-gray-300">
+              <p>
+                <span class="font-semibold text-gray-100">Formula:</span>
+                <span data-formula>Complete the fields to see the formula.</span>
+              </p>
+              <p>
+                <span class="font-semibold text-gray-100">Substitution:</span>
+                <span data-substitution>—</span>
+              </p>
+              <p>
+                <span class="font-semibold text-gray-100">Calculation:</span>
+                <span data-operation>—</span>
+              </p>
+              <p>
+                <span class="font-semibold text-gray-100">Result:</span>
+                <span data-procedure-result>—</span>
+              </p>
+              <div class="border-t border-gray-800 pt-3">
+                <p class="font-semibold text-gray-100">Check</p>
+                <p class="mt-2" data-verification-line-one>—</p>
+                <p class="mt-1" data-verification-line-two>—</p>
+              </div>
+            </div>
+          </details>
+
+          <a
+            href="/en/geometry/area-perimeter-calculator"
+            class="mt-5 hidden min-h-11 items-center justify-center rounded-lg border border-amber-400 px-4 py-2 text-sm font-semibold text-amber-300 transition hover:bg-amber-400 hover:text-gray-950 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/40"
+            data-area-link
+          >
+            Calculate area and perimeter
+          </a>
+        </section>
+
+        <section
+          class="rounded-lg border border-gray-700 bg-gray-950 p-4 sm:p-5 lg:col-start-1 lg:row-start-2"
+          aria-labelledby="pythagorean-diagram-heading"
+        >
+          <div class="flex items-start justify-between gap-4">
+            <div>
+              <h2 id="pythagorean-diagram-heading" class="text-lg font-semibold">
+                Triangle diagram
+              </h2>
+              <p class="mt-2 text-sm leading-relaxed text-gray-400" data-diagram-note>
+                The highlighted side is hypotenuse c.
+              </p>
+            </div>
+            <p class="rounded-full border border-gray-700 px-3 py-1 text-xs font-semibold text-gray-300">
+              Not to scale
+            </p>
+          </div>
+
+          <svg
+            class="mt-5 h-auto w-full"
+            viewBox="0 0 360 240"
+            role="img"
+            aria-labelledby="pythagorean-svg-title pythagorean-svg-desc"
+          >
+            <title id="pythagorean-svg-title">Right triangle with legs a and b and hypotenuse c</title>
+            <desc id="pythagorean-svg-desc">
+              Leg a is horizontal, leg b is vertical and hypotenuse c is opposite the right angle.
+            </desc>
+            <rect x="32" y="32" width="296" height="176" rx="8" fill="#111827" stroke="#374151" />
+            <path
+              d="M88 176 L88 64 L286 176 Z"
+              fill="#1f2937"
+              stroke="#6b7280"
+              stroke-width="4"
+              stroke-linejoin="round"
+            />
+            <path data-diagram-side="b" d="M88 176 L88 64" stroke="#9ca3af" stroke-width="6" stroke-linecap="round" />
+            <path data-diagram-side="a" d="M88 176 L286 176" stroke="#9ca3af" stroke-width="6" stroke-linecap="round" />
+            <path data-diagram-side="c" d="M88 64 L286 176" stroke="#f59e0b" stroke-width="7" stroke-linecap="round" />
+            <path d="M88 152 L112 152 L112 176" fill="none" stroke="#fcd34d" stroke-width="3" />
+            <text data-diagram-label="b" x="58" y="122" fill="#d1d5db" font-size="24" font-weight="700">b</text>
+            <text data-diagram-label="a" x="178" y="210" fill="#d1d5db" font-size="24" font-weight="700">a</text>
+            <text data-diagram-label="c" x="202" y="106" fill="#fbbf24" font-size="24" font-weight="700">c</text>
+            <text x="118" y="166" fill="#fcd34d" font-size="15" font-weight="700">90°</text>
+          </svg>
+
+          <p class="mt-3 text-sm leading-relaxed text-gray-400">
+            The hypotenuse is always opposite the right angle and is the longest side.
+            The diagram only identifies the sides.
+          </p>
+        </section>
+      </div>
+    </Container>
+
+    <AdSlot placement="calculator-after-tool" />
+
+    <Container as="section" class="py-7 md:py-10">
+      <SectionIntro
+        title="How the theorem works"
+        description="In a right triangle, the legs form the 90° angle. The hypotenuse is opposite that angle."
+      />
+      <div class="grid gap-4 md:grid-cols-3">
+        <article class="rounded-lg border border-gray-800 bg-gray-950 p-4">
+          <h3 class="text-base font-semibold">Base formula</h3>
+          <p class="mt-2 text-sm leading-relaxed text-gray-400">
+            The relationship is <strong class="text-gray-100">a² + b² = c²</strong>.
+            If you know two sides, you can solve for the third.
+          </p>
+        </article>
+        <article class="rounded-lg border border-gray-800 bg-gray-950 p-4">
+          <h3 class="text-base font-semibold">For the hypotenuse</h3>
+          <p class="mt-2 text-sm leading-relaxed text-gray-400">
+            Add the squares of both legs and take the square root:
+            <strong class="text-gray-100"> c = √(a² + b²)</strong>.
+          </p>
+        </article>
+        <article class="rounded-lg border border-gray-800 bg-gray-950 p-4">
+          <h3 class="text-base font-semibold">For a missing leg</h3>
+          <p class="mt-2 text-sm leading-relaxed text-gray-400">
+            Subtract the square of the known leg from the square of the hypotenuse:
+            <strong class="text-gray-100"> b = √(c² - a²)</strong>.
+          </p>
+        </article>
+      </div>
+    </Container>
+
+    <Container as="section" class="py-7 md:py-10">
+      <SectionIntro
+        title="Solved examples"
+        description="These examples show the same steps generated by the calculator."
+      />
+      <div class="grid gap-4 md:grid-cols-2">
+        <article class="rounded-lg border border-gray-800 bg-gray-950 p-5">
+          <h3 class="text-lg font-semibold">Legs of 3 cm and 4 cm</h3>
+          <p class="mt-3 text-sm leading-relaxed text-gray-400">
+            c = √(3² + 4²) = √25 = 5 cm. This is one of the most common
+            Pythagorean triples.
+          </p>
+        </article>
+        <article class="rounded-lg border border-gray-800 bg-gray-950 p-5">
+          <h3 class="text-lg font-semibold">Hypotenuse 13 m and leg 5 m</h3>
+          <p class="mt-3 text-sm leading-relaxed text-gray-400">
+            b = √(13² - 5²) = √144 = 12 m. The hypotenuse must be longer than the
+            known leg.
+          </p>
+        </article>
+      </div>
+    </Container>
+
+    <Container as="section" class="py-7 md:py-10">
+      <div class="rounded-lg border border-gray-700 bg-gray-950 p-5 sm:p-6">
+        <SectionIntro
+          title="Continue with area and perimeter"
+          description="Once you know all three sides, use those values to calculate the triangle’s area and perimeter."
+          class="mb-4"
+        />
+        <a
+          href="/en/geometry/area-perimeter-calculator"
+          class="inline-flex min-h-11 items-center justify-center rounded-lg bg-amber-400 px-4 py-2 text-sm font-semibold text-gray-950 transition hover:bg-amber-300 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/40"
+        >
+          Open the area and perimeter calculator
+        </a>
+      </div>
+    </Container>
+
+    <FaqSection faqs={faqs} />
+  </PageShell>
+</BaseLayout>
+
+<script>
+  import {
+    PYTHAGOREAN_PRESETS,
+    PYTHAGOREAN_UNIT_METADATA,
+    buildAreaPerimeterUrl,
+    buildPythagoreanExplanation,
+    buildPythagoreanShareUrl,
+    calculateHypotenuse,
+    calculateMissingLeg,
+    formatLength,
+    isPythagoreanUnit,
+    parseLengthInput,
+    validateHypotenuseAndLeg,
+    validatePositiveLength,
+  } from "@lib/calculators/geometria/calculadora-del-teorema-de-pitagoras/pythagoreanTheorem.en";
+
+  const MODE_TO_PARAM = {
+    hypotenuse: "hypotenuse",
+    leg: "leg",
+  };
+
+  const PARAM_TO_MODE = {
+    hypotenuse: "hypotenuse",
+    leg: "leg",
+  };
+
+  const modeButtons = Array.from(document.querySelectorAll("[data-mode-option]"));
+  const modePanels = Array.from(document.querySelectorAll("[data-mode-panel]"));
+  const unitSelect = document.querySelector("[data-unit-select]");
+  const decimalsSelect = document.querySelector("[data-decimals-select]");
+  const normalizationNote = document.querySelector("[data-normalization-note]");
+  const resultKicker = document.querySelector("[data-result-kicker]");
+  const mainResult = document.querySelector("[data-main-result]");
+  const resultNote = document.querySelector("[data-result-note]");
+  const sideASummary = document.querySelector("[data-side-a-summary]");
+  const sideBSummary = document.querySelector("[data-side-b-summary]");
+  const sideCSummary = document.querySelector("[data-side-c-summary]");
+  const copyResultButton = document.querySelector("[data-copy-result]");
+  const copyLinkButton = document.querySelector("[data-copy-link]");
+  const clearButton = document.querySelector("[data-clear-calculator]");
+  const copyStatus = document.querySelector("[data-copy-status]");
+  const formula = document.querySelector("[data-formula]");
+  const substitution = document.querySelector("[data-substitution]");
+  const operation = document.querySelector("[data-operation]");
+  const procedureResult = document.querySelector("[data-procedure-result]");
+  const verificationLineOne = document.querySelector("[data-verification-line-one]");
+  const verificationLineTwo = document.querySelector("[data-verification-line-two]");
+  const procedureDetail = document.querySelector("[data-procedure-detail]");
+  const areaLink = document.querySelector("[data-area-link]");
+  const diagramNote = document.querySelector("[data-diagram-note]");
+  const presetButtons = Array.from(document.querySelectorAll("[data-preset-index]"));
+
+  let activeMode = "hypotenuse";
+  let currentCopyText = "";
+  let currentShareUrl = window.location.href;
+  let copyTimeout = 0;
+  let hasHydratedFromUrl = false;
+
+  function getUnit() {
+    const value = unitSelect?.value ?? "none";
+
+    return isPythagoreanUnit(value) ? value : "none";
+  }
+
+  function getDecimals() {
+    const value = decimalsSelect?.value ?? "auto";
+
+    if (value === "auto") {
+      return "auto";
+    }
+
+    const parsed = Number(value);
+
+    return Number.isInteger(parsed) && parsed >= 0 && parsed <= 6
+      ? parsed
+      : "auto";
+  }
+
+  function setMode(mode, options = {}) {
+    activeMode = mode === "leg" ? "leg" : "hypotenuse";
+
+    modeButtons.forEach((button) => {
+      const isActive = button.dataset.modeOption === activeMode;
+      button.setAttribute("aria-pressed", String(isActive));
+      button.classList.toggle("border-amber-400", isActive);
+      button.classList.toggle("bg-amber-400", isActive);
+      button.classList.toggle("text-gray-950", isActive);
+      button.classList.toggle("border-gray-700", !isActive);
+      button.classList.toggle("text-gray-200", !isActive);
+      const hint = button.querySelector("span + span");
+      hint?.classList.toggle("text-gray-800", isActive);
+      hint?.classList.toggle("text-gray-400", !isActive);
+    });
+
+    modePanels.forEach((panel) => {
+      panel.classList.toggle("hidden", panel.dataset.modePanel !== activeMode);
+    });
+
+    if (options.clear) {
+      clearAllInputValues();
+    }
+
+    updateDiagram();
+    updateCalculator();
+  }
+
+  function getActiveInputs() {
+    const activePanel = document.querySelector(`[data-mode-panel="${activeMode}"]`);
+
+    return Array.from(activePanel?.querySelectorAll("[data-length-input]") ?? []);
+  }
+
+  function clearAllInputValues() {
+    document.querySelectorAll("[data-length-input]").forEach((input) => {
+      input.value = "";
+    });
+  }
+
+  function parseInput(input) {
+    const parsed = parseLengthInput(input.value);
+
+    if (!parsed.ok) {
+      return parsed;
+    }
+
+    const validation = validatePositiveLength(parsed.value);
+
+    if (!validation.ok) {
+      return validation;
+    }
+
+    return parsed;
+  }
+
+  function parseActiveValues() {
+    const values = {};
+    const errors = {};
+    const normalized = {};
+    const interpretations = [];
+
+    getActiveInputs().forEach((input) => {
+      const field = input.dataset.field;
+      const parsed = parseInput(input);
+
+      if (parsed.ok) {
+        values[field] = parsed.value;
+        normalized[field] = parsed.normalized;
+
+        if (input.value.trim() !== parsed.normalized) {
+          interpretations.push(parsed.normalized);
+        }
+
+        return;
+      }
+
+      errors[field] = parsed.error;
+    });
+
+    return { values, errors, normalized, interpretations };
+  }
+
+  function hasAnyActiveValue() {
+    return getActiveInputs().some((input) => input.value.trim() !== "");
+  }
+
+  function getMissingFields(errors) {
+    const labels =
+      activeMode === "hypotenuse"
+        ? { a: "leg a", b: "leg b" }
+        : { c: "hypotenuse c", a: "known leg a" };
+
+    return Object.entries(errors)
+      .filter(([, error]) => error === "empty")
+      .map(([field]) => labels[field] ?? field);
+  }
+
+  function clearErrors() {
+    document.querySelectorAll("[data-error-for]").forEach((element) => {
+      element.textContent = "";
+    });
+    document.querySelectorAll("[data-length-input]").forEach((input) => {
+      input.removeAttribute("aria-invalid");
+    });
+  }
+
+  function showErrors(errors) {
+    clearErrors();
+
+    Object.entries(errors).forEach(([field, error]) => {
+      if (error === "empty" || error === "incomplete") {
+        return;
+      }
+
+      const activePanel = document.querySelector(`[data-mode-panel="${activeMode}"]`);
+      const message = getErrorMessage(error);
+      const errorElement = activePanel?.querySelector(`[data-error-for="${field}"]`);
+      const input = activePanel?.querySelector(`[data-field="${field}"]`);
+
+      if (errorElement) {
+        errorElement.textContent = message;
+      }
+
+      input?.setAttribute("aria-invalid", "true");
+    });
+  }
+
+  function getErrorMessage(error) {
+    if (error === "non_positive") {
+      return "Enter a length greater than zero.";
+    }
+
+    if (error === "not_larger") {
+      return "The hypotenuse must be longer than the known leg.";
+    }
+
+    if (error === "unit") {
+      return "Do not enter the unit here; select it above.";
+    }
+
+    return "We could not interpret this length. Use a format such as 3.5 or 12.";
+  }
+
+  function setNeutralState(message) {
+    if (resultKicker) {
+      resultKicker.textContent = "Pending";
+    }
+
+    if (mainResult) {
+      mainResult.textContent = "Enter two lengths";
+    }
+
+    if (resultNote) {
+      resultNote.textContent = message;
+    }
+
+    setSummary();
+    setProcedure();
+    setAreaLink();
+    currentCopyText = "";
+
+    if (copyResultButton) {
+      copyResultButton.disabled = true;
+    }
+  }
+
+  function setInvalidState(message) {
+    if (resultKicker) {
+      resultKicker.textContent = "Check the inputs";
+    }
+
+    if (mainResult) {
+      mainResult.textContent = "Cannot calculate yet";
+    }
+
+    if (resultNote) {
+      resultNote.textContent = message;
+    }
+
+    setSummary();
+    setProcedure();
+    setAreaLink();
+    currentCopyText = "";
+
+    if (copyResultButton) {
+      copyResultButton.disabled = true;
+    }
+  }
+
+  function setValidState(result) {
+    const { explanation, resolvedTriangle, resultValue } = result;
+    const unit = getUnit();
+    const decimals = getDecimals();
+    const formattedResult = formatLength(resultValue, unit, decimals);
+
+    if (resultKicker) {
+      resultKicker.textContent = "Result";
+    }
+
+    if (mainResult) {
+      mainResult.textContent = `${explanation.resultLabel}: ${formattedResult}`;
+    }
+
+    if (resultNote) {
+      resultNote.textContent = explanation.isApproximate
+        ? "The displayed result is rounded; the calculation keeps full internal precision."
+        : "Exact result for the entered values.";
+    }
+
+    setSummary(resolvedTriangle);
+    setProcedure(explanation);
+    setAreaLink(buildAreaPerimeterUrl({ ...resolvedTriangle, unit, decimals }));
+    currentCopyText = explanation.copyText;
+
+    if (copyResultButton) {
+      copyResultButton.disabled = false;
+    }
+  }
+
+  function setSummary(triangle) {
+    const unit = getUnit();
+    const decimals = getDecimals();
+
+    if (sideASummary) {
+      sideASummary.textContent = triangle
+        ? formatLength(triangle.a, unit, decimals)
+        : "—";
+    }
+
+    if (sideBSummary) {
+      sideBSummary.textContent = triangle
+        ? formatLength(triangle.b, unit, decimals)
+        : "—";
+    }
+
+    if (sideCSummary) {
+      sideCSummary.textContent = triangle
+        ? formatLength(triangle.c, unit, decimals)
+        : "—";
+    }
+  }
+
+  function setProcedure(explanation) {
+    if (formula) {
+      formula.textContent = explanation?.formula ?? "Complete the fields to see the formula.";
+    }
+
+    if (substitution) {
+      substitution.textContent = explanation?.substitution ?? "—";
+    }
+
+    if (operation) {
+      operation.textContent = explanation?.operation ?? "—";
+    }
+
+    if (procedureResult) {
+      procedureResult.textContent = explanation?.result ?? "—";
+    }
+
+    if (verificationLineOne) {
+      verificationLineOne.textContent = explanation?.verification?.[0] ?? "—";
+    }
+
+    if (verificationLineTwo) {
+      verificationLineTwo.textContent = explanation?.verification?.[1] ?? "—";
+    }
+
+    if (procedureDetail && window.matchMedia("(min-width: 1024px)").matches) {
+      procedureDetail.open = Boolean(explanation);
+    }
+  }
+
+  function setAreaLink(href) {
+    if (!areaLink) {
+      return;
+    }
+
+    areaLink.classList.toggle("hidden", !href);
+    areaLink.classList.toggle("inline-flex", Boolean(href));
+
+    if (href) {
+      areaLink.setAttribute("href", href);
+    }
+  }
+
+  function updateCalculator() {
+    const { values, errors, normalized, interpretations } = parseActiveValues();
+    const blockingErrors = Object.fromEntries(
+      Object.entries(errors).filter(
+        ([, error]) => error !== "empty" && error !== "incomplete",
+      ),
+    );
+
+    updateNormalizationNote(interpretations);
+
+    if (!hasAnyActiveValue()) {
+      clearErrors();
+      setNeutralState(
+        activeMode === "hypotenuse"
+          ? "Enter both legs to calculate the hypotenuse."
+          : "Enter the hypotenuse and known leg to calculate the missing leg.",
+      );
+      updateUrl(normalized);
+      return;
+    }
+
+    if (Object.keys(blockingErrors).length > 0) {
+      showErrors(blockingErrors);
+      setInvalidState("Correct the highlighted lengths to continue.");
+      updateUrl(normalized);
+      return;
+    }
+
+    const missingFields = getMissingFields(errors);
+
+    if (missingFields.length > 0 || Object.values(errors).includes("incomplete")) {
+      clearErrors();
+      setNeutralState(
+        missingFields.length > 0
+          ? `Enter ${missingFields.join(", ")} to calculate.`
+          : "Finish entering the length to calculate.",
+      );
+      updateUrl(normalized);
+      return;
+    }
+
+    if (activeMode === "leg") {
+      const validation = validateHypotenuseAndLeg(values.c, values.a);
+
+      if (!validation.ok) {
+        showErrors({ c: validation.error });
+        setInvalidState(getErrorMessage(validation.error));
+        updateUrl(normalized);
+        return;
+      }
+    }
+
+    try {
+      const result = computeResult(values);
+      clearErrors();
+      setValidState(result);
+      updateUrl(normalized);
+    } catch (error) {
+      setInvalidState("We could not calculate with those values.");
+      updateUrl(normalized);
+    }
+  }
+
+  function computeResult(values) {
+    const unit = getUnit();
+    const decimals = getDecimals();
+
+    if (activeMode === "hypotenuse") {
+      const c = calculateHypotenuse(values.a, values.b);
+      const explanation = buildPythagoreanExplanation(
+        "hypotenuse",
+        { a: values.a, b: values.b },
+        c,
+        { unit, decimals },
+      );
+
+      return {
+        explanation,
+        resultValue: c,
+        resolvedTriangle: { a: values.a, b: values.b, c },
+      };
+    }
+
+    const b = calculateMissingLeg(values.c, values.a);
+    const explanation = buildPythagoreanExplanation(
+      "leg",
+      { c: values.c, a: values.a },
+      b,
+      { unit, decimals },
+    );
+
+    return {
+      explanation,
+      resultValue: b,
+      resolvedTriangle: { a: values.a, b, c: values.c },
+    };
+  }
+
+  function updateNormalizationNote(interpretations) {
+    if (!normalizationNote) {
+      return;
+    }
+
+    if (interpretations.length === 0) {
+      normalizationNote.textContent = "";
+      return;
+    }
+
+    const unit = getUnit();
+    const symbol = PYTHAGOREAN_UNIT_METADATA[unit].symbol;
+    normalizationNote.textContent = `Interpreted as ${interpretations[0]} ${symbol}.`;
+  }
+
+  function updateUrl(normalizedValues = {}) {
+    const urlPath = buildPythagoreanShareUrl({
+      mode: activeMode,
+      ...normalizedValues,
+      unit: getUnit(),
+      decimals: getDecimals(),
+    });
+
+    currentShareUrl = new URL(urlPath, window.location.origin).toString();
+
+    if (hasHydratedFromUrl) {
+      window.history.replaceState({}, "", urlPath);
+    }
+  }
+
+  function hydrateFromUrl() {
+    const params = new URLSearchParams(window.location.search);
+    const mode = PARAM_TO_MODE[params.get("calculate")] ?? "hypotenuse";
+    const unit = params.get("unit");
+    const decimals = params.get("decimals");
+
+    if (unitSelect && unit && isPythagoreanUnit(unit)) {
+      unitSelect.value = unit;
+    }
+
+    if (
+      decimalsSelect &&
+      decimals &&
+      Array.from(decimalsSelect.options).some((option) => option.value === decimals)
+    ) {
+      decimalsSelect.value = decimals;
+    }
+
+    setMode(mode);
+
+    const paramNames =
+      mode === "hypotenuse"
+        ? { a: "a", b: "b" }
+        : { c: "c", a: "a" };
+
+    Object.entries(paramNames).forEach(([field, paramName]) => {
+      const value = params.get(paramName);
+      const input = document
+        .querySelector(`[data-mode-panel="${activeMode}"]`)
+        ?.querySelector(`[data-field="${field}"]`);
+
+      if (!value || !input) {
+        return;
+      }
+
+      const parsed = parseInput({ value });
+
+      if (parsed.ok) {
+        input.value = value;
+      }
+    });
+
+    hasHydratedFromUrl = true;
+    updateCalculator();
+  }
+
+  function updateDiagram() {
+    const unknownSide = activeMode === "hypotenuse" ? "c" : "b";
+
+    document.querySelectorAll("[data-diagram-side]").forEach((side) => {
+      const isUnknown = side.dataset.diagramSide === unknownSide;
+      side.setAttribute("stroke", isUnknown ? "#f59e0b" : "#9ca3af");
+      side.setAttribute("stroke-width", isUnknown ? "7" : "6");
+    });
+
+    document.querySelectorAll("[data-diagram-label]").forEach((label) => {
+      const isUnknown = label.dataset.diagramLabel === unknownSide;
+      label.setAttribute("fill", isUnknown ? "#fbbf24" : "#d1d5db");
+    });
+
+    if (diagramNote) {
+      diagramNote.textContent =
+        activeMode === "hypotenuse"
+          ? "The highlighted side is hypotenuse c."
+          : "The highlighted side is missing leg b.";
+    }
+  }
+
+  async function writeClipboard(text) {
+    if (navigator.clipboard?.writeText) {
+      await navigator.clipboard.writeText(text);
+      return;
+    }
+
+    const textarea = document.createElement("textarea");
+    textarea.value = text;
+    textarea.setAttribute("readonly", "");
+    textarea.style.position = "fixed";
+    textarea.style.top = "-9999px";
+    document.body.append(textarea);
+    textarea.select();
+    document.execCommand("copy");
+    textarea.remove();
+  }
+
+  function setCopyStatus(message) {
+    if (!copyStatus) {
+      return;
+    }
+
+    window.clearTimeout(copyTimeout);
+    copyStatus.textContent = message;
+    copyTimeout = window.setTimeout(() => {
+      copyStatus.textContent = "";
+    }, 2400);
+  }
+
+  modeButtons.forEach((button) => {
+    button.addEventListener("click", () => {
+      setMode(button.dataset.modeOption, { clear: true });
+    });
+  });
+
+  document.querySelectorAll("[data-length-input]").forEach((input) => {
+    input.addEventListener("input", updateCalculator);
+  });
+
+  unitSelect?.addEventListener("change", updateCalculator);
+  decimalsSelect?.addEventListener("change", updateCalculator);
+
+  presetButtons.forEach((button) => {
+    button.addEventListener("click", () => {
+      const preset = PYTHAGOREAN_PRESETS[Number(button.dataset.presetIndex)];
+
+      if (!preset) {
+        return;
+      }
+
+      setMode("hypotenuse");
+      const panel = document.querySelector('[data-mode-panel="hypotenuse"]');
+      const inputA = panel?.querySelector('[data-field="a"]');
+      const inputB = panel?.querySelector('[data-field="b"]');
+
+      if (inputA) {
+        inputA.value = String(preset.a);
+      }
+
+      if (inputB) {
+        inputB.value = String(preset.b);
+      }
+
+      updateCalculator();
+    });
+  });
+
+  clearButton?.addEventListener("click", () => {
+    clearAllInputValues();
+    updateCalculator();
+  });
+
+  copyResultButton?.addEventListener("click", async () => {
+    if (!currentCopyText) {
+      return;
+    }
+
+    try {
+      await writeClipboard(currentCopyText);
+      setCopyStatus("Result copied.");
+    } catch (error) {
+      setCopyStatus("Could not copy the result.");
+    }
+  });
+
+  copyLinkButton?.addEventListener("click", async () => {
+    try {
+      await writeClipboard(currentShareUrl);
+      setCopyStatus("Link copied.");
+    } catch (error) {
+      setCopyStatus("Could not copy the link.");
+    }
+  });
+
+  hydrateFromUrl();
+</script>

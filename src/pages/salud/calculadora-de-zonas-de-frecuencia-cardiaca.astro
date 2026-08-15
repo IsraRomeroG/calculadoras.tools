@@ -1,5 +1,6 @@
 ---
 import BaseLayout from "@layouts/BaseLayout.astro";
+import { buildAlternateLinks } from "@lib/i18n/routing";
 import AdSlot from "@components/ads/AdSlot.astro";
 import Container from "@components/layout/Container.astro";
 import PageShell from "@components/layout/PageShell.astro";
@@ -13,6 +14,8 @@ const title = "Calculadora de Zonas de Frecuencia Cardíaca y Karvonen";
 const description =
   "Calcula tus zonas de frecuencia cardíaca por edad, FCM conocida o método Karvonen y consulta cinco rangos orientativos en bpm.";
 const canonical = "/salud/calculadora-de-zonas-de-frecuencia-cardiaca";
+const englishCanonical = "/en/health/heart-rate-zones-calculator";
+const alternates = buildAlternateLinks({ es: canonical, en: englishCanonical }, Astro.site ?? Astro.url);
 
 const faqs = [
   {
@@ -69,7 +72,7 @@ const segmentTones = [
 ];
 ---
 
-<BaseLayout title={title} description={description} canonical={canonical}>
+<BaseLayout title={title} description={description} canonical={canonical} alternates={alternates}>
   <Fragment slot="head">
     <script type="application/ld+json" set:html={JSON.stringify(faqJsonLd)} />
   </Fragment>

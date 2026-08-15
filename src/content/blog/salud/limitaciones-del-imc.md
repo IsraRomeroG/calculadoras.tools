@@ -4,6 +4,7 @@ seoTitle: "Limitaciones del IMC: masa muscular, grasa corporal y casos especiale
 description: "Conoce las principales limitaciones del IMC y por qué no debe usarse como diagnóstico único."
 pubDate: 2026-07-01
 categorySlug: "salud"
+translationKey: "bmi-limitations"
 tags:
   - imc
   - salud

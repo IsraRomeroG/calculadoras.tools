@@ -1,5 +1,6 @@
 ---
 import BaseLayout from "@layouts/BaseLayout.astro";
+import { buildAlternateLinks } from "@lib/i18n/routing";
 import AdSlot from "@components/ads/AdSlot.astro";
 import Container from "@components/layout/Container.astro";
 import PageShell from "@components/layout/PageShell.astro";
@@ -12,6 +13,8 @@ const title = "Calculadora de Proteína Diaria por Peso y Objetivo";
 const description =
   "Calcula un rango orientativo de proteína diaria según tu peso, actividad y objetivo. Incluye gramos por día, por comida y ejemplos de alimentos.";
 const canonical = "/salud/calculadora-de-proteina-diaria";
+const englishCanonical = "/en/health/daily-protein-calculator";
+const alternates = buildAlternateLinks({ es: canonical, en: englishCanonical }, Astro.site ?? Astro.url);
 
 const goalOptions = [
   {
@@ -105,7 +108,7 @@ const faqs = [
 const faqJsonLd = buildFaqJsonLd(faqs);
 ---
 
-<BaseLayout title={title} description={description} canonical={canonical}>
+<BaseLayout title={title} description={description} canonical={canonical} alternates={alternates}>
   <Fragment slot="head">
     <script type="application/ld+json" set:html={JSON.stringify(faqJsonLd)} />
   </Fragment>

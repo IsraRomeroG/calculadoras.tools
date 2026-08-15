@@ -1,0 +1,847 @@
+---
+import BaseLayout from "@layouts/BaseLayout.astro";
+import AdSlot from "@components/ads/AdSlot.astro";
+import Container from "@components/layout/Container.astro";
+import PageShell from "@components/layout/PageShell.astro";
+import FaqSection from "@components/shared/FaqSection.astro";
+import PageHero from "@components/shared/PageHero.astro";
+import SectionIntro from "@components/shared/SectionIntro.astro";
+import { buildAlternateLinks } from "@lib/i18n/routing";
+import { buildFaqJsonLd } from "@lib/seo";
+
+const title = "Break-even and target profit calculator";
+const description =
+  "Calculate how many units you need to sell to cover costs, evaluate expected sales and reach a target profit.";
+const canonical = "/en/finance/break-even-calculator";
+const spanishCanonical = "/finanzas/calculadora-de-punto-de-equilibrio";
+const alternates = buildAlternateLinks({ es: spanishCanonical, en: canonical }, Astro.site ?? Astro.url);
+const faqs = [
+  {
+    question: "What is the break-even point?",
+    answer:
+      "It is the sales level where revenue exactly covers entered fixed costs, variable costs and fees. Above it there is estimated profit; below it there is a loss.",
+  },
+  {
+    question: "Which fixed and variable costs should I include?",
+    answer:
+      "Fixed costs exist even without sales, such as rent or licenses. Variable costs rise with each sale, such as materials, packaging or directly related labor.",
+  },
+  {
+    question: "What is contribution margin?",
+    answer:
+      "It is what remains from each sale after variable cost and fees. This amount first covers fixed costs and then generates profit.",
+  },
+  {
+    question: "What is the margin of safety?",
+    answer:
+      "It measures how far expected sales can fall before break-even. It can be negative when the forecast does not yet cover costs.",
+  },
+  {
+    question: "Why are units rounded up?",
+    answer:
+      "Selling less than the exact calculation misses the target. The practical minimum is rounded to the selected sellable increment.",
+  },
+  {
+    question: "What if variable cost and fees exceed price?",
+    answer:
+      "There is no break-even point: every sale increases the loss. Raise the price, reduce variable costs or lower the fee.",
+  },
+  {
+    question: "How do I calculate break-even for several products?",
+    answer:
+      "This version analyzes one homogeneous unit. You can use a representative average price and variable cost, but a product mix requires weighting each product's contribution.",
+  },
+  {
+    question: "Should I enter amounts with or without tax?",
+    answer:
+      "Be consistent: enter all amounts either with tax or without tax. The calculator does not calculate taxes automatically.",
+  },
+];
+const faqJsonLd = buildFaqJsonLd(faqs);
+---
+
+<BaseLayout title={title} description={description} canonical={canonical} locale="en" alternates={alternates}>
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={JSON.stringify(faqJsonLd)} />
+  </Fragment>
+
+  <PageShell>
+    <PageHero
+      title="Break-even calculator"
+      description="See how much you need to sell to cover costs, evaluate your forecast and reach a target profit."
+      kicker="Finance"
+      collapseBreadcrumbOnMobile
+      containerClass="py-6 md:py-8"
+      breadcrumbs={[
+        { label: "Home", href: "/en", ariaLabel: "Home" },
+        { label: "Finance", href: "/en/finance", optional: true },
+        { label: "Break-even point", truncate: true },
+      ]}
+    />
+
+    <Container as="section" class="py-6 md:py-8">
+      <section
+        class="overflow-hidden rounded-lg border border-gray-700 bg-gray-950 shadow-xl shadow-gray-950/30"
+        aria-labelledby="calculator-heading"
+      >
+        <div class="grid lg:grid-cols-[minmax(0,1.08fr)_minmax(19rem,0.92fr)]">
+          <div class="p-4 sm:p-6">
+            <p class="text-sm font-semibold uppercase tracking-wide text-amber-400">
+              Sales needed to avoid a loss
+            </p>
+            <h2 id="calculator-heading" class="mt-2 text-2xl font-semibold">
+              Calculate your break-even point
+            </h2>
+            <p class="mt-2 text-sm leading-relaxed text-gray-400">
+              Use values from the same period. The calculator does not convert monthly, annual, or project amounts.
+            </p>
+
+            <form class="mt-6" novalidate data-break-even-form>
+              <div class="grid gap-4 sm:grid-cols-2">
+                <div>
+                  <label class="field-label" for="break-even-period">Period</label>
+                  <select id="break-even-period" class="field" data-period>
+                    <option value="monthly">Monthly</option>
+                    <option value="annual">Annual</option>
+                    <option value="project">Project</option>
+                  </select>
+                  <p class="field-help">Costs, targets, and sales must cover the same period.</p>
+                </div>
+
+                <div>
+                  <label class="field-label" for="break-even-unit">Unit name</label>
+                  <input
+                    id="break-even-unit"
+                    class="field"
+                    type="text"
+                    maxlength="30"
+                    value="units"
+                    autocomplete="off"
+                    data-unit-name
+                    aria-describedby="break-even-unit-help break-even-unit-error"
+                  />
+                  <p id="break-even-unit-help" class="field-help">Examples: products, customers, hours, or bookings.</p>
+                  <p id="break-even-unit-error" class="field-error" data-error-for="unitName"></p>
+                </div>
+
+                <div>
+                  <label class="field-label" for="break-even-price">Price per unit</label>
+                  <div class="field-shell">
+                    <span class="field-affix">$</span>
+                    <input
+                      id="break-even-price"
+                      class="field-input"
+                      type="text"
+                      inputmode="decimal"
+                      autocomplete="off"
+                      placeholder="250"
+                      data-field="price"
+                      aria-describedby="break-even-price-error"
+                    />
+                  </div>
+                  <p id="break-even-price-error" class="field-error" data-error-for="price"></p>
+                </div>
+
+                <div>
+                  <label class="field-label" for="break-even-variable-cost">Variable cost per unit</label>
+                  <div class="field-shell">
+                    <span class="field-affix">$</span>
+                    <input
+                      id="break-even-variable-cost"
+                      class="field-input"
+                      type="text"
+                      inputmode="decimal"
+                      autocomplete="off"
+                      placeholder="100"
+                      data-field="variableCost"
+                      aria-describedby="break-even-variable-help break-even-variable-error"
+                    />
+                  </div>
+                  <p id="break-even-variable-help" class="field-help">Costs that increase every time you make a sale.</p>
+                  <p id="break-even-variable-error" class="field-error" data-error-for="variableCost"></p>
+                </div>
+
+                <div class="sm:col-span-2">
+                  <label class="field-label" for="break-even-fixed-costs">Fixed costs for the period</label>
+                  <div class="field-shell">
+                    <span class="field-affix">$</span>
+                    <input
+                      id="break-even-fixed-costs"
+                      class="field-input"
+                      type="text"
+                      inputmode="decimal"
+                      autocomplete="off"
+                      placeholder="30000"
+                      data-field="fixedCosts"
+                      aria-describedby="break-even-fixed-help break-even-fixed-error"
+                    />
+                  </div>
+                  <p id="break-even-fixed-help" class="field-help">Costs you incur even if you make no sales during the period.</p>
+                  <p id="break-even-fixed-error" class="field-error" data-error-for="fixedCosts"></p>
+                </div>
+              </div>
+
+              <details class="mt-5 rounded-lg border border-gray-700 bg-gray-900/60 p-4" data-options>
+                <summary class="cursor-pointer font-semibold text-white">
+                  Targets and options
+                </summary>
+                <div class="mt-4 grid gap-4 sm:grid-cols-2">
+                  <div>
+                    <label class="field-label" for="break-even-expected">Expected units sold</label>
+                    <input
+                      id="break-even-expected"
+                      class="field"
+                      type="text"
+                      inputmode="decimal"
+                      autocomplete="off"
+                      placeholder="240"
+                      data-field="expectedUnits"
+                      aria-describedby="break-even-expected-help break-even-expected-error"
+                    />
+                    <p id="break-even-expected-help" class="field-help">Calculates estimated profit or loss and the remaining gap or surplus.</p>
+                    <p id="break-even-expected-error" class="field-error" data-error-for="expectedUnits"></p>
+                  </div>
+
+                  <div>
+                    <label class="field-label" for="break-even-target">Target profit</label>
+                    <div class="field-shell">
+                      <span class="field-affix">$</span>
+                      <input
+                        id="break-even-target"
+                        class="field-input"
+                        type="text"
+                        inputmode="decimal"
+                        autocomplete="off"
+                        placeholder="15000"
+                        data-field="targetProfit"
+                        aria-describedby="break-even-target-error"
+                      />
+                    </div>
+                    <p id="break-even-target-error" class="field-error" data-error-for="targetProfit"></p>
+                  </div>
+
+                  <div>
+                    <label class="field-label" for="break-even-commission">Percentage fee</label>
+                    <div class="field-shell">
+                      <input
+                        id="break-even-commission"
+                        class="field-input"
+                        type="text"
+                        inputmode="decimal"
+                        value="0"
+                        data-field="commissionRate"
+                        aria-describedby="break-even-commission-help break-even-commission-error"
+                      />
+                      <span class="field-affix">%</span>
+                    </div>
+                    <p id="break-even-commission-help" class="field-help">Applied to each sale's final price.</p>
+                    <p id="break-even-commission-error" class="field-error" data-error-for="commissionRate"></p>
+                  </div>
+
+                  <div>
+                    <label class="field-label" for="break-even-increment">Minimum sellable increment</label>
+                    <select id="break-even-increment" class="field" data-increment>
+                      <option value="1">1 unit</option>
+                      <option value="0.5">0.5 units</option>
+                      <option value="0.25">0.25 units</option>
+                    </select>
+                    <p class="field-help">The practical result is always rounded up.</p>
+                  </div>
+                </div>
+              </details>
+
+              <div class="mt-6 flex flex-col gap-3 border-t border-gray-800 pt-5 sm:flex-row sm:flex-wrap">
+                <button class="primary-button w-full sm:w-auto sm:min-w-48" type="submit">
+                  Calculate break-even
+                </button>
+                <button class="secondary-button" type="button" data-example>Use example</button>
+                <button class="secondary-button" type="button" data-clear>Clear</button>
+                <button class="secondary-button hidden" type="button" data-copy>
+                  <span data-copy-label>Copy summary</span>
+                </button>
+                <p class="sr-only" role="status" aria-live="polite" data-copy-status></p>
+              </div>
+            </form>
+          </div>
+
+          <aside
+            class="border-t border-gray-800 bg-gray-900/70 p-4 sm:p-6 lg:border-l lg:border-t-0"
+            aria-live="polite"
+            data-result-region
+          >
+            <p class="text-sm font-semibold uppercase tracking-wide text-amber-400" data-result-kicker>
+              Result
+            </p>
+            <p class="mt-3 break-words text-4xl font-bold leading-tight text-white" data-main-result>
+              Enter the values
+            </p>
+            <p class="mt-3 text-sm leading-relaxed text-gray-300" data-interpretation>
+              You will see how much you need to sell to cover costs.
+            </p>
+
+            <div class="mt-5 grid grid-cols-2 gap-3" data-summary-grid>
+              <div class="col-span-2 rounded-lg border border-gray-800 bg-gray-950/70 p-4 text-sm text-gray-400">
+                Enter price, variable cost and fixed costs to begin.
+              </div>
+            </div>
+
+            <div class="mt-4 hidden rounded-lg border p-4" data-expected-card>
+              <p class="text-xs font-semibold uppercase tracking-wide" data-expected-kicker></p>
+              <p class="mt-2 text-sm leading-relaxed" data-expected-text></p>
+              <div class="mt-4 grid grid-cols-2 gap-3" data-expected-grid></div>
+            </div>
+
+            <div class="mt-4 hidden rounded-lg border border-sky-400/40 bg-sky-400/10 p-4" data-target-card>
+              <p class="text-xs font-semibold uppercase tracking-wide text-sky-300">Target profit</p>
+              <p class="mt-2 text-sm leading-relaxed text-sky-100" data-target-text></p>
+            </div>
+
+            <details class="mt-4 hidden rounded-lg border border-gray-800 p-4" data-calculation-details>
+              <summary class="cursor-pointer text-sm font-semibold text-white">How it was calculated</summary>
+              <div class="mt-3 space-y-2 text-sm leading-relaxed text-gray-400" data-calculation-lines></div>
+            </details>
+
+            <p class="mt-4 text-xs leading-relaxed text-gray-500">
+              Estimate based on entered data. It excludes demand changes, discounts, taxes and cost variations.
+            </p>
+          </aside>
+        </div>
+      </section>
+    </Container>
+
+    <AdSlot placement="calculator-after-tool" />
+
+    <Container as="section" class="hidden py-6 md:py-8" data-scenarios-section>
+      <SectionIntro
+        title="Volume scenarios"
+        description="Compare revenue, costs, and profit around the break-even point."
+        class="mb-5"
+      />
+
+      <div class="grid gap-4 md:hidden" data-scenarios-cards></div>
+
+      <div class="hidden overflow-x-auto rounded-lg border border-gray-700 md:block">
+        <table class="min-w-full divide-y divide-gray-800 text-left text-sm">
+          <thead class="bg-gray-900 text-xs uppercase tracking-wide text-gray-400">
+            <tr>
+              <th class="px-4 py-3 font-semibold">Scenario</th>
+              <th class="px-4 py-3 font-semibold">Units</th>
+              <th class="px-4 py-3 font-semibold">Revenue</th>
+              <th class="px-4 py-3 font-semibold">Variable costs</th>
+              <th class="px-4 py-3 font-semibold">Fee</th>
+              <th class="px-4 py-3 font-semibold">Total costs</th>
+              <th class="px-4 py-3 font-semibold">Profit or loss</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-gray-800 bg-gray-950" data-scenarios-table></tbody>
+        </table>
+      </div>
+    </Container>
+
+    <Container as="section" class="py-8">
+      <SectionIntro
+        title="How to interpret the result"
+        description="Break-even is a threshold. These metrics explain what moves it and how far away you are."
+        class="mb-5"
+      />
+      <div class="grid gap-4 md:grid-cols-3">
+        <article class="info-card">
+          <h2 class="font-semibold text-white">Contribution margin</h2>
+          <p class="mt-2 text-sm leading-relaxed text-gray-400">
+            What remains after variable cost and fees. It first covers fixed costs, then generates profit.
+          </p>
+        </article>
+        <article class="info-card">
+          <h2 class="font-semibold text-white">Practical minimum</h2>
+          <p class="mt-2 text-sm leading-relaxed text-gray-400">
+            The exact calculation may have decimals. The practical minimum is rounded up to avoid falling below break-even.
+          </p>
+        </article>
+        <article class="info-card">
+          <h2 class="font-semibold text-white">Margin of safety</h2>
+          <p class="mt-2 text-sm leading-relaxed text-gray-400">
+            Compares expected sales with break-even and shows how far they could fall before a loss.
+          </p>
+        </article>
+      </div>
+    </Container>
+
+    <Container as="section" class="py-8">
+      <div class="grid gap-5 md:grid-cols-2">
+        <article class="rounded-lg border border-gray-700 bg-gray-950 p-5 sm:p-6">
+          <h2 class="text-xl font-semibold">Which costs to include</h2>
+          <p class="mt-3 text-sm leading-relaxed text-gray-400">
+            Separate per-sale costs from costs that exist throughout the period. Enter each cost once and use the same tax treatment for every amount.
+          </p>
+        </article>
+        <article class="rounded-lg border border-gray-700 bg-gray-950 p-5 sm:p-6">
+          <h2 class="text-xl font-semibold">When no break-even point exists</h2>
+          <p class="mt-3 text-sm leading-relaxed text-gray-400">
+            If price does not cover variable cost and fees, selling more increases the loss. Improve contribution per sale first.
+          </p>
+        </article>
+      </div>
+      <p class="mt-5 text-sm leading-relaxed text-gray-400">
+        To review the profitability of an individual sale, use the
+        <a class="font-semibold text-amber-400 underline underline-offset-4" href="/en/finance/margin-markup-calculator">margin and markup calculator</a>.
+        To evaluate a project's total return, see the
+        <a class="font-semibold text-amber-400 underline underline-offset-4" href="/en/finance/roi-calculator">ROI calculator</a>.
+      </p>
+    </Container>
+
+    <FaqSection faqs={faqs} />
+  </PageShell>
+</BaseLayout>
+
+<style is:global>
+  .field-label { display: block; font-size: .875rem; font-weight: 500; color: rgb(229 231 235); }
+  .field, .field-shell { margin-top: .5rem; min-height: 3rem; width: 100%; border-radius: .5rem; border: 1px solid rgb(55 65 81); background: rgb(17 24 39); color: white; outline: none; }
+  .field { padding: 0 1rem; }
+  .field-shell { display: flex; align-items: center; }
+  .field-input { min-height: 2.875rem; min-width: 0; width: 100%; background: transparent; padding: 0 .25rem; color: white; outline: none; }
+  .field-affix { flex: none; padding: 0 .75rem; color: rgb(107 114 128); }
+  .field:focus, .field-shell:focus-within { border-color: rgb(251 191 36); box-shadow: 0 0 0 3px rgb(251 191 36 / .15); }
+  .field-help { margin-top: .4rem; font-size: .75rem; line-height: 1.4; color: rgb(107 114 128); }
+  .field-error { display: none; margin-top: .4rem; font-size: .8rem; color: rgb(252 165 165); }
+  .field-error:not(:empty) { display: block; }
+  .primary-button { display: inline-flex; min-height: 2.75rem; align-items: center; justify-content: center; border-radius: .5rem; background: rgb(251 191 36); padding: .5rem 1rem; font-size: .875rem; font-weight: 700; color: rgb(3 7 18); }
+  .secondary-button { display: inline-flex; min-height: 2.75rem; align-items: center; justify-content: center; border-radius: .5rem; border: 1px solid rgb(55 65 81); padding: .5rem 1rem; font-size: .875rem; font-weight: 600; color: rgb(229 231 235); }
+  .info-card { border-radius: .5rem; border: 1px solid rgb(55 65 81); background: rgb(3 7 18); padding: 1.25rem; }
+</style>
+
+<script>
+  import {
+    calculateBreakEven,
+    formatCurrency,
+    formatPercent,
+    formatQuantity,
+    parseMoneyInput,
+    parsePercentInput,
+    parseQuantityInput,
+  } from "@lib/calculators/finanzas/calculadora-de-punto-de-equilibrio/breakEven.en";
+
+  const form = document.querySelector("[data-break-even-form]");
+  const periodSelect = document.querySelector("[data-period]");
+  const incrementSelect = document.querySelector("[data-increment]");
+  const unitNameInput = document.querySelector("[data-unit-name]");
+  const resultKicker = document.querySelector("[data-result-kicker]");
+  const mainResult = document.querySelector("[data-main-result]");
+  const interpretation = document.querySelector("[data-interpretation]");
+  const summaryGrid = document.querySelector("[data-summary-grid]");
+  const expectedCard = document.querySelector("[data-expected-card]");
+  const expectedKicker = document.querySelector("[data-expected-kicker]");
+  const expectedText = document.querySelector("[data-expected-text]");
+  const expectedGrid = document.querySelector("[data-expected-grid]");
+  const targetCard = document.querySelector("[data-target-card]");
+  const targetText = document.querySelector("[data-target-text]");
+  const calculationDetails = document.querySelector("[data-calculation-details]");
+  const calculationLines = document.querySelector("[data-calculation-lines]");
+  const scenariosSection = document.querySelector("[data-scenarios-section]");
+  const scenariosCards = document.querySelector("[data-scenarios-cards]");
+  const scenariosTable = document.querySelector("[data-scenarios-table]");
+  const copyButton = document.querySelector("[data-copy]");
+  const copyLabel = document.querySelector("[data-copy-label]");
+  const copyStatus = document.querySelector("[data-copy-status]");
+  const fields = Object.fromEntries(
+    [...document.querySelectorAll("[data-field]")].map((input) => [input.dataset.field, input]),
+  );
+
+  let copyText = "";
+
+  const ERROR_MESSAGES = {
+    required: "Complete this field to calculate.",
+    invalid: "Enter a valid number.",
+    negative: "The value cannot be negative.",
+    too_many_decimals: "Use fewer decimal places.",
+    price_zero: "Price must be greater than zero.",
+    commission_limit: "The fee must be below 100%.",
+    unit_name: "Enter a name from 1 to 30 characters.",
+  };
+
+  const PERIODS = {
+    monthly: { result: "for the month", copy: "monthly" },
+    annual: { result: "for the year", copy: "annual" },
+    project: { result: "for the project", copy: "for the project" },
+  };
+
+  function calculate() {
+    clearErrors();
+    const errors = {};
+    const unitName = unitNameInput.value.trim();
+
+    if (!unitName || unitName.length > 30) errors.unitName = "unit_name";
+
+    const price = parseRequired("price", parseMoneyInput, errors);
+    const variableCost = parseRequired("variableCost", parseMoneyInput, errors);
+    const fixedCosts = parseRequired("fixedCosts", parseMoneyInput, errors);
+    const commissionRate = parseOptional("commissionRate", parsePercentInput, errors, 0);
+    const expectedUnits = parseOptional("expectedUnits", parseQuantityInput, errors);
+    const targetProfit = parseOptional("targetProfit", parseMoneyInput, errors);
+
+    if (price !== undefined && price <= 0) errors.price = "price_zero";
+    if (commissionRate !== undefined && commissionRate >= 100) errors.commissionRate = "commission_limit";
+
+    showErrors(errors);
+    if (hasErrors(errors)) {
+      setInvalidState(errors);
+      return;
+    }
+
+    const input = {
+      price,
+      variableCost,
+      fixedCosts,
+      commissionRate,
+      increment: Number(incrementSelect.value),
+      expectedUnits,
+      targetProfit,
+    };
+    const result = calculateBreakEven(input);
+
+    if (!result.feasible) {
+      renderInfeasible(input, result, unitName);
+      return;
+    }
+
+    renderFeasible(input, result, unitName);
+  }
+
+  function parseRequired(field, parser, errors) {
+    const parsed = parser(fields[field].value);
+    if (!parsed.ok) {
+      errors[field] = parsed.error;
+      return undefined;
+    }
+    return parsed.value;
+  }
+
+  function parseOptional(field, parser, errors, fallback = undefined) {
+    if (!fields[field].value.trim()) return fallback;
+    return parseRequired(field, parser, errors);
+  }
+
+  function renderFeasible(input, result, unitName) {
+    const period = PERIODS[periodSelect.value];
+    resultKicker.textContent = "Practical minimum";
+    mainResult.textContent = formatUnitCount(result.practicalBreakEvenUnits, unitName);
+    interpretation.textContent = `You need to sell at least ${formatUnitCount(result.practicalBreakEvenUnits, unitName)}, equivalent to ${formatCurrency(result.practicalBreakEvenSales)}, to cover your costs ${period.result}.`;
+    const summaryItems = [
+      ["Minimum sales", formatCurrency(result.practicalBreakEvenSales)],
+      ["Contribution per unit", formatCurrency(result.contributionPerUnit)],
+      ["Contribution as share of price", formatPercent(result.contributionPercent)],
+      ["Exact break-even", formatUnitCount(result.exactBreakEvenUnits, unitName)],
+      ["Exact break-even sales", formatCurrency(result.exactBreakEvenSales)],
+      ["Variable costs at minimum", formatCurrency(result.practicalAnalysis.variableCosts)],
+      ["Profit at practical minimum", formatSignedCurrency(result.practicalAnalysis.profit)],
+    ];
+    if (input.commissionRate > 0) {
+      summaryItems.push(["Fee at minimum", formatCurrency(result.practicalAnalysis.commission)]);
+    }
+    summaryGrid.innerHTML = summaryItems.map(([label, value]) => summary(label, value)).join("");
+
+    renderExpected(result, unitName);
+    renderTarget(result, unitName);
+    renderCalculation(input, result, unitName);
+    renderScenarios(result, unitName);
+    copyText = buildCopyText(input, result, unitName);
+    copyButton.classList.remove("hidden");
+  }
+
+  function renderInfeasible(input, result, unitName) {
+    resultKicker.textContent = "No break-even point exists";
+    mainResult.textContent = result.contributionPerUnit < 0 ? "Every sale increases the loss" : "Each sale contributes nothing";
+    interpretation.textContent = result.contributionPerUnit < 0
+      ? `Each ${unitName} increases the loss by ${formatCurrency(result.lossPerAdditionalUnit)}. Raise the price, reduce variable cost or lower the fee before seeking more sales.`
+      : `Each ${unitName} covers variable costs and fees but contributes nothing to fixed costs. Increase the price, reduce costs, or lower the fee.`;
+    summaryGrid.innerHTML = [
+      ["Contribution per unit", formatSignedCurrency(result.contributionPerUnit)],
+      ["Contribution as share of price", formatPercent(result.contributionPercent)],
+      ["Fee per unit", formatCurrency(result.commissionPerUnit)],
+      ["Variable cost per unit", formatCurrency(input.variableCost)],
+    ].map(([label, value]) => summary(label, value)).join("");
+    expectedCard.classList.add("hidden");
+    targetCard.classList.add("hidden");
+    scenariosSection.classList.add("hidden");
+    renderInfeasibleCalculation(input, result);
+    copyText = buildInfeasibleCopyText(input, result, unitName);
+    copyButton.classList.remove("hidden");
+  }
+
+  function renderExpected(result, unitName) {
+    if (!result.expected) {
+      expectedCard.classList.add("hidden");
+      return;
+    }
+
+    const expected = result.expected;
+    expectedCard.className = "mt-4 rounded-lg border p-4";
+
+    if (expected.status === "below") {
+      expectedCard.classList.add("border-red-400/40", "bg-red-400/10");
+      expectedKicker.className = "text-xs font-semibold uppercase tracking-wide text-red-300";
+      expectedText.className = "mt-2 text-sm leading-relaxed text-red-100";
+      expectedKicker.textContent = "Below break-even";
+      expectedText.textContent = `At your expected volume, you would lose ${formatCurrency(Math.abs(expected.profit))}. You are short ${formatUnitCount(Math.abs(expected.differenceFromExactUnits), unitName)} to reach exact break-even.`;
+    } else if (expected.status === "above") {
+      expectedCard.classList.add("border-emerald-400/40", "bg-emerald-400/10");
+      expectedKicker.className = "text-xs font-semibold uppercase tracking-wide text-emerald-300";
+      expectedText.className = "mt-2 text-sm leading-relaxed text-emerald-100";
+      expectedKicker.textContent = "Above break-even";
+      expectedText.textContent = `At your expected volume, you would earn approximately ${formatCurrency(expected.profit)} and exceed exact break-even by ${formatUnitCount(expected.differenceFromExactUnits, unitName)}.`;
+    } else {
+      expectedCard.classList.add("border-sky-400/40", "bg-sky-400/10");
+      expectedKicker.className = "text-xs font-semibold uppercase tracking-wide text-sky-300";
+      expectedText.className = "mt-2 text-sm leading-relaxed text-sky-100";
+      expectedKicker.textContent = "At break-even";
+      expectedText.textContent = "Expected sales are at break-even.";
+    }
+
+    expectedGrid.innerHTML = [
+      ["Expected sales", formatCurrency(expected.revenue)],
+      [expected.profit >= 0 ? "Estimated profit" : "Estimated loss", formatCurrency(Math.abs(expected.profit))],
+      ["Total costs", formatCurrency(expected.totalCosts)],
+      ["Margin of safety", expected.safetyMarginPercent === null ? "Not available" : formatPercent(expected.safetyMarginPercent)],
+      ["Difference in units", formatSignedQuantity(expected.differenceFromPracticalUnits, unitName)],
+      ["Difference in sales", formatSignedCurrency(expected.differenceFromExactSales)],
+    ].map(([label, value]) => compactSummary(label, value)).join("");
+    expectedCard.classList.remove("hidden");
+  }
+
+  function renderTarget(result, unitName) {
+    if (!result.target) {
+      targetCard.classList.add("hidden");
+      return;
+    }
+
+    targetText.textContent = `The exact calculation is ${formatUnitCount(result.target.exactUnits, unitName)}. To reach a target profit of ${formatCurrency(result.target.targetProfit)}, you need to sell at least ${formatUnitCount(result.target.practicalUnits, unitName)}, equivalent to ${formatCurrency(result.target.practicalSales)}. Estimated profit after rounding is ${formatCurrency(result.target.actualProfit)}.`;
+    targetCard.classList.remove("hidden");
+  }
+
+  function renderCalculation(input, result, unitName) {
+    const lines = [
+      `Fee per unit = ${formatCurrency(input.price)} × ${formatPercent(input.commissionRate)} = ${formatCurrency(result.commissionPerUnit)}`,
+      `Contribution per unit = ${formatCurrency(input.price)} − ${formatCurrency(input.variableCost)} − ${formatCurrency(result.commissionPerUnit)} = ${formatCurrency(result.contributionPerUnit)}`,
+      `Exact break-even = ${formatCurrency(input.fixedCosts)} ÷ ${formatCurrency(result.contributionPerUnit)} = ${formatUnitCount(result.exactBreakEvenUnits, unitName)}`,
+      `Practical minimum = ${formatUnitCount(result.practicalBreakEvenUnits, unitName)} × ${formatCurrency(input.price)} = ${formatCurrency(result.practicalBreakEvenSales)}`,
+    ];
+    calculationLines.innerHTML = lines.map((line) => `<p>${escapeHtml(line)}</p>`).join("");
+    calculationDetails.classList.remove("hidden");
+  }
+
+  function renderInfeasibleCalculation(input, result) {
+    const lines = [
+      `Fee per unit = ${formatCurrency(input.price)} × ${formatPercent(input.commissionRate)} = ${formatCurrency(result.commissionPerUnit)}`,
+      `Contribution per unit = ${formatCurrency(input.price)} − ${formatCurrency(input.variableCost)} − ${formatCurrency(result.commissionPerUnit)} = ${formatSignedCurrency(result.contributionPerUnit)}`,
+    ];
+    calculationLines.innerHTML = lines.map((line) => `<p>${escapeHtml(line)}</p>`).join("");
+    calculationDetails.classList.remove("hidden");
+  }
+
+  function renderScenarios(result, unitName) {
+    const rows = result.scenarios.map((scenario) => ({
+      label: `${scenario.percentage}% of break-even`,
+      ...scenario,
+    }));
+
+    if (result.expected && !rows.some((row) => nearlyEqual(row.units, result.expected.units))) {
+      rows.push({ label: "Your estimate", ...result.expected });
+    }
+
+    if (!rows.length) {
+      scenariosSection.classList.add("hidden");
+      return;
+    }
+
+    scenariosCards.innerHTML = rows.map((row) => `
+      <article class="rounded-lg border border-gray-700 bg-gray-950 p-4">
+        <p class="text-xs font-semibold uppercase tracking-wide text-amber-400">${escapeHtml(row.label)}</p>
+        <p class="mt-2 text-2xl font-bold text-white">${escapeHtml(formatUnitCount(row.units, unitName))}</p>
+        <div class="mt-4 grid grid-cols-2 gap-3 text-sm">
+          ${compactSummary("Revenue", formatCurrency(row.revenue))}
+          ${compactSummary("Variable costs", formatCurrency(row.variableCosts))}
+          ${compactSummary("Fee", formatCurrency(row.commission))}
+          ${compactSummary("Total costs", formatCurrency(row.totalCosts))}
+          <div class="col-span-2">${compactSummary(row.profit >= 0 ? "Profit" : "Loss", formatCurrency(Math.abs(row.profit)))}</div>
+        </div>
+      </article>`).join("");
+
+    scenariosTable.innerHTML = rows.map((row) => `
+      <tr>
+        <td class="whitespace-nowrap px-4 py-3 font-semibold text-gray-200">${escapeHtml(row.label)}</td>
+        <td class="whitespace-nowrap px-4 py-3 text-gray-300">${escapeHtml(formatQuantity(row.units))}</td>
+        <td class="whitespace-nowrap px-4 py-3 text-gray-300">${escapeHtml(formatCurrency(row.revenue))}</td>
+        <td class="whitespace-nowrap px-4 py-3 text-gray-300">${escapeHtml(formatCurrency(row.variableCosts))}</td>
+        <td class="whitespace-nowrap px-4 py-3 text-gray-300">${escapeHtml(formatCurrency(row.commission))}</td>
+        <td class="whitespace-nowrap px-4 py-3 text-gray-300">${escapeHtml(formatCurrency(row.totalCosts))}</td>
+        <td class="whitespace-nowrap px-4 py-3 font-semibold ${row.profit >= 0 ? "text-emerald-300" : "text-red-300"}">${escapeHtml(formatSignedCurrency(row.profit))}</td>
+      </tr>`).join("");
+    scenariosSection.classList.remove("hidden");
+  }
+
+  function buildCopyText(input, result, unitName) {
+    const period = PERIODS[periodSelect.value];
+    const lines = [
+      `Break-even point ${period.copy}`,
+      `Price per ${unitName}: ${formatCurrency(input.price)}`,
+      `Variable cost per ${unitName}: ${formatCurrency(input.variableCost)}`,
+      `Fee: ${formatPercent(input.commissionRate)} (${formatCurrency(result.commissionPerUnit)} per ${unitName})`,
+      `Fixed costs: ${formatCurrency(input.fixedCosts)}`,
+      `Contribution margin: ${formatCurrency(result.contributionPerUnit)} (${formatPercent(result.contributionPercent)})`,
+      `Exact break-even point: ${formatUnitCount(result.exactBreakEvenUnits, unitName)}`,
+      `Practical minimum: ${formatUnitCount(result.practicalBreakEvenUnits, unitName)} (${formatCurrency(result.practicalBreakEvenSales)})`,
+    ];
+
+    if (result.expected) {
+      lines.push(
+        `Expected sales: ${formatUnitCount(result.expected.units, unitName)}`,
+        `Estimated ${result.expected.profit >= 0 ? "profit" : "loss"}: ${formatCurrency(Math.abs(result.expected.profit))}`,
+        `Margin of safety: ${result.expected.safetyMarginPercent === null ? "Not available" : formatPercent(result.expected.safetyMarginPercent)}`,
+      );
+    }
+    if (result.target) {
+      lines.push(
+        `Target profit: ${formatCurrency(result.target.targetProfit)}`,
+        `Minimum for target: ${formatUnitCount(result.target.practicalUnits, unitName)} (${formatCurrency(result.target.practicalSales)})`,
+      );
+    }
+    lines.push("", "Estimate based on entered data.");
+    return lines.join("\n");
+  }
+
+  function buildInfeasibleCopyText(input, result, unitName) {
+    return [
+      "Break-even: infeasible setup",
+      `Price per ${unitName}: ${formatCurrency(input.price)}`,
+      `Variable cost per ${unitName}: ${formatCurrency(input.variableCost)}`,
+      `Fee: ${formatPercent(input.commissionRate)} (${formatCurrency(result.commissionPerUnit)} per ${unitName})`,
+      `Contribution per ${unitName}: ${formatSignedCurrency(result.contributionPerUnit)}`,
+      "",
+      "Every sale must generate positive contribution to reach break-even.",
+    ].join("\n");
+  }
+
+  function fillExample() {
+    periodSelect.value = "monthly";
+    unitNameInput.value = "units";
+    fields.price.value = "250";
+    fields.variableCost.value = "100";
+    fields.fixedCosts.value = "30000";
+    fields.expectedUnits.value = "240";
+    fields.targetProfit.value = "15000";
+    fields.commissionRate.value = "0";
+    incrementSelect.value = "1";
+    document.querySelector("[data-options]").open = true;
+    calculate();
+  }
+
+  function clearAll() {
+    const hasMeaningfulData = [fields.price, fields.variableCost, fields.fixedCosts, fields.expectedUnits, fields.targetProfit]
+      .some((input) => input.value.trim());
+    if (hasMeaningfulData && !window.confirm("Clear the entered data?")) return;
+
+    periodSelect.value = "monthly";
+    unitNameInput.value = "units";
+    Object.values(fields).forEach((input) => { input.value = ""; });
+    fields.commissionRate.value = "0";
+    incrementSelect.value = "1";
+    document.querySelector("[data-options]").open = false;
+    clearErrors();
+    setInitialState();
+  }
+
+  function clearErrors() {
+    document.querySelectorAll("[data-error-for]").forEach((element) => { element.textContent = ""; });
+  }
+
+  function showErrors(errors) {
+    Object.entries(errors).forEach(([field, error]) => {
+      const element = document.querySelector(`[data-error-for="${field}"]`);
+      if (element) element.textContent = ERROR_MESSAGES[error] ?? ERROR_MESSAGES.invalid;
+    });
+  }
+
+  function setInvalidState(errors) {
+    resultKicker.textContent = "Check the fields";
+    mainResult.textContent = "Cannot calculate";
+    interpretation.textContent = "Correct the highlighted values to continue.";
+    summaryGrid.innerHTML = "";
+    expectedCard.classList.add("hidden");
+    targetCard.classList.add("hidden");
+    calculationDetails.classList.add("hidden");
+    scenariosSection.classList.add("hidden");
+    copyButton.classList.add("hidden");
+    copyText = "";
+    const firstError = Object.keys(errors)[0];
+    if (firstError === "unitName") unitNameInput.focus();
+    else if (firstError && fields[firstError]) fields[firstError].focus();
+  }
+
+  function setInitialState() {
+    resultKicker.textContent = "Result";
+    mainResult.textContent = "Enter the values";
+    interpretation.textContent = "You will see how much you need to sell to cover costs.";
+    summaryGrid.innerHTML = `<div class="col-span-2 rounded-lg border border-gray-800 bg-gray-950/70 p-4 text-sm text-gray-400">Enter price, variable cost and fixed costs to begin.</div>`;
+    expectedCard.classList.add("hidden");
+    targetCard.classList.add("hidden");
+    calculationDetails.classList.add("hidden");
+    scenariosSection.classList.add("hidden");
+    copyButton.classList.add("hidden");
+    copyText = "";
+  }
+
+  async function copyResult() {
+    if (!copyText) return;
+    try {
+      await navigator.clipboard.writeText(copyText);
+      copyLabel.textContent = "Copied";
+      copyStatus.textContent = "Summary copied.";
+      window.setTimeout(() => {
+        copyLabel.textContent = "Copy summary";
+        copyStatus.textContent = "";
+      }, 2000);
+    } catch {
+      copyStatus.textContent = "Could not copy the summary.";
+    }
+  }
+
+  function summary(label, value) {
+    return `<div class="rounded-lg border border-gray-800 bg-gray-950/70 p-3"><span class="block text-xs font-semibold uppercase tracking-wide text-gray-500">${escapeHtml(label)}</span><span class="mt-2 block break-words text-base font-semibold text-white">${escapeHtml(value)}</span></div>`;
+  }
+
+  function compactSummary(label, value) {
+    return `<div class="rounded-lg bg-gray-950/50 p-3"><span class="block text-xs uppercase tracking-wide text-gray-400">${escapeHtml(label)}</span><span class="mt-1 block break-words font-semibold text-white">${escapeHtml(value)}</span></div>`;
+  }
+
+  function formatUnitCount(value, unitName) {
+    return `${formatQuantity(value)} ${unitName}`;
+  }
+
+  function formatSignedCurrency(value) {
+    return value < 0 ? `−${formatCurrency(Math.abs(value))}` : formatCurrency(value);
+  }
+
+  function formatSignedQuantity(value, unitName) {
+    if (Math.abs(value) < 1e-8) return formatUnitCount(0, unitName);
+    return `${value < 0 ? "−" : "+"}${formatUnitCount(Math.abs(value), unitName)}`;
+  }
+
+  function nearlyEqual(left, right) {
+    return Math.abs(left - right) < 1e-8;
+  }
+
+  function hasErrors(errors) {
+    return Object.keys(errors).length > 0;
+  }
+
+  function escapeHtml(value) {
+    return String(value).replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;").replaceAll("'", "&#039;");
+  }
+
+  form.addEventListener("submit", (event) => {
+    event.preventDefault();
+    calculate();
+  });
+  document.querySelector("[data-example]").addEventListener("click", fillExample);
+  document.querySelector("[data-clear]").addEventListener("click", clearAll);
+  copyButton.addEventListener("click", copyResult);
+</script>

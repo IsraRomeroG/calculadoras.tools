@@ -1,0 +1,1013 @@
+---
+import AdSlot from "@components/ads/AdSlot.astro";
+import Container from "@components/layout/Container.astro";
+import PageShell from "@components/layout/PageShell.astro";
+import FaqSection from "@components/shared/FaqSection.astro";
+import PageHero from "@components/shared/PageHero.astro";
+import SectionIntro from "@components/shared/SectionIntro.astro";
+import BaseLayout from "@layouts/BaseLayout.astro";
+import {
+  TERMINATION_CANONICAL_PATH,
+  TERMINATION_ENGLISH_CANONICAL_PATH,
+} from "@lib/calculators/legal-impuestos/calculadora-finiquito-liquidacion/terminationPay";
+import { MEXICO_TERMINATION_RULE_2026 } from "@lib/calculators/legal-impuestos/calculadora-finiquito-liquidacion/rules/mx/2026";
+import type { Locale } from "@lib/i18n/config";
+import { buildAlternateLinks } from "@lib/i18n/routing";
+import { buildFaqJsonLd } from "@lib/seo";
+
+interface Props {
+  locale?: Locale;
+}
+
+const { locale = "es" } = Astro.props;
+const isEnglish = locale === "en";
+const canonical = isEnglish
+  ? TERMINATION_ENGLISH_CANONICAL_PATH
+  : TERMINATION_CANONICAL_PATH;
+const alternates = buildAlternateLinks(
+  {
+    es: TERMINATION_CANONICAL_PATH,
+    en: TERMINATION_ENGLISH_CANONICAL_PATH,
+  },
+  Astro.site ?? Astro.url,
+);
+
+const copy = isEnglish
+  ? {
+      title: "Termination pay calculator for Mexico",
+      metaTitle: "Mexico termination pay calculator",
+      description:
+        "Estimate gross final pay, proportional benefits and conditional severance scenarios under Mexico's Federal Labor Law.",
+      hero:
+        "Separate earned final pay from conditional severance and compare it with an offer.",
+      category: "Legal & Taxes",
+      categoryHref: "/en/legal-tax",
+      breadcrumb: "Termination pay",
+      step: "Step 1 · Your situation",
+      formTitle: "Estimate your final pay",
+      formDescription:
+        "This local estimate is for continuous private-sector employment in Mexico with fixed salary.",
+      scope:
+        "I confirm this is a general private-sector employment relationship under Mexico's Federal Labor Law.",
+      scopeHelp:
+        "Public employment, special regimes, seasonal or discontinuous work, and predominantly variable pay require a different review.",
+      situation: "What happened?",
+      situations: {
+        resignation: "I resigned voluntarily",
+        dismissal: "I was dismissed",
+        workerCause: "I left because of an employer cause",
+        contractEnd: "My contract or project ended",
+        agreement: "We reached an agreement",
+        other: "Another situation",
+      },
+      situationHelp: "Your selection does not determine legal eligibility by itself.",
+      hireDate: "Employment start date",
+      endDate: "Last day of the employment relationship",
+      inclusive: "The selected final day is included.",
+      contract: "Contract type",
+      indefinite: "Indefinite",
+      fixedUnderYear: "Fixed term under one year",
+      fixedYearOrMore: "Fixed term of one year or more",
+      unknown: "I don't know",
+      salary: "Base salary",
+      frequency: "Pay frequency",
+      daily: "Daily",
+      weekly: "Weekly",
+      biweekly: "Biweekly",
+      monthly: "Monthly",
+      unpaidDays: "Unpaid salary days",
+      unpaidHelp: "These are salary days owed, not necessarily calendar days. You can enter a known amount below.",
+      unpaidAmount: "Known gross amount for unpaid salary (optional)",
+      benefits: "Benefits and contract values",
+      annualBonusDays: "Annual bonus days",
+      ineligibleDays: "Ineligible bonus days",
+      priorVacation: "Vacation balance before the latest anniversary",
+      usedVacation: "Vacation days taken or already paid",
+      vacationPremium: "Vacation premium (%)",
+      vacationCurrent: "Current service-year vacation days (optional)",
+      vacationLast: "Last completed service-year vacation days (optional)",
+      benefitsHelp: "Legal minimums are prefilled. Contractual values may be higher, never lower.",
+      additional: "Additional concepts",
+      addConcept: "Add concept",
+      conceptName: "Concept name",
+      conceptAmount: "Gross amount",
+      received: "Payments already received",
+      addPayment: "Add payment",
+      paymentConcept: "Concept or note (optional)",
+      paymentAmount: "Amount received",
+      offer: "Offer received (optional)",
+      offerHelp: "A comparison is informational and does not determine a debt.",
+      scenario: "Explore a possible severance scenario",
+      scenarioHelp: "These amounts are conditional. The selected situation alone never activates them.",
+      integratedMode: "I know my integrated daily salary",
+      integratedSalary: "Integrated daily salary",
+      otherIntegrated: "Other recurring integrated benefits per day",
+      seniority: "Include a conditional seniority premium",
+      plantWorker: "I was a permanent/plant worker",
+      area: "Minimum-wage area",
+      generalArea: "General zone",
+      borderArea: "Northern Border Free Zone",
+      constitutional: "Include a conditional three-month indemnity",
+      twentyDays: "Include a conditional 20-days-per-year scenario",
+      calculate: "Calculate final pay",
+      clear: "Clear",
+      result: "Result",
+      neutral: "Enter your dates and salary to begin.",
+      finiquito: "Estimated gross final pay",
+      pending: "Estimated pending final pay",
+      conditional: "Conditional severance scenario",
+      scenarioTotal: "Conditional scenario total",
+      gross: "Gross final-pay subtotal",
+      payments: "Payments already received",
+      excess: "Payments above this estimate",
+      bonus: "Proportional annual bonus",
+      vacations: "Vacation pay",
+      premium: "Vacation premium",
+      unpaid: "Unpaid salary",
+      additionalAmount: "Additional concepts",
+      integrated: "Integrated daily salary used",
+      seniorityAmount: "Seniority premium",
+      constitutionalAmount: "Three-month indemnity",
+      twentyDaysAmount: "20-days-per-year scenario",
+      years: "Years of service",
+      vacationDays: "Vacation days used",
+      formula: "How it was calculated",
+      sources: "Sources and rule version",
+      reviewed: "Reviewed",
+      copy: "Copy result",
+      copied: "Copied",
+      disclaimer: "Informational gross estimate only. It is not a binding decision or legal advice.",
+      stale: "Your data changed. Calculate again to update the result.",
+      required: "Complete this field.",
+      invalidNumber: "Enter a valid non-negative number.",
+      invalidSalary: "Enter a salary greater than zero.",
+      endBeforeHire: "The final date cannot be before the start date.",
+      unsupported: "These dates or this situation are outside the automatic MVP rules.",
+      belowLegal: "The contractual value cannot be below the legal minimum.",
+      invalidRate: "Enter a valid percentage.",
+      scopeError: "Confirm the supported employment scope before calculating.",
+      noScenario: "No conditional severance component is active.",
+      seniorityReason: "Eligibility depends on the facts and documentation.",
+      notDetermined: "Not determined",
+      notIncluded: "Not included",
+      difference: "Difference versus the offer",
+      noOfferBreakdown: "The offer was entered as a total, so its concepts cannot be inferred.",
+      formulaEmpty: "The substituted values will appear here after a valid calculation.",
+      copySuccess: "Result copied.",
+      copyFailure: "The result could not be copied automatically.",
+      viewDetails: "View details",
+    }
+  : {
+      title: "Calculadora de finiquito y liquidación en México",
+      metaTitle: "Calculadora de finiquito y liquidación en México",
+      description:
+        "Estima tu finiquito bruto, prestaciones proporcionales y escenarios condicionados de indemnización bajo la LFT.",
+      hero:
+        "Separa el finiquito generado de una posible indemnización y compara el resultado con una oferta.",
+      category: "Legal e impuestos",
+      categoryHref: "/legal-impuestos",
+      breadcrumb: "Finiquito y liquidación",
+      step: "Paso 1 · Tu situación",
+      formTitle: "Estima tu finiquito",
+      formDescription:
+        "Esta estimación es para una relación privada continua en México con salario fijo.",
+      scope:
+        "Confirmo que es una relación laboral privada general bajo la Ley Federal del Trabajo.",
+      scopeHelp:
+        "El empleo público, regímenes especiales, trabajo de temporada o discontinuo y salario predominantemente variable requieren otra revisión.",
+      situation: "¿Qué ocurrió?",
+      situations: {
+        resignation: "Renuncié voluntariamente",
+        dismissal: "Me despidieron",
+        workerCause: "Me separé por una causa atribuible al patrón",
+        contractEnd: "Terminó mi contrato u obra",
+        agreement: "Llegamos a un acuerdo",
+        other: "Otra situación",
+      },
+      situationHelp: "La opción elegida no determina por sí sola la procedencia legal.",
+      hireDate: "Fecha de ingreso",
+      endDate: "Último día de la relación laboral",
+      inclusive: "El último día seleccionado se incluye.",
+      contract: "Tipo de contrato",
+      indefinite: "Por tiempo indeterminado",
+      fixedUnderYear: "Determinado menor de un año",
+      fixedYearOrMore: "Determinado de un año o más",
+      unknown: "No lo sé",
+      salary: "Salario base",
+      frequency: "Frecuencia de pago",
+      daily: "Diario",
+      weekly: "Semanal",
+      biweekly: "Quincenal",
+      monthly: "Mensual",
+      unpaidDays: "Días de salario devengado no pagados",
+      unpaidHelp: "Son días de salario adeudado, no necesariamente días naturales. Puedes capturar un monto conocido abajo.",
+      unpaidAmount: "Monto bruto conocido de salario pendiente (opcional)",
+      benefits: "Prestaciones y valores contractuales",
+      annualBonusDays: "Días anuales de aguinaldo",
+      ineligibleDays: "Días no elegibles para aguinaldo",
+      priorVacation: "Saldo de vacaciones anterior al último aniversario",
+      usedVacation: "Días de vacaciones disfrutados o ya pagados",
+      vacationPremium: "Prima vacacional (%)",
+      vacationCurrent: "Días de vacaciones del año en curso (opcional)",
+      vacationLast: "Días del último año completado (opcional)",
+      benefitsHelp: "Los mínimos legales aparecen precargados. El contrato puede ofrecer más, nunca menos.",
+      additional: "Conceptos adicionales",
+      addConcept: "Agregar concepto",
+      conceptName: "Nombre del concepto",
+      conceptAmount: "Importe bruto",
+      received: "Pagos ya recibidos",
+      addPayment: "Agregar pago",
+      paymentConcept: "Concepto o nota (opcional)",
+      paymentAmount: "Importe recibido",
+      offer: "Oferta recibida (opcional)",
+      offerHelp: "La comparación es informativa y no determina una deuda.",
+      scenario: "Explorar posible indemnización",
+      scenarioHelp: "Estos importes son condicionados. La situación declarada nunca los activa por sí sola.",
+      integratedMode: "Conozco mi salario diario integrado",
+      integratedSalary: "Salario diario integrado",
+      otherIntegrated: "Otras prestaciones integrables recurrentes por día",
+      seniority: "Incluir escenario condicionado de prima de antigüedad",
+      plantWorker: "Era una persona trabajadora de planta",
+      area: "Área del salario mínimo",
+      generalArea: "Zona general",
+      borderArea: "Zona Libre de la Frontera Norte",
+      constitutional: "Incluir indemnización constitucional condicionada de tres meses",
+      twentyDays: "Incluir escenario condicionado de 20 días por año",
+      calculate: "Calcular finiquito",
+      clear: "Limpiar",
+      result: "Resultado",
+      neutral: "Captura tus fechas y salario para comenzar.",
+      finiquito: "Finiquito bruto estimado",
+      pending: "Finiquito pendiente estimado",
+      conditional: "Escenario condicionado de indemnización",
+      scenarioTotal: "Total del escenario condicionado",
+      gross: "Subtotal bruto del finiquito",
+      payments: "Pagos ya recibidos",
+      excess: "Pagos por encima de esta estimación",
+      bonus: "Aguinaldo proporcional",
+      vacations: "Pago de vacaciones",
+      premium: "Prima vacacional",
+      unpaid: "Salarios pendientes",
+      additionalAmount: "Conceptos adicionales",
+      integrated: "Salario diario integrado utilizado",
+      seniorityAmount: "Prima de antigüedad",
+      constitutionalAmount: "Indemnización de tres meses",
+      twentyDaysAmount: "Escenario de 20 días por año",
+      years: "Antigüedad computada",
+      vacationDays: "Días de vacaciones",
+      formula: "Cómo se calculó",
+      sources: "Fuentes y versión de reglas",
+      reviewed: "Revisado",
+      copy: "Copiar resultado",
+      copied: "Copiado",
+      disclaimer: "Estimación bruta informativa. No constituye resolución vinculante ni asesoría legal.",
+      stale: "Tus datos cambiaron. Calcula de nuevo para actualizar el resultado.",
+      required: "Completa este campo.",
+      invalidNumber: "Escribe un número válido mayor o igual a cero.",
+      invalidSalary: "Escribe un salario mayor que cero.",
+      endBeforeHire: "La fecha final no puede ser anterior a la fecha de ingreso.",
+      unsupported: "Estas fechas o situación están fuera de las reglas automáticas del MVP.",
+      belowLegal: "El valor contractual no puede ser inferior al mínimo legal.",
+      invalidRate: "Escribe un porcentaje válido.",
+      scopeError: "Confirma el alcance laboral soportado antes de calcular.",
+      noScenario: "No hay un componente de indemnización condicionado activo.",
+      seniorityReason: "La procedencia depende de los hechos y documentos del caso.",
+      notDetermined: "No determinada",
+      notIncluded: "No incluida",
+      difference: "Diferencia frente a la oferta",
+      noOfferBreakdown: "La oferta se capturó como total; no es posible inferir sus conceptos.",
+      formulaEmpty: "Aquí aparecerán los valores sustituidos después de un cálculo válido.",
+      copySuccess: "Resultado copiado.",
+      copyFailure: "No se pudo copiar el resultado automáticamente.",
+      viewDetails: "Ver desglose",
+    };
+
+const faqs = isEnglish
+  ? [
+      {
+        question: "Does the calculator decide whether I was entitled to severance?",
+        answer:
+          "No. It separates earned final pay from conditional scenarios. The facts, documents, contract and legal action can change whether a severance concept applies.",
+      },
+      {
+        question: "Why is integrated daily salary different from base salary?",
+        answer:
+          "Indemnity calculations can include the daily salary and proportional integrated benefits. This tool shows the basis it used and lets you enter a known integrated daily salary.",
+      },
+      {
+        question: "Are taxes and deductions included?",
+        answer:
+          "No. The result is gross and does not estimate taxes, withholding, loans or other deductions.",
+      },
+      {
+        question: "Can I compare an employer offer?",
+        answer:
+          "Yes. Enter the total or a breakdown. The comparison is informational and does not determine an amount legally owed.",
+      },
+    ]
+  : [
+      {
+        question: "¿La calculadora decide si tengo derecho a liquidación?",
+        answer:
+          "No. Separa el finiquito generado de escenarios condicionados. Los hechos, documentos, contrato y acción legal pueden cambiar la procedencia de una indemnización.",
+      },
+      {
+        question: "¿Por qué el salario integrado es distinto del salario base?",
+        answer:
+          "Para indemnizaciones pueden considerarse la cuota diaria y partes proporcionales de prestaciones integrables. La herramienta muestra la base utilizada y permite capturar un salario integrado conocido.",
+      },
+      {
+        question: "¿Incluye impuestos y descuentos?",
+        answer:
+          "No. El resultado es bruto y no estima impuestos, retenciones, préstamos ni otros descuentos.",
+      },
+      {
+        question: "¿Puedo comparar una oferta del empleador?",
+        answer:
+          "Sí. Captura el total o un desglose. La comparación es informativa y no determina una cantidad legalmente exigible.",
+      },
+    ];
+
+const faqJsonLd = buildFaqJsonLd(faqs);
+const inputClass =
+  "mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-900 px-4 text-base text-white outline-none transition placeholder:text-gray-600 focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15";
+const fieldErrorClass = "mt-2 hidden text-sm text-red-300";
+---
+
+<BaseLayout
+  title={copy.metaTitle}
+  description={copy.description}
+  canonical={canonical}
+  locale={locale}
+  alternates={alternates}
+>
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={JSON.stringify(faqJsonLd)} />
+  </Fragment>
+
+  <PageShell class="pb-24 lg:pb-0">
+    <PageHero
+      locale={locale}
+      title={copy.title}
+      description={copy.hero}
+      kicker={copy.category}
+      kickerHref={copy.categoryHref}
+      collapseBreadcrumbOnMobile
+      containerClass="py-6 md:py-8"
+      breadcrumbs={[
+        { label: isEnglish ? "Home" : "Inicio", href: isEnglish ? "/en" : "/", ariaLabel: isEnglish ? "Home" : "Inicio" },
+        { label: copy.category, href: copy.categoryHref, optional: true },
+        { label: copy.breadcrumb, truncate: true },
+      ]}
+    />
+
+    <Container as="section" class="py-6 md:py-8">
+      <section class="overflow-hidden rounded-xl border border-gray-700 bg-gray-950 shadow-xl shadow-gray-950/30" aria-labelledby="termination-heading">
+        <div class="border-b border-gray-700 p-4 sm:p-6">
+          <p class="text-sm font-semibold uppercase tracking-wide text-amber-400">{copy.step}</p>
+          <h2 id="termination-heading" class="mt-2 text-xl font-semibold">{copy.formTitle}</h2>
+          <p class="mt-2 max-w-3xl text-sm leading-relaxed text-gray-400">{copy.formDescription}</p>
+        </div>
+
+        <div class="grid lg:grid-cols-[minmax(0,1.08fr)_minmax(20rem,0.92fr)]">
+          <form class="p-4 sm:p-6" data-termination-form novalidate>
+            <label class="flex min-h-12 cursor-pointer items-start gap-3 rounded-xl border border-blue-900/70 bg-blue-950/30 p-4 text-sm text-blue-100 focus-within:ring-3 focus-within:ring-amber-400/30">
+              <input class="mt-1 h-5 w-5 shrink-0 accent-amber-400" type="checkbox" data-scope />
+              <span>
+                <span class="block font-semibold">{copy.scope}</span>
+                <span class="mt-1 block leading-relaxed text-blue-200/80">{copy.scopeHelp}</span>
+              </span>
+            </label>
+            <p class={fieldErrorClass} data-error-for="scope"></p>
+
+            <fieldset class="mt-6">
+              <legend class="block text-sm font-semibold text-gray-200">{copy.situation}</legend>
+              <p class="mt-1 text-xs leading-relaxed text-gray-500">{copy.situationHelp}</p>
+              <div class="mt-3 grid gap-3 sm:grid-cols-2" data-situation-cards>
+                {Object.entries(copy.situations).map(([value, label], index) => (
+                  <label class={`cursor-pointer rounded-xl border p-4 transition focus-within:ring-3 focus-within:ring-amber-400/30 ${index === 0 ? "border-amber-400 bg-amber-400/10" : "border-gray-700 bg-gray-900"}`} data-situation-card={value}>
+                    <input class="sr-only" type="radio" name="termination-situation" value={value} checked={index === 0} data-situation />
+                    <span class="block text-sm font-semibold text-white">{label}</span>
+                  </label>
+                ))}
+              </div>
+            </fieldset>
+
+            <div class="mt-6 grid gap-5 sm:grid-cols-2">
+              <div>
+                <label for="termination-hire-date" class="block text-sm font-medium text-gray-200">{copy.hireDate}</label>
+                <input id="termination-hire-date" class={inputClass} type="date" required data-field="hireDate" aria-describedby="termination-hire-error" />
+                <p id="termination-hire-error" class={fieldErrorClass} data-error-for="hireDate"></p>
+              </div>
+              <div>
+                <label for="termination-end-date" class="block text-sm font-medium text-gray-200">{copy.endDate}</label>
+                <input id="termination-end-date" class={inputClass} type="date" required data-field="endDate" aria-describedby="termination-end-help termination-end-error" />
+                <p id="termination-end-help" class="mt-2 text-xs text-gray-500">{copy.inclusive}</p>
+                <p id="termination-end-error" class={fieldErrorClass} data-error-for="endDate"></p>
+              </div>
+            </div>
+
+            <div class="mt-5 grid gap-5 sm:grid-cols-2">
+              <div>
+                <label for="termination-salary" class="block text-sm font-medium text-gray-200">{copy.salary}</label>
+                <input id="termination-salary" class={inputClass} type="text" inputmode="decimal" autocomplete="off" required data-field="salaryBase" aria-describedby="termination-salary-error" />
+                <p id="termination-salary-error" class={fieldErrorClass} data-error-for="salaryBase"></p>
+              </div>
+              <div>
+                <label for="termination-frequency" class="block text-sm font-medium text-gray-200">{copy.frequency}</label>
+                <select id="termination-frequency" class={inputClass} data-field="frequency">
+                  <option value="monthly">{copy.monthly}</option>
+                  <option value="biweekly">{copy.biweekly}</option>
+                  <option value="weekly">{copy.weekly}</option>
+                  <option value="daily">{copy.daily}</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="mt-5 grid gap-5 sm:grid-cols-2">
+              <div>
+                <label for="termination-contract" class="block text-sm font-medium text-gray-200">{copy.contract}</label>
+                <select id="termination-contract" class={inputClass} data-field="contractType">
+                  <option value="indefinite">{copy.indefinite}</option>
+                  <option value="fixed-under-year">{copy.fixedUnderYear}</option>
+                  <option value="fixed-year-or-more">{copy.fixedYearOrMore}</option>
+                  <option value="unknown">{copy.unknown}</option>
+                </select>
+              </div>
+              <div>
+                <label for="termination-unpaid-days" class="block text-sm font-medium text-gray-200">{copy.unpaidDays}</label>
+                <input id="termination-unpaid-days" class={inputClass} type="text" inputmode="decimal" autocomplete="off" value="0" data-field="unpaidDays" aria-describedby="termination-unpaid-help termination-unpaid-error" />
+                <p id="termination-unpaid-help" class="mt-2 text-xs leading-relaxed text-gray-500">{copy.unpaidHelp}</p>
+                <p id="termination-unpaid-error" class={fieldErrorClass} data-error-for="unpaidDays"></p>
+              </div>
+            </div>
+
+            <div class="mt-5">
+              <label for="termination-unpaid-amount" class="block text-sm font-medium text-gray-200">{copy.unpaidAmount}</label>
+              <input id="termination-unpaid-amount" class={inputClass} type="text" inputmode="decimal" autocomplete="off" data-field="unpaidAmountOverride" aria-describedby="termination-unpaid-amount-error" />
+              <p id="termination-unpaid-amount-error" class={fieldErrorClass} data-error-for="unpaidAmountOverride"></p>
+            </div>
+
+            <details class="mt-6 rounded-xl border border-gray-800 bg-gray-900/50 p-4" open>
+              <summary class="cursor-pointer list-none text-sm font-semibold text-white"><span class="flex items-center justify-between gap-4"><span>{copy.benefits}</span><span class="text-xs font-normal text-gray-500">{copy.benefitsHelp}</span></span></summary>
+              <div class="mt-5 grid gap-5 sm:grid-cols-2">
+                <div>
+                  <label for="termination-bonus-days" class="block text-sm font-medium text-gray-200">{copy.annualBonusDays}</label>
+                  <input id="termination-bonus-days" class={inputClass} type="text" inputmode="decimal" value="15" data-field="annualBonusDays" aria-describedby="termination-bonus-error" />
+                  <p id="termination-bonus-error" class={fieldErrorClass} data-error-for="annualBonusDays"></p>
+                </div>
+                <div>
+                  <label for="termination-ineligible-days" class="block text-sm font-medium text-gray-200">{copy.ineligibleDays}</label>
+                  <input id="termination-ineligible-days" class={inputClass} type="text" inputmode="decimal" value="0" data-field="ineligibleBonusDays" aria-describedby="termination-ineligible-error" />
+                  <p id="termination-ineligible-error" class={fieldErrorClass} data-error-for="ineligibleBonusDays"></p>
+                </div>
+                <div>
+                  <label for="termination-prior-vacation" class="block text-sm font-medium text-gray-200">{copy.priorVacation}</label>
+                  <input id="termination-prior-vacation" class={inputClass} type="text" inputmode="decimal" value="0" data-field="priorVacationBalance" aria-describedby="termination-prior-vacation-error" />
+                  <p id="termination-prior-vacation-error" class={fieldErrorClass} data-error-for="priorVacationBalance"></p>
+                </div>
+                <div>
+                  <label for="termination-used-vacation" class="block text-sm font-medium text-gray-200">{copy.usedVacation}</label>
+                  <input id="termination-used-vacation" class={inputClass} type="text" inputmode="decimal" value="0" data-field="usedVacationDays" aria-describedby="termination-used-vacation-error" />
+                  <p id="termination-used-vacation-error" class={fieldErrorClass} data-error-for="usedVacationDays"></p>
+                </div>
+                <div>
+                  <label for="termination-premium" class="block text-sm font-medium text-gray-200">{copy.vacationPremium}</label>
+                  <input id="termination-premium" class={inputClass} type="text" inputmode="decimal" value="25" data-field="vacationPremium" aria-describedby="termination-premium-error" />
+                  <p id="termination-premium-error" class={fieldErrorClass} data-error-for="vacationPremium"></p>
+                </div>
+              </div>
+              <div class="mt-5 grid gap-5 sm:grid-cols-2">
+                <div>
+                  <label for="termination-vacation-last" class="block text-sm font-medium text-gray-200">{copy.vacationLast}</label>
+                  <input id="termination-vacation-last" class={inputClass} type="text" inputmode="decimal" data-field="lastVacationEntitlementOverride" />
+                </div>
+                <div>
+                  <label for="termination-vacation-current" class="block text-sm font-medium text-gray-200">{copy.vacationCurrent}</label>
+                  <input id="termination-vacation-current" class={inputClass} type="text" inputmode="decimal" data-field="currentVacationEntitlementOverride" />
+                </div>
+              </div>
+            </details>
+
+            <details class="mt-5 rounded-xl border border-gray-800 bg-gray-900/50 p-4" data-list-section="concepts">
+              <summary class="cursor-pointer list-none text-sm font-semibold text-white">{copy.additional}</summary>
+              <div class="mt-4 space-y-3" data-row-list="concepts"></div>
+              <button class="mt-4 inline-flex min-h-11 items-center justify-center rounded-lg border border-gray-700 px-4 py-2 text-sm font-semibold text-gray-200 transition hover:border-amber-400 hover:text-white" type="button" data-add-row="concepts">{copy.addConcept}</button>
+            </details>
+
+            <details class="mt-5 rounded-xl border border-gray-800 bg-gray-900/50 p-4" data-list-section="payments">
+              <summary class="cursor-pointer list-none text-sm font-semibold text-white">{copy.received}</summary>
+              <div class="mt-4 space-y-3" data-row-list="payments"></div>
+              <button class="mt-4 inline-flex min-h-11 items-center justify-center rounded-lg border border-gray-700 px-4 py-2 text-sm font-semibold text-gray-200 transition hover:border-amber-400 hover:text-white" type="button" data-add-row="payments">{copy.addPayment}</button>
+            </details>
+
+            <details class="mt-5 rounded-xl border border-gray-800 bg-gray-900/50 p-4" data-scenario-section>
+              <summary class="cursor-pointer list-none text-sm font-semibold text-white"><span class="flex items-center justify-between gap-4"><span>{copy.scenario}</span><span class="text-xs font-normal text-gray-500">{copy.scenarioHelp}</span></span></summary>
+              <div class="mt-5 space-y-4">
+                <label class="flex min-h-11 cursor-pointer items-start gap-3">
+                  <input class="mt-1 h-5 w-5 accent-amber-400" type="checkbox" data-integrated-override />
+                  <span class="text-sm text-gray-200">{copy.integratedMode}</span>
+                </label>
+                <div class="hidden grid gap-5 sm:grid-cols-2" data-integrated-fields>
+                  <div>
+                    <label for="termination-integrated" class="block text-sm font-medium text-gray-200">{copy.integratedSalary}</label>
+                    <input id="termination-integrated" class={inputClass} type="text" inputmode="decimal" data-field="integratedSalaryOverride" />
+                  </div>
+                  <div>
+                    <label for="termination-other-integrated" class="block text-sm font-medium text-gray-200">{copy.otherIntegrated}</label>
+                    <input id="termination-other-integrated" class={inputClass} type="text" inputmode="decimal" value="0" data-field="otherIntegratedDailyAmount" />
+                  </div>
+                </div>
+                <label class="flex min-h-11 cursor-pointer items-start gap-3">
+                  <input class="mt-1 h-5 w-5 accent-amber-400" type="checkbox" data-seniority-toggle />
+                  <span class="text-sm text-gray-200">{copy.seniority}</span>
+                </label>
+                <div class="hidden space-y-4" data-seniority-fields>
+                  <label class="flex min-h-11 cursor-pointer items-start gap-3">
+                    <input class="mt-1 h-5 w-5 accent-amber-400" type="checkbox" data-plant-worker />
+                    <span class="text-sm text-gray-200">{copy.plantWorker}</span>
+                  </label>
+                  <div class="grid gap-5 sm:grid-cols-2">
+                    <div>
+                      <label for="termination-area" class="block text-sm font-medium text-gray-200">{copy.area}</label>
+                      <select id="termination-area" class={inputClass} data-field="minimumWageArea">
+                        <option value="general">{copy.generalArea}</option>
+                        <option value="northern-border">{copy.borderArea}</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+                <label class="flex min-h-11 cursor-pointer items-start gap-3">
+                  <input class="mt-1 h-5 w-5 accent-amber-400" type="checkbox" data-constitutional />
+                  <span class="text-sm text-gray-200">{copy.constitutional}</span>
+                </label>
+                <label class="flex min-h-11 cursor-pointer items-start gap-3">
+                  <input class="mt-1 h-5 w-5 accent-amber-400" type="checkbox" data-twenty-days />
+                  <span class="text-sm text-gray-200">{copy.twentyDays}</span>
+                </label>
+              </div>
+            </details>
+
+            <div class="mt-5">
+              <label for="termination-offer" class="block text-sm font-medium text-gray-200">{copy.offer}</label>
+              <input id="termination-offer" class={inputClass} type="text" inputmode="decimal" data-field="offerTotal" aria-describedby="termination-offer-help" />
+              <p id="termination-offer-help" class="mt-2 text-xs text-gray-500">{copy.offerHelp}</p>
+            </div>
+
+            <p class="mt-5 hidden rounded-lg border border-red-900/60 bg-red-950/30 p-3 text-sm leading-relaxed text-red-200" role="alert" data-form-error></p>
+            <p class="sr-only" aria-live="polite" data-form-status></p>
+            <div class="mt-6 flex flex-col-reverse gap-3 border-t border-gray-800 pt-5 sm:flex-row sm:justify-between">
+              <button class="inline-flex min-h-12 items-center justify-center rounded-lg border border-gray-700 px-5 py-3 text-sm font-semibold text-gray-200 transition hover:border-amber-400 hover:text-white" type="button" data-clear>{copy.clear}</button>
+              <button class="inline-flex min-h-12 items-center justify-center rounded-lg bg-amber-400 px-6 py-3 text-sm font-bold text-gray-950 transition hover:bg-amber-300" type="submit">{copy.calculate}</button>
+            </div>
+          </form>
+
+          <aside id="termination-result" class="border-t border-gray-800 bg-gray-900/70 p-4 sm:p-6 lg:border-l lg:border-t-0" aria-live="polite" data-result-region>
+            <p class="text-sm font-semibold uppercase tracking-wide text-amber-400">{copy.result}</p>
+            <h3 class="mt-3 text-lg font-semibold text-gray-200" data-result-label>{copy.finiquito}</h3>
+            <p class="mt-3 break-words text-4xl font-bold leading-tight text-white" data-main-result>—</p>
+            <p class="mt-3 text-sm leading-relaxed text-gray-400" data-result-context>{copy.neutral}</p>
+            <div class="mt-6 hidden space-y-2" data-breakdown></div>
+            <p class="mt-5 hidden rounded-lg border border-amber-800/70 bg-amber-950/30 p-3 text-sm leading-relaxed text-amber-100" data-result-warning></p>
+
+            <section class="mt-6 hidden rounded-xl border border-purple-800/70 bg-purple-950/20 p-4" data-conditional-result>
+              <h4 class="font-semibold text-purple-100">{copy.conditional}</h4>
+              <p class="mt-2 text-sm leading-relaxed text-purple-200/80" data-conditional-context>{copy.scenarioHelp}</p>
+              <div class="mt-4 space-y-2" data-conditional-breakdown></div>
+            </section>
+
+            <section class="mt-6 hidden rounded-xl border border-sky-800/70 bg-sky-950/20 p-4" data-offer-result>
+              <h4 class="font-semibold text-sky-100">{copy.difference}</h4>
+              <div class="mt-3 space-y-2" data-offer-breakdown></div>
+              <p class="mt-3 text-xs leading-relaxed text-sky-200/80">{copy.noOfferBreakdown}</p>
+            </section>
+
+            <details class="mt-5 rounded-lg border border-gray-800 bg-gray-950/50 p-4">
+              <summary class="cursor-pointer text-sm font-semibold text-white">{copy.formula}</summary>
+              <div class="mt-3 space-y-2 text-sm leading-relaxed text-gray-400" data-formula>{copy.formulaEmpty}</div>
+            </details>
+            <div class="mt-5 rounded-lg border border-gray-800 bg-gray-950/50 p-4">
+              <p class="text-sm font-semibold text-white">{copy.sources}</p>
+              <p class="mt-2 text-xs text-gray-500">{copy.reviewed}: <span data-rule-reviewed>{MEXICO_TERMINATION_RULE_2026.reviewedAt}</span> · <span data-rule-version>{MEXICO_TERMINATION_RULE_2026.ruleVersion}</span></p>
+              <div class="mt-3 flex flex-wrap gap-x-4 gap-y-2 text-sm" data-source-links>
+                {MEXICO_TERMINATION_RULE_2026.sources.map((source) => (
+                  <a class="font-semibold text-amber-400 hover:text-amber-300 hover:underline" href={source.url} target="_blank" rel="noreferrer">{source.title}</a>
+                ))}
+              </div>
+            </div>
+            <p class="mt-5 text-xs leading-relaxed text-gray-500">{copy.disclaimer}</p>
+            <button class="mt-5 hidden min-h-11 w-full items-center justify-center rounded-lg border border-amber-400/60 px-4 py-2 text-sm font-semibold text-amber-300 transition hover:bg-amber-400/10" type="button" data-copy-result>{copy.copy}</button>
+            <p class="sr-only" aria-live="polite" data-copy-status></p>
+          </aside>
+        </div>
+      </section>
+    </Container>
+
+    <AdSlot placement="calculator-after-tool" />
+    <Container as="section" class="py-8">
+      <SectionIntro
+        title={isEnglish ? "Read the estimate carefully" : "Lee la estimación con cuidado"}
+        description={isEnglish ? "The final pay is gross and the severance section is conditional. Contracts, documents and specific facts can change the result." : "El finiquito es bruto y la sección de indemnización es condicionada. El contrato, los documentos y los hechos concretos pueden cambiar el resultado."}
+      />
+      <div class="grid gap-4 md:grid-cols-2">
+        <article class="rounded-xl border border-gray-700 bg-gray-950 p-5">
+          <h3 class="font-semibold text-white">{isEnglish ? "What is included" : "Qué incluye"}</h3>
+          <p class="mt-2 text-sm leading-relaxed text-gray-400">{isEnglish ? "Unpaid salary, proportional annual bonus, vacation pay, vacation premium and entered additional concepts." : "Salarios pendientes, aguinaldo proporcional, pago de vacaciones, prima vacacional y conceptos adicionales capturados."}</p>
+        </article>
+        <article class="rounded-xl border border-gray-700 bg-gray-950 p-5">
+          <h3 class="font-semibold text-white">{isEnglish ? "What needs review" : "Qué requiere revisión"}</h3>
+          <p class="mt-2 text-sm leading-relaxed text-gray-400">{isEnglish ? "Dismissal classification, conditional indemnities, contracts, variable pay, taxes and special employment regimes." : "La clasificación del despido, indemnizaciones condicionadas, contrato, salario variable, impuestos y regímenes especiales."}</p>
+        </article>
+      </div>
+    </Container>
+    <FaqSection faqs={faqs} />
+
+    <div class="fixed inset-x-0 bottom-0 z-40 hidden border-t border-gray-700 bg-gray-950/95 px-4 py-3 shadow-2xl backdrop-blur lg:hidden" style="padding-bottom: max(0.75rem, env(safe-area-inset-bottom));" data-mobile-summary>
+      <div class="mx-auto flex max-w-5xl items-center justify-between gap-4">
+        <div class="min-w-0"><p class="truncate text-xs font-semibold uppercase tracking-wide text-gray-500">{copy.pending}</p><p class="truncate text-lg font-bold text-white" data-mobile-result>—</p></div>
+        <a class="shrink-0 rounded-lg border border-amber-400/60 px-3 py-2 text-sm font-semibold text-amber-300" href="#termination-result">{copy.viewDetails}</a>
+      </div>
+    </div>
+  </PageShell>
+</BaseLayout>
+
+<script>
+  import {
+    TerminationValidationError,
+    calculateTerminationPay,
+    formatTerminationCurrency,
+    parseAmountInput,
+  } from "@lib/calculators/legal-impuestos/calculadora-finiquito-liquidacion/terminationPay";
+
+  const isEnglish = document.documentElement.lang === "en";
+  const locale = isEnglish ? "en-US" : "es-MX";
+  const messages = isEnglish
+    ? {
+        required: "Complete this field.", invalidNumber: "Enter a valid non-negative number.", invalidSalary: "Enter a salary greater than zero.", endBeforeHire: "The final date cannot be before the start date.", unsupported: "These dates or this situation are outside the automatic MVP rules.", belowLegal: "The contractual value cannot be below the legal minimum.", invalidRate: "Enter a valid percentage.", scopeError: "Confirm the supported employment scope before calculating.", stale: "Your data changed. Calculate again to update the result.", copied: "Copied", copy: "Copy result", copySuccess: "Result copied.", copyFailure: "The result could not be copied automatically.", notDetermined: "Not determined", notIncluded: "Not included", noScenario: "No conditional severance component is active.", seniorityReason: "Eligibility depends on the facts and documentation.",
+      }
+    : {
+        required: "Completa este campo.", invalidNumber: "Escribe un número válido mayor o igual a cero.", invalidSalary: "Escribe un salario mayor que cero.", endBeforeHire: "La fecha final no puede ser anterior a la fecha de ingreso.", unsupported: "Estas fechas o situación están fuera de las reglas automáticas del MVP.", belowLegal: "El valor contractual no puede ser inferior al mínimo legal.", invalidRate: "Escribe un porcentaje válido.", scopeError: "Confirma el alcance laboral soportado antes de calcular.", stale: "Tus datos cambiaron. Calcula de nuevo para actualizar el resultado.", copied: "Copiado", copy: "Copiar resultado", copySuccess: "Resultado copiado.", copyFailure: "No se pudo copiar el resultado automáticamente.", notDetermined: "No determinada", notIncluded: "No incluida", noScenario: "No hay un componente de indemnización condicionado activo.", seniorityReason: "La procedencia depende de los hechos y documentos del caso.",
+      };
+
+  const form = document.querySelector("[data-termination-form]");
+  const scope = document.querySelector("[data-scope]");
+  const formError = document.querySelector("[data-form-error]");
+  const formStatus = document.querySelector("[data-form-status]");
+  const resultLabel = document.querySelector("[data-result-label]");
+  const mainResult = document.querySelector("[data-main-result]");
+  const resultContext = document.querySelector("[data-result-context]");
+  const breakdown = document.querySelector("[data-breakdown]");
+  const warning = document.querySelector("[data-result-warning]");
+  const conditionalResult = document.querySelector("[data-conditional-result]");
+  const conditionalBreakdown = document.querySelector("[data-conditional-breakdown]");
+  const conditionalContext = document.querySelector("[data-conditional-context]");
+  const scenarioSection = document.querySelector("[data-scenario-section]");
+  const offerResult = document.querySelector("[data-offer-result]");
+  const offerBreakdown = document.querySelector("[data-offer-breakdown]");
+  const ruleReviewed = document.querySelector("[data-rule-reviewed]");
+  const ruleVersion = document.querySelector("[data-rule-version]");
+  const sourceLinks = document.querySelector("[data-source-links]");
+  const formula = document.querySelector("[data-formula]");
+  const copyButton = document.querySelector("[data-copy-result]");
+  const copyStatus = document.querySelector("[data-copy-status]");
+  const mobileSummary = document.querySelector("[data-mobile-summary]");
+  const mobileResult = document.querySelector("[data-mobile-result]");
+  const integratedFields = document.querySelector("[data-integrated-fields]");
+  const seniorityFields = document.querySelector("[data-seniority-fields]");
+  const allFields = Array.from(document.querySelectorAll("[data-field]"));
+  let hasResult = false;
+  let copyText = "";
+  let copyTimeout = 0;
+  const rowInputClass = "min-h-11 w-full rounded-lg border border-gray-700 bg-gray-900 px-3 text-base text-white outline-none focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15";
+
+  const field = (name) => document.querySelector(`[data-field="${name}"]`);
+  const checked = (selector) => document.querySelector(`${selector}:checked`);
+
+  function setError(name, message = "") {
+    const input = name === "scope" ? scope : field(name);
+    const error = document.querySelector(`[data-error-for="${name}"]`);
+    input?.setAttribute("aria-invalid", message ? "true" : "false");
+    if (error) {
+      error.textContent = message;
+      error.classList.toggle("hidden", !message);
+    }
+  }
+
+  function clearErrors() {
+    ["scope", ...allFields.map((input) => input.dataset.field)].forEach((name) => setError(name));
+    formError.textContent = "";
+    formError.classList.add("hidden");
+  }
+
+  function showError(message) {
+    formError.textContent = message;
+    formError.classList.remove("hidden");
+  }
+
+  function readAmount(name, required = false) {
+    const input = field(name);
+    const value = input?.value.trim() ?? "";
+    if (!value && !required) return undefined;
+    const parsed = parseAmountInput(value);
+    if (parsed === null || parsed < 0) {
+      setError(name, name === "salaryBase" ? messages.invalidSalary : messages.invalidNumber);
+      return null;
+    }
+    setError(name);
+    return parsed;
+  }
+
+  function makeRow(label, value, emphasis = false) {
+    const row = document.createElement("div");
+    row.className = "flex items-start justify-between gap-4 rounded-lg border border-gray-800 bg-gray-950/70 px-3 py-2.5 text-sm";
+    const name = document.createElement("span");
+    name.className = "text-gray-400";
+    name.textContent = label;
+    const amount = document.createElement(emphasis ? "strong" : "span");
+    amount.className = emphasis ? "shrink-0 text-white" : "shrink-0 font-medium text-gray-200";
+    amount.textContent = value;
+    row.append(name, amount);
+    return row;
+  }
+
+  function addRow(type) {
+    const list = document.querySelector(`[data-row-list="${type}"]`);
+    if (!list) return;
+    const row = document.createElement("div");
+    row.className = "grid gap-3 rounded-lg border border-gray-800 bg-gray-950/60 p-3 sm:grid-cols-[minmax(0,1fr)_10rem_auto]";
+    row.dataset.row = type;
+    row.innerHTML = type === "concepts"
+      ? `<input class="${rowInputClass}" type="text" placeholder="${isEnglish ? "Concept name" : "Nombre del concepto"}" aria-label="${isEnglish ? "Concept name" : "Nombre del concepto"}" data-row-name><input class="${rowInputClass}" type="text" inputmode="decimal" placeholder="${isEnglish ? "Amount" : "Importe"}" aria-label="${isEnglish ? "Gross amount" : "Importe bruto"}" data-row-amount><button class="min-h-11 rounded-lg border border-gray-700 px-3 text-sm text-gray-300" type="button" data-remove-row>${isEnglish ? "Remove" : "Quitar"}</button>`
+      : `<input class="${rowInputClass}" type="text" placeholder="${isEnglish ? "Concept or note" : "Concepto o nota"}" aria-label="${isEnglish ? "Concept or note" : "Concepto o nota"}" data-row-name><input class="${rowInputClass}" type="text" inputmode="decimal" placeholder="${isEnglish ? "Amount received" : "Importe recibido"}" aria-label="${isEnglish ? "Amount received" : "Importe recibido"}" data-row-amount><button class="min-h-11 rounded-lg border border-gray-700 px-3 text-sm text-gray-300" type="button" data-remove-row>${isEnglish ? "Remove" : "Quitar"}</button>`;
+    list.append(row);
+    invalidate();
+  }
+
+  function readRows(type) {
+    const rows = Array.from(document.querySelectorAll(`[data-row="${type}"]`));
+    const values = [];
+    for (const row of rows) {
+      const amount = parseAmountInput(row.querySelector("[data-row-amount]")?.value ?? "");
+      if (amount === null || amount < 0) throw new Error("row_amount");
+      if (type === "concepts") {
+        values.push({ name: row.querySelector("[data-row-name]")?.value ?? "", amount });
+      } else {
+        values.push({ concept: row.querySelector("[data-row-name]")?.value ?? "", amount });
+      }
+    }
+    return values;
+  }
+
+  function updateSituations() {
+    const value = checked("[data-situation]")?.value;
+    document.querySelectorAll("[data-situation-card]").forEach((card) => {
+      const active = card.dataset.situationCard === value;
+      card.classList.toggle("border-amber-400", active);
+      card.classList.toggle("bg-amber-400/10", active);
+      card.classList.toggle("border-gray-700", !active);
+      card.classList.toggle("bg-gray-900", !active);
+    });
+  }
+
+  function updateScenarioFields() {
+    integratedFields.classList.toggle("hidden", !document.querySelector("[data-integrated-override]")?.checked);
+    seniorityFields.classList.toggle("hidden", !document.querySelector("[data-seniority-toggle]")?.checked);
+  }
+
+  function invalidate() {
+    if (!hasResult) return;
+    hasResult = false;
+    resultLabel.textContent = isEnglish ? "Estimated gross final pay" : "Finiquito bruto estimado";
+    mainResult.textContent = "—";
+    resultContext.textContent = messages.stale;
+    breakdown.classList.add("hidden");
+    breakdown.replaceChildren();
+    conditionalResult.classList.add("hidden");
+    offerResult.classList.add("hidden");
+    warning.classList.add("hidden");
+    copyButton.classList.add("hidden");
+    copyButton.classList.remove("flex");
+    mobileSummary.classList.add("hidden");
+    formula.textContent = isEnglish ? "The substituted values will appear here after a valid calculation." : "Aquí aparecerán los valores sustituidos después de un cálculo válido.";
+    copyText = "";
+  }
+
+  function render(result) {
+    hasResult = true;
+    const money = (value) => formatTerminationCurrency(value, locale);
+    resultLabel.textContent = isEnglish ? "Estimated pending final pay" : "Finiquito pendiente estimado";
+    mainResult.textContent = money(result.finiquitoPending);
+    resultContext.textContent = isEnglish ? "Gross final pay after entered payments; taxes and deductions are not included." : "Finiquito bruto después de los pagos capturados; no incluye impuestos ni descuentos.";
+    ruleReviewed.textContent = result.ruleSet.reviewedAt;
+    ruleVersion.textContent = result.ruleSet.ruleVersion;
+    sourceLinks.replaceChildren(...result.ruleSet.sources.map((source) => {
+      const link = document.createElement("a");
+      link.className = "font-semibold text-amber-400 hover:text-amber-300 hover:underline";
+      link.href = source.url;
+      link.target = "_blank";
+      link.rel = "noreferrer";
+      link.textContent = source.articles?.length
+        ? `${source.title} · arts. ${source.articles.join(", ")}`
+        : source.title;
+      return link;
+    }));
+    const rows = [
+      makeRow(isEnglish ? "Unpaid salary" : "Salarios pendientes", money(result.unpaidSalaryAmount)),
+      makeRow(isEnglish ? "Proportional annual bonus" : "Aguinaldo proporcional", money(result.annualBonusAmount)),
+      makeRow(isEnglish ? "Annual-bonus days (eligible / period)" : "Días de aguinaldo (elegibles / periodo)", `${result.annualBonusEligibleDays} / ${result.annualBonusPeriodDays} (${result.ineligibleBonusDays} ${isEnglish ? "excluded" : "excluidos"})`),
+      makeRow(isEnglish ? `Vacation pay (${result.vacation.mainDays.toFixed(2)} days)` : `Pago de vacaciones (${result.vacation.mainDays.toFixed(2)} días)`, money(result.vacationPay)),
+      makeRow(isEnglish ? "Vacation balance (prior / used)" : "Vacaciones (saldo anterior / usadas)", `${result.vacation.priorBalance.toFixed(2)} / ${result.vacation.usedDays.toFixed(2)}`),
+      makeRow(isEnglish ? "Vacation premium" : "Prima vacacional", money(result.vacationPremiumAmount)),
+      makeRow(isEnglish ? "Additional concepts" : "Conceptos adicionales", money(result.additionalAmount)),
+      makeRow(isEnglish ? "Gross final-pay subtotal" : "Subtotal bruto del finiquito", money(result.finiquitoGross), true),
+      makeRow(isEnglish ? "Payments already received" : "Pagos ya recibidos", `−${money(result.receivedPaymentsTotal)}`),
+      makeRow(isEnglish ? "Estimated pending final pay" : "Finiquito pendiente estimado", money(result.finiquitoPending), true),
+    ];
+    breakdown.replaceChildren(...rows);
+    breakdown.classList.remove("hidden");
+    if (result.receivedExcess > 0) {
+      warning.textContent = `${isEnglish ? "Payments above this estimate" : "Pagos por encima de esta estimación"}: ${money(result.receivedExcess)}.`;
+      warning.classList.remove("hidden");
+    } else {
+      warning.classList.add("hidden");
+    }
+
+    const scenarioEnabled = document.querySelector("[data-scenario-section]")?.open;
+    const hasScenario = result.constitutionalIndemnityAmount > 0 || result.twentyDaysIndemnityAmount > 0 || result.seniorityAmount > 0;
+    const seniorityRequested = Boolean(document.querySelector("[data-seniority-toggle]")?.checked);
+    const seniorityValue = !seniorityRequested
+      ? messages.notIncluded
+      : result.seniorityEligible
+        ? money(result.seniorityAmount)
+        : messages.notDetermined;
+    conditionalResult.classList.toggle("hidden", !scenarioEnabled);
+    const scenarioRows = [
+      makeRow(isEnglish ? "Integrated daily salary used" : "Salario diario integrado utilizado", money(result.integratedDailySalary)),
+      makeRow(isEnglish ? "Seniority premium" : "Prima de antigüedad", seniorityValue),
+      makeRow(isEnglish ? "Seniority-premium base" : "Base de la prima de antigüedad", !seniorityRequested ? messages.notIncluded : result.seniorityEligible ? money(result.seniorityBaseSalary) : messages.notDetermined),
+      makeRow(isEnglish ? "Statutory cap (2× minimum wage)" : "Tope legal (2× salario mínimo)", seniorityRequested ? money(result.minimumWageUsed * 2) : messages.notIncluded),
+      makeRow(isEnglish ? "Three-month indemnity" : "Indemnización de tres meses", money(result.constitutionalIndemnityAmount)),
+      makeRow(isEnglish ? "20-days-per-year scenario" : "Escenario de 20 días por año", money(result.twentyDaysIndemnityAmount)),
+      makeRow(isEnglish ? "Conditional scenario total" : "Total del escenario condicionado", money(result.conditionalTotal), true),
+    ];
+    conditionalBreakdown.replaceChildren(...scenarioRows);
+    conditionalContext.textContent = hasScenario
+      ? (isEnglish ? "These amounts remain conditional and require review of the facts and documents." : "Estos importes siguen siendo condicionados y requieren revisar los hechos y documentos.")
+      : seniorityRequested && !result.seniorityEligible
+        ? messages.seniorityReason
+        : messages.noScenario;
+
+    const offer = readAmount("offerTotal");
+    if (offer !== undefined && offer !== null) {
+      offerResult.classList.remove("hidden");
+      offerBreakdown.replaceChildren(
+        makeRow(isEnglish ? "Offer received" : "Oferta recibida", money(offer)),
+        makeRow(isEnglish ? "Difference versus pending final pay" : "Diferencia frente al finiquito pendiente", money(result.finiquitoPending - offer), true),
+        makeRow(isEnglish ? "Difference versus conditional scenario" : "Diferencia frente al escenario condicionado", money(result.totalScenario - offer), true),
+      );
+    }
+
+    const integratedFormula = `${isEnglish ? "Integrated salary" : "Salario integrado"}: ${money(result.ordinaryDailySalary)} × (1 + ${result.annualBonusDays}/${result.annualBonusBaseDays} + ${result.vacation.currentCycleEntitlement} × ${result.vacationPremiumRate}/${result.annualBonusBaseDays}) = ${money(result.integratedDailySalary)}`;
+    formula.replaceChildren(...[
+      `${isEnglish ? "Annual bonus" : "Aguinaldo"}: ${money(result.ordinaryDailySalary)} × ${result.annualBonusDays} × ${result.annualBonusEligibleDays}/${result.annualBonusBaseDays} = ${money(result.annualBonusAmount)}`,
+      `${isEnglish ? "Vacation pay" : "Vacaciones"}: ${result.vacation.mainDays.toFixed(2)} × ${money(result.ordinaryDailySalary)} = ${money(result.vacationPay)}`,
+      `${isEnglish ? "Vacation premium" : "Prima vacacional"}: ${money(result.vacationPay)} × ${(result.vacationPremiumRate * 100).toFixed(2)}% = ${money(result.vacationPremiumAmount)}`,
+      integratedFormula,
+    ].map((text) => { const p = document.createElement("p"); p.textContent = text; return p; }));
+
+    copyButton.classList.remove("hidden");
+    copyButton.classList.add("flex");
+    mobileResult.textContent = money(result.finiquitoPending);
+    mobileSummary.classList.remove("hidden");
+    const declaredSituation = checked("[data-situation]")?.closest("label")?.querySelector("span")?.textContent?.trim() || "";
+    copyText = [
+      `${isEnglish ? "Final day" : "Último día"}: ${result.endDate}`,
+      `${isEnglish ? "Declared situation" : "Situación declarada"}: ${declaredSituation}`,
+      `${isEnglish ? "Estimated pending final pay" : "Finiquito pendiente estimado"}: ${money(result.finiquitoPending)}`,
+      `${isEnglish ? "Gross subtotal" : "Subtotal bruto"}: ${money(result.finiquitoGross)}`,
+      `${isEnglish ? "Payments received" : "Pagos recibidos"}: ${money(result.receivedPaymentsTotal)}`,
+      `${isEnglish ? "Seniority premium" : "Prima de antigüedad"}: ${seniorityValue}`,
+      `${isEnglish ? "Three-month indemnity" : "Indemnización de tres meses"}: ${money(result.constitutionalIndemnityAmount)}`,
+      `${isEnglish ? "20-days-per-year scenario" : "Escenario de 20 días por año"}: ${money(result.twentyDaysIndemnityAmount)}`,
+      `${isEnglish ? "Conditional scenario total" : "Total condicionado"}: ${money(result.totalScenario)}`,
+      `${isEnglish ? "Service years" : "Antigüedad"}: ${result.yearsOfService.toFixed(2)}`,
+      `${isEnglish ? "Rule version" : "Versión de reglas"}: ${result.ruleSet.ruleVersion}`,
+      isEnglish ? "Informational gross estimate only." : "Estimación bruta informativa.",
+    ].join("\n");
+    formStatus.textContent = isEnglish ? "Final-pay result updated." : "Resultado de finiquito actualizado.";
+  }
+
+  function buildInput() {
+    if (!scope.checked) {
+      setError("scope", messages.scopeError);
+      throw new Error("scope");
+    }
+    const salaryBase = readAmount("salaryBase", true);
+    if (salaryBase === null || salaryBase === undefined) throw new Error("salary");
+    const optional = (name) => readAmount(name);
+    const premiumPercent = readAmount("vacationPremium", true);
+    if (premiumPercent === null || premiumPercent === undefined) throw new Error("premium");
+    if (premiumPercent > 100) { setError("vacationPremium", messages.invalidRate); throw new Error("premium"); }
+    const unpaidDays = readAmount("unpaidDays");
+    const annualBonusDays = readAmount("annualBonusDays", true);
+    const ineligibleBonusDays = readAmount("ineligibleBonusDays");
+    const priorVacationBalance = readAmount("priorVacationBalance");
+    const usedVacationDays = readAmount("usedVacationDays");
+    if ([unpaidDays, annualBonusDays, ineligibleBonusDays, priorVacationBalance, usedVacationDays].some((value) => value === null)) throw new Error("number");
+    const integratedOverride = document.querySelector("[data-integrated-override]")?.checked ? optional("integratedSalaryOverride") : undefined;
+    if (integratedOverride === null) throw new Error("integrated");
+    const concepts = readRows("concepts");
+    const payments = readRows("payments");
+    const offerTotal = optional("offerTotal");
+    if (offerTotal === null) throw new Error("offer");
+    return {
+      situation: checked("[data-situation]")?.value || "other",
+      hireDate: field("hireDate")?.value || "",
+      endDate: field("endDate")?.value || "",
+      contractType: field("contractType")?.value || "indefinite",
+      salaryBase,
+      frequency: field("frequency")?.value || "monthly",
+      unpaidDays: unpaidDays ?? 0,
+      unpaidAmountOverride: optional("unpaidAmountOverride"),
+      annualBonusDays: annualBonusDays ?? 15,
+      ineligibleBonusDays: ineligibleBonusDays ?? 0,
+      priorVacationBalance: priorVacationBalance ?? 0,
+      usedVacationDays: usedVacationDays ?? 0,
+      lastVacationEntitlementOverride: optional("lastVacationEntitlementOverride"),
+      currentVacationEntitlementOverride: optional("currentVacationEntitlementOverride"),
+      vacationPremiumRate: premiumPercent / 100,
+      minimumWageArea: field("minimumWageArea")?.value || "general",
+      otherIntegratedDailyAmount: optional("otherIntegratedDailyAmount") ?? 0,
+      integratedSalaryOverride: integratedOverride,
+      includeSeniorityPremium: document.querySelector("[data-seniority-toggle]")?.checked || false,
+      plantWorker: document.querySelector("[data-plant-worker]")?.checked || false,
+      includeConstitutionalIndemnity: document.querySelector("[data-constitutional]")?.checked || false,
+      includeTwentyDaysIndemnity: document.querySelector("[data-twenty-days]")?.checked || false,
+      additionalConcepts: concepts,
+      receivedPayments: payments,
+    };
+  }
+
+  function calculate() {
+    clearErrors();
+    try {
+      render(calculateTerminationPay(buildInput()));
+    } catch (error) {
+      if (error?.message === "scope") { showError(messages.scopeError); scope.focus(); }
+      else if (error?.message === "row_amount") showError(messages.invalidNumber);
+      else if (error instanceof TerminationValidationError) {
+        const map = { invalid_hire_date: ["hireDate", messages.required], invalid_end_date: ["endDate", messages.required], end_before_hire: ["endDate", messages.endBeforeHire], contract_below_legal: ["annualBonusDays", messages.belowLegal], invalid_rate: ["vacationPremium", messages.invalidRate], zero_salary: ["salaryBase", messages.invalidSalary], salary_integrated_required: ["integratedSalaryOverride", messages.invalidSalary] };
+        const contractField = error.code === "contract_below_legal"
+          ? (parseAmountInput(field("annualBonusDays")?.value ?? "") ?? 0) < 15
+            ? ["annualBonusDays", messages.belowLegal]
+            : (parseAmountInput(field("vacationPremium")?.value ?? "") ?? 25) < 25
+              ? ["vacationPremium", messages.belowLegal]
+              : map[error.code]
+          : null;
+        const [name, message] = contractField || map[error.code] || [null, messages.invalidNumber];
+        if (name) setError(name, message); else showError(error.code === "unsupported_rule_period" ? messages.unsupported : message);
+      } else showError(messages.invalidNumber);
+      invalidate();
+    }
+  }
+
+  document.querySelectorAll("[data-situation]").forEach((input) => input.addEventListener("change", () => { updateSituations(); invalidate(); }));
+  document.querySelectorAll("[data-integrated-override], [data-seniority-toggle]").forEach((input) => input.addEventListener("change", () => { updateScenarioFields(); invalidate(); }));
+  document.querySelectorAll("[data-plant-worker], [data-constitutional], [data-twenty-days]").forEach((input) => input.addEventListener("change", invalidate));
+  scenarioSection.addEventListener("toggle", () => {
+    if (hasResult) conditionalResult.classList.toggle("hidden", !scenarioSection.open);
+  });
+  document.querySelectorAll("[data-add-row]").forEach((button) => button.addEventListener("click", () => addRow(button.dataset.addRow)));
+  document.addEventListener("input", (event) => {
+    if (event.target.matches("[data-row-name], [data-row-amount]")) invalidate();
+  });
+  document.addEventListener("click", (event) => {
+    const remove = event.target.closest("[data-remove-row]");
+    if (remove) { remove.closest("[data-row]")?.remove(); invalidate(); }
+  });
+  allFields.forEach((input) => input.addEventListener("input", () => { setError(input.dataset.field); invalidate(); }));
+  scope.addEventListener("change", () => { setError("scope"); invalidate(); });
+  form.addEventListener("submit", (event) => { event.preventDefault(); calculate(); });
+  document.querySelector("[data-clear]").addEventListener("click", () => {
+    form.reset();
+    field("annualBonusDays").value = "15";
+    field("ineligibleBonusDays").value = "0";
+    field("priorVacationBalance").value = "0";
+    field("usedVacationDays").value = "0";
+    field("unpaidDays").value = "0";
+    field("vacationPremium").value = "25";
+    document.querySelectorAll("[data-row]").forEach((row) => row.remove());
+    clearErrors(); updateSituations(); updateScenarioFields(); invalidate();
+    field("hireDate")?.focus();
+  });
+  copyButton.addEventListener("click", async () => {
+    if (!copyText) return;
+    try { await navigator.clipboard.writeText(copyText); copyButton.textContent = messages.copied; copyStatus.textContent = messages.copySuccess; }
+    catch { copyStatus.textContent = messages.copyFailure; }
+    window.clearTimeout(copyTimeout);
+    copyTimeout = window.setTimeout(() => { copyButton.textContent = messages.copy; copyStatus.textContent = ""; }, 2000);
+  });
+
+  updateSituations();
+  updateScenarioFields();
+</script>

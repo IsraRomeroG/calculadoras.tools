@@ -15,6 +15,7 @@ import {
   SPEED_UNITS,
 } from "@lib/calculators/programacion/calculadora-velocidad-descarga/downloadSpeed";
 import { buildFaqJsonLd } from "@lib/seo";
+import { buildAlternateLinks } from "@lib/i18n/routing";
 
 const title = "Calculadora de tiempo de descarga: Mbps, MB/s y GB";
 const description =
@@ -68,7 +69,7 @@ const faqs = [
 const faqJsonLd = buildFaqJsonLd(faqs);
 ---
 
-<BaseLayout title={title} description={description} canonical={canonical}>
+<BaseLayout title={title} description={description} canonical={canonical} alternates={buildAlternateLinks({ es: "/programacion/calculadora-velocidad-descarga", en: "/en/programming/download-time-calculator" }, Astro.site ?? Astro.url)}>
   <Fragment slot="head">
     <script type="application/ld+json" set:html={JSON.stringify(faqJsonLd)} />
   </Fragment>

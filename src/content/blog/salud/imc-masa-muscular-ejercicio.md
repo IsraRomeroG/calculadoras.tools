@@ -4,6 +4,7 @@ seoTitle: "IMC y masa muscular: por qué puede salir alto en deportistas"
 description: "Aprende por qué el IMC puede ser alto en personas con mucha masa muscular y qué otros indicadores pueden ayudar."
 pubDate: 2026-07-03
 categorySlug: "salud"
+translationKey: "bmi-muscle-and-exercise"
 tags:
   - imc
   - masa muscular

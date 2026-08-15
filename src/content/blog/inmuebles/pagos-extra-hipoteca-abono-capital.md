@@ -4,6 +4,7 @@ seoTitle: "Abono a capital en hipoteca: pagos extra, plazo e intereses"
 description: "Conoce cómo los pagos extra pueden reducir capital, acortar el plazo de una hipoteca y ahorrar intereses."
 pubDate: 2026-05-23
 categorySlug: "inmuebles"
+translationKey: "extra-mortgage-payments"
 tags:
   - pagos extra
   - abono a capital

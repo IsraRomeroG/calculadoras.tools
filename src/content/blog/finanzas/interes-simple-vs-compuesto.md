@@ -3,6 +3,7 @@ title: "Interés simple vs interés compuesto"
 description: "Conoce la diferencia entre interés simple e interés compuesto con fórmulas, tabla comparativa y ejemplos."
 pubDate: 2026-03-19
 categorySlug: "finanzas"
+translationKey: "simple-vs-compound-interest"
 tags:
   - interes simple
   - interes compuesto

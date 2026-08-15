@@ -20,6 +20,7 @@ import {
   sanitizeCssVariableName,
 } from "@lib/calculators/programacion/paleta-hex-rgb-hsl/colorPalette";
 import { buildFaqJsonLd } from "@lib/seo";
+import { buildAlternateLinks } from "@lib/i18n/routing";
 
 const title = "Paleta HEX, RGB y HSL para CSS";
 const description =
@@ -116,7 +117,7 @@ const faqs = [
 const faqJsonLd = buildFaqJsonLd(faqs);
 ---
 
-<BaseLayout title={title} description={description} canonical={canonical}>
+<BaseLayout title={title} description={description} canonical={canonical} alternates={buildAlternateLinks({ es: "/programacion/paleta-hex-rgb-hsl", en: "/en/programming/hex-rgb-hsl-color-converter" }, Astro.site ?? Astro.url)}>
   <Fragment slot="head">
     <script type="application/ld+json" set:html={JSON.stringify(faqJsonLd)} />
   </Fragment>

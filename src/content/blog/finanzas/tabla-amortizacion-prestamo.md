@@ -4,6 +4,7 @@ seoTitle: "Tabla de amortización: capital, intereses, saldo y pagos"
 description: "Conoce qué muestra una tabla de amortización, cómo se divide cada pago entre capital e intereses y cómo usarla para comparar un crédito."
 pubDate: 2026-04-27
 categorySlug: "finanzas"
+translationKey: "loan-amortization-schedule"
 tags:
   - amortización
   - préstamo

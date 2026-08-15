@@ -4,6 +4,7 @@ seoTitle: "IMC en adultos mayores: límites, masa muscular y salud"
 description: "Aprende por qué el IMC puede ser menos preciso en adultos mayores y qué factores conviene considerar."
 pubDate: 2026-06-06
 categorySlug: "salud"
+translationKey: "bmi-older-adults"
 tags:
   - imc
   - adultos mayores

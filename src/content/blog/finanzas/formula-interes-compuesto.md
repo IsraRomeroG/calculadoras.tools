@@ -3,6 +3,7 @@ title: "Fórmula del interés compuesto paso a paso"
 description: "Conoce la fórmula del interés compuesto, qué significa cada variable y cómo aplicarla con ejemplos claros."
 pubDate: 2026-03-23
 categorySlug: "finanzas"
+translationKey: "compound-interest-formula"
 tags:
   - interés compuesto
   - fórmulas

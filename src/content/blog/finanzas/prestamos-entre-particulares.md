@@ -4,6 +4,7 @@ seoTitle: "Préstamo entre particulares: intereses, pagos y tabla de amortizaci�
 description: "Aprende a estimar pagos e intereses en un préstamo entre particulares y qué datos conviene dejar claros por escrito."
 pubDate: 2026-06-23
 categorySlug: "finanzas"
+translationKey: "loans-between-individuals"
 tags:
   - préstamo entre particulares
   - intereses

@@ -16,12 +16,18 @@ import {
   type PetSpecialCase,
   type PetWeightContext,
 } from "@lib/calculators/mascotas/calorias-diarias-para-perro-o-gato/petCalories";
+import { buildAlternateLinks } from "@lib/i18n/routing";
 import { buildFaqJsonLd } from "@lib/seo";
 
 const title = "Calorias diarias para perro o gato";
 const description =
   "Estima un rango orientativo de calorias diarias para perros y gatos adultos segun peso, perfil y condicion corporal.";
 const canonical = "/mascotas/calorias-diarias-para-perro-o-gato";
+const englishCanonical = "/en/pets/pet-calorie-calculator";
+const alternates = buildAlternateLinks(
+  { es: canonical, en: englishCanonical },
+  Astro.site ?? Astro.url,
+);
 
 const faqs = [
   {
@@ -114,7 +120,7 @@ const sources = [
 ];
 ---
 
-<BaseLayout title={title} description={description} canonical={canonical}>
+<BaseLayout title={title} description={description} canonical={canonical} alternates={alternates}>
   <Fragment slot="head">
     <script type="application/ld+json" set:html={JSON.stringify(faqJsonLd)} />
   </Fragment>

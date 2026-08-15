@@ -1,0 +1,1225 @@
+---
+import BaseLayout from "@layouts/BaseLayout.astro";
+import { buildAlternateLinks } from "@lib/i18n/routing";
+import AdSlot from "@components/ads/AdSlot.astro";
+import Container from "@components/layout/Container.astro";
+import PageShell from "@components/layout/PageShell.astro";
+import FaqSection from "@components/shared/FaqSection.astro";
+import PageHero from "@components/shared/PageHero.astro";
+import SectionIntro from "@components/shared/SectionIntro.astro";
+import {
+  DIET_PRESET_OPTIONS,
+  MACRO_GOAL_OPTIONS,
+} from "@lib/calculators/salud/calculadora-de-macros/macros.en";
+import { buildFaqJsonLd } from "@lib/seo";
+
+const title = "Macro Calculator — Protein, Carbohydrates, and Fat";
+const description =
+  "Estimate your daily macros from your calorie target, weight, and goal. Get starting targets for protein, carbohydrates, and fat in grams.";
+const canonical = "/en/health/macro-calculator";
+const spanishCanonical = "/salud/calculadora-de-macros";
+const alternates = buildAlternateLinks({ es: spanishCanonical, en: canonical }, Astro.site ?? Astro.url);
+
+const faqs = [
+  {
+    question: "What are macronutrients?",
+    answer:
+      "Macronutrients provide energy: protein, carbohydrates, and fat. Each serves different functions and is measured in grams.",
+  },
+  {
+    question: "How are daily macros calculated?",
+    answer:
+      "This calculator starts with your calorie target. Its primary method sets protein per kilogram of body weight, allocates fat, and assigns the remaining calories to carbohydrates.",
+  },
+  {
+    question: "How much protein should I eat per day?",
+    answer:
+      "It depends on your weight, goal, training, and health context. The calculator uses reference ranges and lets you adjust grams per kilogram.",
+  },
+  {
+    question: "What macro split is suitable for fat loss?",
+    answer:
+      "A practical approach is to prioritize adequate protein, keep fat within a reasonable range, and assign the remaining calories to carbohydrates. A calorie deficit remains the primary driver of fat loss.",
+  },
+  {
+    question: "What macro targets support muscle gain?",
+    answer:
+      "A common starting point is adequate protein, moderate fat, and enough carbohydrates to support training. Training quality, recovery, and progression also matter.",
+  },
+  {
+    question: "How many carbohydrates do I need per day?",
+    answer:
+      "Needs vary widely with calorie intake, activity, and dietary pattern. In the primary method, carbohydrates receive the calories remaining after protein and fat.",
+  },
+  {
+    question: "How much fat should I eat per day?",
+    answer:
+      "The calculator uses reference percentages. An excessively low fat intake may make it harder to obtain essential fatty acids and fat-soluble vitamins.",
+  },
+  {
+    question: "What macros are used for a keto diet?",
+    answer:
+      "Keto diets typically limit carbohydrates in grams. This calculator uses an editable carbohydrate limit and assigns the remaining calories to fat.",
+  },
+  {
+    question: "How do I calculate macros for a vegan diet?",
+    answer:
+      "Use the vegan preset as a starting point and include varied plant protein sources such as legumes, soy, grains, seeds, and nuts.",
+  },
+  {
+    question: "Do I have to eat exactly these amounts every day?",
+    answer:
+      "No. Results are educational reference values. Treat them as practical targets and adjust according to energy, hunger, performance, and actual progress.",
+  },
+];
+
+const faqJsonLd = buildFaqJsonLd(faqs);
+
+const macroSummaries = [
+  {
+    title: "Protein",
+    text: "Calculated first in the primary method so the target scales with your body weight.",
+    tone: "border-sky-400/40 bg-sky-400/10 text-sky-100",
+  },
+  {
+    title: "Carbohydrates",
+    text: "Calculated from the remaining calories, except for keto where a gram limit is set.",
+    tone: "border-orange-400/40 bg-orange-400/10 text-orange-100",
+  },
+  {
+    title: "Fat",
+    text: "Allocated as a percentage, or from the remaining calories on keto, to maintain a coherent distribution.",
+    tone: "border-emerald-400/40 bg-emerald-400/10 text-emerald-100",
+  },
+];
+
+const foodExamples = [
+  {
+    title: "Protein sources",
+    items: [
+      "1 large egg: approx. 6 g",
+      "100 g cooked chicken breast: approx. 31 g",
+      "100 g drained canned tuna: approx. 25 g",
+      "100 g cooked lentils: approx. 9 g",
+    ],
+  },
+  {
+    title: "Carbohydrate sources",
+    items: [
+      "100 g cooked white rice: approx. 28 g",
+      "1 medium banana: approx. 27 g",
+      "1 slice whole-wheat bread: approx. 12 g",
+      "1 medium cooked potato: approx. 37 g",
+    ],
+  },
+  {
+    title: "Fat sources",
+    items: [
+      "1/2 medium avocado: approx. 15 g",
+      "1 tablespoon olive oil: approx. 14 g",
+      "30 g almonds: approx. 14 g",
+      "100 g cooked salmon: approx. 13 g",
+    ],
+  },
+];
+
+const sources = [
+  {
+    label: "National Academies: Dietary Reference Intakes for macronutrients",
+    href: "https://www.nationalacademies.org/cdn/materials/9fb9fae1-63a0-4048-88ad-3f972639149a",
+  },
+  {
+    label: "National Academies Press: The Essential Guide to Nutrient Requirements",
+    href: "https://www.nationalacademies.org/read/11537/chapter/7",
+  },
+  {
+    label: "International Society of Sports Nutrition: protein and exercise",
+    href: "https://link.springer.com/article/10.1186/s12970-017-0177-8",
+  },
+  {
+    label: "USDA FoodData Central",
+    href: "https://fdc.nal.usda.gov/",
+  },
+];
+---
+
+<BaseLayout title={title} description={description} canonical={canonical} locale="en" alternates={alternates}>
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={JSON.stringify(faqJsonLd)} />
+  </Fragment>
+
+  <PageShell>
+    <PageHero
+      title="Macro calculator"
+      description="Convert your calorie target into editable daily gram targets for protein, carbohydrates, and fat."
+      kicker="Health"
+      collapseBreadcrumbOnMobile
+      containerClass="py-5 md:py-7"
+      breadcrumbs={[
+        { label: "Home", href: "/en", ariaLabel: "Home" },
+        { label: "Health", href: "/en/health", optional: true },
+        { label: "Macro calculator", truncate: true },
+      ]}
+    />
+
+    <Container as="section" class="py-6 md:py-8">
+      <section
+        id="macro-calculator"
+        class="overflow-hidden rounded-lg border border-gray-700 bg-gray-950 shadow-xl shadow-gray-950/30"
+        aria-labelledby="calculator-heading"
+      >
+        <div class="grid gap-0 xl:grid-cols-[minmax(0,1fr)_minmax(21rem,0.78fr)]">
+          <div class="p-4 sm:p-6">
+            <div class="mb-5">
+              <p class="text-sm font-semibold uppercase tracking-wide text-amber-400">
+                Main calculation
+              </p>
+              <h2 id="calculator-heading" class="mt-2 text-2xl font-semibold">
+                Calculate your daily macros
+              </h2>
+              <p class="mt-2 text-sm leading-relaxed text-gray-400">
+                Enter your calorie target and weight. If you do not know your
+                calorie needs yet, calculate your TDEE first.
+              </p>
+            </div>
+
+            <div class="mb-5 rounded-lg border border-gray-800 bg-gray-900/70 p-4">
+              <p class="text-sm font-semibold text-gray-100">
+                Don't know your calorie target?
+              </p>
+              <p class="mt-1 text-sm leading-relaxed text-gray-400">
+                Use the TDEE calculator, then return with that number.
+              </p>
+              <a
+                class="mt-3 inline-flex min-h-10 items-center justify-center rounded-lg border border-amber-400/50 px-3 py-2 text-sm font-semibold text-amber-200 transition hover:bg-amber-400/10 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/40"
+                href="/en/health/tdee-calculator"
+              >
+                Calculate TDEE
+              </a>
+            </div>
+
+            <div class="mb-5">
+              <span class="block text-sm font-medium text-gray-200">
+                Sistema de unidades
+              </span>
+              <div
+                class="mt-2 flex rounded-lg border border-gray-700 bg-gray-900 p-1"
+                role="group"
+                aria-label="Sistema de unidades"
+              >
+                <button
+                  class="min-h-11 flex-1 rounded-md px-4 py-2 text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/40"
+                  type="button"
+                  aria-pressed="true"
+                  data-unit-option="metric"
+                >
+                  Metric
+                </button>
+                <button
+                  class="min-h-11 flex-1 rounded-md px-4 py-2 text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/40"
+                  type="button"
+                  aria-pressed="false"
+                  data-unit-option="imperial"
+                >
+                  Imperial
+                </button>
+              </div>
+            </div>
+
+            <div class="grid gap-4 sm:grid-cols-2">
+              <div>
+                <label
+                  for="macro-calories"
+                  class="block text-sm font-medium text-gray-200"
+                >
+                  Calorie target
+                </label>
+                <div
+                  class="mt-2 flex rounded-lg border border-gray-700 bg-gray-900 focus-within:border-amber-400 focus-within:ring-3 focus-within:ring-amber-400/15"
+                >
+                  <input
+                    id="macro-calories"
+                    class="min-h-12 w-full bg-transparent px-4 text-base text-white outline-none"
+                    type="text"
+                    inputmode="decimal"
+                    autocomplete="off"
+                    placeholder="1818"
+                    aria-describedby="macro-calories-error"
+                    data-input="calories"
+                  />
+                  <span class="flex items-center px-4 text-gray-500">kcal</span>
+                </div>
+                <p
+                  id="macro-calories-error"
+                  class="mt-2 hidden text-sm text-red-300"
+                  data-error-for="calories"
+                >
+                </p>
+              </div>
+
+              <div data-unit-panel="metric">
+                <label
+                  for="macro-weight-kg"
+                  class="block text-sm font-medium text-gray-200"
+                >
+                  Weight
+                </label>
+                <div
+                  class="mt-2 flex rounded-lg border border-gray-700 bg-gray-900 focus-within:border-amber-400 focus-within:ring-3 focus-within:ring-amber-400/15"
+                >
+                  <input
+                    id="macro-weight-kg"
+                    class="min-h-12 w-full bg-transparent px-4 text-base text-white outline-none"
+                    type="text"
+                    inputmode="decimal"
+                    autocomplete="off"
+                    placeholder="65"
+                    aria-describedby="macro-weight-kg-error"
+                    data-input="weightKg"
+                  />
+                  <span class="flex items-center px-4 text-gray-500">kg</span>
+                </div>
+                <p
+                  id="macro-weight-kg-error"
+                  class="mt-2 hidden text-sm text-red-300"
+                  data-error-for="weightKg"
+                >
+                </p>
+              </div>
+
+              <div class="hidden" data-unit-panel="imperial">
+                <label
+                  for="macro-weight-lb"
+                  class="block text-sm font-medium text-gray-200"
+                >
+                  Weight
+                </label>
+                <div
+                  class="mt-2 flex rounded-lg border border-gray-700 bg-gray-900 focus-within:border-amber-400 focus-within:ring-3 focus-within:ring-amber-400/15"
+                >
+                  <input
+                    id="macro-weight-lb"
+                    class="min-h-12 w-full bg-transparent px-4 text-base text-white outline-none"
+                    type="text"
+                    inputmode="decimal"
+                    autocomplete="off"
+                    placeholder="143"
+                    aria-describedby="macro-weight-lb-error"
+                    data-input="weightLb"
+                  />
+                  <span class="flex items-center px-4 text-gray-500">lb</span>
+                </div>
+                <p
+                  id="macro-weight-lb-error"
+                  class="mt-2 hidden text-sm text-red-300"
+                  data-error-for="weightLb"
+                >
+                </p>
+              </div>
+            </div>
+
+            <div class="mt-5 grid gap-4 sm:grid-cols-2">
+              <div>
+                <label
+                  for="macro-goal"
+                  class="block text-sm font-medium text-gray-200"
+                >
+                  Goal
+                </label>
+                <select
+                  id="macro-goal"
+                  class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-900 px-4 text-base text-white outline-none transition focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15"
+                  data-input="goal"
+                >
+                  {
+                    MACRO_GOAL_OPTIONS.map((goal) => (
+                      <option value={goal.key}>{goal.label}</option>
+                    ))
+                  }
+                </select>
+              </div>
+
+              <div>
+                <label
+                  for="macro-diet"
+                  class="block text-sm font-medium text-gray-200"
+                >
+                  Dietary approach
+                </label>
+                <select
+                  id="macro-diet"
+                  class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-900 px-4 text-base text-white outline-none transition focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15"
+                  data-input="dietPreset"
+                >
+                  {
+                    DIET_PRESET_OPTIONS.map((diet) => (
+                      <option value={diet.key}>{diet.label}</option>
+                    ))
+                  }
+                </select>
+              </div>
+            </div>
+
+            <div class="mt-5">
+              <span class="block text-sm font-medium text-gray-200">
+                Calculation method
+              </span>
+              <div
+                class="mt-2 grid gap-2 rounded-lg border border-gray-700 bg-gray-900 p-1 sm:grid-cols-2"
+                role="group"
+                aria-label="Calculation method"
+              >
+                <button
+                  class="min-h-11 rounded-md px-4 py-2 text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/40"
+                  type="button"
+                  aria-pressed="true"
+                  data-method-option="protein-first"
+                >
+                  Protein first
+                </button>
+                <button
+                  class="min-h-11 rounded-md px-4 py-2 text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/40"
+                  type="button"
+                  aria-pressed="false"
+                  data-method-option="percentages"
+                >
+                  By percentage
+                </button>
+              </div>
+            </div>
+
+            <div class="mt-5 grid gap-4 sm:grid-cols-2" data-method-panel="protein-first">
+              <div>
+                <label
+                  for="macro-protein-kg"
+                  class="block text-sm font-medium text-gray-200"
+                >
+                  Protein
+                </label>
+                <div
+                  class="mt-2 flex rounded-lg border border-gray-700 bg-gray-900 focus-within:border-amber-400 focus-within:ring-3 focus-within:ring-amber-400/15"
+                >
+                  <input
+                    id="macro-protein-kg"
+                    class="min-h-12 w-full bg-transparent px-4 text-base text-white outline-none"
+                    type="text"
+                    inputmode="decimal"
+                    autocomplete="off"
+                    placeholder="1.8"
+                    aria-describedby="macro-protein-kg-error"
+                    data-input="proteinGramsPerKg"
+                  />
+                  <span class="flex items-center px-4 text-gray-500">g/kg</span>
+                </div>
+                <p
+                  id="macro-protein-kg-error"
+                  class="mt-2 hidden text-sm text-red-300"
+                  data-error-for="proteinGramsPerKg"
+                >
+                </p>
+              </div>
+
+              <div data-fat-percent-field>
+                <label
+                  for="macro-fat-percent"
+                  class="block text-sm font-medium text-gray-200"
+                >
+                  Fat
+                </label>
+                <div
+                  class="mt-2 flex rounded-lg border border-gray-700 bg-gray-900 focus-within:border-amber-400 focus-within:ring-3 focus-within:ring-amber-400/15"
+                >
+                  <input
+                    id="macro-fat-percent"
+                    class="min-h-12 w-full bg-transparent px-4 text-base text-white outline-none"
+                    type="text"
+                    inputmode="decimal"
+                    autocomplete="off"
+                    placeholder="30"
+                    aria-describedby="macro-fat-percent-error"
+                    data-input="fatPercent"
+                  />
+                  <span class="flex items-center px-4 text-gray-500">%</span>
+                </div>
+                <p
+                  id="macro-fat-percent-error"
+                  class="mt-2 hidden text-sm text-red-300"
+                  data-error-for="fatPercent"
+                >
+                </p>
+              </div>
+
+              <div class="hidden sm:col-span-2" data-keto-carb-field>
+                <label
+                  for="macro-keto-carbs"
+                  class="block text-sm font-medium text-gray-200"
+                >
+                  Carbohydrates on keto
+                </label>
+                <div
+                  class="mt-2 flex rounded-lg border border-gray-700 bg-gray-900 focus-within:border-amber-400 focus-within:ring-3 focus-within:ring-amber-400/15"
+                >
+                  <input
+                    id="macro-keto-carbs"
+                    class="min-h-12 w-full bg-transparent px-4 text-base text-white outline-none"
+                    type="text"
+                    inputmode="decimal"
+                    autocomplete="off"
+                    placeholder="30"
+                    aria-describedby="macro-keto-carbs-error"
+                    data-input="carbLimitGrams"
+                  />
+                  <span class="flex items-center px-4 text-gray-500">g/day</span>
+                </div>
+                <p class="mt-2 text-xs leading-relaxed text-gray-500">
+                  On keto, fat receives the remaining calories.
+                </p>
+                <p
+                  id="macro-keto-carbs-error"
+                  class="mt-2 hidden text-sm text-red-300"
+                  data-error-for="carbLimitGrams"
+                >
+                </p>
+              </div>
+            </div>
+
+            <div class="mt-5 hidden" data-method-panel="percentages">
+              <div class="grid gap-4 sm:grid-cols-3">
+                <div>
+                  <label for="macro-protein-percent" class="block text-sm font-medium text-gray-200">Protein</label>
+                  <div class="mt-2 flex rounded-lg border border-gray-700 bg-gray-900 focus-within:border-amber-400">
+                    <input id="macro-protein-percent" class="min-h-12 w-full bg-transparent px-4 text-base text-white outline-none" type="text" inputmode="decimal" autocomplete="off" data-input="proteinPercent" />
+                    <span class="flex items-center px-4 text-gray-500">%</span>
+                  </div>
+                  <p class="mt-2 hidden text-sm text-red-300" data-error-for="proteinPercent"></p>
+                </div>
+                <div>
+                  <label for="macro-carbs-percent" class="block text-sm font-medium text-gray-200">Carbohydrates</label>
+                  <div class="mt-2 flex rounded-lg border border-gray-700 bg-gray-900 focus-within:border-amber-400">
+                    <input id="macro-carbs-percent" class="min-h-12 w-full bg-transparent px-4 text-base text-white outline-none" type="text" inputmode="decimal" autocomplete="off" data-input="carbsPercent" />
+                    <span class="flex items-center px-4 text-gray-500">%</span>
+                  </div>
+                  <p class="mt-2 hidden text-sm text-red-300" data-error-for="carbsPercent"></p>
+                </div>
+                <div>
+                  <label for="macro-fat-percent-manual" class="block text-sm font-medium text-gray-200">Fat</label>
+                  <div class="mt-2 flex rounded-lg border border-gray-700 bg-gray-900 focus-within:border-amber-400">
+                    <input id="macro-fat-percent-manual" class="min-h-12 w-full bg-transparent px-4 text-base text-white outline-none" type="text" inputmode="decimal" autocomplete="off" data-input="fatPercentManual" />
+                    <span class="flex items-center px-4 text-gray-500">%</span>
+                  </div>
+                  <p class="mt-2 hidden text-sm text-red-300" data-error-for="fatPercentManual"></p>
+                </div>
+              </div>
+              <div class="mt-3 flex flex-col gap-3 rounded-lg border border-gray-800 bg-gray-900/70 p-3 sm:flex-row sm:items-center sm:justify-between">
+                <p class="text-sm font-semibold text-gray-200" data-percent-total>Total: 100%</p>
+                <button class="inline-flex min-h-10 items-center justify-center rounded-lg border border-gray-700 px-3 py-2 text-sm font-semibold text-gray-200" type="button" data-fill-remainder>Use remaining calories for carbs</button>
+              </div>
+              <p class="mt-2 hidden text-sm text-red-300" data-error-for="percentageTotal"></p>
+            </div>
+
+            <div class="mt-5 max-w-xs">
+              <label for="macro-meals" class="block text-sm font-medium text-gray-200">Number of meals</label>
+              <select id="macro-meals" class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-900 px-4 text-base text-white" data-input="meals">
+                {[1, 2, 3, 4, 5, 6, 7].map((meal) => <option value={meal} selected={meal === 3}>{meal}</option>)}
+              </select>
+              <p class="mt-2 hidden text-sm text-red-300" data-error-for="meals"></p>
+            </div>
+
+            <div class="mt-6 flex flex-col gap-3 border-t border-gray-800 pt-5 sm:flex-row sm:flex-wrap">
+              <button class="inline-flex min-h-11 items-center justify-center rounded-lg border border-gray-700 px-4 py-2 text-sm font-semibold text-gray-200" type="button" data-fill-example>Use example</button>
+              <button class="inline-flex min-h-11 items-center justify-center rounded-lg border border-gray-700 px-4 py-2 text-sm font-semibold text-gray-200" type="button" data-clear-calculator>Clear</button>
+              <button class="hidden min-h-11 items-center justify-center rounded-lg bg-amber-400 px-4 py-2 text-sm font-semibold text-gray-950" type="button" data-copy-result><span data-copy-label>Copy result</span></button>
+              <p class="sr-only" aria-live="polite" data-copy-status></p>
+            </div>
+          </div>
+
+          <aside class="border-t border-gray-800 bg-gray-900/70 p-4 sm:p-6 xl:border-l xl:border-t-0" aria-live="polite">
+            <p class="text-sm font-semibold uppercase tracking-wide text-amber-400" data-result-kicker>Result</p>
+            <p class="mt-3 break-words text-4xl font-bold leading-tight text-white" data-main-result>Enter your values</p>
+            <p class="mt-3 inline-flex rounded-full border border-gray-700 px-3 py-1 text-sm font-semibold text-gray-300" data-method-label>No calculation yet</p>
+            <div class="mt-6 grid gap-5 sm:grid-cols-[10rem_1fr] xl:grid-cols-1">
+              <div class="flex items-center justify-center">
+                <div class="relative grid size-36 place-items-center rounded-full bg-gray-800" style="background: conic-gradient(#334155 0 100%)" aria-hidden="true" data-donut>
+                  <div class="grid size-24 place-items-center rounded-full bg-gray-900 text-center"><span class="text-sm font-semibold text-gray-300" data-donut-label>Macros</span></div>
+                </div>
+              </div>
+              <div class="grid gap-3">
+                <div class="rounded-lg border border-sky-400/30 bg-sky-400/10 p-4"><div class="flex justify-between"><span class="font-semibold text-sky-100">Protein</span><span data-protein-percent>0%</span></div><p class="mt-2 text-2xl font-bold" data-protein-grams>0 g</p><p class="text-sm" data-protein-calories>0 kcal</p></div>
+                <div class="rounded-lg border border-orange-400/30 bg-orange-400/10 p-4"><div class="flex justify-between"><span class="font-semibold text-orange-100">Carbohydrates</span><span data-carbs-percent>0%</span></div><p class="mt-2 text-2xl font-bold" data-carbs-grams>0 g</p><p class="text-sm" data-carbs-calories>0 kcal</p></div>
+                <div class="rounded-lg border border-emerald-400/30 bg-emerald-400/10 p-4"><div class="flex justify-between"><span class="font-semibold text-emerald-100">Fat</span><span data-fat-percent-result>0%</span></div><p class="mt-2 text-2xl font-bold" data-fat-grams>0 g</p><p class="text-sm" data-fat-calories>0 kcal</p></div>
+              </div>
+            </div>
+            <div class="mt-5 rounded-lg border border-gray-800 bg-gray-950/60 p-4">
+              <p class="text-sm font-semibold text-gray-100">Per-meal distribution</p>
+              <div class="mt-3 overflow-x-auto"><table class="w-full min-w-[28rem] text-left text-sm"><thead><tr><th>Meal</th><th>Calories</th><th>Protein</th><th>Carbs</th><th>Fat</th></tr></thead><tbody data-meal-body><tr><td colspan="5">Complete the calculation to view each meal.</td></tr></tbody></table></div>
+            </div>
+            <div class="mt-5 hidden rounded-lg border border-amber-400/40 bg-amber-400/10 p-4" data-warning-panel><p class="font-semibold text-amber-200">Important notes</p><ul class="mt-2 space-y-2 text-sm text-amber-100" data-warning-list></ul></div>
+            <p class="mt-5 text-sm leading-relaxed text-gray-400" data-explanation>Your result will appear here. Use it as an educational starting point, not an exact prescription.</p>
+          </aside>
+        </div>
+      </section>
+    </Container>
+
+    <AdSlot placement="calculator-after-tool" />
+    <Container as="section" class="py-8 md:py-10">
+      <SectionIntro title="How to interpret your macros" description="The calculator converts energy into grams and flags combinations that may need additional care." />
+      <div class="grid gap-4 md:grid-cols-3">{macroSummaries.map((item) => <article class={`rounded-lg border p-5 ${item.tone}`}><h3 class="text-lg font-semibold text-white">{item.title}</h3><p class="mt-2 text-sm leading-relaxed">{item.text}</p></article>)}</div>
+    </Container>
+    <Container as="section" class="py-8 md:py-10">
+      <SectionIntro title="Food examples" description="Approximate values vary by brand, serving size, preparation, and whether food is weighed raw or cooked." />
+      <div class="grid gap-4 md:grid-cols-3">{foodExamples.map((group) => <article class="rounded-lg border border-gray-800 bg-gray-950/70 p-5"><h3 class="text-lg font-semibold">{group.title}</h3><ul class="mt-3 space-y-2 text-sm text-gray-400">{group.items.map((item) => <li>{item}</li>)}</ul></article>)}</div>
+    </Container>
+    <Container as="section" class="py-8 md:py-10">
+      <SectionIntro title="Health notice" description="Results are educational estimates based on general energy and macronutrient guidelines." />
+      <p class="rounded-lg border border-gray-800 bg-gray-950/70 p-5 text-sm leading-relaxed text-gray-300">Your actual needs may vary with training, body composition, sleep, stress, medications, medical conditions, digestion, preferences, and adherence. Consult a healthcare professional if you are pregnant or breastfeeding, have a history of an eating disorder, kidney disease, diabetes, symptoms, or other medical concerns.</p>
+    </Container>
+    <FaqSection faqs={faqs} />
+  </PageShell>
+</BaseLayout>
+
+<script>
+  import {
+    buildMacroCopyText,
+    calculateMealDistribution,
+    calculatePercentageMacros,
+    calculateProteinFirstMacros,
+    convertKgToLb,
+    convertLbToKg,
+    formatCalories,
+    formatDailyCalories,
+    formatGrams,
+    formatMealGrams,
+    formatPercent,
+    formatWeight,
+    getDietPresetDefaults,
+    getDietPresetOption,
+    getGoalOption,
+    parseHealthInput,
+    roundTo,
+    validateMeals,
+    validatePercentageInput,
+    validateProteinFirstInput,
+  } from "@lib/calculators/salud/calculadora-de-macros/macros.en";
+
+  const ERROR_MESSAGES = {
+    required: "This field is required.", invalid: "Enter a valid number.", negative: "Enter zero or a positive value.", too_many_decimals: "Use fewer decimal places.", calories_range: "Enter 800 to 6,000 kcal.", weight_range: "Enter 30 to 300 kg or 66 to 660 lb.", protein_range_low: "Enter at least 0.6 g/kg.", protein_range_high: "Enter no more than 3.5 g/kg.", fat_percent_range: "Enter 10% to 75% fat.", carb_limit_range: "Enter 0 to 300 g of carbohydrates.", percentage_range: "Review the allowed percentage range.", percentage_total: "The percentages must add up to 100%.", negative_carbs: "Protein and fat exceed your calorie target. Reduce either value or increase calories.", negative_fat: "Protein and carbohydrates exceed your calorie target. Reduce either value.", meals_range: "Choose 1 to 7 meals.",
+  };
+  const WARNING_MESSAGES = {
+    calories_low: "This calorie target is low. Avoid very-low-calorie diets without professional supervision.", protein_low: "Protein is low for a general adult reference. Check whether this target makes sense for you.", protein_high: "Calculated protein is high for your weight. It may suit some athletic contexts but does not always provide additional benefit.", fat_low: "Fat is low, which may make it harder to obtain essential fatty acids and fat-soluble vitamins.", carbs_low: "Carbohydrates are very low. Some people notice reduced energy or performance.", keto_carbs_high: "Ketogenic diets usually restrict carbohydrates further. This value may not fit a classic ketogenic approach.", restrictive_diet: "This approach restricts food groups. Make sure you meet your fiber, micronutrient, and individual needs.", vegan_high_protein: "For a high-protein vegan diet, use varied plant sources such as legumes, soy, grains, seeds, and nuts.", one_meal: "One meal a day can be difficult to sustain. Make sure it covers energy, protein, and micronutrients.", percent_outside_amdr: "This distribution falls outside general AMDR ranges. That may be intentional, but interpret it as a specific adjustment.",
+  };
+  const METHOD_LABELS = { "protein-first": "Protein first", percentages: "By percentage" };
+  const unitButtons = Array.from(document.querySelectorAll("[data-unit-option]"));
+  const unitPanels = Array.from(document.querySelectorAll("[data-unit-panel]"));
+  const methodButtons = Array.from(document.querySelectorAll("[data-method-option]"));
+  const methodPanels = Array.from(document.querySelectorAll("[data-method-panel]"));
+  const fatPercentField = document.querySelector("[data-fat-percent-field]");
+  const ketoCarbField = document.querySelector("[data-keto-carb-field]");
+  const fillRemainderButton = document.querySelector("[data-fill-remainder]");
+  const inputs = {
+    calories: document.querySelector('[data-input="calories"]'),
+    weightKg: document.querySelector('[data-input="weightKg"]'),
+    weightLb: document.querySelector('[data-input="weightLb"]'),
+    goal: document.querySelector('[data-input="goal"]'),
+    dietPreset: document.querySelector('[data-input="dietPreset"]'),
+    proteinGramsPerKg: document.querySelector('[data-input="proteinGramsPerKg"]'),
+    fatPercent: document.querySelector('[data-input="fatPercent"]'),
+    carbLimitGrams: document.querySelector('[data-input="carbLimitGrams"]'),
+    proteinPercent: document.querySelector('[data-input="proteinPercent"]'),
+    carbsPercent: document.querySelector('[data-input="carbsPercent"]'),
+    fatPercentManual: document.querySelector(
+      '[data-input="fatPercentManual"]',
+    ),
+    meals: document.querySelector('[data-input="meals"]'),
+  };
+
+  const resultKicker = document.querySelector("[data-result-kicker]");
+  const mainResult = document.querySelector("[data-main-result]");
+  const methodLabel = document.querySelector("[data-method-label]");
+  const donut = document.querySelector("[data-donut]");
+  const donutLabel = document.querySelector("[data-donut-label]");
+  const percentTotal = document.querySelector("[data-percent-total]");
+  const macroElements = {
+    protein: {
+      grams: document.querySelector("[data-protein-grams]"),
+      calories: document.querySelector("[data-protein-calories]"),
+      percent: document.querySelector("[data-protein-percent]"),
+    },
+    carbs: {
+      grams: document.querySelector("[data-carbs-grams]"),
+      calories: document.querySelector("[data-carbs-calories]"),
+      percent: document.querySelector("[data-carbs-percent]"),
+    },
+    fat: {
+      grams: document.querySelector("[data-fat-grams]"),
+      calories: document.querySelector("[data-fat-calories]"),
+      percent: document.querySelector("[data-fat-percent-result]"),
+    },
+  };
+  const mealBody = document.querySelector("[data-meal-body]");
+  const warningPanel = document.querySelector("[data-warning-panel]");
+  const warningList = document.querySelector("[data-warning-list]");
+  const explanation = document.querySelector("[data-explanation]");
+  const copyButton = document.querySelector("[data-copy-result]");
+  const copyLabel = document.querySelector("[data-copy-label]");
+  const copyStatus = document.querySelector("[data-copy-status]");
+  const clearButton = document.querySelector("[data-clear-calculator]");
+  const exampleButton = document.querySelector("[data-fill-example]");
+
+  let currentUnit = "metric";
+  let currentMethod = "protein-first";
+  let currentCopyText = "";
+  let copiedTimeout = 0;
+
+  function hasStarted() {
+    const weightInput = currentUnit === "metric" ? inputs.weightKg : inputs.weightLb;
+
+    return inputs.calories?.value.trim() !== "" || weightInput?.value.trim() !== "";
+  }
+
+  function updateUnitButtons() {
+    unitButtons.forEach((button) => {
+      const isActive = button.dataset.unitOption === currentUnit;
+      button.setAttribute("aria-pressed", String(isActive));
+      button.classList.toggle("bg-amber-400", isActive);
+      button.classList.toggle("text-gray-950", isActive);
+      button.classList.toggle("text-gray-300", !isActive);
+      button.classList.toggle("hover:bg-gray-800", !isActive);
+    });
+
+    unitPanels.forEach((panel) => {
+      const isActive = panel.dataset.unitPanel === currentUnit;
+      panel.classList.toggle("hidden", !isActive);
+    });
+  }
+
+  function updateMethodButtons() {
+    methodButtons.forEach((button) => {
+      const isActive = button.dataset.methodOption === currentMethod;
+      button.setAttribute("aria-pressed", String(isActive));
+      button.classList.toggle("bg-amber-400", isActive);
+      button.classList.toggle("text-gray-950", isActive);
+      button.classList.toggle("text-gray-300", !isActive);
+      button.classList.toggle("hover:bg-gray-800", !isActive);
+    });
+
+    methodPanels.forEach((panel) => {
+      const isActive = panel.dataset.methodPanel === currentMethod;
+      panel.classList.toggle("hidden", !isActive);
+      panel.classList.toggle("grid", isActive && currentMethod === "protein-first");
+    });
+  }
+
+  function updateKetoControls() {
+    const isKeto =
+      currentMethod === "protein-first" && inputs.dietPreset?.value === "keto";
+
+    fatPercentField?.classList.toggle("hidden", isKeto);
+    ketoCarbField?.classList.toggle("hidden", !isKeto);
+  }
+
+  function applyPresetDefaults() {
+    const defaults = getDietPresetDefaults(inputs.dietPreset.value, inputs.goal.value);
+
+    inputs.proteinGramsPerKg.value = String(defaults.proteinGramsPerKg);
+    inputs.fatPercent.value = String(defaults.fatPercent);
+    inputs.carbLimitGrams.value = String(defaults.carbLimitGrams ?? 30);
+    inputs.proteinPercent.value = String(defaults.proteinPercent);
+    inputs.carbsPercent.value = String(defaults.carbsPercent);
+    inputs.fatPercentManual.value = String(defaults.fatPercentManual);
+    updatePercentTotal();
+    updateKetoControls();
+  }
+
+  function parseNumber(input, errors, field, options = {}) {
+    const parsed = parseHealthInput(input?.value ?? "", options);
+
+    if (!parsed.ok) {
+      errors[field] = parsed.error;
+      return null;
+    }
+
+    return parsed.value;
+  }
+
+  function parseWeight(errors) {
+    if (currentUnit === "metric") {
+      return parseNumber(inputs.weightKg, errors, "weightKg");
+    }
+
+    const weightLb = parseNumber(inputs.weightLb, errors, "weightLb");
+
+    if (weightLb === null) {
+      return null;
+    }
+
+    if (weightLb < 66 || weightLb > 660) {
+      errors.weightLb = "weight_range";
+      return null;
+    }
+
+    return convertLbToKg(weightLb);
+  }
+
+  function parseFormValues() {
+    const errors = {};
+    const calories = parseNumber(inputs.calories, errors, "calories");
+    const weightKg = parseWeight(errors);
+    const meals = parseNumber(inputs.meals, errors, "meals", { maxDecimals: 0 });
+
+    if (meals !== null && !Number.isInteger(meals)) {
+      errors.meals = "meals_range";
+    }
+
+    if (Object.keys(errors).length > 0) {
+      return { ok: false, errors, warnings: [] };
+    }
+
+    if (currentMethod === "protein-first") {
+      return parseProteinFirstValues(calories, weightKg, meals);
+    }
+
+    return parsePercentageValues(calories, weightKg, meals);
+  }
+
+  function parseProteinFirstValues(calories, weightKg, meals) {
+    const errors = {};
+    const proteinGramsPerKg = parseNumber(
+      inputs.proteinGramsPerKg,
+      errors,
+      "proteinGramsPerKg",
+    );
+    const fatPercent = parseNumber(inputs.fatPercent, errors, "fatPercent");
+    const carbLimitGrams =
+      inputs.dietPreset.value === "keto"
+        ? parseNumber(inputs.carbLimitGrams, errors, "carbLimitGrams")
+        : null;
+
+    if (Object.keys(errors).length > 0) {
+      return { ok: false, errors, warnings: [] };
+    }
+
+    const input = {
+      calories,
+      weightKg,
+      goal: inputs.goal.value,
+      dietPreset: inputs.dietPreset.value,
+      proteinGramsPerKg,
+      fatPercent,
+      carbLimitGrams: carbLimitGrams ?? undefined,
+    };
+    const validation = validateProteinFirstInput(input);
+    const mealValidation = validateMeals(meals);
+
+    return {
+      ok: validation.isValid && mealValidation.isValid,
+      errors: mapValidationErrors({
+        ...validation.errors,
+        ...mealValidation.errors,
+      }),
+      warnings: uniqueWarnings([
+        ...validation.warnings,
+        ...mealValidation.warnings,
+      ]),
+      input,
+      meals,
+    };
+  }
+
+  function parsePercentageValues(calories, weightKg, meals) {
+    const errors = {};
+    const proteinPercent = parseNumber(
+      inputs.proteinPercent,
+      errors,
+      "proteinPercent",
+    );
+    const carbsPercent = parseNumber(inputs.carbsPercent, errors, "carbsPercent");
+    const fatPercent = parseNumber(
+      inputs.fatPercentManual,
+      errors,
+      "fatPercentManual",
+    );
+
+    if (Object.keys(errors).length > 0) {
+      return { ok: false, errors, warnings: [] };
+    }
+
+    const input = {
+      calories,
+      weightKg,
+      goal: inputs.goal.value,
+      dietPreset: inputs.dietPreset.value,
+      proteinPercent,
+      carbsPercent,
+      fatPercent,
+    };
+    const validation = validatePercentageInput(input);
+    const mealValidation = validateMeals(meals);
+
+    return {
+      ok: validation.isValid && mealValidation.isValid,
+      errors: mapValidationErrors({
+        ...validation.errors,
+        ...mealValidation.errors,
+      }),
+      warnings: uniqueWarnings([
+        ...validation.warnings,
+        ...mealValidation.warnings,
+      ]),
+      input,
+      meals,
+    };
+  }
+
+  function mapValidationErrors(errors) {
+    const mapped = { ...errors };
+
+    if (mapped.weightKg && currentUnit === "imperial") {
+      mapped.weightLb = mapped.weightKg;
+      delete mapped.weightKg;
+    }
+
+    return mapped;
+  }
+
+  function updateCalculator() {
+    clearErrors();
+    updatePercentTotal();
+    updateKetoControls();
+
+    if (!hasStarted()) {
+      setInitialState();
+      return;
+    }
+
+    const parsed = parseFormValues();
+
+    if (!parsed.ok) {
+      showErrors(parsed.errors);
+      setInvalidState(parsed.warnings);
+      return;
+    }
+
+    const result =
+      currentMethod === "protein-first"
+        ? calculateProteinFirstMacros(parsed.input)
+        : calculatePercentageMacros(parsed.input);
+    const warnings = uniqueWarnings([...parsed.warnings, ...result.warnings]);
+
+    renderValidResult(parsed.input, result, parsed.meals, warnings);
+  }
+
+  function renderValidResult(input, result, meals, warnings) {
+    const goal = getGoalOption(input.goal);
+    const diet = getDietPresetOption(input.dietPreset);
+    const mealRows = calculateMealDistribution({ result, meals });
+
+    resultKicker.textContent = "Daily macros";
+    mainResult.textContent = formatDailyCalories(result.totalCalories);
+    methodLabel.textContent = `${METHOD_LABELS[currentMethod]} · ${goal.label} · ${diet.label}`;
+    donutLabel.textContent = formatGrams(result.protein.grams);
+    updateDonut(result);
+    renderMacroBreakdown(result);
+    renderMeals(mealRows);
+    renderWarnings(warnings);
+    explanation.textContent =
+      "These macro targets are a starting point. Reassess after 2 to 3 weeks based on energy, hunger, performance, and actual progress.";
+    setCopyVisible(true);
+    currentCopyText = buildMacroCopyText({
+      inputLabel: buildCopyInputLabel(input),
+      result,
+      meals,
+    });
+  }
+
+  function buildCopyInputLabel(input) {
+    const weightText =
+      currentUnit === "metric"
+        ? formatWeight(input.weightKg, "kg")
+        : formatWeight(convertKgToLb(input.weightKg), "lb");
+
+    return [
+      `Calorie target: ${formatDailyCalories(input.calories)}`,
+      `Weight: ${weightText}`,
+      `Goal: ${getGoalOption(input.goal).label}`,
+      `Diet: ${getDietPresetOption(input.dietPreset).label}`,
+      `Method: ${METHOD_LABELS[currentMethod]}`,
+    ];
+  }
+
+  function updateDonut(result) {
+    const proteinEnd = result.protein.percent;
+    const carbsEnd = proteinEnd + result.carbs.percent;
+
+    donut.style.background = `conic-gradient(#38bdf8 0 ${proteinEnd}%, #fb923c ${proteinEnd}% ${carbsEnd}%, #34d399 ${carbsEnd}% 100%)`;
+  }
+
+  function renderMacroBreakdown(result) {
+    setMacroValues("protein", result.protein);
+    setMacroValues("carbs", result.carbs);
+    setMacroValues("fat", result.fat);
+  }
+
+  function setMacroValues(macro, values) {
+    macroElements[macro].grams.textContent = formatGrams(values.grams);
+    macroElements[macro].calories.textContent = formatCalories(values.calories);
+    macroElements[macro].percent.textContent = formatPercent(values.percent);
+  }
+
+  function renderMeals(rows) {
+    mealBody.innerHTML = "";
+
+    rows.forEach((row) => {
+      const tableRow = document.createElement("tr");
+      tableRow.className = "text-gray-300";
+      tableRow.innerHTML = `
+        <td class="py-3 pr-3 font-semibold text-gray-100">Meal ${row.meal}</td>
+        <td class="py-3 pr-3">${formatCalories(row.calories)}</td>
+        <td class="py-3 pr-3">${formatMealGrams(row.proteinGrams)}</td>
+        <td class="py-3 pr-3">${formatMealGrams(row.carbsGrams)}</td>
+        <td class="py-3">${formatMealGrams(row.fatGrams)}</td>
+      `;
+      mealBody.append(tableRow);
+    });
+  }
+
+  function renderWarnings(warnings) {
+    warningList.innerHTML = "";
+
+    warnings.forEach((warning) => {
+      const item = document.createElement("li");
+      item.textContent = WARNING_MESSAGES[warning] ?? warning;
+      warningList.append(item);
+    });
+
+    warningPanel.classList.toggle("hidden", warnings.length === 0);
+  }
+
+  function setInitialState() {
+    resultKicker.textContent = "Result";
+    mainResult.textContent = "Enter your values";
+    methodLabel.textContent = "No calculation yet";
+    donut.style.background = "conic-gradient(#334155 0 100%)";
+    donutLabel.textContent = "Macros";
+    setMacroValues("protein", { grams: 0, calories: 0, percent: 0 });
+    setMacroValues("carbs", { grams: 0, calories: 0, percent: 0 });
+    setMacroValues("fat", { grams: 0, calories: 0, percent: 0 });
+    mealBody.innerHTML = `<tr><td class="py-3 text-gray-400" colspan="5">Complete the calculation to view each meal.</td></tr>`;
+    warningList.innerHTML = "";
+    warningPanel.classList.add("hidden");
+    explanation.textContent =
+      "Your result will appear here. Use it as an educational starting point, not an exact prescription.";
+    setCopyVisible(false);
+    currentCopyText = "";
+  }
+
+  function setInvalidState(warnings = []) {
+    resultKicker.textContent = "Review the fields";
+    mainResult.textContent = "Unable to calculate yet";
+    methodLabel.textContent = "Fields required";
+    donut.style.background = "conic-gradient(#334155 0 100%)";
+    donutLabel.textContent = "Review";
+    mealBody.innerHTML = `<tr><td class="py-3 text-gray-400" colspan="5">Correct the fields to view each meal.</td></tr>`;
+    renderWarnings(warnings);
+    explanation.textContent = "Correct the highlighted values to continue.";
+    setCopyVisible(false);
+    currentCopyText = "";
+  }
+
+  function clearErrors() {
+    document.querySelectorAll("[data-error-for]").forEach((errorElement) => {
+      errorElement.textContent = "";
+      errorElement.classList.add("hidden");
+    });
+  }
+
+  function showErrors(errors) {
+    Object.entries(errors).forEach(([field, error]) => {
+      const errorElement = document.querySelector(
+        `[data-error-for="${field}"]`,
+      );
+
+      if (!errorElement) {
+        return;
+      }
+
+      errorElement.textContent = ERROR_MESSAGES[error] ?? ERROR_MESSAGES.invalid;
+      errorElement.classList.remove("hidden");
+    });
+  }
+
+  function updatePercentTotal() {
+    const protein = parseHealthInput(inputs.proteinPercent?.value ?? "");
+    const carbs = parseHealthInput(inputs.carbsPercent?.value ?? "");
+    const fat = parseHealthInput(inputs.fatPercentManual?.value ?? "");
+
+    if (!protein.ok || !carbs.ok || !fat.ok) {
+      percentTotal.textContent = "Total: complete all percentages";
+      percentTotal.classList.remove("text-emerald-300");
+      percentTotal.classList.add("text-gray-300");
+      return;
+    }
+
+    const total = protein.value + carbs.value + fat.value;
+    const isValid = Math.abs(total - 100) <= 0.1;
+    percentTotal.textContent = `Total: ${formatPercent(total)}`;
+    percentTotal.classList.toggle("text-emerald-300", isValid);
+    percentTotal.classList.toggle("text-amber-300", !isValid);
+    percentTotal.classList.remove("text-gray-300");
+  }
+
+  function fillPercentageRemainder() {
+    const protein = parseHealthInput(inputs.proteinPercent?.value ?? "");
+    const fat = parseHealthInput(inputs.fatPercentManual?.value ?? "");
+
+    if (!protein.ok || !fat.ok) {
+      updateCalculator();
+      return;
+    }
+
+    const remainder = Math.max(0, roundTo(100 - protein.value - fat.value, 1));
+    inputs.carbsPercent.value = String(remainder);
+    updateCalculator();
+  }
+
+  function setCopyVisible(isVisible) {
+    copyButton.classList.toggle("hidden", !isVisible);
+    copyButton.classList.toggle("inline-flex", isVisible);
+  }
+
+  function switchUnit(nextUnit) {
+    if (nextUnit === currentUnit) {
+      return;
+    }
+
+    if (currentUnit === "metric") {
+      const parsedWeight = parseHealthInput(inputs.weightKg?.value ?? "");
+
+      if (parsedWeight.ok) {
+        inputs.weightLb.value = String(roundTo(convertKgToLb(parsedWeight.value), 1));
+      }
+    } else {
+      const parsedWeight = parseHealthInput(inputs.weightLb?.value ?? "");
+
+      if (parsedWeight.ok) {
+        inputs.weightKg.value = String(roundTo(convertLbToKg(parsedWeight.value), 1));
+      }
+    }
+
+    currentUnit = nextUnit;
+    updateUnitButtons();
+    clearErrors();
+    updateCalculator();
+  }
+
+  function switchMethod(nextMethod) {
+    currentMethod = nextMethod;
+    updateMethodButtons();
+    updateKetoControls();
+    clearErrors();
+    updateCalculator();
+  }
+
+  function fillExample() {
+    currentUnit = "metric";
+    currentMethod = "protein-first";
+    updateUnitButtons();
+    updateMethodButtons();
+    inputs.calories.value = "1818";
+    inputs.weightKg.value = "65";
+    inputs.weightLb.value = "";
+    inputs.goal.value = "lose-fat";
+    inputs.dietPreset.value = "balanced";
+    inputs.meals.value = "3";
+    applyPresetDefaults();
+    updateCalculator();
+  }
+
+  function clearCalculator() {
+    currentUnit = "metric";
+    currentMethod = "protein-first";
+    updateUnitButtons();
+    updateMethodButtons();
+    inputs.calories.value = "";
+    inputs.weightKg.value = "";
+    inputs.weightLb.value = "";
+    inputs.goal.value = "maintain";
+    inputs.dietPreset.value = "balanced";
+    inputs.meals.value = "3";
+    applyPresetDefaults();
+    clearErrors();
+    setInitialState();
+  }
+
+  async function copyResult() {
+    if (!currentCopyText || !copyLabel || !copyStatus) {
+      return;
+    }
+
+    try {
+      if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(currentCopyText);
+      } else {
+        const textArea = document.createElement("textarea");
+        textArea.value = currentCopyText;
+        textArea.setAttribute("readonly", "");
+        textArea.style.position = "fixed";
+        textArea.style.opacity = "0";
+        document.body.append(textArea);
+        textArea.select();
+        document.execCommand("copy");
+        textArea.remove();
+      }
+
+      window.clearTimeout(copiedTimeout);
+      copyLabel.textContent = "Copied";
+      copyStatus.textContent = "Result copied.";
+      copiedTimeout = window.setTimeout(() => {
+        copyLabel.textContent = "Copy result";
+        copyStatus.textContent = "";
+      }, 2000);
+    } catch {
+      copyStatus.textContent = "Unable to copy the result.";
+    }
+  }
+
+  function uniqueWarnings(warnings) {
+    return [...new Set(warnings)];
+  }
+
+  unitButtons.forEach((button) => {
+    button.addEventListener("click", () => {
+      switchUnit(button.dataset.unitOption);
+    });
+  });
+
+  methodButtons.forEach((button) => {
+    button.addEventListener("click", () => {
+      switchMethod(button.dataset.methodOption);
+    });
+  });
+
+  Object.values(inputs).forEach((input) => {
+    input?.addEventListener("input", updateCalculator);
+    input?.addEventListener("change", updateCalculator);
+  });
+
+  inputs.goal?.addEventListener("change", () => {
+    applyPresetDefaults();
+    updateCalculator();
+  });
+
+  inputs.dietPreset?.addEventListener("change", () => {
+    applyPresetDefaults();
+    updateCalculator();
+  });
+
+  fillRemainderButton?.addEventListener("click", fillPercentageRemainder);
+  clearButton?.addEventListener("click", clearCalculator);
+  exampleButton?.addEventListener("click", fillExample);
+  copyButton?.addEventListener("click", copyResult);
+
+  updateUnitButtons();
+  updateMethodButtons();
+  applyPresetDefaults();
+  setInitialState();
+</script>

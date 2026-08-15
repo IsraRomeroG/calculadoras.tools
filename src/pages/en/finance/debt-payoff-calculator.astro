@@ -1,0 +1,402 @@
+---
+import BaseLayout from "@layouts/BaseLayout.astro";
+import AdSlot from "@components/ads/AdSlot.astro";
+import Container from "@components/layout/Container.astro";
+import PageShell from "@components/layout/PageShell.astro";
+import FaqSection from "@components/shared/FaqSection.astro";
+import PageHero from "@components/shared/PageHero.astro";
+import SectionIntro from "@components/shared/SectionIntro.astro";
+import { buildAlternateLinks } from "@lib/i18n/routing";
+import { buildFaqJsonLd } from "@lib/seo";
+
+const title = "Debt payoff plan — Snowball and avalanche";
+const description =
+  "Compare snowball and avalanche strategies, estimate interest and create a monthly debt payoff plan.";
+const canonical = "/en/finance/debt-payoff-calculator";
+const spanishCanonical = "/finanzas/plan-de-pago-de-deudas";
+const alternates = buildAlternateLinks({ es: spanishCanonical, en: canonical }, Astro.site ?? Astro.url);
+const faqs = [
+  {
+    question: "Which is better, snowball or avalanche?",
+    answer:
+      "Avalanche usually saves more interest by prioritizing the highest rate. Snowball prioritizes the smallest balance and can provide a quicker first win.",
+  },
+  {
+    question: "How is a paid-off debt's payment reused?",
+    answer:
+      "The plan keeps the same monthly budget. When a debt is paid off, its former payment is directed to the next debt.",
+  },
+  {
+    question: "What if I can only make minimum payments?",
+    answer:
+      "The calculator shows a reference scenario with minimum payments that are not reassigned. Some debts may take many years or fail to decrease when the minimum does not cover interest.",
+  },
+  {
+    question: "Does the calculator include fees or late charges?",
+    answer:
+      "No. The estimate uses balance, annual rate and a fixed minimum payment. It excludes fees, insurance, late charges, new purchases and future rate changes.",
+  },
+  {
+    question: "Why can it differ from my statement?",
+    answer:
+      "Lenders may calculate interest using average daily balance, statement dates and variable minimum payments. This tool uses a simplified monthly simulation.",
+  },
+];
+const faqJsonLd = buildFaqJsonLd(faqs);
+---
+
+<BaseLayout title={title} description={description} canonical={canonical} locale="en" alternates={alternates}>
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={JSON.stringify(faqJsonLd)} />
+  </Fragment>
+
+  <PageShell>
+    <PageHero
+      title="Debt payoff plan"
+      description="Compare strategies and turn your monthly budget into a concrete debt-free plan."
+      kicker="Finance"
+      collapseBreadcrumbOnMobile
+      containerClass="py-6 md:py-8"
+      breadcrumbs={[
+        { label: "Home", href: "/en", ariaLabel: "Home" },
+        { label: "Finance", href: "/en/finance", optional: true },
+        { label: "Debt payoff plan", truncate: true },
+      ]}
+    />
+
+    <Container as="section" class="py-6 md:py-8">
+      <section
+        class="overflow-hidden rounded-lg border border-gray-700 bg-gray-950 shadow-xl shadow-gray-950/30"
+        aria-labelledby="calculator-heading"
+      >
+        <div class="grid lg:grid-cols-[minmax(0,1.2fr)_minmax(19rem,0.8fr)]">
+          <div class="p-4 sm:p-6">
+            <p class="text-sm font-semibold uppercase tracking-wide text-amber-400">Create your plan</p>
+            <h2 id="calculator-heading" class="mt-2 text-2xl font-semibold">
+              How much can you allocate each month?
+            </h2>
+            <p class="mt-2 text-sm leading-relaxed text-gray-400">
+              Enter at least one debt. With two or more, you can compare strategies.
+            </p>
+
+            <div class="mt-5 grid gap-4 sm:grid-cols-2">
+              <label class="block">
+                <span class="text-sm font-medium text-gray-200">Input method</span>
+                <select class="field" data-capture-mode>
+                  <option value="extra">Extra payment above minimums</option>
+                  <option value="total">Total monthly budget</option>
+                </select>
+              </label>
+              <label class="block">
+                <span class="text-sm font-medium text-gray-200" data-amount-label>Monthly extra payment</span>
+                <input class="field" type="text" inputmode="decimal" value="0" data-monthly-amount />
+              </label>
+              <label class="block">
+                <span class="text-sm font-medium text-gray-200">Plan to display</span>
+                <select class="field" data-strategy>
+                  <option value="avalanche">Avalanche: highest rate first</option>
+                  <option value="snowball">Snowball: smallest balance first</option>
+                  <option value="custom">Custom order</option>
+                </select>
+              </label>
+              <label class="block">
+                <span class="text-sm font-medium text-gray-200">Starting month</span>
+                <input class="field" type="month" data-start-month />
+              </label>
+            </div>
+
+            <div class="mt-6 flex items-center justify-between gap-4 border-t border-gray-800 pt-5">
+              <div>
+                <h3 class="text-lg font-semibold text-white">Your debts</h3>
+                <p class="mt-1 text-sm text-gray-500" data-debt-count></p>
+              </div>
+              <button class="secondary-button" type="button" data-add-debt>Add debt</button>
+            </div>
+            <div class="mt-4 space-y-4" data-debt-list></div>
+            <div class="mt-5 hidden rounded-lg border border-red-400/40 bg-red-400/10 p-4 text-sm text-red-200" role="alert" data-errors></div>
+
+            <div class="mt-6 flex flex-col gap-3 border-t border-gray-800 pt-5 sm:flex-row sm:flex-wrap">
+              <button class="primary-button" type="button" data-calculate>Comparar estrategias</button>
+              <button class="secondary-button" type="button" data-fill-example>Use example</button>
+              <button class="secondary-button" type="button" data-clear>Limpiar</button>
+            </div>
+          </div>
+
+          <aside class="border-t border-gray-800 bg-gray-900/70 p-4 sm:p-6 lg:border-l lg:border-t-0" aria-live="polite">
+            <p class="text-sm font-semibold uppercase tracking-wide text-amber-400" data-result-kicker>Result</p>
+            <p class="mt-3 text-3xl font-bold leading-tight text-white" data-main-result>Enter your debts</p>
+            <div class="mt-5 grid gap-3" data-summary-grid>
+              <div class="rounded-lg border border-gray-800 bg-gray-950/70 p-4 text-sm text-gray-400">
+                Your estimated debt-free date will appear here.
+              </div>
+            </div>
+            <p class="mt-4 hidden rounded-lg border border-amber-400/40 bg-amber-400/10 p-3 text-sm text-amber-100" data-result-warning></p>
+            <div class="mt-5 rounded-lg border border-gray-800 p-4">
+              <p class="text-xs font-semibold uppercase tracking-wide text-gray-500">Quick summary</p>
+              <p class="mt-2 text-sm leading-relaxed text-gray-300" data-explanation>
+                Compare strategies to see which saves interest and which pays off the first debt sooner.
+              </p>
+            </div>
+            <p class="mt-4 text-xs leading-relaxed text-gray-500">
+              Educational estimate. Excludes fees, late charges, new purchases and rate changes.
+            </p>
+          </aside>
+        </div>
+      </section>
+
+      <div class="sticky bottom-3 z-20 mt-4 lg:hidden">
+        <button class="primary-button w-full shadow-lg shadow-gray-950/50" type="button" data-calculate>
+          Comparar estrategias
+        </button>
+      </div>
+    </Container>
+
+    <div class="hidden" data-results>
+      <Container as="section" class="py-8">
+        <SectionIntro
+          title="Strategy comparison"
+          description="Snowball and avalanche keep the budget constant. The minimum-only scenario does not reassign freed payments."
+          class="mb-5"
+        />
+        <div class="grid gap-4 md:grid-cols-3" data-comparison-cards></div>
+      </Container>
+
+      <Container as="section" class="py-8">
+        <div class="grid gap-6 lg:grid-cols-2">
+          <section class="rounded-lg border border-gray-700 bg-gray-950 p-4 sm:p-6">
+            <h2 class="text-2xl font-semibold">Your next payment</h2>
+            <p class="mt-2 text-sm text-gray-400">Suggested distribution for the first month.</p>
+            <div class="mt-5 space-y-3" data-next-payments></div>
+          </section>
+          <section class="rounded-lg border border-gray-700 bg-gray-950 p-4 sm:p-6">
+            <h2 class="text-2xl font-semibold">Plan milestones</h2>
+            <p class="mt-2 text-sm text-gray-400">Estimated dates when each minimum payment is freed.</p>
+            <div class="mt-5 space-y-3" data-milestones></div>
+          </section>
+        </div>
+      </Container>
+
+      <Container as="section" class="py-8">
+        <div class="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
+          <SectionIntro title="Monthly detail" description="Interest, payments and ending balance by debt." />
+          <div class="flex flex-col gap-3 sm:flex-row">
+            <button class="primary-button" type="button" data-copy><span data-copy-label>Copy summary</span></button>
+            <button class="secondary-button" type="button" data-export>Exportar CSV</button>
+          </div>
+        </div>
+        <p class="sr-only" aria-live="polite" data-copy-status></p>
+        <div class="mt-5 overflow-x-auto rounded-lg border border-gray-700">
+          <table class="min-w-[64rem] w-full divide-y divide-gray-800 bg-gray-950 text-left text-sm">
+            <thead class="bg-gray-900 text-gray-300">
+              <tr>
+                <th class="px-4 py-3">Month</th><th class="px-4 py-3">Debt</th>
+                <th class="px-4 py-3 text-right">Beginning balance</th><th class="px-4 py-3 text-right">Interest</th>
+                <th class="px-4 py-3 text-right">Minimum</th><th class="px-4 py-3 text-right">Extra</th>
+                <th class="px-4 py-3 text-right">Total payment</th><th class="px-4 py-3 text-right">Ending balance</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-800 text-gray-300" data-detail-body></tbody>
+          </table>
+        </div>
+      </Container>
+    </div>
+
+    <AdSlot placement="calculator-after-tool" />
+
+    <Container as="section" class="py-8">
+      <SectionIntro title="How to interpret the plan" description="The best strategy is one you can maintain while covering essential expenses." class="mb-5" />
+      <div class="grid gap-4 md:grid-cols-3">
+        <article class="info-card"><h2 class="font-semibold text-white">Avalanche</h2><p class="mt-2 text-sm text-gray-400">Targets the highest rate and usually minimizes interest.</p></article>
+        <article class="info-card"><h2 class="font-semibold text-white">Snowball</h2><p class="mt-2 text-sm text-gray-400">Targets the smallest balance to reach early milestones.</p></article>
+        <article class="info-card"><h2 class="font-semibold text-white">Assumptions</h2><p class="mt-2 text-sm text-gray-400">Monthly interest on beginning balance and fixed minimum payments.</p></article>
+      </div>
+    </Container>
+
+    <FaqSection faqs={faqs} />
+  </PageShell>
+</BaseLayout>
+
+<style is:global>
+  .field { margin-top: .5rem; min-height: 3rem; width: 100%; border-radius: .5rem; border: 1px solid rgb(55 65 81); background: rgb(17 24 39); padding: 0 1rem; color: white; outline: none; }
+  .field:focus { border-color: rgb(251 191 36); box-shadow: 0 0 0 3px rgb(251 191 36 / .15); }
+  .primary-button { display: inline-flex; min-height: 2.75rem; align-items: center; justify-content: center; border-radius: .5rem; background: rgb(251 191 36); padding: .5rem 1rem; font-size: .875rem; font-weight: 700; color: rgb(3 7 18); }
+  .secondary-button { display: inline-flex; min-height: 2.75rem; align-items: center; justify-content: center; border-radius: .5rem; border: 1px solid rgb(55 65 81); padding: .5rem 1rem; font-size: .875rem; font-weight: 600; color: rgb(229 231 235); }
+  .info-card { border-radius: .5rem; border: 1px solid rgb(55 65 81); background: rgb(3 7 18); padding: 1.25rem; }
+</style>
+
+<script>
+  import { addMonthsToYearMonth, calculateDebtPlan, calculateMonthlyBudget, compareDebtStrategies } from "@lib/calculators/finanzas/plan-de-pago-de-deudas/debtPayoff.en";
+  import { formatCurrency, formatDuration, parseLoanInput, roundCurrency } from "@lib/calculators/finanzas/calculadora-de-prestamo/loan.en";
+
+  const get = (selector) => document.querySelector(selector);
+  const debtList = get("[data-debt-list]");
+  const captureMode = get("[data-capture-mode]");
+  const monthlyAmount = get("[data-monthly-amount]");
+  const strategySelect = get("[data-strategy]");
+  const startMonth = get("[data-start-month]");
+  let sequence = 0;
+  let debts = [newDebt(), newDebt()];
+  let currentPlan = null;
+  let currentComparison = null;
+  let currentStartMonth = "";
+  let copyText = "";
+
+  function newDebt(values = {}) {
+    sequence += 1;
+    return { id: `debt-${sequence}`, name: values.name ?? `Debt ${sequence}`, balance: values.balance ?? "", annualRate: values.annualRate ?? "", minimumPayment: values.minimumPayment ?? "" };
+  }
+
+  function renderDebts() {
+    get("[data-debt-count]").textContent = `${debts.length} ${debts.length === 1 ? "debt" : "debts"}`;
+    debtList.innerHTML = debts.map((debt, index) => `
+      <article class="rounded-lg border border-gray-700 bg-gray-900/70 p-4">
+        <div class="flex items-center justify-between gap-3">
+          <p class="text-sm font-semibold text-amber-300">Debt ${index + 1}</p>
+          <div class="flex flex-wrap justify-end gap-2">
+            ${action("Subir", "up", debt.id, index === 0)} ${action("Bajar", "down", debt.id, index === debts.length - 1)}
+            ${action("Duplicate", "duplicate", debt.id)} ${action("Remove", "remove", debt.id, debts.length === 1, true)}
+          </div>
+        </div>
+        <div class="mt-4 grid gap-4 sm:grid-cols-2">
+          ${debtField("Name", "name", debt, "text", true)}
+          ${debtField("Current balance", "balance", debt)}
+          ${debtField("Annual rate (%)", "annualRate", debt)}
+          ${debtField("Monthly minimum payment", "minimumPayment", debt, "text", true)}
+        </div>
+      </article>`).join("");
+  }
+
+  function action(label, actionName, id, disabled = false, danger = false) {
+    return `<button class="min-h-9 rounded-md border ${danger ? "border-red-400/40 text-red-200" : "border-gray-700 text-gray-300"} px-3 text-xs font-semibold disabled:opacity-30" type="button" data-action="${actionName}" data-id="${id}" ${disabled ? "disabled" : ""}>${label}</button>`;
+  }
+
+  function debtField(label, field, debt, type = "text", wide = false) {
+    return `<label class="block ${wide ? "sm:col-span-2" : ""}"><span class="text-sm font-medium text-gray-200">${label}</span><input class="field" type="${type}" ${field === "name" ? 'maxlength="60"' : 'inputmode="decimal"'} value="${escapeHtml(debt[field])}" data-field="${field}" data-id="${debt.id}" /></label>`;
+  }
+
+  function parseForm() {
+    const errors = [];
+    const parsedDebts = debts.map((debt, index) => {
+      const balance = parseLoanInput(debt.balance);
+      const rate = parseLoanInput(debt.annualRate, { maxDecimals: 4, preferDecimal: true });
+      const minimum = parseLoanInput(debt.minimumPayment);
+      const name = debt.name.trim();
+      if (!name) errors.push(`Debt ${index + 1}: add a name.`);
+      if (!balance.ok || balance.value <= 0) errors.push(`${name || `Debt ${index + 1}`}: invalid balance.`);
+      if (!rate.ok || rate.value > 200) errors.push(`${name || `Debt ${index + 1}`}: invalid rate.`);
+      if (!minimum.ok) errors.push(`${name || `Debt ${index + 1}`}: invalid minimum payment.`);
+      return { id: debt.id, name, balance: balance.ok ? balance.value : 0, annualRate: rate.ok ? rate.value : 0, minimumPayment: minimum.ok ? minimum.value : 0 };
+    });
+    const amount = parseLoanInput(monthlyAmount.value);
+    if (!amount.ok) errors.push("Enter a valid monthly amount.");
+    const budget = calculateMonthlyBudget(parsedDebts, amount.ok ? amount.value : 0, captureMode.value);
+    const minimums = parsedDebts.reduce((sum, debt) => sum + debt.minimumPayment, 0);
+    if (captureMode.value === "total" && budget < minimums) errors.push(`The budget must cover ${formatCurrency(minimums)} in minimums.`);
+    if (budget <= 0) errors.push("The budget must be greater than zero.");
+    return { errors, parsedDebts, budget };
+  }
+
+  function calculate() {
+    const parsed = parseForm();
+    showErrors(parsed.errors);
+    if (parsed.errors.length) return;
+    currentStartMonth = startMonth.value || currentYearMonth();
+    currentComparison = compareDebtStrategies({ debts: parsed.parsedDebts, budget: parsed.budget });
+    const selected = strategySelect.value;
+    currentPlan = selected === "custom"
+      ? calculateDebtPlan({ debts: parsed.parsedDebts, budget: parsed.budget, strategy: "custom", customOrder: parsed.parsedDebts.map((debt) => debt.id) })
+      : currentComparison[selected];
+    renderResults();
+  }
+
+  function renderResults() {
+    const plan = currentPlan;
+    const comparison = currentComparison;
+    const payoffDate = plan.viable ? addMonthsToYearMonth(currentStartMonth, plan.months) : "Not achievable within 600 months";
+    const baseSavings = comparison.minimums.viable ? Math.max(comparison.minimums.totalInterest - plan.totalInterest, 0) : null;
+    get("[data-results]").classList.remove("hidden");
+    get("[data-result-kicker]").textContent = strategyLabel(plan.strategy);
+    get("[data-main-result]").textContent = payoffDate;
+    get("[data-summary-grid]").innerHTML = [
+      ["Monthly budget", formatCurrency(plan.budget)], ["Duration", plan.viable ? formatDuration(plan.months) : "More than 600 months"],
+      ["Interest", formatCurrency(plan.totalInterest)], ["Total paid", formatCurrency(plan.totalPaid)],
+      ["Savings vs. minimums", baseSavings === null ? "Minimum-only plan is not viable" : formatCurrency(baseSavings)],
+    ].map(([label, value]) => summary(label, value)).join("");
+    const warning = get("[data-result-warning]");
+    warning.textContent = plan.warnings.join(" ");
+    warning.classList.toggle("hidden", !plan.warnings.length);
+    get("[data-explanation]").textContent = comparison.recommendedStrategy === "tie"
+      ? "Snowball and avalanche tie on interest."
+      : `${strategyLabel(comparison.recommendedStrategy)} saves ${formatCurrency(comparison.interestDifference)} compared with the other strategy.`;
+    renderComparison(); renderNextPayments(); renderMilestones(); renderRows();
+    copyText = buildCopyText(payoffDate);
+    get("[data-results]").scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
+  function renderComparison() {
+    const items = [["Avalanche", currentComparison.avalanche, "avalanche"], ["Snowball", currentComparison.snowball, "snowball"], ["Minimums only", currentComparison.minimums, "minimums"]];
+    get("[data-comparison-cards]").innerHTML = items.map(([label, plan, key]) => `
+      <article class="rounded-lg border ${currentComparison.recommendedStrategy === key ? "border-emerald-400/60 bg-emerald-400/5" : "border-gray-700 bg-gray-950"} p-5">
+        <h2 class="text-lg font-semibold text-white">${label}</h2>
+        <dl class="mt-4 space-y-3">${definition("Duration", plan.viable ? formatDuration(plan.months) : "More than 600 months")}${definition("Interest", formatCurrency(plan.totalInterest))}${definition("First debt", plan.milestones[0] ? `Month ${plan.milestones[0].payoffMonth}` : "Not available")}</dl>
+      </article>`).join("");
+  }
+
+  function renderNextPayments() {
+    get("[data-next-payments]").innerHTML = currentPlan.nextPayments.map((row) => `<div class="flex items-center justify-between gap-4 rounded-lg border border-gray-800 p-4"><div><p class="font-semibold text-white">${escapeHtml(row.debtName)}</p><p class="mt-1 text-xs text-gray-500">Minimum ${formatCurrency(row.minimumPayment)} + extra ${formatCurrency(row.extraPayment)}</p></div><p class="text-lg font-bold text-amber-300">${formatCurrency(row.totalPayment)}</p></div>`).join("");
+  }
+
+  function renderMilestones() {
+    get("[data-milestones]").innerHTML = currentPlan.milestones.map((item) => `<details class="rounded-lg border border-gray-800 p-4"><summary class="cursor-pointer list-none font-semibold text-white">${item.payoffPosition}. ${escapeHtml(item.debtName)} · ${escapeHtml(addMonthsToYearMonth(currentStartMonth, item.payoffMonth))}</summary><dl class="mt-3 grid gap-3 sm:grid-cols-2">${definition("Interest paid", formatCurrency(item.totalInterest))}${definition("Freed payment", formatCurrency(item.releasedMinimum))}</dl></details>`).join("");
+  }
+
+  function renderRows() {
+    get("[data-detail-body]").innerHTML = currentPlan.rows.map((row) => `<tr class="hover:bg-gray-900/60"><td class="px-4 py-3">${row.month}</td><th class="px-4 py-3 text-white">${escapeHtml(row.debtName)}</th><td class="px-4 py-3 text-right">${formatCurrency(row.beginningBalance)}</td><td class="px-4 py-3 text-right">${formatCurrency(row.interest)}</td><td class="px-4 py-3 text-right">${formatCurrency(row.minimumPayment)}</td><td class="px-4 py-3 text-right">${formatCurrency(row.extraPayment)}</td><td class="px-4 py-3 text-right">${formatCurrency(row.totalPayment)}</td><td class="px-4 py-3 text-right font-semibold text-white">${formatCurrency(row.endingBalance)}</td></tr>`).join("");
+  }
+
+  function fillExample() {
+    sequence = 0;
+    debts = [newDebt({ name: "Credit card", balance: "20000", annualRate: "45", minimumPayment: "1000" }), newDebt({ name: "Personal loan", balance: "50000", annualRate: "24", minimumPayment: "2000" }), newDebt({ name: "Installment purchase", balance: "8000", annualRate: "0", minimumPayment: "500" })];
+    captureMode.value = "extra"; monthlyAmount.value = "2000"; strategySelect.value = "avalanche";
+    renderDebts(); calculate();
+  }
+
+  function clearAll() {
+    if (debts.some((debt) => debt.balance) && !window.confirm("Do you want to clear all debts?")) return;
+    sequence = 0; debts = [newDebt(), newDebt()]; monthlyAmount.value = "0"; captureMode.value = "extra"; strategySelect.value = "avalanche";
+    get("[data-results]").classList.add("hidden"); showErrors([]); renderDebts(); updateLabel();
+  }
+
+  function exportCsv() {
+    if (!currentPlan) return;
+    const rows = ["month,debt,beginning_balance,interest,minimum_payment,extra_payment,total_payment,ending_balance", ...currentPlan.rows.map((row) => [row.month, `"${row.debtName.replaceAll('"', '""')}"`, roundCurrency(row.beginningBalance), roundCurrency(row.interest), roundCurrency(row.minimumPayment), roundCurrency(row.extraPayment), roundCurrency(row.totalPayment), roundCurrency(row.endingBalance)].join(",")), "", "Assumptions: monthly interest on beginning balance; fixed minimum payments; excludes fees and late charges."];
+    const url = URL.createObjectURL(new Blob([rows.join("\n")], { type: "text/csv;charset=utf-8" }));
+    const link = document.createElement("a"); link.href = url; link.download = "debt-payoff-plan.csv"; document.body.append(link); link.click(); link.remove(); URL.revokeObjectURL(url);
+  }
+
+  async function copyResult() {
+    if (!copyText) return;
+    try { await navigator.clipboard.writeText(copyText); get("[data-copy-label]").textContent = "Copied"; get("[data-copy-status]").textContent = "Summary copied."; }
+    catch { get("[data-copy-status]").textContent = "Could not copy."; }
+  }
+
+  function buildCopyText(date) {
+    return ["Debt payoff plan - calculadoras.tools", `Strategy: ${strategyLabel(currentPlan.strategy)}`, `Budget: ${formatCurrency(currentPlan.budget)}`, `Debt-free date: ${date}`, `Interest: ${formatCurrency(currentPlan.totalInterest)}`, "", "Next payment:", ...currentPlan.nextPayments.map((row) => `- ${row.debtName}: ${formatCurrency(row.totalPayment)}`)].join("\n");
+  }
+
+  function showErrors(errors) { const box = get("[data-errors]"); box.innerHTML = errors.map((error) => `<p>${escapeHtml(error)}</p>`).join(""); box.classList.toggle("hidden", !errors.length); }
+  function updateLabel() { get("[data-amount-label]").textContent = captureMode.value === "total" ? "Total monthly budget" : "Monthly extra payment"; }
+  function currentYearMonth() { const date = new Date(); return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`; }
+  function strategyLabel(value) { return ({ avalanche: "Avalanche", snowball: "Snowball", custom: "Custom order", minimums: "Minimums only", tie: "Tie" })[value] ?? value; }
+  function summary(label, value) { return `<div class="rounded-lg border border-gray-800 bg-gray-950/70 p-4"><span class="block text-xs font-semibold uppercase tracking-wide text-gray-500">${escapeHtml(label)}</span><span class="mt-2 block text-lg font-semibold text-white">${escapeHtml(value)}</span></div>`; }
+  function definition(label, value) { return `<div><dt class="text-xs font-semibold uppercase tracking-wide text-gray-500">${escapeHtml(label)}</dt><dd class="mt-1 font-semibold text-white">${escapeHtml(value)}</dd></div>`; }
+  function escapeHtml(value) { return String(value).replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;").replaceAll("'", "&#039;"); }
+
+  debtList.addEventListener("input", (event) => { const input = event.target.closest("[data-field]"); if (input) debts.find((debt) => debt.id === input.dataset.id)[input.dataset.field] = input.value; });
+  debtList.addEventListener("click", (event) => { const button = event.target.closest("[data-action]"); if (!button) return; const index = debts.findIndex((debt) => debt.id === button.dataset.id); if (button.dataset.action === "up" && index > 0) [debts[index - 1], debts[index]] = [debts[index], debts[index - 1]]; if (button.dataset.action === "down" && index < debts.length - 1) [debts[index + 1], debts[index]] = [debts[index], debts[index + 1]]; if (button.dataset.action === "duplicate") debts.splice(index + 1, 0, newDebt({ ...debts[index], name: `${debts[index].name} copy` })); if (button.dataset.action === "remove" && debts.length > 1) debts.splice(index, 1); renderDebts(); });
+  get("[data-add-debt]").addEventListener("click", () => { debts.push(newDebt()); renderDebts(); });
+  document.querySelectorAll("[data-calculate]").forEach((button) => button.addEventListener("click", calculate));
+  get("[data-fill-example]").addEventListener("click", fillExample); get("[data-clear]").addEventListener("click", clearAll);
+  get("[data-copy]").addEventListener("click", copyResult); get("[data-export]").addEventListener("click", exportCsv); captureMode.addEventListener("change", updateLabel);
+  startMonth.value = currentYearMonth(); renderDebts(); updateLabel();
+</script>

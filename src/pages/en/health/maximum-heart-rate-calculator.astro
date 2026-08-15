@@ -1,0 +1,603 @@
+---
+import BaseLayout from "@layouts/BaseLayout.astro";
+import { buildAlternateLinks } from "@lib/i18n/routing";
+import AdSlot from "@components/ads/AdSlot.astro";
+import Container from "@components/layout/Container.astro";
+import PageShell from "@components/layout/PageShell.astro";
+import FaqSection from "@components/shared/FaqSection.astro";
+import PageHero from "@components/shared/PageHero.astro";
+import SectionIntro from "@components/shared/SectionIntro.astro";
+import { buildFaqJsonLd } from "@lib/seo";
+
+const title = "Maximum Heart Rate Calculator by Age";
+const description =
+  "Estimate your maximum heart rate by age with the Tanaka formula and view general moderate- and vigorous-intensity ranges.";
+const canonical = "/en/health/maximum-heart-rate-calculator";
+const spanishCanonical = "/salud/calculadora-de-frecuencia-cardiaca-maxima";
+const alternates = buildAlternateLinks({ es: spanishCanonical, en: canonical }, Astro.site ?? Astro.url);
+
+const faqs = [
+  {
+    question: "What is maximum heart rate?",
+    answer:
+      "It is the approximate highest number of beats per minute your heart can reach during very intense effort. Age-based formulas provide a population estimate, not an individual measurement.",
+  },
+  {
+    question: "Is maximum heart rate an exercise target?",
+    answer:
+      "No. It is an estimated maximum used as a reference for general intensity calculations. It is not a heart rate you should try to reach or maintain during exercise.",
+  },
+  {
+    question: "Which formula should I use: Tanaka or 220 minus age?",
+    answer:
+      "This calculator uses Tanaka as the primary estimate and shows 220 minus age for comparison. Neither formula predicts every person's maximum heart rate exactly.",
+  },
+  {
+    question: "Why might my actual heart rate be different?",
+    answer:
+      "Your response can vary with fitness, genetics, temperature, hydration, medication, stress, sleep, health conditions, and other factors.",
+  },
+  {
+    question: "What is the difference between maximum and target heart rate?",
+    answer:
+      "Maximum heart rate is an estimated limit. Target heart rate is a range derived from that maximum to represent an activity intensity, such as moderate or vigorous.",
+  },
+  {
+    question: "Does this replace an exercise stress test?",
+    answer:
+      "No. A supervised stress test can observe your individual response and may be needed when a healthcare professional requires a more precise measurement.",
+  },
+];
+
+const faqJsonLd = buildFaqJsonLd(faqs);
+---
+
+<BaseLayout title={title} description={description} canonical={canonical} locale="en" alternates={alternates}>
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={JSON.stringify(faqJsonLd)} />
+  </Fragment>
+
+  <PageShell>
+    <PageHero
+      title="Maximum heart rate calculator"
+      description="Estimate your maximum heart rate by age and view general moderate- and vigorous-intensity ranges."
+      kicker="Health"
+      collapseBreadcrumbOnMobile
+      containerClass="py-5 md:py-7"
+      breadcrumbs={[
+        { label: "Home", href: "/en", ariaLabel: "Home" },
+        { label: "Health", href: "/en/health", optional: true },
+        { label: "Maximum heart rate", truncate: true },
+      ]}
+    />
+
+    <Container as="section" class="py-4 md:py-8">
+      <section
+        id="maximum-heart-rate-calculator"
+        class="overflow-hidden rounded-lg border border-gray-700 bg-gray-950 shadow-xl shadow-gray-950/30"
+        aria-labelledby="calculator-heading"
+      >
+        <div class="grid gap-0 lg:grid-cols-[minmax(0,0.78fr)_minmax(21rem,1.12fr)]">
+          <form class="p-4 sm:p-6" data-calculator-form novalidate>
+            <div>
+              <p class="text-sm font-semibold uppercase tracking-wide text-amber-400">
+                Main calculation
+              </p>
+              <h2 id="calculator-heading" class="mt-2 text-2xl font-semibold">
+                Calculate your estimated maximum heart rate
+              </h2>
+              <p class="mt-2 text-sm leading-relaxed text-gray-400">
+                You only need your age. The Tanaka formula is used as the
+                primary estimate.
+              </p>
+            </div>
+
+            <div class="mt-5">
+              <label
+                for="maximum-heart-rate-age"
+                class="block text-sm font-semibold text-gray-200"
+              >
+                Age
+              </label>
+              <div
+                class="mt-2 flex rounded-lg border border-gray-700 bg-gray-900 transition focus-within:border-amber-400 focus-within:ring-3 focus-within:ring-amber-400/15"
+                data-age-wrapper
+              >
+                <input
+                  id="maximum-heart-rate-age"
+                  class="min-h-12 w-full bg-transparent px-4 text-base text-white outline-none placeholder:text-gray-600"
+                  type="text"
+                  inputmode="numeric"
+                  autocomplete="off"
+                  placeholder="35"
+                  aria-describedby="maximum-heart-rate-age-help maximum-heart-rate-age-error"
+                  data-age-input
+                />
+                <span class="flex items-center px-4 text-sm text-gray-500">
+                  years
+                </span>
+              </div>
+              <p
+                id="maximum-heart-rate-age-help"
+                class="mt-2 text-xs leading-relaxed text-gray-500"
+              >
+                Enter a whole-number age from 18 to 100.
+              </p>
+              <p
+                id="maximum-heart-rate-age-error"
+                class="mt-2 hidden text-sm font-medium text-red-300"
+                aria-live="polite"
+                data-age-error
+              >
+              </p>
+            </div>
+
+            <button
+              class="mt-5 min-h-12 w-full rounded-lg bg-amber-400 px-5 py-3 text-base font-bold text-gray-950 transition hover:bg-amber-300 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-300/50"
+              type="submit"
+            >
+              Calculate maximum heart rate
+            </button>
+
+            <div class="mt-3 grid grid-cols-2 gap-3">
+              <button
+                class="min-h-12 rounded-lg border border-gray-700 bg-gray-900 px-4 py-3 text-sm font-semibold text-gray-200 transition hover:border-gray-500 hover:bg-gray-800 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/30"
+                type="button"
+                data-clear-button
+              >
+                Limpiar
+              </button>
+              <button
+                class="min-h-12 rounded-lg border border-gray-700 bg-gray-900 px-4 py-3 text-sm font-semibold text-gray-200 transition enabled:hover:border-amber-400/70 enabled:hover:text-amber-300 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/30 disabled:cursor-not-allowed disabled:opacity-45"
+                type="button"
+                data-copy-button
+                disabled
+              >
+                <span data-copy-label>Copy result</span>
+              </button>
+            </div>
+            <p class="sr-only" aria-live="polite" data-copy-status></p>
+          </form>
+
+          <section
+            class="border-t border-gray-800 bg-gray-900/60 p-4 sm:p-6 lg:border-l lg:border-t-0"
+            aria-labelledby="result-heading"
+            data-result-region
+          >
+            <p class="text-sm font-semibold uppercase tracking-wide text-sky-300">
+              Result
+            </p>
+            <h2 id="result-heading" class="mt-2 text-xl font-semibold text-white">
+              Your estimate will appear here
+            </h2>
+
+            <div class="mt-4 rounded-lg border border-gray-700 bg-gray-950 p-5">
+              <p class="text-sm text-gray-400" data-main-result-label>
+                Estimated maximum heart rate
+              </p>
+              <p
+                class="mt-2 text-5xl font-bold tracking-tight text-white sm:text-6xl"
+                data-main-result
+              >
+                <span>--</span>
+                <span class="text-xl font-semibold text-gray-500">bpm</span>
+              </p>
+              <p class="mt-3 text-sm leading-relaxed text-gray-400" data-formula-note>
+                Enter your age to calculate it with the Tanaka formula.
+              </p>
+            </div>
+
+            <div
+              class="mt-4 rounded-lg border border-amber-400/25 bg-amber-400/10 p-4"
+            >
+              <p class="text-sm font-semibold text-amber-200">
+                This is not a target to maintain
+              </p>
+              <p class="mt-1 text-sm leading-relaxed text-amber-100/75">
+                This figure is an estimated maximum. It does not indicate a
+                heart rate you should try to reach or sustain during exercise.
+              </p>
+            </div>
+
+            <div class="mt-5 hidden" data-result-details>
+              <h3 class="text-base font-semibold text-white">
+                General intensity ranges
+              </h3>
+              <p class="mt-1 text-xs leading-relaxed text-gray-500">
+                These are general references calculated from Tanaka, not personalized zones.
+              </p>
+
+              <div class="mt-3 grid gap-3 sm:grid-cols-2">
+                <article class="rounded-lg border border-sky-400/30 bg-sky-400/10 p-4">
+                  <div class="flex items-start justify-between gap-3">
+                    <h4 class="font-semibold text-sky-200">
+                      Moderate activity
+                    </h4>
+                    <span class="rounded-full bg-sky-400/15 px-2 py-1 text-xs font-bold text-sky-200">
+                      50%-70%
+                    </span>
+                  </div>
+                  <p class="mt-3 text-2xl font-bold text-white" data-moderate-range>
+                    -- bpm
+                  </p>
+                  <p class="mt-2 text-xs leading-relaxed text-gray-400">
+                    General moderate effort; perceived intensity also matters.
+                    importa.
+                  </p>
+                </article>
+
+                <article class="rounded-lg border border-orange-400/30 bg-orange-400/10 p-4">
+                  <div class="flex items-start justify-between gap-3">
+                    <h4 class="font-semibold text-orange-200">
+                      Vigorous activity
+                    </h4>
+                    <span class="rounded-full bg-orange-400/15 px-2 py-1 text-xs font-bold text-orange-200">
+                      70%-85%
+                    </span>
+                  </div>
+                  <p class="mt-3 text-2xl font-bold text-white" data-vigorous-range>
+                    -- bpm
+                  </p>
+                  <p class="mt-2 text-xs leading-relaxed text-gray-400">
+                    A generally harder effort; progress gradually.
+                    gradual.
+                  </p>
+                </article>
+              </div>
+
+              <details class="mt-4 rounded-lg border border-gray-700 bg-gray-950 p-4">
+                <summary class="cursor-pointer text-sm font-semibold text-white">
+                  Compare formulas
+                </summary>
+                <div class="mt-4 grid gap-3 sm:grid-cols-2">
+                  <div class="rounded-lg border border-amber-400/30 bg-amber-400/10 p-3">
+                    <p class="text-xs font-bold uppercase tracking-wide text-amber-300">
+                      Primary
+                    </p>
+                    <p class="mt-2 text-sm font-semibold text-white">
+                      Tanaka: <span data-tanaka-comparison>-- bpm</span>
+                    </p>
+                    <p class="mt-1 text-xs text-gray-500" data-tanaka-formula>
+                      208 - (0.7 × age)
+                    </p>
+                  </div>
+                  <div class="rounded-lg border border-gray-700 bg-gray-900 p-3">
+                    <p class="text-xs font-bold uppercase tracking-wide text-gray-400">
+                      Comparison
+                    </p>
+                    <p class="mt-2 text-sm font-semibold text-white">
+                      Classic: <span data-classic-comparison>-- bpm</span>
+                    </p>
+                    <p class="mt-1 text-xs text-gray-500" data-classic-formula>
+                      220 - age
+                    </p>
+                  </div>
+                </div>
+                <p class="mt-3 text-xs leading-relaxed text-gray-500">
+                  These formulas provide population estimates. Your actual
+                  maximum heart rate may be different.
+                </p>
+              </details>
+
+              <div class="mt-4 rounded-lg border border-gray-700 bg-gray-950 p-4">
+                <p class="text-sm font-semibold text-white">
+                  Looking for zones 1 through 5 or the Karvonen method?
+                </p>
+                <p class="mt-1 text-xs leading-relaxed text-gray-500">
+                  Calculate five illustrative zones using this age or a maximum heart rate.
+                  conocida.
+                </p>
+                <a
+                  class="mt-3 inline-flex min-h-11 items-center rounded-lg border border-amber-400/50 px-3 py-2 text-sm font-semibold text-amber-200 transition hover:bg-amber-400/10 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/40"
+                  href="/en/health/heart-rate-zones-calculator"
+                  data-zones-link
+                >
+                  Calculate heart rate zones
+                </a>
+              </div>
+            </div>
+
+            <p class="sr-only" aria-live="polite" data-result-status></p>
+          </section>
+        </div>
+      </section>
+
+      <aside
+        class="mt-4 rounded-lg border border-red-400/25 bg-red-400/10 p-4 sm:p-5"
+        aria-labelledby="health-notice-heading"
+      >
+        <h2 id="health-notice-heading" class="text-sm font-semibold text-red-200">
+          Health notice
+        </h2>
+        <p class="mt-2 text-sm leading-relaxed text-red-100/75">
+          Some medications and health conditions can affect your heart rate and
+          exercise ranges. Consult a healthcare professional for personalized
+          targets, especially if you have symptoms or a cardiovascular history.
+        </p>
+      </aside>
+    </Container>
+
+    <AdSlot placement="calculator-after-tool" />
+
+    <Container as="section" class="py-8 md:py-10">
+      <SectionIntro
+        title="How to interpret your result"
+        description="The main figure is a mathematical reference based only on your age. It is a starting point, but it does not describe your actual exercise response on its own."
+      />
+
+      <div class="grid gap-4 md:grid-cols-3">
+        <article class="rounded-lg border border-gray-700 bg-gray-950 p-5">
+          <p class="text-sm font-semibold text-amber-300">Estimated maximum heart rate</p>
+          <h3 class="mt-2 text-lg font-semibold text-white">
+            An approximate limit
+          </h3>
+          <p class="mt-2 text-sm leading-relaxed text-gray-400">
+            It represents an estimated population maximum. It is not a target
+            for every workout or a measurement of your fitness.
+          </p>
+        </article>
+        <article class="rounded-lg border border-gray-700 bg-gray-950 p-5">
+          <p class="text-sm font-semibold text-sky-300">Target heart rate</p>
+          <h3 class="mt-2 text-lg font-semibold text-white">
+            An intensity range
+          </h3>
+          <p class="mt-2 text-sm leading-relaxed text-gray-400">
+            Percentages help represent general moderate or vigorous efforts,
+            but they do not replace individual guidance.
+          </p>
+        </article>
+        <article class="rounded-lg border border-gray-700 bg-gray-950 p-5">
+          <p class="text-sm font-semibold text-emerald-300">Individual response</p>
+          <h3 class="mt-2 text-lg font-semibold text-white">
+            It can vary considerably
+          </h3>
+          <p class="mt-2 text-sm leading-relaxed text-gray-400">
+            Sleep, hydration, temperature, stress, medication, genetics, and
+            health can change your heart rate during activity.
+          </p>
+        </article>
+      </div>
+    </Container>
+
+    <Container as="section" class="py-8 md:py-10">
+      <SectionIntro
+        title="Formulas used"
+        description="We compare two well-known formulas to make clear that the result is an estimate, not an exact figure."
+      />
+
+      <div class="grid gap-4 md:grid-cols-2">
+        <article class="rounded-lg border border-amber-400/30 bg-gray-950 p-5">
+          <div class="flex items-center justify-between gap-4">
+            <h3 class="text-lg font-semibold text-white">Tanaka formula</h3>
+            <span class="rounded-full bg-amber-400/15 px-3 py-1 text-xs font-bold text-amber-300">
+              Primary
+            </span>
+          </div>
+          <p class="mt-4 rounded-lg bg-gray-900 p-3 font-mono text-sm text-amber-200">
+            MHR = 208 - (0.7 × age)
+          </p>
+          <p class="mt-3 text-sm leading-relaxed text-gray-400">
+            It is used for the main result and to calculate the general
+            intensity ranges.
+          </p>
+        </article>
+        <article class="rounded-lg border border-gray-700 bg-gray-950 p-5">
+          <h3 class="text-lg font-semibold text-white">Classic formula</h3>
+          <p class="mt-4 rounded-lg bg-gray-900 p-3 font-mono text-sm text-gray-200">
+            MHR = 220 - age
+          </p>
+          <p class="mt-3 text-sm leading-relaxed text-gray-400">
+            It is shown only for comparison. The difference between the two
+            formulas is a reminder that neither predicts every person exactly.
+          </p>
+        </article>
+      </div>
+    </Container>
+
+    <Container as="section" class="py-8 md:py-10">
+      <SectionIntro
+        title="When to seek an individual evaluation"
+        description="An age-based formula does not account for symptoms, medical history, or your response during actual exertion."
+      />
+
+      <div class="rounded-lg border border-gray-700 bg-gray-950 p-5 sm:p-6">
+        <div class="grid gap-5 md:grid-cols-[minmax(0,1fr)_minmax(16rem,0.72fr)]">
+          <div>
+            <h3 class="text-lg font-semibold text-white">
+              A stress test can provide greater precision
+            </h3>
+            <p class="mt-3 text-sm leading-relaxed text-gray-400">
+              A supervised test shows how your heart responds as intensity
+              increases. A professional can determine whether it is appropriate
+              for you and interpret the results alongside your health history.
+            </p>
+          </div>
+          <div class="rounded-lg border border-gray-800 bg-gray-900 p-4">
+            <p class="text-sm font-semibold text-gray-200">
+              Seek professional guidance before using exercise ranges if:
+            </p>
+            <ul class="mt-3 space-y-2 text-sm leading-relaxed text-gray-400">
+              <li>• You have symptoms during activity.</li>
+              <li>• You take medication that affects heart rate.</li>
+              <li>• Tienes antecedentes cardiovasculares.</li>
+              <li>• Necesitas objetivos personalizados.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </Container>
+
+    <Container as="section" class="py-8 md:py-10">
+      <SectionIntro
+        title="Sources and methodology"
+        description="The calculator combines a published population formula with general intensity ranges used in physical-activity education."
+      />
+      <div class="grid gap-3 sm:grid-cols-3">
+        <a
+          class="rounded-lg border border-gray-700 bg-gray-950 p-4 text-sm font-semibold text-amber-300 transition hover:border-amber-400/60 hover:text-amber-200"
+          href="https://pubmed.ncbi.nlm.nih.gov/11153730/"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Study by Tanaka, Monahan, and Seals
+        </a>
+        <a
+          class="rounded-lg border border-gray-700 bg-gray-950 p-4 text-sm font-semibold text-amber-300 transition hover:border-amber-400/60 hover:text-amber-200"
+          href="https://www.heart.org/en/healthy-living/fitness/fitness-basics/target-heart-rates"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          American Heart Association
+        </a>
+        <a
+          class="rounded-lg border border-gray-700 bg-gray-950 p-4 text-sm font-semibold text-amber-300 transition hover:border-amber-400/60 hover:text-amber-200"
+          href="https://www.cdc.gov/physical-activity/php/about/index.html"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          CDC: physical activity
+        </a>
+      </div>
+    </Container>
+
+    <FaqSection faqs={faqs} />
+  </PageShell>
+</BaseLayout>
+
+<script>
+  import {
+    buildMaxHeartRateCopyText,
+    calculateMaxHeartRate,
+    formatBpmRange,
+    parseMaxHeartRateAge,
+  } from "@lib/calculators/salud/calculadora-de-frecuencia-cardiaca-maxima/maxHeartRate.en";
+
+  const form = document.querySelector("[data-calculator-form]");
+  const ageInput = document.querySelector("[data-age-input]");
+  const ageWrapper = document.querySelector("[data-age-wrapper]");
+  const ageError = document.querySelector("[data-age-error]");
+  const clearButton = document.querySelector("[data-clear-button]");
+  const copyButton = document.querySelector("[data-copy-button]");
+  const copyLabel = document.querySelector("[data-copy-label]");
+  const copyStatus = document.querySelector("[data-copy-status]");
+  const mainResult = document.querySelector("[data-main-result]");
+  const formulaNote = document.querySelector("[data-formula-note]");
+  const resultDetails = document.querySelector("[data-result-details]");
+  const moderateRange = document.querySelector("[data-moderate-range]");
+  const vigorousRange = document.querySelector("[data-vigorous-range]");
+  const tanakaComparison = document.querySelector("[data-tanaka-comparison]");
+  const classicComparison = document.querySelector("[data-classic-comparison]");
+  const tanakaFormula = document.querySelector("[data-tanaka-formula]");
+  const classicFormula = document.querySelector("[data-classic-formula]");
+  const resultStatus = document.querySelector("[data-result-status]");
+  const zonesLink = document.querySelector("[data-zones-link]");
+
+  let currentResult = null;
+  let copyResetTimeout;
+
+  const errorMessages = {
+    required: "Enter your age to calculate maximum heart rate.",
+    invalid: "Use numbers only for your age.",
+    not_integer: "Enter your age in whole years, without decimals.",
+    out_of_range: "Age must be between 18 and 100.",
+  };
+
+  function showAgeError(message) {
+    ageError.textContent = message;
+    ageError.classList.remove("hidden");
+    ageWrapper.classList.add("border-red-400");
+    ageInput.setAttribute("aria-invalid", "true");
+  }
+
+  function clearAgeError() {
+    ageError.textContent = "";
+    ageError.classList.add("hidden");
+    ageWrapper.classList.remove("border-red-400");
+    ageInput.removeAttribute("aria-invalid");
+  }
+
+  function renderResult(result) {
+    currentResult = result;
+    mainResult.innerHTML = `<span>${result.tanakaBpm}</span> <span class="text-xl font-semibold text-gray-500">bpm</span>`;
+    formulaNote.textContent = `Tanaka: 208 - (0.7 × ${result.age}) = ${result.tanakaBpm} bpm aproximadamente.`;
+    moderateRange.textContent = formatBpmRange(result.moderate);
+    vigorousRange.textContent = formatBpmRange(result.vigorous);
+    tanakaComparison.textContent = `${result.tanakaBpm} bpm`;
+    classicComparison.textContent = `${result.classicBpm} bpm`;
+    tanakaFormula.textContent = `208 - (0.7 × ${result.age})`;
+    classicFormula.textContent = `220 - ${result.age}`;
+    resultDetails.classList.remove("hidden");
+    copyButton.disabled = false;
+    zonesLink.href = `/en/health/heart-rate-zones-calculator?age=${result.age}`;
+    resultStatus.textContent = `Your estimated maximum heart rate is approximately ${result.tanakaBpm} beats per minute.`;
+  }
+
+  function renderNeutralState() {
+    currentResult = null;
+    mainResult.innerHTML = '<span>--</span> <span class="text-xl font-semibold text-gray-500">bpm</span>';
+    formulaNote.textContent =
+      "Enter your age to calculate it with the Tanaka formula.";
+    moderateRange.textContent = "-- bpm";
+    vigorousRange.textContent = "-- bpm";
+    tanakaComparison.textContent = "-- bpm";
+    classicComparison.textContent = "-- bpm";
+    tanakaFormula.textContent = "208 - (0.7 × age)";
+    classicFormula.textContent = "220 - age";
+    resultDetails.classList.add("hidden");
+    copyButton.disabled = true;
+    zonesLink.href = "/en/health/heart-rate-zones-calculator";
+    copyStatus.textContent = "";
+    resultStatus.textContent = "";
+    resetCopyLabel();
+  }
+
+  function resetCopyLabel() {
+    window.clearTimeout(copyResetTimeout);
+    copyLabel.textContent = "Copy result";
+  }
+
+  async function copyResult() {
+    if (!currentResult) return;
+
+    try {
+      await navigator.clipboard.writeText(
+        buildMaxHeartRateCopyText(currentResult),
+      );
+      copyLabel.textContent = "Result copied";
+      copyStatus.textContent = "Result copied to the clipboard.";
+    } catch {
+      copyLabel.textContent = "Could not copy";
+      copyStatus.textContent = "Could not copy the result.";
+    }
+
+    window.clearTimeout(copyResetTimeout);
+    copyResetTimeout = window.setTimeout(resetCopyLabel, 2500);
+  }
+
+  form.addEventListener("submit", (event) => {
+    event.preventDefault();
+    clearAgeError();
+
+    const parsedAge = parseMaxHeartRateAge(ageInput.value);
+
+    if (!parsedAge.ok) {
+      showAgeError(errorMessages[parsedAge.error]);
+      ageInput.focus();
+      return;
+    }
+
+    ageInput.value = String(parsedAge.age);
+    renderResult(calculateMaxHeartRate(parsedAge.age));
+  });
+
+  ageInput.addEventListener("input", clearAgeError);
+
+  clearButton.addEventListener("click", () => {
+    form.reset();
+    clearAgeError();
+    renderNeutralState();
+    ageInput.focus();
+  });
+
+  copyButton.addEventListener("click", copyResult);
+</script>

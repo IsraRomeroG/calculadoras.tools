@@ -4,6 +4,7 @@ seoTitle: "IMC infantil y adolescente: percentiles por edad y sexo"
 description: "Aprende por qué el IMC en niños y adolescentes se interpreta con percentiles por edad y sexo, no con rangos adultos."
 pubDate: 2026-06-01
 categorySlug: "salud"
+translationKey: "child-teen-bmi-percentiles"
 tags:
   - imc infantil
   - percentiles

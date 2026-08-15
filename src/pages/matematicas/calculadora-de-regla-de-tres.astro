@@ -1,5 +1,7 @@
+
 ---
 import BaseLayout from "@layouts/BaseLayout.astro";
+import { buildAlternateLinks } from "@lib/i18n/routing";
 import AdSlot from "@components/ads/AdSlot.astro";
 import Container from "@components/layout/Container.astro";
 import PageShell from "@components/layout/PageShell.astro";
@@ -12,6 +14,11 @@ const title = "Calculadora de Regla de Tres Online - Directa e Inversa";
 const description =
   "Resuelve reglas de tres directas e inversas al instante. Calcula proporciones con explicación paso a paso, verificación y resultado como fracción.";
 const canonical = "/matematicas/calculadora-de-regla-de-tres";
+const englishCanonical = "/en/math/rule-of-three-calculator";
+const alternates = buildAlternateLinks(
+  { es: canonical, en: englishCanonical },
+  Astro.site ?? Astro.url,
+);
 
 const faqs = [
   {
@@ -64,7 +71,7 @@ const examples = [
 ];
 ---
 
-<BaseLayout title={title} description={description} canonical={canonical}>
+<BaseLayout title={title} description={description} canonical={canonical} alternates={alternates}>
   <Fragment slot="head">
     <script type="application/ld+json" set:html={JSON.stringify(faqJsonLd)} />
   </Fragment>

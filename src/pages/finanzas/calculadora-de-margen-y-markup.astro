@@ -1,5 +1,6 @@
 ---
 import BaseLayout from "@layouts/BaseLayout.astro";
+import { buildAlternateLinks } from "@lib/i18n/routing";
 import AdSlot from "@components/ads/AdSlot.astro";
 import Container from "@components/layout/Container.astro";
 import PageShell from "@components/layout/PageShell.astro";
@@ -12,6 +13,11 @@ const title = "Calculadora de margen, markup y precio de venta";
 const description =
   "Calcula margen, markup, ganancia, precio mínimo y precio de venta objetivo incluyendo costos y comisión porcentual.";
 const canonical = "/finanzas/calculadora-de-margen-y-markup";
+const englishCanonical = "/en/finance/margin-markup-calculator";
+const alternates = buildAlternateLinks(
+  { es: canonical, en: englishCanonical },
+  Astro.site ?? Astro.url,
+);
 const faqs = [
   {
     question: "¿Cuál es la diferencia entre margen y markup?",
@@ -52,7 +58,7 @@ const faqs = [
 const faqJsonLd = buildFaqJsonLd(faqs);
 ---
 
-<BaseLayout title={title} description={description} canonical={canonical}>
+<BaseLayout title={title} description={description} canonical={canonical} alternates={alternates}>
   <Fragment slot="head">
     <script type="application/ld+json" set:html={JSON.stringify(faqJsonLd)} />
   </Fragment>

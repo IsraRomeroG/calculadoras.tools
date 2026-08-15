@@ -1,5 +1,6 @@
 ---
 import BaseLayout from "@layouts/BaseLayout.astro";
+import { buildAlternateLinks } from "@lib/i18n/routing";
 import AdSlot from "@components/ads/AdSlot.astro";
 import Container from "@components/layout/Container.astro";
 import PageShell from "@components/layout/PageShell.astro";
@@ -12,6 +13,8 @@ const title = "Calculadora de Porcentaje de Grasa Corporal";
 const description =
   "Estima tu porcentaje de grasa corporal con medidas de cintura, cuello, altura y cadera. Incluye guía de medición y sensibilidad del resultado.";
 const canonical = "/salud/calculadora-de-porcentaje-de-grasa-corporal";
+const englishCanonical = "/en/health/body-fat-percentage-calculator";
+const alternates = buildAlternateLinks({ es: canonical, en: englishCanonical }, Astro.site ?? Astro.url);
 
 const faqs = [
   {
@@ -61,7 +64,7 @@ const faqs = [
 const faqJsonLd = buildFaqJsonLd(faqs);
 ---
 
-<BaseLayout title={title} description={description} canonical={canonical}>
+<BaseLayout title={title} description={description} canonical={canonical} alternates={alternates}>
   <Fragment slot="head">
     <script type="application/ld+json" set:html={JSON.stringify(faqJsonLd)} />
   </Fragment>

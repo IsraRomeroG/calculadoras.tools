@@ -4,6 +4,7 @@ seoTitle: "Tabla de amortización hipotecaria en Excel: fórmulas paso a paso"
 description: "Aprende a crear una tabla de amortización hipotecaria en Excel o Google Sheets con fórmulas para pago, interés, capital y saldo."
 pubDate: 2026-05-25
 categorySlug: "inmuebles"
+translationKey: "mortgage-amortization-schedule-excel"
 tags:
   - tabla de amortización
   - excel

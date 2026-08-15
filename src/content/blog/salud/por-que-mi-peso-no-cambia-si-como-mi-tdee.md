@@ -4,6 +4,7 @@ seoTitle: "Por qué mi peso no cambia con mi TDEE: errores y ajustes"
 description: "Conoce por qué tu peso puede no cambiar como esperas aunque uses tu TDEE y cómo ajustar tus calorías con calma."
 pubDate: 2026-07-21
 categorySlug: "salud"
+translationKey: "why-weight-does-not-change-at-tdee"
 tags:
   - tdee
   - calorías

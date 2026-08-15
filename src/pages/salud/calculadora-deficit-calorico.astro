@@ -1,5 +1,6 @@
 ---
 import BaseLayout from "@layouts/BaseLayout.astro";
+import { buildAlternateLinks } from "@lib/i18n/routing";
 import AdSlot from "@components/ads/AdSlot.astro";
 import Container from "@components/layout/Container.astro";
 import PageShell from "@components/layout/PageShell.astro";
@@ -14,9 +15,11 @@ const title =
 const description =
   "Calcula un deficit calorico estimado para bajar de peso con un plan responsable: calorias diarias, ritmo semanal, plazo estimado y validaciones de seguridad.";
 const canonical = "/salud/calculadora-deficit-calorico";
+const englishCanonical = "/en/health/calorie-deficit-calculator";
+const alternates = buildAlternateLinks({ es: canonical, en: englishCanonical }, Astro.site ?? Astro.url);
 ---
 
-<BaseLayout title={title} description={description} canonical={canonical}>
+<BaseLayout title={title} description={description} canonical={canonical} alternates={alternates}>
   <PageShell>
     <PageHero
       title="Calculadora de deficit calorico"

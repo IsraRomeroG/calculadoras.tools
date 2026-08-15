@@ -1,0 +1,802 @@
+---
+import AdSlot from "@components/ads/AdSlot.astro";
+import Container from "@components/layout/Container.astro";
+import PageShell from "@components/layout/PageShell.astro";
+import FaqSection from "@components/shared/FaqSection.astro";
+import PageHero from "@components/shared/PageHero.astro";
+import SectionIntro from "@components/shared/SectionIntro.astro";
+import BaseLayout from "@layouts/BaseLayout.astro";
+import {
+  COMBINATORICS_CANONICAL_PATH,
+  COMBINATORICS_EXAMPLES,
+} from "@lib/calculators/probabilidad-estadistica/calculadora-combinaciones-permutaciones/combinatorics.en";
+import { buildFaqJsonLd } from "@lib/seo";
+import { buildAlternateLinks } from "@lib/i18n/routing";
+
+const title = "Combinations and permutations calculator";
+const description =
+  "Calculate combinations, arrangements and permutations with or without repetition. Choose whether order matters and get the formula, explanation and exact result.";
+
+const faqs = [
+  {
+    question: "What is the difference between a combination and a permutation?",
+    answer:
+      "In a combination, order does not change the result. In a permutation or arrangement, changing the order creates a different result. Choosing Ana and Luis for a committee is the same selection as Luis and Ana; assigning them first and second place is not.",
+  },
+  {
+    question: "How do I know whether order matters?",
+    answer:
+      "Ask whether swapping two elements produces a different result. If it changes a podium, password or assignment of positions, order matters. If the final group stays the same, it does not.",
+  },
+  {
+    question: "What does allowing repeated elements mean?",
+    answer:
+      "It means the same option can be used more than once. Digits can repeat in a PIN; one person cannot occupy two places on a podium.",
+  },
+  {
+    question: "What happens if k is greater than n?",
+    answer:
+      "Without repetition, you cannot choose more elements than are available. With repetition, it may be valid because an option can be used several times.",
+  },
+  {
+    question: "Why do some results have so many digits?",
+    answer:
+      "The number of possibilities grows very quickly. The calculator preserves the exact integer with BigInt, shows a compact view and lets you copy every digit.",
+  },
+  {
+    question:
+      "What is the difference between n^k and a permutation of repeated elements?",
+    answer:
+      "n^k counts sequences of k positions with n options at each position. Ordering a set that already contains repeated elements, such as the letters in MAMA, requires another formula and is outside this calculator's scope.",
+  },
+];
+
+const faqJsonLd = buildFaqJsonLd(faqs);
+---
+
+<BaseLayout locale="en"
+  title={title}
+  description={description}
+  canonical={COMBINATORICS_CANONICAL_PATH}
+ alternates={buildAlternateLinks({ es: "/probabilidad-estadistica/calculadora-combinaciones-permutaciones", en: "/en/probability-statistics/combinations-permutations-calculator" }, Astro.site ?? Astro.url)}>
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={JSON.stringify(faqJsonLd)} />
+  </Fragment>
+
+  <PageShell>
+    <PageHero
+      title="Combinations and permutations calculator"
+      description="Answer two questions about order and repetition to choose the correct formula and obtain an exact integer result."
+      kicker="Probability and Statistics"
+      kickerHref="/en/probability-statistics"
+      collapseBreadcrumbOnMobile
+      containerClass="py-6 md:py-8"
+      breadcrumbs={[
+        { label: "Home", href: "/", ariaLabel: "Home" },
+        {
+          label: "Probability and Statistics",
+          href: "/en/probability-statistics",
+          optional: true,
+        },
+        { label: "Combinaciones y permutaciones", truncate: true },
+      ]}
+    />
+
+    <Container as="section" class="py-6 md:py-8">
+      <div
+        id="combinatorics-calculator"
+        class="overflow-hidden rounded-lg border border-gray-700 bg-gray-950 shadow-xl shadow-gray-950/30"
+      >
+        <div
+          class="grid gap-0 lg:grid-cols-[minmax(0,1fr)_minmax(20rem,0.78fr)]"
+        >
+          <section class="p-4 sm:p-6" aria-labelledby="calculator-heading">
+            <h2 id="calculator-heading" class="text-xl font-semibold">
+              Choose the problem type
+            </h2>
+            <p class="mt-2 text-sm leading-relaxed text-gray-400">
+              You do not need to memorize the formula. Indicate what changes a solution and the calculator will identify the case.
+            </p>
+
+            <form class="mt-5" novalidate data-combinatorics-form>
+              <fieldset>
+                <legend class="text-sm font-semibold text-gray-100">
+                  1. Does order matter?
+                </legend>
+                <p class="mt-1 text-sm text-gray-400">
+                  If swapping two elements creates another result, answer Yes.
+                </p>
+                <div class="mt-3 grid grid-cols-2 gap-2">
+                  <label class="relative">
+                    <input
+                      class="peer sr-only"
+                      type="radio"
+                      name="order"
+                      value="no"
+                      checked
+                    />
+                    <span
+                      class="flex min-h-11 cursor-pointer items-center justify-center rounded-lg border border-gray-700 bg-gray-900 px-3 py-2 text-sm font-semibold text-gray-200 transition hover:border-amber-400/70 peer-checked:border-amber-400 peer-checked:bg-amber-400 peer-checked:text-gray-950 peer-focus-visible:ring-3 peer-focus-visible:ring-amber-400/40"
+                    >
+                      No
+                    </span>
+                  </label>
+                  <label class="relative">
+                    <input
+                      class="peer sr-only"
+                      type="radio"
+                      name="order"
+                      value="yes"
+                    />
+                    <span
+                      class="flex min-h-11 cursor-pointer items-center justify-center rounded-lg border border-gray-700 bg-gray-900 px-3 py-2 text-sm font-semibold text-gray-200 transition hover:border-amber-400/70 peer-checked:border-amber-400 peer-checked:bg-amber-400 peer-checked:text-gray-950 peer-focus-visible:ring-3 peer-focus-visible:ring-amber-400/40"
+                    >
+                      Yes
+                    </span>
+                  </label>
+                </div>
+              </fieldset>
+
+              <fieldset class="mt-5">
+                <legend class="text-sm font-semibold text-gray-100">
+                  2. Can elements repeat?
+                </legend>
+                <p class="mt-1 text-sm text-gray-400">
+                  Answer Yes when an option can be used more than once.
+                </p>
+                <div class="mt-3 grid grid-cols-2 gap-2">
+                  <label class="relative">
+                    <input
+                      class="peer sr-only"
+                      type="radio"
+                      name="repetition"
+                      value="no"
+                      checked
+                    />
+                    <span
+                      class="flex min-h-11 cursor-pointer items-center justify-center rounded-lg border border-gray-700 bg-gray-900 px-3 py-2 text-sm font-semibold text-gray-200 transition hover:border-amber-400/70 peer-checked:border-amber-400 peer-checked:bg-amber-400 peer-checked:text-gray-950 peer-focus-visible:ring-3 peer-focus-visible:ring-amber-400/40"
+                    >
+                      No
+                    </span>
+                  </label>
+                  <label class="relative">
+                    <input
+                      class="peer sr-only"
+                      type="radio"
+                      name="repetition"
+                      value="yes"
+                    />
+                    <span
+                      class="flex min-h-11 cursor-pointer items-center justify-center rounded-lg border border-gray-700 bg-gray-900 px-3 py-2 text-sm font-semibold text-gray-200 transition hover:border-amber-400/70 peer-checked:border-amber-400 peer-checked:bg-amber-400 peer-checked:text-gray-950 peer-focus-visible:ring-3 peer-focus-visible:ring-amber-400/40"
+                    >
+                      Yes
+                    </span>
+                  </label>
+                </div>
+              </fieldset>
+
+              <div
+                class="mt-5 rounded-lg border border-sky-400/25 bg-sky-400/10 px-4 py-3"
+              >
+                <p class="text-xs font-semibold uppercase text-sky-300">
+                  Selected calculation
+                </p>
+                <p
+                  class="mt-1 font-semibold text-white"
+                  data-mode-preview
+                >
+                  Combination without repetition
+                </p>
+                <p
+                  class="mt-1 text-sm leading-relaxed text-sky-100"
+                  data-mode-explanation
+                >
+                  Order does not matter and each element can be used once.
+                </p>
+              </div>
+
+              <div class="mt-5 grid gap-4 sm:grid-cols-2">
+                <div>
+                  <label
+                    for="combinatorics-n"
+                    class="block text-sm font-semibold text-gray-100"
+                  >
+                    Available elements (n)
+                  </label>
+                  <input
+                    id="combinatorics-n"
+                    class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-900 px-4 text-base text-white outline-none transition placeholder:text-gray-600 focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15"
+                    type="text"
+                    inputmode="numeric"
+                    autocomplete="off"
+                    maxlength="5"
+                    placeholder="Example: 10"
+                    aria-describedby="combinatorics-n-help combinatorics-n-error"
+                    data-input-n
+                  />
+                  <p
+                    id="combinatorics-n-help"
+                    class="mt-2 text-sm leading-relaxed text-gray-400"
+                    data-help-n
+                  >
+                    The total number of available options or elements.
+                  </p>
+                  <p
+                    id="combinatorics-n-error"
+                    class="mt-2 hidden rounded-lg border border-red-400/30 bg-red-400/10 px-3 py-2 text-sm text-red-200"
+                    data-error-n
+                  ></p>
+                </div>
+
+                <div>
+                  <label
+                    for="combinatorics-k"
+                    class="block text-sm font-semibold text-gray-100"
+                  >
+                    Elements or positions (k)
+                  </label>
+                  <input
+                    id="combinatorics-k"
+                    class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-900 px-4 text-base text-white outline-none transition placeholder:text-gray-600 focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15"
+                    type="text"
+                    inputmode="numeric"
+                    autocomplete="off"
+                    maxlength="5"
+                    placeholder="Example: 3"
+                    aria-describedby="combinatorics-k-help combinatorics-k-error"
+                    data-input-k
+                  />
+                  <p
+                    id="combinatorics-k-help"
+                    class="mt-2 text-sm leading-relaxed text-gray-400"
+                    data-help-k
+                  >
+                    How many elements you choose.
+                  </p>
+                  <p
+                    id="combinatorics-k-error"
+                    class="mt-2 hidden rounded-lg border border-red-400/30 bg-red-400/10 px-3 py-2 text-sm text-red-200"
+                    data-error-k
+                  ></p>
+                </div>
+              </div>
+
+              <div class="mt-5">
+                <p class="text-sm font-semibold text-gray-100">
+                  Quick examples
+                </p>
+                <div
+                  class="mt-2 flex gap-2 overflow-x-auto pb-2"
+                  role="group"
+                  aria-label="Load an example"
+                >
+                  {
+                    COMBINATORICS_EXAMPLES.map((example) => (
+                      <button
+                        class="min-h-11 shrink-0 rounded-lg border border-gray-700 px-3 py-2 text-sm font-semibold text-gray-200 transition hover:border-amber-400 hover:text-white focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/40"
+                        type="button"
+                        data-example
+                        data-order={String(example.orderMatters)}
+                        data-repetition={String(example.repetitionAllowed)}
+                        data-n={String(example.n)}
+                        data-k={String(example.k)}
+                        title={example.description}
+                      >
+                        {example.label}
+                      </button>
+                    ))
+                  }
+                </div>
+              </div>
+
+              <div class="mt-5 flex flex-col gap-3 sm:flex-row">
+                <button
+                  class="inline-flex min-h-11 w-full items-center justify-center rounded-lg bg-amber-400 px-4 py-2 text-sm font-bold text-gray-950 transition hover:bg-amber-300 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/40 sm:w-auto sm:min-w-44"
+                  type="submit"
+                >
+                  Calculate
+                </button>
+                <button
+                  class="inline-flex min-h-11 items-center justify-center rounded-lg border border-gray-700 px-4 py-2 text-sm font-semibold text-gray-200 transition hover:border-amber-400 hover:text-white focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/40"
+                  type="button"
+                  data-clear
+                >
+                  Clear
+                </button>
+              </div>
+            </form>
+          </section>
+
+          <aside
+            class="border-t border-gray-800 bg-gray-900/60 p-4 sm:p-6 lg:border-l lg:border-t-0"
+            aria-labelledby="result-heading"
+          >
+            <div class="rounded-lg border border-gray-700 bg-gray-950 p-5">
+              <p class="text-xs font-semibold uppercase text-amber-400">
+                Result
+              </p>
+              <h2
+                id="result-heading"
+                class="mt-2 text-lg font-semibold text-white"
+                data-result-name
+              >
+                Complete the inputs
+              </h2>
+              <p
+                class="mt-4 break-all text-3xl font-bold leading-tight text-white sm:text-4xl"
+                data-result-value
+              >
+                —
+              </p>
+              <p
+                class="mt-2 hidden text-sm text-gray-500"
+                data-result-digits
+              ></p>
+
+              <p
+                class="mt-4 rounded-lg border border-gray-800 bg-gray-900 px-4 py-3 text-sm leading-relaxed text-gray-300"
+                data-result-interpretation
+              >
+                Specify whether order matters, whether repetition is allowed, and enter n and k.
+              </p>
+
+              <details
+                class="mt-4 hidden rounded-lg border border-gray-800 bg-gray-900/70 p-4"
+                data-exact-details
+              >
+                <summary class="cursor-pointer text-sm font-semibold text-white">
+                  View exact result
+                </summary>
+                <p
+                  class="mt-3 break-all font-mono text-sm leading-relaxed text-gray-300"
+                  dir="ltr"
+                  data-result-exact
+                ></p>
+              </details>
+
+              <div class="mt-5 hidden" data-result-actions>
+                <button
+                  class="inline-flex min-h-11 w-full items-center justify-center rounded-lg bg-amber-400 px-4 py-2 text-sm font-bold text-gray-950 transition hover:bg-amber-300 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/40"
+                  type="button"
+                  data-copy
+                >
+                  Copy exact result
+                </button>
+                <p
+                  class="mt-2 min-h-5 text-sm text-emerald-300"
+                  aria-live="polite"
+                  data-copy-status
+                ></p>
+              </div>
+            </div>
+
+            <div
+              class="mt-4 rounded-lg border border-gray-800 bg-gray-950 p-4"
+            >
+              <h3 class="text-sm font-semibold text-white">
+                Why this formula is used
+              </h3>
+              <p
+                class="mt-2 text-sm leading-relaxed text-gray-400"
+                data-decision
+              >
+                The explanation will appear after calculation.
+              </p>
+            </div>
+          </aside>
+        </div>
+
+        <div class="border-t border-gray-800 p-4 sm:p-6">
+          <div class="grid gap-4 lg:grid-cols-2">
+            <details
+              class="rounded-lg border border-gray-800 bg-gray-900/60 p-4"
+              open
+            >
+              <summary class="cursor-pointer text-base font-semibold text-white">
+                Formula and substitution
+              </summary>
+              <p
+                class="mt-4 rounded-lg border border-gray-800 bg-gray-950 px-3 py-2 font-mono text-sm leading-relaxed text-amber-200"
+                data-formula
+              >
+                C(n, k) = n! / (k! × (n − k)!)
+              </p>
+              <p
+                class="mt-3 break-words text-sm leading-relaxed text-gray-300"
+                data-substitution
+              >
+                The substitution will appear after a valid calculation.
+              </p>
+            </details>
+
+            <details
+              class="rounded-lg border border-gray-800 bg-gray-900/60 p-4"
+            >
+              <summary class="cursor-pointer text-base font-semibold text-white">
+                Procedimiento resumido
+              </summary>
+              <ol
+                class="mt-4 list-decimal space-y-2 pl-5 text-sm leading-relaxed text-gray-300"
+                data-procedure
+              >
+                <li>Complete the inputs to see the procedure.</li>
+              </ol>
+            </details>
+          </div>
+        </div>
+
+        <p class="sr-only" aria-live="polite" data-live-status></p>
+      </div>
+    </Container>
+
+    <AdSlot placement="calculator-after-tool" />
+
+    <Container as="section" class="py-6 md:py-8">
+      <SectionIntro
+        title="How to choose the correct formula"
+        description="The calculator's two questions correspond to these four cases."
+      />
+
+      <div class="grid gap-4 sm:grid-cols-2">
+        <article class="rounded-lg border border-gray-700 bg-gray-950 p-5">
+          <p class="text-xs font-semibold uppercase text-amber-400">
+            Order no · Repetition no
+          </p>
+          <h3 class="mt-2 text-lg font-semibold text-white">
+            Combination without repetition
+          </h3>
+          <p class="mt-2 text-sm leading-relaxed text-gray-400">
+            Use it to form groups where each element appears at most once. Example: choosing a committee.
+          </p>
+        </article>
+        <article class="rounded-lg border border-gray-700 bg-gray-950 p-5">
+          <p class="text-xs font-semibold uppercase text-amber-400">
+            Order yes · Repetition no
+          </p>
+          <h3 class="mt-2 text-lg font-semibold text-white">
+            Arrangement without repetition
+          </h3>
+          <p class="mt-2 text-sm leading-relaxed text-gray-400">
+            Use it when positions are distinct and no element can repeat. Example: gold, silver and bronze.
+          </p>
+        </article>
+        <article class="rounded-lg border border-gray-700 bg-gray-950 p-5">
+          <p class="text-xs font-semibold uppercase text-amber-400">
+            Order no · Repetition yes
+          </p>
+          <h3 class="mt-2 text-lg font-semibold text-white">
+            Combination with repetition
+          </h3>
+          <p class="mt-2 text-sm leading-relaxed text-gray-400">
+            Use it to choose quantities where an option can appear several times. Example: scoops of ice cream by flavor.
+          </p>
+        </article>
+        <article class="rounded-lg border border-gray-700 bg-gray-950 p-5">
+          <p class="text-xs font-semibold uppercase text-amber-400">
+            Order yes · Repetition yes
+          </p>
+          <h3 class="mt-2 text-lg font-semibold text-white">
+            Arrangement with repetition
+          </h3>
+          <p class="mt-2 text-sm leading-relaxed text-gray-400">
+            Each position can use any option. Example: a PIN or a fixed-length password.
+          </p>
+        </article>
+      </div>
+    </Container>
+
+    <Container as="section" class="py-6 md:py-8">
+      <SectionIntro
+        title="Examples to try"
+        description="Each example activates a different combination of order and repetition."
+      />
+      <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        {
+          COMBINATORICS_EXAMPLES.map((example) => (
+            <article class="rounded-lg border border-gray-700 bg-gray-950 p-5">
+              <h3 class="text-base font-semibold text-white">{example.label}</h3>
+              <p class="mt-2 text-sm leading-relaxed text-gray-400">
+                {example.description}
+              </p>
+              <p class="mt-4 text-sm font-semibold text-amber-300">
+                n = {example.n}, k = {example.k}
+              </p>
+            </article>
+          ))
+        }
+      </div>
+    </Container>
+
+    <Container as="section" class="py-6 md:py-8">
+      <div class="rounded-lg border border-gray-700 bg-gray-950 p-5 sm:p-6">
+        <h2 class="text-xl font-semibold text-white">
+          Large results without losing precision
+        </h2>
+        <p class="mt-3 max-w-3xl text-sm leading-relaxed text-gray-400">
+          Many combinatorial operations quickly exceed JavaScript's safe number range. This tool calculates with BigInt integers. Scientific notation only summarizes the display; the exact result remains available to view and copy.
+        </p>
+      </div>
+    </Container>
+
+    <FaqSection faqs={faqs} />
+  </PageShell>
+</BaseLayout>
+
+<script>
+  import {
+    calculateCombinatoricsFromInput,
+    getCombinatoricsMode,
+    getCombinatoricsModeMetadata,
+  } from "@lib/calculators/probabilidad-estadistica/calculadora-combinaciones-permutaciones/combinatorics.en";
+
+  const form = document.querySelector("[data-combinatorics-form]");
+  const inputN = document.querySelector("[data-input-n]");
+  const inputK = document.querySelector("[data-input-k]");
+  const errorN = document.querySelector("[data-error-n]");
+  const errorK = document.querySelector("[data-error-k]");
+  const helpN = document.querySelector("[data-help-n]");
+  const helpK = document.querySelector("[data-help-k]");
+  const modePreview = document.querySelector("[data-mode-preview]");
+  const modeExplanation = document.querySelector("[data-mode-explanation]");
+  const resultName = document.querySelector("[data-result-name]");
+  const resultValue = document.querySelector("[data-result-value]");
+  const resultDigits = document.querySelector("[data-result-digits]");
+  const resultInterpretation = document.querySelector(
+    "[data-result-interpretation]",
+  );
+  const exactDetails = document.querySelector("[data-exact-details]");
+  const resultExact = document.querySelector("[data-result-exact]");
+  const resultActions = document.querySelector("[data-result-actions]");
+  const copyButton = document.querySelector("[data-copy]");
+  const copyStatus = document.querySelector("[data-copy-status]");
+  const decision = document.querySelector("[data-decision]");
+  const formula = document.querySelector("[data-formula]");
+  const substitution = document.querySelector("[data-substitution]");
+  const procedure = document.querySelector("[data-procedure]");
+  const liveStatus = document.querySelector("[data-live-status]");
+  const clearButton = document.querySelector("[data-clear]");
+  const exampleButtons = document.querySelectorAll("[data-example]");
+
+  let currentCopyText = "";
+
+  function readBooleanRadio(name) {
+    const selected = document.querySelector(`input[name="${name}"]:checked`);
+
+    return selected?.value === "yes";
+  }
+
+  function selectBooleanRadio(name, value) {
+    const radio = document.querySelector(
+      `input[name="${name}"][value="${value ? "yes" : "no"}"]`,
+    );
+
+    if (radio) radio.checked = true;
+  }
+
+  function getModeState() {
+    const orderMatters = readBooleanRadio("order");
+    const repetitionAllowed = readBooleanRadio("repetition");
+    const mode = getCombinatoricsMode(orderMatters, repetitionAllowed);
+
+    return {
+      orderMatters,
+      repetitionAllowed,
+      mode,
+      metadata: getCombinatoricsModeMetadata(mode),
+    };
+  }
+
+  function getModeExplanation(mode) {
+    switch (mode) {
+      case "combination":
+        return "Order does not matter and each element can be used once.";
+      case "arrangement":
+        return "Order matters and each element can be used once.";
+      case "combination-repetition":
+        return "Order does not matter and elements can repeat.";
+      case "arrangement-repetition":
+        return "Order matters and each position can repeat elements.";
+    }
+  }
+
+  function updateModeContext({ reset = false } = {}) {
+    const state = getModeState();
+    modePreview.textContent = state.metadata.label;
+    modeExplanation.textContent = getModeExplanation(state.mode);
+    formula.textContent = state.metadata.formula;
+
+    if (state.mode === "arrangement-repetition") {
+      helpN.textContent = "The options available for each position.";
+      helpK.textContent = "How many positions you want to fill.";
+    } else if (state.mode === "arrangement") {
+      helpN.textContent = "The total number of elements that can occupy positions.";
+      helpK.textContent = "How many distinct positions you want to assign.";
+    } else {
+      helpN.textContent = "The total number of available options or elements.";
+      helpK.textContent = "How many elements you want to choose.";
+    }
+
+    if (reset) resetResult();
+  }
+
+  function clearFieldError(field) {
+    const input = field === "n" ? inputN : inputK;
+    const error = field === "n" ? errorN : errorK;
+
+    input.removeAttribute("aria-invalid");
+    error.textContent = "";
+    error.classList.add("hidden");
+  }
+
+  function setFieldError(field, message) {
+    const input = field === "n" ? inputN : inputK;
+    const error = field === "n" ? errorN : errorK;
+
+    input.setAttribute("aria-invalid", "true");
+    error.textContent = message;
+    error.classList.remove("hidden");
+  }
+
+  function clearErrors() {
+    clearFieldError("n");
+    clearFieldError("k");
+  }
+
+  function resetResult() {
+    currentCopyText = "";
+    resultName.textContent = "Complete the inputs";
+    resultValue.textContent = "—";
+    resultDigits.textContent = "";
+    resultDigits.classList.add("hidden");
+    resultInterpretation.textContent =
+      "Specify whether order matters, whether repetition is allowed, and enter n and k.";
+    exactDetails.classList.add("hidden");
+    exactDetails.open = false;
+    resultExact.textContent = "";
+    resultActions.classList.add("hidden");
+    copyStatus.textContent = "";
+    decision.textContent = "The explanation will appear after calculation.";
+    substitution.textContent =
+      "The substitution will appear after a valid calculation.";
+    procedure.replaceChildren();
+    const item = document.createElement("li");
+    item.textContent = "Complete the inputs to see the procedure.";
+    procedure.append(item);
+    liveStatus.textContent = "";
+  }
+
+  function renderCalculation(calculation) {
+    currentCopyText = calculation.copyText;
+    resultName.textContent = calculation.modeLabel;
+    resultValue.textContent = calculation.isLongResult
+      ? `≈ ${calculation.compact}`
+      : calculation.formattedExact;
+    resultInterpretation.textContent = calculation.interpretation;
+    decision.textContent = calculation.decisionExplanation;
+    formula.textContent = calculation.formula;
+    substitution.textContent = calculation.substitution;
+    resultExact.textContent = calculation.exact;
+    resultActions.classList.remove("hidden");
+    copyStatus.textContent = "";
+
+    if (calculation.isLongResult) {
+      resultDigits.textContent = `${calculation.digitCount.toLocaleString("en-US")} digits · compact view`;
+      resultDigits.classList.remove("hidden");
+      exactDetails.classList.remove("hidden");
+    } else {
+      resultDigits.classList.add("hidden");
+      exactDetails.classList.add("hidden");
+      exactDetails.open = false;
+    }
+
+    procedure.replaceChildren();
+    calculation.procedure.forEach((step) => {
+      const item = document.createElement("li");
+      item.textContent = step;
+      procedure.append(item);
+    });
+
+    liveStatus.textContent = calculation.isLongResult
+      ? `${calculation.modeLabel}: exact result with ${calculation.digitCount} digits.`
+      : `${calculation.modeLabel}: ${calculation.exact}.`;
+  }
+
+  function calculate() {
+    clearErrors();
+    const state = getModeState();
+    const result = calculateCombinatoricsFromInput({
+      orderMatters: state.orderMatters,
+      repetitionAllowed: state.repetitionAllowed,
+      n: inputN.value,
+      k: inputK.value,
+    });
+
+    if (!result.ok) {
+      result.errors.forEach((error) =>
+        setFieldError(error.field, error.message),
+      );
+      const firstField = result.errors[0]?.field;
+      (firstField === "n" ? inputN : inputK)?.focus();
+      liveStatus.textContent =
+        "Could not calculate. Check the highlighted fields.";
+      return;
+    }
+
+    renderCalculation(result.calculation);
+  }
+
+  async function copyText(text) {
+    if (navigator.clipboard?.writeText) {
+      await navigator.clipboard.writeText(text);
+      return;
+    }
+
+    const textarea = document.createElement("textarea");
+    textarea.value = text;
+    textarea.setAttribute("readonly", "");
+    textarea.style.position = "fixed";
+    textarea.style.opacity = "0";
+    document.body.append(textarea);
+    textarea.select();
+    document.execCommand("copy");
+    textarea.remove();
+  }
+
+  form.addEventListener("submit", (event) => {
+    event.preventDefault();
+    calculate();
+  });
+
+  document.querySelectorAll('input[name="order"], input[name="repetition"]')
+    .forEach((radio) => {
+      radio.addEventListener("change", () => {
+        clearErrors();
+        updateModeContext({ reset: true });
+      });
+    });
+
+  [inputN, inputK].forEach((input) => {
+    input.addEventListener("input", () => {
+      clearFieldError(input === inputN ? "n" : "k");
+      resetResult();
+    });
+  });
+
+  exampleButtons.forEach((button) => {
+    button.addEventListener("click", () => {
+      selectBooleanRadio("order", button.dataset.order === "true");
+      selectBooleanRadio(
+        "repetition",
+        button.dataset.repetition === "true",
+      );
+      inputN.value = button.dataset.n ?? "";
+      inputK.value = button.dataset.k ?? "";
+      clearErrors();
+      updateModeContext({ reset: true });
+      calculate();
+    });
+  });
+
+  clearButton.addEventListener("click", () => {
+    form.reset();
+    inputN.value = "";
+    inputK.value = "";
+    clearErrors();
+    updateModeContext({ reset: true });
+    inputN.focus();
+  });
+
+  copyButton.addEventListener("click", async () => {
+    if (!currentCopyText) return;
+
+    try {
+      await copyText(currentCopyText);
+      copyStatus.textContent = "Exact result copied.";
+    } catch {
+      copyStatus.textContent =
+        "Could not copy automatically. Select the exact result.";
+    }
+  });
+
+  updateModeContext();
+</script>

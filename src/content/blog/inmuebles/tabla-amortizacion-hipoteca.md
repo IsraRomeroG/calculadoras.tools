@@ -4,6 +4,7 @@ seoTitle: "Tabla de amortización hipotecaria: capital, intereses y saldo"
 description: "Conoce qué muestra una tabla de amortización hipotecaria, cómo se divide cada pago entre capital e intereses y cómo usarla para comparar escenarios."
 pubDate: 2026-04-28
 categorySlug: "inmuebles"
+translationKey: "mortgage-amortization-schedule"
 tags:
   - amortización
   - hipoteca

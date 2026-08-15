@@ -4,6 +4,7 @@ seoTitle: "IMC y calorías diarias: qué mide cada calculadora"
 description: "Conoce la diferencia entre IMC y calorías diarias, y cómo pueden complementarse para entender peso y energía."
 pubDate: 2026-07-08
 categorySlug: "salud"
+translationKey: "daily-calories-and-bmi"
 tags:
   - imc
   - calorías

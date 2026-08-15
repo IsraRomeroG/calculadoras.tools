@@ -1,5 +1,6 @@
 ---
 import BaseLayout from "@layouts/BaseLayout.astro";
+import { buildAlternateLinks } from "@lib/i18n/routing";
 import AdSlot from "@components/ads/AdSlot.astro";
 import Container from "@components/layout/Container.astro";
 import PageShell from "@components/layout/PageShell.astro";
@@ -13,6 +14,8 @@ const title = "Calculadora de IMC Online — Índice de Masa Corporal";
 const description =
   "Calcula tu IMC al instante con peso y altura. Conoce tu categoría de referencia, tu rango saludable estimado y las limitaciones del Índice de Masa Corporal.";
 const canonical = "/salud/calculadora-de-imc";
+const englishCanonical = "/en/health/bmi-calculator";
+const alternates = buildAlternateLinks({ es: canonical, en: englishCanonical }, Astro.site ?? Astro.url);
 
 const faqs = [
   {
@@ -86,7 +89,7 @@ const scaleSegments = [
 ];
 ---
 
-<BaseLayout title={title} description={description} canonical={canonical}>
+<BaseLayout title={title} description={description} canonical={canonical} alternates={alternates}>
   <Fragment slot="head">
     <script type="application/ld+json" set:html={JSON.stringify(faqJsonLd)} />
   </Fragment>

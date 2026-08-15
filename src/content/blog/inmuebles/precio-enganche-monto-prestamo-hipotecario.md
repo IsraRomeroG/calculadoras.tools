@@ -4,6 +4,7 @@ seoTitle: "Precio, enganche y monto de hipoteca: cómo se relacionan"
 description: "Aprende la diferencia entre precio del inmueble, enganche y monto del préstamo hipotecario para calcular mejor tu mensualidad."
 pubDate: 2026-05-07
 categorySlug: "inmuebles"
+translationKey: "property-price-down-payment-loan-amount"
 tags:
   - monto de hipoteca
   - enganche

@@ -1,0 +1,884 @@
+---
+import AdSlot from "@components/ads/AdSlot.astro";
+import Container from "@components/layout/Container.astro";
+import PageShell from "@components/layout/PageShell.astro";
+import FaqSection from "@components/shared/FaqSection.astro";
+import PageHero from "@components/shared/PageHero.astro";
+import SectionIntro from "@components/shared/SectionIntro.astro";
+import BaseLayout from "@layouts/BaseLayout.astro";
+import { buildAlternateLinks } from "@lib/i18n/routing";
+import { buildFaqJsonLd } from "@lib/seo";
+
+const title = "Property appreciation calculator";
+const description =
+  "Project a property's future value with a custom annual appreciation rate and compare conservative, base and optimistic scenarios.";
+const canonical = "/en/real-estate/property-appreciation-calculator";
+const spanishCanonical = "/inmuebles/calculadora-plusvalia-estimada";
+const alternates = buildAlternateLinks(
+  { es: spanishCanonical, en: canonical },
+  Astro.site ?? Astro.url,
+);
+
+const examples = [
+  {
+    label: "Family home",
+    currentValue: "2000000",
+    annualRate: "4",
+    years: "10",
+    improvements: "0",
+  },
+  {
+    label: "Recent improvements",
+    currentValue: "2500000",
+    annualRate: "5",
+    years: "8",
+    improvements: "180000",
+  },
+  {
+    label: "Prudent scenario",
+    currentValue: "1800000",
+    annualRate: "2.5",
+    years: "12",
+    improvements: "50000",
+  },
+] as const;
+
+const explainerCards = [
+  {
+    title: "Base scenario",
+    text: "Uses the annual rate you enter and compounds it throughout the term.",
+  },
+  {
+    title: "Sensitivity range",
+    text: "The conservative scenario subtracts 2 percentage points and the optimistic scenario adds 2 points to the base rate.",
+  },
+  {
+    title: "Included improvements",
+    text: "Improvements are added to the starting value and assumed to be part of the property's current value.",
+  },
+];
+
+const faqs = [
+  {
+    question: "How is property appreciation calculated?",
+    answer:
+      "The calculator adds the current value and improvements, converts the annual rate to a decimal and applies compound growth over the entered term.",
+  },
+  {
+    question: "Is property appreciation guaranteed?",
+    answer:
+      "No. This is an informational projection. The actual price may change because of location, market conditions, property condition, negotiation, inflation and liquidity.",
+  },
+  {
+    question: "Can I use a negative rate?",
+    answer:
+      "Yes. A negative rate can model depreciation or a market adjustment without treating it as an error.",
+  },
+  {
+    question: "Do improvements increase value?",
+    answer:
+      "They may increase value, but they are not always reflected dollar-for-dollar in the sale price. The calculator therefore shows them separately.",
+  },
+  {
+    question: "What do the scenarios mean?",
+    answer:
+      "The base scenario uses your rate. The conservative scenario subtracts 2 percentage points and the optimistic scenario adds 2 points. These are sensitivity ranges, not promises.",
+  },
+  {
+    question: "Is future value the same amount I would receive when selling?",
+    answer:
+      "Not necessarily. Future value does not deduct commissions, taxes, selling costs or final negotiation adjustments.",
+  },
+];
+
+const faqJsonLd = buildFaqJsonLd(faqs);
+---
+
+<BaseLayout title={title} description={description} canonical={canonical} locale="en" alternates={alternates}>
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={JSON.stringify(faqJsonLd)} />
+  </Fragment>
+
+  <PageShell>
+    <PageHero
+      title="Property appreciation calculator"
+      description="Estimate a property’s future value with compound appreciation and compare conservative, base and optimistic scenarios."
+      kicker="Real Estate"
+      kickerHref="/en/real-estate"
+      collapseBreadcrumbOnMobile
+      containerClass="py-6 md:py-8"
+      breadcrumbs={[
+        { label: "Home", href: "/en", ariaLabel: "Home" },
+        { label: "Real Estate", href: "/en/real-estate", optional: true },
+        { label: "Estimated appreciation", truncate: true },
+      ]}
+    />
+
+    <Container as="section" class="py-6 md:py-8">
+      <section
+        id="appreciation-calculator"
+        class="overflow-hidden rounded-lg border border-gray-700 bg-gray-950 shadow-xl shadow-gray-950/30"
+        aria-labelledby="calculator-heading"
+      >
+        <div class="grid lg:grid-cols-[minmax(0,1fr)_minmax(20rem,0.82fr)]">
+          <form class="p-4 sm:p-6" data-calculator-form>
+            <div>
+              <p class="text-sm font-semibold uppercase tracking-wide text-emerald-300">
+                Local projection
+              </p>
+              <h2 id="calculator-heading" class="mt-2 text-2xl font-semibold">
+                Property inputs
+              </h2>
+            </div>
+
+            <div class="mt-5 grid gap-4 sm:grid-cols-2">
+              <div>
+                <label
+                  for="appreciation-current-value"
+                  class="block text-sm font-semibold text-gray-200"
+                >
+                  Current value
+                </label>
+                <div class="mt-2 flex rounded-lg border border-gray-700 bg-gray-900 focus-within:border-emerald-300 focus-within:ring-3 focus-within:ring-emerald-300/15">
+                  <span class="flex items-center px-4 text-gray-500">$</span>
+                  <input
+                    id="appreciation-current-value"
+                    class="min-h-12 w-full bg-transparent px-4 font-mono text-base text-white outline-none placeholder:text-gray-600"
+                    type="text"
+                    inputmode="decimal"
+                    autocomplete="off"
+                    placeholder="2000000"
+                    aria-describedby="appreciation-form-error"
+                    data-current-value
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label
+                  for="appreciation-rate"
+                  class="block text-sm font-semibold text-gray-200"
+                >
+                  Base annual appreciation
+                </label>
+                <div class="mt-2 flex rounded-lg border border-gray-700 bg-gray-900 focus-within:border-emerald-300 focus-within:ring-3 focus-within:ring-emerald-300/15">
+                  <input
+                    id="appreciation-rate"
+                    class="min-h-12 w-full bg-transparent px-4 font-mono text-base text-white outline-none placeholder:text-gray-600"
+                    type="text"
+                    inputmode="decimal"
+                    autocomplete="off"
+                    value="4"
+                    placeholder="4"
+                    aria-describedby="appreciation-form-error"
+                    data-annual-rate
+                  />
+                  <span class="flex items-center px-4 text-gray-500">%</span>
+                </div>
+              </div>
+
+              <div>
+                <label
+                  for="appreciation-years"
+                  class="block text-sm font-semibold text-gray-200"
+                >
+                  Term
+                </label>
+                <div class="mt-2 flex rounded-lg border border-gray-700 bg-gray-900 focus-within:border-emerald-300 focus-within:ring-3 focus-within:ring-emerald-300/15">
+                  <input
+                    id="appreciation-years"
+                    class="min-h-12 w-full bg-transparent px-4 font-mono text-base text-white outline-none placeholder:text-gray-600"
+                    type="text"
+                    inputmode="numeric"
+                    autocomplete="off"
+                    value="10"
+                    placeholder="10"
+                    aria-describedby="appreciation-form-error"
+                    data-years
+                  />
+                  <span class="flex items-center px-4 text-gray-500">years</span>
+                </div>
+              </div>
+
+              <div>
+                <label
+                  for="appreciation-improvements"
+                  class="block text-sm font-semibold text-gray-200"
+                >
+                  Improvements added to value
+                </label>
+                <div class="mt-2 flex rounded-lg border border-gray-700 bg-gray-900 focus-within:border-emerald-300 focus-within:ring-3 focus-within:ring-emerald-300/15">
+                  <span class="flex items-center px-4 text-gray-500">$</span>
+                  <input
+                    id="appreciation-improvements"
+                    class="min-h-12 w-full bg-transparent px-4 font-mono text-base text-white outline-none placeholder:text-gray-600"
+                    type="text"
+                    inputmode="decimal"
+                    autocomplete="off"
+                    placeholder="0"
+                    aria-describedby="appreciation-form-error"
+                    data-improvements
+                  />
+                </div>
+              </div>
+            </div>
+
+            <p
+              id="appreciation-form-error"
+              class="mt-4 hidden rounded-lg border border-red-400/25 bg-red-400/10 p-3 text-sm leading-relaxed text-red-200"
+              role="alert"
+              data-form-error
+            ></p>
+
+            <div class="mt-5 grid gap-2 sm:grid-cols-3">
+              {
+                examples.map((example) => (
+                  <button
+                    class="min-h-16 rounded-lg border border-gray-700 bg-gray-900 px-3 py-2 text-left text-sm text-gray-200 transition hover:border-emerald-400/60 hover:bg-gray-800 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-emerald-300/30"
+                    type="button"
+                    data-example-current-value={example.currentValue}
+                    data-example-rate={example.annualRate}
+                    data-example-years={example.years}
+                    data-example-improvements={example.improvements}
+                  >
+                    <span class="block font-semibold">{example.label}</span>
+                    <span class="mt-1 block font-mono text-xs text-emerald-200">
+                      {example.annualRate}% · {example.years} years
+                    </span>
+                  </button>
+                ))
+              }
+            </div>
+
+            <div class="mt-5 rounded-lg border border-amber-300/25 bg-amber-300/10 p-4 text-sm leading-relaxed text-amber-100">
+              Informational estimate: property appreciation is not guaranteed and may
+              vary with the market, location, property condition and terms of the
+              sale.
+            </div>
+
+            <div class="mt-5 flex flex-col gap-3 sm:flex-row">
+              <button
+                class="min-h-11 rounded-lg bg-emerald-400 px-5 py-2 text-sm font-semibold text-gray-950 transition hover:bg-emerald-300 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-emerald-300/40"
+                type="submit"
+              >
+                Calculate
+              </button>
+              <button
+                class="min-h-11 rounded-lg border border-gray-700 px-5 py-2 text-sm font-semibold text-gray-200 transition hover:border-gray-500 hover:bg-gray-900 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-gray-400/30"
+                type="button"
+                data-clear-calculator
+              >
+                Clear
+              </button>
+            </div>
+          </form>
+
+          <aside
+            class="border-t border-gray-800 bg-gray-900/65 p-4 sm:p-6 lg:border-l lg:border-t-0"
+          >
+            <div class="lg:sticky lg:top-6">
+              <p class="text-xs font-semibold uppercase tracking-wide text-gray-500">
+                Main result
+              </p>
+              <p class="mt-2 text-sm font-semibold text-emerald-300">
+                Estimated future value
+              </p>
+              <div class="mt-3 rounded-lg border border-gray-800 bg-gray-950 p-4">
+                <p
+                  class="break-words text-3xl font-semibold text-emerald-100 sm:text-4xl"
+                  data-main-result
+                >
+                  No calculation
+                </p>
+                <p
+                  class="mt-3 min-h-12 text-sm leading-relaxed text-gray-400"
+                  data-result-context
+                >
+                  Enter the current value, rate and term to create a projection.
+                </p>
+              </div>
+
+              <dl class="mt-4 grid grid-cols-2 gap-2" data-summary-grid>
+                <div class="rounded-lg border border-gray-800 bg-gray-950 p-3">
+                  <dt class="text-xs font-semibold uppercase text-gray-500">
+                    Gain
+                  </dt>
+                  <dd class="mt-1 font-mono text-base font-semibold text-white">
+                    -
+                  </dd>
+                </div>
+                <div class="rounded-lg border border-gray-800 bg-gray-950 p-3">
+                  <dt class="text-xs font-semibold uppercase text-gray-500">
+                    Accumulated
+                  </dt>
+                  <dd class="mt-1 font-mono text-base font-semibold text-white">
+                    -
+                  </dd>
+                </div>
+              </dl>
+
+              <section
+                class="mt-4 rounded-lg border border-gray-800 bg-gray-950 p-4"
+                aria-labelledby="scenario-heading"
+              >
+                <h3 id="scenario-heading" class="text-sm font-semibold text-gray-200">
+                  Scenarios
+                </h3>
+                <div class="mt-3 grid gap-2" data-scenario-list>
+                  <p class="text-sm text-gray-500">No calculated scenarios.</p>
+                </div>
+              </section>
+
+              <p
+                class="mt-4 hidden rounded-lg border border-gray-700 bg-gray-950 p-3 text-sm leading-relaxed text-gray-300"
+                data-rate-note
+              ></p>
+
+              <p
+                class="mt-4 hidden rounded-lg border border-amber-300/25 bg-amber-300/10 p-3 text-sm leading-relaxed text-amber-100"
+                data-warning-panel
+              ></p>
+
+              <div class="mt-4 flex flex-col gap-2 sm:flex-row sm:flex-wrap">
+                <button
+                  class="hidden min-h-11 rounded-lg bg-emerald-400 px-4 py-2 text-sm font-semibold text-gray-950 transition hover:bg-emerald-300 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-emerald-300/40"
+                  type="button"
+                  data-copy-result
+                >
+                  Copy result
+                </button>
+                <button
+                  class="hidden min-h-11 rounded-lg border border-emerald-400/60 px-4 py-2 text-sm font-semibold text-emerald-200 transition hover:bg-emerald-400/10 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-emerald-300/40"
+                  type="button"
+                  data-export-csv
+                >
+                  Export CSV
+                </button>
+              </div>
+              <p
+                class="mt-3 min-h-5 text-sm text-emerald-300"
+                role="status"
+                aria-live="polite"
+                data-copy-status
+              ></p>
+              <p class="sr-only" role="status" aria-live="polite" data-live-status>
+              </p>
+            </div>
+          </aside>
+        </div>
+
+        <div class="border-t border-gray-800 p-4 sm:p-6">
+          <details class="rounded-lg border border-gray-800 bg-gray-900/55 p-4">
+            <summary class="cursor-pointer text-sm font-semibold text-gray-200">
+              Annual table
+            </summary>
+            <div class="mt-4 overflow-x-auto">
+              <table class="min-w-full text-left text-sm">
+                <thead class="text-xs uppercase text-gray-500">
+                  <tr>
+                    <th class="px-3 py-2 font-semibold">Year</th>
+                    <th class="px-3 py-2 font-semibold">Conservative</th>
+                    <th class="px-3 py-2 font-semibold">Base</th>
+                    <th class="px-3 py-2 font-semibold">Optimistic</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-800" data-annual-table-body>
+                  <tr>
+                    <td class="px-3 py-3 text-gray-500" colspan="4">
+                      Enter data to generate the table.
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </details>
+        </div>
+      </section>
+    </Container>
+
+    <AdSlot placement="calculator-after-tool" />
+
+    <Container as="section" class="py-6 md:py-8">
+      <SectionIntro
+        title="How to read the projection"
+        description="The calculator shows a nominal future value and a sensitivity range. Use it as a starting point, not a formal appraisal."
+      />
+      <div class="grid gap-4 md:grid-cols-3">
+        {
+          explainerCards.map((card) => (
+            <article class="rounded-lg border border-gray-800 bg-gray-950 p-5">
+              <h3 class="text-base font-semibold text-white">{card.title}</h3>
+              <p class="mt-2 text-sm leading-relaxed text-gray-400">
+                {card.text}
+              </p>
+            </article>
+          ))
+        }
+      </div>
+    </Container>
+
+    <FaqSection faqs={faqs} />
+  </PageShell>
+</BaseLayout>
+
+<script>
+  import {
+    buildCopyText,
+    buildInterpretation,
+    calculateAppreciation,
+    formatCurrency,
+    formatPercent,
+    parseLocalizedNumber,
+    roundMoney,
+  } from "@lib/calculators/inmuebles/calculadora-plusvalia-estimada/appreciation.en";
+
+  const form = document.querySelector("[data-calculator-form]");
+  const currentValueInput = document.querySelector("[data-current-value]");
+  const annualRateInput = document.querySelector("[data-annual-rate]");
+  const yearsInput = document.querySelector("[data-years]");
+  const improvementsInput = document.querySelector("[data-improvements]");
+  const clearButton = document.querySelector("[data-clear-calculator]");
+  const formError = document.querySelector("[data-form-error]");
+  const mainResult = document.querySelector("[data-main-result]");
+  const resultContext = document.querySelector("[data-result-context]");
+  const summaryGrid = document.querySelector("[data-summary-grid]");
+  const scenarioList = document.querySelector("[data-scenario-list]");
+  const rateNote = document.querySelector("[data-rate-note]");
+  const warningPanel = document.querySelector("[data-warning-panel]");
+  const annualTableBody = document.querySelector("[data-annual-table-body]");
+  const copyButton = document.querySelector("[data-copy-result]");
+  const exportButton = document.querySelector("[data-export-csv]");
+  const copyStatus = document.querySelector("[data-copy-status]");
+  const liveStatus = document.querySelector("[data-live-status]");
+
+  let currentResult = null;
+  let currentCopyText = "";
+  let copyTimer = 0;
+  let liveTimer = 0;
+
+  function parseCalculatorInput({ force = false } = {}) {
+    const currentValue = parseNumberField(
+      currentValueInput?.value ?? "",
+      "The current value",
+      { required: force },
+    );
+
+    if (currentValue === null) {
+      return null;
+    }
+
+    return {
+      currentValue,
+      annualRatePercent:
+        parseNumberField(annualRateInput?.value ?? "", "The annual appreciation", {
+          required: force,
+          defaultValue: 4,
+        }) ?? 4,
+      years:
+        parseNumberField(yearsInput?.value ?? "", "The term", {
+          required: force,
+          defaultValue: 10,
+        }) ?? 10,
+      improvements:
+        parseNumberField(improvementsInput?.value ?? "", "The improvements", {
+          required: false,
+          defaultValue: 0,
+        }) ?? 0,
+    };
+  }
+
+  function parseNumberField(value, label, options = {}) {
+    const trimmed = String(value).trim();
+
+    if (!trimmed) {
+      if (Object.prototype.hasOwnProperty.call(options, "defaultValue")) {
+        return options.defaultValue;
+      }
+
+      if (options.required) {
+        throw new RangeError(`${label} is required.`);
+      }
+
+      return null;
+    }
+
+    const parsed = parseLocalizedNumber(trimmed);
+
+    if (parsed === null) {
+      throw new RangeError(`${label} must be a valid number.`);
+    }
+
+    return parsed;
+  }
+
+  function updateCalculator(options = {}) {
+    try {
+      hideFormError();
+      const input = parseCalculatorInput(options);
+
+      if (!input) {
+        setInitialState();
+        return;
+      }
+
+      currentResult = calculateAppreciation(input);
+      currentCopyText = buildCopyText(currentResult);
+      renderResult(currentResult);
+      setActionsVisible(true);
+    } catch (error) {
+      currentResult = null;
+      currentCopyText = "";
+      showFormError(error instanceof Error ? error.message : "Check the inputs.");
+      setInvalidState();
+    }
+  }
+
+  function renderResult(result) {
+    if (!mainResult || !resultContext || !summaryGrid) {
+      return;
+    }
+
+    mainResult.textContent = formatCurrency(result.baseScenario.futureValue);
+    resultContext.textContent = buildInterpretation(result);
+    summaryGrid.innerHTML = [
+      ["Nominal gain", formatCurrency(result.baseScenario.nominalGain)],
+      [
+        "Accumulated appreciation",
+        formatPercent(result.baseScenario.accumulatedAppreciationPercent),
+      ],
+      ["Projection base", formatCurrency(result.baseAmount)],
+      ["Improvements", formatCurrency(result.improvements)],
+    ]
+      .map(([label, value]) => renderMetric(label, value))
+      .join("");
+
+    renderScenarios(result);
+    renderWarnings(result);
+    renderAnnualRows(result);
+    scheduleAnnouncement(`Result: ${mainResult.textContent}`);
+  }
+
+  function renderMetric(label, value) {
+    return `
+      <div class="rounded-lg border border-gray-800 bg-gray-950 p-3">
+        <dt class="text-xs font-semibold uppercase text-gray-500">${escapeHtml(label)}</dt>
+        <dd class="mt-1 break-words font-mono text-base font-semibold text-white">${escapeHtml(value)}</dd>
+      </div>
+    `;
+  }
+
+  function renderScenarios(result) {
+    if (!scenarioList) {
+      return;
+    }
+
+    scenarioList.innerHTML = result.scenarios
+      .map((scenario) => {
+        const isBase = scenario.id === "base";
+
+        return `
+          <article class="rounded-lg border ${isBase ? "border-emerald-400/60 bg-emerald-400/10" : "border-gray-800 bg-gray-900/65"} p-3">
+            <div class="flex items-start justify-between gap-3">
+              <div>
+                <h4 class="text-sm font-semibold text-gray-100">${escapeHtml(scenario.label)}</h4>
+                <p class="mt-1 text-xs text-gray-500">${formatPercent(scenario.annualRatePercent)} annually</p>
+              </div>
+              <p class="shrink-0 text-right font-mono text-sm font-semibold ${isBase ? "text-emerald-200" : "text-gray-200"}">${formatCurrency(scenario.futureValue)}</p>
+            </div>
+            <p class="mt-2 text-xs text-gray-500">
+              ${escapeHtml(formatCurrency(scenario.nominalGain))} · ${escapeHtml(formatPercent(scenario.accumulatedAppreciationPercent))}
+            </p>
+          </article>
+        `;
+      })
+      .join("");
+  }
+
+  function renderWarnings(result) {
+    if (rateNote) {
+      if (result.annualRatePercent < 0) {
+        rateNote.textContent =
+          "The base rate is negative; the result models a possible decrease in value.";
+        rateNote.classList.remove("hidden");
+      } else {
+        rateNote.textContent = "";
+        rateNote.classList.add("hidden");
+      }
+    }
+
+    if (!warningPanel) {
+      return;
+    }
+
+    if (result.warnings.length === 0) {
+      warningPanel.textContent = "";
+      warningPanel.classList.add("hidden");
+      return;
+    }
+
+    warningPanel.textContent = result.warnings.join(" ");
+    warningPanel.classList.remove("hidden");
+  }
+
+  function renderAnnualRows(result) {
+    if (!annualTableBody) {
+      return;
+    }
+
+    annualTableBody.innerHTML = result.annualRows
+      .map(
+        (row) => `
+          <tr>
+            <td class="px-3 py-3 font-mono text-gray-300">${row.year}</td>
+            <td class="px-3 py-3 font-mono text-gray-200">${formatCurrency(row.conservativeValue)}</td>
+            <td class="px-3 py-3 font-mono font-semibold text-emerald-200">${formatCurrency(row.baseValue)}</td>
+            <td class="px-3 py-3 font-mono text-gray-200">${formatCurrency(row.optimisticValue)}</td>
+          </tr>
+        `,
+      )
+      .join("");
+  }
+
+  function setInitialState() {
+    currentResult = null;
+    currentCopyText = "";
+
+    if (mainResult) {
+      mainResult.textContent = "No calculation";
+    }
+
+    if (resultContext) {
+      resultContext.textContent =
+        "Enter the current value, rate and term to create a projection.";
+    }
+
+    if (summaryGrid) {
+      summaryGrid.innerHTML = [
+        ["Gain", "-"],
+        ["Accumulated", "-"],
+        ["Base", "-"],
+        ["Improvements", "-"],
+      ]
+        .map(([label, value]) => renderMetric(label, value))
+        .join("");
+    }
+
+    if (scenarioList) {
+      scenarioList.innerHTML =
+        '<p class="text-sm text-gray-500">No calculated scenarios.</p>';
+    }
+
+    if (rateNote) {
+      rateNote.textContent = "";
+      rateNote.classList.add("hidden");
+    }
+
+    if (warningPanel) {
+      warningPanel.textContent = "";
+      warningPanel.classList.add("hidden");
+    }
+
+    if (annualTableBody) {
+      annualTableBody.innerHTML =
+        '<tr><td class="px-3 py-3 text-gray-500" colspan="4">Enter data to generate the table.</td></tr>';
+    }
+
+    setActionsVisible(false);
+  }
+
+  function setInvalidState() {
+    if (mainResult) {
+      mainResult.textContent = "Check the inputs";
+    }
+
+    if (resultContext) {
+      resultContext.textContent = "Correct the highlighted fields to calculate.";
+    }
+
+    setActionsVisible(false);
+  }
+
+  function setActionsVisible(isVisible) {
+    copyButton?.classList.toggle("hidden", !isVisible);
+    exportButton?.classList.toggle("hidden", !isVisible);
+  }
+
+  function showFormError(message) {
+    if (!formError) {
+      return;
+    }
+
+    formError.textContent = message;
+    formError.classList.remove("hidden");
+  }
+
+  function hideFormError() {
+    if (!formError) {
+      return;
+    }
+
+    formError.textContent = "";
+    formError.classList.add("hidden");
+  }
+
+  function clearCalculator() {
+    currentValueInput.value = "";
+    annualRateInput.value = "4";
+    yearsInput.value = "10";
+    improvementsInput.value = "";
+    hideFormError();
+    setInitialState();
+    currentValueInput?.focus();
+  }
+
+  async function copyResult() {
+    if (!currentCopyText) {
+      return;
+    }
+
+    try {
+      if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(currentCopyText);
+      } else {
+        const textArea = document.createElement("textarea");
+        textArea.value = currentCopyText;
+        textArea.setAttribute("readonly", "");
+        textArea.style.position = "fixed";
+        textArea.style.opacity = "0";
+        document.body.append(textArea);
+        textArea.select();
+        document.execCommand("copy");
+        textArea.remove();
+      }
+
+      showCopyStatus("Result copied.");
+    } catch {
+      showCopyStatus("Could not copy the result.");
+    }
+  }
+
+  function exportCsv() {
+    if (!currentResult) {
+      return;
+    }
+
+    const rows = [
+      [
+        "year",
+        "conservative_value",
+        "base_value",
+        "optimistic_value",
+      ],
+      ...currentResult.annualRows.map((row) => [
+        row.year,
+        roundMoney(row.conservativeValue),
+        roundMoney(row.baseValue),
+        roundMoney(row.optimisticValue),
+      ]),
+      [],
+      ["current_value", roundMoney(currentResult.currentValue)],
+      ["improvements", roundMoney(currentResult.improvements)],
+      ["projection_base", roundMoney(currentResult.baseAmount)],
+      ["base_annual_appreciation", currentResult.annualRatePercent],
+      ["term_years", currentResult.years],
+      ["base_future_value", roundMoney(currentResult.baseScenario.futureValue)],
+      ["base_nominal_gain", roundMoney(currentResult.baseScenario.nominalGain)],
+    ];
+    const blob = new Blob(
+      [rows.map((row) => row.map(csvEscape).join(",")).join("\n")],
+      { type: "text/csv;charset=utf-8" },
+    );
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "property-appreciation.csv";
+    document.body.append(link);
+    link.click();
+    link.remove();
+    URL.revokeObjectURL(url);
+  }
+
+  function showCopyStatus(message) {
+    if (!copyStatus) {
+      return;
+    }
+
+    copyStatus.textContent = message;
+    window.clearTimeout(copyTimer);
+    copyTimer = window.setTimeout(() => {
+      copyStatus.textContent = "";
+    }, 2200);
+  }
+
+  function scheduleAnnouncement(message) {
+    window.clearTimeout(liveTimer);
+    liveTimer = window.setTimeout(() => {
+      if (liveStatus) {
+        liveStatus.textContent = message;
+      }
+    }, 350);
+  }
+
+  function csvEscape(value) {
+    const text = String(value);
+
+    if (/[",\n]/.test(text)) {
+      return `"${text.replaceAll('"', '""')}"`;
+    }
+
+    return text;
+  }
+
+  function escapeHtml(value) {
+    return String(value)
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;")
+      .replaceAll("'", "&#039;");
+  }
+
+  form?.addEventListener("submit", (event) => {
+    event.preventDefault();
+    updateCalculator({ force: true });
+  });
+
+  [
+    currentValueInput,
+    annualRateInput,
+    yearsInput,
+    improvementsInput,
+  ].forEach((input) => {
+    input?.addEventListener("input", () => updateCalculator());
+  });
+
+  document.addEventListener("click", (event) => {
+    if (!(event.target instanceof Element)) {
+      return;
+    }
+
+    const exampleButton = event.target.closest("[data-example-current-value]");
+
+    if (!exampleButton) {
+      return;
+    }
+
+    currentValueInput.value = exampleButton.dataset.exampleCurrentValue;
+    annualRateInput.value = exampleButton.dataset.exampleRate;
+    yearsInput.value = exampleButton.dataset.exampleYears;
+    improvementsInput.value = exampleButton.dataset.exampleImprovements;
+    updateCalculator({ force: true });
+    document.querySelector("#appreciation-calculator")?.scrollIntoView({
+      behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches
+        ? "auto"
+        : "smooth",
+      block: "start",
+    });
+  });
+
+  clearButton?.addEventListener("click", clearCalculator);
+  copyButton?.addEventListener("click", copyResult);
+  exportButton?.addEventListener("click", exportCsv);
+
+  setInitialState();
+</script>

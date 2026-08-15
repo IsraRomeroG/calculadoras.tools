@@ -4,6 +4,7 @@ seoTitle: "IMC en libras, pies y pulgadas: fórmula imperial"
 description: "Aprende la fórmula imperial del IMC usando libras, pies y pulgadas, con un ejemplo paso a paso."
 pubDate: 2026-06-22
 categorySlug: "salud"
+translationKey: "calculate-bmi-pounds-feet-inches"
 tags:
   - imc
   - libras

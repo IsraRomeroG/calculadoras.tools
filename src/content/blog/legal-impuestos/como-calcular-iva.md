@@ -3,6 +3,7 @@ title: "Cómo calcular el IVA paso a paso"
 description: "Aprende a sumar y desglosar IVA con fórmulas simples, ejemplos claros y una calculadora online."
 pubDate: 2026-03-21
 categorySlug: "legal-impuestos"
+translationKey: "how-to-calculate-vat"
 tags:
   - iva
   - impuestos
@@ -70,6 +71,8 @@ Si partes de un precio final, también puedes ver la explicación completa de [c
 | $2,000 | 19% | $380 | $2,380 |
 
 Estos ejemplos sirven como referencia matemática. La tasa real depende del país, el producto o servicio y la normativa vigente.
+
+Si la operación se realiza en España, consulta la guía específica para [calcular el IVA en España al 21%, 10% o 4%](/blog/legal-impuestos/iva-espana), con ejemplos de facturas y fuentes oficiales de 2026.
 
 ## Errores comunes al calcular IVA
 

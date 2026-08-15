@@ -4,6 +4,7 @@ seoTitle: "Bajar o subir de peso según IMC: cómo usarlo como referencia"
 description: "Aprende cómo usar el IMC como punto de partida para explorar cambios de peso de forma orientativa y responsable."
 pubDate: 2026-07-04
 categorySlug: "salud"
+translationKey: "adjust-weight-based-on-bmi"
 tags:
   - imc
   - peso saludable

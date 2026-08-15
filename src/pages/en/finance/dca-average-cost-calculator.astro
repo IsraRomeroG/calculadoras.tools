@@ -1,0 +1,384 @@
+---
+import BaseLayout from "@layouts/BaseLayout.astro";
+import AdSlot from "@components/ads/AdSlot.astro";
+import Container from "@components/layout/Container.astro";
+import PageShell from "@components/layout/PageShell.astro";
+import FaqSection from "@components/shared/FaqSection.astro";
+import PageHero from "@components/shared/PageHero.astro";
+import SectionIntro from "@components/shared/SectionIntro.astro";
+import { buildAlternateLinks } from "@lib/i18n/routing";
+import { buildFaqJsonLd } from "@lib/seo";
+
+const title = "DCA and average purchase price calculator";
+const description =
+  "Calculate your average purchase price, effective cost including fees, break-even point and how a future purchase would change it.";
+const canonical = "/en/finance/dca-average-cost-calculator";
+const spanishCanonical = "/finanzas/calculadora-dca-costo-promedio";
+const alternates = buildAlternateLinks({ es: spanishCanonical, en: canonical }, Astro.site ?? Astro.url);
+const faqs = [
+  {
+    question: "How is the average price of several purchases calculated?",
+    answer:
+      "Divide the total purchase amount by the total units acquired. Purchases that add more units have more weight.",
+  },
+  {
+    question: "What is the difference between average price and effective cost?",
+    answer:
+      "Average price includes the money allocated to the asset. Effective cost also includes fees paid.",
+  },
+  {
+    question: "Does buying more always lower my average price?",
+    answer:
+      "No. A purchase below the average lowers it, while one above the average raises it. In both cases, capital at risk increases.",
+  },
+  {
+    question: "What does DCA mean?",
+    answer:
+      "Dollar-cost averaging usually means investing equal amounts at regular intervals. This calculator also accepts irregular purchases.",
+  },
+  {
+    question: "Does the calculator use live prices?",
+    answer: "No. All prices, amounts and fees are entered manually.",
+  },
+  {
+    question: "Can this result be used as a tax cost basis?",
+    answer:
+      "No. Tax rules may use different methods and depend on the jurisdiction and asset type.",
+  },
+];
+const faqJsonLd = buildFaqJsonLd(faqs);
+---
+
+<BaseLayout title={title} description={description} canonical={canonical} locale="en" alternates={alternates}>
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={JSON.stringify(faqJsonLd)} />
+  </Fragment>
+
+  <PageShell>
+    <PageHero
+      title="Average purchase price calculator (DCA)"
+      description="Calculate your average, include fees and see how your next purchase would change it."
+      kicker="Finance"
+      collapseBreadcrumbOnMobile
+      containerClass="py-6 md:py-8"
+      breadcrumbs={[
+        { label: "Home", href: "/en", ariaLabel: "Home" },
+        { label: "Finance", href: "/en/finance", optional: true },
+        { label: "DCA calculator", truncate: true },
+      ]}
+    />
+
+    <Container as="section" class="py-6 md:py-8">
+      <section class="overflow-hidden rounded-lg border border-gray-700 bg-gray-950 shadow-xl shadow-gray-950/30" aria-labelledby="calculator-heading">
+        <div class="grid lg:grid-cols-[minmax(0,1.2fr)_minmax(19rem,0.8fr)]">
+          <div class="p-4 sm:p-6">
+            <p class="text-sm font-semibold uppercase tracking-wide text-amber-400">Your purchases</p>
+            <h2 id="calculator-heading" class="mt-2 text-2xl font-semibold">What is your average price?</h2>
+            <p class="mt-2 text-sm leading-relaxed text-gray-400">
+              The purchase amount goes toward the asset. The fee is added separately.
+            </p>
+
+            <div class="mt-5 grid gap-4 sm:grid-cols-3">
+              <label class="block sm:col-span-2">
+                <span class="field-label">Asset name <span class="text-gray-500">(optional)</span></span>
+                <input class="field" type="text" maxlength="40" placeholder="E.g. BTC, ETF or stock" data-asset-name />
+              </label>
+              <label class="block">
+                <span class="field-label">Currency</span>
+                <select class="field" data-currency>
+                  <option value="MXN">MXN</option><option value="USD">USD</option>
+                  <option value="EUR">EUR</option><option value="COP">COP</option>
+                  <option value="ARS">ARS</option><option value="CLP">CLP</option>
+                </select>
+              </label>
+              <label class="block sm:col-span-2">
+                <span class="field-label">Current price <span class="text-gray-500">(optional)</span></span>
+                <input class="field" type="text" inputmode="decimal" placeholder="50" data-current-price />
+                <span class="field-help">Enables current value, gain or loss, and distance from break-even.</span>
+              </label>
+              <label class="block">
+                <span class="field-label">Unit decimal places</span>
+                <select class="field" data-precision>
+                  <option value="2">2</option><option value="4">4</option><option value="6">6</option>
+                  <option value="8" selected>8</option><option value="10">10</option><option value="12">12</option>
+                </select>
+              </label>
+            </div>
+
+            <div class="mt-6 flex items-center justify-between gap-4 border-t border-gray-800 pt-5">
+              <div>
+                <h3 class="text-lg font-semibold text-white">Recorded purchases</h3>
+                <p class="mt-1 text-sm text-gray-500" data-purchase-count></p>
+              </div>
+              <button class="secondary-button" type="button" data-add-purchase>Add purchase</button>
+            </div>
+            <div class="mt-4 space-y-4" data-purchase-list></div>
+            <div class="mt-5 hidden rounded-lg border border-red-400/40 bg-red-400/10 p-4 text-sm text-red-200" role="alert" data-errors></div>
+            <div class="mt-3 hidden rounded-lg border border-amber-400/40 bg-amber-400/10 p-4 text-sm text-amber-100" data-warnings></div>
+
+            <div class="mt-6 flex flex-col gap-3 border-t border-gray-800 pt-5 sm:flex-row sm:flex-wrap">
+              <button class="primary-button" type="button" data-calculate>Calculate average</button>
+              <button class="secondary-button" type="button" data-example>Use example</button>
+              <button class="secondary-button" type="button" data-clear>Clear</button>
+              <button class="secondary-button hidden" type="button" data-copy><span data-copy-label>Copy summary</span></button>
+              <p class="sr-only" aria-live="polite" data-copy-status></p>
+            </div>
+          </div>
+
+          <aside class="border-t border-gray-800 bg-gray-900/70 p-4 sm:p-6 lg:border-l lg:border-t-0" aria-live="polite">
+            <p class="text-sm font-semibold uppercase tracking-wide text-amber-400" data-result-kicker>Result</p>
+            <p class="mt-3 text-3xl font-bold leading-tight text-white" data-main-result>Add your purchases</p>
+            <p class="mt-3 text-sm leading-relaxed text-gray-300" data-interpretation>
+              Your average price and the price needed to recover fees will appear here.
+            </p>
+            <div class="mt-5 grid grid-cols-2 gap-3" data-summary-grid>
+              <div class="col-span-2 rounded-lg border border-gray-800 bg-gray-950/70 p-4 text-sm text-gray-400">
+                Enter at least one complete purchase to calculate.
+              </div>
+            </div>
+            <details class="mt-4 hidden rounded-lg border border-gray-800 p-4" data-calculation-details>
+              <summary class="cursor-pointer text-sm font-semibold text-white">How it was calculated</summary>
+              <div class="mt-3 space-y-2 text-sm leading-relaxed text-gray-400" data-calculation-lines></div>
+            </details>
+            <p class="mt-4 text-xs leading-relaxed text-gray-500">
+              Does not include taxes, selling fees, spreads, dividends, exchange rates or partial sales.
+            </p>
+          </aside>
+        </div>
+      </section>
+      <div class="sticky bottom-3 z-20 mt-4 lg:hidden">
+        <button class="primary-button w-full shadow-lg shadow-gray-950/50" type="button" data-calculate>Calculate average</button>
+      </div>
+    </Container>
+
+    <div class="hidden" data-results>
+      <Container as="section" class="py-8">
+        <section class="rounded-lg border border-gray-700 bg-gray-950 p-4 sm:p-6">
+          <p class="text-sm font-semibold uppercase tracking-wide text-sky-300">Simulator</p>
+          <h2 class="mt-2 text-2xl font-semibold">Next purchase</h2>
+          <p class="mt-2 max-w-2xl text-sm leading-relaxed text-gray-400">
+            Test a purchase without changing your history. Buying more always increases capital at risk.
+          </p>
+          <div class="mt-5 grid gap-4 md:grid-cols-3">
+            <label class="block"><span class="field-label">Next purchase amount</span><input class="field" type="text" inputmode="decimal" placeholder="5000" data-sim-amount /></label>
+            <label class="block"><span class="field-label">Next purchase price</span><input class="field" type="text" inputmode="decimal" placeholder="40" data-sim-price /></label>
+            <label class="block"><span class="field-label">Additional fee</span><input class="field" type="text" inputmode="decimal" value="0" data-sim-fee /></label>
+          </div>
+          <div class="mt-4 hidden rounded-lg border border-red-400/40 bg-red-400/10 p-4 text-sm text-red-200" data-sim-error></div>
+          <div class="mt-5 grid gap-4 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end">
+            <div class="rounded-lg border border-gray-800 bg-gray-900/70 p-4" data-sim-result><p class="text-sm text-gray-400">Enter an amount and price to simulate.</p></div>
+            <button class="primary-button hidden" type="button" data-add-simulation>Add this purchase</button>
+          </div>
+          <p class="mt-4 text-xs leading-relaxed text-amber-200">
+            Buying more can lower or raise your average and does not guarantee recovering losses.
+          </p>
+        </section>
+      </Container>
+    </div>
+
+    <AdSlot placement="calculator-after-tool" />
+
+    <Container as="section" class="py-8">
+      <SectionIntro title="How to interpret the result" description="These figures answer different questions and should be reviewed together." class="mb-5" />
+      <div class="grid gap-4 md:grid-cols-3">
+        <article class="info-card"><h2 class="font-semibold text-white">Average price</h2><p class="mt-2 text-sm leading-relaxed text-gray-400">Purchase amount divided by accumulated units.</p></article>
+        <article class="info-card"><h2 class="font-semibold text-white">Effective cost</h2><p class="mt-2 text-sm leading-relaxed text-gray-400">Includes fees and acts as break-even before other costs.</p></article>
+        <article class="info-card"><h2 class="font-semibold text-white">Next purchase</h2><p class="mt-2 text-sm leading-relaxed text-gray-400">Shows how your average would change and how much additional capital would be at risk.</p></article>
+      </div>
+    </Container>
+
+    <Container as="section" class="py-8">
+      <div class="rounded-lg border border-gray-700 bg-gray-950 p-5 sm:p-6">
+        <h2 class="text-2xl font-semibold">Average price and DCA strategy</h2>
+        <p class="mt-3 text-sm leading-relaxed text-gray-400">
+          Average price weights each purchase by units acquired. DCA usually means investing equal amounts at regular intervals, but this tool also accepts irregular purchases.
+        </p>
+        <p class="mt-3 text-sm leading-relaxed text-gray-400">
+          Buying below your average can lower it, but also increases committed capital. The calculation does not evaluate risk, diversification, liquidity or whether buying more is appropriate.
+        </p>
+      </div>
+    </Container>
+    <FaqSection faqs={faqs} />
+  </PageShell>
+</BaseLayout>
+
+<style is:global>
+  .field-label { display: block; font-size: .875rem; font-weight: 500; color: rgb(229 231 235); }
+  .field { margin-top: .5rem; min-height: 3rem; width: 100%; border-radius: .5rem; border: 1px solid rgb(55 65 81); background: rgb(17 24 39); padding: 0 1rem; color: white; outline: none; }
+  .field:focus { border-color: rgb(251 191 36); box-shadow: 0 0 0 3px rgb(251 191 36 / .15); }
+  .field-help { margin-top: .4rem; display: block; font-size: .75rem; line-height: 1.4; color: rgb(107 114 128); }
+  .primary-button { display: inline-flex; min-height: 2.75rem; align-items: center; justify-content: center; border-radius: .5rem; background: rgb(251 191 36); padding: .5rem 1rem; font-size: .875rem; font-weight: 700; color: rgb(3 7 18); }
+  .secondary-button { display: inline-flex; min-height: 2.75rem; align-items: center; justify-content: center; border-radius: .5rem; border: 1px solid rgb(55 65 81); padding: .5rem 1rem; font-size: .875rem; font-weight: 600; color: rgb(229 231 235); }
+  .info-card { border-radius: .5rem; border: 1px solid rgb(55 65 81); background: rgb(3 7 18); padding: 1.25rem; }
+</style>
+
+<script>
+  import { calculateDca, formatDcaCurrency, formatDcaNumber, formatDcaPercent, parseDcaNumber, simulateNextPurchase } from "@lib/calculators/finanzas/calculadora-dca-costo-promedio/dca.en";
+
+  const get = (selector) => document.querySelector(selector);
+  const purchaseList = get("[data-purchase-list]");
+  const assetName = get("[data-asset-name]");
+  const currency = get("[data-currency]");
+  const currentPrice = get("[data-current-price]");
+  const precision = get("[data-precision]");
+  const simAmount = get("[data-sim-amount]");
+  const simPrice = get("[data-sim-price]");
+  const simFee = get("[data-sim-fee]");
+  let sequence = 0;
+  let purchases = [newPurchase(), newPurchase()];
+  let currentResult = null;
+  let currentSimulation = null;
+  let copyText = "";
+
+  function newPurchase(values = {}) {
+    sequence += 1;
+    return { id: `purchase-${sequence}`, amount: values.amount ?? "", price: values.price ?? "", fee: values.fee ?? "0", date: values.date ?? "" };
+  }
+
+  function renderPurchases() {
+    get("[data-purchase-count]").textContent = `${purchases.length} ${purchases.length === 1 ? "purchase" : "purchases"}`;
+    purchaseList.innerHTML = purchases.map((purchase, index) => `
+      <article class="rounded-lg border border-gray-700 bg-gray-900/70 p-4">
+        <div class="flex items-center justify-between gap-3">
+          <div><p class="text-sm font-semibold text-amber-300">Purchase ${index + 1}</p><p class="mt-1 text-xs text-gray-500" data-unit-preview="${purchase.id}">${unitPreview(purchase)}</p></div>
+          <div class="flex flex-wrap justify-end gap-2">${action("Duplicate", "duplicate", purchase.id)}${action("Remove", "remove", purchase.id, true)}</div>
+        </div>
+        <div class="mt-4 grid gap-4 sm:grid-cols-2">${purchaseField("Purchase amount", "amount", purchase, "1000")}${purchaseField("Price per unit", "price", purchase, "50")}</div>
+        <details class="mt-4 rounded-lg border border-gray-800 p-3">
+          <summary class="cursor-pointer text-sm font-semibold text-gray-300">More details</summary>
+          <div class="mt-4 grid gap-4 sm:grid-cols-2">${purchaseField("Additional fee", "fee", purchase, "0")}<label class="block"><span class="field-label">Purchase date</span><input class="field" type="date" value="${escapeHtml(purchase.date)}" data-field="date" data-id="${purchase.id}" /></label></div>
+        </details>
+        <p class="mt-3 hidden text-sm text-red-200" data-row-error="${purchase.id}"></p>
+      </article>`).join("");
+  }
+
+  function purchaseField(label, field, purchase, placeholder) {
+    return `<label class="block"><span class="field-label">${label}</span><input class="field" type="text" inputmode="decimal" autocomplete="off" placeholder="${placeholder}" value="${escapeHtml(purchase[field])}" data-field="${field}" data-id="${purchase.id}" /></label>`;
+  }
+  function action(label, actionName, id, danger = false) {
+    return `<button class="min-h-11 rounded-md border ${danger ? "border-red-400/40 text-red-200" : "border-gray-700 text-gray-300"} px-3 text-xs font-semibold" type="button" data-action="${actionName}" data-id="${id}">${label}</button>`;
+  }
+  function unitPreview(purchase) {
+    const amount = parseDcaNumber(purchase.amount); const price = parseDcaNumber(purchase.price);
+    return amount.ok && price.ok && amount.value > 0 && price.value > 0 ? `${formatDcaNumber(amount.value / price.value, Number(precision.value))} units` : "Units pending";
+  }
+
+  function parsePurchases() {
+    const errors = []; const warnings = []; const parsed = [];
+    purchases.forEach((purchase, index) => {
+      const rowErrors = [];
+      const rowError = get(`[data-row-error="${purchase.id}"]`);
+      rowError.textContent = "";
+      rowError.classList.add("hidden");
+      const hasData = purchase.amount.trim() || purchase.price.trim() || (purchase.fee.trim() && purchase.fee.trim() !== "0") || purchase.date;
+      if (!hasData) return;
+      const amount = parseDcaNumber(purchase.amount); const price = parseDcaNumber(purchase.price); const fee = parseDcaNumber(purchase.fee || "0");
+      if (!amount.ok || amount.value <= 0) rowErrors.push("Enter an amount greater than zero.");
+      if (!price.ok || price.value <= 0) rowErrors.push("Enter a price greater than zero.");
+      if (!fee.ok) rowErrors.push("Enter a valid fee.");
+      errors.push(...rowErrors.map((message) => `Purchase ${index + 1}: ${message}`));
+      rowError.textContent = rowErrors.join(" ");
+      rowError.classList.toggle("hidden", !rowErrors.length);
+      if (amount.ok && fee.ok && fee.value > amount.value) warnings.push(`Purchase ${index + 1}: the fee exceeds the purchase amount.`);
+      if (amount.ok && price.ok && fee.ok && amount.value > 0 && price.value > 0) parsed.push({ amount: amount.value, price: price.value, fee: fee.value });
+    });
+    if (!parsed.length && !errors.length) errors.push("Add at least one complete purchase.");
+    return { parsed, errors, warnings };
+  }
+
+  function calculate() {
+    const parsed = parsePurchases();
+    const parsedCurrent = currentPrice.value.trim() ? parseDcaNumber(currentPrice.value) : null;
+    if (parsedCurrent && (!parsedCurrent.ok || parsedCurrent.value <= 0)) parsed.errors.push("Enter a current price greater than zero or leave it blank.");
+    showMessages("[data-errors]", parsed.errors); showMessages("[data-warnings]", parsed.warnings);
+    if (parsed.errors.length) return setInvalidState();
+    currentResult = calculateDca(parsed.parsed, parsedCurrent?.ok ? parsedCurrent.value : undefined);
+    renderResult(currentResult); get("[data-results]").classList.remove("hidden"); get("[data-copy]").classList.remove("hidden");
+    simPrice.value = currentPrice.value.trim() || simPrice.value; copyText = buildCopyText(currentResult); simulate();
+  }
+
+  function renderResult(result) {
+    get("[data-result-kicker]").textContent = result.market ? statusLabel(result.market.status) : "Average price";
+    get("[data-main-result]").textContent = money(result.averagePurchasePrice);
+    get("[data-interpretation]").textContent = interpretation(result);
+    const items = [["Effective cost", money(result.effectiveCostPerUnit)], ["Units", units(result.totalUnits)], ["Purchase amount", money(result.totalPurchaseAmount)], ["Fees", `${money(result.totalFees)} · ${formatDcaPercent(result.feePercent)}`], ["Total outlay", money(result.totalOutlay)], ["Extra cost per unit", money(result.feeDifferencePerUnit)]];
+    if (result.market) items.push(["Current value", money(result.market.currentValue)], [result.market.unrealizedProfit >= 0 ? "Unrealized gain" : "Unrealized loss", money(Math.abs(result.market.unrealizedProfit))], ["Return", formatDcaPercent(result.market.returnPercent)], [result.market.status === "loss" ? "Increase to break even" : "Decrease to break even", formatDcaPercent(result.market.breakEvenPercent)]);
+    get("[data-summary-grid]").innerHTML = items.map(([label, value]) => summary(label, value)).join("");
+    get("[data-calculation-lines]").innerHTML = [`Total units = sum of each amount ÷ its price = ${units(result.totalUnits)}`, `Average price = ${money(result.totalPurchaseAmount)} ÷ ${units(result.totalUnits)} = ${money(result.averagePurchasePrice)}`, `Effective cost = ${money(result.totalOutlay)} ÷ ${units(result.totalUnits)} = ${money(result.effectiveCostPerUnit)}`, ...(result.market ? [`Gain or loss = ${money(result.market.currentValue)} − ${money(result.totalOutlay)} = ${money(result.market.unrealizedProfit)}`] : [])].map((line) => `<p>${escapeHtml(line)}</p>`).join("");
+    get("[data-calculation-details]").classList.remove("hidden");
+    copyText = buildCopyText(result);
+  }
+
+  function interpretation(result) {
+    const base = `Your average price is ${money(result.averagePurchasePrice)}. Including fees, you need ${money(result.effectiveCostPerUnit)} per unit to recover the outlay before taxes and selling costs.`;
+    if (!result.market) return base;
+    const difference = money(Math.abs(result.market.differencePerUnit));
+    if (result.market.status === "break_even") return `${base} The current price matches your effective cost.`;
+    return result.market.status === "loss" ? `${base} The current price is ${difference} per unit below break-even and would need to rise ${formatDcaPercent(result.market.breakEvenPercent)}.` : `${base} The current price is ${difference} per unit above break-even; it could fall ${formatDcaPercent(result.market.breakEvenPercent)} before reaching it.`;
+  }
+
+  function simulate() {
+    if (!currentResult) return;
+    if (!simAmount.value.trim() && !simPrice.value.trim()) { currentSimulation = null; get("[data-sim-result]").innerHTML = '<p class="text-sm text-gray-400">Enter an amount and price to simulate.</p>'; get("[data-add-simulation]").classList.add("hidden"); showMessages("[data-sim-error]", []); copyText = buildCopyText(currentResult); return; }
+    const amount = parseDcaNumber(simAmount.value); const price = parseDcaNumber(simPrice.value); const fee = parseDcaNumber(simFee.value || "0"); const errors = [];
+    if (!amount.ok || amount.value <= 0) errors.push("Enter a next-purchase amount greater than zero.");
+    if (!price.ok || price.value <= 0) errors.push("Enter a next-purchase price greater than zero.");
+    if (!fee.ok) errors.push("Enter a valid fee.");
+    showMessages("[data-sim-error]", errors); if (errors.length) { currentSimulation = null; get("[data-add-simulation]").classList.add("hidden"); copyText = buildCopyText(currentResult); return; }
+    currentSimulation = simulateNextPurchase(currentResult, { amount: amount.value, price: price.value, fee: fee.value });
+    const direction = currentSimulation.averagePriceChange < 0 ? "would decrease" : currentSimulation.averagePriceChange > 0 ? "would increase" : "would stay the same";
+    get("[data-sim-result]").innerHTML = `<p class="font-semibold text-white">Your average price ${direction} to ${escapeHtml(money(currentSimulation.averagePurchasePrice))}.</p><div class="mt-3 grid gap-3 sm:grid-cols-3">${definition("New effective cost", money(currentSimulation.effectiveCostPerUnit))}${definition("New units", units(currentSimulation.totalUnits))}${definition("New outlay", money(currentSimulation.totalOutlay))}</div><p class="mt-3 text-sm text-gray-400">Average-price change: ${escapeHtml(money(currentSimulation.averagePriceChange))} (${escapeHtml(formatDcaPercent(currentSimulation.averagePriceChangePercent))}). Additional capital: ${escapeHtml(money(currentSimulation.additionalOutlay))}.</p>`;
+    get("[data-add-simulation]").classList.remove("hidden");
+    copyText = buildCopyText(currentResult);
+  }
+
+  function addSimulation() {
+    if (!currentSimulation) return;
+    purchases.push(newPurchase({ amount: simAmount.value, price: simPrice.value, fee: simFee.value }));
+    simAmount.value = ""; simPrice.value = currentPrice.value; simFee.value = "0"; renderPurchases(); calculate();
+  }
+  function fillExample() {
+    sequence = 0; purchases = [newPurchase({ amount: "1000", price: "50", fee: "10", date: "2026-01-15" }), newPurchase({ amount: "1000", price: "40", fee: "10", date: "2026-02-15" }), newPurchase({ amount: "1000", price: "60", fee: "10", date: "2026-03-15" })];
+    assetName.value = "Sample asset"; currentPrice.value = "52"; currency.value = "MXN"; renderPurchases(); calculate();
+  }
+  function clearAll() {
+    const populated = purchases.filter((purchase) => purchase.amount.trim() || purchase.price.trim()).length;
+    if (populated > 1 && !window.confirm("Do you want to clear all purchases?")) return;
+    sequence = 0; purchases = [newPurchase(), newPurchase()]; currentResult = null; currentSimulation = null; copyText = "";
+    assetName.value = ""; currentPrice.value = ""; currency.value = "MXN"; precision.value = "8"; simAmount.value = ""; simPrice.value = ""; simFee.value = "0";
+    get("[data-results]").classList.add("hidden"); get("[data-copy]").classList.add("hidden"); get("[data-calculation-details]").classList.add("hidden"); showMessages("[data-errors]", []); showMessages("[data-warnings]", []); setInitialState(); renderPurchases();
+  }
+  function setInitialState() {
+    get("[data-result-kicker]").textContent = "Result"; get("[data-main-result]").textContent = "Add your purchases"; get("[data-interpretation]").textContent = "Your average price and the price needed to recover fees will appear here."; get("[data-summary-grid]").innerHTML = '<div class="col-span-2 rounded-lg border border-gray-800 bg-gray-950/70 p-4 text-sm text-gray-400">Enter at least one complete purchase to calculate.</div>';
+  }
+  function setInvalidState() {
+    get("[data-result-kicker]").textContent = "Check the purchases"; get("[data-main-result]").textContent = "Cannot calculate"; get("[data-interpretation]").textContent = "Correct the highlighted purchases to avoid an incomplete result.";
+  }
+  function buildCopyText(result) {
+    const lines = ["DCA average cost calculator - calculadoras.tools", assetName.value.trim() ? `Asset: ${assetName.value.trim()}` : null, `Average price: ${money(result.averagePurchasePrice)}`, `Effective cost: ${money(result.effectiveCostPerUnit)}`, `Units: ${units(result.totalUnits)}`, `Purchase amount: ${money(result.totalPurchaseAmount)}`, `Fees: ${money(result.totalFees)}`, `Total outlay: ${money(result.totalOutlay)}`].filter(Boolean);
+    if (result.market) lines.push(`Current value: ${money(result.market.currentValue)}`, `Unrealized ${result.market.unrealizedProfit >= 0 ? "profit" : "loss"}: ${money(Math.abs(result.market.unrealizedProfit))}`, `Return: ${formatDcaPercent(result.market.returnPercent)}`);
+    if (currentSimulation) lines.push("", "Next-purchase simulation:", `New average price: ${money(currentSimulation.averagePurchasePrice)}`, `New effective cost: ${money(currentSimulation.effectiveCostPerUnit)}`, `New outlay: ${money(currentSimulation.totalOutlay)}`);
+    lines.push("", "Does not include taxes, selling fees, spreads, dividends, exchange rates or partial sales."); return lines.join("\n");
+  }
+  async function copyResult() {
+    if (!copyText) return;
+    try { await navigator.clipboard.writeText(copyText); get("[data-copy-label]").textContent = "Copied"; get("[data-copy-status]").textContent = "Summary copied."; window.setTimeout(() => { get("[data-copy-label]").textContent = "Copy summary"; get("[data-copy-status]").textContent = ""; }, 2000); } catch { get("[data-copy-status]").textContent = "Could not copy the summary."; }
+  }
+  function showMessages(selector, messages) { const box = get(selector); box.innerHTML = messages.map((message) => `<p>${escapeHtml(message)}</p>`).join(""); box.classList.toggle("hidden", !messages.length); }
+  function money(value) { return formatDcaCurrency(value, currency.value); }
+  function units(value) { return formatDcaNumber(value, Number(precision.value)); }
+  function statusLabel(status) { return ({ gain: "Unrealized gain", loss: "Unrealized loss", break_even: "Break-even point" })[status]; }
+  function summary(label, value) { return `<div class="rounded-lg border border-gray-800 bg-gray-950/70 p-3"><span class="block text-xs font-semibold uppercase tracking-wide text-gray-500">${escapeHtml(label)}</span><span class="mt-2 block break-words text-base font-semibold text-white">${escapeHtml(value)}</span></div>`; }
+  function definition(label, value) { return `<div><p class="text-xs font-semibold uppercase tracking-wide text-gray-500">${escapeHtml(label)}</p><p class="mt-1 font-semibold text-white">${escapeHtml(value)}</p></div>`; }
+  function escapeHtml(value) { return String(value).replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;").replaceAll("'", "&#039;"); }
+
+  purchaseList.addEventListener("input", (event) => { const input = event.target.closest("[data-field]"); if (!input) return; const purchase = purchases.find((item) => item.id === input.dataset.id); purchase[input.dataset.field] = input.value; const preview = get(`[data-unit-preview="${input.dataset.id}"]`); if (preview) preview.textContent = unitPreview(purchase); });
+  purchaseList.addEventListener("click", (event) => { const button = event.target.closest("[data-action]"); if (!button) return; const index = purchases.findIndex((purchase) => purchase.id === button.dataset.id); if (button.dataset.action === "duplicate") purchases.splice(index + 1, 0, newPurchase({ ...purchases[index], date: "" })); if (button.dataset.action === "remove") purchases.length === 1 ? purchases.splice(0, 1, newPurchase()) : purchases.splice(index, 1); renderPurchases(); });
+  get("[data-add-purchase]").addEventListener("click", () => { purchases.push(newPurchase()); renderPurchases(); purchaseList.querySelector("article:last-child input")?.focus(); });
+  document.querySelectorAll("[data-calculate]").forEach((button) => button.addEventListener("click", calculate));
+  get("[data-example]").addEventListener("click", fillExample); get("[data-clear]").addEventListener("click", clearAll); get("[data-copy]").addEventListener("click", copyResult); get("[data-add-simulation]").addEventListener("click", addSimulation);
+  [simAmount, simPrice, simFee].forEach((input) => input.addEventListener("input", simulate));
+  currency.addEventListener("change", () => { if (currentResult) renderResult(currentResult); simulate(); });
+  precision.addEventListener("change", () => { renderPurchases(); if (currentResult) renderResult(currentResult); simulate(); });
+  renderPurchases();
+</script>

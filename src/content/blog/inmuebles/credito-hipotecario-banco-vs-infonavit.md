@@ -4,6 +4,7 @@ seoTitle: "Banco vs Infonavit: diferencias al financiar una vivienda"
 description: "Conoce diferencias generales entre un crédito hipotecario bancario e Infonavit, y qué datos comparar antes de decidir."
 pubDate: 2026-06-20
 categorySlug: "inmuebles"
+translationKey: "bank-mortgage-vs-infonavit"
 tags:
   - infonavit
   - crédito hipotecario

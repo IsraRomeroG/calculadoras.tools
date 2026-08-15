@@ -1,0 +1,1293 @@
+---
+import BaseLayout from "@layouts/BaseLayout.astro";
+import AdSlot from "@components/ads/AdSlot.astro";
+import Container from "@components/layout/Container.astro";
+import PageShell from "@components/layout/PageShell.astro";
+import FaqSection from "@components/shared/FaqSection.astro";
+import PageHero from "@components/shared/PageHero.astro";
+import SectionIntro from "@components/shared/SectionIntro.astro";
+import { LOAN_TYPES } from "@lib/calculators/finanzas/calculadora-de-prestamo/loan.en";
+import { buildAlternateLinks } from "@lib/i18n/routing";
+import { buildFaqJsonLd } from "@lib/seo";
+
+const title =
+  "Online loan calculator — Payments, interest and amortization";
+const description =
+  "Calculate monthly payments for a personal, auto or private loan. Compare interest, total cost and the amortization schedule.";
+const canonical = "/en/finance/loan-calculator";
+const spanishCanonical = "/finanzas/calculadora-de-prestamo";
+const alternates = buildAlternateLinks({ es: spanishCanonical, en: canonical }, Astro.site ?? Astro.url);
+
+const faqs = [
+  {
+    question: "How is a loan's monthly payment calculated?",
+    answer:
+      "The standard amortization formula uses a fixed payment combining principal and interest. The annual rate is divided by 12 and applied to each month's outstanding balance.",
+  },
+  {
+    question: "What is a loan's annual percentage cost?",
+    answer:
+      "It summarizes a loan's annualized cost, including interest, fees and other charges under specific assumptions.",
+  },
+  {
+    question: "What is the difference between the interest rate and annual percentage cost?",
+    answer:
+      "The interest rate measures only the cost of borrowed money. Annual percentage cost aims to reflect approximate total cost, so it can rise when there are fees or insurance.",
+  },
+  {
+    question: "How can I know the total amount I will pay on a loan?",
+    answer:
+      "Add all actual monthly payments, including insurance and extra payments, plus any opening fee.",
+  },
+  {
+    question: "Is it worth paying off a loan early?",
+    answer:
+      "It may be worthwhile if extra payments reduce principal and there are no significant penalties. The table shows potential months and interest saved.",
+  },
+  {
+    question: "What is loan amortization?",
+    answer:
+      "It is the breakdown of every payment into principal, interest, insurance and outstanding balance until payoff.",
+  },
+  {
+    question: "What happens if I make extra payments?",
+    answer:
+      "The extra payment is applied after interest and directly reduces the outstanding balance. This can shorten the term and reduce interest.",
+  },
+  {
+    question: "Does the calculator include fees and insurance?",
+    answer:
+      "Yes. The opening fee is added as an initial cost and monthly insurance is added to each payment based on your entries.",
+  },
+];
+
+const faqJsonLd = buildFaqJsonLd(faqs);
+
+const explainerCards = [
+  {
+    title: "Base payment",
+    text: "Includes principal and interest. It is the fixed payment calculated from the amount, annual rate and term in months.",
+  },
+  {
+    title: "Initial fee",
+    text: "Shown separately because it is assumed to be paid upfront rather than financed in the loan.",
+  },
+  {
+    title: "Total monthly payment",
+    text: "Adds the base payment, monthly insurance and extra payment. The final payment may be lower if the loan is paid off early.",
+  },
+];
+---
+
+<BaseLayout title={title} description={description} canonical={canonical} locale="en" alternates={alternates}>
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={JSON.stringify(faqJsonLd)} />
+  </Fragment>
+
+  <PageShell>
+    <PageHero
+      title="Loan calculator"
+      description="Estimate monthly payments, total loan cost and how the balance changes over the term."
+      kicker="Finance"
+      collapseBreadcrumbOnMobile
+      containerClass="py-6 md:py-8"
+      breadcrumbs={[
+        { label: "Home", href: "/en", ariaLabel: "Home" },
+        { label: "Finance", href: "/en/finance", optional: true },
+        { label: "Loan calculator", truncate: true },
+      ]}
+    />
+
+    <Container as="section" class="py-6 md:py-8">
+      <section
+        id="loan-calculator"
+        class="overflow-hidden rounded-lg border border-gray-700 bg-gray-950 shadow-xl shadow-gray-950/30"
+        aria-labelledby="calculator-heading"
+      >
+        <div
+          class="grid gap-0 lg:grid-cols-[minmax(0,1fr)_minmax(18rem,0.72fr)]"
+        >
+          <div class="p-4 sm:p-6">
+            <div class="mb-5">
+              <p
+                class="text-sm font-semibold uppercase tracking-wide text-amber-400"
+              >
+                Main simulation
+              </p>
+              <h2 id="calculator-heading" class="mt-2 text-2xl font-semibold">
+                How much will I pay each month?
+              </h2>
+              <p class="mt-2 text-sm leading-relaxed text-gray-400">
+                Enter the amount, rate, and term. You can add a fee, insurance,
+                or an extra monthly payment.
+              </p>
+            </div>
+
+            <div class="grid gap-4 sm:grid-cols-2">
+              <div class="sm:col-span-2">
+                <label
+                  for="loan-type"
+                  class="block text-sm font-medium text-gray-200"
+                >
+                  Loan type
+                </label>
+                <select
+                  id="loan-type"
+                  class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-900 px-4 text-base text-white outline-none transition focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15"
+                  data-select="loanType"
+                >
+                  {
+                    LOAN_TYPES.map((type) => (
+                      <option
+                        value={type.value}
+                        selected={type.value === "personal-bank"}
+                      >
+                        {type.label}
+                      </option>
+                    ))
+                  }
+                </select>
+                <p class="mt-2 text-xs leading-relaxed text-gray-500">
+                  Rates are illustrative. Check the exact terms
+                  with your lender.
+                </p>
+              </div>
+
+              <div>
+                <label
+                  for="loan-principal"
+                  class="block text-sm font-medium text-gray-200"
+                >
+                  Loan amount
+                </label>
+                <input
+                  id="loan-principal"
+                  class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-900 px-4 text-base text-white outline-none transition placeholder:text-gray-600 focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15"
+                  type="text"
+                  inputmode="decimal"
+                  autocomplete="off"
+                  placeholder="50000"
+                  aria-describedby="loan-principal-error"
+                  data-input="principal"
+                />
+                <p
+                  id="loan-principal-error"
+                  class="mt-2 hidden text-sm text-red-300"
+                  data-error-for="principal"
+                >
+                </p>
+              </div>
+
+              <div>
+                <label
+                  for="loan-rate"
+                  class="block text-sm font-medium text-gray-200"
+                >
+                  Annual interest rate
+                </label>
+                <div
+                  class="mt-2 flex rounded-lg border border-gray-700 bg-gray-900 focus-within:border-amber-400 focus-within:ring-3 focus-within:ring-amber-400/15"
+                >
+                  <input
+                    id="loan-rate"
+                    class="min-h-12 w-full bg-transparent px-4 text-base text-white outline-none"
+                    type="text"
+                    inputmode="decimal"
+                    autocomplete="off"
+                    placeholder="24"
+                    aria-describedby="loan-rate-error"
+                    data-input="annualRate"
+                  />
+                  <span class="flex items-center px-4 text-gray-500">%</span>
+                </div>
+                <p
+                  id="loan-rate-error"
+                  class="mt-2 hidden text-sm text-red-300"
+                  data-error-for="annualRate"
+                >
+                </p>
+              </div>
+
+              <div>
+                <label
+                  for="loan-months"
+                  class="block text-sm font-medium text-gray-200"
+                >
+                  Loan term
+                </label>
+                <div
+                  class="mt-2 flex rounded-lg border border-gray-700 bg-gray-900 focus-within:border-amber-400 focus-within:ring-3 focus-within:ring-amber-400/15"
+                >
+                  <input
+                    id="loan-months"
+                    class="min-h-12 w-full bg-transparent px-4 text-base text-white outline-none"
+                    type="text"
+                    inputmode="decimal"
+                    autocomplete="off"
+                    value="24"
+                    aria-describedby="loan-months-error"
+                    data-input="months"
+                  />
+                  <span class="flex items-center px-4 text-gray-500">months</span>
+                </div>
+                <p
+                  id="loan-months-error"
+                  class="mt-2 hidden text-sm text-red-300"
+                  data-error-for="months"
+                >
+                </p>
+              </div>
+
+              <div>
+                <label
+                  for="loan-opening-fee"
+                  class="block text-sm font-medium text-gray-200"
+                >
+                  Opening fee
+                </label>
+                <div
+                  class="mt-2 flex rounded-lg border border-gray-700 bg-gray-900 focus-within:border-amber-400 focus-within:ring-3 focus-within:ring-amber-400/15"
+                >
+                  <input
+                    id="loan-opening-fee"
+                    class="min-h-12 w-full bg-transparent px-4 text-base text-white outline-none"
+                    type="text"
+                    inputmode="decimal"
+                    autocomplete="off"
+                    value="0"
+                    aria-describedby="loan-opening-fee-error"
+                    data-input="openingFeePercent"
+                  />
+                  <span class="flex items-center px-4 text-gray-500">%</span>
+                </div>
+                <p
+                  id="loan-opening-fee-error"
+                  class="mt-2 hidden text-sm text-red-300"
+                  data-error-for="openingFeePercent"
+                >
+                </p>
+              </div>
+
+              <div>
+                <label
+                  for="loan-insurance"
+                  class="block text-sm font-medium text-gray-200"
+                >
+                  Monthly insurance
+                </label>
+                <input
+                  id="loan-insurance"
+                  class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-900 px-4 text-base text-white outline-none transition placeholder:text-gray-600 focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15"
+                  type="text"
+                  inputmode="decimal"
+                  autocomplete="off"
+                  value="0"
+                  aria-describedby="loan-insurance-error"
+                  data-input="monthlyInsurance"
+                />
+                <p
+                  id="loan-insurance-error"
+                  class="mt-2 hidden text-sm text-red-300"
+                  data-error-for="monthlyInsurance"
+                >
+                </p>
+              </div>
+
+              <div>
+                <label
+                  for="loan-extra-payment"
+                  class="block text-sm font-medium text-gray-200"
+                >
+                  Monthly extra payment
+                </label>
+                <input
+                  id="loan-extra-payment"
+                  class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-900 px-4 text-base text-white outline-none transition placeholder:text-gray-600 focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15"
+                  type="text"
+                  inputmode="decimal"
+                  autocomplete="off"
+                  value="0"
+                  aria-describedby="loan-extra-payment-error"
+                  data-input="extraPayment"
+                />
+                <p
+                  id="loan-extra-payment-error"
+                  class="mt-2 hidden text-sm text-red-300"
+                  data-error-for="extraPayment"
+                >
+                </p>
+              </div>
+            </div>
+
+            <div
+              class="mt-6 flex flex-col gap-3 border-t border-gray-800 pt-5 sm:flex-row sm:flex-wrap"
+            >
+              <button
+                class="inline-flex min-h-11 items-center justify-center rounded-lg border border-gray-700 px-4 py-2 text-sm font-semibold text-gray-200 transition hover:border-amber-400 hover:text-white focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/40"
+                type="button"
+                data-fill-example
+              >
+                Use example
+              </button>
+              <button
+                class="inline-flex min-h-11 items-center justify-center rounded-lg border border-gray-700 px-4 py-2 text-sm font-semibold text-gray-200 transition hover:border-amber-400 hover:text-white focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/40"
+                type="button"
+                data-clear-active
+              >
+                Clear
+              </button>
+              <button
+                class="hidden min-h-11 items-center justify-center rounded-lg bg-amber-400 px-4 py-2 text-sm font-semibold text-gray-950 transition hover:bg-amber-300 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/40"
+                type="button"
+                data-copy-result
+              >
+                <span data-copy-label>Copy summary</span>
+              </button>
+              <button
+                class="hidden min-h-11 items-center justify-center rounded-lg border border-gray-700 px-4 py-2 text-sm font-semibold text-gray-200 transition hover:border-amber-400 hover:text-white focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/40"
+                type="button"
+                data-export-csv
+              >
+                Exportar CSV
+              </button>
+              <p class="sr-only" aria-live="polite" data-copy-status></p>
+            </div>
+          </div>
+
+          <aside
+            class="border-t border-gray-800 bg-gray-900/70 p-4 sm:p-6 lg:border-l lg:border-t-0"
+            aria-live="polite"
+            data-result-region
+          >
+            <p
+              class="text-sm font-semibold uppercase tracking-wide text-amber-400"
+              data-result-kicker
+            >
+              Result
+            </p>
+            <p
+              class="mt-3 break-words text-3xl font-bold leading-tight text-white"
+              data-main-result
+            >
+              Enter the values
+            </p>
+
+            <div class="mt-5 grid gap-3" data-summary-grid>
+              <div
+                class="rounded-lg border border-gray-800 bg-gray-950/70 p-4 text-sm text-gray-400"
+              >
+                The summary will appear here.
+              </div>
+            </div>
+
+            <p
+              class="mt-4 hidden rounded-lg border border-amber-400/40 bg-amber-400/10 p-3 text-sm leading-relaxed text-amber-200"
+              data-warning
+            >
+            </p>
+
+            <p
+              class="mt-4 hidden rounded-lg border border-emerald-400/40 bg-emerald-400/10 p-3 text-sm leading-relaxed text-emerald-200"
+              data-extra-summary
+            >
+            </p>
+
+            <div class="mt-5 rounded-lg border border-gray-800 p-4">
+              <p
+                class="text-xs font-semibold uppercase tracking-wide text-gray-500"
+              >
+                Quick summary
+              </p>
+              <p
+                class="mt-2 text-sm leading-relaxed text-gray-300"
+                data-explanation
+              >
+                The calculation will appear here.
+              </p>
+            </div>
+
+            <p class="mt-4 text-xs leading-relaxed text-gray-500">
+              The APR shown is an approximation excluding taxes. The financial
+              institution determines the exact APR based on fees, insurance,
+              taxes, payment frequency, and the loan's specific terms.
+            </p>
+          </aside>
+        </div>
+      </section>
+    </Container>
+
+    <AdSlot placement="calculator-after-tool" />
+
+    <Container as="section" class="py-8">
+      <SectionIntro
+        title="Amortization schedule"
+        description="See how much of each payment goes to principal, interest, insurance and the outstanding balance. Twelve months are shown per page."
+        class="mb-5"
+      />
+
+      <p
+        class="rounded-lg border border-gray-700 bg-gray-950 p-4 text-sm text-gray-400"
+        data-amortization-empty
+      >
+        The table will appear after you enter a valid loan.
+      </p>
+
+      <div class="hidden space-y-4" data-amortization-table>
+        <div class="overflow-x-auto rounded-lg border border-gray-700">
+          <table
+            class="min-w-[48rem] w-full divide-y divide-gray-800 bg-gray-950 text-left text-sm"
+          >
+            <caption class="sr-only">
+              Monthly loan amortization schedule
+            </caption>
+            <thead class="bg-gray-900 text-gray-300">
+              <tr>
+                <th class="px-4 py-3 font-semibold" scope="col">Month</th>
+                <th class="px-4 py-3 text-right font-semibold" scope="col">
+                  Payment
+                </th>
+                <th class="px-4 py-3 text-right font-semibold" scope="col">
+                  Principal
+                </th>
+                <th class="px-4 py-3 text-right font-semibold" scope="col">
+                  Interest
+                </th>
+                <th class="px-4 py-3 text-right font-semibold" scope="col">
+                  Insurance
+                </th>
+                <th class="px-4 py-3 text-right font-semibold" scope="col">
+                  Outstanding balance
+                </th>
+              </tr>
+            </thead>
+            <tbody
+              class="divide-y divide-gray-800 text-gray-300"
+              data-amortization-body
+            >
+            </tbody>
+          </table>
+        </div>
+
+        <div
+          class="grid gap-4 rounded-lg border border-gray-700 bg-gray-950 p-4 md:grid-cols-[1fr_auto]"
+        >
+          <dl class="grid gap-3 sm:grid-cols-2 lg:grid-cols-5" data-table-totals>
+          </dl>
+
+          <div
+            class="flex flex-col gap-3 sm:flex-row sm:items-end"
+            data-pagination
+          >
+            <button
+              class="inline-flex min-h-11 items-center justify-center rounded-lg border border-gray-700 px-3 py-2 text-sm font-semibold text-gray-200 transition hover:border-amber-400 hover:text-white disabled:cursor-not-allowed disabled:opacity-40"
+              type="button"
+              data-prev-page
+            >
+              Previous
+            </button>
+            <label class="text-sm text-gray-300">
+              <span class="mb-2 block text-xs font-semibold uppercase tracking-wide text-gray-500">
+                Page
+              </span>
+              <select
+                class="min-h-11 rounded-lg border border-gray-700 bg-gray-900 px-3 text-sm text-white outline-none transition focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15"
+                data-page-select
+              >
+              </select>
+            </label>
+            <button
+              class="inline-flex min-h-11 items-center justify-center rounded-lg border border-gray-700 px-3 py-2 text-sm font-semibold text-gray-200 transition hover:border-amber-400 hover:text-white disabled:cursor-not-allowed disabled:opacity-40"
+              type="button"
+              data-next-page
+            >
+              Next
+            </button>
+          </div>
+        </div>
+      </div>
+    </Container>
+
+    <Container as="section" class="py-8">
+      <SectionIntro
+        title="What the payment includes"
+        description="The calculator separates debt-reducing payments from charges that only increase loan cost."
+      />
+
+      <div class="grid gap-5 sm:grid-cols-3">
+        {
+          explainerCards.map((item) => (
+            <article class="rounded-lg border border-gray-700 p-5">
+              <h3 class="text-base font-semibold text-white">{item.title}</h3>
+              <p class="mt-2 text-sm leading-relaxed text-gray-400">
+                {item.text}
+              </p>
+            </article>
+          ))
+        }
+      </div>
+    </Container>
+
+    <Container as="section" class="py-8">
+      <div class="rounded-lg border border-gray-700 bg-gray-950 p-5">
+        <h2 class="text-lg font-semibold text-white">Calculation example</h2>
+        <p class="mt-3 text-sm leading-relaxed text-gray-400">
+          If you borrow $50,000 for 24 months at 24% annually with a 2%
+          origination fee, the estimated base payment is $2,643.55. You would
+          pay $13,445.32 in interest and a $1,000.00 fee, for an approximate
+          total cost of $64,445.32.
+        </p>
+      </div>
+    </Container>
+
+    <Container as="section" class="py-8">
+      <div class="rounded-lg border border-gray-700 bg-gray-950 p-5">
+        <h2 class="text-lg font-semibold text-white">Legal notice</h2>
+        <p class="mt-3 text-sm leading-relaxed text-gray-400">
+          Results are illustrative estimates based on a fixed-payment amortization
+          system. The calculated payment includes principal and interest;
+          insurance, fees, and other charges are shown according to the entered
+          data. Actual terms depend on the financial institution, your credit
+          profile, applicable taxes, and current regulations. This tool is not
+          financial advice or a loan offer.
+        </p>
+      </div>
+    </Container>
+
+    <FaqSection faqs={faqs} />
+  </PageShell>
+</BaseLayout>
+
+<script>
+  import {
+    LOAN_TYPES as CLIENT_LOAN_TYPES,
+    buildAmortizationSchedule,
+    calculateExtraPaymentSavings,
+    calculateLoanSummary,
+    calculateMonthlyPayment,
+    formatCurrency,
+    formatDuration,
+    formatPercent,
+    parseLoanInput,
+    roundCurrency,
+  } from "@lib/calculators/finanzas/calculadora-de-prestamo/loan.en";
+
+  const ROWS_PER_PAGE = 12;
+
+  const ERROR_MESSAGES = {
+    required: "This field is required.",
+    invalid: "Enter a valid number.",
+    negative: "The value cannot be negative.",
+    too_many_decimals: "Use no more than 2 decimal places.",
+    too_many_rate_decimals: "Use no more than 4 decimal places.",
+    amount_positive: "Enter an amount greater than zero.",
+    rate_high: "The rate is too high. The maximum allowed is 120%.",
+    months_integer: "Enter a term in whole months.",
+    months_range: "The term must be between 1 and 120 months.",
+    fee_high: "The fee cannot exceed 20%.",
+  };
+
+  const inputSelectors = {
+    principal: '[data-input="principal"]',
+    annualRate: '[data-input="annualRate"]',
+    months: '[data-input="months"]',
+    openingFeePercent: '[data-input="openingFeePercent"]',
+    monthlyInsurance: '[data-input="monthlyInsurance"]',
+    extraPayment: '[data-input="extraPayment"]',
+  };
+  const selectSelectors = {
+    loanType: '[data-select="loanType"]',
+  };
+
+  const inputs = Object.fromEntries(
+    Object.entries(inputSelectors).map(([key, selector]) => [
+      key,
+      document.querySelector(selector),
+    ]),
+  );
+  const selects = Object.fromEntries(
+    Object.entries(selectSelectors).map(([key, selector]) => [
+      key,
+      document.querySelector(selector),
+    ]),
+  );
+
+  const resultKicker = document.querySelector("[data-result-kicker]");
+  const mainResult = document.querySelector("[data-main-result]");
+  const summaryGrid = document.querySelector("[data-summary-grid]");
+  const warningElement = document.querySelector("[data-warning]");
+  const extraSummary = document.querySelector("[data-extra-summary]");
+  const explanation = document.querySelector("[data-explanation]");
+  const copyButton = document.querySelector("[data-copy-result]");
+  const copyLabel = document.querySelector("[data-copy-label]");
+  const copyStatus = document.querySelector("[data-copy-status]");
+  const exportButton = document.querySelector("[data-export-csv]");
+  const clearButton = document.querySelector("[data-clear-active]");
+  const exampleButton = document.querySelector("[data-fill-example]");
+  const tableEmpty = document.querySelector("[data-amortization-empty]");
+  const tableWrapper = document.querySelector("[data-amortization-table]");
+  const tableBody = document.querySelector("[data-amortization-body]");
+  const tableTotals = document.querySelector("[data-table-totals]");
+  const pageSelect = document.querySelector("[data-page-select]");
+  const prevPageButton = document.querySelector("[data-prev-page]");
+  const nextPageButton = document.querySelector("[data-next-page]");
+
+  let currentSchedule = [];
+  let currentSummary = null;
+  let currentInput = null;
+  let currentCopyText = "";
+  let currentPage = 1;
+  let copiedTimeout = 0;
+
+  function hasStarted() {
+    const requiredHasValue =
+      inputs.principal?.value.trim() || inputs.annualRate?.value.trim();
+    const optionalChanged =
+      (inputs.openingFeePercent?.value.trim() &&
+        inputs.openingFeePercent.value.trim() !== "0") ||
+      (inputs.monthlyInsurance?.value.trim() &&
+        inputs.monthlyInsurance.value.trim() !== "0") ||
+      (inputs.extraPayment?.value.trim() &&
+        inputs.extraPayment.value.trim() !== "0");
+
+    return Boolean(requiredHasValue || optionalChanged);
+  }
+
+  function updateCalculator() {
+    clearErrors();
+
+    if (!hasStarted()) {
+      setInitialState();
+      return;
+    }
+
+    const parsed = parseFormValues();
+
+    if (!parsed.ok) {
+      showErrors(parsed.errors);
+      setInvalidState();
+      return;
+    }
+
+    const monthlyPayment = calculateMonthlyPayment(
+      parsed.input.principal,
+      parsed.input.annualRate,
+      parsed.input.months,
+    );
+    const openingFee =
+      parsed.input.principal * (parsed.input.openingFeePercent / 100);
+    const baseSchedule = buildAmortizationSchedule({
+      principal: parsed.input.principal,
+      annualRate: parsed.input.annualRate,
+      months: parsed.input.months,
+    });
+    const schedule = buildAmortizationSchedule({
+      principal: parsed.input.principal,
+      annualRate: parsed.input.annualRate,
+      months: parsed.input.months,
+      extraPayment: parsed.input.extraPayment,
+      monthlyInsurance: parsed.input.monthlyInsurance,
+    });
+    const summary = calculateLoanSummary({
+      schedule,
+      principal: parsed.input.principal,
+      monthlyPayment,
+      openingFee,
+      monthlyInsurance: parsed.input.monthlyInsurance,
+      extraPayment: parsed.input.extraPayment,
+    });
+    const savings =
+      parsed.input.extraPayment > 0
+        ? calculateExtraPaymentSavings(baseSchedule, schedule)
+        : null;
+    const warnings = buildWarnings(parsed.input, monthlyPayment);
+
+    currentInput = parsed.input;
+    currentSchedule = schedule;
+    currentSummary = summary;
+    currentPage = 1;
+    currentCopyText = buildCopyText(parsed.input, summary, savings);
+
+    renderResult(parsed.input, summary, savings, warnings);
+    renderTable();
+    setActionsVisible(true);
+  }
+
+  function parseFormValues() {
+    const errors = {};
+    const principal = parseRequiredMoney("principal");
+    const annualRate = parseRequiredRate("annualRate");
+    const months = parseRequiredMonths();
+    const openingFeePercent = parseOptionalRate("openingFeePercent", 0);
+    const monthlyInsurance = parseOptionalMoney("monthlyInsurance", 0);
+    const extraPayment = parseOptionalMoney("extraPayment", 0);
+
+    collectError(errors, "principal", principal);
+    collectError(errors, "annualRate", annualRate);
+    collectError(errors, "months", months);
+    collectError(errors, "openingFeePercent", openingFeePercent);
+    collectError(errors, "monthlyInsurance", monthlyInsurance);
+    collectError(errors, "extraPayment", extraPayment);
+
+    if (principal.ok && principal.value <= 0) {
+      errors.principal = "amount_positive";
+    }
+
+    if (annualRate.ok && annualRate.value > 120) {
+      errors.annualRate = "rate_high";
+    }
+
+    if (
+      months.ok &&
+      (!Number.isInteger(months.value) || months.value < 1 || months.value > 120)
+    ) {
+      errors.months = Number.isInteger(months.value)
+        ? "months_range"
+        : "months_integer";
+    }
+
+    if (openingFeePercent.ok && openingFeePercent.value > 20) {
+      errors.openingFeePercent = "fee_high";
+    }
+
+    if (Object.keys(errors).length > 0) {
+      return { ok: false, errors };
+    }
+
+    return {
+      ok: true,
+      input: {
+        loanType: selects.loanType?.value ?? "personal-bank",
+        principal: principal.value,
+        annualRate: annualRate.value,
+        months: months.value,
+        openingFeePercent: openingFeePercent.value,
+        monthlyInsurance: monthlyInsurance.value,
+        extraPayment: extraPayment.value,
+      },
+    };
+  }
+
+  function parseRequiredMoney(field) {
+    return parseLoanInput(inputs[field]?.value ?? "");
+  }
+
+  function parseRequiredRate(field) {
+    return normalizeRateParseError(
+      parseLoanInput(inputs[field]?.value ?? "", {
+        maxDecimals: 4,
+        preferDecimal: true,
+      }),
+    );
+  }
+
+  function parseRequiredMonths() {
+    const parsed = parseLoanInput(inputs.months?.value ?? "", {
+      maxDecimals: 2,
+      preferDecimal: true,
+    });
+
+    if (!parsed.ok) {
+      return parsed;
+    }
+
+    if (parsed.normalized.includes(".")) {
+      return { ok: false, error: "months_integer" };
+    }
+
+    return parsed;
+  }
+
+  function parseOptionalMoney(field, fallback) {
+    const input = inputs[field];
+
+    if (!input || input.value.trim() === "") {
+      return { ok: true, value: fallback };
+    }
+
+    return parseLoanInput(input.value);
+  }
+
+  function parseOptionalRate(field, fallback) {
+    const input = inputs[field];
+
+    if (!input || input.value.trim() === "") {
+      return { ok: true, value: fallback };
+    }
+
+    return normalizeRateParseError(
+      parseLoanInput(input.value, {
+        maxDecimals: 4,
+        preferDecimal: true,
+      }),
+    );
+  }
+
+  function normalizeRateParseError(parsed) {
+    if (parsed.ok || parsed.error !== "too_many_decimals") {
+      return parsed;
+    }
+
+    return { ...parsed, error: "too_many_rate_decimals" };
+  }
+
+  function collectError(errors, field, parsed) {
+    if (!parsed.ok) {
+      errors[field] = parsed.error;
+    }
+  }
+
+  function buildWarnings(input, monthlyPayment) {
+    const warnings = [];
+
+    if (input.annualRate > 80) {
+      warnings.push("The entered rate is very high; check the actual cost before accepting.");
+    }
+
+    if (input.openingFeePercent > 10) {
+      warnings.push("The opening fee is high and increases total cost.");
+    }
+
+    if (input.extraPayment > monthlyPayment) {
+      warnings.push("The extra payment exceeds the base payment; calculation is allowed and payoff will be faster.");
+    }
+
+    return warnings;
+  }
+
+  function renderResult(input, summary, savings, warnings) {
+    if (
+      !resultKicker ||
+      !mainResult ||
+      !summaryGrid ||
+      !warningElement ||
+      !extraSummary ||
+      !explanation
+    ) {
+      return;
+    }
+
+    resultKicker.textContent = "Total monthly payment";
+    mainResult.textContent = formatCurrency(summary.totalMonthlyPayment);
+    summaryGrid.innerHTML = [
+      {
+        label: "Base monthly payment",
+        value: formatCurrency(summary.monthlyPayment),
+      },
+      {
+        label: "Total paid in installments",
+        value: formatCurrency(summary.totalPaid),
+      },
+      {
+        label: "Total interest",
+        value: formatCurrency(summary.totalInterest),
+      },
+      {
+        label: "Opening fee",
+        value: formatCurrency(summary.openingFee),
+      },
+      {
+        label: "Total loan cost",
+        value: formatCurrency(summary.totalCost),
+      },
+      {
+        label: "Approximate APR",
+        value:
+          summary.approximateCat === null
+            ? "Not available"
+            : `${formatPercent(summary.approximateCat)} excluding taxes`,
+      },
+    ]
+      .map(
+        (item) => `
+          <div class="rounded-lg border border-gray-800 bg-gray-950/70 p-4">
+            <span class="block text-xs font-semibold uppercase tracking-wide text-gray-500">${escapeHtml(item.label)}</span>
+            <span class="mt-2 block break-words text-lg font-semibold text-white">${escapeHtml(item.value)}</span>
+          </div>
+        `,
+      )
+      .join("");
+
+    warningElement.textContent = warnings.join(" ");
+    warningElement.classList.toggle("hidden", warnings.length === 0);
+
+    if (savings) {
+      extraSummary.textContent = `With the extra payment, you pay off in ${savings.effectiveMonths} months (${formatDuration(savings.effectiveMonths)}), saving ${savings.monthsSaved} months and ${formatCurrency(savings.interestSaved)} in interest.`;
+      extraSummary.classList.remove("hidden");
+    } else {
+      extraSummary.textContent = "";
+      extraSummary.classList.add("hidden");
+    }
+
+    explanation.textContent = `With an annual rate of ${formatPercent(input.annualRate)} over ${input.months} months, you would pay approximately ${formatCurrency(summary.totalMonthlyPayment)} per month. By the end, you will have paid ${formatCurrency(summary.totalInterest)} in interest, plus ${formatCurrency(summary.openingFee)} in opening fees.`;
+  }
+
+  function renderTable() {
+    if (
+      !tableEmpty ||
+      !tableWrapper ||
+      !tableBody ||
+      !tableTotals ||
+      !pageSelect ||
+      !prevPageButton ||
+      !nextPageButton ||
+      !currentSummary
+    ) {
+      return;
+    }
+
+    const totalPages = Math.max(Math.ceil(currentSchedule.length / ROWS_PER_PAGE), 1);
+    currentPage = Math.min(Math.max(currentPage, 1), totalPages);
+    const startIndex = (currentPage - 1) * ROWS_PER_PAGE;
+    const visibleRows = currentSchedule.slice(
+      startIndex,
+      startIndex + ROWS_PER_PAGE,
+    );
+
+    tableEmpty.classList.add("hidden");
+    tableWrapper.classList.remove("hidden");
+    tableBody.innerHTML = visibleRows
+      .map(
+        (row) => `
+          <tr class="transition-colors hover:bg-gray-900/60">
+            <th class="px-4 py-3 font-semibold text-white" scope="row">${row.month}</th>
+            <td class="px-4 py-3 text-right">${escapeHtml(formatCurrency(row.payment))}</td>
+            <td class="px-4 py-3 text-right">${escapeHtml(formatCurrency(row.principal))}</td>
+            <td class="px-4 py-3 text-right">${escapeHtml(formatCurrency(row.interest))}</td>
+            <td class="px-4 py-3 text-right">${escapeHtml(formatCurrency(row.insurance))}</td>
+            <td class="px-4 py-3 text-right font-semibold text-white">${escapeHtml(formatCurrency(row.remainingBalance))}</td>
+          </tr>
+        `,
+      )
+      .join("");
+
+    tableTotals.innerHTML = [
+      {
+        label: "Principal",
+        value: formatCurrency(currentInput?.principal ?? 0),
+      },
+      {
+        label: "Interest",
+        value: formatCurrency(currentSummary.totalInterest),
+      },
+      {
+        label: "Insurances",
+        value: formatCurrency(currentSummary.totalInsurance),
+      },
+      {
+        label: "Total paid",
+        value: formatCurrency(currentSummary.totalPaid),
+      },
+      {
+        label: "Actual duration",
+        value: `${currentSummary.months} months`,
+      },
+    ]
+      .map(
+        (item) => `
+          <div>
+            <dt class="text-xs font-semibold uppercase tracking-wide text-gray-500">${escapeHtml(item.label)}</dt>
+            <dd class="mt-1 break-words text-sm font-semibold text-white">${escapeHtml(item.value)}</dd>
+          </div>
+        `,
+      )
+      .join("");
+
+    pageSelect.innerHTML = Array.from({ length: totalPages }, (_, index) => {
+      const page = index + 1;
+
+      return `<option value="${page}" ${page === currentPage ? "selected" : ""}>${page} of ${totalPages}</option>`;
+    }).join("");
+    prevPageButton.disabled = currentPage === 1;
+    nextPageButton.disabled = currentPage === totalPages;
+  }
+
+  function setInitialState() {
+    if (
+      !resultKicker ||
+      !mainResult ||
+      !summaryGrid ||
+      !warningElement ||
+      !extraSummary ||
+      !explanation ||
+      !tableEmpty ||
+      !tableWrapper ||
+      !tableBody ||
+      !tableTotals
+    ) {
+      return;
+    }
+
+    resultKicker.textContent = "Result";
+    mainResult.textContent = "Enter the values";
+    summaryGrid.innerHTML = `
+      <div class="rounded-lg border border-gray-800 bg-gray-950/70 p-4 text-sm text-gray-400">
+        The summary will appear here.
+      </div>
+    `;
+    warningElement.textContent = "";
+    warningElement.classList.add("hidden");
+    extraSummary.textContent = "";
+    extraSummary.classList.add("hidden");
+    explanation.textContent = "The calculation will appear here.";
+    tableEmpty.classList.remove("hidden");
+    tableWrapper.classList.add("hidden");
+    tableBody.innerHTML = "";
+    tableTotals.innerHTML = "";
+    setActionsVisible(false);
+    currentSchedule = [];
+    currentSummary = null;
+    currentInput = null;
+    currentCopyText = "";
+    currentPage = 1;
+  }
+
+  function setInvalidState() {
+    if (
+      !resultKicker ||
+      !mainResult ||
+      !summaryGrid ||
+      !warningElement ||
+      !extraSummary ||
+      !explanation ||
+      !tableEmpty ||
+      !tableWrapper ||
+      !tableBody ||
+      !tableTotals
+    ) {
+      return;
+    }
+
+    resultKicker.textContent = "Check the fields";
+    mainResult.textContent = "Cannot calculate yet";
+    summaryGrid.innerHTML = "";
+    warningElement.textContent = "";
+    warningElement.classList.add("hidden");
+    extraSummary.textContent = "";
+    extraSummary.classList.add("hidden");
+    explanation.textContent = "Correct the highlighted values to continue.";
+    tableEmpty.classList.remove("hidden");
+    tableWrapper.classList.add("hidden");
+    tableBody.innerHTML = "";
+    tableTotals.innerHTML = "";
+    setActionsVisible(false);
+    currentSchedule = [];
+    currentSummary = null;
+    currentInput = null;
+    currentCopyText = "";
+  }
+
+  function setActionsVisible(isVisible) {
+    copyButton?.classList.toggle("hidden", !isVisible);
+    copyButton?.classList.toggle("inline-flex", isVisible);
+    exportButton?.classList.toggle("hidden", !isVisible);
+    exportButton?.classList.toggle("inline-flex", isVisible);
+  }
+
+  function clearErrors() {
+    document.querySelectorAll("[data-error-for]").forEach((errorElement) => {
+      errorElement.textContent = "";
+      errorElement.classList.add("hidden");
+    });
+  }
+
+  function showErrors(errors) {
+    Object.entries(errors).forEach(([field, error]) => {
+      const errorElement = document.querySelector(
+        `[data-error-for="${field}"]`,
+      );
+
+      if (!errorElement) {
+        return;
+      }
+
+      errorElement.textContent =
+        ERROR_MESSAGES[error] ?? ERROR_MESSAGES.invalid;
+      errorElement.classList.remove("hidden");
+    });
+  }
+
+  function fillExample() {
+    inputs.principal.value = "50000";
+    inputs.annualRate.value = "24";
+    inputs.months.value = "24";
+    inputs.openingFeePercent.value = "2";
+    inputs.monthlyInsurance.value = "0";
+    inputs.extraPayment.value = "0";
+    selects.loanType.value = "personal-bank";
+    markInputsTouched();
+    updateCalculator();
+  }
+
+  function clearCalculator() {
+    inputs.principal.value = "";
+    inputs.annualRate.value = "";
+    inputs.months.value = "24";
+    inputs.openingFeePercent.value = "0";
+    inputs.monthlyInsurance.value = "0";
+    inputs.extraPayment.value = "0";
+    selects.loanType.value = "personal-bank";
+    Object.values(inputs).forEach((input) => {
+      delete input.dataset.touched;
+    });
+    clearErrors();
+    setInitialState();
+  }
+
+  function applyLoanTypeDefaults() {
+    const selectedType = CLIENT_LOAN_TYPES.find(
+      (type) => type.value === selects.loanType?.value,
+    );
+
+    if (!selectedType) {
+      return;
+    }
+
+    inputs.annualRate.value = String(selectedType.suggestedAnnualRate);
+    inputs.months.value = String(selectedType.suggestedMonths);
+    inputs.annualRate.dataset.touched = "true";
+    inputs.months.dataset.touched = "true";
+    updateCalculator();
+  }
+
+  function markInputsTouched() {
+    Object.values(inputs).forEach((input) => {
+      input.dataset.touched = "true";
+    });
+  }
+
+  function buildCopyText(input, summary, savings) {
+    const loanType =
+      CLIENT_LOAN_TYPES.find((type) => type.value === input.loanType)?.label ??
+      "Loan";
+    const lines = [
+      "Loan calculator - calculadoras.tools",
+      `Tipo: ${loanType}`,
+      `Amount: ${formatCurrency(input.principal)}`,
+      `Annual rate: ${formatPercent(input.annualRate)}`,
+      `Term: ${input.months} months`,
+      `Base monthly payment: ${formatCurrency(summary.monthlyPayment)}`,
+      `Total monthly payment: ${formatCurrency(summary.totalMonthlyPayment)}`,
+      `Total paid in installments: ${formatCurrency(summary.totalPaid)}`,
+      `Total interest: ${formatCurrency(summary.totalInterest)}`,
+      `Opening fee: ${formatCurrency(summary.openingFee)}`,
+      `Total loan cost: ${formatCurrency(summary.totalCost)}`,
+    ];
+
+    if (summary.approximateCat !== null) {
+      lines.push(`Approximate APR: ${formatPercent(summary.approximateCat)} excluding taxes`);
+    }
+
+    if (savings) {
+      lines.push(
+        `Effective term with extra payment: ${savings.effectiveMonths} months`,
+        `Estimated interest savings: ${formatCurrency(savings.interestSaved)}`,
+      );
+    }
+
+    return lines.join("\n");
+  }
+
+  function exportCsv() {
+    if (currentSchedule.length === 0) {
+      return;
+    }
+
+    const rows = [
+      "month,payment,principal,interest,insurance,outstanding_balance",
+      ...currentSchedule.map((row) =>
+        [
+          row.month,
+          roundCurrency(row.payment),
+          roundCurrency(row.principal),
+          roundCurrency(row.interest),
+          roundCurrency(row.insurance),
+          roundCurrency(row.remainingBalance),
+        ].join(","),
+      ),
+    ];
+    const blob = new Blob([rows.join("\n")], {
+      type: "text/csv;charset=utf-8",
+    });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "amortizacion-prestamo.csv";
+    document.body.append(link);
+    link.click();
+    link.remove();
+    URL.revokeObjectURL(url);
+  }
+
+  async function copyResult() {
+    if (!currentCopyText || !copyLabel || !copyStatus) {
+      return;
+    }
+
+    try {
+      if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(currentCopyText);
+      } else {
+        const textArea = document.createElement("textarea");
+        textArea.value = currentCopyText;
+        textArea.setAttribute("readonly", "");
+        textArea.style.position = "fixed";
+        textArea.style.opacity = "0";
+        document.body.append(textArea);
+        textArea.select();
+        document.execCommand("copy");
+        textArea.remove();
+      }
+
+      window.clearTimeout(copiedTimeout);
+      copyLabel.textContent = "Copied";
+      copyStatus.textContent = "Summary copied.";
+      copiedTimeout = window.setTimeout(() => {
+        copyLabel.textContent = "Copy summary";
+        copyStatus.textContent = "";
+      }, 2000);
+    } catch {
+      copyStatus.textContent = "Could not copy the summary.";
+    }
+  }
+
+  function escapeHtml(value) {
+    return String(value)
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;")
+      .replaceAll("'", "&#039;");
+  }
+
+  Object.values(inputs).forEach((input) => {
+    input?.addEventListener("input", () => {
+      input.dataset.touched = "true";
+      updateCalculator();
+    });
+
+    input?.addEventListener("blur", () => {
+      input.dataset.touched = "true";
+      updateCalculator();
+    });
+  });
+
+  selects.loanType?.addEventListener("change", applyLoanTypeDefaults);
+  clearButton?.addEventListener("click", clearCalculator);
+  exampleButton?.addEventListener("click", fillExample);
+  copyButton?.addEventListener("click", copyResult);
+  exportButton?.addEventListener("click", exportCsv);
+  prevPageButton?.addEventListener("click", () => {
+    currentPage -= 1;
+    renderTable();
+  });
+  nextPageButton?.addEventListener("click", () => {
+    currentPage += 1;
+    renderTable();
+  });
+  pageSelect?.addEventListener("change", () => {
+    currentPage = Number(pageSelect.value);
+    renderTable();
+  });
+
+  setInitialState();
+</script>

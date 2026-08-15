@@ -10,12 +10,18 @@ import {
   CAPACITY_PRESET_RATIOS,
   CAPACITY_PRESET_LABELS,
 } from "@lib/calculators/inmuebles/calculadora-capacidad-compra-vivienda/homeAffordability";
+import { buildAlternateLinks } from "@lib/i18n/routing";
 import { buildFaqJsonLd } from "@lib/seo";
 
 const title = "Calculadora de capacidad de compra de vivienda";
 const description =
   "Estima cuanto podrias pagar por una casa segun ingreso, deudas, enganche, gastos iniciales, tasa y plazo hipotecario.";
 const canonical = "/inmuebles/calculadora-capacidad-compra-vivienda";
+const englishCanonical = "/en/real-estate/home-affordability-calculator";
+const alternates = buildAlternateLinks(
+  { es: canonical, en: englishCanonical },
+  Astro.site ?? Astro.url,
+);
 
 const examples = [
   {
@@ -101,7 +107,7 @@ const faqs = [
 const faqJsonLd = buildFaqJsonLd(faqs);
 ---
 
-<BaseLayout title={title} description={description} canonical={canonical}>
+<BaseLayout title={title} description={description} canonical={canonical} alternates={alternates}>
   <Fragment slot="head">
     <script type="application/ld+json" set:html={JSON.stringify(faqJsonLd)} />
   </Fragment>

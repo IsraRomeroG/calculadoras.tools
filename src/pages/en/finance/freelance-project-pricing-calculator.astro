@@ -1,0 +1,1097 @@
+---
+import BaseLayout from "@layouts/BaseLayout.astro";
+import AdSlot from "@components/ads/AdSlot.astro";
+import Container from "@components/layout/Container.astro";
+import PageShell from "@components/layout/PageShell.astro";
+import FaqSection from "@components/shared/FaqSection.astro";
+import PageHero from "@components/shared/PageHero.astro";
+import SectionIntro from "@components/shared/SectionIntro.astro";
+import { buildAlternateLinks } from "@lib/i18n/routing";
+import { buildFaqJsonLd } from "@lib/seo";
+
+const title = "Freelance project pricing calculator";
+const description =
+  "Calculate what to charge for a freelance project, compare scenarios and see whether a fixed price covers hours, expenses, risk and margin.";
+const canonical = "/en/finance/freelance-project-pricing-calculator";
+const spanishCanonical = "/finanzas/calculadora-de-precio-de-proyecto-freelance";
+const alternates = buildAlternateLinks({ es: spanishCanonical, en: canonical }, Astro.site ?? Astro.url);
+const faqs = [
+  {
+    question: "How do I calculate what to charge for a freelance project?",
+    answer:
+      "Estimate hours for each phase, assign a sustainable rate, add direct expenses and reserve time for contingencies. Then include fees and a business margin before tax.",
+  },
+  {
+    question: "What contingency percentage should I use?",
+    answer:
+      "It depends on how well defined the scope is. Contingency reserves hours for coordination, revisions and small changes; compare it with base and conservative scenarios.",
+  },
+  {
+    question: "What is the difference between margin and markup?",
+    answer:
+      "Margin measures what percentage of price remains after costs and fees. Markup simply adds a percentage to cost and does not guarantee the same margin.",
+  },
+  {
+    question: "How do I know whether a fixed price works for me?",
+    answer:
+      "Review its effective rate, achieved margin and how many hours it can fund before falling below the modeled value of your time.",
+  },
+  {
+    question: "Should I charge a deposit?",
+    answer:
+      "A deposit helps fund the start and reduces collection risk. The right percentage depends on the project, client and upfront expenses.",
+  },
+  {
+    question: "Are taxes part of my effective rate?",
+    answer:
+      "Not in this calculator. Added tax is shown separately and is not treated as available revenue for work, expenses or margin.",
+  },
+  {
+    question: "Which expenses should I include in a quote?",
+    answer:
+      "Include only expenses required for the project, such as licenses, materials, travel, contractors or hired services.",
+  },
+];
+const faqJsonLd = buildFaqJsonLd(faqs);
+---
+
+<BaseLayout title={title} description={description} canonical={canonical} locale="en" alternates={alternates}>
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={JSON.stringify(faqJsonLd)} />
+  </Fragment>
+
+  <PageShell>
+    <PageHero
+      title="Freelance project pricing calculator"
+      description="Turn hours, expenses and risk into a clear quote, or check whether a fixed price truly works."
+      kicker="Finance"
+      collapseBreadcrumbOnMobile
+      containerClass="py-6 md:py-8"
+      breadcrumbs={[
+        { label: "Home", href: "/en", ariaLabel: "Home" },
+        { label: "Finance", href: "/en/finance", optional: true },
+        { label: "Project price", truncate: true },
+      ]}
+    />
+
+    <Container as="section" class="py-6 md:py-8">
+      <section
+        class="overflow-hidden rounded-lg border border-gray-700 bg-gray-950 shadow-xl shadow-gray-950/30"
+        aria-labelledby="calculator-heading"
+      >
+        <div class="grid lg:grid-cols-[minmax(0,1.15fr)_minmax(20rem,0.85fr)]">
+          <div class="p-4 sm:p-6">
+            <p class="text-sm font-semibold uppercase tracking-wide text-amber-400">
+              From estimate to quote
+            </p>
+            <h2 id="calculator-heading" class="mt-2 text-2xl font-semibold">
+              What do you want to review?
+            </h2>
+
+            <div
+              class="mt-5 grid grid-cols-2 rounded-lg border border-gray-700 bg-gray-900 p-1"
+              role="tablist"
+              aria-label="Calculation mode"
+            >
+              <button
+                class="mode-button is-active"
+                type="button"
+                role="tab"
+                aria-selected="true"
+                data-mode="recommend"
+              >
+                Recommend a price
+              </button>
+              <button
+                class="mode-button"
+                type="button"
+                role="tab"
+                aria-selected="false"
+                data-mode="analyze"
+              >
+                Analyze quote
+              </button>
+            </div>
+
+            <form class="mt-6" novalidate data-project-form>
+              <div
+                class="hidden rounded-lg border border-red-400/40 bg-red-400/10 p-4 text-sm text-red-100"
+                role="alert"
+                tabindex="-1"
+                data-errors
+              ></div>
+
+              <div class="grid gap-4 sm:grid-cols-2">
+                <div>
+                  <label class="field-label" for="project-base-rate">
+                    Base hourly rate <span class="text-gray-500">(optional if every phase has a rate)</span>
+                  </label>
+                  <div class="field-shell">
+                    <span class="field-affix">$</span>
+                    <input
+                      id="project-base-rate"
+                      class="field-input"
+                      type="text"
+                      inputmode="decimal"
+                      autocomplete="off"
+                      placeholder="600"
+                      data-field="baseHourlyRate"
+                    />
+                    <span class="field-affix">/ hour</span>
+                  </div>
+                  <p class="field-help">
+                    Do not know it yet? Use the
+                    <a class="text-amber-300 underline hover:text-amber-200" href="/en/finance/freelance-hourly-rate-calculator">
+                      freelance rate calculator
+                    </a>.
+                  </p>
+                </div>
+
+                <div class="hidden" data-proposed-wrap>
+                  <label class="field-label" for="project-proposed-price">
+                    Proposed price before tax
+                  </label>
+                  <div class="field-shell">
+                    <span class="field-affix">$</span>
+                    <input
+                      id="project-proposed-price"
+                      class="field-input"
+                      type="text"
+                      inputmode="decimal"
+                      autocomplete="off"
+                      placeholder="55000"
+                      data-field="proposedPrice"
+                    />
+                  </div>
+                  <p class="field-help">The fixed amount you want to evaluate.</p>
+                </div>
+              </div>
+
+              <div class="mt-6 flex items-center justify-between gap-4 border-t border-gray-800 pt-5">
+                <div>
+                  <h3 class="text-lg font-semibold text-white">Project phases</h3>
+                  <p class="mt-1 text-sm text-gray-500" data-phase-count></p>
+                </div>
+                <button class="secondary-button shrink-0" type="button" data-add-phase>
+                  Add phase
+                </button>
+              </div>
+
+              <div class="mt-4 space-y-4" data-phase-list></div>
+
+              <details class="mt-5 rounded-lg border border-gray-700 bg-gray-900/60 p-4" data-risk-options>
+                <summary class="cursor-pointer font-semibold text-white">
+                  Risk, expenses and margin
+                </summary>
+                <p class="mt-2 text-xs leading-relaxed text-gray-400" data-risk-summary>
+                  Defaults: 10% contingency, no expenses and 20% margin.
+                </p>
+
+                <div class="mt-4 grid gap-4 sm:grid-cols-2">
+                  <label class="block">
+                    <span class="field-label">Direct expenses</span>
+                    <span class="field-shell">
+                      <span class="field-affix">$</span>
+                      <input class="field-input" type="text" inputmode="decimal" value="0" data-field="directExpenses" />
+                    </span>
+                    <span class="field-help">Licences, materials, collaborators or travel.</span>
+                  </label>
+
+                  <label class="block">
+                    <span class="field-label">Collection fee</span>
+                    <span class="field-shell">
+                      <input class="field-input field-input-leading" type="text" inputmode="decimal" value="0" data-field="collectionFeeRate" />
+                      <span class="field-affix">%</span>
+                    </span>
+                    <span class="field-help">Marketplace, platform or payment processor.</span>
+                  </label>
+
+                  <label class="block">
+                    <span class="field-label">Recommended contingency</span>
+                    <span class="field-shell">
+                      <input class="field-input field-input-leading" type="text" inputmode="decimal" value="10" data-field="recommendedContingencyRate" />
+                      <span class="field-affix">%</span>
+                    </span>
+                    <span class="field-help">Hours reserved for revisions and contingencies.</span>
+                  </label>
+
+                  <label class="block">
+                    <span class="field-label">Conservative contingency</span>
+                    <span class="field-shell">
+                      <input class="field-input field-input-leading" type="text" inputmode="decimal" value="20" data-field="conservativeContingencyRate" />
+                      <span class="field-affix">%</span>
+                    </span>
+                    <span class="field-help">Scenario with a larger work reserve.</span>
+                  </label>
+
+                  <label class="block sm:col-span-2">
+                    <span class="field-label">Target business margin</span>
+                    <span class="field-shell">
+                      <input class="field-input field-input-leading" type="text" inputmode="decimal" value="20" data-field="targetMarginRate" />
+                      <span class="field-affix">%</span>
+                    </span>
+                    <span class="field-help">
+                      Actual percentage of price remaining after work, expenses and fees.
+                    </span>
+                  </label>
+                </div>
+              </details>
+
+              <details class="mt-4 rounded-lg border border-gray-700 bg-gray-900/60 p-4" data-payment-options>
+                <summary class="cursor-pointer font-semibold text-white">
+                  Tax and payment plan
+                </summary>
+                <p class="mt-2 text-xs leading-relaxed text-gray-400" data-payment-summary>
+                  No added tax. Payments: 50%, 25%, and 25%.
+                </p>
+
+                <div class="mt-4 grid gap-4 sm:grid-cols-2">
+                  <label class="block sm:col-span-2">
+                    <span class="field-label">Tax added to quote</span>
+                    <span class="field-shell">
+                      <input class="field-input field-input-leading" type="text" inputmode="decimal" value="0" data-field="taxRate" />
+                      <span class="field-affix">%</span>
+                    </span>
+                    <span class="field-help">Manual estimate; does not calculate tax obligations or withholding.</span>
+                  </label>
+
+                  <label class="block">
+                    <span class="field-label">Deposit</span>
+                    <span class="field-shell">
+                      <input class="field-input field-input-leading" type="text" inputmode="decimal" value="50" data-field="deposit" />
+                      <span class="field-affix">%</span>
+                    </span>
+                  </label>
+
+                  <label class="block">
+                    <span class="field-label">Progress payment</span>
+                    <span class="field-shell">
+                      <input class="field-input field-input-leading" type="text" inputmode="decimal" value="25" data-field="progress" />
+                      <span class="field-affix">%</span>
+                    </span>
+                  </label>
+
+                  <label class="block sm:col-span-2">
+                    <span class="field-label">Final payment</span>
+                    <span class="field-shell">
+                      <input class="field-input field-input-leading" type="text" inputmode="decimal" value="25" data-field="final" />
+                      <span class="field-affix">%</span>
+                    </span>
+                  </label>
+                </div>
+              </details>
+
+              <div
+                class="mt-4 hidden rounded-lg border border-amber-400/40 bg-amber-400/10 p-4 text-sm text-amber-100"
+                data-warnings
+              ></div>
+
+              <div class="mt-6 flex flex-col gap-3 border-t border-gray-800 pt-5 sm:flex-row sm:flex-wrap">
+                <button class="primary-button w-full sm:w-auto sm:min-w-56" type="submit" data-submit-label>
+                  Calculate recommended price
+                </button>
+                <button class="secondary-button" type="button" data-example>Use example</button>
+                <button class="secondary-button" type="button" data-clear>Clear</button>
+                <button class="secondary-button hidden" type="button" data-copy>
+                  <span data-copy-label>Copy proposal summary</span>
+                </button>
+                <p class="sr-only" aria-live="polite" data-copy-status></p>
+              </div>
+            </form>
+          </div>
+
+          <aside
+            class="border-t border-gray-800 bg-gray-900/70 p-4 sm:p-6 lg:border-l lg:border-t-0"
+            aria-live="polite"
+            tabindex="-1"
+            data-result-region
+          >
+            <div
+              class="hidden rounded-lg border border-amber-400/40 bg-amber-400/10 p-3 text-sm text-amber-100"
+              data-stale-notice
+            >
+              Inputs changed. Calculate again to update this result.
+            </div>
+            <p class="mt-1 text-sm font-semibold uppercase tracking-wide text-amber-400" data-result-kicker>
+              Result
+            </p>
+            <p class="mt-3 break-words text-4xl font-bold leading-tight text-white" data-main-result>
+              Estimate your phases
+            </p>
+            <p class="mt-3 text-sm leading-relaxed text-gray-300" data-interpretation>
+              You will see a base price, recommended price and conservative scenario.
+            </p>
+
+            <div class="mt-5 grid grid-cols-2 gap-3" data-summary-grid>
+              <div class="col-span-2 rounded-lg border border-gray-800 bg-gray-950/70 p-4 text-sm text-gray-400">
+                Enter a rate and hours for at least one phase to begin.
+              </div>
+            </div>
+
+            <div class="mt-4 hidden rounded-lg border p-4" data-status-card>
+              <p class="text-xs font-semibold uppercase tracking-wide" data-status-label></p>
+              <p class="mt-2 text-sm leading-relaxed" data-status-text></p>
+            </div>
+
+            <details class="mt-4 hidden rounded-lg border border-gray-800 p-4" data-breakdown-details>
+              <summary class="cursor-pointer text-sm font-semibold text-white">How it was calculated</summary>
+              <div class="mt-3 space-y-2 text-sm leading-relaxed text-gray-400" data-breakdown-lines></div>
+            </details>
+
+            <p class="mt-4 text-xs leading-relaxed text-gray-500">
+              Planning estimate. It does not replace tax or contract advice or a
+              scope review with the client.
+            </p>
+          </aside>
+        </div>
+      </section>
+
+      <div class="sticky bottom-3 z-20 mt-4 lg:hidden">
+        <button class="primary-button w-full shadow-lg shadow-gray-950/50" type="button" data-mobile-calculate>
+          Calculate recommended price
+        </button>
+      </div>
+    </Container>
+
+    <div class="hidden" data-results>
+      <Container as="section" class="py-6 md:py-8">
+        <SectionIntro
+          title="Quote scenarios"
+          description="Compare how price changes when more or less project time is reserved."
+          class="mb-5"
+        />
+        <div class="grid gap-4 md:grid-cols-3" data-scenario-grid></div>
+      </Container>
+
+      <Container as="section" class="py-6 md:py-8">
+        <div class="grid gap-5 lg:grid-cols-2">
+          <section class="rounded-lg border border-gray-700 bg-gray-950 p-4 sm:p-6">
+            <p class="text-sm font-semibold uppercase tracking-wide text-sky-300">Milestone payments</p>
+            <h2 class="mt-2 text-2xl font-semibold">Payment plan</h2>
+            <p class="mt-2 text-sm leading-relaxed text-gray-400">
+              The amounts add up to the total presented to the client, including any added tax.
+            </p>
+            <div class="mt-5 grid gap-3 sm:grid-cols-3 lg:grid-cols-1 xl:grid-cols-3" data-payment-grid></div>
+          </section>
+
+          <section class="rounded-lg border border-gray-700 bg-gray-950 p-4 sm:p-6">
+            <p class="text-sm font-semibold uppercase tracking-wide text-amber-400">Ready to adapt</p>
+            <h2 class="mt-2 text-2xl font-semibold">Quote summary</h2>
+            <p class="mt-2 text-sm leading-relaxed text-gray-400" data-proposal-summary></p>
+            <button class="primary-button mt-5 w-full sm:w-auto" type="button" data-copy>
+              <span data-copy-label>Copy proposal summary</span>
+            </button>
+          </section>
+        </div>
+      </Container>
+    </div>
+
+    <AdSlot placement="calculator-after-tool" />
+
+    <Container as="section" class="py-8">
+      <SectionIntro
+        title="How to interpret your quote"
+        description="A good price does more than cover hours: it makes risk visible and leaves room to operate."
+        class="mb-5"
+      />
+      <div class="grid gap-4 md:grid-cols-3">
+        <article class="info-card">
+          <h2 class="font-semibold text-white">Contingency hours</h2>
+          <p class="mt-2 text-sm leading-relaxed text-gray-400">
+            Turns risk into visible time for revisions, coordination and small changes.
+          </p>
+        </article>
+        <article class="info-card">
+          <h2 class="font-semibold text-white">Margin is not markup</h2>
+          <p class="mt-2 text-sm leading-relaxed text-gray-400">
+            Margin shows what share of price remains after work, expenses and fees.
+          </p>
+        </article>
+        <article class="info-card">
+          <h2 class="font-semibold text-white">Fixed price with limits</h2>
+          <p class="mt-2 text-sm leading-relaxed text-gray-400">
+            Reviewing funded hours and effective rate helps detect quotes that are too tight.
+          </p>
+        </article>
+      </div>
+    </Container>
+
+    <Container as="section" class="py-8">
+      <section class="rounded-lg border border-gray-700 bg-gray-950 p-5 sm:p-6">
+        <h2 class="text-2xl font-semibold">Before sending the quote</h2>
+        <div class="mt-4 grid gap-4 text-sm leading-relaxed text-gray-400 md:grid-cols-2">
+          <p>
+            Define deliverables, included revisions, and what constitutes a scope change. Contingency reduces risk but does not replace clear agreements.
+          </p>
+          <p>
+            Separate added tax from available revenue. Also confirm when direct expenses are paid and what happens if the project is paused.
+          </p>
+        </div>
+        <div class="mt-5 flex flex-wrap gap-3">
+          <a class="secondary-button" href="/en/finance/freelance-hourly-rate-calculator">
+            Calculate hourly rate
+          </a>
+          <a class="secondary-button" href="/en/finance/margin-markup-calculator">
+            Understand margin and markup
+          </a>
+        </div>
+      </section>
+    </Container>
+
+    <FaqSection faqs={faqs} />
+  </PageShell>
+</BaseLayout>
+
+<style is:global>
+  .field-label { display: block; font-size: .875rem; font-weight: 500; color: rgb(229 231 235); }
+  .field, .field-shell { margin-top: .5rem; min-height: 3rem; width: 100%; border-radius: .5rem; border: 1px solid rgb(55 65 81); background: rgb(17 24 39); color: white; outline: none; }
+  .field { padding: 0 1rem; }
+  .field-shell { display: flex; align-items: center; }
+  .field-input { min-height: 2.875rem; min-width: 0; width: 100%; background: transparent; padding: 0 .25rem; color: white; outline: none; }
+  .field-input-leading { padding-left: .75rem; }
+  .field-affix { flex: none; padding: 0 .75rem; font-size: .875rem; color: rgb(156 163 175); }
+  .field:focus, .field-shell:focus-within { border-color: rgb(251 191 36); box-shadow: 0 0 0 3px rgb(251 191 36 / .15); }
+  .field[aria-invalid="true"], .field-shell:has(.field-input[aria-invalid="true"]) { border-color: rgb(248 113 113); }
+  .field-help { margin-top: .4rem; display: block; font-size: .75rem; line-height: 1.4; color: rgb(107 114 128); }
+  .primary-button, .secondary-button, .mode-button { display: inline-flex; min-height: 2.75rem; align-items: center; justify-content: center; border-radius: .5rem; padding: .5rem 1rem; font-size: .875rem; font-weight: 700; }
+  .primary-button { background: rgb(251 191 36); color: rgb(3 7 18); }
+  .secondary-button { border: 1px solid rgb(55 65 81); color: rgb(229 231 235); }
+  .secondary-button:hover { border-color: rgb(107 114 128); color: white; }
+  .mode-button { min-height: 2.75rem; color: rgb(156 163 175); }
+  .mode-button.is-active { background: rgb(31 41 55); color: rgb(253 230 138); box-shadow: 0 1px 3px rgb(0 0 0 / .3); }
+  .info-card { border-radius: .5rem; border: 1px solid rgb(55 65 81); background: rgb(3 7 18); padding: 1.25rem; }
+  .phase-action { display: inline-flex; min-height: 2.75rem; align-items: center; justify-content: center; border-radius: .375rem; border: 1px solid rgb(55 65 81); padding: .4rem .75rem; font-size: .75rem; font-weight: 600; color: rgb(209 213 219); }
+  .phase-action-danger { border-color: rgb(248 113 113 / .4); color: rgb(254 202 202); }
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+  }
+</style>
+
+<script>
+  import {
+    analyzeProposedPrice,
+    calculateProjectRecommendation,
+    formatProjectCurrency,
+    formatProjectPercent,
+    formatProjectQuantity,
+    parseProjectNumber,
+  } from "@lib/calculators/finanzas/calculadora-de-precio-de-proyecto-freelance/freelanceProjectPrice.en";
+
+  const get = (selector) => document.querySelector(selector);
+  const phaseList = get("[data-phase-list]");
+  const form = get("[data-project-form]");
+  const resultRegion = get("[data-result-region]");
+  const proposedWrap = get("[data-proposed-wrap]");
+  const submitLabel = get("[data-submit-label]");
+  const mobileCalculate = get("[data-mobile-calculate]");
+  let mode = "recommend";
+  let sequence = 0;
+  let phases = [newPhase()];
+  let conservativeEdited = false;
+  let currentInput = null;
+  let currentRecommendation = null;
+  let currentAnalysis = null;
+  let copyText = "";
+
+  const warningMessages = {
+    no_contingency: "You are not reserving hours for revisions or minor changes. Confirm the scope is sufficiently defined.",
+    high_contingency: "The reserve exceeds half the estimated work. Consider adjusting scope or splitting the project.",
+    expenses_exceed_work: "Direct expenses represent most of the quote. Confirm amounts and reimbursement terms.",
+    no_tax: "The quote does not add tax. Confirm this assumption applies.",
+    low_deposit: "A low deposit can increase the risk of financing the project start.",
+  };
+
+  function newPhase(values = {}) {
+    sequence += 1;
+    return {
+      id: `phase-${sequence}`,
+      name: values.name ?? `Phase ${sequence}`,
+      hours: values.hours ?? "",
+      hourlyRate: values.hourlyRate ?? "",
+      open: values.open ?? true,
+    };
+  }
+
+  function renderPhases(focusLast = false) {
+    get("[data-phase-count]").textContent = `${phases.length} ${phases.length === 1 ? "phase" : "phases"}`;
+    phaseList.innerHTML = phases.map((phase, index) => `
+      <details class="rounded-lg border border-gray-700 bg-gray-900/70 p-4" data-phase-card="${phase.id}" ${phase.open ? "open" : ""}>
+        <summary class="cursor-pointer list-none">
+          <div class="flex items-center justify-between gap-3">
+            <div class="min-w-0">
+              <p class="truncate text-sm font-semibold text-amber-300">${escapeHtml(phase.name || `Phase ${index + 1}`)}</p>
+              <p class="mt-1 truncate text-xs text-gray-500" data-phase-preview="${phase.id}">${escapeHtml(phasePreview(phase))}</p>
+            </div>
+            <span class="text-xs font-semibold text-gray-400">Editar</span>
+          </div>
+        </summary>
+        <div class="mt-4 grid gap-4 sm:grid-cols-2">
+          <label class="block sm:col-span-2">
+            <span class="field-label">Phase name</span>
+            <input class="field" type="text" maxlength="60" value="${escapeHtml(phase.name)}" data-phase-field="name" data-id="${phase.id}" />
+          </label>
+          <label class="block">
+            <span class="field-label">Estimated hours</span>
+            <span class="field-shell">
+              <input class="field-input field-input-leading" type="text" inputmode="decimal" autocomplete="off" placeholder="20" value="${escapeHtml(phase.hours)}" data-phase-field="hours" data-id="${phase.id}" />
+              <span class="field-affix">hours</span>
+            </span>
+          </label>
+          <label class="block">
+            <span class="field-label">Specific rate <span class="text-gray-500">(optional)</span></span>
+            <span class="field-shell">
+              <span class="field-affix">$</span>
+              <input class="field-input" type="text" inputmode="decimal" autocomplete="off" placeholder="Use base rate" value="${escapeHtml(phase.hourlyRate)}" data-phase-field="hourlyRate" data-id="${phase.id}" />
+              <span class="field-affix">/ hour</span>
+            </span>
+          </label>
+        </div>
+        <p class="mt-3 hidden text-sm text-red-200" data-phase-error="${phase.id}"></p>
+        <div class="mt-4 flex flex-wrap justify-end gap-2">
+          <button class="phase-action" type="button" data-phase-action="duplicate" data-id="${phase.id}">Duplicate</button>
+          <button class="phase-action phase-action-danger" type="button" data-phase-action="remove" data-id="${phase.id}">Remove</button>
+        </div>
+      </details>
+    `).join("");
+
+    if (focusLast) {
+      phaseList.querySelector("details:last-child input")?.focus();
+    }
+  }
+
+  function phasePreview(phase) {
+    const hours = parseProjectNumber(phase.hours, 2, true);
+    const rate = parseProjectNumber(phase.hourlyRate);
+    const base = parseProjectNumber(getField("baseHourlyRate").value);
+    const appliedRate = rate.ok ? rate.value : base.ok ? base.value : null;
+
+    if (!hours.ok || hours.value <= 0) return "Hours pending";
+    if (!appliedRate || appliedRate <= 0) return `${formatProjectQuantity(hours.value)} h · rate pending`;
+
+    return `${formatProjectQuantity(hours.value)} h · ${formatProjectCurrency(hours.value * appliedRate)}`;
+  }
+
+  function readInput() {
+    clearInvalidFields();
+    const errors = [];
+    const base = parseOptionalNumber("baseHourlyRate", "base hourly rate", errors, { positive: true });
+    const parsedPhases = [];
+
+    phases.forEach((phase, index) => {
+      const rowErrors = [];
+      const name = phase.name.trim();
+      const hours = parseProjectNumber(phase.hours, 2, true);
+      const rate = phase.hourlyRate.trim() ? parseProjectNumber(phase.hourlyRate) : null;
+
+      if (!name || name.length > 60) rowErrors.push("add a name from 1 to 60 characters");
+      if (!hours.ok || hours.value <= 0) rowErrors.push("enter hours greater than zero");
+      if (rate && (!rate.ok || rate.value <= 0)) rowErrors.push("check the specific rate");
+      if (!rate && base === undefined) rowErrors.push("add a specific or base rate");
+
+      const rowError = get(`[data-phase-error="${phase.id}"]`);
+      rowError.textContent = rowErrors.join(". ");
+      rowError.classList.toggle("hidden", !rowErrors.length);
+      errors.push(...rowErrors.map((message) => `Phase ${index + 1}: ${message}.`));
+
+      if (!rowErrors.length && hours.ok) {
+        parsedPhases.push({
+          name,
+          hours: hours.value,
+          hourlyRate: rate?.ok ? rate.value : undefined,
+        });
+      }
+    });
+
+    const directExpenses = parseRequiredNumber("directExpenses", "direct expenses", errors);
+    const recommendedContingencyRate = parseRequiredNumber("recommendedContingencyRate", "recommended contingency", errors, { preferDecimal: true });
+    const conservativeContingencyRate = parseRequiredNumber("conservativeContingencyRate", "conservative contingency", errors, { preferDecimal: true });
+    const collectionFeeRate = parseRequiredNumber("collectionFeeRate", "collection fee", errors, { preferDecimal: true });
+    const targetMarginRate = parseRequiredNumber("targetMarginRate", "target margin", errors, { preferDecimal: true });
+    const taxRate = parseRequiredNumber("taxRate", "added tax", errors, { preferDecimal: true });
+    const deposit = parseRequiredNumber("deposit", "deposit", errors, { preferDecimal: true });
+    const progress = parseRequiredNumber("progress", "progress payment", errors, { preferDecimal: true });
+    const final = parseRequiredNumber("final", "final payment", errors, { preferDecimal: true });
+    const proposedPrice = mode === "analyze"
+      ? parseRequiredNumber("proposedPrice", "proposed price", errors, { positive: true })
+      : undefined;
+
+    if (errors.length) return { errors };
+
+    return {
+      errors,
+      proposedPrice,
+      input: {
+        phases: parsedPhases,
+        baseHourlyRate: base,
+        directExpenses,
+        recommendedContingencyRate,
+        conservativeContingencyRate,
+        collectionFeeRate,
+        targetMarginRate,
+        taxRate,
+        paymentRates: { deposit, progress, final },
+      },
+    };
+  }
+
+  function calculate() {
+    const parsed = readInput();
+
+    if (parsed.errors.length) {
+      showErrors(parsed.errors);
+      markStale();
+      get("[data-errors]").focus();
+      return;
+    }
+
+    try {
+      currentRecommendation = calculateProjectRecommendation(parsed.input);
+      currentInput = parsed.input;
+      currentAnalysis = mode === "analyze"
+        ? analyzeProposedPrice(parsed.input, parsed.proposedPrice)
+        : null;
+      showErrors([]);
+      showWarnings(currentRecommendation.warnings);
+      renderResult(currentRecommendation, currentAnalysis);
+      get("[data-results]").classList.remove("hidden");
+      document.querySelectorAll("[data-copy]").forEach((button) => button.classList.remove("hidden"));
+      setCopyEnabled(true);
+      get("[data-stale-notice]").classList.add("hidden");
+      resultRegion.focus({ preventScroll: true });
+      resultRegion.scrollIntoView({
+        behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth",
+        block: "start",
+      });
+    } catch (error) {
+      showErrors([error instanceof Error ? error.message : "Could not calculate. Check the inputs."]);
+      markStale();
+      get("[data-errors]").focus();
+    }
+  }
+
+  function renderResult(recommendation, analysis) {
+    const recommended = recommendation.scenarios.recommended;
+    const activePrice = analysis?.proposedPriceBeforeTax ?? recommended.priceBeforeTax;
+    const activeTotal = analysis?.clientTotal ?? recommended.clientTotal;
+    const activeFee = analysis?.collectionFeeAmount ?? recommended.collectionFeeAmount;
+    const activeEffectiveRate = analysis?.effectiveNetHourlyRate ?? recommended.effectiveNetHourlyRate;
+
+    if (analysis) {
+      const difference = analysis.differenceFromRecommended;
+      get("[data-result-kicker]").textContent = statusLabel(analysis.status);
+      get("[data-main-result]").textContent = Math.abs(difference) < 0.005
+        ? "Matches the recommendation"
+        : difference > 0
+          ? `${formatProjectCurrency(difference)} above the recommendation`
+          : `${formatProjectCurrency(Math.abs(difference))} below the recommendation`;
+      get("[data-interpretation]").textContent = analysisInterpretation(analysis, recommendation);
+      renderStatusCard(analysis);
+    } else {
+      get("[data-result-kicker]").textContent = "Recommended price before tax";
+      get("[data-main-result]").textContent = formatProjectCurrency(recommended.priceBeforeTax);
+      get("[data-interpretation]").textContent =
+        `Reserve ${formatProjectQuantity(recommended.contingencyHours)} contingency hours and reach an estimated business margin of ${formatProjectPercent(recommended.achievedMarginRate)}.`;
+      get("[data-status-card]").classList.add("hidden");
+    }
+
+    const items = [
+      ["Client total", formatProjectCurrency(activeTotal)],
+      ["Price before tax", formatProjectCurrency(activePrice)],
+      ["Estimated hours", formatProjectQuantity(recommendation.estimatedHours)],
+      ["Hours with contingency", formatProjectQuantity(recommended.adjustedHours)],
+      ["Net effective rate", `${formatProjectCurrency(activeEffectiveRate)} / h`],
+      ["Direct expenses", formatProjectCurrency(getActiveInput().directExpenses)],
+      ["Estimated fee", formatProjectCurrency(activeFee)],
+      ["Added tax", formatProjectCurrency(analysis?.taxAmount ?? recommended.taxAmount)],
+    ];
+
+    if (analysis) {
+      items.push(
+        ["Achieved margin", formatProjectPercent(analysis.achievedMarginRate)],
+        ["Additional hours", signedHours(analysis.additionalHoursAvailable)],
+        ["Funded hours", `${formatProjectQuantity(analysis.financedHours)} h`],
+        ["Minimum coverage", formatProjectCurrency(analysis.minimumCoveragePrice)],
+      );
+    } else {
+      items.push(
+        ["Target margin", formatProjectPercent(recommended.achievedMarginRate)],
+        ["Work reserve", formatProjectCurrency(recommended.contingencyCost)],
+      );
+    }
+
+    get("[data-summary-grid]").innerHTML = items.map(([label, value]) => summaryCard(label, value)).join("");
+    renderScenarios(recommendation);
+    renderPayments(analysis?.payments ?? recommendation.payments);
+    renderBreakdown(recommendation, analysis);
+    copyText = buildProposalText(recommendation, analysis);
+    get("[data-proposal-summary]").textContent = copyText;
+    get("[data-breakdown-details]").classList.remove("hidden");
+  }
+
+  function renderScenarios(recommendation) {
+    const scenarioData = [
+      ["Base", recommendation.scenarios.base, "No contingency reserve."],
+      ["Recommended", recommendation.scenarios.recommended, "Uses your main work reserve."],
+      ["Conservative", recommendation.scenarios.conservative, "Shows the cost of absorbing more risk."],
+    ];
+
+    get("[data-scenario-grid]").innerHTML = scenarioData.map(([label, scenario, description]) => `
+      <article class="rounded-lg border ${scenario.kind === "recommended" ? "border-amber-400/50 bg-amber-400/10" : "border-gray-700 bg-gray-950"} p-5">
+        <p class="text-xs font-semibold uppercase tracking-wide ${scenario.kind === "recommended" ? "text-amber-300" : "text-gray-500"}">${escapeHtml(label)}</p>
+        <p class="mt-2 break-words text-2xl font-bold text-white">${escapeHtml(formatProjectCurrency(scenario.priceBeforeTax))}</p>
+        <p class="mt-1 text-xs text-gray-500">Before tax · total ${escapeHtml(formatProjectCurrency(scenario.clientTotal))}</p>
+        <p class="mt-3 text-sm leading-relaxed text-gray-400">${escapeHtml(description)}</p>
+        <dl class="mt-4 space-y-2 text-sm">
+          ${definitionRow("Contingency", `${formatProjectPercent(scenario.contingencyRate)} · ${formatProjectQuantity(scenario.contingencyHours)} h`)}
+          ${definitionRow("Work reserve", formatProjectCurrency(scenario.contingencyCost))}
+          ${definitionRow("Effective rate", `${formatProjectCurrency(scenario.effectiveNetHourlyRate)} / h`)}
+        </dl>
+      </article>
+    `).join("");
+  }
+
+  function renderPayments(payments) {
+    const labels = { deposit: "Deposit", progress: "Progress payment", final: "Final payment" };
+    get("[data-payment-grid]").innerHTML = payments.map((payment) => `
+      <article class="rounded-lg border border-gray-800 bg-gray-900/70 p-4">
+        <p class="text-xs font-semibold uppercase tracking-wide text-gray-500">${escapeHtml(labels[payment.key])}</p>
+        <p class="mt-2 break-words text-xl font-bold text-white">${escapeHtml(formatProjectCurrency(payment.amount))}</p>
+        <p class="mt-1 text-sm text-gray-400">${escapeHtml(formatProjectPercent(payment.rate))}</p>
+      </article>
+    `).join("");
+  }
+
+  function renderBreakdown(recommendation, analysis) {
+    const recommended = recommendation.scenarios.recommended;
+    const lines = [
+      `Estimated work: ${formatProjectQuantity(recommendation.estimatedHours)} h × average rate ${formatProjectCurrency(recommendation.weightedHourlyRate)} = ${formatProjectCurrency(recommendation.workCost)}.`,
+      `Recommended contingency: ${formatProjectPercent(recommended.contingencyRate)} = ${formatProjectQuantity(recommended.contingencyHours)} h and ${formatProjectCurrency(recommended.contingencyCost)}.`,
+      `Cost adjusted for expenses: ${formatProjectCurrency(recommended.adjustedCost)}.`,
+      `Recommended price to cover fees and margin: ${formatProjectCurrency(recommended.priceBeforeTax)} before tax.`,
+    ];
+
+    if (analysis) {
+      lines.push(
+        `Proposed price: ${formatProjectCurrency(analysis.proposedPriceBeforeTax)} before tax.`,
+        `Achieved margin: ${formatProjectPercent(analysis.achievedMarginRate)}; target: ${formatProjectPercent(getActiveInput().targetMarginRate)}.`,
+        `Minimum coverage price including fee: ${formatProjectCurrency(analysis.minimumCoveragePrice)}.`,
+      );
+    }
+
+    get("[data-breakdown-lines]").innerHTML = lines.map((line) => `<p>${escapeHtml(line)}</p>`).join("");
+  }
+
+  function renderStatusCard(analysis) {
+    const card = get("[data-status-card]");
+    const styles = {
+      healthy: ["border-emerald-400/40", "bg-emerald-400/10", "text-emerald-100"],
+      tight: ["border-amber-400/40", "bg-amber-400/10", "text-amber-100"],
+      below_base: ["border-red-400/40", "bg-red-400/10", "text-red-100"],
+    };
+    card.className = `mt-4 rounded-lg border p-4 ${styles[analysis.status].join(" ")}`;
+    get("[data-status-label]").textContent = statusLabel(analysis.status);
+    get("[data-status-text]").textContent = analysis.status === "healthy"
+      ? "The quote reaches the target business margin under entered assumptions."
+      : analysis.status === "tight"
+        ? "The quote covers the modeled time value but misses the target margin."
+        : "The quote leaves the effective rate below the modeled value of your time.";
+  }
+
+  function analysisInterpretation(analysis, recommendation) {
+    const hours = Math.abs(analysis.additionalHoursAvailable);
+    const direction = analysis.additionalHoursAvailable >= 0 ? "can fund" : "falls short by";
+    return `The quote ${direction} approximately ${formatProjectQuantity(hours)} hours compared with the initial estimate and leaves an effective rate of ${formatProjectCurrency(analysis.effectiveNetHourlyRate)} per hour. Your modeled average rate is ${formatProjectCurrency(recommendation.weightedHourlyRate)}.`;
+  }
+
+  function buildProposalText(recommendation, analysis) {
+    const input = getActiveInput();
+    const scenario = recommendation.scenarios.recommended;
+    const price = analysis?.proposedPriceBeforeTax ?? scenario.priceBeforeTax;
+    const total = analysis?.clientTotal ?? scenario.clientTotal;
+    const payments = analysis?.payments ?? recommendation.payments;
+    const expenseLine = input.directExpenses > 0 ? ` and ${formatProjectCurrency(input.directExpenses)} in direct expenses` : "";
+    const taxLine = input.taxRate > 0
+      ? ` Total with ${formatProjectPercent(input.taxRate)} added tax: ${formatProjectCurrency(total)}.`
+      : "";
+
+    return `Estimated quote: ${formatProjectCurrency(price)} before tax. Includes ${formatProjectQuantity(recommendation.estimatedHours)} estimated hours, ${formatProjectQuantity(scenario.contingencyHours)} contingency hours${expenseLine}.${taxLine} Payments: ${formatProjectPercent(payments[0].rate)} deposit, ${formatProjectPercent(payments[1].rate)} progress payment, and ${formatProjectPercent(payments[2].rate)} on delivery. Scope changes not included require a new estimate.`;
+  }
+
+  function fillExample() {
+    sequence = 0;
+    phases = [
+      newPhase({ name: "Descubrimiento", hours: "10", open: false }),
+      newPhase({ name: "Design and delivery", hours: "40", open: false }),
+      newPhase({ name: "Delivery and revisions", hours: "10", open: true }),
+    ];
+    setField("baseHourlyRate", "600");
+    setField("directExpenses", "3000");
+    setField("recommendedContingencyRate", "15");
+    setField("conservativeContingencyRate", "25");
+    setField("collectionFeeRate", "3");
+    setField("targetMarginRate", "20");
+    setField("taxRate", "16");
+    setField("deposit", "50");
+    setField("progress", "25");
+    setField("final", "25");
+    setField("proposedPrice", "55000");
+    conservativeEdited = false;
+    renderPhases();
+    updateOptionSummaries();
+    calculate();
+  }
+
+  function clearAll() {
+    if (currentRecommendation && !window.confirm("Do you want to clear the current quote?")) return;
+    sequence = 0;
+    phases = [newPhase()];
+    ["baseHourlyRate", "proposedPrice"].forEach((field) => setField(field, ""));
+    setField("directExpenses", "0");
+    setField("recommendedContingencyRate", "10");
+    setField("conservativeContingencyRate", "20");
+    setField("collectionFeeRate", "0");
+    setField("targetMarginRate", "20");
+    setField("taxRate", "0");
+    setField("deposit", "50");
+    setField("progress", "25");
+    setField("final", "25");
+    conservativeEdited = false;
+    currentRecommendation = null;
+    currentInput = null;
+    currentAnalysis = null;
+    copyText = "";
+    renderPhases();
+    showErrors([]);
+    showWarnings([]);
+    get("[data-results]").classList.add("hidden");
+    document.querySelectorAll("[data-copy]").forEach((button) => button.classList.add("hidden"));
+    setCopyEnabled(false);
+    get("[data-stale-notice]").classList.add("hidden");
+    get("[data-breakdown-details]").classList.add("hidden");
+    setInitialResult();
+    updateOptionSummaries();
+  }
+
+  function setMode(nextMode) {
+    mode = nextMode;
+    document.querySelectorAll("[data-mode]").forEach((button) => {
+      const active = button.dataset.mode === mode;
+      button.classList.toggle("is-active", active);
+      button.setAttribute("aria-selected", String(active));
+    });
+    proposedWrap.classList.toggle("hidden", mode !== "analyze");
+    const label = mode === "analyze" ? "Analyze proposed price" : "Calculate recommended price";
+    submitLabel.textContent = label;
+    mobileCalculate.textContent = label;
+    markStale();
+  }
+
+  function updateOptionSummaries() {
+    const expenses = numericValue("directExpenses", false);
+    const contingency = numericValue("recommendedContingencyRate");
+    const margin = numericValue("targetMarginRate");
+    const tax = numericValue("taxRate");
+    const deposit = numericValue("deposit");
+    const progress = numericValue("progress");
+    const final = numericValue("final");
+    get("[data-risk-summary]").textContent =
+      `Adjustments: ${formatProjectPercent(contingency)} contingency, ${expenses > 0 ? formatProjectCurrency(expenses) : "no expenses"}, and a ${formatProjectPercent(margin)} margin.`;
+    get("[data-payment-summary]").textContent =
+      `${tax > 0 ? `${formatProjectPercent(tax)} added tax` : "No added tax"}. Payments: ${formatProjectPercent(deposit)}, ${formatProjectPercent(progress)}, and ${formatProjectPercent(final)}.`;
+  }
+
+  function getActiveInput() {
+    return currentInput ?? {
+      directExpenses: numericValue("directExpenses", false),
+      targetMarginRate: numericValue("targetMarginRate"),
+    };
+  }
+
+  function updatePhasePreviews() {
+    phases.forEach((phase) => {
+      const preview = get(`[data-phase-preview="${phase.id}"]`);
+      if (preview) preview.textContent = phasePreview(phase);
+    });
+  }
+
+  function parseRequiredNumber(field, label, errors, options = {}) {
+    const input = getField(field);
+    const parsed = parseProjectNumber(input.value, 2, options.preferDecimal ?? false);
+    const invalid = !parsed.ok || (options.positive && parsed.value <= 0);
+    input.setAttribute("aria-invalid", String(invalid));
+    if (invalid) {
+      errors.push(`Check ${label}.`);
+      return 0;
+    }
+    return parsed.value;
+  }
+
+  function parseOptionalNumber(field, label, errors, options = {}) {
+    const input = getField(field);
+    if (!input.value.trim()) {
+      input.removeAttribute("aria-invalid");
+      return undefined;
+    }
+    return parseRequiredNumber(field, label, errors, options);
+  }
+
+  function numericValue(field, preferDecimal = true) {
+    const parsed = parseProjectNumber(getField(field).value, 2, preferDecimal);
+    return parsed.ok ? parsed.value : 0;
+  }
+
+  function getField(field) {
+    return get(`[data-field="${field}"]`);
+  }
+
+  function setField(field, value) {
+    getField(field).value = value;
+  }
+
+  function showErrors(messages) {
+    const box = get("[data-errors]");
+    box.innerHTML = messages.map((message) => `<p>${escapeHtml(message)}</p>`).join("");
+    box.classList.toggle("hidden", !messages.length);
+  }
+
+  function showWarnings(warnings) {
+    const messages = warnings.map((warning) => warningMessages[warning]);
+    const box = get("[data-warnings]");
+    box.innerHTML = messages.map((message) => `<p>${escapeHtml(message)}</p>`).join("");
+    box.classList.toggle("hidden", !messages.length);
+  }
+
+  function clearInvalidFields() {
+    form.querySelectorAll('[aria-invalid="true"]').forEach((field) => field.removeAttribute("aria-invalid"));
+  }
+
+  function markStale() {
+    if (currentRecommendation) {
+      get("[data-stale-notice]").classList.remove("hidden");
+      setCopyEnabled(false);
+    }
+  }
+
+  function setCopyEnabled(enabled) {
+    document.querySelectorAll("[data-copy]").forEach((button) => {
+      button.disabled = !enabled;
+      button.classList.toggle("opacity-50", !enabled);
+      button.classList.toggle("cursor-not-allowed", !enabled);
+    });
+  }
+
+  function setInitialResult() {
+    get("[data-result-kicker]").textContent = "Result";
+    get("[data-main-result]").textContent = "Estimate your phases";
+    get("[data-interpretation]").textContent = "You will see a base price, recommended price and conservative scenario.";
+    get("[data-summary-grid]").innerHTML = '<div class="col-span-2 rounded-lg border border-gray-800 bg-gray-950/70 p-4 text-sm text-gray-400">Enter a rate and hours for at least one phase to begin.</div>';
+    get("[data-status-card]").classList.add("hidden");
+  }
+
+  async function copyResult() {
+    if (!copyText || get("[data-stale-notice]").classList.contains("hidden") === false) return;
+    try {
+      await navigator.clipboard.writeText(copyText);
+      document.querySelectorAll("[data-copy-label]").forEach((label) => label.textContent = "Copied");
+      get("[data-copy-status]").textContent = "Summary copied.";
+      window.setTimeout(() => {
+        document.querySelectorAll("[data-copy-label]").forEach((label) => label.textContent = "Copy proposal summary");
+        get("[data-copy-status]").textContent = "";
+      }, 2000);
+    } catch {
+      get("[data-copy-status]").textContent = "Could not copy the summary.";
+    }
+  }
+
+  function summaryCard(label, value) {
+    return `<div class="rounded-lg border border-gray-800 bg-gray-950/70 p-3"><span class="block text-xs font-semibold uppercase tracking-wide text-gray-500">${escapeHtml(label)}</span><span class="mt-2 block break-words text-base font-semibold text-white">${escapeHtml(value)}</span></div>`;
+  }
+
+  function definitionRow(label, value) {
+    return `<div class="flex items-start justify-between gap-3"><dt class="text-gray-500">${escapeHtml(label)}</dt><dd class="text-right font-semibold text-gray-200">${escapeHtml(value)}</dd></div>`;
+  }
+
+  function signedHours(value) {
+    const sign = value > 0 ? "+" : value < 0 ? "−" : "";
+    return `${sign}${formatProjectQuantity(Math.abs(value))} h`;
+  }
+
+  function statusLabel(status) {
+    return ({ healthy: "Healthy price", tight: "Tight price", below_base: "Below base" })[status];
+  }
+
+  function escapeHtml(value) {
+    return String(value).replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;").replaceAll("'", "&#039;");
+  }
+
+  phaseList.addEventListener("input", (event) => {
+    const input = event.target.closest("[data-phase-field]");
+    if (!input) return;
+    const phase = phases.find((item) => item.id === input.dataset.id);
+    phase[input.dataset.phaseField] = input.value;
+    const preview = get(`[data-phase-preview="${phase.id}"]`);
+    if (preview) preview.textContent = phasePreview(phase);
+    markStale();
+  });
+
+  phaseList.addEventListener("toggle", (event) => {
+    const card = event.target.closest("[data-phase-card]");
+    if (!card) return;
+    const phase = phases.find((item) => item.id === card.dataset.phaseCard);
+    if (phase) phase.open = card.open;
+  }, true);
+
+  phaseList.addEventListener("click", (event) => {
+    const button = event.target.closest("[data-phase-action]");
+    if (!button) return;
+    const index = phases.findIndex((phase) => phase.id === button.dataset.id);
+    if (button.dataset.phaseAction === "duplicate") {
+      if (phases.length >= 20) {
+        showErrors(["The project supports up to 20 phases."]);
+        return;
+      }
+      phases.splice(index + 1, 0, newPhase({ ...phases[index], name: `${phases[index].name} copy`, open: true }));
+    }
+    if (button.dataset.phaseAction === "remove") {
+      phases.length === 1 ? phases.splice(0, 1, newPhase({ name: "Phase 1" })) : phases.splice(index, 1);
+    }
+    renderPhases();
+    markStale();
+  });
+
+  get("[data-add-phase]").addEventListener("click", () => {
+    if (phases.length >= 20) {
+      showErrors(["The project supports up to 20 phases."]);
+      return;
+    }
+    phases.push(newPhase());
+    renderPhases(true);
+    markStale();
+  });
+
+  form.addEventListener("submit", (event) => {
+    event.preventDefault();
+    calculate();
+  });
+
+  form.addEventListener("input", (event) => {
+    if (event.target.matches("[data-field]")) {
+      if (event.target.dataset.field === "recommendedContingencyRate" && !conservativeEdited) {
+        const parsed = parseProjectNumber(event.target.value, 2, true);
+        if (parsed.ok) setField("conservativeContingencyRate", String(Math.min(100, parsed.value + 10)));
+      }
+      if (event.target.dataset.field === "conservativeContingencyRate") conservativeEdited = true;
+      updateOptionSummaries();
+      if (event.target.dataset.field === "baseHourlyRate") updatePhasePreviews();
+      markStale();
+    }
+  });
+
+  document.querySelectorAll("[data-mode]").forEach((button) => button.addEventListener("click", () => setMode(button.dataset.mode)));
+  document.querySelectorAll("[data-copy]").forEach((button) => button.addEventListener("click", copyResult));
+  get("[data-example]").addEventListener("click", fillExample);
+  get("[data-clear]").addEventListener("click", clearAll);
+  mobileCalculate.addEventListener("click", calculate);
+  renderPhases();
+  updateOptionSummaries();
+</script>

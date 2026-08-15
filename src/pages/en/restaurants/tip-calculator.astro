@@ -1,0 +1,801 @@
+---
+import BaseLayout from "@layouts/BaseLayout.astro";
+import AdSlot from "@components/ads/AdSlot.astro";
+import Container from "@components/layout/Container.astro";
+import PageShell from "@components/layout/PageShell.astro";
+import FaqSection from "@components/shared/FaqSection.astro";
+import PageHero from "@components/shared/PageHero.astro";
+import SectionIntro from "@components/shared/SectionIntro.astro";
+import { buildFaqJsonLd } from "@lib/seo";
+import { buildAlternateLinks } from "@lib/i18n/routing";
+
+const title = "Tip calculator";
+const description =
+  "Calculate the tip, final total, rounded total and payment per person.";
+const canonical = "/en/restaurants/tip-calculator";
+
+const faqs = [
+  {
+    question: "How do you calculate a tip?",
+    answer:
+      "Multiply the bill amount by the tip percentage and divide by 100. For example, 850 at 15% gives a tip of 127.50.",
+  },
+  {
+    question: "How do you calculate the total with tip?",
+    answer:
+      "Add the tip to the bill amount. If the bill is 850 and the tip is 127.50, the final total is 977.50.",
+  },
+  {
+    question: "How do you split a tip among several people?",
+    answer:
+      "Divide the tip and final total by the number of people. The calculator shows both amounts per person when you enter more than one.",
+  },
+  {
+    question: "Can the tip already be included in the bill?",
+    answer:
+      "Yes. Some checks include service or gratuity. Review the check before adding an extra amount to avoid paying it twice.",
+  },
+  {
+    question: "How do you round the total to a practical amount?",
+    answer:
+      "Turn on final-total rounding and choose an increment. The calculator adjusts the tip and shows the resulting effective percentage.",
+  },
+  {
+    question: "What percentage should I use?",
+    answer:
+      "It depends on the country, establishment, service and your judgment. The calculator's percentages are editable shortcuts, not a universal rule.",
+  },
+];
+
+const faqJsonLd = buildFaqJsonLd(faqs);
+
+const currencies = [
+  { value: "MXN", label: "MXN" },
+  { value: "USD", label: "USD" },
+  { value: "EUR", label: "EUR" },
+  { value: "COP", label: "COP" },
+  { value: "ARS", label: "ARS" },
+  { value: "CLP", label: "CLP" },
+  { value: "PEN", label: "PEN" },
+  { value: "BRL", label: "BRL" },
+  { value: "OTHER", label: "Other" },
+];
+---
+
+<BaseLayout locale="en" title={title} description={description} canonical={canonical} alternates={buildAlternateLinks({ es: "/restaurantes/calculadora-de-propina", en: "/en/restaurants/tip-calculator" }, Astro.site ?? Astro.url)}>
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={JSON.stringify(faqJsonLd)} />
+  </Fragment>
+
+  <PageShell>
+    <PageHero
+      title={title}
+      description="Calculate a tip using your chosen percentage, round the total to a practical amount and review the payment per person."
+      kicker="Restaurants"
+      collapseBreadcrumbOnMobile
+      containerClass="py-5 md:py-7"
+      breadcrumbs={[
+        { label: "Home", href: "/", ariaLabel: "Home" },
+        {
+          label: "Restaurants",
+          href: "/en/restaurants",
+          optional: true,
+        },
+        { label: "Tip", truncate: true },
+      ]}
+    />
+
+    <Container as="section" class="py-4 md:py-7">
+      <section
+        id="tip-calculator"
+        class="overflow-hidden rounded-lg border border-gray-700 bg-gray-950 shadow-xl shadow-gray-950/30"
+        aria-labelledby="calculator-heading"
+      >
+        <div class="grid gap-0 lg:grid-cols-[minmax(0,1fr)_minmax(20rem,0.72fr)]">
+          <div class="p-4 sm:p-6">
+            <h2 id="calculator-heading" class="sr-only">
+              Restaurant tip calculator
+            </h2>
+
+            <div class="grid gap-4 sm:grid-cols-[minmax(0,1fr)_10rem]">
+              <div>
+                <label for="consumption" class="block text-sm font-semibold text-gray-200">
+                  Bill before tip
+                </label>
+                <input
+                  id="consumption"
+                  class="mt-2 min-h-14 w-full rounded-lg border border-gray-700 bg-gray-900 px-4 text-2xl font-semibold text-white outline-none placeholder:text-gray-600 transition focus:border-emerald-400 focus:ring-3 focus:ring-emerald-400/15"
+                  type="text"
+                  inputmode="decimal"
+                  autocomplete="off"
+                  placeholder="850"
+                  aria-describedby="consumption-error"
+                  data-consumption
+                />
+                <p id="consumption-error" class="mt-2 min-h-5 text-sm text-red-300" data-error="consumption"></p>
+              </div>
+
+              <div>
+                <label for="currency" class="block text-sm font-semibold text-gray-200">
+                  Currency
+                </label>
+                <select
+                  id="currency"
+                  class="mt-2 min-h-14 w-full rounded-lg border border-gray-700 bg-gray-900 px-4 text-base text-white outline-none transition focus:border-emerald-400 focus:ring-3 focus:ring-emerald-400/15"
+                  data-currency
+                >
+                  {currencies.map((currency) => (
+                    <option value={currency.value}>{currency.label}</option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
+            <div class="mt-5">
+              <label for="percentage" class="block text-sm font-semibold text-gray-200">
+                Percentage
+              </label>
+              <div class="mt-2 flex gap-2 overflow-x-auto pb-1" aria-label="Percentage shortcuts">
+                {[0, 10, 15, 20].map((percentage) => (
+                  <button
+                    class="min-h-11 min-w-16 rounded-lg border border-gray-700 px-4 text-sm font-semibold text-gray-200 transition hover:border-emerald-400 hover:text-white focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-emerald-400/30"
+                    type="button"
+                    data-tip-preset={percentage}
+                    aria-pressed={percentage === 10 ? "true" : "false"}
+                  >
+                    {percentage}%
+                  </button>
+                ))}
+              </div>
+              <input
+                id="percentage"
+                class="mt-3 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-900 px-4 text-base text-white outline-none placeholder:text-gray-600 transition focus:border-emerald-400 focus:ring-3 focus:ring-emerald-400/15"
+                type="text"
+                inputmode="decimal"
+                autocomplete="off"
+                value="10"
+                aria-describedby="percentage-error percentage-warning"
+                data-percentage
+              />
+              <p id="percentage-error" class="mt-2 min-h-5 text-sm text-red-300" data-error="percentage"></p>
+              <p id="percentage-warning" class="text-sm text-amber-200" data-warning="percentage"></p>
+            </div>
+
+            <div class="mt-5 rounded-lg border border-gray-800 bg-gray-900/65 p-4">
+              <label class="flex items-start gap-3 text-sm text-gray-300">
+                <input
+                  class="mt-1 h-4 w-4 rounded border-gray-700 bg-gray-900 text-emerald-400 focus:ring-emerald-400"
+                  type="checkbox"
+                  data-service-included
+                />
+                <span>The check already includes service or tip</span>
+              </label>
+            </div>
+
+            <details class="mt-5 rounded-lg border border-gray-800 bg-gray-900/65 p-4">
+              <summary class="cursor-pointer text-sm font-semibold text-gray-200">
+                Opciones
+              </summary>
+
+              <div class="mt-4 grid gap-4 sm:grid-cols-2">
+                <div>
+                  <label for="people" class="block text-sm font-semibold text-gray-200">
+                    People
+                  </label>
+                  <div class="mt-2 grid grid-cols-[3.25rem_minmax(0,1fr)_3.25rem] overflow-hidden rounded-lg border border-gray-700 bg-gray-950 focus-within:border-emerald-400 focus-within:ring-3 focus-within:ring-emerald-400/15">
+                    <button
+                      class="min-h-12 border-r border-gray-700 text-xl font-semibold text-gray-200 transition hover:bg-gray-800 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-emerald-400/30"
+                      type="button"
+                      aria-label="Remove person"
+                      data-people-step="-1"
+                    >
+                      -
+                    </button>
+                    <input
+                      id="people"
+                      class="min-h-12 w-full bg-transparent px-4 text-center text-lg font-semibold text-white outline-none"
+                      type="text"
+                      inputmode="numeric"
+                      autocomplete="off"
+                      value="1"
+                      aria-describedby="people-error people-warning"
+                      data-people
+                    />
+                    <button
+                      class="min-h-12 border-l border-gray-700 text-xl font-semibold text-gray-200 transition hover:bg-gray-800 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-emerald-400/30"
+                      type="button"
+                      aria-label="Add person"
+                      data-people-step="1"
+                    >
+                      +
+                    </button>
+                  </div>
+                  <div class="mt-3 flex gap-2 overflow-x-auto" aria-label="People presets">
+                    {[1, 2, 3, 4, 5, 6].map((people) => (
+                      <button
+                        class="min-h-10 min-w-12 rounded-lg border border-gray-700 px-3 text-sm font-semibold text-gray-200 transition hover:border-emerald-400 hover:text-white focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-emerald-400/30"
+                        type="button"
+                        data-people-preset={people}
+                      >
+                        {people}
+                      </button>
+                    ))}
+                  </div>
+                  <p id="people-error" class="mt-2 min-h-5 text-sm text-red-300" data-error="people"></p>
+                  <p id="people-warning" class="text-sm text-amber-200" data-warning="people"></p>
+                </div>
+
+                <div>
+                  <label for="rounding-mode" class="block text-sm font-semibold text-gray-200">
+                    Rounding
+                  </label>
+                  <select
+                    id="rounding-mode"
+                    class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-950 px-4 text-base text-white outline-none transition focus:border-emerald-400 focus:ring-3 focus:ring-emerald-400/15"
+                    data-rounding-mode
+                  >
+                    <option value="none">No rounding</option>
+                    <option value="tip">Round tip</option>
+                    <option value="total">Redondear total</option>
+                  </select>
+
+                  <label for="rounding-increment" class="mt-4 block text-sm font-semibold text-gray-200">
+                    Incremento
+                  </label>
+                  <select
+                    id="rounding-increment"
+                    class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-950 px-4 text-base text-white outline-none transition focus:border-emerald-400 focus:ring-3 focus:ring-emerald-400/15 disabled:cursor-not-allowed disabled:opacity-60"
+                    disabled
+                    data-rounding-increment
+                  >
+                    <option value="1">1</option>
+                    <option value="5">5</option>
+                    <option value="10">10</option>
+                    <option value="minimum">Smallest unit</option>
+                  </select>
+                </div>
+              </div>
+            </details>
+          </div>
+
+          <aside
+            class="border-t border-gray-800 bg-gray-900/70 p-4 sm:p-6 lg:border-l lg:border-t-0"
+            aria-live="polite"
+            data-result-region
+          >
+            <p class="text-xs font-semibold uppercase tracking-wide text-emerald-400">
+              Result
+            </p>
+            <p class="mt-3 break-words text-3xl font-bold leading-tight text-white" data-main-result>
+              Enter the bill amount
+            </p>
+            <p class="mt-2 min-h-5 text-sm leading-relaxed text-gray-400" data-result-note>
+              The breakdown will appear here.
+            </p>
+
+            <div class="mt-5 space-y-3" data-breakdown-list></div>
+
+            <div
+              class="mt-4 hidden rounded-lg border border-amber-400/40 bg-amber-400/10 p-3 text-sm leading-relaxed text-amber-100"
+              data-result-warning
+            ></div>
+
+            <div class="mt-5 flex flex-col gap-3 sm:flex-row">
+              <button
+                class="hidden min-h-11 items-center justify-center rounded-lg bg-emerald-400 px-4 py-2 text-sm font-semibold text-gray-950 transition hover:bg-emerald-300 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-emerald-400/40"
+                type="button"
+                data-copy-result
+              >
+                Copy result
+              </button>
+              <button
+                class="hidden min-h-11 items-center justify-center rounded-lg border border-gray-700 px-4 py-2 text-sm font-semibold text-gray-200 transition hover:border-emerald-400 hover:text-white focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-emerald-400/40"
+                type="button"
+                data-copy-url
+              >
+                Copy link
+              </button>
+            </div>
+            <p class="mt-3 min-h-5 text-sm text-emerald-300" role="status" aria-live="polite" data-copy-status></p>
+          </aside>
+        </div>
+      </section>
+
+      <div
+        class="fixed inset-x-0 bottom-0 z-30 hidden border-t border-gray-800 bg-gray-950/95 px-4 py-3 shadow-2xl shadow-black/50 backdrop-blur md:hidden"
+        data-mobile-total
+      >
+        <div class="mx-auto flex max-w-xl items-center justify-between gap-3">
+          <span class="text-xs font-semibold uppercase tracking-wide text-gray-500">Total</span>
+          <span class="break-words text-right text-lg font-bold text-emerald-100" data-mobile-total-text></span>
+        </div>
+      </div>
+    </Container>
+
+    <AdSlot placement="calculator-after-tool" />
+
+    <Container as="section" class="py-6 md:py-8">
+      <SectionIntro
+        title="Antes de pagar"
+        description="Check whether the establishment already included service or a tip before adding another amount."
+      />
+      <div class="grid gap-4 md:grid-cols-3">
+        <article class="rounded-lg border border-gray-800 bg-gray-950 p-5">
+          <h3 class="text-lg font-semibold">Total cerrado</h3>
+          <p class="mt-3 text-sm leading-relaxed text-gray-400">
+            Round the total up and review the effective tip you are leaving.
+          </p>
+        </article>
+        <article class="rounded-lg border border-gray-800 bg-gray-950 p-5">
+          <h3 class="text-lg font-semibold">Atajos editables</h3>
+          <p class="mt-3 text-sm leading-relaxed text-gray-400">
+            Use a quick percentage or enter the exact value you want to calculate.
+          </p>
+        </article>
+        <article class="rounded-lg border border-gray-800 bg-gray-950 p-5">
+          <h3 class="text-lg font-semibold">Payment per person</h3>
+          <p class="mt-3 text-sm leading-relaxed text-gray-400">
+            If the table shares the bill, review the tip and total per person.
+          </p>
+        </article>
+      </div>
+    </Container>
+
+    <Container as="section" class="py-6 md:py-8">
+      <SectionIntro
+        title="Shared bill"
+        description="If you need to adjust cents or round individual payments, use the bill splitting calculator."
+      />
+      <div class="rounded-lg border border-gray-800 bg-gray-950 p-5">
+        <a
+          href="/en/restaurants/restaurant-bill-split-calculator"
+          class="inline-flex min-h-11 items-center rounded-lg border border-emerald-400/60 px-4 py-2 text-sm font-semibold text-emerald-300 transition hover:bg-emerald-400/10 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-emerald-400/30"
+        >
+          Open bill splitting calculator
+        </a>
+      </div>
+    </Container>
+
+    <FaqSection faqs={faqs} />
+  </PageShell>
+</BaseLayout>
+
+<script>
+  import {
+    TIP_CURRENCIES,
+    buildShareText,
+    calculateRestaurantTip,
+    formatMoney,
+    formatPercentage,
+    parseMoneyInput,
+  } from "@lib/calculators/restaurantes/calculadora-de-propina/tip.en";
+
+  const ERROR_MESSAGES = {
+    required: "Enter an amount to calculate.",
+    invalid: "Enter a valid amount.",
+    negative: "Use an amount greater than or equal to zero.",
+    too_many_decimals: "Use at most 4 decimal places.",
+  };
+
+  const consumptionInput = document.querySelector("[data-consumption]");
+  const percentageInput = document.querySelector("[data-percentage]");
+  const peopleInput = document.querySelector("[data-people]");
+  const currencySelect = document.querySelector("[data-currency]");
+  const serviceIncludedInput = document.querySelector("[data-service-included]");
+  const roundingModeSelect = document.querySelector("[data-rounding-mode]");
+  const roundingIncrementSelect = document.querySelector("[data-rounding-increment]");
+  const presetButtons = Array.from(document.querySelectorAll("[data-tip-preset]"));
+  const mainResult = document.querySelector("[data-main-result]");
+  const resultNote = document.querySelector("[data-result-note]");
+  const breakdownList = document.querySelector("[data-breakdown-list]");
+  const resultWarning = document.querySelector("[data-result-warning]");
+  const copyButton = document.querySelector("[data-copy-result]");
+  const copyUrlButton = document.querySelector("[data-copy-url]");
+  const copyStatus = document.querySelector("[data-copy-status]");
+  const mobileTotal = document.querySelector("[data-mobile-total]");
+  const mobileTotalText = document.querySelector("[data-mobile-total-text]");
+
+  let currentShareText = "";
+  let currentShareUrl = window.location.href;
+  let copyTimer = 0;
+  let urlTimer = 0;
+
+  function setError(field, message = "") {
+    const element = document.querySelector(`[data-error="${field}"]`);
+
+    if (element) {
+      element.textContent = message;
+    }
+  }
+
+  function setWarning(field, message = "") {
+    const element = document.querySelector(`[data-warning="${field}"]`);
+
+    if (element) {
+      element.textContent = message;
+    }
+  }
+
+  function getCurrency() {
+    return TIP_CURRENCIES.includes(currencySelect.value)
+      ? currencySelect.value
+      : "OTHER";
+  }
+
+  function parsePeople() {
+    const value = peopleInput.value.trim();
+
+    if (!/^\d+$/.test(value)) {
+      return { ok: false, error: "People must be an integer." };
+    }
+
+    const people = Number(value);
+
+    if (!Number.isInteger(people) || people < 1) {
+      return { ok: false, error: "Use at least 1 person." };
+    }
+
+    return { ok: true, value: people };
+  }
+
+  function getRoundingModeForUrl(mode) {
+    if (mode === "tip") {
+      return "tip";
+    }
+
+    if (mode === "total") {
+      return "total";
+    }
+
+    return "none";
+  }
+
+  function getRoundingModeFromUrl(mode) {
+    if (mode === "tip") {
+      return "tip";
+    }
+
+    if (mode === "total") {
+      return "total";
+    }
+
+    return "none";
+  }
+
+  function setNeutralResult(message = "Enter the bill amount") {
+    mainResult.textContent = message;
+    resultNote.textContent = "The breakdown will appear here.";
+    breakdownList.replaceChildren();
+    resultWarning.classList.add("hidden");
+    resultWarning.textContent = "";
+    copyButton.classList.add("hidden");
+    copyButton.classList.remove("inline-flex");
+    copyUrlButton.classList.add("hidden");
+    copyUrlButton.classList.remove("inline-flex");
+    mobileTotal.classList.add("hidden");
+    currentShareText = "";
+  }
+
+  function setPresetState() {
+    const current = percentageInput.value.trim().replace(",", ".");
+
+    presetButtons.forEach((button) => {
+      const isActive = current === button.dataset.tipPreset;
+      button.setAttribute("aria-pressed", String(isActive));
+      button.classList.toggle("bg-emerald-400", isActive);
+      button.classList.toggle("text-gray-950", isActive);
+      button.classList.toggle("border-emerald-400", isActive);
+      button.classList.toggle("text-gray-200", !isActive);
+    });
+  }
+
+  function addBreakdownRow(label, value) {
+    const row = document.createElement("div");
+    const labelElement = document.createElement("span");
+    const valueElement = document.createElement("span");
+
+    row.className =
+      "flex items-start justify-between gap-4 rounded-lg border border-gray-800 bg-gray-950/70 p-4";
+    labelElement.className = "min-w-0 text-sm text-gray-400";
+    valueElement.className =
+      "break-words text-right text-sm font-semibold text-white";
+    labelElement.textContent = label;
+    valueElement.textContent = value;
+    row.append(labelElement, valueElement);
+    breakdownList.append(row);
+  }
+
+  function renderResult(result, warnings) {
+    const totalLabel =
+      result.rounding.mode === "total" ? "Total cerrado" : "Total";
+
+    mainResult.textContent = `${totalLabel}: ${formatMoney(result.total, result.currency)}`;
+    resultNote.textContent =
+      result.effectivePercentage === null
+        ? "Zero bill amount."
+        : `Effective tip: ${formatPercentage(result.effectivePercentage)}.`;
+    breakdownList.replaceChildren();
+
+    addBreakdownRow("Bill amount", formatMoney(result.consumption, result.currency));
+    addBreakdownRow(
+      result.rounding.mode === "total" ? "Adjusted tip" : "Tip",
+      formatMoney(result.tip, result.currency),
+    );
+    addBreakdownRow(totalLabel, formatMoney(result.total, result.currency));
+    addBreakdownRow(
+      "Effective percentage",
+      formatPercentage(result.effectivePercentage),
+    );
+
+    if (result.people > 1) {
+      addBreakdownRow("People", String(result.people));
+      addBreakdownRow(
+        "Tip per person",
+        formatMoney(result.tipPerPerson, result.currency),
+      );
+      addBreakdownRow(
+        "Total per person",
+        formatMoney(result.totalPerPerson, result.currency),
+      );
+    }
+
+    if (result.rounding.mode !== "none") {
+      addBreakdownRow(
+        "Rounding adjustment",
+        formatMoney(result.rounding.difference, result.currency),
+      );
+    }
+
+    if (warnings.length) {
+      resultWarning.textContent = warnings.join(" ");
+      resultWarning.classList.remove("hidden");
+    } else {
+      resultWarning.textContent = "";
+      resultWarning.classList.add("hidden");
+    }
+
+    currentShareText = buildShareText(result);
+    copyButton.classList.remove("hidden");
+    copyButton.classList.add("inline-flex");
+    copyUrlButton.classList.remove("hidden");
+    copyUrlButton.classList.add("inline-flex");
+    mobileTotalText.textContent = formatMoney(result.total, result.currency);
+    mobileTotal.classList.remove("hidden");
+  }
+
+  function updateCalculator({ syncUrl = true } = {}) {
+    setError("consumption");
+    setError("percentage");
+    setError("people");
+    setWarning("percentage");
+    setWarning("people");
+    setPresetState();
+
+    roundingIncrementSelect.disabled = roundingModeSelect.value === "none";
+
+    if (!consumptionInput.value.trim()) {
+      setNeutralResult();
+      if (syncUrl) {
+        syncShareUrl(null);
+      }
+      return;
+    }
+
+    const consumption = parseMoneyInput(consumptionInput.value);
+    const percentage = parseMoneyInput(percentageInput.value);
+    const people = parsePeople();
+
+    if (!consumption.ok) {
+      setError(
+        "consumption",
+        ERROR_MESSAGES[consumption.error] ?? ERROR_MESSAGES.invalid,
+      );
+    }
+
+    if (!percentage.ok) {
+      setError(
+        "percentage",
+        ERROR_MESSAGES[percentage.error] ?? ERROR_MESSAGES.invalid,
+      );
+    } else if (percentage.value > 100) {
+      setWarning("percentage", "Tip over 100%: make sure it is intentional.");
+    }
+
+    if (!people.ok) {
+      setError("people", people.error);
+    } else if (people.value > 100) {
+      setWarning("people", "Large group: check that the number is correct.");
+    }
+
+    if (!consumption.ok || !percentage.ok || !people.ok) {
+      setNeutralResult("Check the fields");
+      return;
+    }
+
+    const warnings = [];
+
+    if (serviceIncludedInput.checked && percentage.value > 0) {
+      warnings.push(
+        "Check whether the establishment already included service or a tip before adding another amount.",
+      );
+    }
+
+    try {
+      const result = calculateRestaurantTip({
+        consumption: consumption.value,
+        percentage: percentage.value,
+        people: people.value,
+        currency: getCurrency(),
+        serviceIncluded: serviceIncludedInput.checked,
+        rounding: {
+          mode: roundingModeSelect.value,
+          increment:
+            roundingIncrementSelect.value === "minimum"
+              ? "minimum"
+              : Number(roundingIncrementSelect.value),
+        },
+      });
+
+      renderResult(result, warnings);
+
+      if (syncUrl) {
+        syncShareUrl({
+          consumption,
+          percentage,
+          people: people.value,
+          currency: result.currency,
+        });
+      }
+    } catch {
+      setNeutralResult("Cannot calculate");
+    }
+  }
+
+  function syncShareUrl(values) {
+    const url = new URL(window.location.href);
+    url.search = "";
+
+    if (values) {
+      url.searchParams.set("bill amount", values.consumption.normalized);
+      url.searchParams.set("percentage", values.percentage.normalized);
+      url.searchParams.set("people", String(values.people));
+      url.searchParams.set("currency", values.currency);
+      url.searchParams.set(
+        "rounding",
+        getRoundingModeForUrl(roundingModeSelect.value),
+      );
+      url.searchParams.set("incremento", roundingIncrementSelect.value);
+      url.searchParams.set(
+        "servicioIncluido",
+        serviceIncludedInput.checked ? "1" : "0",
+      );
+    }
+
+    currentShareUrl = url.toString();
+    window.clearTimeout(urlTimer);
+    urlTimer = window.setTimeout(() => {
+      window.history.replaceState({}, "", url);
+    }, 250);
+  }
+
+  function loadUrlParameters() {
+    const params = new URLSearchParams(window.location.search);
+    const consumo = params.get("bill amount");
+    const porcentaje = params.get("percentage");
+    const personas = params.get("people");
+    const moneda = params.get("currency");
+    const redondeo = params.get("rounding");
+    const incremento = params.get("incremento");
+    const servicioIncluido = params.get("servicioIncluido");
+
+    if (consumo && parseMoneyInput(consumo).ok) {
+      consumptionInput.value = consumo;
+    }
+
+    if (porcentaje && parseMoneyInput(porcentaje).ok) {
+      percentageInput.value = porcentaje;
+    }
+
+    if (personas && /^\d+$/.test(personas) && Number(personas) >= 1) {
+      peopleInput.value = personas;
+    }
+
+    if (moneda && TIP_CURRENCIES.includes(moneda)) {
+      currencySelect.value = moneda;
+    }
+
+    if (redondeo && ["none", "tip", "total"].includes(redondeo)) {
+      roundingModeSelect.value = getRoundingModeFromUrl(redondeo);
+    }
+
+    if (["1", "5", "10", "minimum"].includes(incremento)) {
+      roundingIncrementSelect.value = incremento;
+    }
+
+    if (servicioIncluido === "0" || servicioIncluido === "1") {
+      serviceIncludedInput.checked = servicioIncluido === "1";
+    }
+  }
+
+  async function copyText(text, successMessage) {
+    try {
+      if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(text);
+      } else {
+        const textArea = document.createElement("textarea");
+        textArea.value = text;
+        textArea.setAttribute("readonly", "");
+        textArea.style.position = "fixed";
+        textArea.style.opacity = "0";
+        document.body.append(textArea);
+        textArea.select();
+        document.execCommand("copy");
+        textArea.remove();
+      }
+      copyStatus.textContent = successMessage;
+    } catch {
+      copyStatus.textContent = "Could not copy automatically.";
+    }
+
+    window.clearTimeout(copyTimer);
+    copyTimer = window.setTimeout(() => {
+      copyStatus.textContent = "";
+    }, 2500);
+  }
+
+  presetButtons.forEach((button) => {
+    button.addEventListener("click", () => {
+      percentageInput.value = button.dataset.tipPreset;
+      updateCalculator();
+    });
+  });
+
+  document.querySelectorAll("[data-people-step]").forEach((button) => {
+    button.addEventListener("click", () => {
+      const current = parsePeople();
+      const nextValue = current.ok ? current.value + Number(button.dataset.peopleStep) : 1;
+
+      peopleInput.value = String(Math.max(1, nextValue));
+      updateCalculator();
+    });
+  });
+
+  document.querySelectorAll("[data-people-preset]").forEach((button) => {
+    button.addEventListener("click", () => {
+      peopleInput.value = button.dataset.peoplePreset;
+      updateCalculator();
+    });
+  });
+
+  serviceIncludedInput.addEventListener("change", () => {
+    if (serviceIncludedInput.checked) {
+      percentageInput.value = "0";
+    }
+    updateCalculator();
+  });
+
+  [
+    consumptionInput,
+    percentageInput,
+    peopleInput,
+    currencySelect,
+    roundingModeSelect,
+    roundingIncrementSelect,
+  ].forEach((input) => {
+    input.addEventListener("input", () => updateCalculator());
+    input.addEventListener("change", () => updateCalculator());
+  });
+
+  copyButton.addEventListener("click", () => {
+    if (currentShareText) {
+      copyText(currentShareText, "Result copied.");
+    }
+  });
+
+  copyUrlButton.addEventListener("click", () => {
+    copyText(currentShareUrl, "Link copied.");
+  });
+
+  loadUrlParameters();
+  updateCalculator({ syncUrl: false });
+</script>

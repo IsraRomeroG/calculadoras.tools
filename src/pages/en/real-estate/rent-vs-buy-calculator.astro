@@ -1,0 +1,1160 @@
+---
+import AdSlot from "@components/ads/AdSlot.astro";
+import Container from "@components/layout/Container.astro";
+import PageShell from "@components/layout/PageShell.astro";
+import FaqSection from "@components/shared/FaqSection.astro";
+import PageHero from "@components/shared/PageHero.astro";
+import SectionIntro from "@components/shared/SectionIntro.astro";
+import BaseLayout from "@layouts/BaseLayout.astro";
+import { buildAlternateLinks } from "@lib/i18n/routing";
+import { buildFaqJsonLd } from "@lib/seo";
+
+const title = "Rent vs. buy calculator";
+const description =
+  "Compare the estimated cost of renting or buying a home using editable mortgage, down payment, appreciation and investment assumptions.";
+const canonical = "/en/real-estate/rent-vs-buy-calculator";
+const spanishCanonical = "/inmuebles/calculadora-renta-vs-compra";
+const alternates = buildAlternateLinks(
+  { es: spanishCanonical, en: canonical },
+  Astro.site ?? Astro.url,
+);
+
+const rentFields = [
+  {
+    id: "rvb-monthly-rent",
+    name: "monthlyRent",
+    label: "Monthly rent",
+    placeholder: "18000",
+    prefix: "$",
+  },
+  {
+    id: "rvb-rent-increase",
+    name: "annualRentIncreasePercent",
+    label: "Annual rent increase",
+    value: "4",
+    suffix: "%",
+  },
+] as const;
+
+const propertyFields = [
+  {
+    id: "rvb-property-price",
+    name: "propertyPrice",
+    label: "Home price",
+    placeholder: "3500000",
+    prefix: "$",
+  },
+  {
+    id: "rvb-down-payment",
+    name: "downPaymentPercent",
+    label: "Down payment",
+    value: "20",
+    suffix: "%",
+  },
+  {
+    id: "rvb-comparison-years",
+    name: "comparisonYears",
+    label: "Years you plan to keep it",
+    value: "10",
+    suffix: "years",
+    help: "This is the comparison horizon. If you sell before the mortgage ends, the remaining balance is subtracted.",
+  },
+] as const;
+
+const mortgageFields = [
+  {
+    id: "rvb-mortgage-rate",
+    name: "annualMortgageRatePercent",
+    label: "Annual mortgage rate",
+    placeholder: "10",
+    suffix: "%",
+  },
+  {
+    id: "rvb-mortgage-term",
+    name: "mortgageTermYears",
+    label: "Mortgage term",
+    value: "20",
+    suffix: "years",
+    help: "Used to calculate the monthly payment and loan amortization.",
+  },
+] as const;
+
+const advancedFields = [
+  {
+    id: "rvb-purchase-costs",
+    name: "purchaseCostPercent",
+    label: "Purchase costs",
+    value: "5",
+    suffix: "%",
+  },
+  {
+    id: "rvb-selling-costs",
+    name: "sellingCostPercent",
+    label: "Selling costs",
+    value: "5",
+    suffix: "%",
+  },
+  {
+    id: "rvb-maintenance",
+    name: "annualMaintenancePercent",
+    label: "Annual maintenance",
+    value: "1",
+    suffix: "%",
+  },
+  {
+    id: "rvb-property-tax",
+    name: "annualPropertyTaxPercent",
+    label: "Annual property tax",
+    value: "0.2",
+    suffix: "%",
+  },
+  {
+    id: "rvb-appreciation",
+    name: "annualAppreciationPercent",
+    label: "Annual appreciation",
+    value: "3",
+    suffix: "%",
+  },
+  {
+    id: "rvb-alternative-return",
+    name: "annualAlternativeReturnPercent",
+    label: "Alternative investment return",
+    value: "5",
+    suffix: "%",
+  },
+] as const;
+
+const faqs = [
+  {
+    question: "What costs are included when buying a home?",
+    answer:
+      "The calculation includes the down payment, purchase costs, mortgage payments, maintenance, property tax, estimated appreciation and selling costs.",
+  },
+  {
+    question: "How does appreciation affect the result?",
+    answer:
+      "Appreciation changes the home's estimated value at the end of the horizon. Higher appreciation improves equity in the buying scenario; negative appreciation reduces it.",
+  },
+  {
+    question: "What is the alternative return on the down payment and upfront costs?",
+    answer:
+      "It is the hypothetical return from investing money not used to buy: the down payment, upfront costs and cash-flow differences when buying costs more than renting.",
+  },
+  {
+    question: "Why compare net worth instead of only monthly payments?",
+    answer:
+      "Buying creates both an asset and debt, while renting may leave capital invested. Comparing net worth captures both sides of the scenario.",
+  },
+  {
+    question: "What does the net-worth break-even point mean?",
+    answer:
+      "It is the first year when the estimated net worth from buying equals or exceeds the estimated net worth from renting.",
+  },
+  {
+    question: "Does the calculator recommend buying or renting?",
+    answer:
+      "No. It presents a scenario with editable assumptions. The actual decision depends on liquidity, location, risk, taxes, loan terms and personal plans.",
+  },
+];
+
+const faqJsonLd = buildFaqJsonLd(faqs);
+
+const explainerCards = [
+  {
+    title: "Net worth while renting",
+    text: "Adds the initial capital not used to buy and cash-flow differences invested during the horizon.",
+  },
+  {
+    title: "Net worth while buying",
+    text: "Starts with the home's estimated value and subtracts the remaining mortgage balance and selling costs.",
+  },
+  {
+    title: "Break-even point",
+    text: "Marks the first year when buying reaches or exceeds the estimated net worth from renting.",
+  },
+];
+---
+
+<BaseLayout title={title} description={description} canonical={canonical} locale="en" alternates={alternates}>
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={JSON.stringify(faqJsonLd)} />
+  </Fragment>
+
+  <PageShell>
+    <PageHero
+      title="Rent vs. buy calculator"
+      description="Compare renting and investing with buying using a mortgage, upfront costs, appreciation and editable assumptions."
+      kicker="Real Estate"
+      kickerHref="/en/real-estate"
+      collapseBreadcrumbOnMobile
+      containerClass="py-6 md:py-8"
+      breadcrumbs={[
+        { label: "Home", href: "/en", ariaLabel: "Home" },
+        { label: "Real Estate", href: "/en/real-estate", optional: true },
+        { label: "Rent vs. buy", truncate: true },
+      ]}
+    />
+
+    <Container as="section" class="py-6 md:py-8">
+      <section
+        id="rent-vs-buy-calculator"
+        class="overflow-hidden rounded-lg border border-gray-700 bg-gray-950 shadow-xl shadow-gray-950/30"
+        aria-labelledby="calculator-heading"
+      >
+        <div
+          class="grid gap-0 lg:grid-cols-[minmax(0,1fr)_minmax(18rem,0.78fr)]"
+        >
+          <form class="p-4 sm:p-6" data-calculator-form>
+            <div class="mb-5">
+              <p class="text-sm font-semibold uppercase tracking-wide text-cyan-300">
+                Net-worth comparison
+              </p>
+              <h2 id="calculator-heading" class="mt-2 text-2xl font-semibold">
+                Rent and invest or buy
+              </h2>
+              <p class="mt-2 text-sm leading-relaxed text-gray-400">
+                Enter the main inputs. Advanced assumptions remain editable
+                below the result.
+              </p>
+            </div>
+
+            <div class="grid gap-5">
+              <fieldset class="rounded-lg border border-gray-800 bg-gray-900/50 p-4">
+                <legend class="px-1 text-sm font-semibold text-cyan-200">
+                  Your rent
+                </legend>
+                <div class="mt-3 grid gap-4 sm:grid-cols-2">
+                  {
+                    rentFields.map((field) => (
+                      <div>
+                        <label
+                          for={field.id}
+                          class="block text-sm font-medium text-gray-200"
+                        >
+                          {field.label}
+                        </label>
+                        <div class="mt-2 flex rounded-lg border border-gray-700 bg-gray-900 focus-within:border-cyan-300 focus-within:ring-3 focus-within:ring-cyan-300/15">
+                          {"prefix" in field && field.prefix ? (
+                            <span class="flex items-center px-4 text-gray-500">
+                              {field.prefix}
+                            </span>
+                          ) : null}
+                          <input
+                            id={field.id}
+                            class="min-h-12 w-full bg-transparent px-4 text-base text-white outline-none placeholder:text-gray-600"
+                            type="text"
+                            inputmode="decimal"
+                            autocomplete="off"
+                            placeholder={"placeholder" in field ? field.placeholder : undefined}
+                            value={"value" in field ? field.value : undefined}
+                            aria-describedby={`${field.id}-error`}
+                            data-input={field.name}
+                          />
+                          {"suffix" in field && field.suffix ? (
+                            <span class="flex items-center px-4 text-gray-500">
+                              {field.suffix}
+                            </span>
+                          ) : null}
+                        </div>
+                        <p
+                          id={`${field.id}-error`}
+                          class="mt-2 hidden text-sm text-red-300"
+                          data-error-for={field.name}
+                        />
+                        {"help" in field && field.help ? (
+                          <p class="mt-2 text-xs leading-relaxed text-gray-500">
+                            {field.help}
+                          </p>
+                        ) : null}
+                      </div>
+                    ))
+                  }
+                </div>
+              </fieldset>
+
+              <fieldset class="rounded-lg border border-gray-800 bg-gray-900/50 p-4">
+                <legend class="px-1 text-sm font-semibold text-cyan-200">
+                  The home
+                </legend>
+                <div class="mt-3 grid gap-4 sm:grid-cols-3">
+                  {
+                    propertyFields.map((field) => (
+                      <div>
+                        <label
+                          for={field.id}
+                          class="block text-sm font-medium text-gray-200"
+                        >
+                          {field.label}
+                        </label>
+                        <div class="mt-2 flex rounded-lg border border-gray-700 bg-gray-900 focus-within:border-cyan-300 focus-within:ring-3 focus-within:ring-cyan-300/15">
+                          {"prefix" in field && field.prefix ? (
+                            <span class="flex items-center px-4 text-gray-500">
+                              {field.prefix}
+                            </span>
+                          ) : null}
+                          <input
+                            id={field.id}
+                            class="min-h-12 w-full bg-transparent px-4 text-base text-white outline-none placeholder:text-gray-600"
+                            type="text"
+                            inputmode="decimal"
+                            autocomplete="off"
+                            placeholder={"placeholder" in field ? field.placeholder : undefined}
+                            value={"value" in field ? field.value : undefined}
+                            aria-describedby={`${field.id}-error`}
+                            data-input={field.name}
+                          />
+                          {"suffix" in field && field.suffix ? (
+                            <span class="flex items-center px-4 text-gray-500">
+                              {field.suffix}
+                            </span>
+                          ) : null}
+                        </div>
+                        <p
+                          id={`${field.id}-error`}
+                          class="mt-2 hidden text-sm text-red-300"
+                          data-error-for={field.name}
+                        />
+                        {"help" in field && field.help ? (
+                          <p class="mt-2 text-xs leading-relaxed text-gray-500">
+                            {field.help}
+                          </p>
+                        ) : null}
+                      </div>
+                    ))
+                  }
+                </div>
+                <label
+                  class="mt-4 flex gap-3 rounded-lg border border-gray-800 bg-gray-950/70 p-3 text-sm leading-relaxed text-gray-300"
+                >
+                  <input
+                    class="mt-1 h-4 w-4 rounded border-gray-600 bg-gray-900 text-cyan-300 focus:ring-cyan-300"
+                    type="checkbox"
+                    data-sync-terms
+                  />
+                  <span>
+                    <span class="block font-semibold text-gray-100">
+                      Use the mortgage term as the comparison horizon
+                    </span>
+                    <span class="mt-1 block text-xs text-gray-500">
+                      Enable this to evaluate the scenario until the mortgage
+                      is fully repaid.
+                    </span>
+                  </span>
+                </label>
+              </fieldset>
+
+              <fieldset class="rounded-lg border border-gray-800 bg-gray-900/50 p-4">
+                <legend class="px-1 text-sm font-semibold text-cyan-200">
+                  Mortgage
+                </legend>
+                <div class="mt-3 grid gap-4 sm:grid-cols-2">
+                  {
+                    mortgageFields.map((field) => (
+                      <div>
+                        <label
+                          for={field.id}
+                          class="block text-sm font-medium text-gray-200"
+                        >
+                          {field.label}
+                        </label>
+                        <div class="mt-2 flex rounded-lg border border-gray-700 bg-gray-900 focus-within:border-cyan-300 focus-within:ring-3 focus-within:ring-cyan-300/15">
+                          <input
+                            id={field.id}
+                            class="min-h-12 w-full bg-transparent px-4 text-base text-white outline-none placeholder:text-gray-600"
+                            type="text"
+                            inputmode="decimal"
+                            autocomplete="off"
+                            placeholder={"placeholder" in field ? field.placeholder : undefined}
+                            value={"value" in field ? field.value : undefined}
+                            aria-describedby={`${field.id}-error`}
+                            data-input={field.name}
+                          />
+                          <span class="flex items-center px-4 text-gray-500">
+                            {field.suffix}
+                          </span>
+                        </div>
+                        <p
+                          id={`${field.id}-error`}
+                          class="mt-2 hidden text-sm text-red-300"
+                          data-error-for={field.name}
+                        />
+                      </div>
+                    ))
+                  }
+                </div>
+              </fieldset>
+            </div>
+
+            <div
+              class="mt-6 flex flex-col gap-3 border-t border-gray-800 pt-5 sm:flex-row sm:flex-wrap"
+            >
+              <button
+                class="inline-flex min-h-11 items-center justify-center rounded-lg bg-cyan-300 px-4 py-2 text-sm font-semibold text-gray-950 transition hover:bg-cyan-200 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-cyan-300/40"
+                type="submit"
+              >
+                Calculate
+              </button>
+              <button
+                class="inline-flex min-h-11 items-center justify-center rounded-lg border border-gray-700 px-4 py-2 text-sm font-semibold text-gray-200 transition hover:border-cyan-300 hover:text-white focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-cyan-300/30"
+                type="button"
+                data-fill-example
+              >
+                Use example
+              </button>
+              <button
+                class="inline-flex min-h-11 items-center justify-center rounded-lg border border-gray-700 px-4 py-2 text-sm font-semibold text-gray-200 transition hover:border-cyan-300 hover:text-white focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-cyan-300/30"
+                type="button"
+                data-clear-calculator
+              >
+                Clear
+              </button>
+              <button
+                class="hidden min-h-11 items-center justify-center rounded-lg border border-cyan-300/70 px-4 py-2 text-sm font-semibold text-cyan-100 transition hover:bg-cyan-300/10 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-cyan-300/30"
+                type="button"
+                data-copy-result
+              >
+                <span data-copy-label>Copy summary</span>
+              </button>
+              <button
+                class="hidden min-h-11 items-center justify-center rounded-lg border border-gray-700 px-4 py-2 text-sm font-semibold text-gray-200 transition hover:border-cyan-300 hover:text-white focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-cyan-300/30"
+                type="button"
+                data-export-csv
+              >
+                Export CSV
+              </button>
+              <p class="sr-only" aria-live="polite" data-copy-status></p>
+            </div>
+          </form>
+
+          <aside
+            class="border-t border-gray-800 bg-gray-900/70 p-4 sm:p-6 lg:border-l lg:border-t-0"
+            aria-live="polite"
+            data-result-region
+          >
+            <p class="text-sm font-semibold uppercase tracking-wide text-cyan-300">
+              Result
+            </p>
+            <p
+              class="mt-3 break-words text-3xl font-bold leading-tight text-white"
+              data-main-result
+            >
+              Enter the values
+            </p>
+            <p
+              class="mt-3 min-h-10 text-sm leading-relaxed text-gray-400"
+              data-result-context
+            >
+              The comparison summary will appear here.
+            </p>
+
+            <dl class="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2" data-summary-grid>
+              <div class="rounded-lg border border-gray-800 bg-gray-950/70 p-4">
+                <dt class="text-xs font-semibold uppercase tracking-wide text-gray-500">
+                  Status
+                </dt>
+                <dd class="mt-2 text-sm font-semibold text-gray-300">
+                  No calculation
+                </dd>
+              </div>
+            </dl>
+
+            <p
+              class="mt-4 hidden rounded-lg border border-amber-300/30 bg-amber-300/10 p-3 text-sm leading-relaxed text-amber-100"
+              data-result-warning
+            >
+            </p>
+          </aside>
+        </div>
+
+        <details class="border-t border-gray-800 bg-gray-950/70 p-4 sm:p-6">
+          <summary
+            class="cursor-pointer text-sm font-semibold text-cyan-100 transition hover:text-white"
+          >
+            Advanced assumptions
+          </summary>
+          <div class="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {
+              advancedFields.map((field) => (
+                <div>
+                  <label
+                    for={field.id}
+                    class="block text-sm font-medium text-gray-200"
+                  >
+                    {field.label}
+                  </label>
+                  <div class="mt-2 flex rounded-lg border border-gray-700 bg-gray-900 focus-within:border-cyan-300 focus-within:ring-3 focus-within:ring-cyan-300/15">
+                    <input
+                      id={field.id}
+                      class="min-h-12 w-full bg-transparent px-4 text-base text-white outline-none"
+                      type="text"
+                      inputmode="decimal"
+                      autocomplete="off"
+                      value={field.value}
+                      aria-describedby={`${field.id}-error`}
+                      data-input={field.name}
+                    />
+                    <span class="flex items-center px-4 text-gray-500">
+                      {field.suffix}
+                    </span>
+                  </div>
+                  <p
+                    id={`${field.id}-error`}
+                    class="mt-2 hidden text-sm text-red-300"
+                    data-error-for={field.name}
+                  />
+                </div>
+              ))
+            }
+          </div>
+        </details>
+
+        <div class="border-t border-gray-800 p-4 sm:p-6">
+          <div
+            class="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between"
+          >
+            <div>
+              <h3 class="text-lg font-semibold">Annual comparison</h3>
+              <p class="mt-1 text-sm leading-relaxed text-gray-500">
+                The table shows estimated net worth, cash flow and mortgage
+                balance at the end of each year.
+              </p>
+            </div>
+            <dl class="grid grid-cols-2 gap-3 text-sm sm:min-w-80" data-table-totals>
+              <div>
+                <dt class="text-xs font-semibold uppercase text-gray-500">
+                  Horizon
+                </dt>
+                <dd class="mt-1 font-semibold text-gray-300">Pending</dd>
+              </div>
+              <div>
+                <dt class="text-xs font-semibold uppercase text-gray-500">
+                  Break-even
+                </dt>
+                <dd class="mt-1 font-semibold text-gray-300">Pending</dd>
+              </div>
+            </dl>
+          </div>
+
+          <p
+            class="mt-4 rounded-lg border border-gray-800 bg-gray-900/60 p-4 text-sm text-gray-400"
+            data-table-empty
+          >
+            Calculate a scenario to view the annual comparison.
+          </p>
+
+          <div class="mt-4 hidden overflow-x-auto" data-table-wrapper>
+            <table class="min-w-[58rem] text-left text-sm">
+              <thead class="border-b border-gray-800 text-xs uppercase tracking-wide text-gray-500">
+                <tr>
+                  <th class="px-4 py-3" scope="col">Year</th>
+                  <th class="px-4 py-3 text-right" scope="col">Annual rent</th>
+                  <th class="px-4 py-3 text-right" scope="col">Extra cash flow</th>
+                  <th class="px-4 py-3 text-right" scope="col">Renting</th>
+                  <th class="px-4 py-3 text-right" scope="col">Buying</th>
+                  <th class="px-4 py-3 text-right" scope="col">Difference</th>
+                  <th class="px-4 py-3 text-right" scope="col">Balance</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-gray-900 text-gray-300" data-table-body>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+    </Container>
+
+    <AdSlot placement="calculator-after-tool" />
+
+    <Container as="section" class="py-6 md:py-8">
+      <SectionIntro
+        title="How to read the result"
+        description="The calculator does not decide for you; it makes the assumptions that often drive the comparison visible."
+      />
+      <div class="grid gap-4 md:grid-cols-3">
+        {
+          explainerCards.map((card) => (
+            <article class="rounded-lg border border-gray-800 bg-gray-950 p-5">
+              <h3 class="text-base font-semibold text-white">{card.title}</h3>
+              <p class="mt-2 text-sm leading-relaxed text-gray-400">
+                {card.text}
+              </p>
+            </article>
+          ))
+        }
+      </div>
+    </Container>
+
+    <FaqSection faqs={faqs} />
+  </PageShell>
+</BaseLayout>
+
+<script>
+  import {
+    calculateRentVsBuy,
+    formatCompactCurrency,
+    formatCurrency,
+    formatPercent,
+    parseRentVsBuyInput,
+    roundCurrency,
+  } from "@lib/calculators/inmuebles/calculadora-renta-vs-compra/rentVsBuy.en";
+
+  const form = document.querySelector("[data-calculator-form]");
+  const inputs = Object.fromEntries(
+    Array.from(document.querySelectorAll("[data-input]")).map((input) => [
+      input.dataset.input,
+      input,
+    ]),
+  );
+  const mainResult = document.querySelector("[data-main-result]");
+  const resultContext = document.querySelector("[data-result-context]");
+  const summaryGrid = document.querySelector("[data-summary-grid]");
+  const resultWarning = document.querySelector("[data-result-warning]");
+  const tableEmpty = document.querySelector("[data-table-empty]");
+  const tableWrapper = document.querySelector("[data-table-wrapper]");
+  const tableBody = document.querySelector("[data-table-body]");
+  const tableTotals = document.querySelector("[data-table-totals]");
+  const clearButton = document.querySelector("[data-clear-calculator]");
+  const exampleButton = document.querySelector("[data-fill-example]");
+  const copyButton = document.querySelector("[data-copy-result]");
+  const copyLabel = document.querySelector("[data-copy-label]");
+  const copyStatus = document.querySelector("[data-copy-status]");
+  const exportButton = document.querySelector("[data-export-csv]");
+  const syncTermsCheckbox = document.querySelector("[data-sync-terms]");
+  let currentResult = null;
+  let currentInput = null;
+  let currentCopyText = "";
+  let copiedTimeout = 0;
+
+  const ERROR_MESSAGES = {
+    required: "Complete this field.",
+    invalid: "Use valid numbers only.",
+    negative: "The value cannot be negative.",
+    too_many_decimals: "Use fewer decimal places.",
+    positive: "The value must be greater than zero.",
+    range: "The value is outside the allowed range.",
+    integer: "Use a whole number.",
+  };
+
+  const FIELD_RULES = {
+    monthlyRent: { min: 0, positive: true },
+    annualRentIncreasePercent: { min: 0, max: 50, percent: true },
+    propertyPrice: { min: 0, positive: true },
+    downPaymentPercent: { min: 0, max: 100, percent: true },
+    annualMortgageRatePercent: { min: 0, max: 100, percent: true },
+    mortgageTermYears: { min: 1, max: 40, integer: true },
+    comparisonYears: { min: 1, max: 40, integer: true },
+    purchaseCostPercent: { min: 0, max: 30, percent: true },
+    sellingCostPercent: { min: 0, max: 20, percent: true },
+    annualMaintenancePercent: { min: 0, max: 20, percent: true },
+    annualPropertyTaxPercent: { min: 0, max: 5, percent: true },
+    annualAppreciationPercent: {
+      min: -20,
+      max: 50,
+      percent: true,
+      allowNegative: true,
+    },
+    annualAlternativeReturnPercent: { min: 0, max: 100, percent: true },
+  };
+
+  const DEFAULTS = {
+    monthlyRent: "",
+    annualRentIncreasePercent: "4",
+    propertyPrice: "",
+    downPaymentPercent: "20",
+    annualMortgageRatePercent: "",
+    mortgageTermYears: "20",
+    comparisonYears: "10",
+    purchaseCostPercent: "5",
+    sellingCostPercent: "5",
+    annualMaintenancePercent: "1",
+    annualPropertyTaxPercent: "0.2",
+    annualAppreciationPercent: "3",
+    annualAlternativeReturnPercent: "5",
+  };
+
+  const EXAMPLE = {
+    monthlyRent: "18000",
+    annualRentIncreasePercent: "4",
+    propertyPrice: "3500000",
+    downPaymentPercent: "20",
+    annualMortgageRatePercent: "10",
+    mortgageTermYears: "20",
+    comparisonYears: "10",
+    purchaseCostPercent: "5",
+    sellingCostPercent: "5",
+    annualMaintenancePercent: "1",
+    annualPropertyTaxPercent: "0.2",
+    annualAppreciationPercent: "3",
+    annualAlternativeReturnPercent: "5",
+  };
+
+  function parseCalculatorInput() {
+    const errors = {};
+    const values = {};
+
+    Object.entries(FIELD_RULES).forEach(([field, rules]) => {
+      const parsed = parseRentVsBuyInput(inputs[field]?.value ?? "", {
+        maxDecimals: rules.integer ? 0 : 4,
+        preferDecimal: rules.percent || rules.integer,
+        allowNegative: rules.allowNegative,
+      });
+
+      if (!parsed.ok) {
+        errors[field] = parsed.error;
+        return;
+      }
+
+      if (rules.integer && !Number.isInteger(parsed.value)) {
+        errors[field] = "integer";
+        return;
+      }
+
+      if (rules.positive && parsed.value <= 0) {
+        errors[field] = "positive";
+        return;
+      }
+
+      if (
+        (typeof rules.min === "number" && parsed.value < rules.min) ||
+        (typeof rules.max === "number" && parsed.value > rules.max)
+      ) {
+        errors[field] = "range";
+        return;
+      }
+
+      values[field] = parsed.value;
+    });
+
+    if (Object.keys(errors).length > 0) {
+      return { ok: false, errors };
+    }
+
+    return { ok: true, values };
+  }
+
+  function updateCalculator({ force = false } = {}) {
+    syncComparisonYearsIfNeeded();
+    clearErrors();
+    const parsed = parseCalculatorInput();
+
+    if (!parsed.ok) {
+      showErrors(parsed.errors);
+
+      if (force) {
+        setInvalidState();
+      }
+
+      return;
+    }
+
+    currentInput = parsed.values;
+    currentResult = calculateRentVsBuy(parsed.values);
+    currentCopyText = buildCopyText(currentInput, currentResult);
+    renderResult(currentInput, currentResult);
+    renderTable(currentResult);
+    setActionsVisible(true);
+  }
+
+  function renderResult(input, result) {
+    if (!mainResult || !resultContext || !summaryGrid || !resultWarning) {
+      return;
+    }
+
+    const absDifference = Math.abs(result.netWorthDifference);
+    const winnerText =
+      result.winner === "tie"
+        ? "Very similar net worth"
+        : result.winner === "buy"
+          ? "Buying comes out ahead"
+          : "Renting comes out ahead";
+    const contextText =
+      result.winner === "tie"
+        ? "With these assumptions, both scenarios end almost equal."
+        : result.winner === "buy"
+          ? `In this scenario, buying ends with ${formatCurrency(absDifference)} more in estimated net worth.`
+          : `In this scenario, renting and investing ends with ${formatCurrency(absDifference)} more in estimated net worth.`;
+
+    mainResult.textContent =
+      result.winner === "tie"
+        ? winnerText
+        : `${winnerText}: ${formatCompactCurrency(absDifference)}`;
+    resultContext.textContent = contextText;
+
+    const breakEvenText =
+      result.breakEvenYear === null
+        ? "Not reached"
+        : `Year ${result.breakEvenYear}`;
+    const summaryItems = [
+      {
+        label: "Net worth while renting",
+        value: formatCurrency(result.rentNetWorth),
+      },
+      {
+        label: "Net worth while buying",
+        value: formatCurrency(result.buyNetWorth),
+      },
+      {
+        label: "Difference",
+        value: formatCurrency(result.netWorthDifference),
+      },
+      {
+        label: "Break-even",
+        value: breakEvenText,
+      },
+      {
+        label: "Years compared",
+        value: `${input.comparisonYears} years`,
+      },
+      {
+        label: "Mortgage term",
+        value: `${input.mortgageTermYears} years`,
+      },
+      {
+        label: "Monthly mortgage",
+        value: formatCurrency(result.monthlyMortgagePayment),
+      },
+      {
+        label: "Initial cash",
+        value: formatCurrency(result.initialCashRequired),
+      },
+      {
+        label: "Interest paid",
+        value: formatCurrency(result.totalInterestPaid),
+      },
+      {
+        label: "Final balance",
+        value: formatCurrency(result.finalMortgageBalance),
+      },
+    ];
+
+    summaryGrid.innerHTML = summaryItems
+      .map(
+        (item) => `
+          <div class="rounded-lg border border-gray-800 bg-gray-950/70 p-4">
+            <dt class="text-xs font-semibold uppercase tracking-wide text-gray-500">${escapeHtml(item.label)}</dt>
+            <dd class="mt-2 break-words text-base font-semibold text-white">${escapeHtml(item.value)}</dd>
+          </div>
+        `,
+      )
+      .join("");
+    resultWarning.textContent =
+      `Results depend on assumptions: rent increases ${formatPercent(input.annualRentIncreasePercent)}, appreciation is ${formatPercent(input.annualAppreciationPercent)} and the alternative return is ${formatPercent(input.annualAlternativeReturnPercent)}.`;
+    resultWarning.classList.remove("hidden");
+  }
+
+  function renderTable(result) {
+    if (!tableEmpty || !tableWrapper || !tableBody || !tableTotals) {
+      return;
+    }
+
+    tableEmpty.classList.add("hidden");
+    tableWrapper.classList.remove("hidden");
+    tableBody.innerHTML = result.annualRows
+      .map(
+        (row) => `
+          <tr class="transition-colors hover:bg-gray-900/60">
+            <th class="px-4 py-3 font-semibold text-white" scope="row">${row.year}</th>
+            <td class="px-4 py-3 text-right">${escapeHtml(formatCurrency(row.annualRent))}</td>
+            <td class="px-4 py-3 text-right">${escapeHtml(formatCurrency(row.flowDifference))}</td>
+            <td class="px-4 py-3 text-right">${escapeHtml(formatCurrency(row.rentNetWorth))}</td>
+            <td class="px-4 py-3 text-right">${escapeHtml(formatCurrency(row.buyNetWorth))}</td>
+            <td class="px-4 py-3 text-right font-semibold ${row.netWorthDifference >= 0 ? "text-emerald-200" : "text-amber-200"}">${escapeHtml(formatCurrency(row.netWorthDifference))}</td>
+            <td class="px-4 py-3 text-right">${escapeHtml(formatCurrency(row.remainingMortgageBalance))}</td>
+          </tr>
+        `,
+      )
+      .join("");
+
+    tableTotals.innerHTML = [
+      {
+        label: "Total rent",
+        value: formatCurrency(result.totalRentPaid),
+      },
+      {
+        label: "Buying cash outflow",
+        value: formatCurrency(result.totalOwnershipCashOut),
+      },
+      {
+        label: "Final value",
+        value: formatCurrency(result.finalPropertyValue),
+      },
+      {
+        label: "Break-even",
+        value:
+          result.breakEvenYear === null
+            ? "Not reached"
+            : `Year ${result.breakEvenYear}`,
+      },
+    ]
+      .map(
+        (item) => `
+          <div>
+            <dt class="text-xs font-semibold uppercase text-gray-500">${escapeHtml(item.label)}</dt>
+            <dd class="mt-1 break-words text-sm font-semibold text-gray-100">${escapeHtml(item.value)}</dd>
+          </div>
+        `,
+      )
+      .join("");
+  }
+
+  function setInitialState() {
+    if (
+      !mainResult ||
+      !resultContext ||
+      !summaryGrid ||
+      !resultWarning ||
+      !tableEmpty ||
+      !tableWrapper ||
+      !tableBody ||
+      !tableTotals
+    ) {
+      return;
+    }
+
+    mainResult.textContent = "Enter the values";
+    resultContext.textContent = "The comparison summary will appear here.";
+    summaryGrid.innerHTML = `
+      <div class="rounded-lg border border-gray-800 bg-gray-950/70 p-4">
+        <dt class="text-xs font-semibold uppercase tracking-wide text-gray-500">Status</dt>
+        <dd class="mt-2 text-sm font-semibold text-gray-300">No calculation</dd>
+      </div>
+    `;
+    resultWarning.textContent = "";
+    resultWarning.classList.add("hidden");
+    tableEmpty.classList.remove("hidden");
+    tableWrapper.classList.add("hidden");
+    tableBody.innerHTML = "";
+    tableTotals.innerHTML = `
+      <div>
+        <dt class="text-xs font-semibold uppercase text-gray-500">Comparison</dt>
+        <dd class="mt-1 font-semibold text-gray-300">Pending</dd>
+      </div>
+      <div>
+        <dt class="text-xs font-semibold uppercase text-gray-500">Break-even</dt>
+        <dd class="mt-1 font-semibold text-gray-300">Pending</dd>
+      </div>
+    `;
+    currentInput = null;
+    currentResult = null;
+    currentCopyText = "";
+    setActionsVisible(false);
+  }
+
+  function setInvalidState() {
+    if (!mainResult || !resultContext || !summaryGrid) {
+      return;
+    }
+
+    mainResult.textContent = "Check the fields";
+    resultContext.textContent = "Correct the marked values to calculate.";
+    summaryGrid.innerHTML = "";
+    setActionsVisible(false);
+  }
+
+  function clearErrors() {
+    document.querySelectorAll("[data-error-for]").forEach((errorElement) => {
+      errorElement.textContent = "";
+      errorElement.classList.add("hidden");
+    });
+  }
+
+  function showErrors(errors) {
+    Object.entries(errors).forEach(([field, error]) => {
+      const errorElement = document.querySelector(
+        `[data-error-for="${field}"]`,
+      );
+
+      if (!errorElement) {
+        return;
+      }
+
+      errorElement.textContent =
+        ERROR_MESSAGES[error] ?? ERROR_MESSAGES.invalid;
+      errorElement.classList.remove("hidden");
+    });
+  }
+
+  function setActionsVisible(isVisible) {
+    copyButton?.classList.toggle("hidden", !isVisible);
+    copyButton?.classList.toggle("inline-flex", isVisible);
+    exportButton?.classList.toggle("hidden", !isVisible);
+    exportButton?.classList.toggle("inline-flex", isVisible);
+  }
+
+  function fillValues(values) {
+    Object.entries(values).forEach(([field, value]) => {
+      if (inputs[field]) {
+        inputs[field].value = value;
+      }
+    });
+  }
+
+  function syncComparisonYearsIfNeeded() {
+    if (
+      !syncTermsCheckbox?.checked ||
+      !inputs.comparisonYears ||
+      !inputs.mortgageTermYears
+    ) {
+      return;
+    }
+
+    inputs.comparisonYears.value = inputs.mortgageTermYears.value;
+  }
+
+  function setComparisonSyncEnabled(isEnabled) {
+    if (!inputs.comparisonYears) {
+      return;
+    }
+
+    if (syncTermsCheckbox) {
+      syncTermsCheckbox.checked = isEnabled;
+    }
+
+    syncComparisonYearsIfNeeded();
+    inputs.comparisonYears.disabled = isEnabled;
+    inputs.comparisonYears.classList.toggle("opacity-60", isEnabled);
+    inputs.comparisonYears.classList.toggle("cursor-not-allowed", isEnabled);
+  }
+
+  function clearCalculator() {
+    fillValues(DEFAULTS);
+    setComparisonSyncEnabled(false);
+    clearErrors();
+    setInitialState();
+  }
+
+  function fillExample() {
+    fillValues(EXAMPLE);
+    setComparisonSyncEnabled(false);
+    updateCalculator({ force: true });
+  }
+
+  function buildCopyText(input, result) {
+    const lines = [
+      "Rent vs. buy calculator - calculadoras.tools",
+      `Initial monthly rent: ${formatCurrency(input.monthlyRent)}`,
+      `Home price: ${formatCurrency(input.propertyPrice)}`,
+      `Down payment: ${formatPercent(input.downPaymentPercent)} (${formatCurrency(result.downPaymentAmount)})`,
+      `Initial cash required: ${formatCurrency(result.initialCashRequired)}`,
+      `Estimated monthly mortgage: ${formatCurrency(result.monthlyMortgagePayment)}`,
+      `Net worth while renting: ${formatCurrency(result.rentNetWorth)}`,
+      `Net worth while buying: ${formatCurrency(result.buyNetWorth)}`,
+      `Buying - renting difference: ${formatCurrency(result.netWorthDifference)}`,
+      `Net-worth break-even: ${
+        result.breakEvenYear === null
+          ? "Not reached"
+          : `Year ${result.breakEvenYear}`
+      }`,
+      `Annual appreciation: ${formatPercent(input.annualAppreciationPercent)}`,
+      `Alternative return: ${formatPercent(input.annualAlternativeReturnPercent)}`,
+    ];
+
+    return lines.join("\n");
+  }
+
+  function exportCsv() {
+    if (!currentResult) {
+      return;
+    }
+
+    const rows = [
+      "year,annual_rent,cash_flow_difference,renting_net_worth,buying_net_worth,difference,mortgage_balance,home_value",
+      ...currentResult.annualRows.map((row) =>
+        [
+          row.year,
+          roundCurrency(row.annualRent),
+          roundCurrency(row.flowDifference),
+          roundCurrency(row.rentNetWorth),
+          roundCurrency(row.buyNetWorth),
+          roundCurrency(row.netWorthDifference),
+          roundCurrency(row.remainingMortgageBalance),
+          roundCurrency(row.propertyValue),
+        ].join(","),
+      ),
+    ];
+    const blob = new Blob([rows.join("\n")], {
+      type: "text/csv;charset=utf-8",
+    });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "rent-vs-buy.csv";
+    document.body.append(link);
+    link.click();
+    link.remove();
+    URL.revokeObjectURL(url);
+  }
+
+  async function copyResult() {
+    if (!currentCopyText || !copyLabel || !copyStatus) {
+      return;
+    }
+
+    try {
+      if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(currentCopyText);
+      } else {
+        const textArea = document.createElement("textarea");
+        textArea.value = currentCopyText;
+        textArea.setAttribute("readonly", "");
+        textArea.style.position = "fixed";
+        textArea.style.opacity = "0";
+        document.body.append(textArea);
+        textArea.select();
+        document.execCommand("copy");
+        textArea.remove();
+      }
+
+      window.clearTimeout(copiedTimeout);
+      copyLabel.textContent = "Copied";
+      copyStatus.textContent = "Summary copied.";
+      copiedTimeout = window.setTimeout(() => {
+        copyLabel.textContent = "Copy summary";
+        copyStatus.textContent = "";
+      }, 2000);
+    } catch {
+      copyStatus.textContent = "The summary could not be copied.";
+    }
+  }
+
+  function escapeHtml(value) {
+    return String(value)
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;")
+      .replaceAll("'", "&#039;");
+  }
+
+  form?.addEventListener("submit", (event) => {
+    event.preventDefault();
+    updateCalculator({ force: true });
+  });
+
+  Object.values(inputs).forEach((input) => {
+    input?.addEventListener("input", () => {
+      if (input === inputs.mortgageTermYears) {
+        syncComparisonYearsIfNeeded();
+      }
+
+      if (currentResult) {
+        updateCalculator();
+      }
+    });
+  });
+
+  clearButton?.addEventListener("click", clearCalculator);
+  exampleButton?.addEventListener("click", fillExample);
+  copyButton?.addEventListener("click", copyResult);
+  exportButton?.addEventListener("click", exportCsv);
+  syncTermsCheckbox?.addEventListener("change", () => {
+    setComparisonSyncEnabled(syncTermsCheckbox.checked);
+
+    if (currentResult) {
+      updateCalculator();
+    }
+  });
+
+  setComparisonSyncEnabled(false);
+  setInitialState();
+</script>

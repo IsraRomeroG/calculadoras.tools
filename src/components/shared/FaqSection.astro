@@ -14,7 +14,10 @@ interface Props {
   class?: string;
 }
 
-const { faqs, title = "Preguntas frecuentes", class: className = "" } = Astro.props;
+const defaultTitle = Astro.url.pathname.startsWith("/en/")
+  ? "Frequently asked questions"
+  : "Preguntas frecuentes";
+const { faqs, title = defaultTitle, class: className = "" } = Astro.props;
 ---
 
 <Container as="section" class={`py-8 pb-12 ${className}`}>

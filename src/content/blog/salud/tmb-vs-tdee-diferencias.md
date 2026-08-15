@@ -4,6 +4,7 @@ seoTitle: "TMB vs TDEE: diferencia entre metabolismo basal y calorías diarias"
 description: "Conoce la diferencia entre TMB y TDEE, cómo se calculan y por qué el TDEE suele usarse para estimar calorías diarias."
 pubDate: 2026-07-17
 categorySlug: "salud"
+translationKey: "bmr-vs-tdee"
 tags:
   - tmb
   - tdee

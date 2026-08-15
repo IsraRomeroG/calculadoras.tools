@@ -1,0 +1,728 @@
+
+
+
+
+---
+import BaseLayout from "@layouts/BaseLayout.astro";
+import { buildAlternateLinks } from "@lib/i18n/routing";
+import AdSlot from "@components/ads/AdSlot.astro";
+import Container from "@components/layout/Container.astro";
+import PageShell from "@components/layout/PageShell.astro";
+import FaqSection from "@components/shared/FaqSection.astro";
+import PageHero from "@components/shared/PageHero.astro";
+import SectionIntro from "@components/shared/SectionIntro.astro";
+import { GCD_LCM_EXAMPLES } from "@lib/calculators/matematicas/calculadora-mcd-mcm/gcdLcm.en";
+import { buildFaqJsonLd } from "@lib/seo";
+
+const title = "GCD and LCM calculator";
+const description =
+  "Calculate the greatest common divisor and least common multiple of two or more numbers with step-by-step work, verification and prime factors.";
+const canonical = "/en/math/gcd-lcm-calculator";
+const spanishCanonical = "/matematicas/calculadora-mcd-mcm";
+const alternates = buildAlternateLinks(
+  { es: spanishCanonical, en: canonical },
+  Astro.site ?? Astro.url,
+);
+
+const faqs = [
+  {
+    question: "What is the GCD?",
+    answer:
+      "The greatest common divisor is the largest number that divides every number in a list exactly.",
+  },
+  {
+    question: "What is the LCM?",
+    answer:
+      "The least common multiple is the smallest positive number that is a multiple of every number in a list.",
+  },
+  {
+    question: "How does the Euclidean algorithm work?",
+    answer:
+      "The Euclidean algorithm divides one number by another and repeats with the divisor and remainder until the remainder is 0. The last divisor is the GCD.",
+  },
+  {
+    question: "How is the GCD calculated with prime factors?",
+    answer:
+      "Factor each number and take only common prime factors with the lowest exponent. Their product is the GCD.",
+  },
+  {
+    question: "How is the LCM calculated with prime factors?",
+    answer:
+      "Factor each number and take every prime factor with its highest exponent. Their product is the LCM.",
+  },
+  {
+    question: "Can negative numbers be used?",
+    answer:
+      "Yes. The calculator accepts negative numbers but uses their absolute values to calculate the GCD and LCM.",
+  },
+  {
+    question: "What happens if one of the numbers is zero?",
+    answer:
+      "The GCD of a number and 0 is that number's absolute value. The LCM is shown as 0 when the list contains at least one 0.",
+  },
+  {
+    question: "What does it mean for two numbers to be coprime?",
+    answer:
+      "Their GCD is 1. They share no common divisor greater than 1.",
+  },
+];
+
+const faqJsonLd = buildFaqJsonLd(faqs);
+---
+
+<BaseLayout title={title} description={description} canonical={canonical} locale="en" alternates={alternates}>
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={JSON.stringify(faqJsonLd)} />
+  </Fragment>
+
+  <PageShell>
+    <PageHero
+      title="GCD and LCM calculator"
+      description="Enter two or more integers and get the greatest common divisor, least common multiple, verification and step-by-step work."
+      kicker="Math"
+      collapseBreadcrumbOnMobile
+      containerClass="py-6 md:py-8"
+      breadcrumbs={[
+        { label: "Home", href: "/en", ariaLabel: "Home" },
+        { label: "Math", href: "/en/math", optional: true },
+        { label: "GCD and LCM calculator", truncate: true },
+      ]}
+    />
+
+    <Container as="section" class="py-6 md:py-8">
+      <div
+        id="gcd-lcm-calculator"
+        class="overflow-hidden rounded-lg border border-gray-700 bg-gray-950 shadow-xl shadow-gray-950/30"
+      >
+        <div class="grid gap-0 lg:grid-cols-[minmax(0,1fr)_minmax(20rem,0.74fr)]">
+          <section class="p-4 sm:p-6" aria-labelledby="calculator-heading">
+            <h2 id="calculator-heading" class="text-xl font-semibold">
+              Numbers
+            </h2>
+
+            <div class="mt-5">
+              <label
+                for="gcd-lcm-input"
+                class="block text-sm font-medium text-gray-200"
+              >
+              Enter or paste your integers
+              </label>
+              <textarea
+                id="gcd-lcm-input"
+                class="mt-2 max-h-72 min-h-32 w-full resize-y rounded-lg border border-gray-700 bg-gray-900 px-4 py-3 text-base text-white outline-none transition placeholder:text-gray-600 focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15"
+                rows="4"
+                maxlength="5000"
+                inputmode="numeric"
+                autocomplete="off"
+                spellcheck="false"
+                placeholder="Example: 12, 18, 30"
+                aria-describedby="gcd-lcm-help gcd-lcm-error"
+                data-gcd-lcm-input
+              ></textarea>
+              <p
+                id="gcd-lcm-help"
+                class="mt-2 text-sm leading-relaxed text-gray-400"
+              >
+                Separate with commas, spaces or line breaks. Only
+                  integers.
+              </p>
+              <p
+                id="gcd-lcm-error"
+                class="mt-3 hidden rounded-lg border border-red-400/30 bg-red-400/10 px-3 py-2 text-sm text-red-200"
+                data-gcd-lcm-error
+              ></p>
+            </div>
+
+            <div class="mt-5">
+              <p class="text-sm font-medium text-gray-200">Calculation</p>
+              <div
+                class="mt-2 inline-flex w-full rounded-lg border border-gray-700 bg-gray-900 p-1 sm:w-auto"
+                role="group"
+                aria-label="Calculation type"
+              >
+                <button
+                  class="min-h-11 flex-1 rounded-md px-3 py-2 text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/40 sm:flex-none sm:px-4"
+                  type="button"
+                  data-mode-button="gcd"
+                  aria-pressed="false"
+                >
+                  GCD
+                </button>
+                <button
+                  class="min-h-11 flex-1 rounded-md px-3 py-2 text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/40 sm:flex-none sm:px-4"
+                  type="button"
+                  data-mode-button="lcm"
+                  aria-pressed="false"
+                >
+                  LCM
+                </button>
+                <button
+                  class="min-h-11 flex-1 rounded-md px-3 py-2 text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/40 sm:flex-none sm:px-4"
+                  type="button"
+                  data-mode-button="both"
+                  aria-pressed="true"
+                >
+                    Both
+                </button>
+              </div>
+            </div>
+
+            <div class="mt-5">
+              <p class="text-sm font-medium text-gray-200">Examples</p>
+              <div
+                class="mt-2 flex gap-2 overflow-x-auto pb-1"
+                role="group"
+                aria-label="Load example"
+              >
+                {
+                  GCD_LCM_EXAMPLES.map((example) => (
+                    <button
+                      class="min-h-11 shrink-0 rounded-lg border border-gray-700 px-3 py-2 text-sm font-semibold text-gray-200 transition hover:border-amber-400 hover:text-white focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/40"
+                      type="button"
+                      data-example-value={example.value}
+                      title={example.description}
+                    >
+                      {example.label}
+                    </button>
+                  ))
+                }
+              </div>
+            </div>
+
+            <div class="mt-5 flex flex-wrap gap-3">
+              <button
+                class="hidden min-h-11 items-center justify-center rounded-lg bg-amber-400 px-4 py-2 text-sm font-semibold text-gray-950 transition hover:bg-amber-300 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/40"
+                type="button"
+                data-copy-result
+              >
+                Copy result
+              </button>
+              <button
+                class="hidden min-h-11 items-center justify-center rounded-lg border border-gray-700 px-4 py-2 text-sm font-semibold text-gray-200 transition hover:border-amber-400 hover:text-white focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/40"
+                type="button"
+                data-copy-explanation
+              >
+                Copy explanation
+              </button>
+              <button
+                class="inline-flex min-h-11 items-center justify-center rounded-lg border border-gray-700 px-4 py-2 text-sm font-semibold text-gray-200 transition hover:border-amber-400 hover:text-white focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/40"
+                type="button"
+                data-clear-calculator
+              >
+                Clear
+              </button>
+            </div>
+            <p class="mt-3 min-h-5 text-sm text-emerald-300" data-copy-status>
+            </p>
+          </section>
+
+          <aside
+            class="border-t border-gray-800 bg-gray-900/60 p-4 sm:p-6 lg:border-l lg:border-t-0"
+          >
+            <div
+              class="rounded-lg border border-gray-700 bg-gray-950 p-5"
+              aria-live="polite"
+              data-result-region
+            >
+              <p class="text-sm font-semibold uppercase text-amber-400">
+                Result
+              </p>
+
+              <div class="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-1">
+                <div
+                  class="rounded-lg border border-gray-800 bg-gray-900 p-4"
+                  data-result-panel="gcd"
+                >
+                  <p class="text-xs font-semibold uppercase text-gray-400">
+                    GCD
+                  </p>
+                  <p
+                    class="mt-2 break-words text-3xl font-semibold text-white"
+                    data-result-gcd
+                  >
+                    -
+                  </p>
+                </div>
+                <div
+                  class="rounded-lg border border-gray-800 bg-gray-900 p-4"
+                  data-result-panel="lcm"
+                >
+                  <p class="text-xs font-semibold uppercase text-gray-400">
+                    LCM
+                  </p>
+                  <p
+                    class="mt-2 break-words text-3xl font-semibold text-white"
+                    data-result-lcm
+                  >
+                    -
+                  </p>
+                </div>
+              </div>
+
+              <p
+                class="mt-4 rounded-lg border border-gray-800 bg-gray-900 px-4 py-3 text-sm leading-relaxed text-gray-300"
+                data-normalized-list
+              >
+                Paste a list to calculate.
+              </p>
+
+              <div
+                class="mt-3 hidden rounded-lg border border-sky-400/30 bg-sky-400/10 px-3 py-2 text-sm leading-relaxed text-sky-100"
+                data-verification-box
+              >
+                <ul class="space-y-1" data-verification-list></ul>
+              </div>
+
+              <div
+                class="mt-3 hidden rounded-lg border border-orange-400/30 bg-orange-400/10 px-3 py-2 text-sm leading-relaxed text-orange-100"
+                data-warning-box
+              >
+                <ul class="space-y-1" data-warning-list></ul>
+              </div>
+            </div>
+          </aside>
+        </div>
+
+        <div class="border-t border-gray-800 p-4 sm:p-6">
+          <div class="grid gap-4 lg:grid-cols-2">
+            <details
+              class="rounded-lg border border-gray-800 bg-gray-900/60 p-4"
+              data-procedure-section="gcd"
+            >
+              <summary class="cursor-pointer text-base font-semibold text-white">
+                GCD steps
+              </summary>
+              <ol
+                class="mt-4 space-y-3 text-sm leading-relaxed text-gray-300"
+                data-gcd-steps
+              >
+                <li>Complete a valid list to view the steps.</li>
+              </ol>
+            </details>
+
+            <details
+              class="rounded-lg border border-gray-800 bg-gray-900/60 p-4"
+              data-procedure-section="lcm"
+            >
+              <summary class="cursor-pointer text-base font-semibold text-white">
+                LCM steps
+              </summary>
+              <ol
+                class="mt-4 space-y-3 text-sm leading-relaxed text-gray-300"
+                data-lcm-steps
+              >
+                <li>Complete a valid list to view the steps.</li>
+              </ol>
+            </details>
+          </div>
+
+          <details class="mt-4 rounded-lg border border-gray-800 bg-gray-900/60 p-4">
+            <summary class="cursor-pointer text-base font-semibold text-white">
+              Prime factors
+            </summary>
+            <div class="mt-4 grid gap-4 lg:grid-cols-[minmax(0,1fr)_18rem]">
+              <div>
+                <ul
+                  class="space-y-2 text-sm leading-relaxed text-gray-300"
+                  data-factor-list
+                >
+                  <li>Prime factorization will appear with a valid list.</li>
+                </ul>
+                <p
+                  class="mt-3 hidden rounded-lg border border-gray-700 bg-gray-950 px-3 py-2 text-sm text-gray-300"
+                  data-factor-note
+                ></p>
+              </div>
+              <div class="rounded-lg border border-gray-800 bg-gray-950 p-4">
+                <p class="text-xs font-semibold uppercase text-gray-500">
+                By prime factors
+                </p>
+                <p class="mt-3 text-sm text-gray-300" data-factor-gcd>
+                  GCD: -
+                </p>
+                <p class="mt-2 text-sm text-gray-300" data-factor-lcm>
+                  LCM: -
+                </p>
+              </div>
+            </div>
+          </details>
+        </div>
+      </div>
+    </Container>
+
+    <AdSlot placement="calculator-after-tool" />
+
+    <Container as="section" class="py-6 md:py-8">
+      <SectionIntro
+        title="Worked examples"
+        description="Common cases for practicing GCD, LCM, zeros and coprime numbers."
+      />
+
+      <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+        {
+          GCD_LCM_EXAMPLES.map((example) => (
+            <article class="rounded-lg border border-gray-700 bg-gray-950 p-5">
+              <h3 class="text-base font-semibold text-white">{example.label}</h3>
+              <p class="mt-2 text-sm leading-relaxed text-gray-400">
+                {example.description}
+              </p>
+              <p class="mt-4 break-words rounded-lg border border-gray-800 bg-gray-900 px-3 py-2 text-sm text-gray-300">
+                {example.value}
+              </p>
+            </article>
+          ))
+        }
+      </div>
+    </Container>
+
+    <Container as="section" class="py-6 md:py-8">
+      <SectionIntro
+        title="When to use GCD or LCM"
+        description="Both concepts compare numbers but answer different questions."
+      />
+
+      <div class="grid gap-4 md:grid-cols-2">
+        <article class="rounded-lg border border-gray-700 bg-gray-950 p-5">
+          <h2 class="text-xl font-semibold text-white">GCD</h2>
+          <p class="mt-3 text-sm leading-relaxed text-gray-400">
+            Use it to split quantities, simplify fractions or find the largest common
+            divisor. If the GCD is 1, the numbers are coprime.
+          </p>
+        </article>
+        <article class="rounded-lg border border-gray-700 bg-gray-950 p-5">
+          <h2 class="text-xl font-semibold text-white">LCM</h2>
+          <p class="mt-3 text-sm leading-relaxed text-gray-400">
+            Use it for common denominators, repeating cycles or synchronizing
+            multiples. It is the smallest number divisible by every value.
+          </p>
+        </article>
+      </div>
+    </Container>
+
+    <FaqSection faqs={faqs} />
+  </PageShell>
+</BaseLayout>
+
+<script>
+  import {
+    GCD_LCM_CANONICAL_PATH,
+    buildGcdLcmExplanation,
+    buildGcdLcmSummary,
+    buildGcdProcedureLines,
+    buildLcmProcedureLines,
+    buildVerificationLines,
+    calculateGcdLcmFromInput,
+    formatBigInt,
+    includesGcd,
+    includesLcm,
+  } from "@lib/calculators/matematicas/calculadora-mcd-mcm/gcdLcm.en";
+
+  const input = document.querySelector("[data-gcd-lcm-input]");
+  const errorMessage = document.querySelector("[data-gcd-lcm-error]");
+  const modeButtons = Array.from(document.querySelectorAll("[data-mode-button]"));
+  const resultPanels = Array.from(document.querySelectorAll("[data-result-panel]"));
+  const resultGcd = document.querySelector("[data-result-gcd]");
+  const resultLcm = document.querySelector("[data-result-lcm]");
+  const normalizedList = document.querySelector("[data-normalized-list]");
+  const verificationBox = document.querySelector("[data-verification-box]");
+  const verificationList = document.querySelector("[data-verification-list]");
+  const warningBox = document.querySelector("[data-warning-box]");
+  const warningList = document.querySelector("[data-warning-list]");
+  const gcdSteps = document.querySelector("[data-gcd-steps]");
+  const lcmSteps = document.querySelector("[data-lcm-steps]");
+  const procedureSections = Array.from(
+    document.querySelectorAll("[data-procedure-section]"),
+  );
+  const factorList = document.querySelector("[data-factor-list]");
+  const factorNote = document.querySelector("[data-factor-note]");
+  const factorGcd = document.querySelector("[data-factor-gcd]");
+  const factorLcm = document.querySelector("[data-factor-lcm]");
+  const copyResultButton = document.querySelector("[data-copy-result]");
+  const copyExplanationButton = document.querySelector("[data-copy-explanation]");
+  const copyStatus = document.querySelector("[data-copy-status]");
+  const clearButton = document.querySelector("[data-clear-calculator]");
+  const exampleButtons = Array.from(
+    document.querySelectorAll("[data-example-value]"),
+  );
+
+  let activeMode = "both";
+  let currentCalculation = null;
+  let currentSummaryText = "";
+  let currentExplanationText = "";
+  let copyStatusTimeout = 0;
+
+  function setActiveMode(mode) {
+    activeMode = mode;
+
+    modeButtons.forEach((button) => {
+      const isActive = button.dataset.modeButton === mode;
+      button.setAttribute("aria-pressed", String(isActive));
+      button.classList.toggle("bg-amber-400", isActive);
+      button.classList.toggle("text-gray-950", isActive);
+      button.classList.toggle("text-gray-300", !isActive);
+      button.classList.toggle("hover:bg-gray-800", !isActive);
+    });
+
+    updateModeVisibility();
+    render();
+  }
+
+  function updateModeVisibility() {
+    resultPanels.forEach((panel) => {
+      const panelMode = panel.dataset.resultPanel;
+      const isVisible =
+        (panelMode === "gcd" && includesGcd(activeMode)) ||
+        (panelMode === "lcm" && includesLcm(activeMode));
+
+      panel.classList.toggle("hidden", !isVisible);
+    });
+
+    procedureSections.forEach((section) => {
+      const sectionMode = section.dataset.procedureSection;
+      const isVisible =
+        (sectionMode === "gcd" && includesGcd(activeMode)) ||
+        (sectionMode === "lcm" && includesLcm(activeMode));
+
+      section.classList.toggle("hidden", !isVisible);
+    });
+
+    factorGcd?.classList.toggle("hidden", !includesGcd(activeMode));
+    factorLcm?.classList.toggle("hidden", !includesLcm(activeMode));
+  }
+
+  function render() {
+    if (!(input instanceof HTMLTextAreaElement)) {
+      return;
+    }
+
+    const rawValue = input.value;
+
+    if (!rawValue.trim()) {
+      renderEmptyState();
+      replaceUrl();
+      return;
+    }
+
+    const result = calculateGcdLcmFromInput(rawValue, activeMode);
+
+    if (!result.ok) {
+      renderInvalidState(result.message);
+      replaceUrl();
+      return;
+    }
+
+    renderValidState(result.calculation);
+  }
+
+  function renderValidState(calculation) {
+    currentCalculation = calculation;
+    currentSummaryText = buildGcdLcmSummary(calculation, activeMode);
+    currentExplanationText = buildGcdLcmExplanation(calculation, activeMode);
+
+    setInputValidity(false);
+    hideElement(errorMessage);
+    setText(errorMessage, "");
+    setText(resultGcd, formatBigInt(calculation.gcd));
+    setText(resultLcm, formatBigInt(calculation.lcm));
+    setText(
+      normalizedList,
+      `Values used: ${calculation.normalizedInput}`,
+    );
+    renderLines(verificationList, buildVerificationLines(calculation, activeMode));
+    toggleElement(verificationBox, true);
+    renderLines(warningList, calculation.warnings);
+    toggleElement(warningBox, calculation.warnings.length > 0);
+    renderLines(gcdSteps, buildGcdProcedureLines(calculation));
+    renderLines(lcmSteps, buildLcmProcedureLines(calculation));
+    renderPrimeFactors(calculation);
+    setActionButtonsVisible(true);
+  }
+
+  function renderInvalidState(message) {
+    currentCalculation = null;
+    currentSummaryText = "";
+    currentExplanationText = "";
+    setInputValidity(true);
+    setText(errorMessage, message);
+    toggleElement(errorMessage, true);
+    setText(resultGcd, "-");
+    setText(resultLcm, "-");
+    setText(normalizedList, "Correct the list to continue.");
+    toggleElement(verificationBox, false);
+    toggleElement(warningBox, false);
+    renderLines(gcdSteps, ["Correct the list to view the steps."]);
+    renderLines(lcmSteps, ["Correct the list to view the steps."]);
+    resetPrimeFactors("Correct the list to view prime factorization.");
+    setActionButtonsVisible(false);
+  }
+
+  function renderEmptyState() {
+    currentCalculation = null;
+    currentSummaryText = "";
+    currentExplanationText = "";
+    setInputValidity(false);
+    hideElement(errorMessage);
+    setText(errorMessage, "");
+    setText(resultGcd, "-");
+    setText(resultLcm, "-");
+    setText(normalizedList, "Paste a list to calculate.");
+    toggleElement(verificationBox, false);
+    toggleElement(warningBox, false);
+    renderLines(gcdSteps, ["Complete a valid list to view the steps."]);
+    renderLines(lcmSteps, ["Complete a valid list to view the steps."]);
+    resetPrimeFactors("Prime factorization will appear with a valid list.");
+    setActionButtonsVisible(false);
+  }
+
+  function renderPrimeFactors(calculation) {
+    if (!calculation.primeFactors.available) {
+      resetPrimeFactors(calculation.primeFactors.note);
+      return;
+    }
+
+    renderLines(
+      factorList,
+      calculation.primeFactors.rows.map((row) => row.text),
+    );
+    setText(factorGcd, `GCD: ${calculation.primeFactors.gcdText}`);
+    setText(factorLcm, `LCM: ${calculation.primeFactors.lcmText}`);
+    setText(factorNote, calculation.primeFactors.note ?? "");
+    toggleElement(factorNote, Boolean(calculation.primeFactors.note));
+  }
+
+  function resetPrimeFactors(message) {
+    renderLines(factorList, [message]);
+    setText(factorGcd, "GCD: -");
+    setText(factorLcm, "LCM: -");
+    setText(factorNote, "");
+    toggleElement(factorNote, false);
+  }
+
+  function renderLines(container, lines) {
+    if (!container) {
+      return;
+    }
+
+    const items = lines.length > 0 ? lines : ["-"];
+    const fragment = document.createDocumentFragment();
+
+    items.forEach((line) => {
+      const item = document.createElement("li");
+      item.textContent = line;
+      fragment.append(item);
+    });
+
+    container.replaceChildren(fragment);
+  }
+
+  function setActionButtonsVisible(isVisible) {
+    [copyResultButton, copyExplanationButton].forEach((button) => {
+      button?.classList.toggle("hidden", !isVisible);
+      button?.classList.toggle("inline-flex", isVisible);
+    });
+  }
+
+  function setInputValidity(isInvalid) {
+    if (input instanceof HTMLTextAreaElement) {
+      input.setAttribute("aria-invalid", String(isInvalid));
+    }
+  }
+
+  function setText(element, value) {
+    if (element) {
+      element.textContent = value;
+    }
+  }
+
+  function toggleElement(element, isVisible) {
+    element?.classList.toggle("hidden", !isVisible);
+  }
+
+  function hideElement(element) {
+    element?.classList.add("hidden");
+  }
+
+  function replaceUrl() {
+    if (!window.history?.replaceState) {
+      return;
+    }
+
+    if (window.location.pathname !== GCD_LCM_CANONICAL_PATH || window.location.search) {
+      window.history.replaceState(null, "", GCD_LCM_CANONICAL_PATH);
+    }
+  }
+
+  async function copyText(text, successMessage) {
+    if (!text) {
+      setCopyStatus("There is no result to copy.");
+      return;
+    }
+
+    try {
+      if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(text);
+      } else {
+        const textArea = document.createElement("textarea");
+        textArea.value = text;
+        textArea.setAttribute("readonly", "");
+        textArea.style.position = "fixed";
+        textArea.style.opacity = "0";
+        document.body.append(textArea);
+        textArea.select();
+        document.execCommand("copy");
+        textArea.remove();
+      }
+
+      setCopyStatus(successMessage);
+    } catch {
+      setCopyStatus("Could not copy.");
+    }
+  }
+
+  function setCopyStatus(message) {
+    setText(copyStatus, message);
+    window.clearTimeout(copyStatusTimeout);
+    copyStatusTimeout = window.setTimeout(() => setText(copyStatus, ""), 2500);
+  }
+
+  function loadExample(value) {
+    if (!(input instanceof HTMLTextAreaElement)) {
+      return;
+    }
+
+    input.value = value;
+    render();
+    input.focus();
+  }
+
+  input?.addEventListener("input", render);
+  copyResultButton?.addEventListener("click", () =>
+    copyText(currentSummaryText, "Result copied."),
+  );
+  copyExplanationButton?.addEventListener("click", () =>
+    copyText(currentExplanationText, "Explanation copied."),
+  );
+  clearButton?.addEventListener("click", () => {
+    if (input instanceof HTMLTextAreaElement) {
+      input.value = "";
+      render();
+      input.focus();
+    }
+  });
+  modeButtons.forEach((button) => {
+    button.addEventListener("click", () => {
+      setActiveMode(button.dataset.modeButton ?? "both");
+    });
+  });
+  exampleButtons.forEach((button) => {
+    button.addEventListener("click", () => {
+      loadExample(button.dataset.exampleValue ?? "");
+    });
+  });
+
+  setActiveMode(activeMode);
+</script>
+
+
+
+

@@ -11,12 +11,18 @@ import {
   RESPONSIBILITY_LABELS,
   SUGGESTED_CLOSING_COSTS,
 } from "@lib/calculators/inmuebles/calculadora-gastos-escrituracion/closingCosts";
+import { buildAlternateLinks } from "@lib/i18n/routing";
 import { buildFaqJsonLd } from "@lib/seo";
 
 const title = "Calculadora de gastos de escrituracion";
 const description =
   "Estima gastos de escrituracion y cierre con porcentajes y montos editables para comprador y vendedor.";
 const canonical = "/inmuebles/calculadora-gastos-escrituracion";
+const englishCanonical = "/en/real-estate/closing-costs-calculator";
+const alternates = buildAlternateLinks(
+  { es: canonical, en: englishCanonical },
+  Astro.site ?? Astro.url,
+);
 
 const reserveOptions = [0, 5, 10, 15, 20, 30] as const;
 
@@ -66,7 +72,7 @@ const faqs = [
 const faqJsonLd = buildFaqJsonLd(faqs);
 ---
 
-<BaseLayout title={title} description={description} canonical={canonical}>
+<BaseLayout title={title} description={description} canonical={canonical} alternates={alternates}>
   <Fragment slot="head">
     <script type="application/ld+json" set:html={JSON.stringify(faqJsonLd)} />
   </Fragment>

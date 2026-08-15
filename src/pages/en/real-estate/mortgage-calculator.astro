@@ -1,0 +1,1624 @@
+---
+import BaseLayout from "@layouts/BaseLayout.astro";
+import AdSlot from "@components/ads/AdSlot.astro";
+import Container from "@components/layout/Container.astro";
+import PageShell from "@components/layout/PageShell.astro";
+import FaqSection from "@components/shared/FaqSection.astro";
+import PageHero from "@components/shared/PageHero.astro";
+import SectionIntro from "@components/shared/SectionIntro.astro";
+import { buildAlternateLinks } from "@lib/i18n/routing";
+import { buildFaqJsonLd } from "@lib/seo";
+
+const title =
+  "Online Mortgage Calculator — Monthly Payment and Amortization";
+const description =
+  "Calculate your mortgage payment instantly. See the monthly payment, total interest and amortization schedule. Free and no registration required.";
+const canonical = "/en/real-estate/mortgage-calculator";
+const spanishCanonical = "/inmuebles/calculadora-de-hipoteca";
+const alternates = buildAlternateLinks(
+  { es: spanishCanonical, en: canonical },
+  Astro.site ?? Astro.url,
+);
+
+const yearOptions = Array.from({ length: 30 }, (_, index) => index + 1);
+
+const faqs = [
+  {
+    question: "How is a mortgage's monthly payment calculated?",
+    answer:
+      "A fixed-payment amortization formula is used. The annual rate is divided by 12 and applied to the outstanding balance; each payment covers interest first and then principal.",
+  },
+  {
+    question: "What is an amortization schedule?",
+    answer:
+      "It is the month-by-month breakdown of each payment: how much goes to interest, how much reduces principal and the remaining balance.",
+  },
+  {
+    question: "What does this calculator's payment include?",
+    answer:
+      "The calculated payment includes loan principal and interest. It excludes insurance, taxes, notary fees, appraisals, bank fees and other purchase costs.",
+  },
+  {
+    question: "How much down payment do I need for a mortgage?",
+    answer:
+      "It depends on the lender, property price and borrower profile. This calculator lets you test different percentages or amounts to see how the loan changes.",
+  },
+  {
+    question: "Is a shorter or longer term better?",
+    answer:
+      "A shorter term usually reduces total interest but raises the monthly payment. A longer term lowers the monthly payment but normally increases total cost.",
+  },
+  {
+    question: "What happens if I make extra payments?",
+    answer:
+      "The monthly extra payment is applied after the month's interest and directly reduces the balance. This can shorten the term and save interest.",
+  },
+  {
+    question: "Does the calculator include insurance, taxes or fees?",
+    answer:
+      "No. It estimates only mortgage principal and interest. Review actual costs with the lender, closing professionals and applicable authorities.",
+  },
+];
+
+const faqJsonLd = buildFaqJsonLd(faqs);
+
+const explainerCards = [
+  {
+    title: "Principal and interest",
+    text: "The monthly payment covers the loan: one portion pays interest and another reduces the outstanding balance.",
+  },
+  {
+    title: "Excluded costs",
+    text: "Insurance, taxes, appraisals, notary fees, commissions and other charges are not included in this estimate.",
+  },
+  {
+    title: "Extra payment",
+    text: "If you add a monthly extra payment, the schedule ends when the balance reaches zero and adjusts the final payment.",
+  },
+];
+---
+
+<BaseLayout title={title} description={description} canonical={canonical} locale="en" alternates={alternates}>
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={JSON.stringify(faqJsonLd)} />
+  </Fragment>
+
+  <PageShell>
+    <PageHero
+      title="Mortgage calculator"
+      description="Estimate a mortgage’s monthly payment, total paid, interest and month-by-month amortization."
+      kicker="Real Estate"
+      collapseBreadcrumbOnMobile
+      containerClass="py-6 md:py-8"
+      breadcrumbs={[
+        { label: "Home", href: "/en", ariaLabel: "Home" },
+        { label: "Real Estate", href: "/en/real-estate", optional: true },
+        { label: "Mortgage calculator", truncate: true },
+      ]}
+    />
+
+    <Container as="section" class="py-6 md:py-8">
+      <section
+        id="mortgage-calculator"
+        class="overflow-hidden rounded-lg border border-gray-700 bg-gray-950 shadow-xl shadow-gray-950/30"
+        aria-labelledby="calculator-heading"
+      >
+        <div
+          class="grid gap-0 lg:grid-cols-[minmax(0,1fr)_minmax(18rem,0.76fr)]"
+        >
+          <div class="p-4 sm:p-6">
+            <div class="mb-5">
+              <p
+                class="text-sm font-semibold uppercase tracking-wide text-amber-400"
+              >
+                Main simulation
+              </p>
+              <h2 id="calculator-heading" class="mt-2 text-2xl font-semibold">
+                How much will I pay each month?
+              </h2>
+              <p class="mt-2 text-sm leading-relaxed text-gray-400">
+                Enter the price and down payment, or enter the loan amount
+                directly. Extra payments are optional.
+              </p>
+            </div>
+
+            <div class="mb-5">
+              <span class="block text-sm font-medium text-gray-200">
+                Input type
+              </span>
+              <div
+                class="mt-2 flex rounded-lg border border-gray-700 bg-gray-900 p-1"
+                role="group"
+                aria-label="Input type"
+              >
+                <button
+                  class="min-h-11 flex-1 rounded-md bg-amber-400 px-3 py-2 text-sm font-semibold text-gray-950 transition focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/40"
+                  type="button"
+                  aria-pressed="true"
+                  data-entry-type-option="price"
+                >
+                  Price + down payment
+                </button>
+                <button
+                  class="min-h-11 flex-1 rounded-md px-3 py-2 text-sm font-semibold text-gray-300 transition hover:bg-gray-800 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/40"
+                  type="button"
+                  aria-pressed="false"
+                  data-entry-type-option="loan"
+                >
+                  Loan amount only
+                </button>
+              </div>
+            </div>
+
+            <div class="grid gap-4 sm:grid-cols-2">
+              <div data-entry-panel="price">
+                <label
+                  for="mortgage-property-price"
+                  class="block text-sm font-medium text-gray-200"
+                >
+                  Property price
+                </label>
+                <input
+                  id="mortgage-property-price"
+                  class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-900 px-4 text-base text-white outline-none transition placeholder:text-gray-600 focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15"
+                  type="text"
+                  inputmode="decimal"
+                  autocomplete="off"
+                  placeholder="2000000"
+                  aria-describedby="mortgage-property-price-error"
+                  data-input="propertyPrice"
+                />
+                <p
+                  id="mortgage-property-price-error"
+                  class="mt-2 hidden text-sm text-red-300"
+                  data-error-for="propertyPrice"
+                >
+                </p>
+              </div>
+
+              <div data-entry-panel="price">
+                <span class="block text-sm font-medium text-gray-200">
+                  Enter down payment as
+                </span>
+                <div
+                  class="mt-2 flex min-h-12 rounded-lg border border-gray-700 bg-gray-900 p-1"
+                  role="group"
+                  aria-label="Down payment type"
+                >
+                  <button
+                    class="flex-1 rounded-md bg-amber-400 px-3 py-2 text-sm font-semibold text-gray-950 transition focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/40"
+                    type="button"
+                    aria-pressed="true"
+                    data-down-payment-option="percent"
+                  >
+                    %
+                  </button>
+                  <button
+                    class="flex-1 rounded-md px-3 py-2 text-sm font-semibold text-gray-300 transition hover:bg-gray-800 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/40"
+                    type="button"
+                    aria-pressed="false"
+                    data-down-payment-option="amount"
+                  >
+                    $
+                  </button>
+                </div>
+              </div>
+
+              <div data-entry-panel="price">
+                <label
+                  for="mortgage-down-percent"
+                  class="block text-sm font-medium text-gray-200"
+                >
+                  Enganche
+                </label>
+                <div
+                  class="mt-2 flex rounded-lg border border-gray-700 bg-gray-900 focus-within:border-amber-400 focus-within:ring-3 focus-within:ring-amber-400/15"
+                >
+                  <input
+                    id="mortgage-down-percent"
+                    class="min-h-12 w-full bg-transparent px-4 text-base text-white outline-none"
+                    type="text"
+                    inputmode="decimal"
+                    autocomplete="off"
+                    value="20"
+                    aria-describedby="mortgage-down-percent-error"
+                    data-input="downPaymentPercent"
+                  />
+                  <span class="flex items-center px-4 text-gray-500">%</span>
+                </div>
+                <p
+                  id="mortgage-down-percent-error"
+                  class="mt-2 hidden text-sm text-red-300"
+                  data-error-for="downPaymentPercent"
+                >
+                </p>
+              </div>
+
+              <div data-entry-panel="price">
+                <label
+                  for="mortgage-down-amount"
+                  class="block text-sm font-medium text-gray-200"
+                >
+                  Down payment amount
+                </label>
+                <input
+                  id="mortgage-down-amount"
+                  class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-900 px-4 text-base text-white outline-none transition placeholder:text-gray-600 focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15"
+                  type="text"
+                  inputmode="decimal"
+                  autocomplete="off"
+                  placeholder="Calculated from the price"
+                  aria-describedby="mortgage-down-amount-error"
+                  data-input="downPaymentAmount"
+                />
+                <p
+                  id="mortgage-down-amount-error"
+                  class="mt-2 hidden text-sm text-red-300"
+                  data-error-for="downPaymentAmount"
+                >
+                </p>
+              </div>
+
+              <div data-entry-panel="price">
+                <label
+                  for="mortgage-calculated-principal"
+                  class="block text-sm font-medium text-gray-200"
+                >
+                  Loan amount
+                </label>
+                <input
+                  id="mortgage-calculated-principal"
+                  class="mt-2 min-h-12 w-full rounded-lg border border-gray-800 bg-gray-900/70 px-4 text-base text-gray-300 outline-none"
+                  type="text"
+                  value="Pending"
+                  readonly
+                  data-output="loanAmount"
+                />
+              </div>
+
+              <div class="hidden" data-entry-panel="loan">
+                <label
+                  for="mortgage-loan-principal"
+                  class="block text-sm font-medium text-gray-200"
+                >
+                  Loan amount
+                </label>
+                <input
+                  id="mortgage-loan-principal"
+                  class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-900 px-4 text-base text-white outline-none transition placeholder:text-gray-600 focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15"
+                  type="text"
+                  inputmode="decimal"
+                  autocomplete="off"
+                  placeholder="2000000"
+                  aria-describedby="mortgage-loan-principal-error"
+                  data-input="loanPrincipal"
+                />
+                <p
+                  id="mortgage-loan-principal-error"
+                  class="mt-2 hidden text-sm text-red-300"
+                  data-error-for="loanPrincipal"
+                >
+                </p>
+              </div>
+
+              <div>
+                <label
+                  for="mortgage-rate"
+                  class="block text-sm font-medium text-gray-200"
+                >
+                  Annual interest rate
+                </label>
+                <div
+                  class="mt-2 flex rounded-lg border border-gray-700 bg-gray-900 focus-within:border-amber-400 focus-within:ring-3 focus-within:ring-amber-400/15"
+                >
+                  <input
+                    id="mortgage-rate"
+                    class="min-h-12 w-full bg-transparent px-4 text-base text-white outline-none"
+                    type="text"
+                    inputmode="decimal"
+                    autocomplete="off"
+                    placeholder="9"
+                    aria-describedby="mortgage-rate-error"
+                    data-input="annualRate"
+                  />
+                  <span class="flex items-center px-4 text-gray-500">%</span>
+                </div>
+                <p
+                  id="mortgage-rate-error"
+                  class="mt-2 hidden text-sm text-red-300"
+                  data-error-for="annualRate"
+                >
+                </p>
+              </div>
+
+              <div>
+                <label
+                  for="mortgage-years"
+                  class="block text-sm font-medium text-gray-200"
+                >
+                  Loan term
+                </label>
+                <select
+                  id="mortgage-years"
+                  class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-900 px-4 text-base text-white outline-none transition focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15"
+                  aria-describedby="mortgage-years-error"
+                  data-input="years"
+                >
+                  {
+                    yearOptions.map((year) => (
+                      <option value={year} selected={year === 20}>
+                        {year} {year === 1 ? "year" : "years"}
+                      </option>
+                    ))
+                  }
+                </select>
+                <p
+                  id="mortgage-years-error"
+                  class="mt-2 hidden text-sm text-red-300"
+                  data-error-for="years"
+                >
+                </p>
+              </div>
+
+              <div>
+                <label
+                  for="mortgage-extra-payment"
+                  class="block text-sm font-medium text-gray-200"
+                >
+                  Monthly extra payment
+                </label>
+                <input
+                  id="mortgage-extra-payment"
+                  class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-900 px-4 text-base text-white outline-none transition placeholder:text-gray-600 focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15"
+                  type="text"
+                  inputmode="decimal"
+                  autocomplete="off"
+                  value="0"
+                  aria-describedby="mortgage-extra-payment-error"
+                  data-input="extraPayment"
+                />
+                <p
+                  id="mortgage-extra-payment-error"
+                  class="mt-2 hidden text-sm text-red-300"
+                  data-error-for="extraPayment"
+                >
+                </p>
+              </div>
+            </div>
+
+            <div
+              class="mt-6 flex flex-col gap-3 border-t border-gray-800 pt-5 sm:flex-row sm:flex-wrap"
+            >
+              <button
+                class="inline-flex min-h-11 items-center justify-center rounded-lg border border-gray-700 px-4 py-2 text-sm font-semibold text-gray-200 transition hover:border-amber-400 hover:text-white focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/40"
+                type="button"
+                data-fill-example
+              >
+                Use example
+              </button>
+              <button
+                class="inline-flex min-h-11 items-center justify-center rounded-lg border border-gray-700 px-4 py-2 text-sm font-semibold text-gray-200 transition hover:border-amber-400 hover:text-white focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/40"
+                type="button"
+                data-clear-calculator
+              >
+                Clear
+              </button>
+              <button
+                class="hidden min-h-11 items-center justify-center rounded-lg bg-amber-400 px-4 py-2 text-sm font-semibold text-gray-950 transition hover:bg-amber-300 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/40"
+                type="button"
+                data-copy-result
+              >
+                <span data-copy-label>Copy summary</span>
+              </button>
+              <button
+                class="hidden min-h-11 items-center justify-center rounded-lg border border-gray-700 px-4 py-2 text-sm font-semibold text-gray-200 transition hover:border-amber-400 hover:text-white focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/40"
+                type="button"
+                data-export-csv
+              >
+                Export CSV
+              </button>
+              <p class="sr-only" aria-live="polite" data-copy-status></p>
+            </div>
+          </div>
+
+          <aside
+            class="border-t border-gray-800 bg-gray-900/70 p-4 sm:p-6 lg:border-l lg:border-t-0"
+            aria-live="polite"
+            data-result-region
+          >
+            <p
+              class="text-sm font-semibold uppercase tracking-wide text-amber-400"
+              data-result-kicker
+            >
+              Result
+            </p>
+            <p
+              class="mt-3 break-words text-3xl font-bold leading-tight text-white"
+              data-main-result
+            >
+              Enter the values
+            </p>
+
+            <div class="mt-5 grid gap-3" data-summary-grid>
+              <div
+                class="rounded-lg border border-gray-800 bg-gray-950/70 p-4 text-sm text-gray-400"
+              >
+                The summary will appear here.
+              </div>
+            </div>
+
+            <p
+              class="mt-4 hidden rounded-lg border border-amber-400/40 bg-amber-400/10 p-3 text-sm leading-relaxed text-amber-200"
+              data-warning
+            >
+            </p>
+
+            <p
+              class="mt-4 hidden rounded-lg border border-emerald-400/40 bg-emerald-400/10 p-3 text-sm leading-relaxed text-emerald-200"
+              data-extra-summary
+            >
+            </p>
+
+            <div class="mt-5 rounded-lg border border-gray-800 p-4">
+              <p
+                class="text-xs font-semibold uppercase tracking-wide text-gray-500"
+              >
+                Quick summary
+              </p>
+              <p
+                class="mt-2 text-sm leading-relaxed text-gray-300"
+                data-explanation
+              >
+                The calculation will appear here.
+              </p>
+            </div>
+
+            <p
+              class="mt-4 rounded-lg border border-gray-800 bg-gray-950/70 p-3 text-xs leading-relaxed text-gray-400"
+            >
+              Results are illustrative estimates. The calculated payment
+              includes loan principal and interest but does not include
+              insurance, taxes, notary fees, appraisals, commissions or
+              other costs. Actual terms depend on the
+              lender, your credit profile and applicable regulations.
+            </p>
+          </aside>
+        </div>
+      </section>
+    </Container>
+
+    <AdSlot placement="calculator-after-tool" />
+
+    <Container as="section" class="py-8">
+      <SectionIntro
+        title="Amortization schedule"
+        description="See how much of each payment goes to principal, interest and the outstanding balance. Twelve months are shown per page."
+        class="mb-5"
+      />
+
+      <p
+        class="rounded-lg border border-gray-700 bg-gray-950 p-4 text-sm text-gray-400"
+        data-amortization-empty
+      >
+        The table will appear after you enter a valid mortgage.
+      </p>
+
+      <div class="hidden space-y-4" data-amortization-table>
+        <div class="overflow-x-auto rounded-lg border border-gray-700">
+          <table
+            class="min-w-[42rem] w-full divide-y divide-gray-800 bg-gray-950 text-left text-sm"
+          >
+            <caption class="sr-only">
+              Monthly mortgage amortization schedule
+            </caption>
+            <thead class="bg-gray-900 text-gray-300">
+              <tr>
+                <th class="px-4 py-3 font-semibold" scope="col">Month</th>
+                <th class="px-4 py-3 text-right font-semibold" scope="col">
+                  Payment
+                </th>
+                <th class="px-4 py-3 text-right font-semibold" scope="col">
+                  Principal
+                </th>
+                <th class="px-4 py-3 text-right font-semibold" scope="col">
+                  Interest
+                </th>
+                <th class="px-4 py-3 text-right font-semibold" scope="col">
+                  Outstanding balance
+                </th>
+              </tr>
+            </thead>
+            <tbody
+              class="divide-y divide-gray-800 text-gray-300"
+              data-amortization-body
+            >
+            </tbody>
+          </table>
+        </div>
+
+        <div
+          class="grid gap-4 rounded-lg border border-gray-700 bg-gray-950 p-4 md:grid-cols-[1fr_auto]"
+        >
+          <dl class="grid gap-3 sm:grid-cols-2 lg:grid-cols-4" data-table-totals>
+          </dl>
+
+          <div
+            class="flex flex-col gap-3 sm:flex-row sm:items-end"
+            data-pagination
+          >
+            <button
+              class="inline-flex min-h-11 items-center justify-center rounded-lg border border-gray-700 px-3 py-2 text-sm font-semibold text-gray-200 transition hover:border-amber-400 hover:text-white disabled:cursor-not-allowed disabled:opacity-40"
+              type="button"
+              data-prev-page
+            >
+              Previous
+            </button>
+            <label class="sr-only" for="mortgage-page-select">
+              Amortization page
+            </label>
+            <select
+              id="mortgage-page-select"
+              class="min-h-11 rounded-lg border border-gray-700 bg-gray-900 px-3 text-sm text-white outline-none focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15"
+              data-page-select
+            >
+            </select>
+            <button
+              class="inline-flex min-h-11 items-center justify-center rounded-lg border border-gray-700 px-3 py-2 text-sm font-semibold text-gray-200 transition hover:border-amber-400 hover:text-white disabled:cursor-not-allowed disabled:opacity-40"
+              type="button"
+              data-next-page
+            >
+              Next
+            </button>
+          </div>
+        </div>
+      </div>
+    </Container>
+
+    <Container as="section" class="py-8">
+      <SectionIntro
+        title="What this calculator shows"
+        description="The result is a mortgage estimate that helps compare scenarios before speaking with a lender."
+        class="mb-6"
+      />
+
+      <div class="grid gap-4 md:grid-cols-3">
+        {
+          explainerCards.map((card) => (
+            <article class="rounded-lg border border-gray-700 bg-gray-950 p-5">
+              <h3 class="text-lg font-semibold text-white">{card.title}</h3>
+              <p class="mt-2 text-sm leading-relaxed text-gray-400">
+                {card.text}
+              </p>
+            </article>
+          ))
+        }
+      </div>
+    </Container>
+
+    <Container as="section" class="py-8">
+      <div class="grid gap-6 lg:grid-cols-2">
+        <article>
+          <h2 class="text-2xl font-semibold">Calculation example</h2>
+          <p class="mt-3 text-sm leading-relaxed text-gray-400">
+            For a $2,000,000 loan over 20 years at a 9% annual rate, the
+            estimated payment is $17,994.52. The total paid would be
+            approximately $4,318,684.59, of which $2,318,684.59 would be
+            interest.
+          </p>
+        </article>
+        <article>
+          <h2 class="text-2xl font-semibold">How to read the amortization schedule</h2>
+          <p class="mt-3 text-sm leading-relaxed text-gray-400">
+            At first, a larger portion of each payment goes to interest. Over
+            time, the portion reducing principal increases. Extra payments reduce
+            the balance faster and may lower total cost.
+          </p>
+        </article>
+      </div>
+    </Container>
+
+    <FaqSection faqs={faqs} />
+  </PageShell>
+</BaseLayout>
+
+<script>
+  import {
+    buildAmortizationSchedule,
+    calculateExtraPaymentSavings,
+    calculateMonthlyPayment,
+    calculateMortgageSummary,
+    formatCurrency,
+    formatDuration,
+    formatPercent,
+    parseMortgageInput,
+    roundCurrency,
+  } from "@lib/calculators/inmuebles/calculadora-de-hipoteca/mortgage.en";
+
+  const ROWS_PER_PAGE = 12;
+  const BALANCE_EPSILON = 0.005;
+
+  const ERROR_MESSAGES = {
+    required: "This field is required.",
+    invalid: "Enter a valid number.",
+    negative: "The value cannot be negative.",
+    too_many_decimals: "Use no more than 2 decimal places.",
+    too_many_rate_decimals: "Use no more than 4 decimal places.",
+    price_positive: "Enter a price greater than zero.",
+    principal_positive: "Enter a loan amount greater than zero.",
+    down_payment_negative: "The down payment cannot be negative.",
+    down_payment_high: "The down payment cannot exceed the property price.",
+    down_payment_percent_range: "The down payment must be between 0% and 100%.",
+    rate_negative: "The rate cannot be negative.",
+    rate_high: "The rate cannot exceed 30%.",
+    years_integer: "Enter a whole number of years.",
+    years_range: "The term must be between 1 and 30 years.",
+    extra_negative: "The extra payment cannot be negative.",
+  };
+
+  const inputSelectors = {
+    propertyPrice: '[data-input="propertyPrice"]',
+    downPaymentPercent: '[data-input="downPaymentPercent"]',
+    downPaymentAmount: '[data-input="downPaymentAmount"]',
+    loanPrincipal: '[data-input="loanPrincipal"]',
+    annualRate: '[data-input="annualRate"]',
+    years: '[data-input="years"]',
+    extraPayment: '[data-input="extraPayment"]',
+  };
+
+  const inputs = Object.fromEntries(
+    Object.entries(inputSelectors).map(([key, selector]) => [
+      key,
+      document.querySelector(selector),
+    ]),
+  );
+
+  const entryButtons = document.querySelectorAll("[data-entry-type-option]");
+  const downPaymentButtons = document.querySelectorAll(
+    "[data-down-payment-option]",
+  );
+  const entryPanels = document.querySelectorAll("[data-entry-panel]");
+  const loanAmountOutput = document.querySelector('[data-output="loanAmount"]');
+  const resultKicker = document.querySelector("[data-result-kicker]");
+  const mainResult = document.querySelector("[data-main-result]");
+  const summaryGrid = document.querySelector("[data-summary-grid]");
+  const warningElement = document.querySelector("[data-warning]");
+  const extraSummary = document.querySelector("[data-extra-summary]");
+  const explanation = document.querySelector("[data-explanation]");
+  const copyButton = document.querySelector("[data-copy-result]");
+  const copyLabel = document.querySelector("[data-copy-label]");
+  const copyStatus = document.querySelector("[data-copy-status]");
+  const exportButton = document.querySelector("[data-export-csv]");
+  const clearButton = document.querySelector("[data-clear-calculator]");
+  const exampleButton = document.querySelector("[data-fill-example]");
+  const tableEmpty = document.querySelector("[data-amortization-empty]");
+  const tableWrapper = document.querySelector("[data-amortization-table]");
+  const tableBody = document.querySelector("[data-amortization-body]");
+  const tableTotals = document.querySelector("[data-table-totals]");
+  const prevPageButton = document.querySelector("[data-prev-page]");
+  const nextPageButton = document.querySelector("[data-next-page]");
+  const pageSelect = document.querySelector("[data-page-select]");
+
+  let currentEntryType = "price";
+  let currentDownPaymentMode = "percent";
+  let currentSchedule = [];
+  let currentSummary = null;
+  let currentInput = null;
+  let currentPage = 1;
+  let currentCopyText = "";
+  let copiedTimeout = 0;
+
+  function updateSegmentButtons() {
+    entryButtons.forEach((button) => {
+      const isActive = button.dataset.entryTypeOption === currentEntryType;
+      button.setAttribute("aria-pressed", String(isActive));
+      button.classList.toggle("bg-amber-400", isActive);
+      button.classList.toggle("text-gray-950", isActive);
+      button.classList.toggle("text-gray-300", !isActive);
+      button.classList.toggle("hover:bg-gray-800", !isActive);
+    });
+
+    downPaymentButtons.forEach((button) => {
+      const isActive =
+        button.dataset.downPaymentOption === currentDownPaymentMode;
+      button.setAttribute("aria-pressed", String(isActive));
+      button.classList.toggle("bg-amber-400", isActive);
+      button.classList.toggle("text-gray-950", isActive);
+      button.classList.toggle("text-gray-300", !isActive);
+      button.classList.toggle("hover:bg-gray-800", !isActive);
+    });
+
+    entryPanels.forEach((panel) => {
+      const isActive = panel.dataset.entryPanel === currentEntryType;
+      panel.classList.toggle("hidden", !isActive);
+    });
+  }
+
+  function hasStarted() {
+    return Object.values(inputs).some((input) => {
+      if (!input || input.dataset.touched !== "true") {
+        return false;
+      }
+
+      return true;
+    });
+  }
+
+  function updateCalculator() {
+    clearErrors();
+    updateCalculatedLoanAmount();
+
+    if (!hasStarted()) {
+      setInitialState();
+      return;
+    }
+
+    const parsed = parseFormValues();
+
+    if (parsed.noLoan) {
+      setNoLoanState();
+      return;
+    }
+
+    if (!parsed.ok) {
+      showErrors(parsed.errors);
+      setInvalidState();
+      return;
+    }
+
+    const monthlyPayment = calculateMonthlyPayment(
+      parsed.input.principal,
+      parsed.input.annualRate,
+      parsed.input.years,
+    );
+    const baseSchedule = buildAmortizationSchedule({
+      principal: parsed.input.principal,
+      annualRate: parsed.input.annualRate,
+      years: parsed.input.years,
+    });
+    const schedule = buildAmortizationSchedule(parsed.input);
+    const summary = calculateMortgageSummary(schedule, parsed.input.principal);
+    const savings =
+      parsed.input.extraPayment > 0
+        ? calculateExtraPaymentSavings(baseSchedule, schedule)
+        : null;
+    const warnings = buildWarnings(parsed.input, monthlyPayment);
+
+    currentInput = parsed.input;
+    currentSchedule = schedule;
+    currentSummary = summary;
+    currentPage = 1;
+    currentCopyText = buildCopyText(
+      parsed.input,
+      monthlyPayment,
+      summary,
+      savings,
+    );
+
+    renderResult(parsed.input, monthlyPayment, summary, savings, warnings);
+    renderTable();
+    setActionsVisible(true);
+  }
+
+  function parseFormValues() {
+    const principalResult =
+      currentEntryType === "price"
+        ? parsePrincipalFromPrice()
+        : parseDirectPrincipal();
+
+    if (principalResult.noLoan) {
+      return { noLoan: true };
+    }
+
+    if (!principalResult.ok) {
+      return { ok: false, errors: principalResult.errors };
+    }
+
+    const errors = {};
+    const annualRate = parseRequiredRate("annualRate");
+    const years = parseRequiredYears();
+    const extraPayment = parseOptionalMoney("extraPayment", 0);
+
+    collectError(errors, "annualRate", annualRate, {
+      negative: "rate_negative",
+      too_many_decimals: "too_many_rate_decimals",
+    });
+    collectError(errors, "years", years, {
+      too_many_decimals: "years_integer",
+    });
+    collectError(errors, "extraPayment", extraPayment, {
+      negative: "extra_negative",
+    });
+
+    if (annualRate.ok && annualRate.value > 30) {
+      errors.annualRate = "rate_high";
+    }
+
+    if (
+      years.ok &&
+      (!Number.isInteger(years.value) || years.value < 1 || years.value > 30)
+    ) {
+      errors.years = Number.isInteger(years.value)
+        ? "years_range"
+        : "years_integer";
+    }
+
+    if (Object.keys(errors).length > 0) {
+      return { ok: false, errors };
+    }
+
+    return {
+      ok: true,
+      input: {
+        entryType: currentEntryType,
+        principal: principalResult.principal,
+        annualRate: annualRate.value,
+        years: years.value,
+        extraPayment: extraPayment.value,
+        propertyPrice: principalResult.propertyPrice,
+        downPayment: principalResult.downPayment,
+      },
+    };
+  }
+
+  function parsePrincipalFromPrice() {
+    const errors = {};
+    const propertyPrice = parseRequiredMoney("propertyPrice");
+
+    collectError(errors, "propertyPrice", propertyPrice, {
+      negative: "price_positive",
+    });
+
+    if (propertyPrice.ok && propertyPrice.value <= 0) {
+      errors.propertyPrice = "price_positive";
+    }
+
+    if (!propertyPrice.ok || errors.propertyPrice) {
+      return { ok: false, errors };
+    }
+
+    const downPaymentResult =
+      currentDownPaymentMode === "percent"
+        ? parseDownPaymentPercent(propertyPrice.value, errors)
+        : parseDownPaymentAmount(propertyPrice.value, errors);
+
+    if (Object.keys(errors).length > 0 || !downPaymentResult.ok) {
+      return { ok: false, errors };
+    }
+
+    const principal = propertyPrice.value - downPaymentResult.downPayment;
+
+    if (Math.abs(principal) <= BALANCE_EPSILON) {
+      return { noLoan: true };
+    }
+
+    if (principal < 0) {
+      errors.downPaymentAmount = "down_payment_high";
+      return { ok: false, errors };
+    }
+
+    return {
+      ok: true,
+      principal,
+      propertyPrice: propertyPrice.value,
+      downPayment: downPaymentResult.downPayment,
+    };
+  }
+
+  function parseDownPaymentPercent(propertyPrice, errors) {
+    const parsed = parseRequiredRate("downPaymentPercent");
+
+    collectError(errors, "downPaymentPercent", parsed, {
+      negative: "down_payment_negative",
+      too_many_decimals: "too_many_rate_decimals",
+    });
+
+    if (!parsed.ok) {
+      return { ok: false };
+    }
+
+    if (parsed.value < 0 || parsed.value > 100) {
+      errors.downPaymentPercent = "down_payment_percent_range";
+      return { ok: false };
+    }
+
+    return {
+      ok: true,
+      downPayment: propertyPrice * (parsed.value / 100),
+    };
+  }
+
+  function parseDownPaymentAmount(propertyPrice, errors) {
+    const parsed = parseRequiredMoney("downPaymentAmount");
+
+    collectError(errors, "downPaymentAmount", parsed, {
+      negative: "down_payment_negative",
+    });
+
+    if (!parsed.ok) {
+      return { ok: false };
+    }
+
+    if (parsed.value > propertyPrice) {
+      errors.downPaymentAmount = "down_payment_high";
+      return { ok: false };
+    }
+
+    return {
+      ok: true,
+      downPayment: parsed.value,
+    };
+  }
+
+  function parseDirectPrincipal() {
+    const errors = {};
+    const principal = parseRequiredMoney("loanPrincipal");
+
+    collectError(errors, "loanPrincipal", principal, {
+      negative: "principal_positive",
+    });
+
+    if (principal.ok && principal.value <= 0) {
+      errors.loanPrincipal = "principal_positive";
+    }
+
+    if (Object.keys(errors).length > 0) {
+      return { ok: false, errors };
+    }
+
+    return {
+      ok: true,
+      principal: principal.value,
+      propertyPrice: null,
+      downPayment: null,
+    };
+  }
+
+  function parseRequiredMoney(field) {
+    return parseMortgageInput(inputs[field]?.value ?? "");
+  }
+
+  function parseRequiredRate(field) {
+    return parseMortgageInput(inputs[field]?.value ?? "", {
+      maxDecimals: 4,
+      preferDecimal: true,
+    });
+  }
+
+  function parseRequiredYears() {
+    const parsed = parseMortgageInput(inputs.years?.value ?? "", {
+      maxDecimals: 2,
+      preferDecimal: true,
+    });
+
+    if (!parsed.ok) {
+      return parsed;
+    }
+
+    if (parsed.normalized.includes(".")) {
+      return { ok: false, error: "years_integer" };
+    }
+
+    return parsed;
+  }
+
+  function parseOptionalMoney(field, fallback) {
+    const input = inputs[field];
+
+    if (!input || input.value.trim() === "") {
+      return { ok: true, value: fallback };
+    }
+
+    return parseMortgageInput(input.value);
+  }
+
+  function collectError(errors, field, parsed, overrides = {}) {
+    if (!parsed.ok) {
+      errors[field] = overrides[parsed.error] ?? parsed.error;
+    }
+  }
+
+  function buildWarnings(input, monthlyPayment) {
+    const warnings = [];
+
+    if (input.extraPayment > monthlyPayment) {
+      warnings.push(
+        "The extra payment exceeds the base payment; calculation is allowed and the loan will be paid off faster.",
+      );
+    }
+
+    return warnings;
+  }
+
+  function renderResult(input, monthlyPayment, summary, savings, warnings) {
+    if (
+      !resultKicker ||
+      !mainResult ||
+      !summaryGrid ||
+      !warningElement ||
+      !extraSummary ||
+      !explanation
+    ) {
+      return;
+    }
+
+    resultKicker.textContent = "Estimated monthly payment";
+    mainResult.textContent = formatCurrency(monthlyPayment);
+
+    const summaryItems = [
+      {
+        label: "Loan amount",
+        value: formatCurrency(input.principal),
+      },
+      {
+        label: "Total paid",
+        value: formatCurrency(summary.totalPaid),
+      },
+      {
+        label: "Total interest",
+        value: formatCurrency(summary.totalInterest),
+      },
+      {
+        label: "Interest / principal",
+        value: `${formatPercent(summary.interestShare)} interest - ${formatPercent(summary.principalShare)} principal`,
+      },
+    ];
+
+    if (input.extraPayment > 0) {
+      summaryItems.splice(1, 0, {
+        label: "Monthly payment with extra",
+        value: formatCurrency(monthlyPayment + input.extraPayment),
+      });
+    }
+
+    summaryGrid.innerHTML = summaryItems
+      .map(
+        (item) => `
+          <div class="rounded-lg border border-gray-800 bg-gray-950/70 p-4">
+            <span class="block text-xs font-semibold uppercase tracking-wide text-gray-500">${escapeHtml(item.label)}</span>
+            <span class="mt-2 block break-words text-lg font-semibold text-white">${escapeHtml(item.value)}</span>
+          </div>
+        `,
+      )
+      .join("");
+
+    warningElement.textContent = warnings.join(" ");
+    warningElement.classList.toggle("hidden", warnings.length === 0);
+
+    if (savings) {
+      extraSummary.textContent = `With the extra payment, you pay off the loan in ${formatDuration(savings.effectiveMonths)}, saving ${savings.monthsSaved} months and ${formatCurrency(savings.interestSaved)} in interest.`;
+      extraSummary.classList.remove("hidden");
+    } else {
+      extraSummary.textContent = "";
+      extraSummary.classList.add("hidden");
+    }
+
+    const duration = `${input.years} ${input.years === 1 ? "year" : "years"}`;
+    const extraText =
+      input.extraPayment > 0
+        ? ` With the extra payment, the effective term would be ${formatDuration(summary.months)}.`
+        : "";
+
+    explanation.textContent = `At an annual rate of ${formatPercent(input.annualRate)} over ${duration}, you would pay approximately ${formatCurrency(monthlyPayment)} per month. By the end, you will have paid ${formatCurrency(summary.totalInterest)} in interest.${extraText}`;
+  }
+
+  function renderTable() {
+    if (
+      !tableEmpty ||
+      !tableWrapper ||
+      !tableBody ||
+      !tableTotals ||
+      !pageSelect ||
+      !prevPageButton ||
+      !nextPageButton ||
+      !currentSummary
+    ) {
+      return;
+    }
+
+    const totalPages = Math.max(
+      Math.ceil(currentSchedule.length / ROWS_PER_PAGE),
+      1,
+    );
+    currentPage = Math.min(Math.max(currentPage, 1), totalPages);
+    const startIndex = (currentPage - 1) * ROWS_PER_PAGE;
+    const visibleRows = currentSchedule.slice(
+      startIndex,
+      startIndex + ROWS_PER_PAGE,
+    );
+
+    tableEmpty.classList.add("hidden");
+    tableWrapper.classList.remove("hidden");
+    tableBody.innerHTML = visibleRows
+      .map(
+        (row) => `
+          <tr class="transition-colors hover:bg-gray-900/60">
+            <th class="px-4 py-3 font-semibold text-white" scope="row">${row.month}</th>
+            <td class="px-4 py-3 text-right">${escapeHtml(formatCurrency(row.payment))}</td>
+            <td class="px-4 py-3 text-right">${escapeHtml(formatCurrency(row.principal))}</td>
+            <td class="px-4 py-3 text-right">${escapeHtml(formatCurrency(row.interest))}</td>
+            <td class="px-4 py-3 text-right font-semibold text-white">${escapeHtml(formatCurrency(row.remainingBalance))}</td>
+          </tr>
+        `,
+      )
+      .join("");
+
+    tableTotals.innerHTML = [
+      {
+        label: "Principal",
+        value: formatCurrency(currentSummary.totalPrincipal),
+      },
+      {
+        label: "Interest",
+        value: formatCurrency(currentSummary.totalInterest),
+      },
+      {
+        label: "Total paid",
+        value: formatCurrency(currentSummary.totalPaid),
+      },
+      {
+        label: "Actual duration",
+        value: `${currentSummary.months} months`,
+      },
+    ]
+      .map(
+        (item) => `
+          <div>
+            <dt class="text-xs font-semibold uppercase tracking-wide text-gray-500">${escapeHtml(item.label)}</dt>
+            <dd class="mt-1 break-words text-sm font-semibold text-white">${escapeHtml(item.value)}</dd>
+          </div>
+        `,
+      )
+      .join("");
+
+    pageSelect.innerHTML = Array.from({ length: totalPages }, (_, index) => {
+      const page = index + 1;
+
+      return `<option value="${page}" ${page === currentPage ? "selected" : ""}>Page ${page} of ${totalPages}</option>`;
+    }).join("");
+    prevPageButton.disabled = currentPage === 1;
+    nextPageButton.disabled = currentPage === totalPages;
+  }
+
+  function setInitialState() {
+    if (
+      !resultKicker ||
+      !mainResult ||
+      !summaryGrid ||
+      !warningElement ||
+      !extraSummary ||
+      !explanation ||
+      !tableEmpty ||
+      !tableWrapper ||
+      !tableBody ||
+      !tableTotals
+    ) {
+      return;
+    }
+
+    resultKicker.textContent = "Result";
+    mainResult.textContent = "Enter the values";
+    summaryGrid.innerHTML = `
+      <div class="rounded-lg border border-gray-800 bg-gray-950/70 p-4 text-sm text-gray-400">
+        The summary will appear here.
+      </div>
+    `;
+    warningElement.textContent = "";
+    warningElement.classList.add("hidden");
+    extraSummary.textContent = "";
+    extraSummary.classList.add("hidden");
+    explanation.textContent = "The calculation will appear here.";
+    tableEmpty.classList.remove("hidden");
+    tableWrapper.classList.add("hidden");
+    tableBody.innerHTML = "";
+    tableTotals.innerHTML = "";
+    setActionsVisible(false);
+    currentSchedule = [];
+    currentSummary = null;
+    currentInput = null;
+    currentCopyText = "";
+    currentPage = 1;
+  }
+
+  function setInvalidState() {
+    if (
+      !resultKicker ||
+      !mainResult ||
+      !summaryGrid ||
+      !warningElement ||
+      !extraSummary ||
+      !explanation ||
+      !tableEmpty ||
+      !tableWrapper ||
+      !tableBody ||
+      !tableTotals
+    ) {
+      return;
+    }
+
+    resultKicker.textContent = "Check the fields";
+    mainResult.textContent = "Cannot calculate yet";
+    summaryGrid.innerHTML = "";
+    warningElement.textContent = "";
+    warningElement.classList.add("hidden");
+    extraSummary.textContent = "";
+    extraSummary.classList.add("hidden");
+    explanation.textContent = "Correct the highlighted values to continue.";
+    tableEmpty.classList.remove("hidden");
+    tableWrapper.classList.add("hidden");
+    tableBody.innerHTML = "";
+    tableTotals.innerHTML = "";
+    setActionsVisible(false);
+    currentSchedule = [];
+    currentSummary = null;
+    currentInput = null;
+    currentCopyText = "";
+  }
+
+  function setNoLoanState() {
+    if (
+      !resultKicker ||
+      !mainResult ||
+      !summaryGrid ||
+      !warningElement ||
+      !extraSummary ||
+      !explanation ||
+      !tableEmpty ||
+      !tableWrapper ||
+      !tableBody ||
+      !tableTotals
+    ) {
+      return;
+    }
+
+    resultKicker.textContent = "No loan";
+    mainResult.textContent = "There is no loan to calculate";
+    summaryGrid.innerHTML = `
+      <div class="rounded-lg border border-emerald-400/40 bg-emerald-400/10 p-4 text-sm leading-relaxed text-emerald-200">
+        There is no loan to calculate because the down payment covers the full price.
+      </div>
+    `;
+    warningElement.textContent = "";
+    warningElement.classList.add("hidden");
+    extraSummary.textContent = "";
+    extraSummary.classList.add("hidden");
+    explanation.textContent =
+      "To compare a mortgage, reduce the down payment or select Loan amount only.";
+    tableEmpty.classList.remove("hidden");
+    tableWrapper.classList.add("hidden");
+    tableBody.innerHTML = "";
+    tableTotals.innerHTML = "";
+    setActionsVisible(false);
+    currentSchedule = [];
+    currentSummary = null;
+    currentInput = null;
+    currentCopyText = "";
+  }
+
+  function setActionsVisible(isVisible) {
+    copyButton?.classList.toggle("hidden", !isVisible);
+    copyButton?.classList.toggle("inline-flex", isVisible);
+    exportButton?.classList.toggle("hidden", !isVisible);
+    exportButton?.classList.toggle("inline-flex", isVisible);
+  }
+
+  function clearErrors() {
+    document.querySelectorAll("[data-error-for]").forEach((errorElement) => {
+      errorElement.textContent = "";
+      errorElement.classList.add("hidden");
+    });
+  }
+
+  function showErrors(errors) {
+    Object.entries(errors).forEach(([field, error]) => {
+      const errorElement = document.querySelector(
+        `[data-error-for="${field}"]`,
+      );
+
+      if (!errorElement) {
+        return;
+      }
+
+      errorElement.textContent =
+        ERROR_MESSAGES[error] ?? ERROR_MESSAGES.invalid;
+      errorElement.classList.remove("hidden");
+    });
+  }
+
+  function updateCalculatedLoanAmount() {
+    if (!loanAmountOutput || currentEntryType !== "price") {
+      return;
+    }
+
+    const parsed = parsePrincipalFromPrice();
+
+    if (parsed.noLoan) {
+      loanAmountOutput.value = formatCurrency(0);
+      return;
+    }
+
+    if (!parsed.ok) {
+      loanAmountOutput.value = "Pending";
+      return;
+    }
+
+    loanAmountOutput.value = formatCurrency(parsed.principal);
+  }
+
+  function syncDownPaymentFromPercent() {
+    const price = parseMortgageInput(inputs.propertyPrice?.value ?? "");
+    const percent = parseMortgageInput(inputs.downPaymentPercent?.value ?? "", {
+      maxDecimals: 4,
+      preferDecimal: true,
+    });
+
+    if (!price.ok || !percent.ok || price.value <= 0) {
+      return;
+    }
+
+    inputs.downPaymentAmount.value = formatPlainNumber(
+      price.value * (percent.value / 100),
+    );
+  }
+
+  function syncDownPaymentFromAmount() {
+    const price = parseMortgageInput(inputs.propertyPrice?.value ?? "");
+    const amount = parseMortgageInput(inputs.downPaymentAmount?.value ?? "");
+
+    if (!price.ok || !amount.ok || price.value <= 0) {
+      return;
+    }
+
+    inputs.downPaymentPercent.value = formatPlainNumber(
+      (amount.value / price.value) * 100,
+      4,
+    );
+  }
+
+  function setEntryType(nextType) {
+    currentEntryType = nextType;
+    updateSegmentButtons();
+    clearErrors();
+    updateCalculator();
+  }
+
+  function setDownPaymentMode(nextMode) {
+    currentDownPaymentMode = nextMode;
+    updateSegmentButtons();
+
+    if (nextMode === "percent") {
+      syncDownPaymentFromPercent();
+      inputs.downPaymentPercent?.focus();
+    } else {
+      syncDownPaymentFromAmount();
+      inputs.downPaymentAmount?.focus();
+    }
+
+    updateCalculator();
+  }
+
+  function markTouched(input) {
+    if (input) {
+      input.dataset.touched = "true";
+    }
+  }
+
+  function clearCalculator() {
+    currentEntryType = "price";
+    currentDownPaymentMode = "percent";
+    inputs.propertyPrice.value = "";
+    inputs.downPaymentPercent.value = "20";
+    inputs.downPaymentAmount.value = "";
+    inputs.loanPrincipal.value = "";
+    inputs.annualRate.value = "";
+    inputs.years.value = "20";
+    inputs.extraPayment.value = "0";
+    Object.values(inputs).forEach((input) => {
+      if (input) {
+        delete input.dataset.touched;
+      }
+    });
+    updateSegmentButtons();
+    updateCalculatedLoanAmount();
+    clearErrors();
+    setInitialState();
+  }
+
+  function fillExample() {
+    currentEntryType = "loan";
+    currentDownPaymentMode = "percent";
+    inputs.propertyPrice.value = "";
+    inputs.downPaymentPercent.value = "20";
+    inputs.downPaymentAmount.value = "";
+    inputs.loanPrincipal.value = "2000000";
+    inputs.annualRate.value = "9";
+    inputs.years.value = "20";
+    inputs.extraPayment.value = "0";
+    Object.values(inputs).forEach(markTouched);
+    updateSegmentButtons();
+    updateCalculator();
+  }
+
+  function buildCopyText(input, monthlyPayment, summary, savings) {
+    const lines = [
+      "Mortgage calculator - calculadoras.tools",
+      `Loan amount: ${formatCurrency(input.principal)}`,
+      `Annual rate: ${formatPercent(input.annualRate)}`,
+      `Term: ${input.years} ${input.years === 1 ? "year" : "years"}`,
+      `Monthly payment: ${formatCurrency(monthlyPayment)}`,
+      `Total paid: ${formatCurrency(summary.totalPaid)}`,
+      `Total interest: ${formatCurrency(summary.totalInterest)}`,
+    ];
+
+    if (input.extraPayment > 0 && savings) {
+      lines.push(
+        `Monthly extra payment: ${formatCurrency(input.extraPayment)}`,
+        `Effective term: ${formatDuration(savings.effectiveMonths)}`,
+        `Estimated interest savings: ${formatCurrency(savings.interestSaved)}`,
+      );
+    }
+
+    return lines.join("\n");
+  }
+
+  function exportCsv() {
+    if (currentSchedule.length === 0) {
+      return;
+    }
+
+    const rows = [
+      "month,payment,principal,interest,outstanding_balance",
+      ...currentSchedule.map((row) =>
+        [
+          row.month,
+          roundCurrency(row.payment),
+          roundCurrency(row.principal),
+          roundCurrency(row.interest),
+          roundCurrency(row.remainingBalance),
+        ].join(","),
+      ),
+    ];
+    const blob = new Blob([rows.join("\n")], {
+      type: "text/csv;charset=utf-8",
+    });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "mortgage-amortization.csv";
+    document.body.append(link);
+    link.click();
+    link.remove();
+    URL.revokeObjectURL(url);
+  }
+
+  async function copyResult() {
+    if (!currentCopyText || !copyLabel || !copyStatus) {
+      return;
+    }
+
+    try {
+      if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(currentCopyText);
+      } else {
+        const textArea = document.createElement("textarea");
+        textArea.value = currentCopyText;
+        textArea.setAttribute("readonly", "");
+        textArea.style.position = "fixed";
+        textArea.style.opacity = "0";
+        document.body.append(textArea);
+        textArea.select();
+        document.execCommand("copy");
+        textArea.remove();
+      }
+
+      window.clearTimeout(copiedTimeout);
+      copyLabel.textContent = "Copied";
+      copyStatus.textContent = "Summary copied.";
+      copiedTimeout = window.setTimeout(() => {
+        copyLabel.textContent = "Copy summary";
+        copyStatus.textContent = "";
+      }, 2000);
+    } catch {
+      copyStatus.textContent = "Could not copy the summary.";
+    }
+  }
+
+  function formatPlainNumber(value, decimals = 2) {
+    return String(
+      Number.parseFloat(roundTo(value, decimals).toFixed(decimals)),
+    );
+  }
+
+  function roundTo(value, decimals) {
+    const factor = 10 ** decimals;
+
+    return Math.round((value + Number.EPSILON) * factor) / factor;
+  }
+
+  function escapeHtml(value) {
+    return String(value)
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;")
+      .replaceAll("'", "&#039;");
+  }
+
+  entryButtons.forEach((button) => {
+    button.addEventListener("click", () => {
+      setEntryType(button.dataset.entryTypeOption);
+    });
+  });
+
+  downPaymentButtons.forEach((button) => {
+    button.addEventListener("click", () => {
+      setDownPaymentMode(button.dataset.downPaymentOption);
+    });
+  });
+
+  inputs.propertyPrice?.addEventListener("input", () => {
+    markTouched(inputs.propertyPrice);
+
+    if (currentDownPaymentMode === "percent") {
+      syncDownPaymentFromPercent();
+    } else {
+      syncDownPaymentFromAmount();
+    }
+
+    updateCalculator();
+  });
+
+  inputs.downPaymentPercent?.addEventListener("input", () => {
+    currentDownPaymentMode = "percent";
+    updateSegmentButtons();
+    markTouched(inputs.downPaymentPercent);
+    syncDownPaymentFromPercent();
+    updateCalculator();
+  });
+
+  inputs.downPaymentAmount?.addEventListener("input", () => {
+    currentDownPaymentMode = "amount";
+    updateSegmentButtons();
+    markTouched(inputs.downPaymentAmount);
+    syncDownPaymentFromAmount();
+    updateCalculator();
+  });
+
+  [inputs.loanPrincipal, inputs.annualRate, inputs.extraPayment].forEach(
+    (input) => {
+      input?.addEventListener("input", () => {
+        markTouched(input);
+        updateCalculator();
+      });
+
+      input?.addEventListener("blur", () => {
+        markTouched(input);
+        updateCalculator();
+      });
+    },
+  );
+
+  inputs.years?.addEventListener("change", () => {
+    markTouched(inputs.years);
+    updateCalculator();
+  });
+
+  clearButton?.addEventListener("click", clearCalculator);
+  exampleButton?.addEventListener("click", fillExample);
+  copyButton?.addEventListener("click", copyResult);
+  exportButton?.addEventListener("click", exportCsv);
+  prevPageButton?.addEventListener("click", () => {
+    currentPage -= 1;
+    renderTable();
+  });
+  nextPageButton?.addEventListener("click", () => {
+    currentPage += 1;
+    renderTable();
+  });
+  pageSelect?.addEventListener("change", () => {
+    currentPage = Number(pageSelect.value);
+    renderTable();
+  });
+
+  updateSegmentButtons();
+  setInitialState();
+</script>

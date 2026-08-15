@@ -4,6 +4,7 @@ seoTitle: "Tasa anual a mensual en préstamos: fórmula, ejemplo y errores"
 description: "Aprende a convertir una tasa anual a mensual o diaria para entender mejor los intereses de un préstamo."
 pubDate: 2026-05-14
 categorySlug: "finanzas"
+translationKey: "annual-monthly-daily-loan-rates"
 tags:
   - tasa anual
   - tasa mensual

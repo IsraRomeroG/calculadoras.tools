@@ -4,6 +4,7 @@ seoTitle: "Cómo calcular la cuota mensual de un préstamo: fórmula y ejemplo"
 description: "Aprende cómo se calcula la mensualidad de un préstamo con monto, tasa anual y plazo, y revisa un ejemplo paso a paso."
 pubDate: 2026-04-22
 categorySlug: "finanzas"
+translationKey: "calculate-monthly-loan-payment"
 tags:
   - préstamo
   - cuota mensual

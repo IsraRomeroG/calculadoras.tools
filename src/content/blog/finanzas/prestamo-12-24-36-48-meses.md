@@ -4,6 +4,7 @@ seoTitle: "Préstamo a 12, 24, 36 o 48 meses: mensualidad vs intereses"
 description: "Compara cómo cambia la mensualidad y el costo total de un préstamo cuando eliges 12, 24, 36 o 48 meses."
 pubDate: 2026-05-20
 categorySlug: "finanzas"
+translationKey: "loan-terms-12-24-36-48-months"
 tags:
   - plazo de préstamo
   - cuota mensual

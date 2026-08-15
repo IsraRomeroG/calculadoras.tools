@@ -62,11 +62,35 @@ describe("calculator category directory", () => {
   it("publishes only reviewed English calculator metadata", () => {
     const englishCalculators = getPublishedCalculators("en");
 
-    expect(englishCalculators).toEqual([
+    expect(englishCalculators).toEqual(expect.arrayContaining([
       expect.objectContaining({
         id: "calculadora-de-porcentajes",
         title: "Percentage calculator",
         href: "/en/math/percentage-calculator",
+        categoryId: "matematicas",
+      }),
+      expect.objectContaining({
+        id: "calculadora-de-regla-de-tres",
+        title: "Rule of three calculator",
+        href: "/en/math/rule-of-three-calculator",
+        categoryId: "matematicas",
+      }),
+      expect.objectContaining({
+        id: "calculadora-mcd-mcm",
+        title: "GCD and LCM calculator",
+        href: "/en/math/gcd-lcm-calculator",
+        categoryId: "matematicas",
+      }),
+      expect.objectContaining({
+        id: "calculadora-ecuaciones-cuadraticas",
+        title: "Quadratic equation calculator",
+        href: "/en/math/quadratic-equation-calculator",
+        categoryId: "matematicas",
+      }),
+      expect.objectContaining({
+        id: "calculadora-sistema-ecuaciones-2x2",
+        title: "2x2 system of equations calculator",
+        href: "/en/math/linear-system-2x2-calculator",
         categoryId: "matematicas",
       }),
       expect.objectContaining({
@@ -87,6 +111,142 @@ describe("calculator category directory", () => {
         href: "/en/legal-tax/net-salary-calculator",
         categoryId: "legal-impuestos",
       }),
+      expect.objectContaining({
+        id: "calculadora-vacaciones-proporcionales",
+        title: "Proportional vacation calculator",
+        href: "/en/legal-tax/proportional-vacation-calculator",
+        categoryId: "legal-impuestos",
+      }),
+      expect.objectContaining({
+        id: "calculadora-de-interes-compuesto",
+        title: "Compound interest calculator",
+        href: "/en/finance/compound-interest-calculator",
+        categoryId: "finanzas",
+      }),
+      expect.objectContaining({
+        id: "calculadora-de-inflacion-poder-adquisitivo",
+        title: "Inflation and purchasing power calculator",
+        href: "/en/finance/inflation-purchasing-power-calculator",
+        categoryId: "finanzas",
+      }),
+      expect.objectContaining({
+        id: "calculadora-de-interes-simple",
+        title: "Simple interest calculator",
+        href: "/en/finance/simple-interest-calculator",
+        categoryId: "finanzas",
+      }),
+      expect.objectContaining({
+        id: "calculadora-de-prestamo",
+        title: "Loan calculator",
+        href: "/en/finance/loan-calculator",
+        categoryId: "finanzas",
+      }),
+      expect.objectContaining({
+        id: "plan-de-pago-de-deudas",
+        title: "Debt payoff calculator",
+        href: "/en/finance/debt-payoff-calculator",
+        categoryId: "finanzas",
+      }),
+      expect.objectContaining({
+        id: "calculadora-de-ahorro-para-un-objetivo",
+        title: "Savings goal calculator",
+        href: "/en/finance/savings-goal-calculator",
+        categoryId: "finanzas",
+      }),
+      expect.objectContaining({
+        id: "calculadora-de-roi",
+        title: "ROI calculator",
+        href: "/en/finance/roi-calculator",
+        categoryId: "finanzas",
+      }),
+      expect.objectContaining({
+        id: "calculadora-de-margen-y-markup",
+        title: "Margin and markup calculator",
+        href: "/en/finance/margin-markup-calculator",
+        categoryId: "finanzas",
+      }),
+      expect.objectContaining({
+        id: "calculadora-de-punto-de-equilibrio",
+        title: "Break-even calculator",
+        href: "/en/finance/break-even-calculator",
+        categoryId: "finanzas",
+      }),
+      expect.objectContaining({
+        id: "calculadora-de-tarifa-por-hora-freelance",
+        title: "Freelance hourly rate calculator",
+        href: "/en/finance/freelance-hourly-rate-calculator",
+        categoryId: "finanzas",
+      }),
+      expect.objectContaining({
+        id: "calculadora-de-precio-de-proyecto-freelance",
+        title: "Freelance project pricing calculator",
+        href: "/en/finance/freelance-project-pricing-calculator",
+        categoryId: "finanzas",
+      }),
+      expect.objectContaining({
+        id: "calculadora-dca-costo-promedio",
+        title: "DCA average cost calculator",
+        href: "/en/finance/dca-average-cost-calculator",
+        categoryId: "finanzas",
+      }),
+      expect.objectContaining({
+        id: "calculadora-de-hipoteca",
+        title: "Mortgage calculator",
+        href: "/en/real-estate/mortgage-calculator",
+        categoryId: "inmuebles",
+      }),
+      expect.objectContaining({
+        id: "calculadora-capacidad-compra-vivienda",
+        title: "Home affordability calculator",
+        href: "/en/real-estate/home-affordability-calculator",
+        categoryId: "inmuebles",
+      }),
+      expect.objectContaining({
+        id: "calculadora-renta-vs-compra",
+        title: "Rent vs. buy calculator",
+        href: "/en/real-estate/rent-vs-buy-calculator",
+        categoryId: "inmuebles",
+      }),
+      expect.objectContaining({
+        id: "calculadora-cap-rate-rentabilidad",
+        title: "Cap rate calculator",
+        href: "/en/real-estate/cap-rate-calculator",
+        categoryId: "inmuebles",
+      }),
+      expect.objectContaining({
+        id: "calculadora-gastos-escrituracion",
+        title: "Closing costs calculator",
+        href: "/en/real-estate/closing-costs-calculator",
+        categoryId: "inmuebles",
+      }),
+      expect.objectContaining({
+        id: "calculadora-plusvalia-estimada",
+        title: "Property appreciation calculator",
+        href: "/en/real-estate/property-appreciation-calculator",
+        categoryId: "inmuebles",
+      }),
+      expect.objectContaining({
+        id: "calculadora-precio-por-metro-cuadrado",
+        title: "Price per area calculator",
+        href: "/en/real-estate/price-per-area-calculator",
+        categoryId: "inmuebles",
+      }),
+      expect.objectContaining({ id: "calculadora-de-imc", title: "BMI calculator", href: "/en/health/bmi-calculator", categoryId: "salud" }),
+      expect.objectContaining({ id: "calculadora-de-porcentaje-de-grasa-corporal", title: "Body fat percentage calculator", href: "/en/health/body-fat-percentage-calculator", categoryId: "salud" }),
+      expect.objectContaining({ id: "calculadora-de-calorias-diarias-tdee", title: "TDEE calculator", href: "/en/health/tdee-calculator", categoryId: "salud" }),
+      expect.objectContaining({ id: "calculadora-de-calorias-quemadas-por-ejercicio", title: "Exercise calories burned calculator", href: "/en/health/exercise-calories-burned-calculator", categoryId: "salud" }),
+      expect.objectContaining({ id: "calculadora-de-macros", title: "Macro calculator", href: "/en/health/macro-calculator", categoryId: "salud" }),
+      expect.objectContaining({ id: "calculadora-de-proteina-diaria", title: "Daily protein calculator", href: "/en/health/daily-protein-calculator", categoryId: "salud" }),
+      expect.objectContaining({ id: "calculadora-deficit-calorico", title: "Calorie deficit calculator", href: "/en/health/calorie-deficit-calculator", categoryId: "salud" }),
+      expect.objectContaining({ id: "fecha-probable-de-parto", title: "Pregnancy due date calculator", href: "/en/health/pregnancy-due-date-calculator", categoryId: "salud" }),
+      expect.objectContaining({ id: "calculadora-de-ovulacion", title: "Ovulation calculator", href: "/en/health/ovulation-calculator", categoryId: "salud" }),
+      expect.objectContaining({ id: "calculadora-de-frecuencia-cardiaca-maxima", title: "Maximum heart rate calculator", href: "/en/health/maximum-heart-rate-calculator", categoryId: "salud" }),
+      expect.objectContaining({ id: "calculadora-de-zonas-de-frecuencia-cardiaca", title: "Heart rate zones calculator", href: "/en/health/heart-rate-zones-calculator", categoryId: "salud" }),
+      expect.objectContaining({ id: "calculadora-de-agua-diaria", title: "Daily water intake calculator", href: "/en/health/daily-water-intake-calculator", categoryId: "salud" }),
+      expect.objectContaining({ id: "calculadora-1rm-repeticion-maxima", title: "One-rep max calculator", href: "/en/health/one-rep-max-calculator", categoryId: "salud" }),
+      expect.objectContaining({ id: "calculadora-vo2-max", title: "VO2 max calculator", href: "/en/health/vo2-max-calculator", categoryId: "salud" }),
+      expect.objectContaining({ id: "calculadora-de-pace-ritmo-de-carrera", title: "Running pace calculator", href: "/en/health/running-pace-calculator", categoryId: "salud" }),
+      expect.objectContaining({ id: "calculadora-prediccion-tiempo-carrera", title: "Race time predictor", href: "/en/health/race-time-predictor", categoryId: "salud" }),
       expect.objectContaining({
         id: "calculadora-de-edad",
         title: "Age calculator",
@@ -172,6 +332,54 @@ describe("calculator category directory", () => {
         categoryId: "conversores",
       }),
       expect.objectContaining({
+        id: "calculadora-de-area-y-perimetro",
+        title: "Area and perimeter calculator",
+        href: "/en/geometry/area-perimeter-calculator",
+        categoryId: "geometria",
+      }),
+      expect.objectContaining({
+        id: "calculadora-del-teorema-de-pitagoras",
+        title: "Pythagorean theorem calculator",
+        href: "/en/geometry/pythagorean-theorem-calculator",
+        categoryId: "geometria",
+      }),
+      expect.objectContaining({
+        id: "calculadora-de-estadistica-basica",
+        title: "Basic statistics calculator",
+        href: "/en/math/basic-statistics-calculator",
+        categoryId: "matematicas",
+      }),
+      expect.objectContaining({
+        id: "calculadora-promedio-escolar-gpa",
+        title: "Grade average and GPA calculator",
+        href: "/en/math/gpa-calculator",
+        categoryId: "matematicas",
+      }),
+      expect.objectContaining({
+        id: "calculadora-nota-minima-para-aprobar",
+        title: "Minimum grade calculator",
+        href: "/en/math/minimum-grade-calculator",
+        categoryId: "matematicas",
+      }),
+      expect.objectContaining({
+        id: "calculadora-calificacion-ponderada",
+        title: "Weighted grade calculator",
+        href: "/en/math/weighted-grade-calculator",
+        categoryId: "matematicas",
+      }),
+      expect.objectContaining({
+        id: "calculadora-horas-de-estudio",
+        title: "Study hours calculator",
+        href: "/en/math/study-hours-calculator",
+        categoryId: "matematicas",
+      }),
+      expect.objectContaining({
+        id: "calculadora-porcentaje-asistencia-escolar",
+        title: "School attendance percentage calculator",
+        href: "/en/math/attendance-percentage-calculator",
+        categoryId: "matematicas",
+      }),
+      expect.objectContaining({
         id: "conversor-de-medidas-culinarias",
         title: "Cooking measurement converter",
         href: "/en/cooking/cooking-measurement-converter",
@@ -194,6 +402,18 @@ describe("calculator category directory", () => {
         title: "Recipe scaler",
         href: "/en/cooking/recipe-scaler",
         categoryId: "cocina",
+      }),
+      expect.objectContaining({
+        id: "edad-de-mascota-en-anos-humanos",
+        title: "Pet age calculator",
+        href: "/en/pets/pet-age-calculator",
+        categoryId: "mascotas",
+      }),
+      expect.objectContaining({
+        id: "calorias-diarias-para-perro-o-gato",
+        title: "Pet calorie calculator",
+        href: "/en/pets/pet-calorie-calculator",
+        categoryId: "mascotas",
       }),
       expect.objectContaining({
         id: "calculadora-presupuesto-boda",
@@ -237,11 +457,14 @@ describe("calculator category directory", () => {
         href: "/en/construction/paint-calculator",
         categoryId: "construccion",
       }),
-    ]);
-
-    expect(
-      englishCalculators.map((calculator) => calculator.id),
-    ).not.toContain("calculadora-de-regla-de-tres");
+    ]));
+    expect(englishCalculators).toHaveLength(CALCULATORS.length - 2);
+    expect(englishCalculators.map((calculator) => calculator.id)).not.toContain(
+      "calculadora-aguinaldo-proporcional",
+    );
+    expect(englishCalculators.map((calculator) => calculator.id)).not.toContain(
+      "calculadora-prima-vacacional",
+    );
   });
 
   it("groups English calculators only under localized published categories", () => {
@@ -256,7 +479,7 @@ describe("calculator category directory", () => {
           id: "matematicas",
           slug: "math",
           label: "Math",
-          count: 1,
+          count: 11,
         }),
         expect.objectContaining({
           id: "cocina",
@@ -268,7 +491,7 @@ describe("calculator category directory", () => {
           id: "construccion",
           slug: "construction",
           label: "Construction",
-          count: 5,
+          count: 6,
         }),
         expect.objectContaining({
           id: "conversores",
@@ -289,14 +512,37 @@ describe("calculator category directory", () => {
           count: 7,
         }),
         expect.objectContaining({
+          id: "finanzas",
+          slug: "finance",
+          label: "Finance",
+          count: 12,
+        }),
+        expect.objectContaining({
+          id: "geometria",
+          slug: "geometry",
+          label: "Geometry",
+          count: 2,
+        }),
+        expect.objectContaining({
+          id: "inmuebles",
+          slug: "real-estate",
+          label: "Real Estate",
+          count: 7,
+        }),
+        expect.objectContaining({
+          id: "mascotas",
+          slug: "pets",
+          label: "Pets",
+          count: 2,
+        }),
+        expect.objectContaining({
           id: "legal-impuestos",
           slug: "legal-tax",
           label: "Legal & Taxes",
-          count: 3,
+          count: 5,
         }),
       ]),
     );
-    expect(categories.map((category) => category.id)).not.toContain("finanzas");
   });
 
   it("lists all published legal and tax calculators", () => {
@@ -308,7 +554,22 @@ describe("calculator category directory", () => {
       "calculadora-de-iva",
       "calculadora-isr-irpf",
       "calculadora-salario-neto",
+      "calculadora-vacaciones-proporcionales",
+      "calculadora-aguinaldo-proporcional",
+      "calculadora-prima-vacacional",
+      "calculadora-finiquito-liquidacion",
     ]);
+  });
+
+  it("publishes the probability, programming, vehicle and restaurant calculators in English", () => {
+    const englishCalculators = getPublishedCalculators("en");
+
+    expect(englishCalculators).toEqual(expect.arrayContaining([
+      expect.objectContaining({ id: "calculadora-probabilidad-basica", href: "/en/probability-statistics/basic-probability-calculator" }),
+      expect.objectContaining({ id: "calculadora-entropia-contrasena", href: "/en/programming/password-entropy-calculator" }),
+      expect.objectContaining({ id: "calculadora-de-consumo-de-gasolina", href: "/en/vehicles/fuel-consumption-calculator" }),
+      expect.objectContaining({ id: "calculadora-de-propina", href: "/en/restaurants/tip-calculator" }),
+    ]));
   });
 
   it("keeps display labels separate from canonical slugs", () => {

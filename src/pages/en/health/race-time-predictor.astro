@@ -1,0 +1,648 @@
+---
+import BaseLayout from "@layouts/BaseLayout.astro";
+import { buildAlternateLinks } from "@lib/i18n/routing";
+import AdSlot from "@components/ads/AdSlot.astro";
+import Container from "@components/layout/Container.astro";
+import PageShell from "@components/layout/PageShell.astro";
+import FaqSection from "@components/shared/FaqSection.astro";
+import PageHero from "@components/shared/PageHero.astro";
+import SectionIntro from "@components/shared/SectionIntro.astro";
+import { POPULAR_DISTANCES } from "@lib/calculators/salud/calculadora-prediccion-tiempo-carrera/racePrediction.en";
+import { buildFaqJsonLd } from "@lib/seo";
+
+const title = "Race Time Predictor";
+const description =
+  "Predict your 5K, 10K, half-marathon, or marathon time from a recent performance. See target pace, scenarios, and reference quality.";
+const canonical = "/en/health/race-time-predictor";
+const spanishCanonical = "/salud/calculadora-prediccion-tiempo-carrera";
+const alternates = buildAlternateLinks({ es: spanishCanonical, en: canonical }, Astro.site ?? Astro.url);
+
+const faqs = [
+  {
+    question: "What is the Riegel formula?",
+    answer:
+      "It is a model that estimates your time for another distance from a known performance. It accounts for the fact that pace usually slows as distance increases.",
+  },
+  {
+    question: "How accurate is the prediction?",
+    answer:
+      "It is a mathematical estimate, not a guarantee. It is generally more useful when your reference performance is recent, represents an all-out effort, and is close to your target distance.",
+  },
+  {
+    question: "Can I predict a marathon time from a 5K?",
+    answer:
+      "Yes, but uncertainty is high. Marathon-specific training, endurance, and nutrition have a much greater effect over that distance.",
+  },
+  {
+    question: "Why is the predicted pace slower for longer distances?",
+    answer:
+      "The formula accounts for the increasing difficulty of maintaining the same pace as distance rises.",
+  },
+  {
+    question: "Which performance should I use as a reference?",
+    answer:
+      "Use a recent race or all-out effort, ideally over a distance and in conditions similar to your goal event.",
+  },
+  {
+    question: "Does the calculator account for weather, terrain, or elevation?",
+    answer:
+      "It does not adjust for them automatically. You can indicate whether conditions were comparable to better understand the uncertainty.",
+  },
+  {
+    question: "How is this different from the running pace calculator?",
+    answer:
+      "The running pace calculator assumes a constant pace. This calculator uses a performance model to estimate how pace changes across distances.",
+  },
+];
+
+const faqJsonLd = buildFaqJsonLd(faqs);
+---
+
+<BaseLayout title={title} description={description} canonical={canonical} locale="en" alternates={alternates}>
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={JSON.stringify(faqJsonLd)} />
+  </Fragment>
+
+  <PageShell>
+    <PageHero
+      title="Race Time Predictor"
+      description="Turn a recent performance into a race goal and see how reliable that reference is."
+      kicker="Health"
+      collapseBreadcrumbOnMobile
+      containerClass="py-5 md:py-7"
+      breadcrumbs={[
+        { label: "Home", href: "/en", ariaLabel: "Home" },
+        { label: "Health", href: "/en/health", optional: true },
+        { label: "Race Time Predictor", truncate: true },
+      ]}
+    />
+
+    <Container as="section" class="py-4 md:py-8">
+      <section
+        class="overflow-hidden rounded-lg border border-gray-700 bg-gray-950 shadow-xl shadow-gray-950/30"
+        aria-labelledby="prediction-calculator-heading"
+      >
+        <div class="grid xl:grid-cols-[minmax(0,0.95fr)_minmax(25rem,1.05fr)]">
+          <form class="p-4 sm:p-6" data-calculator-form novalidate>
+            <p class="text-sm font-semibold uppercase tracking-wide text-amber-400">Your prediction</p>
+            <h2 id="prediction-calculator-heading" class="mt-2 text-2xl font-semibold text-white">
+              Use a recent performance
+            </h2>
+            <p class="mt-2 text-sm leading-relaxed text-gray-400">
+              A recent race or all-out effort usually provides the most useful reference.
+            </p>
+
+            <section class="mt-6">
+              <div class="flex items-end justify-between gap-3">
+                <label for="reference-distance" class="text-sm font-semibold text-gray-200">Your recent performance</label>
+                <span class="text-xs text-gray-500">Distance</span>
+              </div>
+              <div class="mt-2 flex flex-wrap gap-2">
+                {POPULAR_DISTANCES.map((distance) => (
+                  <button class="min-h-11 rounded-full border border-gray-700 px-3 py-2 text-sm font-semibold text-gray-300 transition hover:border-amber-400/60 hover:text-amber-200" type="button" aria-pressed="false" data-preset-group="reference" data-preset={distance.distanceKm}>
+                    {distance.label}
+                  </button>
+                ))}
+              </div>
+              <div class="mt-3 grid grid-cols-[minmax(0,1fr)_7rem] gap-2">
+                <div class="rounded-lg border border-gray-700 bg-gray-900 focus-within:border-amber-400" data-wrapper="referenceDistance">
+                  <input id="reference-distance" class="min-h-12 w-full bg-transparent px-4 text-base text-white outline-none" type="text" inputmode="decimal" autocomplete="off" value="10" aria-describedby="reference-distance-error" data-distance-input="reference" />
+                </div>
+                <select class="min-h-12 rounded-lg border border-gray-700 bg-gray-900 px-3 text-base text-white outline-none focus:border-amber-400" aria-label="Unit for your recent performance" data-distance-unit="reference">
+                  <option value="km">km</option>
+                  <option value="mi">miles</option>
+                </select>
+              </div>
+              <p id="reference-distance-error" class="mt-2 hidden text-sm font-medium text-red-300" data-error="referenceDistance"></p>
+            </section>
+
+            <section class="mt-5">
+              <label class="text-sm font-semibold text-gray-200">Reference time</label>
+              <div class="mt-2 grid grid-cols-3 gap-2">
+                {[
+                  ["hours", "Hours", "0", "hr"],
+                  ["minutes", "Minutes", "50", "min"],
+                  ["seconds", "Seconds", "00", "sec"],
+                ].map(([part, label, placeholder, suffix]) => (
+                  <label class="rounded-lg border border-gray-700 bg-gray-900 focus-within:border-amber-400" data-wrapper="referenceTime">
+                    <span class="sr-only">{label}</span>
+                    <input class="min-h-12 w-full bg-transparent px-3 text-center text-base text-white outline-none" type="text" inputmode="numeric" placeholder={placeholder} aria-label={label} data-time-part={part} />
+                    <span class="block pb-2 text-center text-xs text-gray-500">{suffix}</span>
+                  </label>
+                ))}
+              </div>
+              <p class="mt-2 hidden text-sm font-medium text-red-300" data-error="referenceTime"></p>
+            </section>
+
+            <section class="mt-6">
+              <div class="flex items-end justify-between gap-3">
+                <label for="target-distance" class="text-sm font-semibold text-gray-200">Your goal</label>
+                <span class="text-xs text-gray-500">Distance</span>
+              </div>
+              <div class="mt-2 flex flex-wrap gap-2">
+                {POPULAR_DISTANCES.map((distance) => (
+                  <button class="min-h-11 rounded-full border border-gray-700 px-3 py-2 text-sm font-semibold text-gray-300 transition hover:border-amber-400/60 hover:text-amber-200" type="button" aria-pressed="false" data-preset-group="target" data-preset={distance.distanceKm}>
+                    {distance.label}
+                  </button>
+                ))}
+              </div>
+              <div class="mt-3 grid grid-cols-[minmax(0,1fr)_7rem] gap-2">
+                <div class="rounded-lg border border-gray-700 bg-gray-900 focus-within:border-amber-400" data-wrapper="targetDistance">
+                  <input id="target-distance" class="min-h-12 w-full bg-transparent px-4 text-base text-white outline-none" type="text" inputmode="decimal" autocomplete="off" value="21.0975" aria-describedby="target-distance-error" data-distance-input="target" />
+                </div>
+                <select class="min-h-12 rounded-lg border border-gray-700 bg-gray-900 px-3 text-base text-white outline-none focus:border-amber-400" aria-label="Unit for your target distance" data-distance-unit="target">
+                  <option value="km">km</option>
+                  <option value="mi">miles</option>
+                </select>
+              </div>
+              <p id="target-distance-error" class="mt-2 hidden text-sm font-medium text-red-300" data-error="targetDistance"></p>
+            </section>
+
+            <section class="mt-6 rounded-lg border border-gray-700 bg-gray-900/60">
+              <button
+                class="flex min-h-12 w-full items-center justify-between gap-3 px-4 py-3 text-left text-sm font-semibold text-gray-200"
+                type="button"
+                aria-expanded="false"
+                aria-controls="prediction-context"
+                data-context-toggle
+              >
+                <span>Refine prediction <span class="font-normal text-gray-500">(optional)</span></span>
+                <span aria-hidden="true" data-context-symbol>+</span>
+              </button>
+              <div id="prediction-context" class="hidden border-t border-gray-700 p-4" data-context>
+                <p class="text-sm leading-relaxed text-gray-400">
+                  These details help explain uncertainty, but do not change the calculated time.
+                </p>
+                <div class="mt-4 grid gap-4">
+                  <label class="block">
+                    <span class="text-sm font-semibold text-gray-200">How recent is the performance?</span>
+                    <select class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-950 px-4 text-base text-white outline-none focus:border-amber-400" data-context-input="recency">
+                      <option value="unknown">Not specified</option>
+                      <option value="recent">Within the last 30 days</option>
+                      <option value="one_to_three_months">1 to 3 months ago</option>
+                      <option value="older">More than 3 months ago</option>
+                    </select>
+                  </label>
+                  <label class="block">
+                    <span class="text-sm font-semibold text-gray-200">Type of effort</span>
+                    <select class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-950 px-4 text-base text-white outline-none focus:border-amber-400" data-context-input="effort">
+                      <option value="unknown">Not specified</option>
+                      <option value="race">Race or all-out effort</option>
+                      <option value="controlled">Controlled training effort</option>
+                    </select>
+                  </label>
+                  <label class="block">
+                    <span class="text-sm font-semibold text-gray-200">Comparable conditions</span>
+                    <select class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-950 px-4 text-base text-white outline-none focus:border-amber-400" data-context-input="conditions">
+                      <option value="unknown">Not sure</option>
+                      <option value="yes">Yes</option>
+                      <option value="no">No</option>
+                    </select>
+                  </label>
+                </div>
+              </div>
+            </section>
+
+            <p class="mt-4 hidden rounded-lg border border-red-400/30 bg-red-400/10 p-3 text-sm font-medium text-red-200" role="alert" tabindex="-1" data-general-error></p>
+
+            <div class="mt-6 grid gap-3 sm:grid-cols-3">
+              <button class="min-h-12 rounded-lg bg-amber-400 px-5 py-3 text-sm font-bold text-gray-950 transition hover:bg-amber-300 sm:col-span-3" type="submit">
+                Predict my race time
+              </button>
+              <button class="min-h-12 rounded-lg border border-gray-700 px-4 py-3 text-sm font-semibold text-gray-200 transition hover:bg-gray-900 sm:col-span-2" type="button" data-example>
+                Try a 10K example
+              </button>
+              <button class="min-h-12 rounded-lg border border-gray-700 px-4 py-3 text-sm font-semibold text-gray-300 transition hover:bg-gray-900" type="reset">
+                Clear
+              </button>
+            </div>
+          </form>
+
+          <aside class="border-t border-gray-800 bg-gray-900/45 p-4 sm:p-6 xl:border-l xl:border-t-0">
+            <div data-empty-result>
+              <p class="text-sm font-semibold uppercase tracking-wide text-amber-400">Result</p>
+              <h2 class="mt-2 text-2xl font-semibold text-white">Your predicted time will appear here</h2>
+              <p class="mt-3 text-sm leading-relaxed text-gray-400">
+                You will see your predicted time, target pace, change from your reference, scenarios, and reference quality.
+              </p>
+            </div>
+
+            <div class="hidden" aria-live="polite" data-result>
+              <p class="text-sm font-semibold uppercase tracking-wide text-amber-400">Predicted time</p>
+              <h2 class="mt-2 text-5xl font-bold tracking-tight text-white outline-none" tabindex="-1" data-result-time></h2>
+              <p class="mt-2 text-sm leading-relaxed text-gray-400" data-result-distance></p>
+
+              <div class="mt-5 grid gap-3 sm:grid-cols-2">
+                <div class="rounded-lg border border-gray-700 bg-gray-950/70 p-4">
+                  <p class="text-xs font-semibold uppercase tracking-wide text-gray-500">Target pace</p>
+                  <p class="mt-2 text-xl font-semibold text-white" data-result-pace></p>
+                  <p class="mt-1 text-xs text-gray-500" data-result-other-pace></p>
+                </div>
+                <div class="rounded-lg border border-gray-700 bg-gray-950/70 p-4">
+                  <p class="text-xs font-semibold uppercase tracking-wide text-gray-500">Speed</p>
+                  <p class="mt-2 text-xl font-semibold text-white" data-result-speed></p>
+                  <p class="mt-1 text-xs text-gray-500" data-result-pace-change-short></p>
+                </div>
+              </div>
+              <p class="mt-4 rounded-lg border border-gray-700 bg-gray-950/60 p-3 text-sm leading-relaxed text-gray-300" data-result-pace-change></p>
+
+              <section class="mt-6 border-t border-gray-800 pt-6" aria-labelledby="quality-heading">
+                <p class="text-xs font-semibold uppercase tracking-wide text-gray-500">Reference quality</p>
+                <h3 id="quality-heading" class="mt-2 text-xl font-semibold text-white" data-quality-label></h3>
+                <ul class="mt-3 space-y-2 text-sm leading-relaxed text-gray-400" data-quality-reasons></ul>
+              </section>
+
+              <section class="mt-6 border-t border-gray-800 pt-6" aria-labelledby="scenarios-heading">
+                <h3 id="scenarios-heading" class="text-lg font-semibold text-white">Formula scenarios</h3>
+                <div class="mt-3 grid gap-2" data-scenarios></div>
+                <p class="mt-3 text-xs leading-relaxed text-gray-500">
+                  These are Riegel scenarios, not a confidence interval. Your actual result may fall outside this range.
+                </p>
+              </section>
+
+              <section class="mt-6 hidden border-t border-gray-800 pt-6" aria-labelledby="warnings-heading" data-warnings-section>
+                <h3 id="warnings-heading" class="text-lg font-semibold text-amber-200">Consider this before using the goal</h3>
+                <ul class="mt-3 space-y-2 text-sm leading-relaxed text-amber-100/80" data-warnings></ul>
+              </section>
+
+              <div class="mt-6 grid gap-2 sm:grid-cols-2">
+                <a class="flex min-h-12 items-center justify-center rounded-lg border border-amber-400/50 px-4 py-3 text-center text-sm font-semibold text-amber-200 transition hover:bg-amber-400/10" href="/en/health/running-pace-calculator">
+                  Plan pace and splits
+                </a>
+                <button class="min-h-12 rounded-lg border border-gray-700 px-4 py-3 text-sm font-semibold text-gray-300 transition hover:bg-gray-800" type="button" data-copy>
+                  Copy result
+                </button>
+              </div>
+              <p class="sr-only" aria-live="polite" data-copy-status></p>
+            </div>
+          </aside>
+        </div>
+      </section>
+    </Container>
+
+    <AdSlot placement="calculator-after-tool" />
+
+    <Container as="section" class="py-8 md:py-12">
+      <SectionIntro
+        title="Predictions for popular distances"
+        description="Compare how time and pace change using the same reference performance."
+      />
+      <div class="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3" data-popular-predictions>
+        {POPULAR_DISTANCES.map((distance) => (
+          <article class="rounded-lg border border-gray-800 bg-gray-950/60 p-4" data-popular={distance.id}>
+            <div class="flex items-start justify-between gap-3">
+              <h3 class="font-semibold text-white">{distance.label}</h3>
+              <span class="hidden rounded-full bg-amber-400/15 px-2 py-1 text-xs font-semibold text-amber-200" data-target-badge>Your goal</span>
+            </div>
+            <p class="mt-3 text-2xl font-semibold text-gray-500" data-popular-time>Calculate to compare</p>
+            <p class="mt-1 text-sm text-gray-500" data-popular-pace></p>
+          </article>
+        ))}
+      </div>
+    </Container>
+
+    <Container as="section" class="py-8 md:py-12">
+      <SectionIntro
+        title="How to interpret the prediction"
+        description="Riegel adjusts the expected pace between distances, but it cannot account for your training or race-day conditions."
+      />
+      <div class="mt-6 grid gap-4 md:grid-cols-3">
+        <article class="rounded-lg border border-gray-800 bg-gray-950/60 p-5">
+          <h3 class="font-semibold text-white">Comparable performance</h3>
+          <p class="mt-2 text-sm leading-relaxed text-gray-400">A recent, all-out race usually provides a more useful reference than a controlled training effort.</p>
+        </article>
+        <article class="rounded-lg border border-gray-800 bg-gray-950/60 p-5">
+          <h3 class="font-semibold text-white">Similar distances</h3>
+          <p class="mt-2 text-sm leading-relaxed text-gray-400">Uncertainty increases when the target distance is very different from the reference distance.</p>
+        </article>
+        <article class="rounded-lg border border-gray-800 bg-gray-950/60 p-5">
+          <h3 class="font-semibold text-white">Pace is not constant</h3>
+          <p class="mt-2 text-sm leading-relaxed text-gray-400">The formula accounts for expected fatigue. Use the running pace calculator for exact pace conversions or splits.</p>
+        </article>
+      </div>
+    </Container>
+
+    <Container as="section" class="py-8 md:py-12">
+      <SectionIntro
+        title="Formula used"
+        description="The central prediction uses a Riegel exponent of 1.06 and retains full internal precision."
+      />
+      <div class="mt-6 rounded-lg border border-gray-800 bg-gray-950/60 p-5">
+        <p class="text-sm leading-relaxed text-gray-400">
+          <strong class="text-gray-200">Target time = reference time × (target distance ÷ reference distance)<sup>1.06</sup>.</strong>
+          The scenarios use exponents of 1.03, 1.06, and 1.09 to show different levels of performance retention.
+        </p>
+      </div>
+    </Container>
+
+    <FaqSection faqs={faqs} />
+  </PageShell>
+</BaseLayout>
+
+<script>
+  import {
+    buildRacePredictionCopyText,
+    calculateRacePrediction,
+    combineTimeParts,
+    convertDistance,
+    formatDistance,
+    formatDuration,
+    formatPace,
+    formatPaceChange,
+    parseLocalizedNumber,
+    qualityLabel,
+    type ComparableConditions,
+    type DistanceUnit,
+    type RacePredictionResult,
+    type ReferenceEffort,
+    type ReferenceRecency,
+  } from "@lib/calculators/salud/calculadora-prediccion-tiempo-carrera/racePrediction.en";
+
+  const form = document.querySelector<HTMLFormElement>("[data-calculator-form]");
+
+  if (form) {
+    const query = <T extends Element>(selector: string) => document.querySelector<T>(selector)!;
+    const referenceDistance = form.querySelector<HTMLInputElement>('[data-distance-input="reference"]')!;
+    const referenceUnit = form.querySelector<HTMLSelectElement>('[data-distance-unit="reference"]')!;
+    const targetDistance = form.querySelector<HTMLInputElement>('[data-distance-input="target"]')!;
+    const targetUnit = form.querySelector<HTMLSelectElement>('[data-distance-unit="target"]')!;
+    const hours = form.querySelector<HTMLInputElement>('[data-time-part="hours"]')!;
+    const minutes = form.querySelector<HTMLInputElement>('[data-time-part="minutes"]')!;
+    const seconds = form.querySelector<HTMLInputElement>('[data-time-part="seconds"]')!;
+    const recency = form.querySelector<HTMLSelectElement>('[data-context-input="recency"]')!;
+    const effort = form.querySelector<HTMLSelectElement>('[data-context-input="effort"]')!;
+    const conditions = form.querySelector<HTMLSelectElement>('[data-context-input="conditions"]')!;
+    const resultPanel = query<HTMLElement>("[data-result]");
+    const emptyResult = query<HTMLElement>("[data-empty-result]");
+    let currentResult: RacePredictionResult | undefined;
+
+    const warningMessages = {
+      wide_distance_ratio: "The distances are far apart, so interpret the prediction with caution.",
+      old_reference: "Your current fitness may have changed since you recorded that performance.",
+      controlled_effort: "A controlled training effort may not reflect your maximum performance.",
+      different_conditions: "Different weather, terrain, or elevation can affect the result.",
+      marathon_from_short_reference: "For a marathon, specific preparation, endurance, and nutrition have an especially large impact.",
+    };
+
+    function numberPart(input: HTMLInputElement) {
+      if (!input.value.trim()) return 0;
+      return /^\d+$/.test(input.value.trim()) ? Number(input.value) : Number.NaN;
+    }
+
+    function clearErrors() {
+      document.querySelectorAll<HTMLElement>("[data-error]").forEach((element) => {
+        element.textContent = "";
+        element.classList.add("hidden");
+      });
+      document.querySelectorAll<HTMLElement>("[data-wrapper]").forEach((element) => {
+        element.classList.remove("border-red-400");
+      });
+      query<HTMLElement>("[data-general-error]").classList.add("hidden");
+    }
+
+    function showError(field: "referenceDistance" | "referenceTime" | "targetDistance", message: string) {
+      const error = query<HTMLElement>(`[data-error="${field}"]`);
+      error.textContent = message;
+      error.classList.remove("hidden");
+      document.querySelectorAll<HTMLElement>(`[data-wrapper="${field}"]`).forEach((wrapper) => wrapper.classList.add("border-red-400"));
+    }
+
+    function calculate(focusResult = true) {
+      clearErrors();
+      const referenceValue = parseLocalizedNumber(referenceDistance.value);
+      const targetValue = parseLocalizedNumber(targetDistance.value);
+      const time = combineTimeParts(numberPart(hours), numberPart(minutes), numberPart(seconds));
+      let valid = true;
+
+      const referenceKm = referenceValue === undefined ? undefined : referenceUnit.value === "km" ? referenceValue : referenceValue * 1.609344;
+      const targetKm = targetValue === undefined ? undefined : targetUnit.value === "km" ? targetValue : targetValue * 1.609344;
+
+      if (referenceKm === undefined || referenceKm <= 0) {
+        showError("referenceDistance", "Enter a reference distance greater than zero.");
+        valid = false;
+      } else if (referenceKm > 500) {
+        showError("referenceDistance", "The maximum allowed distance is 500 km.");
+        valid = false;
+      }
+      if (time === undefined || time <= 0) {
+        showError("referenceTime", "Enter a valid time; minutes and seconds must be between 0 and 59.");
+        valid = false;
+      }
+      if (targetKm === undefined || targetKm <= 0) {
+        showError("targetDistance", "Enter a target distance greater than zero.");
+        valid = false;
+      } else if (targetKm > 500) {
+        showError("targetDistance", "The maximum allowed distance is 500 km.");
+        valid = false;
+      }
+
+      if (!valid) {
+        const error = query<HTMLElement>("[data-general-error]");
+        error.textContent = "Review the highlighted fields before calculating.";
+        error.classList.remove("hidden");
+        error.focus();
+        resultPanel.classList.add("hidden");
+        emptyResult.classList.remove("hidden");
+        return;
+      }
+
+      try {
+        currentResult = calculateRacePrediction({
+          referenceDistance: referenceValue!,
+          referenceUnit: referenceUnit.value as DistanceUnit,
+          referenceTimeSeconds: time!,
+          targetDistance: targetValue!,
+          targetUnit: targetUnit.value as DistanceUnit,
+          recency: recency.value as ReferenceRecency,
+          effort: effort.value as ReferenceEffort,
+          comparableConditions: conditions.value as ComparableConditions,
+        });
+        renderResult(currentResult, focusResult);
+      } catch {
+        const error = query<HTMLElement>("[data-general-error]");
+        error.textContent = "The calculation falls outside the allowed limits. Check the distances, time, and units.";
+        error.classList.remove("hidden");
+        error.focus();
+        resultPanel.classList.add("hidden");
+        emptyResult.classList.remove("hidden");
+      }
+    }
+
+    function renderResult(result: RacePredictionResult, focusResult: boolean) {
+      emptyResult.classList.add("hidden");
+      resultPanel.classList.remove("hidden");
+      query<HTMLElement>("[data-result-time]").textContent = formatDuration(result.targetTimeSeconds);
+      query<HTMLElement>("[data-result-distance]").textContent = formatDistance(result.targetDistanceKm, result.input.targetUnit);
+      query<HTMLElement>("[data-result-pace]").textContent = `${formatPace(result.targetPaceSecondsPerKm)} min/km`;
+      query<HTMLElement>("[data-result-other-pace]").textContent = `${formatPace(result.targetPaceSecondsPerMi)} min/mi`;
+      query<HTMLElement>("[data-result-speed]").textContent = `${result.targetSpeedKmh.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} km/h`;
+      query<HTMLElement>("[data-result-pace-change-short]").textContent =
+        `${result.paceChangeSecondsPerKm > 0 ? "+" : ""}${Math.round(result.paceChangeSecondsPerKm)} s/km`;
+      query<HTMLElement>("[data-result-pace-change]").textContent = formatPaceChange(result.paceChangeSecondsPerKm);
+      query<HTMLElement>("[data-quality-label]").textContent = qualityLabel(result.quality);
+
+      const reasons = query<HTMLElement>("[data-quality-reasons]");
+      reasons.innerHTML = "";
+      result.qualityReasons.forEach((reason) => reasons.append(createListItem(reason)));
+
+      const scenarios = query<HTMLElement>("[data-scenarios]");
+      scenarios.innerHTML = "";
+      result.scenarios.forEach((scenario) => {
+        const row = document.createElement("div");
+        row.className = `flex min-h-12 items-center justify-between gap-3 rounded-lg border px-4 py-3 ${scenario.id === "central" ? "border-amber-400/40 bg-amber-400/10" : "border-gray-700 bg-gray-950/60"}`;
+        const label = document.createElement("span");
+        label.className = "text-sm text-gray-300";
+        label.textContent = `${scenario.label} · ${scenario.exponent}`;
+        const time = document.createElement("strong");
+        time.className = "text-sm text-white";
+        time.textContent = formatDuration(scenario.timeSeconds);
+        row.append(label, time);
+        scenarios.append(row);
+      });
+
+      const warningsSection = query<HTMLElement>("[data-warnings-section]");
+      const warnings = query<HTMLElement>("[data-warnings]");
+      warnings.innerHTML = "";
+      result.warnings.forEach((warning) => warnings.append(createListItem(warningMessages[warning])));
+      warningsSection.classList.toggle("hidden", result.warnings.length === 0);
+
+      document.querySelectorAll<HTMLElement>("[data-popular]").forEach((card) => {
+        card.classList.remove("border-amber-400/50");
+        card.querySelector<HTMLElement>("[data-target-badge]")!.classList.add("hidden");
+        card.querySelector<HTMLElement>("[data-popular-time]")!.textContent = "Your reference performance";
+        card.querySelector<HTMLElement>("[data-popular-time]")!.className = "mt-3 text-sm font-semibold text-gray-400";
+        card.querySelector<HTMLElement>("[data-popular-pace]")!.textContent = "";
+      });
+      result.popularPredictions.forEach((prediction) => {
+        const card = query<HTMLElement>(`[data-popular="${prediction.id}"]`);
+        const time = card.querySelector<HTMLElement>("[data-popular-time]")!;
+        time.textContent = formatDuration(prediction.timeSeconds);
+        time.className = "mt-3 text-2xl font-semibold text-white";
+        card.querySelector<HTMLElement>("[data-popular-pace]")!.textContent = `${formatPace(prediction.paceSecondsPerKm)} min/km`;
+        card.classList.toggle("border-amber-400/50", prediction.isTarget);
+        card.querySelector<HTMLElement>("[data-target-badge]")!.classList.toggle("hidden", !prediction.isTarget);
+      });
+
+      if (focusResult) {
+        const heading = query<HTMLElement>("[data-result-time]");
+        heading.focus({ preventScroll: true });
+        heading.scrollIntoView({
+          behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth",
+          block: "start",
+        });
+      }
+    }
+
+    function createListItem(text: string) {
+      const item = document.createElement("li");
+      item.textContent = text;
+      return item;
+    }
+
+    function setDistancePreset(group: "reference" | "target", value: string) {
+      const input = group === "reference" ? referenceDistance : targetDistance;
+      const unit = group === "reference" ? referenceUnit : targetUnit;
+      input.value = value;
+      unit.value = "km";
+      updatePresetSelection(group);
+    }
+
+    function updatePresetSelection(group: "reference" | "target") {
+      const input = group === "reference" ? referenceDistance : targetDistance;
+      const unit = group === "reference" ? referenceUnit : targetUnit;
+      const value = parseLocalizedNumber(input.value);
+      const distanceKm = value === undefined ? undefined : unit.value === "km" ? value : value * 1.609344;
+      form.querySelectorAll<HTMLButtonElement>(`[data-preset-group="${group}"]`).forEach((button) => {
+        const selected = distanceKm !== undefined && Math.abs(distanceKm - Number(button.dataset.preset)) < 1e-5;
+        button.setAttribute("aria-pressed", String(selected));
+        button.classList.toggle("border-amber-400", selected);
+        button.classList.toggle("text-amber-200", selected);
+        button.classList.toggle("bg-amber-400/10", selected);
+      });
+    }
+
+    function convertVisibleDistance(group: "reference" | "target") {
+      const input = group === "reference" ? referenceDistance : targetDistance;
+      const unit = group === "reference" ? referenceUnit : targetUnit;
+      const value = parseLocalizedNumber(input.value);
+      if (value !== undefined) {
+        const previous = unit.value === "km" ? "mi" : "km";
+        input.value = Number(convertDistance(value, previous, unit.value as DistanceUnit).toFixed(5)).toString();
+      }
+      updatePresetSelection(group);
+      if (currentResult) calculate(false);
+    }
+
+    function clearCalculator() {
+      currentResult = undefined;
+      referenceDistance.value = "10";
+      referenceUnit.value = "km";
+      targetDistance.value = "21.0975";
+      targetUnit.value = "km";
+      hours.value = "";
+      minutes.value = "";
+      seconds.value = "";
+      recency.value = "unknown";
+      effort.value = "unknown";
+      conditions.value = "unknown";
+      clearErrors();
+      resultPanel.classList.add("hidden");
+      emptyResult.classList.remove("hidden");
+      updatePresetSelection("reference");
+      updatePresetSelection("target");
+      referenceDistance.focus();
+    }
+
+    form.addEventListener("submit", (event) => {
+      event.preventDefault();
+      calculate();
+    });
+    form.addEventListener("reset", (event) => {
+      event.preventDefault();
+      clearCalculator();
+    });
+    form.querySelectorAll<HTMLButtonElement>("[data-preset-group]").forEach((button) => {
+      button.addEventListener("click", () => setDistancePreset(button.dataset.presetGroup as "reference" | "target", button.dataset.preset!));
+    });
+    referenceUnit.addEventListener("change", () => convertVisibleDistance("reference"));
+    targetUnit.addEventListener("change", () => convertVisibleDistance("target"));
+    referenceDistance.addEventListener("input", () => updatePresetSelection("reference"));
+    targetDistance.addEventListener("input", () => updatePresetSelection("target"));
+    form.querySelector<HTMLButtonElement>("[data-context-toggle]")!.addEventListener("click", (event) => {
+      const button = event.currentTarget as HTMLButtonElement;
+      const expanded = button.getAttribute("aria-expanded") === "true";
+      button.setAttribute("aria-expanded", String(!expanded));
+      query<HTMLElement>("[data-context]").classList.toggle("hidden", expanded);
+      query<HTMLElement>("[data-context-symbol]").textContent = expanded ? "+" : "−";
+    });
+    form.querySelector<HTMLButtonElement>("[data-example]")!.addEventListener("click", () => {
+      referenceDistance.value = "10";
+      referenceUnit.value = "km";
+      targetDistance.value = "21.0975";
+      targetUnit.value = "km";
+      hours.value = "0";
+      minutes.value = "50";
+      seconds.value = "0";
+      recency.value = "unknown";
+      effort.value = "unknown";
+      conditions.value = "unknown";
+      updatePresetSelection("reference");
+      updatePresetSelection("target");
+      calculate();
+    });
+    query<HTMLButtonElement>("[data-copy]").addEventListener("click", async () => {
+      if (!currentResult) return;
+      const status = query<HTMLElement>("[data-copy-status]");
+      try {
+        await navigator.clipboard.writeText(buildRacePredictionCopyText(currentResult));
+        status.textContent = "Result copied.";
+      } catch {
+        status.textContent = "The result could not be copied.";
+      }
+    });
+
+    updatePresetSelection("reference");
+    updatePresetSelection("target");
+  }
+</script>
+

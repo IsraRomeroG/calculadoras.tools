@@ -1,0 +1,829 @@
+---
+import BaseLayout from "@layouts/BaseLayout.astro";
+import AdSlot from "@components/ads/AdSlot.astro";
+import Container from "@components/layout/Container.astro";
+import PageShell from "@components/layout/PageShell.astro";
+import FaqSection from "@components/shared/FaqSection.astro";
+import PageHero from "@components/shared/PageHero.astro";
+import SectionIntro from "@components/shared/SectionIntro.astro";
+import { buildAlternateLinks } from "@lib/i18n/routing";
+import { buildFaqJsonLd } from "@lib/seo";
+
+const title = "Freelance hourly rate calculator";
+const description =
+  "Calculate a freelance hourly rate based on desired income, expenses, taxes, fees and billable hours.";
+const canonical = "/en/finance/freelance-hourly-rate-calculator";
+const spanishCanonical = "/finanzas/calculadora-de-tarifa-por-hora-freelance";
+const alternates = buildAlternateLinks({ es: spanishCanonical, en: canonical }, Astro.site ?? Astro.url);
+const faqs = [
+  {
+    question: "How do I calculate my freelance hourly rate?",
+    answer:
+      "First estimate monthly revenue needed to cover expenses, savings, fees and tax reserves. Then divide by the hours you can actually bill each month.",
+  },
+  {
+    question: "What percentage of my hours should be billable?",
+    answer:
+      "It depends on how you work. Proposals, sales, administration, training and accounting use non-billable time. Review past weeks for a realistic percentage.",
+  },
+  {
+    question: "Why should my rate include expenses and taxes?",
+    answer:
+      "Revenue is not personal income. Business expenses, payment fees and estimated tax reserves must be covered first.",
+  },
+  {
+    question: "What is the difference between minimum and practical rates?",
+    answer:
+      "The minimum rate is the exact mathematical result. The practical rate rounds up to the selected increment to simplify quotes without falling below the target.",
+  },
+  {
+    question: "Why is my hourly rate not equivalent to a salary?",
+    answer:
+      "Freelancers usually cannot bill every hour and must cover expenses, time off, administration, benefits and risks that employment may cover differently.",
+  },
+  {
+    question: "How do I turn my hourly rate into a project price?",
+    answer:
+      "Estimate hours for each phase and add direct expenses, contingency and scope. The hourly rate is a base, but a fixed price must account for project-specific risk.",
+  },
+];
+const faqJsonLd = buildFaqJsonLd(faqs);
+---
+
+<BaseLayout title={title} description={description} canonical={canonical} locale="en" alternates={alternates}>
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={JSON.stringify(faqJsonLd)} />
+  </Fragment>
+
+  <PageShell>
+    <PageHero
+      title="Freelance hourly rate calculator"
+      description="Calculate a sustainable rate based on desired take-home income, expenses and truly billable time."
+      kicker="Finance"
+      collapseBreadcrumbOnMobile
+      containerClass="py-6 md:py-8"
+      breadcrumbs={[
+        { label: "Home", href: "/en", ariaLabel: "Home" },
+        { label: "Finance", href: "/en/finance", optional: true },
+        { label: "Freelance rate", truncate: true },
+      ]}
+    />
+
+    <Container as="section" class="py-6 md:py-8">
+      <section
+        class="overflow-hidden rounded-lg border border-gray-700 bg-gray-950 shadow-xl shadow-gray-950/30"
+        aria-labelledby="calculator-heading"
+      >
+        <div class="grid lg:grid-cols-[minmax(0,1.04fr)_minmax(20rem,0.96fr)]">
+          <div class="p-4 sm:p-6">
+            <p class="text-sm font-semibold uppercase tracking-wide text-amber-400">
+              From desired income to a sustainable rate
+            </p>
+            <h2 id="calculator-heading" class="mt-2 text-2xl font-semibold">
+              Calculate your hourly rate
+            </h2>
+            <p class="mt-2 text-sm leading-relaxed text-gray-400">
+              Start with three inputs. Then adjust expenses, taxes,
+              fees, and time off.
+            </p>
+
+            <form class="mt-6" novalidate data-rate-form>
+              <div
+                class="mb-4 hidden rounded-lg border border-red-400/40 bg-red-400/10 p-3 text-sm text-red-100"
+                role="alert"
+                data-error-summary
+              ></div>
+
+              <div class="grid gap-4 sm:grid-cols-2">
+                <div class="sm:col-span-2">
+                  <label class="field-label" for="rate-income">
+                    Desired monthly take-home income
+                  </label>
+                  <div class="field-shell">
+                    <span class="field-affix">$</span>
+                    <input
+                      id="rate-income"
+                      class="field-input"
+                      type="text"
+                      inputmode="decimal"
+                      autocomplete="off"
+                      placeholder="40000"
+                      data-field="desiredNetMonthlyIncome"
+                      aria-describedby="rate-income-help rate-income-error"
+                    />
+                  </div>
+                  <p id="rate-income-help" class="field-help">
+                    What you want to keep for personal use each month.
+                  </p>
+                  <p id="rate-income-error" class="field-error" data-error-for="desiredNetMonthlyIncome"></p>
+                </div>
+
+                <div>
+                  <label class="field-label" for="rate-weekly-hours">
+                    Work hours per week
+                  </label>
+                  <div class="field-shell">
+                    <input
+                      id="rate-weekly-hours"
+                      class="field-input field-input-leading"
+                      type="text"
+                      inputmode="decimal"
+                      value="40"
+                      data-field="weeklyWorkHours"
+                      aria-describedby="rate-weekly-hours-error"
+                    />
+                    <span class="field-affix">hours</span>
+                  </div>
+                  <p id="rate-weekly-hours-error" class="field-error" data-error-for="weeklyWorkHours"></p>
+                </div>
+
+                <div>
+                  <label class="field-label" for="rate-billable">
+                    Billable percentage
+                  </label>
+                  <div class="field-shell">
+                    <input
+                      id="rate-billable"
+                      class="field-input field-input-leading"
+                      type="text"
+                      inputmode="decimal"
+                      value="60"
+                      data-field="billablePercentage"
+                      aria-describedby="rate-billable-help rate-billable-error"
+                    />
+                    <span class="field-affix">%</span>
+                  </div>
+                  <p id="rate-billable-help" class="field-help">
+                    Time you can bill to clients.
+                  </p>
+                  <div class="mt-2 flex flex-wrap gap-2" aria-label="Common billable percentages">
+                    <button class="chip-button" type="button" data-billable-chip="50">50%</button>
+                    <button class="chip-button" type="button" data-billable-chip="60">60%</button>
+                    <button class="chip-button" type="button" data-billable-chip="70">70%</button>
+                  </div>
+                  <p id="rate-billable-error" class="field-error" data-error-for="billablePercentage"></p>
+                </div>
+              </div>
+
+              <details class="mt-5 rounded-lg border border-gray-700 bg-gray-900/60 p-4" data-options>
+                <summary class="cursor-pointer font-semibold text-white">
+                  Expenses, taxes and time off
+                </summary>
+                <p class="mt-2 text-xs leading-relaxed text-gray-400" data-options-summary>
+                  Defaults: no expenses, no tax reserve and 4 weeks off.
+                </p>
+
+                <div class="mt-4 grid gap-4 sm:grid-cols-2">
+                  <div>
+                    <label class="field-label" for="rate-expenses">Monthly business expenses</label>
+                    <div class="field-shell">
+                      <span class="field-affix">$</span>
+                      <input id="rate-expenses" class="field-input" type="text" inputmode="decimal" value="0" data-field="monthlyBusinessExpenses" aria-describedby="rate-expenses-help rate-expenses-error" />
+                    </div>
+                    <p id="rate-expenses-help" class="field-help">Software, equipment, advice, internet and other costs.</p>
+                    <p id="rate-expenses-error" class="field-error" data-error-for="monthlyBusinessExpenses"></p>
+                  </div>
+
+                  <div>
+                    <label class="field-label" for="rate-savings">Monthly savings or reserve</label>
+                    <div class="field-shell">
+                      <span class="field-affix">$</span>
+                      <input id="rate-savings" class="field-input" type="text" inputmode="decimal" value="0" data-field="monthlySavings" aria-describedby="rate-savings-error" />
+                    </div>
+                    <p id="rate-savings-error" class="field-error" data-error-for="monthlySavings"></p>
+                  </div>
+
+                  <div>
+                    <label class="field-label" for="rate-taxes">Estimated tax reserve</label>
+                    <div class="field-shell">
+                      <input id="rate-taxes" class="field-input field-input-leading" type="text" inputmode="decimal" value="0" data-field="taxReserveRate" aria-describedby="rate-taxes-help rate-taxes-error" />
+                      <span class="field-affix">%</span>
+                    </div>
+                    <p id="rate-taxes-help" class="field-help">Manual estimate based on profit; not a tax calculation.</p>
+                    <p id="rate-taxes-error" class="field-error" data-error-for="taxReserveRate"></p>
+                  </div>
+
+                  <div>
+                    <label class="field-label" for="rate-fee">Payment collection fee</label>
+                    <div class="field-shell">
+                      <input id="rate-fee" class="field-input field-input-leading" type="text" inputmode="decimal" value="0" data-field="collectionFeeRate" aria-describedby="rate-fee-help rate-fee-error" />
+                      <span class="field-affix">%</span>
+                    </div>
+                    <p id="rate-fee-help" class="field-help">Marketplace, platform, or payment processor.</p>
+                    <p id="rate-fee-error" class="field-error" data-error-for="collectionFeeRate"></p>
+                  </div>
+
+                  <div>
+                    <label class="field-label" for="rate-weeks-off">Weeks off per year</label>
+                    <div class="field-shell">
+                      <input id="rate-weeks-off" class="field-input field-input-leading" type="text" inputmode="decimal" value="4" data-field="weeksOffPerYear" aria-describedby="rate-weeks-off-error" />
+                      <span class="field-affix">weeks</span>
+                    </div>
+                    <p id="rate-weeks-off-error" class="field-error" data-error-for="weeksOffPerYear"></p>
+                  </div>
+
+                  <div>
+                    <label class="field-label" for="rate-day-hours">Hours per billable day</label>
+                    <div class="field-shell">
+                      <input id="rate-day-hours" class="field-input field-input-leading" type="text" inputmode="decimal" value="8" data-field="billableDayHours" aria-describedby="rate-day-hours-error" />
+                      <span class="field-affix">hours</span>
+                    </div>
+                    <p id="rate-day-hours-error" class="field-error" data-error-for="billableDayHours"></p>
+                  </div>
+
+                  <div>
+                    <label class="field-label" for="rate-current">Current rate <span class="text-gray-500">(optional)</span></label>
+                    <div class="field-shell">
+                      <span class="field-affix">$</span>
+                      <input id="rate-current" class="field-input" type="text" inputmode="decimal" placeholder="600" data-field="currentHourlyRate" aria-describedby="rate-current-help rate-current-error" />
+                      <span class="field-affix">/ hour</span>
+                    </div>
+                    <p id="rate-current-help" class="field-help">We will compare it with your sustainable minimum.</p>
+                    <p id="rate-current-error" class="field-error" data-error-for="currentHourlyRate"></p>
+                  </div>
+
+                  <div>
+                    <label class="field-label" for="rate-rounding">Round practical rate to</label>
+                    <select id="rate-rounding" class="field" data-rounding>
+                      <option value="1">$1</option>
+                      <option value="10">$10</option>
+                      <option value="50" selected>$50</option>
+                      <option value="100">$100</option>
+                    </select>
+                    <p class="field-help">Always rounds up.</p>
+                  </div>
+                </div>
+              </details>
+
+              <div class="mt-6 flex flex-col gap-3 border-t border-gray-800 pt-5 sm:flex-row sm:flex-wrap">
+                <button class="primary-button w-full sm:w-auto sm:min-w-48" type="submit">
+                  Calculate my rate
+                </button>
+                <button class="secondary-button" type="button" data-example>Use example</button>
+                <button class="secondary-button" type="button" data-clear>Clear</button>
+                <button class="secondary-button hidden" type="button" data-copy>
+                  <span data-copy-label>Copy summary</span>
+                </button>
+                <p class="sr-only" role="status" aria-live="polite" data-copy-status></p>
+              </div>
+            </form>
+          </div>
+
+          <aside
+            class="border-t border-gray-800 bg-gray-900/70 p-4 sm:p-6 lg:border-l lg:border-t-0"
+            aria-live="polite"
+            tabindex="-1"
+            data-result-region
+          >
+            <div class="hidden rounded-lg border border-amber-400/40 bg-amber-400/10 p-3 text-sm text-amber-100" data-stale-notice>
+              Inputs changed. Calculate again to update this result.
+            </div>
+            <p class="mt-1 text-sm font-semibold uppercase tracking-wide text-amber-400" data-result-kicker>
+              Result
+            </p>
+            <p class="mt-3 break-words text-4xl font-bold leading-tight text-white" data-main-result>
+              Enter your target
+            </p>
+            <p class="mt-3 text-sm leading-relaxed text-gray-300" data-interpretation>
+              You will see a practical rate and the exact minimum needed to sustain it.
+            </p>
+
+            <div class="mt-5 grid grid-cols-2 gap-3" data-summary-grid>
+              <div class="col-span-2 rounded-lg border border-gray-800 bg-gray-950/70 p-4 text-sm text-gray-400">
+                Enter desired income, weekly hours and billable percentage to begin.
+              </div>
+            </div>
+
+            <div class="mt-4 hidden rounded-lg border p-4" data-comparison-card>
+              <p class="text-xs font-semibold uppercase tracking-wide" data-comparison-kicker></p>
+              <p class="mt-2 text-sm leading-relaxed" data-comparison-text></p>
+            </div>
+
+            <div class="mt-4 hidden rounded-lg border border-amber-400/30 bg-amber-400/10 p-4" data-warnings-card>
+              <p class="text-xs font-semibold uppercase tracking-wide text-amber-300">Review these assumptions</p>
+              <ul class="mt-2 space-y-2 text-sm leading-relaxed text-amber-100" data-warnings-list></ul>
+            </div>
+
+            <details class="mt-4 hidden rounded-lg border border-gray-800 p-4" data-breakdown-details>
+              <summary class="cursor-pointer text-sm font-semibold text-white">Monthly revenue allocation</summary>
+              <div class="mt-3 grid grid-cols-2 gap-2" data-breakdown-grid></div>
+            </details>
+
+            <details class="mt-4 hidden rounded-lg border border-gray-800 p-4" data-calculation-details>
+              <summary class="cursor-pointer text-sm font-semibold text-white">How it was calculated</summary>
+              <div class="mt-3 space-y-2 text-sm leading-relaxed text-gray-400" data-calculation-lines></div>
+            </details>
+
+            <p class="mt-4 text-xs leading-relaxed text-gray-500">
+              Planning estimate based on your assumptions. It does not replace
+              tax advice or market-rate research.
+            </p>
+          </aside>
+        </div>
+      </section>
+    </Container>
+
+    <AdSlot placement="calculator-after-tool" />
+
+    <Container as="section" class="hidden py-6 md:py-8" data-scenarios-section>
+      <SectionIntro
+        title="Billable-capacity scenarios"
+        description="Compare how your rate changes when you can bill more or fewer hours without changing your monthly target."
+        class="mb-5"
+      />
+      <div class="grid gap-4 md:grid-cols-3" data-scenarios-cards></div>
+    </Container>
+
+    <Container as="section" class="py-8">
+      <SectionIntro
+        title="How to interpret your rate"
+        description="A sustainable rate is not just salary divided by hours: it must also fund work you cannot bill."
+        class="mb-5"
+      />
+      <div class="grid gap-4 md:grid-cols-3">
+        <article class="info-card">
+          <h2 class="font-semibold text-white">Revenue is not personal income</h2>
+          <p class="mt-2 text-sm leading-relaxed text-gray-400">
+            Fees, business expenses, taxes, and reserves still have to come out
+            of what you collect before the money reaches your pocket.
+          </p>
+        </article>
+        <article class="info-card">
+          <h2 class="font-semibold text-white">Not every hour is billable</h2>
+          <p class="mt-2 text-sm leading-relaxed text-gray-400">
+            Sales, proposals, follow-up, training and administration
+            consume necessary time, even when it does not appear on an invoice.
+          </p>
+        </article>
+        <article class="info-card">
+          <h2 class="font-semibold text-white">Quote with a practical buffer</h2>
+          <p class="mt-2 text-sm leading-relaxed text-gray-400">
+            The exact rate marks your minimum. Rounding it up makes quotes easier
+            and reduces the risk of falling below your target.
+          </p>
+        </article>
+      </div>
+    </Container>
+
+    <Container as="section" class="py-8">
+      <div class="grid gap-5 md:grid-cols-2">
+        <article class="rounded-lg border border-gray-700 bg-gray-950 p-5 sm:p-6">
+          <h2 class="text-xl font-semibold">How to estimate billable hours</h2>
+          <p class="mt-3 text-sm leading-relaxed text-gray-400">
+            Review two to four recent weeks. Add only the time you could bill to
+            clients and divide it by all your working hours. Use a conservative
+            scenario if you do not have data yet.
+          </p>
+        </article>
+        <article class="rounded-lg border border-gray-700 bg-gray-950 p-5 sm:p-6">
+          <h2 class="text-xl font-semibold">From hourly rate to fixed price</h2>
+          <p class="mt-3 text-sm leading-relaxed text-gray-400">
+            To quote a project, multiply this rate by the hours in each phase and
+            add direct expenses, contingency, and scope risk. A fixed quote needs
+            more information than a base rate.
+          </p>
+          <a class="secondary-button mt-4" href="/en/finance/freelance-project-pricing-calculator">
+            Calculate a project price
+          </a>
+        </article>
+      </div>
+    </Container>
+
+    <FaqSection faqs={faqs} />
+  </PageShell>
+</BaseLayout>
+
+<style is:global>
+  .field-label { display: block; font-size: .875rem; font-weight: 500; color: rgb(229 231 235); }
+  .field, .field-shell { margin-top: .5rem; min-height: 3rem; width: 100%; border-radius: .5rem; border: 1px solid rgb(55 65 81); background: rgb(17 24 39); color: white; outline: none; }
+  .field { padding: 0 1rem; }
+  .field-shell { display: flex; align-items: center; }
+  .field-input { min-height: 2.875rem; min-width: 0; width: 100%; background: transparent; padding: 0 .25rem; color: white; outline: none; }
+  .field-input-leading { padding-left: .75rem; }
+  .field-affix { flex: none; padding: 0 .75rem; color: rgb(107 114 128); }
+  .field:focus, .field-shell:focus-within { border-color: rgb(251 191 36); box-shadow: 0 0 0 3px rgb(251 191 36 / .15); }
+  .field-help { margin-top: .4rem; font-size: .75rem; line-height: 1.4; color: rgb(107 114 128); }
+  .field-error { display: none; margin-top: .4rem; font-size: .8rem; color: rgb(252 165 165); }
+  .field-error:not(:empty) { display: block; }
+  .primary-button { display: inline-flex; min-height: 2.75rem; align-items: center; justify-content: center; border-radius: .5rem; background: rgb(251 191 36); padding: .5rem 1rem; font-size: .875rem; font-weight: 700; color: rgb(3 7 18); }
+  .secondary-button, .chip-button { display: inline-flex; min-height: 2.75rem; align-items: center; justify-content: center; border-radius: .5rem; border: 1px solid rgb(55 65 81); padding: .5rem 1rem; font-size: .875rem; font-weight: 600; color: rgb(229 231 235); }
+  .chip-button { min-height: 2.5rem; padding: .35rem .8rem; }
+  .chip-button[aria-pressed="true"] { border-color: rgb(251 191 36); background: rgb(251 191 36 / .15); color: rgb(253 230 138); }
+  .info-card { border-radius: .5rem; border: 1px solid rgb(55 65 81); background: rgb(3 7 18); padding: 1.25rem; }
+</style>
+
+<script>
+  import {
+    calculateFreelanceRate,
+    formatCurrency,
+    formatPercent,
+    formatQuantity,
+    parseMoneyInput,
+    parsePercentInput,
+    parseQuantityInput,
+  } from "@lib/calculators/finanzas/calculadora-de-tarifa-por-hora-freelance/freelanceRate.en";
+
+  const form = document.querySelector("[data-rate-form]");
+  const options = document.querySelector("[data-options]");
+  const optionsSummary = document.querySelector("[data-options-summary]");
+  const errorSummary = document.querySelector("[data-error-summary]");
+  const roundingSelect = document.querySelector("[data-rounding]");
+  const resultRegion = document.querySelector("[data-result-region]");
+  const resultKicker = document.querySelector("[data-result-kicker]");
+  const mainResult = document.querySelector("[data-main-result]");
+  const interpretation = document.querySelector("[data-interpretation]");
+  const summaryGrid = document.querySelector("[data-summary-grid]");
+  const staleNotice = document.querySelector("[data-stale-notice]");
+  const comparisonCard = document.querySelector("[data-comparison-card]");
+  const comparisonKicker = document.querySelector("[data-comparison-kicker]");
+  const comparisonText = document.querySelector("[data-comparison-text]");
+  const warningsCard = document.querySelector("[data-warnings-card]");
+  const warningsList = document.querySelector("[data-warnings-list]");
+  const breakdownDetails = document.querySelector("[data-breakdown-details]");
+  const breakdownGrid = document.querySelector("[data-breakdown-grid]");
+  const calculationDetails = document.querySelector("[data-calculation-details]");
+  const calculationLines = document.querySelector("[data-calculation-lines]");
+  const scenariosSection = document.querySelector("[data-scenarios-section]");
+  const scenariosCards = document.querySelector("[data-scenarios-cards]");
+  const copyButton = document.querySelector("[data-copy]");
+  const copyLabel = document.querySelector("[data-copy-label]");
+  const copyStatus = document.querySelector("[data-copy-status]");
+  const billableChips = [...document.querySelectorAll("[data-billable-chip]")];
+  const fields = Object.fromEntries(
+    [...document.querySelectorAll("[data-field]")].map((input) => [input.dataset.field, input]),
+  );
+
+  let copyText = "";
+  let hasResult = false;
+
+  const ERROR_MESSAGES = {
+    required: "Complete this field to calculate.",
+    invalid: "Enter a valid number.",
+    negative: "The value cannot be negative.",
+    too_many_decimals: "Use no more than two decimal places.",
+    income_zero: "Desired income must be greater than zero.",
+    weekly_range: "Use between 1 and 80 hours per week.",
+    billable_range: "Use a percentage between 1% and 100%.",
+    taxes_range: "Use a reserve between 0% and 80%.",
+    fee_range: "Use a fee between 0% and 50%.",
+    weeks_range: "Use between 0 and 20 weeks.",
+    day_hours_range: "Use between 1 and 12 hours.",
+    current_zero: "Current rate must be greater than zero.",
+  };
+
+  const WARNING_MESSAGES = {
+    no_tax_reserve: "You are not reserving money for taxes. Confirm this assumption applies.",
+    high_billable_percentage: "Sustaining more than 80% billable time may leave little room for sales, administration and breaks.",
+    low_billable_hours: "Billable capacity is very low; small hour changes can significantly alter the rate.",
+    high_weekly_hours: "This scenario assumes a high weekly workload. Check whether it is sustainable.",
+  };
+
+  function calculate() {
+    clearErrors();
+    const errors = {};
+
+    const desiredNetMonthlyIncome = parseRequired("desiredNetMonthlyIncome", parseMoneyInput, errors);
+    const weeklyWorkHours = parseRequired("weeklyWorkHours", parseQuantityInput, errors);
+    const billablePercentage = parseRequired("billablePercentage", parsePercentInput, errors);
+    const monthlyBusinessExpenses = parseRequired("monthlyBusinessExpenses", parseMoneyInput, errors);
+    const monthlySavings = parseRequired("monthlySavings", parseMoneyInput, errors);
+    const taxReserveRate = parseRequired("taxReserveRate", parsePercentInput, errors);
+    const collectionFeeRate = parseRequired("collectionFeeRate", parsePercentInput, errors);
+    const weeksOffPerYear = parseRequired("weeksOffPerYear", parseQuantityInput, errors);
+    const billableDayHours = parseRequired("billableDayHours", parseQuantityInput, errors);
+    const currentHourlyRate = parseOptional("currentHourlyRate", parseMoneyInput, errors);
+
+    if (desiredNetMonthlyIncome !== undefined && desiredNetMonthlyIncome <= 0) errors.desiredNetMonthlyIncome = "income_zero";
+    if (!inRange(weeklyWorkHours, 1, 80)) errors.weeklyWorkHours = "weekly_range";
+    if (!inRange(billablePercentage, 1, 100)) errors.billablePercentage = "billable_range";
+    if (!inRange(taxReserveRate, 0, 80)) errors.taxReserveRate = "taxes_range";
+    if (!inRange(collectionFeeRate, 0, 50)) errors.collectionFeeRate = "fee_range";
+    if (!inRange(weeksOffPerYear, 0, 20)) errors.weeksOffPerYear = "weeks_range";
+    if (!inRange(billableDayHours, 1, 12)) errors.billableDayHours = "day_hours_range";
+    if (currentHourlyRate !== undefined && currentHourlyRate <= 0) errors.currentHourlyRate = "current_zero";
+
+    showErrors(errors);
+    if (Object.keys(errors).length) {
+      setInvalidState(errors);
+      return;
+    }
+
+    const input = {
+      desiredNetMonthlyIncome,
+      weeklyWorkHours,
+      billablePercentage,
+      monthlyBusinessExpenses,
+      monthlySavings,
+      taxReserveRate,
+      collectionFeeRate,
+      weeksOffPerYear,
+      billableDayHours,
+      roundingIncrement: Number(roundingSelect.value),
+      currentHourlyRate,
+    };
+    const result = calculateFreelanceRate(input);
+
+    renderResult(input, result);
+    hasResult = true;
+    staleNotice.classList.add("hidden");
+    copyButton.classList.remove("hidden");
+    resultRegion.focus({ preventScroll: true });
+    resultRegion.scrollIntoView({ behavior: "smooth", block: "nearest" });
+  }
+
+  function renderResult(input, result) {
+    resultKicker.textContent = "Suggested practical rate";
+    mainResult.textContent = `${formatCurrency(result.practicalHourlyRate)} per hour`;
+    interpretation.textContent = `To keep ${formatCurrency(input.desiredNetMonthlyIncome)} per month, you should quote at least ${formatCurrency(result.practicalHourlyRate)} per hour with these assumptions.`;
+
+    summaryGrid.innerHTML = [
+      ["Exact sustainable minimum", `${formatCurrency(result.minimumHourlyRate)} / hour`],
+      [`A ${formatQuantity(input.billableDayHours)} hours`, formatCurrency(result.practicalDayRate)],
+      ["Required monthly revenue", formatCurrency(result.monthlyRevenueRequired)],
+      ["Billable hours per month", formatQuantity(result.billableHoursMonthly)],
+      ["Billable hours per year", formatQuantity(result.billableHoursAnnual)],
+      ["Minimum without savings", `${formatCurrency(result.minimumRateWithoutSavings)} / hour`],
+    ].map(([label, value]) => summary(label, value)).join("");
+
+    renderComparison(result.currentRateComparison);
+    renderWarnings(result.warnings);
+    renderBreakdown(input, result);
+    renderCalculation(input, result);
+    renderScenarios(result.scenarios);
+    copyText = buildCopyText(input, result);
+  }
+
+  function renderComparison(comparison) {
+    if (!comparison) {
+      comparisonCard.classList.add("hidden");
+      return;
+    }
+
+    const difference = formatCurrency(Math.abs(comparison.differenceAmount));
+    const percentage = formatPercent(Math.abs(comparison.differencePercentage));
+    comparisonCard.className = "mt-4 rounded-lg border p-4";
+
+    if (comparison.status === "below") {
+      comparisonCard.classList.add("border-red-400/40", "bg-red-400/10");
+      comparisonKicker.className = "text-xs font-semibold uppercase tracking-wide text-red-300";
+      comparisonText.className = "mt-2 text-sm leading-relaxed text-red-100";
+      comparisonKicker.textContent = "Below your target";
+      comparisonText.textContent = `Your current rate is ${difference} per hour (${percentage}) below the sustainable minimum.`;
+    } else {
+      comparisonCard.classList.add("border-emerald-400/40", "bg-emerald-400/10");
+      comparisonKicker.className = "text-xs font-semibold uppercase tracking-wide text-emerald-300";
+      comparisonText.className = "mt-2 text-sm leading-relaxed text-emerald-100";
+      comparisonKicker.textContent = "Meets your target";
+      comparisonText.textContent = `Your current rate exceeds the sustainable minimum by ${difference} per hour (${percentage}).`;
+    }
+
+    comparisonCard.classList.remove("hidden");
+  }
+
+  function renderWarnings(warnings) {
+    if (!warnings.length) {
+      warningsCard.classList.add("hidden");
+      return;
+    }
+
+    warningsList.innerHTML = warnings
+      .map((warning) => `<li>• ${escapeHtml(WARNING_MESSAGES[warning])}</li>`)
+      .join("");
+    warningsCard.classList.remove("hidden");
+  }
+
+  function renderBreakdown(input, result) {
+    breakdownGrid.innerHTML = [
+      ["Required revenue", formatCurrency(result.monthlyRevenueRequired)],
+      ["Payment collection fee", `−${formatCurrency(result.monthlyCollectionFee)}`],
+      ["Business expenses", `−${formatCurrency(input.monthlyBusinessExpenses)}`],
+      ["Pre-tax profit", formatCurrency(result.preTaxProfitRequired)],
+      ["Tax reserve", `−${formatCurrency(result.monthlyTaxReserve)}`],
+      ["Personal income", formatCurrency(input.desiredNetMonthlyIncome)],
+      ["Savings or reserve", formatCurrency(input.monthlySavings)],
+    ].map(([label, value]) => compactSummary(label, value)).join("");
+    breakdownDetails.classList.remove("hidden");
+  }
+
+  function renderCalculation(input, result) {
+    const lines = [
+      `Weeks worked = 52 − ${formatQuantity(input.weeksOffPerYear)} = ${formatQuantity(result.weeksWorkedPerYear)}`,
+      `Monthly billable hours = ${formatQuantity(input.weeklyWorkHours)} × ${formatQuantity(result.weeksWorkedPerYear)} × ${formatPercent(input.billablePercentage)} ÷ 12 = ${formatQuantity(result.billableHoursMonthly)}`,
+      `Pre-tax profit = ${formatCurrency(result.netAfterTaxesTarget)} ÷ (1 − ${formatPercent(input.taxReserveRate)}) = ${formatCurrency(result.preTaxProfitRequired)}`,
+      `Required revenue = (${formatCurrency(input.monthlyBusinessExpenses)} + ${formatCurrency(result.preTaxProfitRequired)}) ÷ (1 − ${formatPercent(input.collectionFeeRate)}) = ${formatCurrency(result.monthlyRevenueRequired)}`,
+      `Minimum rate = ${formatCurrency(result.monthlyRevenueRequired)} ÷ ${formatQuantity(result.billableHoursMonthly)} hours = ${formatCurrency(result.minimumHourlyRate)} per hour`,
+    ];
+    calculationLines.innerHTML = lines.map((line) => `<p>${escapeHtml(line)}</p>`).join("");
+    calculationDetails.classList.remove("hidden");
+  }
+
+  function renderScenarios(scenarios) {
+    scenariosCards.innerHTML = scenarios.map((scenario) => `
+      <article class="rounded-lg border ${scenario.current ? "border-amber-400/60 bg-amber-400/10" : "border-gray-700 bg-gray-950"} p-4">
+        <p class="text-xs font-semibold uppercase tracking-wide ${scenario.current ? "text-amber-300" : "text-gray-400"}">
+          ${scenario.current ? "Your current capacity" : "Scenario"} · ${escapeHtml(formatPercent(scenario.billablePercentage))}
+        </p>
+        <p class="mt-2 text-2xl font-bold text-white">${escapeHtml(formatCurrency(scenario.practicalHourlyRate))} / hour</p>
+        <div class="mt-4 grid grid-cols-2 gap-2 text-sm">
+          ${compactSummary("Exact minimum", formatCurrency(scenario.minimumHourlyRate))}
+          ${compactSummary("Hours per month", formatQuantity(scenario.billableHoursMonthly))}
+        </div>
+      </article>
+    `).join("");
+    scenariosSection.classList.remove("hidden");
+  }
+
+  function buildCopyText(input, result) {
+    const lines = [
+      "Estimated freelance rate",
+      `Suggested practical rate: ${formatCurrency(result.practicalHourlyRate)} per hour`,
+      `Sustainable minimum rate: ${formatCurrency(result.minimumHourlyRate)} per hour`,
+      `Equivalent for a ${formatQuantity(input.billableDayHours)}-hour day: ${formatCurrency(result.practicalDayRate)}`,
+      `Required monthly revenue: ${formatCurrency(result.monthlyRevenueRequired)}`,
+      `Estimated capacity: ${formatQuantity(result.billableHoursMonthly)} billable hours per month`,
+      `Assumptions: ${formatQuantity(input.weeklyWorkHours)} hours per week, ${formatPercent(input.billablePercentage)} billable, ${formatQuantity(input.weeksOffPerYear)} weeks off, ${formatCurrency(input.monthlyBusinessExpenses)} in expenses, ${formatPercent(input.taxReserveRate)} for taxes, and a ${formatPercent(input.collectionFeeRate)} fee.`,
+    ];
+
+    if (result.currentRateComparison) {
+      lines.push(`Current rate: ${formatCurrency(result.currentRateComparison.currentHourlyRate)} per hour (${result.currentRateComparison.status === "below" ? "below target" : "meets target"}).`);
+    }
+
+    lines.push("", "Planning estimate based on entered data.");
+    return lines.join("\n");
+  }
+
+  function fillExample() {
+    fields.desiredNetMonthlyIncome.value = "40000";
+    fields.weeklyWorkHours.value = "40";
+    fields.billablePercentage.value = "60";
+    fields.monthlyBusinessExpenses.value = "8000";
+    fields.monthlySavings.value = "3000";
+    fields.taxReserveRate.value = "25";
+    fields.collectionFeeRate.value = "3";
+    fields.weeksOffPerYear.value = "4";
+    fields.billableDayHours.value = "8";
+    fields.currentHourlyRate.value = "600";
+    roundingSelect.value = "50";
+    options.open = true;
+    updateOptionsSummary();
+    updateChips();
+    calculate();
+  }
+
+  function clearAll() {
+    const hasMeaningfulData = fields.desiredNetMonthlyIncome.value.trim() || hasResult;
+    if (hasMeaningfulData && !window.confirm("Clear the entered data?")) return;
+
+    fields.desiredNetMonthlyIncome.value = "";
+    fields.weeklyWorkHours.value = "40";
+    fields.billablePercentage.value = "60";
+    fields.monthlyBusinessExpenses.value = "0";
+    fields.monthlySavings.value = "0";
+    fields.taxReserveRate.value = "0";
+    fields.collectionFeeRate.value = "0";
+    fields.weeksOffPerYear.value = "4";
+    fields.billableDayHours.value = "8";
+    fields.currentHourlyRate.value = "";
+    roundingSelect.value = "50";
+    options.open = false;
+    hasResult = false;
+    clearErrors();
+    updateOptionsSummary();
+    updateChips();
+    setInitialState();
+  }
+
+  function parseRequired(field, parser, errors) {
+    const parsed = parser(fields[field].value);
+    if (!parsed.ok) {
+      errors[field] = parsed.error;
+      return undefined;
+    }
+    return parsed.value;
+  }
+
+  function parseOptional(field, parser, errors) {
+    if (!fields[field].value.trim()) return undefined;
+    return parseRequired(field, parser, errors);
+  }
+
+  function inRange(value, minimum, maximum) {
+    return value === undefined || (value >= minimum && value <= maximum);
+  }
+
+  function clearErrors() {
+    document.querySelectorAll("[data-error-for]").forEach((element) => { element.textContent = ""; });
+    errorSummary.textContent = "";
+    errorSummary.classList.add("hidden");
+  }
+
+  function showErrors(errors) {
+    Object.entries(errors).forEach(([field, error]) => {
+      const element = document.querySelector(`[data-error-for="${field}"]`);
+      if (element) element.textContent = ERROR_MESSAGES[error] ?? ERROR_MESSAGES.invalid;
+    });
+    const count = Object.keys(errors).length;
+    if (count) {
+      errorSummary.textContent = `Review ${count === 1 ? "the highlighted field" : `the ${count} highlighted fields`} to calculate your rate.`;
+      errorSummary.classList.remove("hidden");
+    }
+  }
+
+  function setInvalidState(errors) {
+    if (hasResult) {
+      staleNotice.classList.remove("hidden");
+      copyButton.classList.add("hidden");
+    } else {
+      resultKicker.textContent = "Check the fields";
+      mainResult.textContent = "Cannot calculate";
+      interpretation.textContent = "Correct the highlighted values to continue.";
+    }
+    const firstError = Object.keys(errors)[0];
+    if (firstError && fields[firstError]) fields[firstError].focus();
+  }
+
+  function markResultStale() {
+    updateOptionsSummary();
+    updateChips();
+    if (!hasResult) return;
+    staleNotice.classList.remove("hidden");
+    copyButton.classList.add("hidden");
+  }
+
+  function updateOptionsSummary() {
+    const expenses = parseMoneyInput(fields.monthlyBusinessExpenses.value);
+    const taxes = parsePercentInput(fields.taxReserveRate.value);
+    const weeks = parseQuantityInput(fields.weeksOffPerYear.value);
+    const expenseText = expenses.ok && expenses.value > 0 ? `${formatCurrency(expenses.value)} in expenses` : "no expenses";
+    const taxText = taxes.ok && taxes.value > 0 ? `${formatPercent(taxes.value)} for taxes` : "no tax reserve";
+    const weeksText = weeks.ok ? `${formatQuantity(weeks.value)} weeks off` : "weeks off to review";
+    optionsSummary.textContent = `Adjustments: ${expenseText}, ${taxText}, and ${weeksText}.`;
+  }
+
+  function updateChips() {
+    const current = fields.billablePercentage.value.trim();
+    billableChips.forEach((chip) => {
+      chip.setAttribute("aria-pressed", String(chip.dataset.billableChip === current));
+    });
+  }
+
+  function setInitialState() {
+    resultKicker.textContent = "Result";
+    mainResult.textContent = "Enter your target";
+    interpretation.textContent = "You will see a practical rate and the exact minimum needed to sustain it.";
+    summaryGrid.innerHTML = `<div class="col-span-2 rounded-lg border border-gray-800 bg-gray-950/70 p-4 text-sm text-gray-400">Enter desired income, weekly hours and billable percentage to begin.</div>`;
+    staleNotice.classList.add("hidden");
+    comparisonCard.classList.add("hidden");
+    warningsCard.classList.add("hidden");
+    breakdownDetails.classList.add("hidden");
+    calculationDetails.classList.add("hidden");
+    scenariosSection.classList.add("hidden");
+    copyButton.classList.add("hidden");
+    copyText = "";
+  }
+
+  async function copyResult() {
+    if (!copyText) return;
+    try {
+      await navigator.clipboard.writeText(copyText);
+      copyLabel.textContent = "Copied";
+      copyStatus.textContent = "Summary copied.";
+      window.setTimeout(() => {
+        copyLabel.textContent = "Copy summary";
+        copyStatus.textContent = "";
+      }, 2000);
+    } catch {
+      copyStatus.textContent = "Could not copy the summary.";
+    }
+  }
+
+  function summary(label, value) {
+    return `<div class="rounded-lg border border-gray-800 bg-gray-950/70 p-3"><span class="block text-xs font-semibold uppercase tracking-wide text-gray-500">${escapeHtml(label)}</span><span class="mt-2 block break-words text-base font-semibold text-white">${escapeHtml(value)}</span></div>`;
+  }
+
+  function compactSummary(label, value) {
+    return `<div class="rounded-lg bg-gray-950/50 p-3"><span class="block text-xs uppercase tracking-wide text-gray-400">${escapeHtml(label)}</span><span class="mt-1 block break-words font-semibold text-white">${escapeHtml(value)}</span></div>`;
+  }
+
+  function escapeHtml(value) {
+    return String(value).replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;").replaceAll("'", "&#039;");
+  }
+
+  form.addEventListener("submit", (event) => {
+    event.preventDefault();
+    calculate();
+  });
+  form.addEventListener("input", markResultStale);
+  roundingSelect.addEventListener("change", markResultStale);
+  document.querySelector("[data-example]").addEventListener("click", fillExample);
+  document.querySelector("[data-clear]").addEventListener("click", clearAll);
+  copyButton.addEventListener("click", copyResult);
+  billableChips.forEach((chip) => {
+    chip.addEventListener("click", () => {
+      fields.billablePercentage.value = chip.dataset.billableChip;
+      markResultStale();
+    });
+  });
+  updateOptionsSummary();
+  updateChips();
+</script>

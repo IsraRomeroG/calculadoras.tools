@@ -1,0 +1,724 @@
+
+
+
+
+---
+import BaseLayout from "@layouts/BaseLayout.astro";
+import { buildAlternateLinks } from "@lib/i18n/routing";
+import AdSlot from "@components/ads/AdSlot.astro";
+import Container from "@components/layout/Container.astro";
+import PageShell from "@components/layout/PageShell.astro";
+import FaqSection from "@components/shared/FaqSection.astro";
+import PageHero from "@components/shared/PageHero.astro";
+import SectionIntro from "@components/shared/SectionIntro.astro";
+import { QUADRATIC_EXAMPLES } from "@lib/calculators/matematicas/calculadora-ecuaciones-cuadraticas/quadratic.en";
+import { buildFaqJsonLd } from "@lib/seo";
+
+const title = "Quadratic equation calculator";
+const description =
+  "Solve quadratic equations with the quadratic formula, discriminant, real or complex roots and step-by-step work.";
+const canonical = "/en/math/quadratic-equation-calculator";
+const spanishCanonical = "/matematicas/calculadora-ecuaciones-cuadraticas";
+const alternates = buildAlternateLinks(
+  { es: spanishCanonical, en: canonical },
+  Astro.site ?? Astro.url,
+);
+
+const faqs = [
+  {
+    question: "What is the discriminant?",
+    answer:
+      "The discriminant is D = b² - 4ac. Its sign indicates whether the equation has two real roots, one double root or complex roots.",
+  },
+  {
+    question: "What happens when the discriminant is negative?",
+    answer:
+      "When the discriminant is negative, the equation has no real roots. The calculator shows two complex roots with real and imaginary parts.",
+  },
+  {
+    question: "Why can't a be zero?",
+    answer:
+      "If a = 0, the expression is no longer quadratic and becomes a linear equation of the form bx + c = 0.",
+  },
+  {
+    question: "Does the calculator show complex roots?",
+    answer:
+      "Yes. When D < 0, it shows solutions as real part ± imaginary part i.",
+  },
+  {
+    question: "What does a double root mean?",
+    answer:
+      "A double root occurs when D = 0. On the graph, the parabola touches the x-axis at one point.",
+  },
+  {
+    question: "What does the parabola's vertex represent?",
+    answer:
+      "The vertex is the parabola's maximum or minimum point. It is calculated with xv = -b/(2a) and yv = a*xv² + b*xv + c.",
+  },
+];
+
+const faqJsonLd = buildFaqJsonLd(faqs);
+---
+
+<BaseLayout title={title} description={description} canonical={canonical} locale="en" alternates={alternates}>
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={JSON.stringify(faqJsonLd)} />
+  </Fragment>
+
+  <PageShell>
+    <PageHero
+      title="Quadratic equation calculator"
+      description="Calculate real or complex roots with the discriminant, vertex, exact form and quadratic-formula steps."
+      kicker="Math"
+      collapseBreadcrumbOnMobile
+      containerClass="py-6 md:py-8"
+      breadcrumbs={[
+        { label: "Home", href: "/en", ariaLabel: "Home" },
+        { label: "Math", href: "/en/math", optional: true },
+        { label: "Quadratic equation calculator", truncate: true },
+      ]}
+    />
+
+    <Container as="section" class="py-6 md:py-8">
+      <div
+        id="quadratic-calculator"
+        class="overflow-hidden rounded-lg border border-gray-700 bg-gray-950 shadow-xl shadow-gray-950/30"
+      >
+        <div class="grid gap-0 lg:grid-cols-[minmax(0,1fr)_minmax(21rem,0.78fr)]">
+          <section class="p-4 sm:p-6" aria-labelledby="calculator-heading">
+            <h2 id="calculator-heading" class="text-xl font-semibold">
+              Coefficients
+            </h2>
+
+            <div class="mt-5 grid gap-4 md:grid-cols-3">
+              <div>
+                <label
+                  for="coefficient-a"
+                  class="block text-sm font-medium text-gray-200"
+                >
+                  Coefficient a
+                </label>
+                <input
+                  id="coefficient-a"
+                  class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-900 px-4 text-base text-white outline-none transition placeholder:text-gray-600 focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15"
+                  type="text"
+                  inputmode="decimal"
+                  autocomplete="off"
+                  placeholder="1"
+                  aria-describedby="coefficient-a-error"
+                  data-coefficient-input="a"
+                />
+                <p
+                  id="coefficient-a-error"
+                  class="mt-2 hidden text-sm text-red-300"
+                  data-error-for="a"
+                >
+                </p>
+              </div>
+
+              <div>
+                <label
+                  for="coefficient-b"
+                  class="block text-sm font-medium text-gray-200"
+                >
+                  Coefficient b
+                </label>
+                <input
+                  id="coefficient-b"
+                  class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-900 px-4 text-base text-white outline-none transition placeholder:text-gray-600 focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15"
+                  type="text"
+                  inputmode="decimal"
+                  autocomplete="off"
+                  placeholder="-5"
+                  aria-describedby="coefficient-b-error"
+                  data-coefficient-input="b"
+                />
+                <p
+                  id="coefficient-b-error"
+                  class="mt-2 hidden text-sm text-red-300"
+                  data-error-for="b"
+                >
+                </p>
+              </div>
+
+              <div>
+                <label
+                  for="coefficient-c"
+                  class="block text-sm font-medium text-gray-200"
+                >
+                  Coefficient c
+                </label>
+                <input
+                  id="coefficient-c"
+                  class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-900 px-4 text-base text-white outline-none transition placeholder:text-gray-600 focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15"
+                  type="text"
+                  inputmode="decimal"
+                  autocomplete="off"
+                  placeholder="6"
+                  aria-describedby="coefficient-c-error"
+                  data-coefficient-input="c"
+                />
+                <p
+                  id="coefficient-c-error"
+                  class="mt-2 hidden text-sm text-red-300"
+                  data-error-for="c"
+                >
+                </p>
+              </div>
+            </div>
+
+            <div class="mt-5 rounded-lg border border-gray-800 bg-gray-900 px-4 py-3">
+              <p class="text-xs font-semibold uppercase text-gray-500">
+                Equation
+              </p>
+              <p
+                class="mt-2 break-words text-2xl font-semibold text-white"
+                data-equation-preview
+              >
+                ax² + bx + c = 0
+              </p>
+            </div>
+
+            <div class="mt-5">
+              <p class="text-sm font-medium text-gray-200">Examples</p>
+              <div
+                class="mt-2 flex gap-2 overflow-x-auto pb-1"
+                role="group"
+                aria-label="Load example"
+              >
+                {
+                  QUADRATIC_EXAMPLES.map((example) => (
+                    <button
+                      class="min-h-11 shrink-0 rounded-lg border border-gray-700 px-3 py-2 text-sm font-semibold text-gray-200 transition hover:border-amber-400 hover:text-white focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/40"
+                      type="button"
+                      data-example-a={example.a}
+                      data-example-b={example.b}
+                      data-example-c={example.c}
+                    >
+                      {example.label}
+                    </button>
+                  ))
+                }
+              </div>
+            </div>
+
+            <div class="mt-5 grid gap-4 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-end">
+              <div>
+                <label
+                  for="quadratic-decimals"
+                  class="block text-sm font-medium text-gray-200"
+                >
+                  Decimal places
+                </label>
+                <select
+                  id="quadratic-decimals"
+                  class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-900 px-4 text-base text-white outline-none transition focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15"
+                  data-decimals
+                >
+                  {
+                    Array.from({ length: 9 }, (_, decimals) => (
+                      <option value={String(decimals)} selected={decimals === 4}>
+                        {decimals} {decimals === 1 ? "decimal" : "decimal places"}
+                      </option>
+                    ))
+                  }
+                </select>
+              </div>
+
+              <button
+                class="inline-flex min-h-11 items-center justify-center rounded-lg border border-gray-700 px-4 py-2 text-sm font-semibold text-gray-200 transition hover:border-amber-400 hover:text-white focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/40"
+                type="button"
+                data-clear-calculator
+              >
+                Clear
+              </button>
+            </div>
+          </section>
+
+          <aside
+            class="border-t border-gray-800 bg-gray-900/60 p-4 sm:p-6 lg:border-l lg:border-t-0"
+          >
+            <div
+              class="rounded-lg border border-gray-700 bg-gray-950 p-5"
+              aria-live="polite"
+              data-result-region
+            >
+              <p class="text-sm font-semibold uppercase text-amber-400">
+                Result
+              </p>
+              <p
+                class="mt-3 break-words text-3xl font-semibold text-white"
+                data-solution-label
+              >
+                Enter the coefficients
+              </p>
+              <p
+                class="mt-3 rounded-lg border border-gray-800 bg-gray-900 px-3 py-2 text-sm leading-relaxed text-gray-300"
+                data-interpretation
+              >
+                The roots will appear when a, b and c are valid.
+              </p>
+
+              <div class="mt-4 grid gap-3" data-roots-list>
+                <div class="rounded-lg border border-gray-800 bg-gray-900 p-4">
+                  <p class="text-xs font-semibold uppercase text-gray-500">
+                    Roots
+                  </p>
+                  <p class="mt-2 text-sm text-gray-400">No calculation yet.</p>
+                </div>
+              </div>
+
+              <div class="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2">
+                <div class="rounded-lg border border-gray-800 bg-gray-900 p-4">
+                  <p class="text-xs font-semibold uppercase text-gray-500">
+                    Discriminant
+                  </p>
+                  <p
+                    class="mt-2 break-words text-2xl font-semibold text-white"
+                    data-discriminant
+                  >
+                    -
+                  </p>
+                </div>
+                <div class="rounded-lg border border-gray-800 bg-gray-900 p-4">
+                  <p class="text-xs font-semibold uppercase text-gray-500">
+                    Vertex
+                  </p>
+                  <p
+                    class="mt-2 break-words text-2xl font-semibold text-white"
+                    data-vertex
+                  >
+                    -
+                  </p>
+                </div>
+              </div>
+
+              <div class="mt-5 flex flex-wrap gap-3">
+                <button
+                  class="hidden min-h-11 items-center justify-center rounded-lg bg-amber-400 px-4 py-2 text-sm font-semibold text-gray-950 transition hover:bg-amber-300 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/40"
+                  type="button"
+                  data-copy-result
+                >
+                  Copy result
+                </button>
+              </div>
+              <p class="mt-3 min-h-5 text-sm text-emerald-300" data-copy-status>
+              </p>
+            </div>
+          </aside>
+        </div>
+
+        <div class="border-t border-gray-800 p-4 sm:p-6">
+          <details class="rounded-lg border border-gray-800 bg-gray-900/60 p-4">
+            <summary class="cursor-pointer text-base font-semibold text-white">
+              Quadratic-formula steps
+            </summary>
+            <div class="mt-4 rounded-lg border border-gray-800 bg-gray-950 p-4">
+              <p class="text-sm font-semibold text-gray-200" data-formula>
+                x = (-b ± sqrt(D)) / (2a)
+              </p>
+              <p
+                class="mt-2 break-words text-sm leading-relaxed text-gray-400"
+                data-substitution
+              >
+                Substitute the coefficients to view the formula.
+              </p>
+            </div>
+            <ol
+              class="mt-4 space-y-3 text-sm leading-relaxed text-gray-300"
+              data-steps-list
+            >
+              <li>Complete the values to view the steps.</li>
+            </ol>
+          </details>
+        </div>
+      </div>
+    </Container>
+
+    <AdSlot placement="calculator-after-tool" />
+
+    <Container as="section" class="py-6 md:py-8">
+      <SectionIntro
+        title="How to read the result"
+        description="The discriminant connects the roots with the shape of the parabola."
+      />
+
+      <div class="grid gap-4 md:grid-cols-3">
+        <article class="rounded-lg border border-gray-700 bg-gray-950 p-5">
+          <h2 class="text-lg font-semibold text-white">D &gt; 0</h2>
+          <p class="mt-3 text-sm leading-relaxed text-gray-400">
+            There are two distinct real roots. The parabola crosses the x-axis at two
+            points.
+          </p>
+        </article>
+        <article class="rounded-lg border border-gray-700 bg-gray-950 p-5">
+          <h2 class="text-lg font-semibold text-white">D = 0</h2>
+          <p class="mt-3 text-sm leading-relaxed text-gray-400">
+            There is one double real root. The parabola touches the x-axis at its vertex.
+          </p>
+        </article>
+        <article class="rounded-lg border border-gray-700 bg-gray-950 p-5">
+          <h2 class="text-lg font-semibold text-white">D &lt; 0</h2>
+          <p class="mt-3 text-sm leading-relaxed text-gray-400">
+            There are no real roots. The solutions appear as complex numbers.
+          </p>
+        </article>
+      </div>
+    </Container>
+
+    <Container as="section" class="py-6 md:py-8">
+      <div class="rounded-lg border border-gray-700 bg-gray-950 p-5">
+        <h2 class="text-xl font-semibold text-white">Quadratic formula</h2>
+        <p class="mt-3 break-words text-sm leading-relaxed text-gray-400">
+          For an equation ax² + bx + c = 0, the discriminant is D = b² - 4ac,
+          and the solutions are obtained with x = (-b ± sqrt(D)) / (2a).
+        </p>
+      </div>
+    </Container>
+
+    <FaqSection faqs={faqs} />
+  </PageShell>
+</BaseLayout>
+
+<script>
+  import {
+    calculateQuadraticEquation,
+    formatFlexibleQuadraticNumber,
+    formatQuadraticEquation,
+    parseQuadraticInput,
+  } from "@lib/calculators/matematicas/calculadora-ecuaciones-cuadraticas/quadratic.en";
+
+  const ERROR_MESSAGES = {
+    required: "This field is required.",
+    incomplete: "Complete the number.",
+    invalid: "Enter a valid number.",
+    zero_a: "Coefficient a cannot be zero.",
+  };
+
+  const inputs = Array.from(
+    document.querySelectorAll("[data-coefficient-input]"),
+  );
+  const decimalsSelect = document.querySelector("[data-decimals]");
+  const equationPreview = document.querySelector("[data-equation-preview]");
+  const solutionLabel = document.querySelector("[data-solution-label]");
+  const interpretation = document.querySelector("[data-interpretation]");
+  const rootsList = document.querySelector("[data-roots-list]");
+  const discriminant = document.querySelector("[data-discriminant]");
+  const vertex = document.querySelector("[data-vertex]");
+  const formula = document.querySelector("[data-formula]");
+  const substitution = document.querySelector("[data-substitution]");
+  const stepsList = document.querySelector("[data-steps-list]");
+  const copyButton = document.querySelector("[data-copy-result]");
+  const copyStatus = document.querySelector("[data-copy-status]");
+  const clearButton = document.querySelector("[data-clear-calculator]");
+  const exampleButtons = Array.from(
+    document.querySelectorAll("[data-example-a]"),
+  );
+
+  let currentCopyText = "";
+  let copyStatusTimeout = 0;
+
+  function getInput(name) {
+    return document.querySelector(`[data-coefficient-input="${name}"]`);
+  }
+
+  function getDecimals() {
+    return Number(decimalsSelect?.value ?? "4");
+  }
+
+  function parseInputs() {
+    const values = {};
+    const errors = {};
+
+    inputs.forEach((input) => {
+      const field = input.dataset.coefficientInput;
+      const parsed = parseQuadraticInput(input.value);
+
+      if (parsed.ok) {
+        values[field] = parsed.value;
+      } else {
+        errors[field] = parsed.error;
+      }
+    });
+
+    if (values.a === 0) {
+      errors.a = "zero_a";
+    }
+
+    return { values, errors };
+  }
+
+  function hasAnyValue() {
+    return inputs.some((input) => input.value.trim() !== "");
+  }
+
+  function showErrors(errors) {
+    document.querySelectorAll("[data-error-for]").forEach((errorElement) => {
+      errorElement.textContent = "";
+      errorElement.classList.add("hidden");
+    });
+
+    Object.entries(errors).forEach(([field, error]) => {
+      const errorElement = document.querySelector(`[data-error-for="${field}"]`);
+      const input = getInput(field);
+      const shouldShow =
+        input?.dataset.touched === "true" ||
+        error === "zero_a" ||
+        (hasAnyValue() && error !== "required");
+
+      if (!errorElement || !shouldShow) {
+        return;
+      }
+
+      errorElement.textContent = ERROR_MESSAGES[error] ?? ERROR_MESSAGES.invalid;
+      errorElement.classList.remove("hidden");
+    });
+  }
+
+  function updateEquationPreview(values, errors) {
+    if (
+      ["a", "b", "c"].every((field) => typeof values[field] === "number") &&
+      Object.keys(errors).length === 0
+    ) {
+      equationPreview.textContent = formatQuadraticEquation(
+        values.a,
+        values.b,
+        values.c,
+      );
+      return;
+    }
+
+    if (!hasAnyValue()) {
+      equationPreview.textContent = "ax² + bx + c = 0";
+      return;
+    }
+
+    equationPreview.textContent = "Complete a, b and c";
+  }
+
+  function renderEmptyState() {
+    currentCopyText = "";
+    solutionLabel.textContent = "Enter the coefficients";
+    solutionLabel.classList.remove("text-red-300");
+    solutionLabel.classList.add("text-white");
+    interpretation.textContent =
+      "The roots will appear when a, b and c are valid.";
+    renderEmptyRoots("No calculation yet.");
+    discriminant.textContent = "-";
+    vertex.textContent = "-";
+    formula.textContent = "x = (-b ± sqrt(D)) / (2a)";
+    substitution.textContent = "Substitute the coefficients to view the formula.";
+    renderSteps(["Complete the values to view the steps."]);
+    setCopyVisible(false);
+  }
+
+  function renderInvalidState() {
+    currentCopyText = "";
+    solutionLabel.textContent = "Check the fields";
+    solutionLabel.classList.remove("text-white");
+    solutionLabel.classList.add("text-red-300");
+    interpretation.textContent = "Correct the marked coefficients to continue.";
+    renderEmptyRoots("Some values are missing or invalid.");
+    discriminant.textContent = "-";
+    vertex.textContent = "-";
+    formula.textContent = "x = (-b ± sqrt(D)) / (2a)";
+    substitution.textContent = "Correct the coefficients to substitute them into the formula.";
+    renderSteps(["Correct the marked fields to view the steps."]);
+    setCopyVisible(false);
+  }
+
+  function renderResult(result) {
+    currentCopyText = result.copyText;
+    solutionLabel.textContent = result.solutionLabel;
+    solutionLabel.classList.remove("text-red-300");
+    solutionLabel.classList.add("text-white");
+    interpretation.textContent = result.interpretation;
+    discriminant.textContent = formatFlexibleQuadraticNumber(result.discriminant);
+    vertex.textContent = result.vertex.display;
+    formula.textContent = result.formula;
+    substitution.textContent = result.substitution;
+    renderRoots(result.roots);
+    renderSteps(result.steps);
+    setCopyVisible(true);
+  }
+
+  function renderRoots(roots) {
+    const fragment = document.createDocumentFragment();
+
+    roots.forEach((root) => {
+      const item = document.createElement("div");
+      item.className = "rounded-lg border border-gray-800 bg-gray-900 p-4";
+
+      const label = document.createElement("p");
+      label.className = "text-xs font-semibold uppercase text-gray-500";
+      label.textContent = root.label;
+
+      const value = document.createElement("p");
+      value.className = "mt-2 break-words text-2xl font-semibold text-white";
+      value.textContent = root.display;
+
+      const exact = document.createElement("p");
+      exact.className = "mt-2 break-words text-sm text-gray-400";
+      exact.textContent = `Exacta: ${root.exact}`;
+
+      item.append(label, value, exact);
+      fragment.append(item);
+    });
+
+    rootsList.replaceChildren(fragment);
+  }
+
+  function renderEmptyRoots(message) {
+    const item = document.createElement("div");
+    item.className = "rounded-lg border border-gray-800 bg-gray-900 p-4";
+
+    const label = document.createElement("p");
+    label.className = "text-xs font-semibold uppercase text-gray-500";
+    label.textContent = "Roots";
+
+    const text = document.createElement("p");
+    text.className = "mt-2 text-sm text-gray-400";
+    text.textContent = message;
+
+    item.append(label, text);
+    rootsList.replaceChildren(item);
+  }
+
+  function renderSteps(steps) {
+    const fragment = document.createDocumentFragment();
+
+    steps.forEach((step) => {
+      const item = document.createElement("li");
+      item.textContent = step;
+      fragment.append(item);
+    });
+
+    stepsList.replaceChildren(fragment);
+  }
+
+  function setCopyVisible(isVisible) {
+    copyButton?.classList.toggle("hidden", !isVisible);
+    copyButton?.classList.toggle("inline-flex", isVisible);
+  }
+
+  function updateCalculator() {
+    const { values, errors } = parseInputs();
+
+    updateEquationPreview(values, errors);
+
+    if (!hasAnyValue()) {
+      showErrors({});
+      renderEmptyState();
+      return;
+    }
+
+    if (Object.keys(errors).length > 0) {
+      showErrors(errors);
+      renderInvalidState();
+      return;
+    }
+
+    showErrors({});
+    renderResult(
+      calculateQuadraticEquation({
+        a: values.a,
+        b: values.b,
+        c: values.c,
+        decimals: getDecimals(),
+      }),
+    );
+  }
+
+  async function copyResult() {
+    if (!currentCopyText) {
+      return;
+    }
+
+    try {
+      if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(currentCopyText);
+      } else {
+        const textArea = document.createElement("textarea");
+        textArea.value = currentCopyText;
+        textArea.setAttribute("readonly", "");
+        textArea.style.position = "fixed";
+        textArea.style.opacity = "0";
+        document.body.append(textArea);
+        textArea.select();
+        document.execCommand("copy");
+        textArea.remove();
+      }
+
+      setCopyStatus("Result copied.");
+    } catch {
+      setCopyStatus("Could not copy the result.");
+    }
+  }
+
+  function setCopyStatus(message) {
+    copyStatus.textContent = message;
+    window.clearTimeout(copyStatusTimeout);
+    copyStatusTimeout = window.setTimeout(() => {
+      copyStatus.textContent = "";
+    }, 2500);
+  }
+
+  function clearCalculator() {
+    inputs.forEach((input) => {
+      input.value = "";
+      delete input.dataset.touched;
+    });
+
+    if (decimalsSelect) {
+      decimalsSelect.value = "4";
+    }
+
+    updateCalculator();
+    getInput("a")?.focus();
+  }
+
+  function loadExample(button) {
+    const a = getInput("a");
+    const b = getInput("b");
+    const c = getInput("c");
+
+    if (!a || !b || !c) {
+      return;
+    }
+
+    a.value = button.dataset.exampleA ?? "";
+    b.value = button.dataset.exampleB ?? "";
+    c.value = button.dataset.exampleC ?? "";
+    inputs.forEach((input) => {
+      input.dataset.touched = "true";
+    });
+    updateCalculator();
+  }
+
+  inputs.forEach((input) => {
+    input.addEventListener("input", () => {
+      input.dataset.touched = "true";
+      updateCalculator();
+    });
+
+    input.addEventListener("blur", () => {
+      input.dataset.touched = "true";
+      updateCalculator();
+    });
+  });
+
+  decimalsSelect?.addEventListener("change", updateCalculator);
+  copyButton?.addEventListener("click", copyResult);
+  clearButton?.addEventListener("click", clearCalculator);
+  exampleButtons.forEach((button) => {
+    button.addEventListener("click", () => loadExample(button));
+  });
+
+  updateCalculator();
+</script>
+
+
+
+
+
+

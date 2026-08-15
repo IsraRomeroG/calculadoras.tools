@@ -1,0 +1,877 @@
+
+
+
+
+
+---
+import BaseLayout from "@layouts/BaseLayout.astro";
+import { buildAlternateLinks } from "@lib/i18n/routing";
+import AdSlot from "@components/ads/AdSlot.astro";
+import Container from "@components/layout/Container.astro";
+import PageShell from "@components/layout/PageShell.astro";
+import FaqSection from "@components/shared/FaqSection.astro";
+import PageHero from "@components/shared/PageHero.astro";
+import SectionIntro from "@components/shared/SectionIntro.astro";
+import {
+  ATTENDANCE_CANONICAL_PATH,
+  ATTENDANCE_EXAMPLES,
+} from "@lib/calculators/matematicas/calculadora-porcentaje-asistencia-escolar/attendance.en";
+import { buildFaqJsonLd } from "@lib/seo";
+
+const title = "School attendance percentage calculator";
+const description =
+  "Calculate your attendance percentage, available absences and classes needed to meet a required minimum.";
+const canonical = "/en/math/attendance-percentage-calculator";
+const spanishCanonical = "/matematicas/calculadora-porcentaje-asistencia-escolar";
+const alternates = buildAlternateLinks(
+  { es: spanishCanonical, en: canonical },
+  Astro.site ?? Astro.url,
+);
+
+const faqs = [
+  {
+    question: "How is attendance percentage calculated?",
+    answer:
+      "Divide attended classes by total completed classes and multiply by 100.",
+  },
+  {
+    question: "How many absences can I have?",
+    answer:
+      "It depends on the required minimum, accumulated absences and remaining classes. The calculator estimates additional absences allowed without falling below the final minimum.",
+  },
+  {
+    question: "What happens if I am below the minimum?",
+    answer:
+      "The calculator checks whether you can recover with remaining classes and shows how many you would need to attend.",
+  },
+  {
+    question: "Can I include remaining classes?",
+    answer:
+      "Yes. Enter the classes remaining in the course to estimate the final scenario, not only the current percentage.",
+  },
+  {
+    question: "What does it mean when the minimum can no longer be reached?",
+    answer:
+      "It means that even if you attend every entered remaining class, the final percentage would remain below the requirement.",
+  },
+  {
+    question: "Do excused absences count toward the percentage?",
+    answer:
+      "It depends on your school's rules. In this calculator, all entered absences count equally toward the percentage.",
+  },
+];
+
+const faqJsonLd = buildFaqJsonLd(faqs);
+---
+
+<BaseLayout title={title} description={description} canonical={canonical} locale="en" alternates={alternates}>
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={JSON.stringify(faqJsonLd)} />
+  </Fragment>
+
+  <PageShell>
+    <PageHero
+      title="School attendance calculator"
+      description="Calculate your current percentage, check whether you meet the minimum and estimate your margin for remaining classes."
+      kicker="Math"
+      collapseBreadcrumbOnMobile
+      containerClass="py-6 md:py-8"
+      breadcrumbs={[
+        { label: "Home", href: "/en", ariaLabel: "Home" },
+        { label: "Math", href: "/en/math", optional: true },
+        { label: "School attendance", truncate: true },
+      ]}
+    />
+
+    <Container as="section" class="py-6 md:py-8">
+      <div
+        id="attendance-calculator"
+        class="overflow-hidden rounded-lg border border-gray-700 bg-gray-950 shadow-xl shadow-gray-950/30"
+      >
+        <div class="grid gap-0 lg:grid-cols-[minmax(0,1fr)_minmax(20rem,0.78fr)]">
+          <aside
+            class="border-b border-gray-800 bg-gray-900/60 p-4 sm:p-6 lg:order-2 lg:border-b-0 lg:border-l"
+            aria-live="polite"
+          >
+            <p class="text-sm font-semibold uppercase text-amber-400">
+              Result
+            </p>
+
+            <div class="mt-4 rounded-lg border border-gray-700 bg-gray-950 p-5">
+              <p class="text-xs font-semibold uppercase text-gray-400">
+                Recommended action
+              </p>
+              <p
+                class="mt-2 break-words text-2xl font-bold leading-tight text-white sm:text-3xl"
+                data-result-action
+              >
+                Complete your inputs to calculate.
+              </p>
+              <p class="mt-3 text-sm leading-relaxed text-gray-400" data-result-note>
+                Your current percentage and absence margin will appear here.
+              </p>
+            </div>
+
+            <div class="mt-3 grid grid-cols-2 gap-3">
+              <div class="rounded-lg border border-gray-800 bg-gray-950 p-4">
+                <p class="text-xs font-semibold uppercase text-gray-500">
+                  Attendance
+                </p>
+                <p
+                  class="mt-2 break-words text-3xl font-semibold text-white"
+                  data-result-percent
+                >
+                  -
+                </p>
+              </div>
+              <div class="rounded-lg border border-gray-800 bg-gray-950 p-4">
+                <p class="text-xs font-semibold uppercase text-gray-500">
+                  Status
+                </p>
+                <p class="mt-2 break-words text-2xl font-semibold text-white" data-result-status>
+                  -
+                </p>
+              </div>
+              <div class="rounded-lg border border-gray-800 bg-gray-950 p-4">
+                <p class="text-xs font-semibold uppercase text-gray-500">
+                  Available absences
+                </p>
+                <p class="mt-2 break-words text-2xl font-semibold text-white" data-result-available>
+                  -
+                </p>
+              </div>
+              <div class="rounded-lg border border-gray-800 bg-gray-950 p-4">
+                <p class="text-xs font-semibold uppercase text-gray-500">
+                  Classes needed
+                </p>
+                <p class="mt-2 break-words text-2xl font-semibold text-white" data-result-needed>
+                  -
+                </p>
+              </div>
+            </div>
+
+            <div class="mt-3 rounded-lg border border-gray-800 bg-gray-950 p-4">
+              <p class="text-xs font-semibold uppercase text-gray-500">
+                Quick summary
+              </p>
+              <div class="mt-3 grid gap-2 text-sm leading-relaxed text-gray-300">
+                <p data-result-margin>Margin: -</p>
+                <p data-result-final-absences>Maximum final absences: -</p>
+                <p data-result-recovery>Consecutive classes needed to recover: -</p>
+                <p data-result-max-possible>Maximum possible: -</p>
+              </div>
+            </div>
+          </aside>
+
+          <section class="p-4 sm:p-6 lg:order-1" aria-labelledby="calculator-heading">
+            <h2 id="calculator-heading" class="text-xl font-semibold">
+              Attendance inputs
+            </h2>
+
+            <div class="mt-5 grid gap-4 sm:grid-cols-2">
+              <div>
+                <label for="attendance-total" class="block text-sm font-medium text-gray-200">
+                  Total completed classes
+                </label>
+                <input
+                  id="attendance-total"
+                  class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-900 px-4 text-base text-white outline-none transition placeholder:text-gray-600 focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15"
+                  type="text"
+                  inputmode="numeric"
+                  autocomplete="off"
+                  placeholder="40"
+                  data-field="totalClasses"
+                />
+                <p class="mt-2 hidden text-sm text-red-300" data-error-for="totalClasses"></p>
+              </div>
+
+              <div>
+                <label for="attendance-required" class="block text-sm font-medium text-gray-200">
+                  Required minimum (%)
+                </label>
+                <input
+                  id="attendance-required"
+                  class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-900 px-4 text-base text-white outline-none transition placeholder:text-gray-600 focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15"
+                  type="text"
+                  inputmode="decimal"
+                  autocomplete="off"
+                  value="80"
+                  data-field="requiredPercent"
+                />
+                <p class="mt-2 hidden text-sm text-red-300" data-error-for="requiredPercent"></p>
+              </div>
+            </div>
+
+            <div class="mt-5">
+              <span class="block text-sm font-medium text-gray-200">
+                  Enter by
+              </span>
+              <div
+                class="mt-2 inline-flex rounded-lg border border-gray-700 bg-gray-900 p-1"
+                role="group"
+                aria-label="Input mode"
+              >
+                <button
+                  class="min-h-11 rounded-md px-4 py-2 text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/40"
+                  type="button"
+                  data-mode-button="attended"
+                  aria-pressed="true"
+                >
+                  Attended
+                </button>
+                <button
+                  class="min-h-11 rounded-md px-4 py-2 text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/40"
+                  type="button"
+                  data-mode-button="absences"
+                  aria-pressed="false"
+                >
+                  Absences
+                </button>
+              </div>
+            </div>
+
+            <div class="mt-5 grid gap-4 sm:grid-cols-2">
+              <div data-attended-wrapper>
+                <label
+                  for="attendance-attended"
+                  class="block text-sm font-medium text-gray-200"
+                >
+                  Classes attended
+                </label>
+                <input
+                  id="attendance-attended"
+                  class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-900 px-4 text-base text-white outline-none transition placeholder:text-gray-600 focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15"
+                  type="text"
+                  inputmode="numeric"
+                  autocomplete="off"
+                  placeholder="34"
+                  data-field="attendedClasses"
+                />
+                <p class="mt-2 hidden text-sm text-red-300" data-error-for="attendedClasses"></p>
+              </div>
+
+              <div class="hidden" data-absences-wrapper>
+                <label
+                  for="attendance-absences"
+                  class="block text-sm font-medium text-gray-200"
+                >
+                  Absences
+                </label>
+                <input
+                  id="attendance-absences"
+                  class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-900 px-4 text-base text-white outline-none transition placeholder:text-gray-600 focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15"
+                  type="text"
+                  inputmode="numeric"
+                  autocomplete="off"
+                  placeholder="6"
+                  data-field="absences"
+                />
+                <p class="mt-2 hidden text-sm text-red-300" data-error-for="absences"></p>
+              </div>
+
+              <div>
+                <label
+                  for="attendance-remaining"
+                  class="block text-sm font-medium text-gray-200"
+                >
+                  Remaining classes
+                </label>
+                <input
+                  id="attendance-remaining"
+                  class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-900 px-4 text-base text-white outline-none transition placeholder:text-gray-600 focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15"
+                  type="text"
+                  inputmode="numeric"
+                  autocomplete="off"
+                  value="0"
+                  data-field="remainingClasses"
+                />
+                <p class="mt-2 hidden text-sm text-red-300" data-error-for="remainingClasses"></p>
+              </div>
+            </div>
+
+            <div class="mt-5 flex flex-wrap gap-3">
+              <button
+                class="inline-flex min-h-11 items-center justify-center rounded-lg bg-amber-400 px-4 py-2 text-sm font-semibold text-gray-950 transition hover:bg-amber-300 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/40"
+                type="button"
+                data-copy-summary
+                disabled
+              >
+                Copy summary
+              </button>
+              <button
+                class="inline-flex min-h-11 items-center justify-center rounded-lg border border-gray-700 px-4 py-2 text-sm font-semibold text-gray-200 transition hover:border-amber-400 hover:text-white focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/40"
+                type="button"
+                data-clear
+              >
+                Clear
+              </button>
+            </div>
+            <p class="mt-3 min-h-5 text-sm text-emerald-300" data-action-status></p>
+
+            <div class="mt-5">
+              <p class="text-sm font-medium text-gray-200">Examples</p>
+              <div class="mt-2 flex flex-wrap gap-2">
+                {
+                  ATTENDANCE_EXAMPLES.map((example) => (
+                    <button
+                      class="min-h-11 rounded-lg border border-gray-700 px-3 py-2 text-sm font-semibold text-gray-200 transition hover:border-amber-400 hover:text-white focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/40"
+                      type="button"
+                      data-example-id={example.id}
+                    >
+                      {example.label}
+                    </button>
+                  ))
+                }
+              </div>
+            </div>
+          </section>
+        </div>
+      </div>
+    </Container>
+
+    <AdSlot placement="calculator-after-tool" />
+
+    <Container as="section" class="py-6 md:py-8">
+      <SectionIntro
+        title="How to read the result"
+        description="The most useful value is often the next action: how many absences remain or how many classes should be attended."
+      />
+
+      <div class="grid gap-4 md:grid-cols-3">
+        <article class="rounded-lg border border-gray-700 bg-gray-950 p-5">
+          <h3 class="text-lg font-semibold text-white">Accumulated absences</h3>
+          <p class="mt-3 text-sm leading-relaxed text-gray-400">
+            Classes already counted as absences within the total
+            registrado.
+          </p>
+        </article>
+        <article class="rounded-lg border border-gray-700 bg-gray-950 p-5">
+          <h3 class="text-lg font-semibold text-white">Available absences</h3>
+          <p class="mt-3 text-sm leading-relaxed text-gray-400">
+            Possible future absences within remaining classes
+            entered.
+          </p>
+        </article>
+        <article class="rounded-lg border border-gray-700 bg-gray-950 p-5">
+          <h3 class="text-lg font-semibold text-white">Classes needed</h3>
+          <p class="mt-3 text-sm leading-relaxed text-gray-400">
+            Shows how many remaining classes you need to attend to meet the
+          minimum at the end.
+          </p>
+        </article>
+      </div>
+    </Container>
+
+    <FaqSection faqs={faqs} />
+  </PageShell>
+</BaseLayout>
+
+<script>
+  import {
+    ATTENDANCE_EXAMPLES,
+    buildAttendanceSummary,
+    calculateAttendance,
+    formatAttendanceCount,
+    formatAttendancePercent,
+    formatSignedAttendanceNumber,
+    parseAttendanceInteger,
+    parseAttendancePercent,
+  } from "@lib/calculators/matematicas/calculadora-porcentaje-asistencia-escolar/attendance.en";
+
+  const INTEGER_ERROR_MESSAGES = {
+    required: "This field is required.",
+    invalid: "Enter a valid whole number.",
+    negative: "Use a number greater than or equal to zero.",
+    zero: "Must be greater than zero.",
+    too_large: "Cannot exceed the allowed limit.",
+  };
+
+  const PERCENT_ERROR_MESSAGES = {
+    required: "This field is required.",
+    invalid: "Enter a valid percentage.",
+    negative: "Use a percentage greater than or equal to zero.",
+    too_large: "The percentage cannot exceed 100.",
+    too_many_decimals: "Use no more than 4 decimal places.",
+  };
+
+  const modeButtons = Array.from(document.querySelectorAll("[data-mode-button]"));
+  const attendedWrapper = document.querySelector("[data-attended-wrapper]");
+  const absencesWrapper = document.querySelector("[data-absences-wrapper]");
+  const copyButton = document.querySelector("[data-copy-summary]");
+  const clearButton = document.querySelector("[data-clear]");
+  const actionStatus = document.querySelector("[data-action-status]");
+  const resultAction = document.querySelector("[data-result-action]");
+  const resultNote = document.querySelector("[data-result-note]");
+  const resultPercent = document.querySelector("[data-result-percent]");
+  const resultStatus = document.querySelector("[data-result-status]");
+  const resultAvailable = document.querySelector("[data-result-available]");
+  const resultNeeded = document.querySelector("[data-result-needed]");
+  const resultMargin = document.querySelector("[data-result-margin]");
+  const resultFinalAbsences = document.querySelector("[data-result-final-absences]");
+  const resultRecovery = document.querySelector("[data-result-recovery]");
+  const resultMaxPossible = document.querySelector("[data-result-max-possible]");
+  const exampleButtons = Array.from(document.querySelectorAll("[data-example-id]"));
+
+  let mode = "attended";
+  let currentSummary = "";
+  let statusTimeout = 0;
+
+  function getField(field) {
+    return document.querySelector(`[data-field="${field}"]`);
+  }
+
+  function getFieldValue(field) {
+    return getField(field)?.value ?? "";
+  }
+
+  function setFieldValue(field, value) {
+    const input = getField(field);
+
+    if (input) {
+      input.value = value;
+    }
+  }
+
+  function readIntegerField(field, options = {}) {
+    const input = getField(field);
+    const parsed = parseAttendanceInteger(input?.value ?? "", {
+      required: options.required ?? true,
+      allowZero: options.allowZero ?? true,
+      max: options.max ?? 1000,
+    });
+
+    if (!parsed.ok) {
+      setFieldError(
+        field,
+        options.tooLargeMessage && parsed.error === "too_large"
+          ? options.tooLargeMessage
+          : INTEGER_ERROR_MESSAGES[parsed.error],
+        shouldShowError(input),
+      );
+      return { ok: false, value: null };
+    }
+
+    return { ok: true, value: parsed.value };
+  }
+
+  function readPercentField(field) {
+    const input = getField(field);
+    const parsed = parseAttendancePercent(input?.value ?? "");
+
+    if (!parsed.ok) {
+      setFieldError(field, PERCENT_ERROR_MESSAGES[parsed.error], shouldShowError(input));
+      return { ok: false, value: null };
+    }
+
+    return { ok: true, value: parsed.value };
+  }
+
+  function readCalculatorInput() {
+    clearErrors();
+
+    const total = readIntegerField("totalClasses", {
+      allowZero: false,
+      max: 1000,
+    });
+
+    if (!total.ok || total.value === null) {
+      return { ok: false, reason: "Add total completed classes." };
+    }
+
+    const required = readPercentField("requiredPercent");
+
+    if (!required.ok || required.value === null) {
+      return { ok: false, reason: "Enter the required minimum." };
+    }
+
+    const remaining = readIntegerField("remainingClasses", {
+      required: false,
+      allowZero: true,
+      max: 1000,
+    });
+
+    if (!remaining.ok || remaining.value === null) {
+      return { ok: false, reason: "Check remaining classes." };
+    }
+
+    if (mode === "absences") {
+      const absences = readIntegerField("absences", {
+        allowZero: true,
+        max: total.value,
+        tooLargeMessage: "Absences cannot exceed the total.",
+      });
+
+      if (!absences.ok || absences.value === null) {
+        return { ok: false, reason: "Add accumulated absences." };
+      }
+
+      return {
+        ok: true,
+        value: {
+          totalClasses: total.value,
+          mode,
+          absences: absences.value,
+          requiredPercent: required.value,
+          remainingClasses: remaining.value,
+        },
+      };
+    }
+
+    const attended = readIntegerField("attendedClasses", {
+      allowZero: true,
+      max: total.value,
+      tooLargeMessage: "Attended classes cannot exceed the total.",
+    });
+
+    if (!attended.ok || attended.value === null) {
+      return { ok: false, reason: "Add attended classes." };
+    }
+
+    return {
+      ok: true,
+      value: {
+        totalClasses: total.value,
+        mode,
+        attendedClasses: attended.value,
+        requiredPercent: required.value,
+        remainingClasses: remaining.value,
+      },
+    };
+  }
+
+  function updateCalculator() {
+    updateModeUi();
+
+    const input = readCalculatorInput();
+
+    if (!input.ok) {
+      renderEmptyState(input.reason);
+      return;
+    }
+
+    try {
+      const result = calculateAttendance(input.value);
+      currentSummary = buildAttendanceSummary(result);
+      renderResult(result);
+      syncAlternateField(result);
+    } catch (error) {
+      renderEmptyState(error instanceof Error ? error.message : "Could not calculate.");
+    }
+  }
+
+  function renderResult(result) {
+    setText(resultAction, result.actionMessage);
+    setText(
+      resultNote,
+      result.viability === "impossible"
+        ? "The final target cannot be reached with the entered remaining classes."
+        : "Result calculated using completed and remaining classes.",
+    );
+    setText(resultPercent, formatAttendancePercent(result.currentPercent));
+    setText(
+      resultStatus,
+      result.viability === "meets"
+        ? "Meets"
+        : result.viability === "recoverable"
+          ? "Recoverable"
+          : "Impossible",
+    );
+    setText(
+      resultAvailable,
+      result.availableAbsences < 0
+        ? `Excedes ${formatAttendanceCount(result.exceededAbsences)}`
+        : formatAttendanceCount(result.availableAbsences),
+    );
+    setText(
+      resultNeeded,
+      `${formatAttendanceCount(result.minimumRemainingAttendances)}/${formatAttendanceCount(
+        result.remainingClasses,
+      )}`,
+    );
+    setText(
+      resultMargin,
+      `Margin: ${formatSignedAttendanceNumber(result.marginPoints)} points`,
+    );
+    setText(
+      resultFinalAbsences,
+      `Maximum final absences: ${formatAttendanceCount(
+        result.maximumFinalAbsences,
+      )}`,
+    );
+    setText(resultRecovery, `Consecutive classes needed to recover: ${formatRecovery(result)}`);
+    setText(
+      resultMaxPossible,
+      `Maximum possible: ${formatAttendancePercent(result.maxPossiblePercent)}`,
+    );
+
+    updateResultColors(result);
+    setCopyEnabled(true);
+  }
+
+  function renderEmptyState(message) {
+    currentSummary = "";
+    setText(resultAction, "Complete your inputs to calculate.");
+    setText(resultNote, message);
+    setText(resultPercent, "-");
+    setText(resultStatus, "-");
+    setText(resultAvailable, "-");
+    setText(resultNeeded, "-");
+    setText(resultMargin, "Margin: -");
+    setText(resultFinalAbsences, "Maximum final absences: -");
+    setText(resultRecovery, "Consecutive classes needed to recover: -");
+    setText(resultMaxPossible, "Maximum possible: -");
+    updateResultColors(null);
+    setCopyEnabled(false);
+  }
+
+  function updateResultColors(result) {
+    const statusClasses = ["text-white", "text-emerald-300", "text-amber-300", "text-red-300"];
+
+    [resultAction, resultPercent, resultStatus, resultAvailable].forEach((element) => {
+      element?.classList.remove(...statusClasses);
+      element?.classList.add("text-white");
+    });
+
+    if (!result) {
+      return;
+    }
+
+    const color =
+      result.viability === "meets"
+        ? "text-emerald-300"
+        : result.viability === "recoverable"
+          ? "text-amber-300"
+          : "text-red-300";
+
+    resultAction?.classList.remove("text-white");
+    resultStatus?.classList.remove("text-white");
+    resultAvailable?.classList.remove("text-white");
+    resultAction?.classList.add(color);
+    resultStatus?.classList.add(color);
+    resultAvailable?.classList.add(
+      result.availableAbsences < 0 ? "text-red-300" : color,
+    );
+  }
+
+  function formatRecovery(result) {
+    if (result.consecutiveClassesToRecover === 0) {
+      return "0";
+    }
+
+    if (result.recoverySearchLimitExceeded) {
+      return ">1000";
+    }
+
+    if (result.consecutiveClassesToRecover === null) {
+      return "Not possible";
+    }
+
+    return formatAttendanceCount(result.consecutiveClassesToRecover);
+  }
+
+  function setMode(nextMode) {
+    const normalizedMode = nextMode === "absences" ? "absences" : "attended";
+
+    if (mode === normalizedMode) {
+      return;
+    }
+
+    inferAlternateField(normalizedMode);
+    mode = normalizedMode;
+    updateCalculator();
+  }
+
+  function updateModeUi() {
+    modeButtons.forEach((button) => {
+      const isActive = button.dataset.modeButton === mode;
+      button.setAttribute("aria-pressed", String(isActive));
+      button.classList.toggle("bg-amber-400", isActive);
+      button.classList.toggle("text-gray-950", isActive);
+      button.classList.toggle("text-gray-300", !isActive);
+      button.classList.toggle("hover:bg-gray-800", !isActive);
+    });
+
+    attendedWrapper?.classList.toggle("hidden", mode !== "attended");
+    absencesWrapper?.classList.toggle("hidden", mode !== "absences");
+  }
+
+  function inferAlternateField(nextMode) {
+    const totalParsed = parseAttendanceInteger(getFieldValue("totalClasses"), {
+      allowZero: false,
+      max: 1000,
+    });
+
+    if (!totalParsed.ok) {
+      return;
+    }
+
+    if (nextMode === "absences") {
+      const attendedParsed = parseAttendanceInteger(getFieldValue("attendedClasses"), {
+        allowZero: true,
+        max: totalParsed.value,
+      });
+
+      if (attendedParsed.ok) {
+        setFieldValue("absences", String(totalParsed.value - attendedParsed.value));
+      }
+      return;
+    }
+
+    const absencesParsed = parseAttendanceInteger(getFieldValue("absences"), {
+      allowZero: true,
+      max: totalParsed.value,
+    });
+
+    if (absencesParsed.ok) {
+      setFieldValue("attendedClasses", String(totalParsed.value - absencesParsed.value));
+    }
+  }
+
+  function syncAlternateField(result) {
+    if (mode === "attended") {
+      setFieldValue("absences", String(result.currentAbsences));
+      return;
+    }
+
+    setFieldValue("attendedClasses", String(result.attendedClasses));
+  }
+
+  function loadExample(exampleId) {
+    const example = ATTENDANCE_EXAMPLES.find((item) => item.id === exampleId);
+
+    if (!example) {
+      return;
+    }
+
+    mode = example.values.mode;
+    setFieldValue("totalClasses", example.values.totalClasses);
+    setFieldValue("attendedClasses", example.values.attendedClasses);
+    setFieldValue("absences", example.values.absences);
+    setFieldValue("requiredPercent", example.values.requiredPercent);
+    setFieldValue("remainingClasses", example.values.remainingClasses);
+    markFieldsTouched();
+    updateCalculator();
+  }
+
+  function clearCalculator() {
+    mode = "attended";
+    setFieldValue("totalClasses", "");
+    setFieldValue("attendedClasses", "");
+    setFieldValue("absences", "");
+    setFieldValue("requiredPercent", "80");
+    setFieldValue("remainingClasses", "0");
+
+    document.querySelectorAll("[data-field]").forEach((input) => {
+      delete input.dataset.touched;
+    });
+
+    clearErrors();
+    updateCalculator();
+  }
+
+  async function copySummary() {
+    if (!currentSummary) {
+      setStatus("There is no summary to copy.");
+      return;
+    }
+
+    try {
+      if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(currentSummary);
+      } else {
+        const textArea = document.createElement("textarea");
+        textArea.value = currentSummary;
+        textArea.setAttribute("readonly", "");
+        textArea.style.position = "fixed";
+        textArea.style.opacity = "0";
+        document.body.append(textArea);
+        textArea.select();
+        document.execCommand("copy");
+        textArea.remove();
+      }
+
+      setStatus("Summary copied.");
+    } catch {
+      setStatus("Could not copy.");
+    }
+  }
+
+  function setCopyEnabled(isEnabled) {
+    copyButton?.toggleAttribute("disabled", !isEnabled);
+    copyButton?.classList.toggle("opacity-50", !isEnabled);
+    copyButton?.classList.toggle("cursor-not-allowed", !isEnabled);
+  }
+
+  function markFieldsTouched() {
+    document.querySelectorAll("[data-field]").forEach((input) => {
+      input.dataset.touched = "true";
+    });
+  }
+
+  function clearErrors() {
+    document.querySelectorAll("[data-error-for]").forEach((errorElement) => {
+      errorElement.textContent = "";
+      errorElement.classList.add("hidden");
+    });
+  }
+
+  function setFieldError(field, message, shouldShow = true) {
+    const error = document.querySelector(`[data-error-for="${field}"]`);
+
+    if (!error || !shouldShow) {
+      return;
+    }
+
+    error.textContent = message;
+    error.classList.remove("hidden");
+  }
+
+  function shouldShowError(input) {
+    return input?.dataset.touched === "true";
+  }
+
+  function setText(element, value) {
+    if (element) {
+      element.textContent = value ?? "-";
+    }
+  }
+
+  function setStatus(message) {
+    setText(actionStatus, message);
+    window.clearTimeout(statusTimeout);
+    statusTimeout = window.setTimeout(() => setText(actionStatus, ""), 2500);
+  }
+
+  document.querySelectorAll("[data-field]").forEach((input) => {
+    input.addEventListener("input", () => {
+      input.dataset.touched = "true";
+      updateCalculator();
+    });
+    input.addEventListener("change", () => {
+      input.dataset.touched = "true";
+      updateCalculator();
+    });
+    input.addEventListener("blur", () => {
+      input.dataset.touched = "true";
+      updateCalculator();
+    });
+  });
+
+  modeButtons.forEach((button) => {
+    button.addEventListener("click", () => setMode(button.dataset.modeButton));
+  });
+  exampleButtons.forEach((button) => {
+    button.addEventListener("click", () => loadExample(button.dataset.exampleId));
+  });
+  copyButton?.addEventListener("click", copySummary);
+  clearButton?.addEventListener("click", clearCalculator);
+
+  updateCalculator();
+</script>
+
+
+
+
+
+
+

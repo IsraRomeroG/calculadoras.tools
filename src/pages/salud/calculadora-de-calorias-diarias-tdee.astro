@@ -1,5 +1,6 @@
 ---
 import BaseLayout from "@layouts/BaseLayout.astro";
+import { buildAlternateLinks } from "@lib/i18n/routing";
 import AdSlot from "@components/ads/AdSlot.astro";
 import Container from "@components/layout/Container.astro";
 import PageShell from "@components/layout/PageShell.astro";
@@ -13,6 +14,8 @@ const title = "Calculadora de Calorías Diarias (TDEE) — TMB y Gasto Diario";
 const description =
   "Calcula tus calorías diarias estimadas según tu metabolismo, actividad física y objetivo. Obtén TMB, TDEE y rangos orientativos para mantener peso, crear déficit o usar superávit.";
 const canonical = "/salud/calculadora-de-calorias-diarias-tdee";
+const englishCanonical = "/en/health/tdee-calculator";
+const alternates = buildAlternateLinks({ es: canonical, en: englishCanonical }, Astro.site ?? Astro.url);
 
 const faqs = [
   {
@@ -109,7 +112,7 @@ const sources = [
 ];
 ---
 
-<BaseLayout title={title} description={description} canonical={canonical}>
+<BaseLayout title={title} description={description} canonical={canonical} alternates={alternates}>
   <Fragment slot="head">
     <script type="application/ld+json" set:html={JSON.stringify(faqJsonLd)} />
   </Fragment>

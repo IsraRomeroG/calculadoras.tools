@@ -4,6 +4,7 @@ seoTitle: "IMC 30 o más: qué significa y cómo interpretarlo"
 description: "Conoce qué significa un IMC de 30 o más en adultos y cuáles son las clases de obesidad según el IMC."
 pubDate: 2026-06-29
 categorySlug: "salud"
+translationKey: "bmi-30-or-higher"
 tags:
   - imc 30
   - obesidad

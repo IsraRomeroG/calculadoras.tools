@@ -4,6 +4,7 @@ seoTitle: "Porcentaje y puntos porcentuales: diferencias con ejemplos"
 description: "Entiende la diferencia entre porcentaje y puntos porcentuales para interpretar tasas, encuestas e incrementos correctamente."
 pubDate: 2026-04-03
 categorySlug: "matematicas"
+translationKey: "percentage-vs-percentage-points"
 tags:
   - porcentajes
   - puntos porcentuales

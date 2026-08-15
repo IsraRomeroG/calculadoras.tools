@@ -1,0 +1,617 @@
+---
+import BaseLayout from "@layouts/BaseLayout.astro";
+import AdSlot from "@components/ads/AdSlot.astro";
+import Container from "@components/layout/Container.astro";
+import PageShell from "@components/layout/PageShell.astro";
+import FaqSection from "@components/shared/FaqSection.astro";
+import PageHero from "@components/shared/PageHero.astro";
+import SectionIntro from "@components/shared/SectionIntro.astro";
+import { buildAlternateLinks } from "@lib/i18n/routing";
+import { buildFaqJsonLd } from "@lib/seo";
+
+const title = "ROI calculator — Return on investment";
+const description =
+  "Calculate ROI, profit, break-even and how much you need to reach a target return.";
+const canonical = "/en/finance/roi-calculator";
+const spanishCanonical = "/finanzas/calculadora-de-roi";
+const alternates = buildAlternateLinks({ es: spanishCanonical, en: canonical }, Astro.site ?? Astro.url);
+const faqs = [
+  {
+    question: "What is the ROI formula?",
+    answer:
+      "ROI is calculated by subtracting total cost from recovered value, dividing the profit or loss by total cost, and multiplying by 100.",
+  },
+  {
+    question: "Should I enter total revenue or net profit?",
+    answer:
+      "In simple-investment mode, enter the total recovered value including invested capital. In business or project mode, enter total revenue and each cost once.",
+  },
+  {
+    question: "Are ROI and profit margin the same?",
+    answer:
+      "No. ROI compares profit with total cost. Margin compares profit with revenue.",
+  },
+  {
+    question: "Does a positive ROI mean the investment was good?",
+    answer:
+      "Not necessarily. You should also consider time, risk, inflation, taxes and other alternatives.",
+  },
+  {
+    question: "When should ROI be annualized?",
+    answer:
+      "When comparing investments with different terms. The equivalent annual rate assumes an initial investment and final value without intermediate cash flows.",
+  },
+  {
+    question: "What factors does this calculator exclude?",
+    answer:
+      "It does not automatically include inflation, taxes, risk, opportunity cost or intermediate deposits and withdrawals.",
+  },
+];
+const faqJsonLd = buildFaqJsonLd(faqs);
+---
+
+<BaseLayout title={title} description={description} canonical={canonical} locale="en" alternates={alternates}>
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={JSON.stringify(faqJsonLd)} />
+  </Fragment>
+
+  <PageShell>
+    <PageHero
+      title="ROI calculator"
+      description="Measure the return on an investment or project and see how much remains to recover your money or reach a target."
+      kicker="Finance"
+      collapseBreadcrumbOnMobile
+      containerClass="py-6 md:py-8"
+      breadcrumbs={[
+        { label: "Home", href: "/en", ariaLabel: "Home" },
+        { label: "Finance", href: "/en/finance", optional: true },
+        { label: "ROI calculator", truncate: true },
+      ]}
+    />
+
+    <Container as="section" class="py-6 md:py-8">
+      <section
+        class="overflow-hidden rounded-lg border border-gray-700 bg-gray-950 shadow-xl shadow-gray-950/30"
+        aria-labelledby="calculator-heading"
+      >
+        <div class="grid lg:grid-cols-[minmax(0,1.1fr)_minmax(19rem,0.9fr)]">
+          <div class="p-4 sm:p-6">
+            <p class="text-sm font-semibold uppercase tracking-wide text-amber-400">
+              Calculate your return
+            </p>
+            <h2 id="calculator-heading" class="mt-2 text-2xl font-semibold">
+              What do you want to analyze?
+            </h2>
+
+            <div
+              class="mt-5 grid grid-cols-2 rounded-lg border border-gray-700 bg-gray-900 p-1"
+              role="tablist"
+              aria-label="Calculation mode"
+            >
+              <button
+                class="mode-button is-active"
+                type="button"
+                role="tab"
+                aria-selected="true"
+                data-mode-button="simple"
+              >
+                Simple investment
+              </button>
+              <button
+                class="mode-button"
+                type="button"
+                role="tab"
+                aria-selected="false"
+                data-mode-button="business"
+              >
+                Business or project
+              </button>
+            </div>
+
+            <form class="mt-6" novalidate data-roi-form>
+              <div class="grid gap-4 sm:grid-cols-2" data-simple-fields>
+                <div>
+                  <label class="field-label" for="roi-investment">Initial investment</label>
+                  <div class="field-shell">
+                    <span class="field-affix">$</span>
+                    <input id="roi-investment" class="field-input" type="text" inputmode="decimal" autocomplete="off" placeholder="25000" data-field="initialInvestment" />
+                  </div>
+                  <p class="field-error" data-error-for="initialInvestment"></p>
+                </div>
+                <div>
+                  <label class="field-label" for="roi-recovered">Total recovered value</label>
+                  <div class="field-shell">
+                    <span class="field-affix">$</span>
+                    <input id="roi-recovered" class="field-input" type="text" inputmode="decimal" autocomplete="off" placeholder="38000" data-field="recoveredValue" />
+                  </div>
+                  <p class="field-help">Includes recovered capital and any profit.</p>
+                  <p class="field-error" data-error-for="recoveredValue"></p>
+                </div>
+              </div>
+
+              <div class="hidden grid gap-4 sm:grid-cols-2" data-business-fields>
+                <div class="sm:col-span-2">
+                  <label class="field-label" for="roi-revenue">Total revenue</label>
+                  <div class="field-shell">
+                    <span class="field-affix">$</span>
+                    <input id="roi-revenue" class="field-input" type="text" inputmode="decimal" autocomplete="off" placeholder="120000" data-field="revenue" />
+                  </div>
+                  <p class="field-error" data-error-for="revenue"></p>
+                </div>
+                <div>
+                  <label class="field-label" for="roi-initial-costs">Initial costs</label>
+                  <div class="field-shell">
+                    <span class="field-affix">$</span>
+                    <input id="roi-initial-costs" class="field-input" type="text" inputmode="decimal" value="0" data-field="initialCosts" />
+                  </div>
+                  <p class="field-error" data-error-for="initialCosts"></p>
+                </div>
+                <div>
+                  <label class="field-label" for="roi-fixed-costs">Fixed costs for the period</label>
+                  <div class="field-shell">
+                    <span class="field-affix">$</span>
+                    <input id="roi-fixed-costs" class="field-input" type="text" inputmode="decimal" value="0" data-field="fixedCosts" />
+                  </div>
+                  <p class="field-error" data-error-for="fixedCosts"></p>
+                </div>
+                <div>
+                  <label class="field-label" for="roi-variable-costs">Variable costs for the period</label>
+                  <div class="field-shell">
+                    <span class="field-affix">$</span>
+                    <input id="roi-variable-costs" class="field-input" type="text" inputmode="decimal" value="0" data-field="variableCosts" />
+                  </div>
+                  <p class="field-error" data-error-for="variableCosts"></p>
+                </div>
+                <div>
+                  <label class="field-label" for="roi-other-costs">Other costs not included</label>
+                  <div class="field-shell">
+                    <span class="field-affix">$</span>
+                    <input id="roi-other-costs" class="field-input" type="text" inputmode="decimal" value="0" data-field="otherCosts" />
+                  </div>
+                  <p class="field-error" data-error-for="otherCosts"></p>
+                </div>
+                <p class="sm:col-span-2 text-sm leading-relaxed text-gray-500">
+                  Enter each cost only once. Total cost must be greater than zero.
+                </p>
+              </div>
+
+              <details class="mt-5 rounded-lg border border-gray-700 bg-gray-900/60 p-4" data-options>
+                <summary class="cursor-pointer font-semibold text-white">
+                  Options: target ROI and term
+                </summary>
+                <div class="mt-4 grid gap-4 sm:grid-cols-2">
+                  <div>
+                    <label class="field-label" for="roi-target">Optional target ROI</label>
+                    <div class="field-shell">
+                      <input id="roi-target" class="field-input" type="text" inputmode="decimal" autocomplete="off" placeholder="25" data-field="targetRoi" />
+                      <span class="field-affix">%</span>
+                    </div>
+                    <p class="field-error" data-error-for="targetRoi"></p>
+                  </div>
+                  <div data-duration-group>
+                    <label class="field-label" for="roi-duration">Optional term</label>
+                    <div class="grid grid-cols-[minmax(0,1fr)_7.5rem] gap-2">
+                      <input id="roi-duration" class="field" type="text" inputmode="decimal" autocomplete="off" placeholder="18" data-field="duration" />
+                      <select class="field" aria-label="Term unit" data-duration-unit>
+                        <option value="months">Months</option>
+                        <option value="days">Days</option>
+                        <option value="years">Years</option>
+                      </select>
+                    </div>
+                    <p class="field-help">Calculates the equivalent annual compound return.</p>
+                    <p class="field-error" data-error-for="duration"></p>
+                  </div>
+                </div>
+              </details>
+
+              <div class="mt-6 flex flex-col gap-3 border-t border-gray-800 pt-5 sm:flex-row sm:flex-wrap">
+                <button class="primary-button sm:min-w-40" type="submit">Calculate ROI</button>
+                <button class="secondary-button" type="button" data-example>Use example</button>
+                <button class="secondary-button" type="button" data-clear>Clear</button>
+                <button class="secondary-button hidden" type="button" data-copy>
+                  <span data-copy-label>Copy summary</span>
+                </button>
+                <p class="sr-only" aria-live="polite" data-copy-status></p>
+              </div>
+            </form>
+          </div>
+
+          <aside
+            class="border-t border-gray-800 bg-gray-900/70 p-4 sm:p-6 lg:border-l lg:border-t-0"
+            aria-live="polite"
+            data-result-region
+          >
+            <p class="text-sm font-semibold uppercase tracking-wide text-amber-400" data-result-kicker>
+              Result
+            </p>
+            <p class="mt-3 break-words text-4xl font-bold leading-tight text-white" data-main-result>
+              Enter the values
+            </p>
+            <p class="mt-3 text-sm leading-relaxed text-gray-300" data-interpretation>
+              ROI and its interpretation will appear here.
+            </p>
+
+            <div class="mt-5 grid grid-cols-2 gap-3" data-summary-grid>
+              <div class="col-span-2 rounded-lg border border-gray-800 bg-gray-950/70 p-4 text-sm text-gray-400">
+                Use simple mode for an investment or detailed mode for a business.
+              </div>
+            </div>
+
+            <div class="mt-4 hidden rounded-lg border border-sky-400/40 bg-sky-400/10 p-4" data-target-card>
+              <p class="text-xs font-semibold uppercase tracking-wide text-sky-300">Target ROI</p>
+              <p class="mt-2 text-sm leading-relaxed text-sky-100" data-target-text></p>
+            </div>
+
+            <details class="mt-4 hidden rounded-lg border border-gray-800 p-4" data-calculation-details>
+              <summary class="cursor-pointer text-sm font-semibold text-white">How it was calculated</summary>
+              <div class="mt-3 space-y-2 text-sm leading-relaxed text-gray-400" data-calculation-lines></div>
+            </details>
+
+            <p class="mt-4 text-xs leading-relaxed text-gray-500">
+              A positive ROI does not guarantee that the investment was worthwhile. Consider time, risk, inflation, taxes and other alternatives.
+            </p>
+          </aside>
+        </div>
+      </section>
+
+      <div class="sticky bottom-3 z-20 mt-4 lg:hidden">
+        <button class="primary-button w-full shadow-lg shadow-gray-950/50" type="button" data-mobile-calculate>
+          Calculate ROI
+        </button>
+      </div>
+    </Container>
+
+    <AdSlot placement="calculator-after-tool" />
+
+    <Container as="section" class="py-8">
+      <SectionIntro
+        title="How to interpret ROI"
+        description="These metrics answer different questions and should be reviewed together."
+        class="mb-5"
+      />
+      <div class="grid gap-4 md:grid-cols-3">
+        <article class="info-card">
+          <h2 class="font-semibold text-white">ROI</h2>
+          <p class="mt-2 text-sm leading-relaxed text-gray-400">Compares profit or loss with the entire investment.</p>
+        </article>
+        <article class="info-card">
+          <h2 class="font-semibold text-white">Multiplicador</h2>
+          <p class="mt-2 text-sm leading-relaxed text-gray-400">Shows how much you recovered in total for every dollar invested.</p>
+        </article>
+        <article class="info-card">
+          <h2 class="font-semibold text-white">Margin</h2>
+          <p class="mt-2 text-sm leading-relaxed text-gray-400">In business, compare profit with total revenue.</p>
+        </article>
+      </div>
+    </Container>
+
+    <Container as="section" class="py-8">
+      <div class="rounded-lg border border-gray-700 bg-gray-950 p-5 sm:p-6">
+        <h2 class="text-2xl font-semibold">ROI formula</h2>
+        <p class="mt-3 text-sm leading-relaxed text-gray-400">
+          ROI = (amount recovered − total cost) ÷ total cost × 100. If you invested
+          $25,000 and recovered $38,000 in total, you earned $13,000 and your ROI was 52%.
+        </p>
+        <p class="mt-3 text-sm leading-relaxed text-gray-400">
+          This tool expresses break-even as a monetary amount. To calculate it by
+          units or customers, you also need the price, variable cost, and fixed
+          costs. Use the <a class="font-semibold text-amber-400 underline underline-offset-4" href="/en/finance/break-even-calculator">break-even calculator</a> for that analysis.
+        </p>
+      </div>
+    </Container>
+
+    <FaqSection faqs={faqs} />
+  </PageShell>
+</BaseLayout>
+
+<style is:global>
+  .field-label { display: block; font-size: .875rem; font-weight: 500; color: rgb(229 231 235); }
+  .field, .field-shell { margin-top: .5rem; min-height: 3rem; width: 100%; border-radius: .5rem; border: 1px solid rgb(55 65 81); background: rgb(17 24 39); color: white; outline: none; }
+  .field { padding: 0 1rem; }
+  .field-shell { display: flex; align-items: center; }
+  .field-input { min-height: 2.875rem; min-width: 0; width: 100%; background: transparent; padding: 0 .25rem; color: white; outline: none; }
+  .field-affix { padding: 0 .75rem; color: rgb(107 114 128); }
+  .field:focus, .field-shell:focus-within { border-color: rgb(251 191 36); box-shadow: 0 0 0 3px rgb(251 191 36 / .15); }
+  .field-help { margin-top: .4rem; font-size: .75rem; line-height: 1.4; color: rgb(107 114 128); }
+  .field-error { display: none; margin-top: .4rem; font-size: .8rem; color: rgb(252 165 165); }
+  .field-error:not(:empty) { display: block; }
+  .mode-button { min-height: 2.75rem; border-radius: .4rem; padding: .5rem .65rem; font-size: .8rem; font-weight: 700; color: rgb(156 163 175); }
+  .mode-button.is-active { background: rgb(251 191 36); color: rgb(3 7 18); }
+  .primary-button { display: inline-flex; min-height: 2.75rem; align-items: center; justify-content: center; border-radius: .5rem; background: rgb(251 191 36); padding: .5rem 1rem; font-size: .875rem; font-weight: 700; color: rgb(3 7 18); }
+  .secondary-button { display: inline-flex; min-height: 2.75rem; align-items: center; justify-content: center; border-radius: .5rem; border: 1px solid rgb(55 65 81); padding: .5rem 1rem; font-size: .875rem; font-weight: 600; color: rgb(229 231 235); }
+  .info-card { border-radius: .5rem; border: 1px solid rgb(55 65 81); background: rgb(3 7 18); padding: 1.25rem; }
+</style>
+
+<script>
+  import {
+    calculateBusinessRoi,
+    calculateSimpleRoi,
+    formatCurrency,
+    formatMultiplier,
+    formatPercent,
+    parseMoneyInput,
+    parsePositiveInput,
+    parseTargetRoiInput,
+  } from "@lib/calculators/finanzas/calculadora-de-roi/roi.en";
+
+  const form = document.querySelector("[data-roi-form]");
+  const simpleFields = document.querySelector("[data-simple-fields]");
+  const businessFields = document.querySelector("[data-business-fields]");
+  const durationGroup = document.querySelector("[data-duration-group]");
+  const durationUnit = document.querySelector("[data-duration-unit]");
+  const resultKicker = document.querySelector("[data-result-kicker]");
+  const mainResult = document.querySelector("[data-main-result]");
+  const interpretation = document.querySelector("[data-interpretation]");
+  const summaryGrid = document.querySelector("[data-summary-grid]");
+  const targetCard = document.querySelector("[data-target-card]");
+  const targetText = document.querySelector("[data-target-text]");
+  const calculationDetails = document.querySelector("[data-calculation-details]");
+  const calculationLines = document.querySelector("[data-calculation-lines]");
+  const copyButton = document.querySelector("[data-copy]");
+  const copyLabel = document.querySelector("[data-copy-label]");
+  const copyStatus = document.querySelector("[data-copy-status]");
+  const fields = Object.fromEntries(
+    [...document.querySelectorAll("[data-field]")].map((input) => [input.dataset.field, input]),
+  );
+  let mode = "simple";
+  let copyText = "";
+
+  const ERROR_MESSAGES = {
+    required: "This field is required.",
+    invalid: "Enter a valid number.",
+    negative: "The value cannot be negative.",
+    too_many_decimals: "Use fewer decimal places.",
+    greater_than_zero: "The value must be greater than zero.",
+    target_low: "The target ROI must be greater than -100%.",
+    total_cost_zero: "Enter at least one cost greater than zero.",
+  };
+
+  function setMode(nextMode) {
+    mode = nextMode;
+    document.querySelectorAll("[data-mode-button]").forEach((button) => {
+      const active = button.dataset.modeButton === mode;
+      button.classList.toggle("is-active", active);
+      button.setAttribute("aria-selected", String(active));
+    });
+    simpleFields.classList.toggle("hidden", mode !== "simple");
+    businessFields.classList.toggle("hidden", mode !== "business");
+    businessFields.classList.toggle("grid", mode === "business");
+    durationGroup.classList.toggle("hidden", mode !== "simple");
+    clearErrors();
+    setInitialState();
+  }
+
+  function calculate() {
+    clearErrors();
+    const fatalErrors = {};
+    const target = parseOptional("targetRoi", parseTargetRoiInput);
+    const errors = {};
+    if (!target.ok) errors.targetRoi = target.error;
+    if (target.ok && target.value !== undefined && target.value <= -100) errors.targetRoi = "target_low";
+
+    const validTarget = errors.targetRoi ? { ok: true, value: undefined } : target;
+    const parsed = mode === "simple"
+      ? parseSimple(errors, fatalErrors, validTarget)
+      : parseBusiness(errors, fatalErrors, validTarget);
+    showErrors(errors);
+    if (!parsed || Object.keys(fatalErrors).length) {
+      setInvalidState();
+      return;
+    }
+
+    const result = mode === "simple" ? calculateSimpleRoi(parsed) : calculateBusinessRoi(parsed);
+    renderResult(parsed, result);
+  }
+
+  function parseSimple(errors, fatalErrors, target) {
+    const investment = parseRequiredMoney("initialInvestment", errors, fatalErrors);
+    const recovered = parseRequiredMoney("recoveredValue", errors, fatalErrors);
+    const duration = parseOptional("duration", parsePositiveInput);
+    if (!duration.ok) errors.duration = duration.error;
+    if (investment !== undefined && investment <= 0) {
+      errors.initialInvestment = "greater_than_zero";
+      fatalErrors.initialInvestment = "greater_than_zero";
+    }
+    if (duration.ok && duration.value !== undefined && duration.value <= 0) errors.duration = "greater_than_zero";
+    if (Object.keys(fatalErrors).length) return null;
+    const validDuration = errors.duration ? undefined : duration.value;
+    return {
+      initialInvestment: investment,
+      recoveredValue: recovered,
+      targetRoi: target.value,
+      duration: validDuration,
+      durationUnit: validDuration === undefined ? undefined : durationUnit.value,
+    };
+  }
+
+  function parseBusiness(errors, fatalErrors, target) {
+    const revenue = parseRequiredMoney("revenue", errors, fatalErrors);
+    const initialCosts = parseRequiredMoney("initialCosts", errors, fatalErrors);
+    const fixedCosts = parseRequiredMoney("fixedCosts", errors, fatalErrors);
+    const variableCosts = parseRequiredMoney("variableCosts", errors, fatalErrors);
+    const otherCosts = parseRequiredMoney("otherCosts", errors, fatalErrors);
+    const totalCost = [initialCosts, fixedCosts, variableCosts, otherCosts].reduce((sum, value) => sum + (value ?? 0), 0);
+    if (!Object.keys(fatalErrors).length && totalCost <= 0) {
+      errors.initialCosts = "total_cost_zero";
+      fatalErrors.initialCosts = "total_cost_zero";
+    }
+    if (Object.keys(fatalErrors).length) return null;
+    return { revenue, initialCosts, fixedCosts, variableCosts, otherCosts, targetRoi: target.value };
+  }
+
+  function parseRequiredMoney(field, errors, fatalErrors) {
+    const parsed = parseMoneyInput(fields[field].value);
+    if (!parsed.ok) {
+      errors[field] = parsed.error;
+      fatalErrors[field] = parsed.error;
+      return undefined;
+    }
+    return parsed.value;
+  }
+
+  function parseOptional(field, parser) {
+    const value = fields[field].value.trim();
+    return value ? parser(value) : { ok: true, value: undefined };
+  }
+
+  function renderResult(input, result) {
+    resultKicker.textContent = result.status === "gain" ? "Profit" : result.status === "loss" ? "Loss" : "Break-even point";
+    mainResult.textContent = formatPercent(result.roi);
+    interpretation.textContent = buildInterpretation(result);
+    const items = [
+      [result.profit >= 0 ? "Net profit" : "Net loss", formatCurrency(Math.abs(result.profit))],
+      ["Multiplicador", formatMultiplier(result.multiplier)],
+      [mode === "simple" ? "Total invested" : "Total cost", formatCurrency(result.totalCost)],
+      [result.breakEvenDifference >= 0 ? "Above break-even" : "Amount to break-even", formatCurrency(Math.abs(result.breakEvenDifference))],
+    ];
+    if (mode === "simple" && result.annualizedReturn !== undefined) items.push(["Equivalent annual return", formatPercent(result.annualizedReturn)]);
+    if (mode === "business") items.push(["Margin on revenue", result.marginOnRevenue === null ? "Not available" : formatPercent(result.marginOnRevenue)]);
+    summaryGrid.innerHTML = items.map(([label, value]) => summary(label, value)).join("");
+    renderTarget(input.targetRoi, result);
+    renderCalculation(input, result);
+    copyText = buildCopyText(input, result);
+    copyButton.classList.remove("hidden");
+  }
+
+  function buildInterpretation(result) {
+    if (result.status === "break_even") return "You recovered exactly what you invested. There was no profit or loss.";
+    const amount = formatCurrency(Math.abs(result.profit));
+    const direction = result.status === "gain" ? "more" : "less";
+    return `You recovered ${amount} ${direction} than you invested. For every $1 invested, you recovered ${formatCurrency(result.multiplier)} in total.`;
+  }
+
+  function renderTarget(targetRoi, result) {
+    if (!result.target) {
+      targetCard.classList.add("hidden");
+      return;
+    }
+    const difference = result.target.difference;
+    const message = Math.abs(difference) < 0.005
+      ? `You reached your ${formatPercent(targetRoi)} target exactly.`
+      : difference < 0
+        ? `To reach your ${formatPercent(targetRoi)} target, you need to generate an additional ${formatCurrency(Math.abs(difference))}.`
+        : `You exceeded your ${formatPercent(targetRoi)} target by ${formatCurrency(difference)}.`;
+    targetText.textContent = `${message} Target value: ${formatCurrency(result.target.targetValue)}.`;
+    targetCard.classList.remove("hidden");
+  }
+
+  function renderCalculation(input, result) {
+    const lines = mode === "simple"
+      ? [
+          `Profit = ${formatCurrency(input.recoveredValue)} − ${formatCurrency(input.initialInvestment)} = ${formatCurrency(result.profit)}`,
+          `ROI = ${formatCurrency(result.profit)} ÷ ${formatCurrency(input.initialInvestment)} × 100 = ${formatPercent(result.roi)}`,
+          `Multiplicador = ${formatCurrency(input.recoveredValue)} ÷ ${formatCurrency(input.initialInvestment)} = ${formatMultiplier(result.multiplier)}`,
+        ]
+      : [
+          `Total cost = ${formatCurrency(input.initialCosts)} + ${formatCurrency(input.fixedCosts)} + ${formatCurrency(input.variableCosts)} + ${formatCurrency(input.otherCosts)} = ${formatCurrency(result.totalCost)}`,
+          `Profit = ${formatCurrency(input.revenue)} − ${formatCurrency(result.totalCost)} = ${formatCurrency(result.profit)}`,
+          `ROI = ${formatCurrency(result.profit)} ÷ ${formatCurrency(result.totalCost)} × 100 = ${formatPercent(result.roi)}`,
+        ];
+    calculationLines.innerHTML = lines.map((line) => `<p>${escapeHtml(line)}</p>`).join("");
+    calculationDetails.classList.remove("hidden");
+  }
+
+  function buildCopyText(input, result) {
+    const lines = [
+      "ROI calculator - calculadoras.tools",
+      `Mode: ${mode === "simple" ? "Simple investment" : "Business or project"}`,
+      `ROI: ${formatPercent(result.roi)}`,
+      `${result.profit >= 0 ? "Profit" : "Loss"}: ${formatCurrency(Math.abs(result.profit))}`,
+      `${mode === "simple" ? "Total invested" : "Total cost"}: ${formatCurrency(result.totalCost)}`,
+      `Multiplicador: ${formatMultiplier(result.multiplier)}`,
+      `${result.breakEvenDifference >= 0 ? "Above break-even" : "Amount to break-even"}: ${formatCurrency(Math.abs(result.breakEvenDifference))}`,
+    ];
+    if (mode === "simple" && result.annualizedReturn !== undefined) lines.push(`Equivalent annual return: ${formatPercent(result.annualizedReturn)}`);
+    if (mode === "business" && result.marginOnRevenue !== null) lines.push(`Margin on revenue: ${formatPercent(result.marginOnRevenue)}`);
+    if (result.target) lines.push(`Value for target ROI: ${formatCurrency(result.target.targetValue)}`);
+    lines.push("", "Does not automatically include inflation, taxes, risk or intermediate cash flows.");
+    return lines.join("\n");
+  }
+
+  function summary(label, value) {
+    return `<div class="rounded-lg border border-gray-800 bg-gray-950/70 p-3"><span class="block text-xs font-semibold uppercase tracking-wide text-gray-500">${escapeHtml(label)}</span><span class="mt-2 block break-words text-base font-semibold text-white">${escapeHtml(value)}</span></div>`;
+  }
+
+  function fillExample() {
+    if (mode === "simple") {
+      fields.initialInvestment.value = "25000";
+      fields.recoveredValue.value = "38000";
+      fields.targetRoi.value = "60";
+      fields.duration.value = "18";
+      durationUnit.value = "months";
+    } else {
+      fields.revenue.value = "120000";
+      fields.initialCosts.value = "20000";
+      fields.fixedCosts.value = "30000";
+      fields.variableCosts.value = "25000";
+      fields.otherCosts.value = "5000";
+      fields.targetRoi.value = "60";
+    }
+    calculate();
+  }
+
+  function clearAll() {
+    Object.entries(fields).forEach(([key, input]) => {
+      input.value = ["initialCosts", "fixedCosts", "variableCosts", "otherCosts"].includes(key) ? "0" : "";
+    });
+    durationUnit.value = "months";
+    clearErrors();
+    setInitialState();
+  }
+
+  function clearErrors() {
+    document.querySelectorAll("[data-error-for]").forEach((element) => { element.textContent = ""; });
+  }
+
+  function showErrors(errors) {
+    Object.entries(errors).forEach(([field, error]) => {
+      const element = document.querySelector(`[data-error-for="${field}"]`);
+      if (element) element.textContent = ERROR_MESSAGES[error] ?? ERROR_MESSAGES.invalid;
+    });
+  }
+
+  function setInvalidState() {
+    resultKicker.textContent = "Check the fields";
+    mainResult.textContent = "Cannot calculate";
+    interpretation.textContent = "Correct the highlighted values to continue.";
+    summaryGrid.innerHTML = "";
+    targetCard.classList.add("hidden");
+    calculationDetails.classList.add("hidden");
+    copyButton.classList.add("hidden");
+    copyText = "";
+  }
+
+  function setInitialState() {
+    resultKicker.textContent = "Result";
+    mainResult.textContent = "Enter the values";
+    interpretation.textContent = "ROI and its interpretation will appear here.";
+    summaryGrid.innerHTML = `<div class="col-span-2 rounded-lg border border-gray-800 bg-gray-950/70 p-4 text-sm text-gray-400">Use simple mode for an investment or detailed mode for a business.</div>`;
+    targetCard.classList.add("hidden");
+    calculationDetails.classList.add("hidden");
+    copyButton.classList.add("hidden");
+    copyText = "";
+  }
+
+  async function copyResult() {
+    if (!copyText) return;
+    try {
+      await navigator.clipboard.writeText(copyText);
+      copyLabel.textContent = "Copied";
+      copyStatus.textContent = "Summary copied.";
+      window.setTimeout(() => { copyLabel.textContent = "Copy summary"; copyStatus.textContent = ""; }, 2000);
+    } catch {
+      copyStatus.textContent = "Could not copy the summary.";
+    }
+  }
+
+  function escapeHtml(value) {
+    return String(value).replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;").replaceAll("'", "&#039;");
+  }
+
+  document.querySelectorAll("[data-mode-button]").forEach((button) => button.addEventListener("click", () => setMode(button.dataset.modeButton)));
+  form.addEventListener("submit", (event) => { event.preventDefault(); calculate(); });
+  document.querySelector("[data-mobile-calculate]").addEventListener("click", calculate);
+  document.querySelector("[data-example]").addEventListener("click", fillExample);
+  document.querySelector("[data-clear]").addEventListener("click", clearAll);
+  copyButton.addEventListener("click", copyResult);
+</script>

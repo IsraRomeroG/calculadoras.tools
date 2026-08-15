@@ -1,0 +1,1058 @@
+---
+import BaseLayout from "@layouts/BaseLayout.astro";
+import { buildAlternateLinks } from "@lib/i18n/routing";
+import AdSlot from "@components/ads/AdSlot.astro";
+import Container from "@components/layout/Container.astro";
+import PageShell from "@components/layout/PageShell.astro";
+import FaqSection from "@components/shared/FaqSection.astro";
+import PageHero from "@components/shared/PageHero.astro";
+import SectionIntro from "@components/shared/SectionIntro.astro";
+import { HEART_RATE_ZONE_DEFINITIONS } from "@lib/calculators/salud/calculadora-de-zonas-de-frecuencia-cardiaca/heartRateZones.en";
+import { buildFaqJsonLd } from "@lib/seo";
+
+const title = "Heart Rate Zones and Karvonen Calculator";
+const description =
+  "Calculate five heart rate training zones from your age, known maximum heart rate, or the Karvonen method, with ranges in bpm.";
+const canonical = "/en/health/heart-rate-zones-calculator";
+const spanishCanonical = "/salud/calculadora-de-zonas-de-frecuencia-cardiaca";
+const alternates = buildAlternateLinks({ es: spanishCanonical, en: canonical }, Astro.site ?? Astro.url);
+
+const faqs = [
+  {
+    question: "What are heart rate zones?",
+    answer:
+      "They are general heart rate ranges used to represent different intensity levels. The five-zone model is a training convention, and its boundaries can vary among devices and professionals.",
+  },
+  {
+    question: "Which method should I choose: percentage of maximum heart rate or Karvonen?",
+    answer:
+      "Percentage of maximum heart rate is simpler and only requires a maximum value. Karvonen also uses resting heart rate to calculate percentages of heart rate reserve.",
+  },
+  {
+    question: "How can I measure my resting heart rate?",
+    answer:
+      "Measure it while awake, calm, and at rest, ideally under similar conditions over several days. A single measurement can vary with sleep, stress, hydration, temperature, and other factors.",
+  },
+  {
+    question: "What is the difference between estimated and known maximum heart rate?",
+    answer:
+      "Estimated maximum heart rate is calculated from age using a population formula. A known maximum is a value you enter from your own measurement or reference, although the calculator cannot verify its source.",
+  },
+  {
+    question: "Why does my watch show different zones?",
+    answer:
+      "Watches and apps may use another maximum-heart-rate formula, different percentages, personalized thresholds, or historical data. Their zones may therefore differ from this calculator.",
+  },
+  {
+    question: "Is Zone 5 a target I should reach?",
+    answer:
+      "No. It represents a very high general effort level, not a heart rate you should try to reach or maintain. Zones do not replace individualized recommendations.",
+  },
+  {
+    question: "Can medications affect my zones?",
+    answer:
+      "Yes. Some medications and health conditions can change heart rate and its response to exercise. Consult a professional if you need personalized targets.",
+  },
+];
+
+const faqJsonLd = buildFaqJsonLd(faqs);
+const zoneTones = [
+  "border-sky-400/35 bg-sky-400/10 text-sky-200",
+  "border-emerald-400/35 bg-emerald-400/10 text-emerald-200",
+  "border-amber-400/35 bg-amber-400/10 text-amber-200",
+  "border-orange-400/35 bg-orange-400/10 text-orange-200",
+  "border-red-400/35 bg-red-400/10 text-red-200",
+];
+const segmentTones = [
+  "bg-sky-400/25 text-sky-100",
+  "bg-emerald-400/25 text-emerald-100",
+  "bg-amber-400/25 text-amber-100",
+  "bg-orange-400/25 text-orange-100",
+  "bg-red-400/25 text-red-100",
+];
+---
+
+<BaseLayout title={title} description={description} canonical={canonical} locale="en" alternates={alternates}>
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={JSON.stringify(faqJsonLd)} />
+  </Fragment>
+
+  <PageShell>
+    <PageHero
+      title="Heart Rate Zones Calculator"
+      description="Estimate five training zones from a percentage of maximum heart rate or heart rate reserve using Karvonen."
+      kicker="Health"
+      collapseBreadcrumbOnMobile
+      containerClass="py-5 md:py-7"
+      breadcrumbs={[
+        { label: "Home", href: "/en", ariaLabel: "Home" },
+        { label: "Health", href: "/en/health", optional: true },
+        { label: "Heart Rate Zones", truncate: true },
+      ]}
+    />
+
+    <Container as="section" class="py-4 md:py-8">
+      <section
+        id="heart-rate-zones-calculator"
+        class="overflow-hidden rounded-lg border border-gray-700 bg-gray-950 shadow-xl shadow-gray-950/30"
+        aria-labelledby="calculator-heading"
+      >
+        <div class="grid gap-0 xl:grid-cols-[minmax(0,0.8fr)_minmax(24rem,1.2fr)]">
+          <form class="p-4 sm:p-6" data-calculator-form novalidate>
+            <div>
+              <p class="text-sm font-semibold uppercase tracking-wide text-amber-400">
+                Main calculation
+              </p>
+              <h2 id="calculator-heading" class="mt-2 text-2xl font-semibold">
+                Calculate your five zones
+              </h2>
+              <p class="mt-2 text-sm leading-relaxed text-gray-400">
+                Choose where your maximum heart rate comes from and how to
+                calculate the ranges. We will show which data was used.
+              </p>
+            </div>
+
+            <fieldset class="mt-6">
+              <legend class="text-sm font-semibold text-gray-200">
+                1. How should we obtain your maximum heart rate?
+              </legend>
+              <div
+                class="mt-2 grid gap-2 rounded-lg border border-gray-700 bg-gray-900 p-1 sm:grid-cols-2"
+                role="group"
+                aria-label="Maximum heart rate source"
+              >
+                <button
+                  class="min-h-12 rounded-md bg-amber-400 px-3 py-2 text-sm font-bold text-gray-950 transition focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-300/50"
+                  type="button"
+                  aria-pressed="true"
+                  data-source-option="age"
+                >
+                  Estimate from my age
+                </button>
+                <button
+                  class="min-h-12 rounded-md px-3 py-2 text-sm font-semibold text-gray-300 transition hover:bg-gray-800 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/40"
+                  type="button"
+                  aria-pressed="false"
+                  data-source-option="known"
+                >
+                  Use a known maximum heart rate
+                </button>
+              </div>
+            </fieldset>
+
+            <div class="mt-4" data-source-panel="age">
+              <label for="heart-rate-zones-age" class="block text-sm font-semibold text-gray-200">
+                Age
+              </label>
+              <div
+                class="mt-2 flex rounded-lg border border-gray-700 bg-gray-900 transition focus-within:border-amber-400 focus-within:ring-3 focus-within:ring-amber-400/15"
+                data-wrapper-for="age"
+              >
+                <input
+                  id="heart-rate-zones-age"
+                  class="min-h-12 w-full bg-transparent px-4 text-base text-white outline-none placeholder:text-gray-600"
+                  type="text"
+                  inputmode="numeric"
+                  autocomplete="off"
+                  placeholder="35"
+                  aria-describedby="heart-rate-zones-age-help heart-rate-zones-age-error"
+                  data-input="age"
+                />
+                <span class="flex items-center px-4 text-sm text-gray-500">years</span>
+              </div>
+              <p id="heart-rate-zones-age-help" class="mt-2 text-xs leading-relaxed text-gray-500">
+                We will estimate your maximum heart rate with Tanaka. Enter an age between 18 and 100 years.
+              </p>
+              <p
+                id="heart-rate-zones-age-error"
+                class="mt-2 hidden text-sm font-medium text-red-300"
+                data-error-for="age"
+              >
+              </p>
+            </div>
+
+            <div class="mt-4 hidden" data-source-panel="known">
+              <label for="heart-rate-zones-known-max" class="block text-sm font-semibold text-gray-200">
+                Known maximum heart rate
+              </label>
+              <div
+                class="mt-2 flex rounded-lg border border-gray-700 bg-gray-900 transition focus-within:border-amber-400 focus-within:ring-3 focus-within:ring-amber-400/15"
+                data-wrapper-for="knownMaxHeartRate"
+              >
+                <input
+                  id="heart-rate-zones-known-max"
+                  class="min-h-12 w-full bg-transparent px-4 text-base text-white outline-none placeholder:text-gray-600"
+                  type="text"
+                  inputmode="numeric"
+                  autocomplete="off"
+                  placeholder="180"
+                  aria-describedby="heart-rate-zones-known-max-help heart-rate-zones-known-max-error"
+                  data-input="knownMaxHeartRate"
+                />
+                <span class="flex items-center px-4 text-sm text-gray-500">bpm</span>
+              </div>
+              <p id="heart-rate-zones-known-max-help" class="mt-2 text-xs leading-relaxed text-gray-500">
+                Use your own measurement or reference between 80 and 240 bpm.
+              </p>
+              <p
+                id="heart-rate-zones-known-max-error"
+                class="mt-2 hidden text-sm font-medium text-red-300"
+                data-error-for="knownMaxHeartRate"
+              >
+              </p>
+            </div>
+
+            <fieldset class="mt-6">
+              <legend class="text-sm font-semibold text-gray-200">
+                2. How should we calculate your zones?
+              </legend>
+              <div
+                class="mt-2 grid gap-2 rounded-lg border border-gray-700 bg-gray-900 p-1 sm:grid-cols-2"
+                role="group"
+                aria-label="Zone calculation method"
+              >
+                <button
+                  class="min-h-12 rounded-md bg-amber-400 px-3 py-2 text-sm font-bold text-gray-950 transition focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-300/50"
+                  type="button"
+                  aria-pressed="true"
+                  data-method-option="max-percent"
+                >
+                  Percentage of maximum heart rate
+                </button>
+                <button
+                  class="min-h-12 rounded-md px-3 py-2 text-sm font-semibold text-gray-300 transition hover:bg-gray-800 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/40"
+                  type="button"
+                  aria-pressed="false"
+                  data-method-option="karvonen"
+                >
+                  Karvonen
+                </button>
+              </div>
+            </fieldset>
+
+            <div
+              class="mt-3 rounded-lg border border-sky-400/25 bg-sky-400/10 p-3"
+              data-method-explanation
+            >
+              <p class="text-sm leading-relaxed text-sky-100/80">
+                Percentage of maximum heart rate is the simplest method and
+                does not require your resting heart rate.
+              </p>
+            </div>
+
+            <div class="mt-4 hidden" data-resting-panel>
+              <label for="heart-rate-zones-resting" class="block text-sm font-semibold text-gray-200">
+                Resting heart rate
+              </label>
+              <div
+                class="mt-2 flex rounded-lg border border-gray-700 bg-gray-900 transition focus-within:border-amber-400 focus-within:ring-3 focus-within:ring-amber-400/15"
+                data-wrapper-for="restingHeartRate"
+              >
+                <input
+                  id="heart-rate-zones-resting"
+                  class="min-h-12 w-full bg-transparent px-4 text-base text-white outline-none placeholder:text-gray-600"
+                  type="text"
+                  inputmode="numeric"
+                  autocomplete="off"
+                  placeholder="60"
+                  aria-describedby="heart-rate-zones-resting-help heart-rate-zones-resting-error"
+                  data-input="restingHeartRate"
+                />
+                <span class="flex items-center px-4 text-sm text-gray-500">bpm</span>
+              </div>
+              <p id="heart-rate-zones-resting-help" class="mt-2 text-xs leading-relaxed text-gray-500">
+                Use a measurement taken while awake, calm, and at rest.
+              </p>
+              <p
+                id="heart-rate-zones-resting-error"
+                class="mt-2 hidden text-sm font-medium text-red-300"
+                data-error-for="restingHeartRate"
+              >
+              </p>
+            </div>
+
+            <p
+              class="mt-4 hidden rounded-lg border border-red-400/30 bg-red-400/10 p-3 text-sm font-medium leading-relaxed text-red-200"
+              role="alert"
+              data-calculation-error
+            >
+            </p>
+
+            <button
+              class="mt-5 min-h-12 w-full rounded-lg bg-amber-400 px-5 py-3 text-base font-bold text-gray-950 transition hover:bg-amber-300 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-300/50"
+              type="submit"
+            >
+              Calculate my zones
+            </button>
+
+            <div class="mt-3 grid grid-cols-2 gap-3">
+              <button
+                class="min-h-12 rounded-lg border border-gray-700 bg-gray-900 px-3 py-3 text-sm font-semibold text-gray-200 transition hover:border-amber-400/60 hover:text-amber-200 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/30"
+                type="button"
+                data-fill-example
+              >
+                Try an example
+              </button>
+              <button
+                class="min-h-12 rounded-lg border border-gray-700 bg-gray-900 px-3 py-3 text-sm font-semibold text-gray-200 transition hover:border-gray-500 hover:bg-gray-800 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/30"
+                type="button"
+                data-clear-button
+              >
+                Clear
+              </button>
+            </div>
+          </form>
+
+          <section
+            class="border-t border-gray-800 bg-gray-900/60 p-4 sm:p-6 xl:border-l xl:border-t-0"
+            aria-labelledby="result-heading"
+            data-result-region
+          >
+            <p class="text-sm font-semibold uppercase tracking-wide text-sky-300">
+              Result
+            </p>
+            <h2
+              id="result-heading"
+              class="mt-2 text-xl font-semibold text-white outline-none"
+              tabindex="-1"
+              data-result-heading
+            >
+              Your zones will appear here
+            </h2>
+
+            <div class="mt-4 rounded-lg border border-gray-700 bg-gray-950 p-5" data-result-placeholder>
+              <p class="text-sm leading-relaxed text-gray-400">
+                Complete the form to see five ranges in bpm, the method used,
+                and a practical reference for interpreting each zone.
+              </p>
+              <div class="mt-4 grid grid-cols-5 gap-1" aria-hidden="true">
+                {
+                  HEART_RATE_ZONE_DEFINITIONS.map((zone, index) => (
+                    <div class={`rounded-md px-1 py-3 text-center text-xs font-bold ${segmentTones[index]}`}>
+                      Z{zone.number}
+                    </div>
+                  ))
+                }
+              </div>
+            </div>
+
+            <div class="mt-4 hidden" data-result-content>
+              <div class="rounded-lg border border-gray-700 bg-gray-950 p-4">
+                <div class="grid gap-3 sm:grid-cols-2">
+                  <div>
+                    <p class="text-xs font-bold uppercase tracking-wide text-gray-500">
+                      Maximum heart rate used
+                    </p>
+                    <p class="mt-1 text-3xl font-bold text-white" data-summary-max>-- bpm</p>
+                    <p class="mt-1 text-xs leading-relaxed text-gray-500" data-summary-source></p>
+                  </div>
+                  <div>
+                    <p class="text-xs font-bold uppercase tracking-wide text-gray-500">
+                      Method
+                    </p>
+                    <p class="mt-1 text-lg font-semibold text-white" data-summary-method></p>
+                    <p class="mt-1 text-xs leading-relaxed text-gray-500" data-summary-basis></p>
+                  </div>
+                </div>
+                <div
+                  class="mt-4 hidden grid-cols-2 gap-3 border-t border-gray-800 pt-4"
+                  data-karvonen-summary
+                >
+                  <div>
+                    <p class="text-xs text-gray-500">Resting heart rate</p>
+                    <p class="mt-1 font-semibold text-white" data-summary-resting></p>
+                  </div>
+                  <div>
+                    <p class="text-xs text-gray-500">Heart rate reserve</p>
+                    <p class="mt-1 font-semibold text-white" data-summary-reserve></p>
+                  </div>
+                </div>
+                <p class="mt-4 border-t border-gray-800 pt-4 text-xs leading-relaxed text-gray-500" data-formula-note></p>
+              </div>
+
+              <div class="mt-4">
+                <h3 class="text-sm font-semibold text-white">Overview</h3>
+                <div class="mt-2 grid grid-cols-5 gap-1" aria-label="Five heart rate zones">
+                  {
+                    HEART_RATE_ZONE_DEFINITIONS.map((zone, index) => (
+                      <div
+                        class={`rounded-md px-1 py-3 text-center text-xs font-bold ${segmentTones[index]}`}
+                        data-zone-segment={index}
+                        aria-label={`Zone ${zone.number}`}
+                      >
+                        Z{zone.number}
+                      </div>
+                    ))
+                  }
+                </div>
+                <p class="mt-2 text-xs leading-relaxed text-gray-500">
+                  Colors make the overview easier to scan; the cards include
+                  all information without relying on color.
+                </p>
+              </div>
+
+              <div class="mt-4 grid gap-3">
+                {
+                  HEART_RATE_ZONE_DEFINITIONS.map((zone, index) => (
+                    <article
+                      class={`rounded-lg border p-4 ${zoneTones[index]}`}
+                      data-zone-card={index}
+                    >
+                      <div class="flex items-start justify-between gap-3">
+                        <div>
+                          <p class="text-xs font-bold uppercase tracking-wide opacity-80">
+                            Zone {zone.number}
+                          </p>
+                          <h3 class="mt-1 font-semibold text-white">{zone.label}</h3>
+                        </div>
+                        <span
+                          class="rounded-full border border-current/25 px-2 py-1 text-xs font-bold"
+                          data-zone-basis
+                        >
+                          {zone.minPercent}%-{zone.maxPercent}%
+                        </span>
+                      </div>
+                      <p class="mt-3 text-3xl font-bold tracking-tight text-white" data-zone-range>
+                        -- bpm
+                      </p>
+                      <div class="mt-3 grid gap-2 text-xs leading-relaxed text-gray-300 sm:grid-cols-2">
+                        <p>
+                          <span class="font-semibold text-white">Effort:</span>
+                          {" "}
+                          {zone.effort}
+                        </p>
+                        <p>
+                          <span class="font-semibold text-white">Talk test:</span>
+                          {" "}
+                          {zone.talkTest}
+                        </p>
+                      </div>
+                    </article>
+                  ))
+                }
+              </div>
+
+              <div class="mt-4 rounded-lg border border-amber-400/25 bg-amber-400/10 p-4">
+                <p class="text-sm font-semibold text-amber-200">These are general ranges</p>
+                <p class="mt-1 text-xs leading-relaxed text-amber-100/75">
+                  Watches, apps, and professionals may use different boundaries.
+                  Zone 5 is not a target you should maintain.
+                </p>
+              </div>
+
+              <button
+                class="mt-4 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-950 px-4 py-3 text-sm font-semibold text-gray-200 transition hover:border-amber-400/60 hover:text-amber-200 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/30"
+                type="button"
+                data-copy-button
+              >
+                <span data-copy-label>Copy result</span>
+              </button>
+              <p class="sr-only" aria-live="polite" data-copy-status></p>
+            </div>
+
+            <p class="sr-only" aria-live="polite" data-result-status></p>
+          </section>
+        </div>
+      </section>
+
+      <aside
+        class="mt-4 rounded-lg border border-red-400/25 bg-red-400/10 p-4 sm:p-5"
+        aria-labelledby="health-notice-heading"
+      >
+        <h2 id="health-notice-heading" class="text-sm font-semibold text-red-200">Health notice</h2>
+        <p class="mt-2 text-sm leading-relaxed text-red-100/75">
+          These zones are general estimates, not a medical or exercise
+          prescription. Heart-rate response can change with fitness,
+          temperature, hydration, stress, sleep, medications, and health conditions.
+        </p>
+        <p class="mt-2 text-sm leading-relaxed text-red-100/75">
+          Consult a professional if you take medication that affects heart rate,
+          experience symptoms during activity, have a cardiovascular history,
+          or need personalized targets.
+        </p>
+      </aside>
+    </Container>
+
+    <AdSlot placement="calculator-after-tool" />
+
+    <Container as="section" class="py-8 md:py-10">
+      <SectionIntro
+        title="How to choose a method"
+        description="Both methods produce five general ranges, but they use different information."
+      />
+      <div class="grid gap-4 md:grid-cols-2">
+        <article class="rounded-lg border border-sky-400/30 bg-gray-950 p-5">
+          <p class="text-sm font-semibold text-sky-300">% of maximum heart rate</p>
+          <h3 class="mt-2 text-lg font-semibold text-white">The simplest option</h3>
+          <p class="mt-2 text-sm leading-relaxed text-gray-400">
+            Calculates each boundary directly from your maximum heart rate. It
+            is useful when you do not know or do not want to use resting heart rate.
+          </p>
+        </article>
+        <article class="rounded-lg border border-emerald-400/30 bg-gray-950 p-5">
+          <p class="text-sm font-semibold text-emerald-300">Karvonen</p>
+          <h3 class="mt-2 text-lg font-semibold text-white">Uses heart rate reserve</h3>
+          <p class="mt-2 text-sm leading-relaxed text-gray-400">
+            Subtracts resting heart rate from maximum heart rate, applies the
+            percentage to that reserve, and then adds resting heart rate back.
+          </p>
+        </article>
+      </div>
+    </Container>
+
+    <Container as="section" class="py-8 md:py-10">
+      <SectionIntro
+        title="How to interpret your zones"
+        description="The bpm values are mathematical references. Compare them with how the effort actually feels."
+      />
+      <div class="grid gap-4 md:grid-cols-3">
+        <article class="rounded-lg border border-gray-700 bg-gray-950 p-5">
+          <p class="text-sm font-semibold text-amber-300">Estimated maximum</p>
+          <h3 class="mt-2 text-lg font-semibold text-white">It is not a target</h3>
+          <p class="mt-2 text-sm leading-relaxed text-gray-400">
+            Tanaka provides an age-based population estimate. Your actual
+            maximum heart rate may differ.
+          </p>
+        </article>
+        <article class="rounded-lg border border-gray-700 bg-gray-950 p-5">
+          <p class="text-sm font-semibold text-sky-300">Talk test</p>
+          <h3 class="mt-2 text-lg font-semibold text-white">Adds context</h3>
+          <p class="mt-2 text-sm leading-relaxed text-gray-400">
+            How easily you can speak helps describe effort without relying only
+            on the heart rate displayed by a device.
+          </p>
+        </article>
+        <article class="rounded-lg border border-gray-700 bg-gray-950 p-5">
+          <p class="text-sm font-semibold text-emerald-300">Five zones</p>
+          <h3 class="mt-2 text-lg font-semibold text-white">They are not universal</h3>
+          <p class="mt-2 text-sm leading-relaxed text-gray-400">
+            Other systems may use different percentages, names, or thresholds.
+            Always compare the method before comparing results.
+          </p>
+        </article>
+      </div>
+    </Container>
+
+    <Container as="section" class="py-8 md:py-10">
+      <SectionIntro
+        title="Maximum and resting heart rate"
+        description="The quality of your input data directly affects the calculated ranges."
+      />
+      <div class="grid gap-4 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
+        <article class="rounded-lg border border-gray-700 bg-gray-950 p-5">
+          <h3 class="text-lg font-semibold text-white">Estimated or known maximum</h3>
+          <p class="mt-3 text-sm leading-relaxed text-gray-400">
+            If you do not know your maximum heart rate, this page uses Tanaka.
+            You can also enter your own reference or compare formulas in the
+            dedicated calculator.
+          </p>
+          <a
+            class="mt-4 inline-flex min-h-11 items-center rounded-lg border border-amber-400/50 px-4 py-2 text-sm font-semibold text-amber-200 transition hover:bg-amber-400/10 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/40"
+            href="/en/health/maximum-heart-rate-calculator"
+          >
+            Calculate maximum heart rate
+          </a>
+        </article>
+        <article class="rounded-lg border border-gray-700 bg-gray-950 p-5">
+          <h3 class="text-lg font-semibold text-white">Measure resting heart rate consistently</h3>
+          <p class="mt-3 text-sm leading-relaxed text-gray-400">
+            Measure your heart rate while awake, calm, and at rest. Repeating
+            the measurement under similar conditions reduces reliance on a
+            single value affected by stress, sleep, or hydration.
+          </p>
+        </article>
+      </div>
+    </Container>
+
+    <Container as="section" class="py-8 md:py-10">
+      <SectionIntro
+        title="Sources and methodology"
+        description="The calculator combines a published population formula with a transparently explained five-zone convention."
+      />
+      <div class="grid gap-3 sm:grid-cols-3">
+        <a
+          class="rounded-lg border border-gray-700 bg-gray-950 p-4 text-sm font-semibold text-amber-300 transition hover:border-amber-400/60 hover:text-amber-200"
+          href="https://pubmed.ncbi.nlm.nih.gov/11153730/"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Tanaka, Monahan, and Seals study
+        </a>
+        <a
+          class="rounded-lg border border-gray-700 bg-gray-950 p-4 text-sm font-semibold text-amber-300 transition hover:border-amber-400/60 hover:text-amber-200"
+          href="https://www.heart.org/en/healthy-living/exercise-and-physical-activity/fitness-basics/target-heart-rates"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          American Heart Association
+        </a>
+        <a
+          class="rounded-lg border border-gray-700 bg-gray-950 p-4 text-sm font-semibold text-amber-300 transition hover:border-amber-400/60 hover:text-amber-200"
+          href="https://www.cdc.gov/physical-activity/"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          CDC: physical activity
+        </a>
+      </div>
+    </Container>
+
+    <FaqSection faqs={faqs} />
+  </PageShell>
+</BaseLayout>
+
+<script>
+  import {
+    buildHeartRateZonesCopyText,
+    calculateHeartRateZones,
+    formatHeartRateValue,
+    formatHeartRateZoneRange,
+    HeartRateZonesError,
+    MAX_KNOWN_MAX_HEART_RATE,
+    MAX_RESTING_HEART_RATE,
+    MIN_KNOWN_MAX_HEART_RATE,
+    MIN_RESTING_HEART_RATE,
+    parseHeartRateInteger,
+  } from "@lib/calculators/salud/calculadora-de-zonas-de-frecuencia-cardiaca/heartRateZones.en";
+  import {
+    MAX_MAX_HEART_RATE_AGE,
+    MIN_MAX_HEART_RATE_AGE,
+  } from "@lib/calculators/salud/calculadora-de-frecuencia-cardiaca-maxima/maxHeartRate.en";
+
+  const form = document.querySelector("[data-calculator-form]");
+  const sourceButtons = document.querySelectorAll("[data-source-option]");
+  const sourcePanels = document.querySelectorAll("[data-source-panel]");
+  const methodButtons = document.querySelectorAll("[data-method-option]");
+  const restingPanel = document.querySelector("[data-resting-panel]");
+  const methodExplanation = document.querySelector("[data-method-explanation] p");
+  const calculationError = document.querySelector("[data-calculation-error]");
+  const resultHeading = document.querySelector("[data-result-heading]");
+  const resultPlaceholder = document.querySelector("[data-result-placeholder]");
+  const resultContent = document.querySelector("[data-result-content]");
+  const resultStatus = document.querySelector("[data-result-status]");
+  const summaryMax = document.querySelector("[data-summary-max]");
+  const summarySource = document.querySelector("[data-summary-source]");
+  const summaryMethod = document.querySelector("[data-summary-method]");
+  const summaryBasis = document.querySelector("[data-summary-basis]");
+  const karvonenSummary = document.querySelector("[data-karvonen-summary]");
+  const summaryResting = document.querySelector("[data-summary-resting]");
+  const summaryReserve = document.querySelector("[data-summary-reserve]");
+  const formulaNote = document.querySelector("[data-formula-note]");
+  const zoneCards = document.querySelectorAll("[data-zone-card]");
+  const zoneSegments = document.querySelectorAll("[data-zone-segment]");
+  const fillExampleButton = document.querySelector("[data-fill-example]");
+  const clearButton = document.querySelector("[data-clear-button]");
+  const copyButton = document.querySelector("[data-copy-button]");
+  const copyLabel = document.querySelector("[data-copy-label]");
+  const copyStatus = document.querySelector("[data-copy-status]");
+  const inputs = {
+    age: document.querySelector('[data-input="age"]'),
+    knownMaxHeartRate: document.querySelector('[data-input="knownMaxHeartRate"]'),
+    restingHeartRate: document.querySelector('[data-input="restingHeartRate"]'),
+  };
+
+  const fieldMessages = {
+    age: {
+      required: "Enter your age to estimate maximum heart rate.",
+      invalid: "Use numbers only for your age.",
+      not_integer: "Enter your age in whole years, without decimals.",
+      out_of_range: "Age must be between 18 and 100 years.",
+    },
+    knownMaxHeartRate: {
+      required: "Enter the maximum heart rate you want to use.",
+      invalid: "Use numbers only for maximum heart rate.",
+      not_integer: "Enter maximum heart rate as a whole number.",
+      out_of_range: "Known maximum heart rate must be between 80 and 240 bpm.",
+    },
+    restingHeartRate: {
+      required: "Karvonen requires your resting heart rate.",
+      invalid: "Use numbers only for resting heart rate.",
+      not_integer: "Enter resting heart rate as a whole number.",
+      out_of_range: "Resting heart rate must be between 35 and 120 bpm.",
+    },
+  };
+
+  const calculationMessages = {
+    max_not_above_rest:
+      "Maximum heart rate must be higher than resting heart rate.",
+    limits_not_distinct:
+      "The difference between maximum and resting heart rate is too small to show five distinct zones. Review the values.",
+    age_out_of_range: fieldMessages.age.out_of_range,
+    known_max_out_of_range: fieldMessages.knownMaxHeartRate.out_of_range,
+    resting_required: fieldMessages.restingHeartRate.required,
+    resting_out_of_range: fieldMessages.restingHeartRate.out_of_range,
+  };
+
+  let currentSource = "age";
+  let currentMethod = "max-percent";
+  let currentResult = null;
+  let copyResetTimeout = 0;
+
+  function updateSelectionButtons(buttons, dataKey, selectedValue) {
+    buttons.forEach((button) => {
+      const isSelected = button.dataset[dataKey] === selectedValue;
+      button.setAttribute("aria-pressed", String(isSelected));
+      button.classList.toggle("bg-amber-400", isSelected);
+      button.classList.toggle("text-gray-950", isSelected);
+      button.classList.toggle("font-bold", isSelected);
+      button.classList.toggle("text-gray-300", !isSelected);
+      button.classList.toggle("font-semibold", !isSelected);
+      button.classList.toggle("hover:bg-gray-800", !isSelected);
+    });
+  }
+
+  function updateControls() {
+    updateSelectionButtons(sourceButtons, "sourceOption", currentSource);
+    updateSelectionButtons(methodButtons, "methodOption", currentMethod);
+
+    sourcePanels.forEach((panel) => {
+      panel.classList.toggle("hidden", panel.dataset.sourcePanel !== currentSource);
+    });
+
+    const usesKarvonen = currentMethod === "karvonen";
+    restingPanel.classList.toggle("hidden", !usesKarvonen);
+    methodExplanation.textContent = usesKarvonen
+      ? "Karvonen calculates percentages of heart rate reserve and requires resting heart rate."
+      : "Percentage of maximum heart rate is the simplest method and does not require resting heart rate.";
+
+    clearInactiveErrors();
+  }
+
+  function clearInactiveErrors() {
+    if (currentSource === "age") {
+      clearFieldError("knownMaxHeartRate");
+    } else {
+      clearFieldError("age");
+    }
+
+    if (currentMethod !== "karvonen") {
+      clearFieldError("restingHeartRate");
+    }
+  }
+
+  function clearFieldError(field) {
+    const errorElement = document.querySelector(`[data-error-for="${field}"]`);
+    const wrapper = document.querySelector(`[data-wrapper-for="${field}"]`);
+    const input = inputs[field];
+
+    errorElement.textContent = "";
+    errorElement.classList.add("hidden");
+    wrapper.classList.remove("border-red-400");
+    input.removeAttribute("aria-invalid");
+  }
+
+  function clearErrors() {
+    Object.keys(inputs).forEach(clearFieldError);
+    calculationError.textContent = "";
+    calculationError.classList.add("hidden");
+  }
+
+  function showFieldError(field, message) {
+    const errorElement = document.querySelector(`[data-error-for="${field}"]`);
+    const wrapper = document.querySelector(`[data-wrapper-for="${field}"]`);
+    const input = inputs[field];
+
+    errorElement.textContent = message;
+    errorElement.classList.remove("hidden");
+    wrapper.classList.add("border-red-400");
+    input.setAttribute("aria-invalid", "true");
+  }
+
+  function showCalculationError(message) {
+    calculationError.textContent = message;
+    calculationError.classList.remove("hidden");
+  }
+
+  function parseField(field, min, max) {
+    const parsed = parseHeartRateInteger(inputs[field].value, min, max);
+
+    if (!parsed.ok) {
+      showFieldError(field, fieldMessages[field][parsed.error]);
+      return null;
+    }
+
+    inputs[field].value = String(parsed.value);
+    return parsed.value;
+  }
+
+  function readInput() {
+    const age =
+      currentSource === "age"
+        ? parseField("age", MIN_MAX_HEART_RATE_AGE, MAX_MAX_HEART_RATE_AGE)
+        : undefined;
+    const knownMaxHeartRate =
+      currentSource === "known"
+        ? parseField(
+            "knownMaxHeartRate",
+            MIN_KNOWN_MAX_HEART_RATE,
+            MAX_KNOWN_MAX_HEART_RATE,
+          )
+        : undefined;
+    const restingHeartRate =
+      currentMethod === "karvonen"
+        ? parseField(
+            "restingHeartRate",
+            MIN_RESTING_HEART_RATE,
+            MAX_RESTING_HEART_RATE,
+          )
+        : undefined;
+
+    if (
+      (currentSource === "age" && age === null) ||
+      (currentSource === "known" && knownMaxHeartRate === null) ||
+      (currentMethod === "karvonen" && restingHeartRate === null)
+    ) {
+      return null;
+    }
+
+    return {
+      source: currentSource,
+      method: currentMethod,
+      age,
+      knownMaxHeartRate,
+      restingHeartRate,
+    };
+  }
+
+  function calculateAndRender({ focusResult = true } = {}) {
+    clearErrors();
+    const input = readInput();
+
+    if (!input) {
+      setInvalidResult();
+      focusFirstError();
+      return;
+    }
+
+    try {
+      const result = calculateHeartRateZones(input);
+      renderResult(result, focusResult);
+    } catch (error) {
+      setInvalidResult();
+
+      if (error instanceof HeartRateZonesError) {
+        const message = calculationMessages[error.code] ?? error.message;
+
+        if (error.code === "max_not_above_rest") {
+          showFieldError("restingHeartRate", message);
+          focusFirstError();
+        } else {
+          showCalculationError(message);
+        }
+      } else {
+        showCalculationError("The zones could not be calculated. Review the values.");
+      }
+    }
+  }
+
+  function renderResult(result, focusResult) {
+    currentResult = result;
+    resultHeading.textContent = "Your estimated zones";
+    resultPlaceholder.classList.add("hidden");
+    resultContent.classList.remove("hidden");
+
+    summaryMax.textContent = `${result.maxHeartRateBpm} bpm`;
+    summarySource.textContent =
+      result.source === "age"
+        ? `Estimated with Tanaka for age ${result.age}`
+        : "Entered as a known maximum heart rate";
+    summaryMethod.textContent =
+      result.method === "karvonen" ? "Karvonen method" : "Percentage of maximum heart rate";
+    summaryBasis.textContent =
+      result.method === "karvonen"
+        ? "The zones use percentages of heart rate reserve."
+        : "The zones use direct percentages of maximum heart rate.";
+
+    const usesKarvonen = result.method === "karvonen";
+    karvonenSummary.classList.toggle("hidden", !usesKarvonen);
+    karvonenSummary.classList.toggle("grid", usesKarvonen);
+
+    if (usesKarvonen) {
+      summaryResting.textContent = `${result.restingHeartRate} bpm`;
+      summaryReserve.textContent = `${formatHeartRateValue(result.reserveExact)} bpm`;
+    }
+
+    const maxFormula =
+      result.source === "age"
+        ? `Tanaka: 208 - (0.7 × ${result.age}) = ${formatHeartRateValue(result.maxHeartRateExact)} bpm.`
+        : `Known maximum heart rate used directly: ${result.maxHeartRateBpm} bpm.`;
+    const methodFormula = usesKarvonen
+      ? ` Reserve: ${formatHeartRateValue(result.maxHeartRateExact)} - ${result.restingHeartRate} = ${formatHeartRateValue(result.reserveExact)} bpm.`
+      : " The boundaries were calculated directly from that maximum heart rate.";
+    formulaNote.textContent = `${maxFormula}${methodFormula}`;
+
+    const basis = usesKarvonen ? "of reserve" : "of maximum";
+    result.zones.forEach((zone, index) => {
+      const card = zoneCards[index];
+      card.querySelector("[data-zone-range]").textContent =
+        formatHeartRateZoneRange(zone);
+      card.querySelector("[data-zone-basis]").textContent =
+        `${zone.minPercent}%-${zone.maxPercent}% ${basis}`;
+      zoneSegments[index].setAttribute(
+        "aria-label",
+        `Zone ${zone.number}: ${formatHeartRateZoneRange(zone)}`,
+      );
+    });
+
+    resultStatus.textContent =
+      `Calculation complete. The maximum heart rate used is ${result.maxHeartRateBpm} bpm, and five zones are shown.`;
+
+    if (focusResult) {
+      resultHeading.focus({ preventScroll: true });
+      resultHeading.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  }
+
+  function setNeutralResult() {
+    currentResult = null;
+    resultHeading.textContent = "Your zones will appear here";
+    resultPlaceholder.classList.remove("hidden");
+    resultContent.classList.add("hidden");
+    resultStatus.textContent = "";
+    copyStatus.textContent = "";
+    resetCopyLabel();
+  }
+
+  function setInvalidResult() {
+    currentResult = null;
+    resultHeading.textContent = "Review your information";
+    resultPlaceholder.classList.remove("hidden");
+    resultContent.classList.add("hidden");
+    resultStatus.textContent = "The zones could not be calculated. Review the highlighted fields.";
+    copyStatus.textContent = "";
+    resetCopyLabel();
+  }
+
+  function focusFirstError() {
+    const firstInvalid = form.querySelector('[aria-invalid="true"]');
+    firstInvalid?.focus();
+  }
+
+  function setSource(source) {
+    currentSource = source;
+    updateControls();
+    clearErrors();
+    setNeutralResult();
+  }
+
+  function setMethod(method) {
+    currentMethod = method;
+    updateControls();
+    clearErrors();
+    setNeutralResult();
+  }
+
+  function fillExample() {
+    currentSource = "age";
+    currentMethod = "karvonen";
+    inputs.age.value = "35";
+    inputs.knownMaxHeartRate.value = "";
+    inputs.restingHeartRate.value = "60";
+    updateControls();
+    calculateAndRender();
+  }
+
+  function clearCalculator() {
+    currentSource = "age";
+    currentMethod = "max-percent";
+    form.reset();
+    updateControls();
+    clearErrors();
+    setNeutralResult();
+    inputs.age.focus();
+  }
+
+  function resetCopyLabel() {
+    window.clearTimeout(copyResetTimeout);
+    copyLabel.textContent = "Copy result";
+  }
+
+  async function copyResult() {
+    if (!currentResult) {
+      return;
+    }
+
+    const text = buildHeartRateZonesCopyText(currentResult);
+
+    try {
+      if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(text);
+      } else {
+        const textArea = document.createElement("textarea");
+        textArea.value = text;
+        textArea.setAttribute("readonly", "");
+        textArea.style.position = "fixed";
+        textArea.style.opacity = "0";
+        document.body.append(textArea);
+        textArea.select();
+        document.execCommand("copy");
+        textArea.remove();
+      }
+
+      copyLabel.textContent = "Result copied";
+      copyStatus.textContent = "Result copied to the clipboard.";
+    } catch {
+      copyLabel.textContent = "Could not copy";
+      copyStatus.textContent = "The result could not be copied.";
+    }
+
+    window.clearTimeout(copyResetTimeout);
+    copyResetTimeout = window.setTimeout(resetCopyLabel, 2500);
+  }
+
+  function loadAgeFromQuery() {
+    const rawAge = new URLSearchParams(window.location.search).get("age");
+
+    if (!rawAge) {
+      return;
+    }
+
+    const parsed = parseHeartRateInteger(
+      rawAge,
+      MIN_MAX_HEART_RATE_AGE,
+      MAX_MAX_HEART_RATE_AGE,
+    );
+
+    if (!parsed.ok) {
+      return;
+    }
+
+    currentSource = "age";
+    inputs.age.value = String(parsed.value);
+    updateControls();
+    calculateAndRender({ focusResult: false });
+  }
+
+  form.addEventListener("submit", (event) => {
+    event.preventDefault();
+    calculateAndRender();
+  });
+
+  sourceButtons.forEach((button) => {
+    button.addEventListener("click", () => setSource(button.dataset.sourceOption));
+  });
+
+  methodButtons.forEach((button) => {
+    button.addEventListener("click", () => setMethod(button.dataset.methodOption));
+  });
+
+  Object.entries(inputs).forEach(([field, input]) => {
+    input.addEventListener("input", () => {
+      clearFieldError(field);
+      calculationError.textContent = "";
+      calculationError.classList.add("hidden");
+
+      if (currentResult) {
+        setNeutralResult();
+      }
+    });
+  });
+
+  fillExampleButton.addEventListener("click", fillExample);
+  clearButton.addEventListener("click", clearCalculator);
+  copyButton.addEventListener("click", copyResult);
+
+  updateControls();
+  setNeutralResult();
+  loadAgeFromQuery();
+</script>

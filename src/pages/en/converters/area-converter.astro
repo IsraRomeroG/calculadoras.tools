@@ -209,7 +209,7 @@ const equivalenceRows = [
                   for="origin-unit"
                   class="block text-sm font-semibold text-gray-200"
                 >
-                  Unit origen
+                  Source unit
                 </label>
                 <select
                   id="origin-unit"
@@ -355,7 +355,7 @@ const equivalenceRows = [
                   for="area-decimals"
                   class="block text-sm font-semibold text-gray-200"
                 >
-                  Decimales
+                  Decimal places
                 </label>
                 <select
                   id="area-decimals"
@@ -596,7 +596,7 @@ const equivalenceRows = [
       <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         <a
           class="rounded-lg border border-gray-800 bg-gray-950 p-4 transition hover:border-amber-400/60 hover:bg-gray-900"
-          href="/en/real-estate/price-per-square-meter-calculator"
+          href="/en/real-estate/price-per-area-calculator"
         >
           <span class="block font-semibold text-white"
             >Price per square meter</span
@@ -925,11 +925,11 @@ const equivalenceRows = [
     if (!parsedLength.ok || !parsedWidth.ok) {
       const lengthMessage =
         lengthHasValue && !["empty", "incomplete"].includes(parsedLength.error)
-          ? getInputError(parsedLength.error, "largo")
+          ? getInputError(parsedLength.error, "length")
           : "";
       const widthMessage =
         widthHasValue && !["empty", "incomplete"].includes(parsedWidth.error)
-          ? getInputError(parsedWidth.error, "ancho")
+          ? getInputError(parsedWidth.error, "width")
           : "";
 
       setFieldError(lengthError, lengthInput, lengthMessage);
@@ -1040,7 +1040,7 @@ const equivalenceRows = [
 
     try {
       await navigator.clipboard.writeText(text);
-      showStatus("Result copiado.");
+      showStatus("Result copied.");
     } catch {
       showStatus("The result could not be copied automatically.");
     }

@@ -1,0 +1,1209 @@
+---
+import AdSlot from "@components/ads/AdSlot.astro";
+import Container from "@components/layout/Container.astro";
+import PageShell from "@components/layout/PageShell.astro";
+import FaqSection from "@components/shared/FaqSection.astro";
+import PageHero from "@components/shared/PageHero.astro";
+import SectionIntro from "@components/shared/SectionIntro.astro";
+import BaseLayout from "@layouts/BaseLayout.astro";
+import {
+  COLOR_SCALE_STEPS,
+  DEFAULT_COLOR_HEX,
+  DEFAULT_VARIABLE_NAME,
+  buildCssVariables,
+  calculateContrast,
+  formatHslClassic,
+  formatRgbClassic,
+  generateColorScale,
+  parseColorInput,
+  recommendTextColor,
+  sanitizeCssVariableName,
+} from "@lib/calculators/programacion/paleta-hex-rgb-hsl/colorPalette.en";
+import { buildFaqJsonLd } from "@lib/seo";
+import { buildAlternateLinks } from "@lib/i18n/routing";
+
+const title = "HEX, RGB and HSL color palette for CSS";
+const description =
+  "Convert colors between HEX, RGB and HSL, generate CSS variables, create a color scale and check WCAG contrast for web interfaces.";
+const canonical = "/en/programming/hex-rgb-hsl-color-converter";
+
+const parsedDefault = parseColorInput(DEFAULT_COLOR_HEX);
+
+if (!parsedDefault.ok) {
+  throw new Error("DEFAULT_COLOR_HEX must be a valid color.");
+}
+
+const defaultColor = parsedDefault.color;
+const defaultScale = generateColorScale(defaultColor);
+const defaultRecommendation = recommendTextColor(defaultColor.rgb);
+const parsedDefaultText = parseColorInput(defaultRecommendation.color);
+
+if (!parsedDefaultText.ok) {
+  throw new Error("Recommended text color must be valid.");
+}
+
+const defaultTextColor = parsedDefaultText.color;
+const defaultContrast = calculateContrast(defaultColor.rgb, defaultTextColor.rgb);
+const defaultCss = buildCssVariables(defaultColor, DEFAULT_VARIABLE_NAME);
+
+const contrastLabels = {
+  fail: "Falla",
+  "aa-large": "AA grande",
+  "aa-normal": "AA normal",
+  aaa: "AAA",
+};
+
+const examples = [
+  {
+    label: "Azul UI",
+    color: "#0EA5E9",
+    name: "primary",
+  },
+  {
+    label: "Verde exito",
+    color: "#22C55E",
+    name: "success",
+  },
+  {
+    label: "Error red",
+    color: "#EF4444",
+    name: "danger",
+  },
+  {
+    label: "Gris neutral",
+    color: "#64748B",
+    name: "neutral",
+  },
+];
+
+const faqs = [
+  {
+    question: "What is the difference between HEX, RGB and HSL?",
+    answer:
+      "HEX represents colors with hexadecimal values, RGB uses red, green and blue channels from 0 to 255, and HSL organizes color by hue, saturation and lightness.",
+  },
+  {
+    question: "How do I convert HEX to RGB?",
+    answer:
+      "Each hexadecimal pair converts to decimal: the first two digits are red, the next two green and the last two blue.",
+  },
+  {
+    question: "How do I generate CSS variables from a color?",
+    answer:
+      "The tool takes the base color, calculates its HEX, RGB and HSL values, generates a 50–900 scale and builds CSS declarations with your chosen variable name.",
+  },
+  {
+    question: "What is a 50–900 color scale?",
+    answer:
+      "It is a family of shades where 500 is usually the base color, lower steps are lighter and higher steps are darker.",
+  },
+  {
+    question: "What is WCAG contrast?",
+    answer:
+      "It is a numerical relationship between the text color and background color. For normal text, AA requires at least 4.5:1 and AAA at least 7:1.",
+  },
+  {
+    question: "Which text color works best on a background?",
+    answer:
+      "The calculator compares white and black on the selected background and recommends the one with the higher contrast.",
+  },
+  {
+    question: "Can I share a palette by URL?",
+    answer:
+      "Yes. The page updates parameters such as color, name, bg and text so you can copy a link with the current settings.",
+  },
+];
+
+const faqJsonLd = buildFaqJsonLd(faqs);
+---
+
+<BaseLayout locale="en" title={title} description={description} canonical={canonical} alternates={buildAlternateLinks({ es: "/programacion/paleta-hex-rgb-hsl", en: "/en/programming/hex-rgb-hsl-color-converter" }, Astro.site ?? Astro.url)}>
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={JSON.stringify(faqJsonLd)} />
+  </Fragment>
+
+  <PageShell>
+    <PageHero
+      title="Paleta HEX, RGB y HSL"
+      description="Convert colors for CSS, generate a 50–900 scale and check WCAG contrast in one tool."
+      kicker="Programacion"
+      kickerHref="/en/programming"
+      collapseBreadcrumbOnMobile
+      containerClass="py-6 md:py-8"
+      breadcrumbs={[
+        { label: "Home", href: "/", ariaLabel: "Home" },
+        { label: "Programacion", href: "/en/programming", optional: true },
+        { label: "Paleta HEX RGB HSL", truncate: true },
+      ]}
+    />
+
+    <Container as="section" class="py-6 md:py-8">
+      <section
+        id="color-palette-tool"
+        class="overflow-hidden rounded-lg border border-gray-700 bg-gray-950 shadow-xl shadow-gray-950/30"
+        aria-labelledby="calculator-heading"
+      >
+        <div class="grid lg:grid-cols-[minmax(0,1.02fr)_minmax(19rem,0.98fr)]">
+          <div class="p-4 sm:p-6">
+            <p class="text-sm font-semibold text-sky-300">Color for CSS</p>
+            <h2 id="calculator-heading" class="mt-2 text-2xl font-semibold">
+                Convert and export your palette
+            </h2>
+
+            <div class="mt-5">
+              <label
+                for="palette-color-input"
+                class="block text-sm font-semibold text-gray-200"
+              >
+                Main color
+              </label>
+              <input
+                id="palette-color-input"
+                class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-900 px-4 font-mono text-lg text-white outline-none transition placeholder:text-gray-600 focus:border-sky-400 focus:ring-3 focus:ring-sky-400/15"
+                type="text"
+                value={defaultColor.hex}
+                inputmode="text"
+                autocomplete="off"
+                autocapitalize="off"
+                autocorrect="off"
+                spellcheck="false"
+                placeholder="#0EA5E9, rgb(14 165 233), hsl(199 89% 48%)"
+                aria-describedby="palette-color-error"
+                data-color-input
+              />
+              <p
+                id="palette-color-error"
+                class="mt-2 hidden text-sm leading-relaxed text-red-300"
+                role="alert"
+                data-color-error
+              ></p>
+            </div>
+
+            <div class="mt-5 grid gap-4 sm:grid-cols-2">
+              <div>
+                <label
+                  for="palette-hex-input"
+                  class="block text-sm font-semibold text-gray-200"
+                >
+                  HEX
+                </label>
+                <input
+                  id="palette-hex-input"
+                  class="mt-2 min-h-11 w-full rounded-lg border border-gray-700 bg-gray-900 px-3 font-mono text-base text-white outline-none transition focus:border-sky-400 focus:ring-3 focus:ring-sky-400/15"
+                  type="text"
+                  value={defaultColor.hex}
+                  autocomplete="off"
+                  spellcheck="false"
+                  data-hex-input
+                />
+              </div>
+              <div>
+                <label
+                  for="palette-variable-input"
+                  class="block text-sm font-semibold text-gray-200"
+                >
+                  Variable CSS
+                </label>
+                <input
+                  id="palette-variable-input"
+                  class="mt-2 min-h-11 w-full rounded-lg border border-gray-700 bg-gray-900 px-3 font-mono text-base text-white outline-none transition focus:border-sky-400 focus:ring-3 focus:ring-sky-400/15"
+                  type="text"
+                  value={DEFAULT_VARIABLE_NAME}
+                  autocomplete="off"
+                  spellcheck="false"
+                  data-variable-input
+                />
+              </div>
+            </div>
+
+            <p
+              class="mt-3 hidden text-sm leading-relaxed text-red-300"
+              role="alert"
+              data-format-error
+            ></p>
+
+            <div class="mt-5 grid gap-5 md:grid-cols-2">
+              <fieldset>
+                <legend class="text-sm font-semibold text-gray-200">RGB</legend>
+                <div class="mt-2 grid grid-cols-3 gap-2">
+                  <label class="block">
+                    <span class="sr-only">Rojo</span>
+                    <input
+                      class="min-h-11 w-full rounded-lg border border-gray-700 bg-gray-900 px-3 font-mono text-base text-white outline-none transition focus:border-sky-400 focus:ring-3 focus:ring-sky-400/15"
+                      type="number"
+                      min="0"
+                      max="255"
+                      value={defaultColor.rgb.r}
+                      inputmode="numeric"
+                      data-r-input
+                    />
+                  </label>
+                  <label class="block">
+                    <span class="sr-only">Verde</span>
+                    <input
+                      class="min-h-11 w-full rounded-lg border border-gray-700 bg-gray-900 px-3 font-mono text-base text-white outline-none transition focus:border-sky-400 focus:ring-3 focus:ring-sky-400/15"
+                      type="number"
+                      min="0"
+                      max="255"
+                      value={defaultColor.rgb.g}
+                      inputmode="numeric"
+                      data-g-input
+                    />
+                  </label>
+                  <label class="block">
+                    <span class="sr-only">Azul</span>
+                    <input
+                      class="min-h-11 w-full rounded-lg border border-gray-700 bg-gray-900 px-3 font-mono text-base text-white outline-none transition focus:border-sky-400 focus:ring-3 focus:ring-sky-400/15"
+                      type="number"
+                      min="0"
+                      max="255"
+                      value={defaultColor.rgb.b}
+                      inputmode="numeric"
+                      data-b-input
+                    />
+                  </label>
+                </div>
+                <div class="mt-1 grid grid-cols-3 gap-2 text-center text-xs text-gray-500">
+                  <span>R</span>
+                  <span>G</span>
+                  <span>B</span>
+                </div>
+              </fieldset>
+
+              <fieldset>
+                <legend class="text-sm font-semibold text-gray-200">HSL</legend>
+                <div class="mt-2 grid grid-cols-3 gap-2">
+                  <label class="block">
+                    <span class="sr-only">Tono</span>
+                    <input
+                      class="min-h-11 w-full rounded-lg border border-gray-700 bg-gray-900 px-3 font-mono text-base text-white outline-none transition focus:border-sky-400 focus:ring-3 focus:ring-sky-400/15"
+                      type="number"
+                      min="0"
+                      max="360"
+                      value={defaultColor.hsl.h}
+                      inputmode="numeric"
+                      data-h-input
+                    />
+                  </label>
+                  <label class="block">
+                    <span class="sr-only">Saturacion</span>
+                    <input
+                      class="min-h-11 w-full rounded-lg border border-gray-700 bg-gray-900 px-3 font-mono text-base text-white outline-none transition focus:border-sky-400 focus:ring-3 focus:ring-sky-400/15"
+                      type="number"
+                      min="0"
+                      max="100"
+                      value={defaultColor.hsl.s}
+                      inputmode="numeric"
+                      data-s-input
+                    />
+                  </label>
+                  <label class="block">
+                    <span class="sr-only">Luminosidad</span>
+                    <input
+                      class="min-h-11 w-full rounded-lg border border-gray-700 bg-gray-900 px-3 font-mono text-base text-white outline-none transition focus:border-sky-400 focus:ring-3 focus:ring-sky-400/15"
+                      type="number"
+                      min="0"
+                      max="100"
+                      value={defaultColor.hsl.l}
+                      inputmode="numeric"
+                      data-l-input
+                    />
+                  </label>
+                </div>
+                <div class="mt-1 grid grid-cols-3 gap-2 text-center text-xs text-gray-500">
+                  <span>H</span>
+                  <span>S</span>
+                  <span>L</span>
+                </div>
+              </fieldset>
+            </div>
+
+            <div class="mt-5 grid gap-3 sm:grid-cols-2">
+              <button
+                class="min-h-11 rounded-lg border border-gray-700 px-4 py-2 text-sm font-semibold text-gray-200 transition hover:border-gray-500 hover:bg-gray-900 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-gray-400/30"
+                type="button"
+                data-clear-tool
+              >
+                Clear
+              </button>
+              <p
+                class="min-h-11 rounded-lg border border-emerald-400/20 bg-emerald-400/10 px-4 py-3 text-sm text-emerald-200"
+                role="status"
+                aria-live="polite"
+                data-copy-status
+              ></p>
+            </div>
+          </div>
+
+          <aside
+            class="border-t border-gray-800 bg-gray-900/65 p-4 sm:p-6 lg:border-l lg:border-t-0"
+          >
+            <div
+              class="min-h-64 rounded-lg border border-gray-700 p-5 shadow-inner"
+              style={`background:${defaultColor.hex};color:${defaultRecommendation.color};`}
+              data-main-preview
+            >
+              <p class="text-sm font-semibold" data-preview-title>
+                Vista previa
+              </p>
+              <p class="mt-3 max-w-sm text-3xl font-semibold leading-tight">
+                Text on background
+              </p>
+              <p class="mt-3 max-w-sm text-sm leading-relaxed opacity-85">
+                Contrast is calculated using the selected colors.
+              </p>
+              <div class="mt-6 flex flex-wrap gap-3">
+                <span
+                  class="rounded-md px-4 py-2 text-sm font-semibold"
+                  style={`background:${defaultRecommendation.color};color:${defaultColor.hex};`}
+                  data-preview-button
+                >
+                  Boton
+                </span>
+                <span
+                  class="rounded-md border px-4 py-2 text-sm font-semibold"
+                  style={`border-color:${defaultRecommendation.color};`}
+                  data-preview-outline
+                >
+                  Borde
+                </span>
+                <span
+                  class="rounded-md px-4 py-2 text-sm font-semibold opacity-85"
+                  style={`background:${defaultRecommendation.color};color:${defaultColor.hex};`}
+                  data-preview-hover
+                >
+                  Hover
+                </span>
+              </div>
+            </div>
+
+            <div class="mt-4 grid grid-cols-2 gap-2">
+              <button
+                class="min-h-11 rounded-lg bg-sky-400 px-3 py-2 text-sm font-semibold text-gray-950 transition hover:bg-sky-300 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-sky-300/40"
+                type="button"
+                data-copy-kind="hex"
+              >
+                Copy HEX
+              </button>
+              <button
+                class="min-h-11 rounded-lg border border-sky-400/60 px-3 py-2 text-sm font-semibold text-sky-200 transition hover:bg-sky-400/10 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-sky-300/30"
+                type="button"
+                data-copy-kind="rgb"
+              >
+                Copy RGB
+              </button>
+              <button
+                class="min-h-11 rounded-lg border border-sky-400/60 px-3 py-2 text-sm font-semibold text-sky-200 transition hover:bg-sky-400/10 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-sky-300/30"
+                type="button"
+                data-copy-kind="rgb-modern"
+              >
+                RGB moderno
+              </button>
+              <button
+                class="min-h-11 rounded-lg border border-sky-400/60 px-3 py-2 text-sm font-semibold text-sky-200 transition hover:bg-sky-400/10 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-sky-300/30"
+                type="button"
+                data-copy-kind="hsl"
+              >
+                Copy HSL
+              </button>
+              <button
+                class="min-h-11 rounded-lg border border-sky-400/60 px-3 py-2 text-sm font-semibold text-sky-200 transition hover:bg-sky-400/10 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-sky-300/30"
+                type="button"
+                data-copy-kind="hsl-modern"
+              >
+                HSL moderno
+              </button>
+              <button
+                class="min-h-11 rounded-lg border border-sky-400/60 px-3 py-2 text-sm font-semibold text-sky-200 transition hover:bg-sky-400/10 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-sky-300/30"
+                type="button"
+                data-copy-kind="var"
+              >
+                Copy var
+              </button>
+            </div>
+
+            <div class="mt-4 grid gap-2 text-sm">
+              <div class="rounded-lg border border-gray-800 bg-gray-950 p-3">
+                <span class="block text-xs font-semibold uppercase text-gray-500">
+                  HEX
+                </span>
+                <span class="mt-1 block font-mono text-base text-white" data-hex-output>
+                  {defaultColor.hex}
+                </span>
+              </div>
+              <div class="rounded-lg border border-gray-800 bg-gray-950 p-3">
+                <span class="block text-xs font-semibold uppercase text-gray-500">
+                  RGB
+                </span>
+                <span class="mt-1 block font-mono text-base text-white" data-rgb-output>
+                  {formatRgbClassic(defaultColor.rgb)}
+                </span>
+              </div>
+              <div class="rounded-lg border border-gray-800 bg-gray-950 p-3">
+                <span class="block text-xs font-semibold uppercase text-gray-500">
+                  HSL
+                </span>
+                <span class="mt-1 block font-mono text-base text-white" data-hsl-output>
+                  {formatHslClassic(defaultColor.hsl)}
+                </span>
+              </div>
+            </div>
+          </aside>
+        </div>
+
+        <div class="border-t border-gray-800 p-4 sm:p-6">
+          <div class="grid gap-6 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]">
+            <section aria-labelledby="contrast-heading">
+              <h3 id="contrast-heading" class="text-lg font-semibold">
+                Contraste WCAG
+              </h3>
+              <div class="mt-4 grid gap-4 sm:grid-cols-2">
+                <div>
+                  <label
+                    for="palette-bg-input"
+                    class="block text-sm font-semibold text-gray-200"
+                  >
+                    Fondo
+                  </label>
+                  <input
+                    id="palette-bg-input"
+                    class="mt-2 min-h-11 w-full rounded-lg border border-gray-700 bg-gray-900 px-3 font-mono text-base text-white outline-none transition focus:border-sky-400 focus:ring-3 focus:ring-sky-400/15"
+                    type="text"
+                    value={defaultColor.hex}
+                    autocomplete="off"
+                    spellcheck="false"
+                    data-bg-input
+                  />
+                </div>
+                <div>
+                  <label
+                    for="palette-text-input"
+                    class="block text-sm font-semibold text-gray-200"
+                  >
+                    Texto
+                  </label>
+                  <input
+                    id="palette-text-input"
+                    class="mt-2 min-h-11 w-full rounded-lg border border-gray-700 bg-gray-900 px-3 font-mono text-base text-white outline-none transition focus:border-sky-400 focus:ring-3 focus:ring-sky-400/15"
+                    type="text"
+                    value={defaultTextColor.hex}
+                    autocomplete="off"
+                    spellcheck="false"
+                    data-text-input
+                  />
+                </div>
+              </div>
+              <p
+                class="mt-3 hidden text-sm leading-relaxed text-red-300"
+                role="alert"
+                data-contrast-error
+              ></p>
+
+              <div class="mt-4 grid gap-3 sm:grid-cols-3">
+                <div class="rounded-lg border border-gray-800 bg-gray-900/60 p-4">
+                  <span class="block text-xs font-semibold uppercase text-gray-500">
+                    Ratio
+                  </span>
+                  <span class="mt-1 block text-2xl font-semibold text-white" data-contrast-ratio>
+                    {defaultContrast.ratio.toFixed(2)}:1
+                  </span>
+                </div>
+                <div class="rounded-lg border border-gray-800 bg-gray-900/60 p-4">
+                  <span class="block text-xs font-semibold uppercase text-gray-500">
+                    Nivel
+                  </span>
+                  <span class="mt-1 block text-2xl font-semibold text-sky-200" data-contrast-level>
+                    {contrastLabels[defaultContrast.level]}
+                  </span>
+                </div>
+                <div class="rounded-lg border border-gray-800 bg-gray-900/60 p-4">
+                  <span class="block text-xs font-semibold uppercase text-gray-500">
+                    Texto sugerido
+                  </span>
+                  <span class="mt-1 block font-mono text-2xl font-semibold text-white" data-recommended-text>
+                    {defaultRecommendation.color}
+                  </span>
+                </div>
+              </div>
+
+              <p
+                class="mt-4 hidden rounded-lg border border-amber-400/30 bg-amber-400/10 p-4 text-sm leading-relaxed text-amber-100"
+                data-recommendation-warning
+              >
+                No automatic recommendation meets AA for normal text.
+              </p>
+
+              <div class="mt-4 grid gap-3 sm:grid-cols-[1fr_auto] sm:items-end">
+                <p class="rounded-lg border border-gray-800 bg-gray-900/60 p-4 text-sm leading-relaxed text-gray-300">
+                  Negro:
+                  <span class="font-mono text-white" data-black-contrast>
+                    {defaultRecommendation.blackContrast.ratio.toFixed(2)}:1
+                  </span>
+                  <span class="mx-2 text-gray-600">/</span>
+                  Blanco:
+                  <span class="font-mono text-white" data-white-contrast>
+                    {defaultRecommendation.whiteContrast.ratio.toFixed(2)}:1
+                  </span>
+                </p>
+                <button
+                  class="min-h-11 rounded-lg border border-sky-400/60 px-4 py-2 text-sm font-semibold text-sky-200 transition hover:bg-sky-400/10 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-sky-300/30"
+                  type="button"
+                  data-use-recommended
+                >
+                  Use suggested
+                </button>
+              </div>
+            </section>
+
+            <section aria-labelledby="scale-heading">
+              <h3 id="scale-heading" class="text-lg font-semibold">
+                Escala 50-900
+              </h3>
+              <div class="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-5">
+                {
+                  COLOR_SCALE_STEPS.map((step) => (
+                    <div class="rounded-lg border border-gray-800 bg-gray-900/60 p-2">
+                      <button
+                        class="block aspect-[1.6/1] w-full rounded-md border border-white/10"
+                        type="button"
+                        style={`background:${defaultScale[step].hex};`}
+                        aria-label={`Copy color ${step}`}
+                        data-scale-swatch={step}
+                      ></button>
+                      <div class="mt-2 px-1">
+                        <p class="text-xs font-semibold text-gray-400">{step}</p>
+                        <p
+                          class="break-all font-mono text-xs text-white"
+                          data-scale-hex={step}
+                        >
+                          {defaultScale[step].hex}
+                        </p>
+                      </div>
+                    </div>
+                  ))
+                }
+              </div>
+            </section>
+          </div>
+        </div>
+
+        <div class="border-t border-gray-800 p-4 sm:p-6">
+          <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <h3 class="text-lg font-semibold">CSS variables</h3>
+              <p class="mt-1 text-sm text-gray-500" data-css-summary>
+                --color-{sanitizeCssVariableName(DEFAULT_VARIABLE_NAME)}
+              </p>
+            </div>
+            <button
+              class="min-h-11 rounded-lg bg-sky-400 px-4 py-2 text-sm font-semibold text-gray-950 transition hover:bg-sky-300 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-sky-300/40"
+              type="button"
+              data-copy-kind="css"
+            >
+              Copy CSS
+            </button>
+          </div>
+          <pre class="mt-4 max-h-96 overflow-auto rounded-lg border border-gray-800 bg-gray-950 p-4 text-sm leading-relaxed text-gray-100"><code data-css-output>{defaultCss}</code></pre>
+        </div>
+      </section>
+    </Container>
+
+    <AdSlot placement="calculator-after-tool" />
+
+    <Container as="section" class="py-6 md:py-8">
+      <SectionIntro
+        title="Ejemplos rapidos"
+        description="Common colors for interfaces and product states."
+      />
+      <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        {
+          examples.map((example) => (
+            <button
+              class="min-h-24 rounded-lg border border-gray-800 bg-gray-950 p-4 text-left transition hover:border-sky-400/60 hover:bg-gray-900 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-sky-400/30"
+              type="button"
+              data-example-color={example.color}
+              data-example-name={example.name}
+            >
+              <span
+                class="block h-8 rounded-md border border-white/10"
+                style={`background:${example.color};`}
+                aria-hidden="true"
+              ></span>
+              <span class="mt-3 block text-sm font-semibold text-white">
+                {example.label}
+              </span>
+              <span class="mt-1 block font-mono text-xs text-sky-300">
+                {example.color}
+              </span>
+            </button>
+          ))
+        }
+      </div>
+    </Container>
+
+    <Container as="section" class="py-6 md:py-8">
+      <SectionIntro
+        title="Color in CSS"
+        description="HEX is compact, RGB maps directly to channels, and HSL is often more convenient for adjusting hue, saturation and lightness."
+      />
+      <div class="grid gap-4 md:grid-cols-3">
+        <article class="rounded-lg border border-gray-800 bg-gray-950 p-5">
+          <h3 class="text-lg font-semibold">HEX</h3>
+          <p class="mt-3 text-sm leading-relaxed text-gray-400">
+            Each pair defines red, green and blue in base 16. It is common in
+            tokens, style guides and CSS stylesheets.
+          </p>
+        </article>
+        <article class="rounded-lg border border-gray-800 bg-gray-950 p-5">
+          <h3 class="text-lg font-semibold">RGB</h3>
+          <p class="mt-3 text-sm leading-relaxed text-gray-400">
+            Uses channels from 0 to 255. Modern syntax lets you store channels
+            as variables and apply transparency afterwards.
+          </p>
+        </article>
+        <article class="rounded-lg border border-gray-800 bg-gray-950 p-5">
+          <h3 class="text-lg font-semibold">HSL</h3>
+          <p class="mt-3 text-sm leading-relaxed text-gray-400">
+            Separates hue, saturation and lightness. It is useful for creating lighter and darker variants of a base color.
+          </p>
+        </article>
+      </div>
+    </Container>
+
+    <FaqSection faqs={faqs} />
+  </PageShell>
+</BaseLayout>
+
+<script>
+  import {
+    COLOR_SCALE_STEPS,
+    DEFAULT_COLOR_HEX,
+    DEFAULT_VARIABLE_NAME,
+    buildCssVariables,
+    calculateContrast,
+    createColorFromHsl,
+    createColorFromRgb,
+    formatHslClassic,
+    formatHslModern,
+    formatRgbClassic,
+    formatRgbModern,
+    generateColorScale,
+    getColorErrorMessage,
+    parseColorInput,
+    recommendTextColor,
+    sanitizeCssVariableName,
+  } from "@lib/calculators/programacion/paleta-hex-rgb-hsl/colorPalette.en";
+
+  const contrastLabels = {
+    fail: "Falla",
+    "aa-large": "AA grande",
+    "aa-normal": "AA normal",
+    aaa: "AAA",
+  };
+
+  function query(selector) {
+    const element = document.querySelector(selector);
+
+    if (!element) {
+      throw new Error(`Could not find element ${selector}.`);
+    }
+
+    return element;
+  }
+
+  function parseInitialColor(value) {
+    const result = parseColorInput(value);
+
+    if (!result.ok) {
+      throw new Error("The initial color is invalid.");
+    }
+
+    return result.color;
+  }
+
+  const colorInput = query("[data-color-input]");
+  const hexInput = query("[data-hex-input]");
+  const variableInput = query("[data-variable-input]");
+  const rInput = query("[data-r-input]");
+  const gInput = query("[data-g-input]");
+  const bInput = query("[data-b-input]");
+  const hInput = query("[data-h-input]");
+  const sInput = query("[data-s-input]");
+  const lInput = query("[data-l-input]");
+  const bgInput = query("[data-bg-input]");
+  const textInput = query("[data-text-input]");
+  const colorError = query("[data-color-error]");
+  const formatError = query("[data-format-error]");
+  const contrastError = query("[data-contrast-error]");
+  const copyStatus = query("[data-copy-status]");
+  const mainPreview = query("[data-main-preview]");
+  const previewButton = query("[data-preview-button]");
+  const previewOutline = query("[data-preview-outline]");
+  const previewHover = query("[data-preview-hover]");
+  const hexOutput = query("[data-hex-output]");
+  const rgbOutput = query("[data-rgb-output]");
+  const hslOutput = query("[data-hsl-output]");
+  const contrastRatio = query("[data-contrast-ratio]");
+  const contrastLevel = query("[data-contrast-level]");
+  const recommendedText = query("[data-recommended-text]");
+  const blackContrast = query("[data-black-contrast]");
+  const whiteContrast = query("[data-white-contrast]");
+  const recommendationWarning = query("[data-recommendation-warning]");
+  const cssOutput = query("[data-css-output]");
+  const cssSummary = query("[data-css-summary]");
+  const clearButton = query("[data-clear-tool]");
+  const useRecommendedButton = query("[data-use-recommended]");
+
+  let color = parseInitialColor(DEFAULT_COLOR_HEX);
+  let backgroundColor = color;
+  let textColor = parseInitialColor(recommendTextColor(backgroundColor.rgb).color);
+  let variableName = DEFAULT_VARIABLE_NAME;
+  let bgFollowsBase = true;
+  let textFollowsRecommendation = true;
+  let copyTimer = 0;
+  let hasUserChanged = false;
+
+  function setHiddenError(element, message) {
+    element.textContent = message;
+    element.classList.toggle("hidden", !message);
+  }
+
+  function setInputValue(element, value) {
+    element.value = value;
+  }
+
+  function getNumberInputValue(element) {
+    if (element.value.trim() === "") {
+      return null;
+    }
+
+    const value = Number(element.value);
+
+    return Number.isFinite(value) ? value : null;
+  }
+
+  function setColor(nextColor, options = {}) {
+    color = nextColor;
+
+    if (options.variableName) {
+      variableName = sanitizeCssVariableName(options.variableName);
+    }
+
+    if (bgFollowsBase || options.resetContrast) {
+      backgroundColor = color;
+      bgFollowsBase = true;
+    }
+
+    if (textFollowsRecommendation || options.resetContrast) {
+      textColor = parseInitialColor(
+        recommendTextColor(backgroundColor.rgb).color,
+      );
+      textFollowsRecommendation = true;
+    }
+
+    render(true);
+  }
+
+  function render(updateUrl) {
+    const recommendation = recommendTextColor(backgroundColor.rgb);
+    const contrast = calculateContrast(backgroundColor.rgb, textColor.rgb);
+    const scale = generateColorScale(color);
+    const css = buildCssVariables(color, variableName);
+
+    setInputValue(colorInput, color.hex);
+    setInputValue(hexInput, color.hex);
+    setInputValue(variableInput, variableName);
+    setInputValue(rInput, String(color.rgb.r));
+    setInputValue(gInput, String(color.rgb.g));
+    setInputValue(bInput, String(color.rgb.b));
+    setInputValue(hInput, String(color.hsl.h));
+    setInputValue(sInput, String(color.hsl.s));
+    setInputValue(lInput, String(color.hsl.l));
+    setInputValue(bgInput, backgroundColor.hex);
+    setInputValue(textInput, textColor.hex);
+
+    mainPreview.style.background = backgroundColor.hex;
+    mainPreview.style.color = textColor.hex;
+    previewButton.style.background = textColor.hex;
+    previewButton.style.color = backgroundColor.hex;
+    previewOutline.style.borderColor = textColor.hex;
+    previewHover.style.background = textColor.hex;
+    previewHover.style.color = backgroundColor.hex;
+
+    hexOutput.textContent = color.hex;
+    rgbOutput.textContent = formatRgbClassic(color.rgb);
+    hslOutput.textContent = formatHslClassic(color.hsl);
+
+    contrastRatio.textContent = `${contrast.ratio.toFixed(2)}:1`;
+    contrastLevel.textContent = contrastLabels[contrast.level];
+    contrastLevel.classList.toggle("text-red-300", contrast.level === "fail");
+    contrastLevel.classList.toggle("text-amber-300", contrast.level === "aa-large");
+    contrastLevel.classList.toggle(
+      "text-emerald-300",
+      contrast.level === "aa-normal" || contrast.level === "aaa",
+    );
+    recommendedText.textContent = recommendation.color;
+    blackContrast.textContent = `${recommendation.blackContrast.ratio.toFixed(2)}:1`;
+    whiteContrast.textContent = `${recommendation.whiteContrast.ratio.toFixed(2)}:1`;
+    recommendationWarning.classList.toggle(
+      "hidden",
+      recommendation.passesAANormal,
+    );
+
+    COLOR_SCALE_STEPS.forEach((step) => {
+      const swatch = query(`[data-scale-swatch="${step}"]`);
+      const hex = query(`[data-scale-hex="${step}"]`);
+
+      swatch.style.background = scale[step].hex;
+      swatch.setAttribute("aria-label", `Copy ${scale[step].hex}`);
+      hex.textContent = scale[step].hex;
+    });
+
+    cssOutput.textContent = css;
+    cssSummary.textContent = `--color-${variableName}`;
+
+    if (updateUrl) {
+      updateShareUrl();
+    }
+  }
+
+  function updateShareUrl() {
+    if (!hasUserChanged) {
+      return;
+    }
+
+    const url = new URL(window.location.href);
+
+    url.searchParams.set("color", color.hex.slice(1));
+    url.searchParams.set("name", variableName);
+    url.searchParams.set("bg", backgroundColor.hex.slice(1));
+    url.searchParams.set("text", textColor.hex.slice(1));
+    window.history.replaceState(null, "", `${url.pathname}?${url.searchParams}`);
+  }
+
+  function updateFromMainInput(value) {
+    const result = parseColorInput(value);
+
+    if (!result.ok) {
+      setHiddenError(colorError, getColorErrorMessage(result));
+      return;
+    }
+
+    setHiddenError(colorError, "");
+    setHiddenError(formatError, "");
+    setColor(result.color);
+  }
+
+  function updateFromHexInput(value) {
+    const result = parseColorInput(value);
+
+    if (!result.ok) {
+      setHiddenError(formatError, getColorErrorMessage(result));
+      return;
+    }
+
+    setHiddenError(colorError, "");
+    setHiddenError(formatError, "");
+    setColor({ ...result.color, format: "hex" });
+  }
+
+  function updateFromRgbInputs() {
+    const r = getNumberInputValue(rInput);
+    const g = getNumberInputValue(gInput);
+    const b = getNumberInputValue(bInput);
+
+    if (
+      r === null ||
+      g === null ||
+      b === null ||
+      !Number.isInteger(r) ||
+      !Number.isInteger(g) ||
+      !Number.isInteger(b) ||
+      r < 0 ||
+      r > 255 ||
+      g < 0 ||
+      g > 255 ||
+      b < 0 ||
+      b > 255
+    ) {
+      setHiddenError(formatError, "RGB must use integers from 0 to 255.");
+      return;
+    }
+
+    setHiddenError(colorError, "");
+    setHiddenError(formatError, "");
+    setColor(createColorFromRgb({ r, g, b }));
+  }
+
+  function updateFromHslInputs() {
+    const h = getNumberInputValue(hInput);
+    const s = getNumberInputValue(sInput);
+    const l = getNumberInputValue(lInput);
+
+    if (
+      h === null ||
+      s === null ||
+      l === null ||
+      h < 0 ||
+      h > 360 ||
+      s < 0 ||
+      s > 100 ||
+      l < 0 ||
+      l > 100
+    ) {
+      setHiddenError(formatError, "HSL must keep H from 0–360 and S/L from 0–100.");
+      return;
+    }
+
+    setHiddenError(colorError, "");
+    setHiddenError(formatError, "");
+    setColor(createColorFromHsl({ h, s, l }));
+  }
+
+  function updateContrastInput(target, value) {
+    const result = parseColorInput(value);
+
+    if (!result.ok) {
+      setHiddenError(contrastError, getColorErrorMessage(result));
+      return;
+    }
+
+    setHiddenError(contrastError, "");
+
+    if (target === "background") {
+      backgroundColor = result.color;
+      bgFollowsBase = result.color.hex === color.hex;
+
+      if (textFollowsRecommendation) {
+        textColor = parseInitialColor(recommendTextColor(backgroundColor.rgb).color);
+      }
+    } else {
+      textColor = result.color;
+      textFollowsRecommendation = false;
+    }
+
+    render(true);
+  }
+
+  function showCopyStatus(message) {
+    copyStatus.textContent = message;
+    window.clearTimeout(copyTimer);
+    copyTimer = window.setTimeout(() => {
+      copyStatus.textContent = "";
+    }, 2000);
+  }
+
+  async function copyText(text, message) {
+    try {
+      await navigator.clipboard.writeText(text);
+      showCopyStatus(message);
+    } catch {
+      const textarea = document.createElement("textarea");
+
+      textarea.value = text;
+      textarea.setAttribute("readonly", "");
+      textarea.style.position = "fixed";
+      textarea.style.opacity = "0";
+      document.body.append(textarea);
+      textarea.select();
+
+      try {
+        document.execCommand("copy");
+        showCopyStatus(message);
+      } catch {
+        showCopyStatus("Could not copy.");
+      } finally {
+        textarea.remove();
+      }
+    }
+  }
+
+  function getCopyValue(kind) {
+    switch (kind) {
+      case "hex":
+        return { value: color.hex, message: "HEX copied." };
+      case "rgb":
+        return { value: formatRgbClassic(color.rgb), message: "RGB copied." };
+      case "hsl":
+        return { value: formatHslClassic(color.hsl), message: "HSL copied." };
+      case "var":
+        return {
+          value: `--color-${variableName}: ${color.hex};`,
+          message: "Variable copiada.",
+        };
+      case "css":
+        return { value: cssOutput.textContent ?? "", message: "CSS copied." };
+      case "rgb-modern":
+        return { value: formatRgbModern(color.rgb), message: "RGB copied." };
+      case "hsl-modern":
+        return { value: formatHslModern(color.hsl), message: "HSL copied." };
+      default:
+        return null;
+    }
+  }
+
+  function initializeFromUrl() {
+    const params = new URLSearchParams(window.location.search);
+    const colorParam = params.get("color");
+    const nameParam = params.get("name");
+    const bgParam = params.get("bg");
+    const textParam = params.get("text");
+
+    if (nameParam) {
+      variableName = sanitizeCssVariableName(nameParam);
+    }
+
+    if (colorParam) {
+      const parsedColor = parseColorInput(colorParam);
+
+      if (parsedColor.ok) {
+        color = parsedColor.color;
+        backgroundColor = color;
+      }
+    }
+
+    if (bgParam) {
+      const parsedBackground = parseColorInput(bgParam);
+
+      if (parsedBackground.ok) {
+        backgroundColor = parsedBackground.color;
+        bgFollowsBase = backgroundColor.hex === color.hex;
+      }
+    }
+
+    if (textParam) {
+      const parsedText = parseColorInput(textParam);
+
+      if (parsedText.ok) {
+        textColor = parsedText.color;
+        textFollowsRecommendation = false;
+      }
+    } else {
+      textColor = parseInitialColor(recommendTextColor(backgroundColor.rgb).color);
+    }
+
+    hasUserChanged = Boolean(window.location.search);
+    render(Boolean(window.location.search));
+  }
+
+  colorInput.addEventListener("input", () => {
+    hasUserChanged = true;
+    updateFromMainInput(colorInput.value);
+  });
+
+  hexInput.addEventListener("input", () => {
+    hasUserChanged = true;
+    updateFromHexInput(hexInput.value);
+  });
+
+  [rInput, gInput, bInput].forEach((input) => {
+    input.addEventListener("input", () => {
+      hasUserChanged = true;
+      updateFromRgbInputs();
+    });
+  });
+
+  [hInput, sInput, lInput].forEach((input) => {
+    input.addEventListener("input", () => {
+      hasUserChanged = true;
+      updateFromHslInputs();
+    });
+  });
+
+  variableInput.addEventListener("input", () => {
+    hasUserChanged = true;
+    variableName = sanitizeCssVariableName(variableInput.value);
+    render(true);
+  });
+
+  bgInput.addEventListener("input", () => {
+    hasUserChanged = true;
+    updateContrastInput("background", bgInput.value);
+  });
+
+  textInput.addEventListener("input", () => {
+    hasUserChanged = true;
+    updateContrastInput("text", textInput.value);
+  });
+
+  useRecommendedButton.addEventListener("click", () => {
+    hasUserChanged = true;
+    textColor = parseInitialColor(recommendTextColor(backgroundColor.rgb).color);
+    textFollowsRecommendation = true;
+    render(true);
+  });
+
+  clearButton.addEventListener("click", () => {
+    hasUserChanged = true;
+    color = parseInitialColor(DEFAULT_COLOR_HEX);
+    backgroundColor = color;
+    variableName = DEFAULT_VARIABLE_NAME;
+    bgFollowsBase = true;
+    textFollowsRecommendation = true;
+    textColor = parseInitialColor(recommendTextColor(backgroundColor.rgb).color);
+    setHiddenError(colorError, "");
+    setHiddenError(formatError, "");
+    setHiddenError(contrastError, "");
+    render(true);
+    colorInput.focus();
+  });
+
+  document.addEventListener("click", (event) => {
+    if (!(event.target instanceof Element)) {
+      return;
+    }
+
+    const copyButton = event.target.closest("[data-copy-kind]");
+
+    if (copyButton) {
+      const copy = getCopyValue(copyButton.dataset.copyKind);
+
+      if (copy) {
+        copyText(copy.value, copy.message);
+      }
+
+      return;
+    }
+
+    const swatchButton = event.target.closest("[data-scale-swatch]");
+
+    if (swatchButton) {
+      const step = Number(swatchButton.dataset.scaleSwatch);
+      const scale = generateColorScale(color);
+      const scaleColor = scale[step];
+
+      if (scaleColor) {
+        copyText(scaleColor.hex, `Color ${step} copied.`);
+      }
+
+      return;
+    }
+
+    const exampleButton = event.target.closest("[data-example-color]");
+
+    if (!exampleButton) {
+      return;
+    }
+
+    const parsedExample = parseColorInput(exampleButton.dataset.exampleColor ?? "");
+
+    if (!parsedExample.ok) {
+      return;
+    }
+
+    hasUserChanged = true;
+    setColor(parsedExample.color, {
+      variableName: exampleButton.dataset.exampleName,
+      resetContrast: true,
+    });
+    colorInput.focus();
+    document.querySelector("#color-palette-tool")?.scrollIntoView({
+      behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches
+        ? "auto"
+        : "smooth",
+      block: "start",
+    });
+  });
+
+  initializeFromUrl();
+</script>

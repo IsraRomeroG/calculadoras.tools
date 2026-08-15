@@ -1,0 +1,763 @@
+---
+import AdSlot from "@components/ads/AdSlot.astro";
+import Container from "@components/layout/Container.astro";
+import PageShell from "@components/layout/PageShell.astro";
+import FaqSection from "@components/shared/FaqSection.astro";
+import PageHero from "@components/shared/PageHero.astro";
+import SectionIntro from "@components/shared/SectionIntro.astro";
+import BaseLayout from "@layouts/BaseLayout.astro";
+import { ANNUAL_BONUS_CANONICAL_PATH } from "@lib/calculators/legal-impuestos/calculadora-aguinaldo-proporcional/proportionalBonus";
+import { MEXICO_ANNUAL_BONUS_RULE_2026 } from "@lib/calculators/legal-impuestos/calculadora-aguinaldo-proporcional/rules/mx/2026";
+import { buildFaqJsonLd } from "@lib/seo";
+
+const title = "Calculadora de aguinaldo proporcional en México";
+const description =
+  "Calcula tu aguinaldo proporcional en México según tu salario, fecha de ingreso y días trabajados. Consulta la fórmula y la regla utilizada.";
+
+const faqs = [
+  {
+    question: "¿Cuántos días de aguinaldo corresponden como mínimo en México?",
+    answer:
+      "La Ley Federal del Trabajo establece al menos 15 días de salario. Si tu contrato reconoce una prestación superior, puedes capturarla en los ajustes de la calculadora.",
+  },
+  {
+    question: "¿Tengo derecho si trabajé menos de un año?",
+    answer:
+      "Sí. El artículo 87 de la LFT reconoce la parte proporcional conforme al tiempo trabajado, incluso si ya no laboras al momento de pagarse el aguinaldo.",
+  },
+  {
+    question: "¿Cómo calculo mi salario diario si me pagan al mes?",
+    answer:
+      "La calculadora divide el salario mensual entre 30. También admite importes diarios, semanales y quincenales, y muestra la conversión utilizada en el desglose.",
+  },
+  {
+    question: "¿Puedo usarla si recibo comisiones o mi salario cambia?",
+    answer:
+      "No para el cálculo automático del MVP. Los salarios variables, mixtos, por comisión o por unidad de obra requieren periodos de promedio y reglas específicas; consulta tus recibos y orientación especializada.",
+  },
+  {
+    question: "¿Debo descontar vacaciones, licencias o incapacidades?",
+    answer:
+      "No las descuentes automáticamente. PROFEDET incluye, entre otros periodos, vacaciones, descansos semanales, licencias de maternidad o paternidad e incapacidades por riesgo de trabajo. Usa el ajuste sólo para días confirmados como no computables en tu caso.",
+  },
+  {
+    question: "¿El resultado ya incluye ISR?",
+    answer:
+      "No. El resultado es bruto, antes de ISR, retenciones, descuentos o ajustes de nómina. Por eso sólo debe compararse con un importe recibido que también sea bruto.",
+  },
+  {
+    question: "¿La estimación es oficial?",
+    answer:
+      "No. Es una estimación informativa bajo el régimen general de la LFT. El contrato, convenio colectivo, régimen laboral, ausencias y hechos específicos pueden cambiar el resultado.",
+  },
+];
+
+const faqJsonLd = buildFaqJsonLd(faqs);
+const inputClass =
+  "mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-900 px-4 text-base text-white outline-none transition placeholder:text-gray-600 focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15 disabled:cursor-not-allowed disabled:opacity-60";
+---
+
+<BaseLayout
+  title={title}
+  description={description}
+  canonical={ANNUAL_BONUS_CANONICAL_PATH}
+>
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={JSON.stringify(faqJsonLd)} />
+  </Fragment>
+
+  <PageShell class="pb-24 lg:pb-0">
+    <PageHero
+      title="Calculadora de aguinaldo proporcional"
+      description="Estima cuánto aguinaldo bruto has generado en México y revisa el cálculo completo con fechas, salario y fuentes oficiales."
+      kicker="Legal e impuestos"
+      kickerHref="/legal-impuestos"
+      collapseBreadcrumbOnMobile
+      containerClass="py-6 md:py-8"
+      breadcrumbs={[
+        { label: "Inicio", href: "/", ariaLabel: "Inicio" },
+        { label: "Legal e impuestos", href: "/legal-impuestos", optional: true },
+        { label: "Aguinaldo proporcional", truncate: true },
+      ]}
+    />
+
+    <Container as="section" class="py-6 md:py-8">
+      <section
+        id="annual-bonus-calculator"
+        class="overflow-hidden rounded-xl border border-gray-700 bg-gray-950 shadow-xl shadow-gray-950/30"
+        aria-labelledby="annual-bonus-heading"
+      >
+        <div class="border-b border-gray-700 p-4 sm:p-6">
+          <p class="text-sm font-semibold uppercase tracking-wide text-amber-400">
+            Paso 1 · Tu situación
+          </p>
+          <h2 id="annual-bonus-heading" class="mt-2 text-xl font-semibold">
+            Calcula lo generado en un año
+          </h2>
+          <p class="mt-2 max-w-3xl text-sm leading-relaxed text-gray-400">
+            Usaremos el año de la fecha final. Si ingresaste antes, el periodo
+            comienza el 1 de enero; nunca se acumula más de un año por cálculo.
+          </p>
+        </div>
+
+        <div class="grid lg:grid-cols-[minmax(0,1.08fr)_minmax(19rem,0.92fr)]">
+          <form class="p-4 sm:p-6" data-bonus-form novalidate>
+            <fieldset>
+              <legend class="sr-only">Situación laboral</legend>
+              <div class="grid gap-3 sm:grid-cols-2">
+                <label class="relative cursor-pointer rounded-xl border border-amber-400 bg-amber-400/10 p-4 transition focus-within:ring-3 focus-within:ring-amber-400/30" data-mode-card="active">
+                  <input class="sr-only" type="radio" name="employment-status" value="active" checked data-mode />
+                  <span class="block font-semibold text-white">Sigo trabajando</span>
+                  <span class="mt-1 block text-sm leading-relaxed text-gray-400">Calcula lo generado hasta una fecha de corte.</span>
+                </label>
+                <label class="relative cursor-pointer rounded-xl border border-gray-700 bg-gray-900 p-4 transition focus-within:ring-3 focus-within:ring-amber-400/30" data-mode-card="terminated">
+                  <input class="sr-only" type="radio" name="employment-status" value="terminated" data-mode />
+                  <span class="block font-semibold text-white">Terminó mi relación laboral</span>
+                  <span class="mt-1 block text-sm leading-relaxed text-gray-400">Usa como fecha final tu último día.</span>
+                </label>
+              </div>
+            </fieldset>
+
+            <div class="mt-5 rounded-lg border border-blue-900/70 bg-blue-950/30 p-4 text-sm text-blue-100">
+              <p class="font-medium">
+                México · relación privada general · trabajo continuo · salario fijo
+              </p>
+              <details class="mt-2 text-blue-200/80">
+                <summary class="cursor-pointer font-semibold underline decoration-blue-500/50 underline-offset-4">
+                  Mi caso es diferente
+                </summary>
+                <p class="mt-2 leading-relaxed">
+                  Si tu salario cambia, recibes comisiones o propinas, trabajas por
+                  temporada, plataformas digitales, sector público o un régimen
+                  especial, este cálculo automático puede no corresponder a tu caso.
+                  Consulta tus recibos y solicita orientación a PROFEDET.
+                </p>
+              </details>
+            </div>
+
+            <div class="mt-6 grid gap-5 sm:grid-cols-2">
+              <div>
+                <label for="bonus-hire-date" class="block text-sm font-medium text-gray-200">
+                  Fecha de ingreso
+                </label>
+                <input id="bonus-hire-date" class={inputClass} type="date" required data-field="hireDate" aria-describedby="bonus-hire-date-error" />
+                <p id="bonus-hire-date-error" class="mt-2 hidden text-sm text-red-300" data-error-for="hireDate"></p>
+              </div>
+              <div>
+                <label for="bonus-end-date" class="block text-sm font-medium text-gray-200" data-end-label>
+                  Fecha de cálculo
+                </label>
+                <input id="bonus-end-date" class={inputClass} type="date" required data-field="endDate" aria-describedby="bonus-end-help bonus-end-date-error" />
+                <p id="bonus-end-help" class="mt-2 text-xs leading-relaxed text-gray-500">La fecha final se cuenta como día inclusivo.</p>
+                <p id="bonus-end-date-error" class="mt-2 hidden text-sm text-red-300" data-error-for="endDate"></p>
+              </div>
+            </div>
+
+            <div class="mt-5 grid gap-5 sm:grid-cols-2">
+              <div>
+                <label for="bonus-salary" class="block text-sm font-medium text-gray-200">
+                  Salario bruto fijo
+                </label>
+                <div class="mt-2 flex rounded-lg border border-gray-700 bg-gray-900 focus-within:border-amber-400 focus-within:ring-3 focus-within:ring-amber-400/15">
+                  <span class="flex items-center pl-4 text-gray-500">$</span>
+                  <input id="bonus-salary" class="min-h-12 w-full bg-transparent px-3 pr-4 text-base text-white outline-none placeholder:text-gray-600" type="text" inputmode="decimal" autocomplete="off" placeholder="18,000" data-field="salary" aria-describedby="bonus-salary-help bonus-salary-error" />
+                  <span class="flex items-center pr-4 text-xs font-semibold text-gray-500">MXN</span>
+                </div>
+                <p id="bonus-salary-help" class="mt-2 text-xs leading-relaxed text-gray-500">Antes de impuestos y descuentos.</p>
+                <p id="bonus-salary-error" class="mt-2 hidden text-sm text-red-300" data-error-for="salary"></p>
+              </div>
+              <div>
+                <label for="bonus-frequency" class="block text-sm font-medium text-gray-200">
+                  Frecuencia del salario
+                </label>
+                <select id="bonus-frequency" class={inputClass} data-field="salaryFrequency">
+                  <option value="daily">Diario</option>
+                  <option value="weekly">Semanal</option>
+                  <option value="biweekly">Quincenal</option>
+                  <option value="monthly" selected>Mensual</option>
+                </select>
+                <p class="mt-2 text-xs leading-relaxed text-gray-500">Mostraremos la conversión a salario diario.</p>
+              </div>
+            </div>
+
+            <details class="mt-6 rounded-xl border border-gray-800 bg-gray-900/50 p-4" data-advanced>
+              <summary class="cursor-pointer list-none text-sm font-semibold text-white">
+                <span class="flex items-center justify-between gap-4">
+                  <span>Ajustar prestación y ausencias</span>
+                  <span class="text-xs font-normal text-gray-500">Opcional</span>
+                </span>
+              </summary>
+
+              <div class="mt-5 grid gap-5 sm:grid-cols-2">
+                <div>
+                  <label for="bonus-annual-days" class="block text-sm font-medium text-gray-200">
+                    Días de aguinaldo según contrato
+                  </label>
+                  <input id="bonus-annual-days" class={inputClass} type="text" inputmode="decimal" autocomplete="off" value={String(MEXICO_ANNUAL_BONUS_RULE_2026.minimumDays)} data-field="annualDays" aria-describedby="bonus-annual-days-help bonus-annual-days-error" />
+                  <p id="bonus-annual-days-help" class="mt-2 text-xs leading-relaxed text-gray-500">Mínimo legal del preset: {MEXICO_ANNUAL_BONUS_RULE_2026.minimumDays} días.</p>
+                  <p id="bonus-annual-days-error" class="mt-2 hidden text-sm text-red-300" data-error-for="annualDays"></p>
+                </div>
+                <div>
+                  <label for="bonus-non-eligible" class="block text-sm font-medium text-gray-200">
+                    Días confirmados que no computan
+                  </label>
+                  <input id="bonus-non-eligible" class={inputClass} type="text" inputmode="numeric" autocomplete="off" value="0" data-field="nonEligibleDays" aria-describedby="bonus-non-eligible-help bonus-non-eligible-error" />
+                  <p id="bonus-non-eligible-help" class="mt-2 text-xs leading-relaxed text-gray-500">Usa días enteros y sólo si confirmaste su tratamiento.</p>
+                  <p id="bonus-non-eligible-error" class="mt-2 hidden text-sm text-red-300" data-error-for="nonEligibleDays"></p>
+                </div>
+              </div>
+
+              <div class="mt-5 rounded-lg border border-amber-800/60 bg-amber-950/20 p-4">
+                <p class="text-xs leading-relaxed text-amber-100/90">
+                  No restes automáticamente vacaciones, descansos semanales,
+                  licencias de maternidad o paternidad ni incapacidades por riesgo
+                  de trabajo. La herramienta no determina el tratamiento de cada ausencia.
+                </p>
+                <label class="mt-3 flex min-h-11 cursor-pointer items-start gap-3">
+                  <input class="mt-1 h-5 w-5 shrink-0 accent-amber-400" type="checkbox" data-field="absenceConfirmation" />
+                  <span class="text-sm text-gray-300">Confirmo que revisé esta ayuda si descuento días.</span>
+                </label>
+                <p class="mt-2 hidden text-sm text-red-300" data-error-for="absenceConfirmation"></p>
+              </div>
+
+              <div class="mt-5 space-y-4">
+                <label class="flex min-h-11 cursor-pointer items-start gap-3" data-projection-label>
+                  <input class="mt-1 h-5 w-5 shrink-0 accent-amber-400" type="checkbox" data-field="projection" />
+                  <span>
+                    <span class="block text-sm font-semibold text-gray-200">Proyectar al 31 de diciembre</span>
+                    <span class="mt-1 block text-xs leading-relaxed text-gray-500">Supone que continúas trabajando y no agregas más días no elegibles.</span>
+                  </span>
+                </label>
+
+                <div>
+                  <label for="bonus-received" class="block text-sm font-medium text-gray-200">
+                    Aguinaldo bruto recibido por ese año
+                  </label>
+                  <div class="mt-2 flex rounded-lg border border-gray-700 bg-gray-900 focus-within:border-amber-400 focus-within:ring-3 focus-within:ring-amber-400/15">
+                    <span class="flex items-center pl-4 text-gray-500">$</span>
+                    <input id="bonus-received" class="min-h-12 w-full bg-transparent px-3 pr-4 text-base text-white outline-none placeholder:text-gray-600" type="text" inputmode="decimal" autocomplete="off" placeholder="Opcional" data-field="receivedAmount" aria-describedby="bonus-received-help bonus-received-error" />
+                    <span class="flex items-center pr-4 text-xs font-semibold text-gray-500">MXN</span>
+                  </div>
+                  <p id="bonus-received-help" class="mt-2 text-xs leading-relaxed text-gray-500">Déjalo vacío si sólo conoces el importe neto.</p>
+                  <p id="bonus-received-error" class="mt-2 hidden text-sm text-red-300" data-error-for="receivedAmount"></p>
+                </div>
+              </div>
+            </details>
+
+            <p class="mt-5 hidden rounded-lg border border-red-900/60 bg-red-950/30 p-3 text-sm leading-relaxed text-red-200 outline-none" role="alert" tabindex="-1" data-form-error></p>
+            <p class="sr-only" aria-live="polite" data-form-status></p>
+
+            <div class="mt-6 flex flex-col-reverse gap-3 border-t border-gray-800 pt-5 sm:flex-row sm:justify-between">
+              <button class="inline-flex min-h-12 items-center justify-center rounded-lg border border-gray-700 px-5 py-3 text-sm font-semibold text-gray-200 transition hover:border-amber-400 hover:text-white focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/40" type="button" data-clear>
+                Limpiar
+              </button>
+              <button class="inline-flex min-h-12 items-center justify-center rounded-lg bg-amber-400 px-6 py-3 text-sm font-bold text-gray-950 transition hover:bg-amber-300 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/40" type="submit">
+                Calcular aguinaldo
+              </button>
+            </div>
+          </form>
+
+          <aside id="annual-bonus-result" class="scroll-mt-4 border-t border-gray-800 bg-gray-900/70 p-4 outline-none sm:p-6 lg:border-l lg:border-t-0" aria-live="polite" aria-atomic="false" tabindex="-1" data-result-region>
+            <p class="text-sm font-semibold uppercase tracking-wide text-amber-400" data-result-kicker>Resultado</p>
+            <h3 class="mt-3 text-lg font-semibold text-gray-200">Aguinaldo bruto generado</h3>
+            <p class="mt-2 break-words text-4xl font-bold leading-tight text-white sm:text-5xl" data-main-result>—</p>
+            <p class="mt-3 text-sm leading-relaxed text-gray-400" data-result-context>Completa tus datos para obtener la estimación.</p>
+
+            <div class="mt-6 hidden grid-cols-2 gap-3" data-result-metrics>
+              <div class="rounded-lg border border-gray-800 bg-gray-950/70 p-3">
+                <p class="text-xs text-gray-500">Días elegibles</p>
+                <p class="mt-1 font-semibold text-white" data-eligible-days>—</p>
+              </div>
+              <div class="rounded-lg border border-gray-800 bg-gray-950/70 p-3">
+                <p class="text-xs text-gray-500">Proporción generada</p>
+                <p class="mt-1 font-semibold text-white" data-generated-proportion>—</p>
+              </div>
+              <div class="rounded-lg border border-gray-800 bg-gray-950/70 p-3">
+                <p class="text-xs text-gray-500">Salario diario</p>
+                <p class="mt-1 break-words text-sm font-semibold text-white" data-daily-salary>—</p>
+              </div>
+              <div class="rounded-lg border border-gray-800 bg-gray-950/70 p-3">
+                <p class="text-xs text-gray-500">Año completo</p>
+                <p class="mt-1 break-words text-sm font-semibold text-white" data-annual-equivalent>—</p>
+              </div>
+            </div>
+
+            <div class="mt-5 hidden rounded-lg border border-emerald-800/60 bg-emerald-950/20 p-4" data-projection-result>
+              <p class="text-xs font-semibold uppercase tracking-wide text-emerald-300">Proyección al 31 de diciembre</p>
+              <p class="mt-2 break-words text-2xl font-bold text-white" data-projected-amount>—</p>
+              <p class="mt-2 text-xs leading-relaxed text-gray-400">Si continúas trabajando y no agregas más días no elegibles.</p>
+            </div>
+
+            <div class="mt-5 hidden rounded-lg border border-blue-800/60 bg-blue-950/20 p-4" data-comparison-result>
+              <p class="text-sm font-semibold text-blue-100" data-comparison-label></p>
+              <p class="mt-1 text-xs leading-relaxed text-blue-200/70">Comparación informativa; no determina una deuda ni un incumplimiento.</p>
+            </div>
+
+            <p class="mt-5 hidden rounded-lg border border-amber-800/70 bg-amber-950/30 p-3 text-sm leading-relaxed text-amber-100" data-result-warning></p>
+
+            <details class="mt-5 rounded-lg border border-gray-800 bg-gray-950/50 p-4" data-formula-details>
+              <summary class="cursor-pointer text-sm font-semibold text-white">Cómo se calculó</summary>
+              <div class="mt-3 space-y-2 text-sm leading-relaxed text-gray-400" data-formula>Aquí aparecerán las fechas y valores sustituidos.</div>
+            </details>
+
+            <div class="mt-5 rounded-lg border border-gray-800 bg-gray-950/50 p-4">
+              <p class="text-sm font-semibold text-white">México · LFT · artículo 87</p>
+              <p class="mt-2 text-xs text-gray-500">
+                Regla {MEXICO_ANNUAL_BONUS_RULE_2026.ruleVersion} · Fuentes revisadas el {MEXICO_ANNUAL_BONUS_RULE_2026.reviewedAt}
+              </p>
+              <div class="mt-3 flex flex-wrap gap-x-4 gap-y-2 text-sm">
+                {MEXICO_ANNUAL_BONUS_RULE_2026.sources.map((source) => (
+                  <a class="font-semibold text-amber-400 hover:text-amber-300 hover:underline" href={source.url} target="_blank" rel="noreferrer">{source.title}</a>
+                ))}
+              </div>
+            </div>
+
+            <p class="mt-5 text-xs leading-relaxed text-gray-500">
+              Estimación informativa y bruta. No incluye ISR ni sustituye una
+              resolución, asesoría legal o revisión de tus documentos laborales.
+            </p>
+
+            <button class="mt-5 hidden min-h-11 w-full items-center justify-center rounded-lg border border-amber-400/60 px-4 py-2 text-sm font-semibold text-amber-300 transition hover:bg-amber-400/10 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/30" type="button" data-copy-result>
+              <span data-copy-label>Copiar resultado</span>
+            </button>
+            <p class="sr-only" aria-live="polite" data-copy-status></p>
+          </aside>
+        </div>
+      </section>
+    </Container>
+
+    <AdSlot placement="calculator-after-tool" />
+
+    <Container as="section" class="py-8">
+      <SectionIntro
+        title="Cómo interpretar la estimación"
+        description="El resultado conserva separados el salario, el periodo y los ajustes para que puedas contrastarlo con tus documentos."
+      />
+      <div class="grid gap-4 md:grid-cols-3">
+        <article class="rounded-xl border border-gray-700 bg-gray-950 p-5">
+          <h3 class="font-semibold text-white">Salario diario</h3>
+          <p class="mt-2 text-sm leading-relaxed text-gray-400">Un salario semanal se divide entre 7, uno quincenal entre 15 y uno mensual entre 30. La conversión exacta aparece en el desglose.</p>
+        </article>
+        <article class="rounded-xl border border-gray-700 bg-gray-950 p-5">
+          <h3 class="font-semibold text-white">Días inclusivos</h3>
+          <p class="mt-2 text-sm leading-relaxed text-gray-400">Se cuenta tanto el primer día como la fecha final y el cálculo se limita al año mostrado, con una base real de 365 o 366 días.</p>
+        </article>
+        <article class="rounded-xl border border-gray-700 bg-gray-950 p-5">
+          <h3 class="font-semibold text-white">Importe bruto</h3>
+          <p class="mt-2 text-sm leading-relaxed text-gray-400">Es el valor antes de ISR y otros ajustes de nómina. Para comparar, usa únicamente un pago recibido que también sea bruto.</p>
+        </article>
+      </div>
+    </Container>
+
+    <FaqSection faqs={faqs} />
+
+    <div class="fixed inset-x-0 bottom-0 z-40 hidden border-t border-gray-700 bg-gray-950/95 px-4 py-3 shadow-2xl backdrop-blur lg:hidden" style="padding-bottom: max(0.75rem, env(safe-area-inset-bottom));" data-mobile-summary>
+      <div class="mx-auto flex max-w-5xl items-center justify-between gap-4">
+        <div class="min-w-0">
+          <p class="truncate text-xs font-semibold uppercase tracking-wide text-gray-500">Aguinaldo generado</p>
+          <p class="truncate text-lg font-bold text-white" data-mobile-result>—</p>
+        </div>
+        <a class="shrink-0 rounded-lg border border-amber-400/60 px-3 py-2 text-sm font-semibold text-amber-300" href="#annual-bonus-result">Ver desglose</a>
+      </div>
+    </div>
+  </PageShell>
+</BaseLayout>
+
+<script>
+  import {
+    AnnualBonusValidationError,
+    calculateProportionalAnnualBonus,
+    formatAnnualBonusDate,
+    formatAnnualBonusMoney,
+    formatAnnualBonusNumber,
+    formatAnnualBonusPercent,
+    parseLocalizedNumber,
+  } from "@lib/calculators/legal-impuestos/calculadora-aguinaldo-proporcional/proportionalBonus";
+  import type {
+    EmploymentStatus,
+    SalaryFrequency,
+  } from "@lib/calculators/legal-impuestos/calculadora-aguinaldo-proporcional/proportionalBonus";
+
+  const form = document.querySelector<HTMLFormElement>("[data-bonus-form]");
+  const modeInputs = Array.from(document.querySelectorAll<HTMLInputElement>("[data-mode]"));
+  const trackedFields = Array.from(document.querySelectorAll<HTMLInputElement | HTMLSelectElement>("[data-field]"));
+  const endLabel = document.querySelector<HTMLElement>("[data-end-label]");
+  const endInput = document.querySelector<HTMLInputElement>('[data-field="endDate"]');
+  const projectionInput = document.querySelector<HTMLInputElement>('[data-field="projection"]');
+  const projectionLabel = document.querySelector<HTMLElement>("[data-projection-label]");
+  const formError = document.querySelector<HTMLElement>("[data-form-error]");
+  const formStatus = document.querySelector<HTMLElement>("[data-form-status]");
+  const resultRegion = document.querySelector<HTMLElement>("[data-result-region]");
+  const resultKicker = document.querySelector<HTMLElement>("[data-result-kicker]");
+  const mainResult = document.querySelector<HTMLElement>("[data-main-result]");
+  const resultContext = document.querySelector<HTMLElement>("[data-result-context]");
+  const resultMetrics = document.querySelector<HTMLElement>("[data-result-metrics]");
+  const projectionResult = document.querySelector<HTMLElement>("[data-projection-result]");
+  const comparisonResult = document.querySelector<HTMLElement>("[data-comparison-result]");
+  const comparisonLabel = document.querySelector<HTMLElement>("[data-comparison-label]");
+  const resultWarning = document.querySelector<HTMLElement>("[data-result-warning]");
+  const formula = document.querySelector<HTMLElement>("[data-formula]");
+  const copyButton = document.querySelector<HTMLButtonElement>("[data-copy-result]");
+  const copyLabel = document.querySelector<HTMLElement>("[data-copy-label]");
+  const copyStatus = document.querySelector<HTMLElement>("[data-copy-status]");
+  const clearButton = document.querySelector<HTMLButtonElement>("[data-clear]");
+  const mobileSummary = document.querySelector<HTMLElement>("[data-mobile-summary]");
+  const mobileResult = document.querySelector<HTMLElement>("[data-mobile-result]");
+  let copyText = "";
+  let copyTimeout = 0;
+  let hasFreshResult = false;
+  let resultIsVisible = false;
+
+  const today = getLocalIsoDate();
+
+  if (endInput) {
+    endInput.value = today;
+    endInput.max = today;
+  }
+
+  function getLocalIsoDate() {
+    const now = new Date();
+    return [
+      String(now.getFullYear()).padStart(4, "0"),
+      String(now.getMonth() + 1).padStart(2, "0"),
+      String(now.getDate()).padStart(2, "0"),
+    ].join("-");
+  }
+
+  function getField<T extends HTMLInputElement | HTMLSelectElement>(name: string) {
+    return document.querySelector<T>(`[data-field="${name}"]`);
+  }
+
+  function getMode(): EmploymentStatus {
+    return (document.querySelector<HTMLInputElement>("[data-mode]:checked")?.value ?? "active") as EmploymentStatus;
+  }
+
+  function setFieldError(name: string, message = "") {
+    const field = getField(name);
+    const error = document.querySelector<HTMLElement>(`[data-error-for="${name}"]`);
+
+    field?.setAttribute("aria-invalid", message ? "true" : "false");
+
+    if (error) {
+      error.textContent = message;
+      error.classList.toggle("hidden", !message);
+    }
+  }
+
+  function clearErrors() {
+    ["hireDate", "endDate", "salary", "annualDays", "nonEligibleDays", "absenceConfirmation", "receivedAmount"].forEach((name) => setFieldError(name));
+    if (formError) {
+      formError.textContent = "";
+      formError.classList.add("hidden");
+    }
+  }
+
+  function showFormError(message: string) {
+    if (!formError) return;
+    formError.textContent = message;
+    formError.classList.remove("hidden");
+    formError.focus();
+  }
+
+  function readNumber(name: string, options: { required?: boolean; maximumDecimals?: number } = {}) {
+    const field = getField<HTMLInputElement>(name);
+    const parsed = parseLocalizedNumber(field?.value ?? "", options);
+    const messages = {
+      required: "Completa este campo.",
+      invalid: "Usa un número válido.",
+      negative: "El valor no puede ser negativo.",
+      too_many_decimals: `Usa como máximo ${options.maximumDecimals ?? 4} decimales.`,
+    };
+
+    if (!parsed.ok) {
+      setFieldError(name, messages[parsed.error]);
+      return null;
+    }
+
+    setFieldError(name);
+    return parsed.value;
+  }
+
+  function updateModeUi() {
+    const mode = getMode();
+    modeInputs.forEach((input) => {
+      const card = document.querySelector<HTMLElement>(`[data-mode-card="${input.value}"]`);
+      const selected = input.checked;
+      card?.classList.toggle("border-amber-400", selected);
+      card?.classList.toggle("bg-amber-400/10", selected);
+      card?.classList.toggle("border-gray-700", !selected);
+      card?.classList.toggle("bg-gray-900", !selected);
+    });
+
+    if (endLabel) {
+      endLabel.textContent = mode === "active" ? "Fecha de cálculo" : "Último día de la relación";
+    }
+
+    updateProjectionAvailability();
+  }
+
+  function updateProjectionAvailability() {
+    if (!projectionInput || !projectionLabel) return;
+    const yearEnd = `${today.slice(0, 4)}-12-31`;
+    const available =
+      getMode() === "active" &&
+      Boolean(endInput?.value) &&
+      endInput.value.slice(0, 4) === today.slice(0, 4) &&
+      endInput.value < yearEnd;
+
+    projectionInput.disabled = !available;
+    if (!available) projectionInput.checked = false;
+    projectionLabel.classList.toggle("opacity-50", !available);
+  }
+
+  function resetResult() {
+    hasFreshResult = false;
+    if (resultKicker) resultKicker.textContent = "Resultado";
+    if (mainResult) mainResult.textContent = "—";
+    if (resultContext) resultContext.textContent = "Completa tus datos para obtener la estimación.";
+    resultMetrics?.classList.add("hidden");
+    resultMetrics?.classList.remove("grid");
+    projectionResult?.classList.add("hidden");
+    comparisonResult?.classList.add("hidden");
+    resultWarning?.classList.add("hidden");
+    if (resultWarning) resultWarning.textContent = "";
+    if (formula) formula.textContent = "Aquí aparecerán las fechas y valores sustituidos.";
+    copyButton?.classList.add("hidden");
+    copyButton?.classList.remove("flex");
+    mobileSummary?.classList.add("hidden");
+    copyText = "";
+  }
+
+  function invalidateResult() {
+    if (!hasFreshResult) return;
+    hasFreshResult = false;
+    if (resultKicker) resultKicker.textContent = "Datos modificados";
+    if (resultContext) resultContext.textContent = "Vuelve a calcular para actualizar este resultado.";
+    mobileSummary?.classList.add("hidden");
+    if (formStatus) formStatus.textContent = "Los datos cambiaron; el resultado anterior está desactualizado.";
+  }
+
+  function updateMobileSummary() {
+    if (!mobileSummary) return;
+    mobileSummary.classList.toggle("hidden", !hasFreshResult || resultIsVisible);
+  }
+
+  function renderResult(result: ReturnType<typeof calculateProportionalAnnualBonus>) {
+    hasFreshResult = true;
+    if (resultKicker) resultKicker.textContent = "Resultado";
+    if (mainResult) mainResult.textContent = formatAnnualBonusMoney(result.generatedAmount);
+    if (resultContext) {
+      resultContext.textContent = `México · ${result.year} · ${formatAnnualBonusNumber(result.annualBonusDays)} días de aguinaldo · antes de ISR`;
+    }
+
+    const eligibleDays = document.querySelector<HTMLElement>("[data-eligible-days]");
+    const generatedProportion = document.querySelector<HTMLElement>("[data-generated-proportion]");
+    const dailySalary = document.querySelector<HTMLElement>("[data-daily-salary]");
+    const annualEquivalent = document.querySelector<HTMLElement>("[data-annual-equivalent]");
+    if (eligibleDays) eligibleDays.textContent = `${result.eligibleDays} de ${result.basisDays}`;
+    if (generatedProportion) generatedProportion.textContent = formatAnnualBonusPercent(result.generatedProportion);
+    if (dailySalary) dailySalary.textContent = formatAnnualBonusMoney(result.dailySalary);
+    if (annualEquivalent) annualEquivalent.textContent = formatAnnualBonusMoney(result.annualEquivalent);
+    resultMetrics?.classList.remove("hidden");
+    resultMetrics?.classList.add("grid");
+
+    if (result.projectedAmount !== undefined) {
+      const projectedAmount = document.querySelector<HTMLElement>("[data-projected-amount]");
+      if (projectedAmount) projectedAmount.textContent = formatAnnualBonusMoney(result.projectedAmount);
+      projectionResult?.classList.remove("hidden");
+    } else {
+      projectionResult?.classList.add("hidden");
+    }
+
+    if (result.differenceFromEstimate !== undefined && comparisonLabel) {
+      const difference = result.differenceFromEstimate;
+      if (Math.abs(difference) < 0.005) {
+        comparisonLabel.textContent = "El importe recibido coincide con la estimación.";
+      } else if (difference < 0) {
+        comparisonLabel.textContent = `Recibiste ${formatAnnualBonusMoney(Math.abs(difference))} menos que esta estimación.`;
+      } else {
+        comparisonLabel.textContent = `Recibiste ${formatAnnualBonusMoney(difference)} más que esta estimación.`;
+      }
+      comparisonResult?.classList.remove("hidden");
+    } else {
+      comparisonResult?.classList.add("hidden");
+    }
+
+    const warnings = [];
+    if (result.usesContractBenefit) warnings.push("Se usó la prestación contractual informada por ti.");
+    if (result.nonEligibleDays > 0) warnings.push(`Se descontaron ${result.nonEligibleDays} días confirmados por ti.`);
+    if (warnings.length && resultWarning) {
+      resultWarning.textContent = warnings.join(" ");
+      resultWarning.classList.remove("hidden");
+    } else {
+      resultWarning?.classList.add("hidden");
+    }
+
+    const frequencyLabels = {
+      daily: "diario",
+      weekly: "semanal",
+      biweekly: "quincenal",
+      monthly: "mensual",
+    };
+    const formulaRows = [
+      `Salario ${frequencyLabels[result.salaryFrequency]}: ${formatAnnualBonusMoney(result.salaryAmount)} ÷ ${result.salaryDivisor} = ${formatAnnualBonusMoney(result.dailySalary)} diarios`,
+      `Periodo efectivo: ${formatAnnualBonusDate(result.effectiveStart)} a ${formatAnnualBonusDate(result.effectiveEnd)} = ${result.inclusiveDays} días inclusivos`,
+      `Días elegibles: ${result.inclusiveDays} − ${result.nonEligibleDays} = ${result.eligibleDays}`,
+      `Aguinaldo anual equivalente: ${formatAnnualBonusMoney(result.dailySalary)} × ${formatAnnualBonusNumber(result.annualBonusDays)} = ${formatAnnualBonusMoney(result.annualEquivalent)}`,
+      `Aguinaldo generado: ${formatAnnualBonusMoney(result.annualEquivalent)} × ${result.eligibleDays} ÷ ${result.basisDays} = ${formatAnnualBonusMoney(result.generatedAmount)}`,
+    ];
+    formula?.replaceChildren(...formulaRows.map((text) => {
+      const row = document.createElement("p");
+      row.textContent = text;
+      return row;
+    }));
+
+    copyText = [
+      `Aguinaldo bruto generado: ${formatAnnualBonusMoney(result.generatedAmount)}`,
+      `Periodo: ${result.effectiveStart} a ${result.effectiveEnd}`,
+      `Días elegibles: ${result.eligibleDays} de ${result.basisDays}`,
+      `Salario diario: ${formatAnnualBonusMoney(result.dailySalary)}`,
+      `Días anuales de aguinaldo: ${formatAnnualBonusNumber(result.annualBonusDays)}`,
+      `Equivalente anual: ${formatAnnualBonusMoney(result.annualEquivalent)}`,
+      ...(result.projectedAmount !== undefined ? [`Proyección al 31 de diciembre: ${formatAnnualBonusMoney(result.projectedAmount)}`] : []),
+      "México · LFT · artículo 87 · Estimación bruta antes de ISR.",
+    ].join("\n");
+    copyButton?.classList.remove("hidden");
+    copyButton?.classList.add("flex");
+    if (mobileResult) mobileResult.textContent = formatAnnualBonusMoney(result.generatedAmount);
+    updateMobileSummary();
+    if (formStatus) formStatus.textContent = `Resultado actualizado: ${formatAnnualBonusMoney(result.generatedAmount)} de aguinaldo bruto generado.`;
+  }
+
+  function handleCalculationError(error: unknown) {
+    if (!(error instanceof AnnualBonusValidationError)) {
+      showFormError("No se pudo completar el cálculo. Revisa los datos e intenta de nuevo.");
+      return;
+    }
+
+    const fieldMessages: Partial<Record<typeof error.code, [string, string]>> = {
+      invalid_hire_date: ["hireDate", "Selecciona una fecha de ingreso válida."],
+      invalid_end_date: ["endDate", "Selecciona una fecha final válida."],
+      invalid_today: ["endDate", "No se pudo validar la fecha actual."],
+      end_before_hire: ["endDate", "La fecha final no puede ser anterior al ingreso."],
+      end_in_future: ["endDate", "La fecha final no puede estar en el futuro; usa la proyección opcional."],
+      invalid_salary: ["salary", "Usa un salario válido."],
+      salary_not_positive: ["salary", "El salario debe ser mayor que cero."],
+      invalid_annual_days: ["annualDays", "Usa una cantidad válida de días de aguinaldo."],
+      below_legal_minimum: ["annualDays", "La prestación no puede ser inferior a 15 días."],
+      invalid_non_eligible_days: ["nonEligibleDays", "Usa una cantidad válida no negativa."],
+      non_eligible_days_not_integer: ["nonEligibleDays", "Usa únicamente días enteros."],
+      non_eligible_days_exceed_period: ["nonEligibleDays", "Los días descontados no pueden superar el periodo."],
+      invalid_received_amount: ["receivedAmount", "Usa un importe bruto válido."],
+      negative_received_amount: ["receivedAmount", "El importe recibido no puede ser negativo."],
+      projection_unavailable: ["endDate", "La proyección sólo está disponible para una relación vigente en el año actual."],
+    };
+    const fieldMessage = fieldMessages[error.code];
+    if (fieldMessage) setFieldError(...fieldMessage);
+    showFormError(
+      error.code === "unsupported_rule_period"
+        ? "No contamos con una regla revisada para la fecha seleccionada."
+        : "Revisa los campos señalados antes de calcular.",
+    );
+  }
+
+  form?.addEventListener("submit", (event) => {
+    event.preventDefault();
+    clearErrors();
+
+    const hireDate = getField<HTMLInputElement>("hireDate")?.value ?? "";
+    const endDate = getField<HTMLInputElement>("endDate")?.value ?? "";
+    if (!hireDate) setFieldError("hireDate", "Selecciona tu fecha de ingreso.");
+    if (!endDate) setFieldError("endDate", "Selecciona la fecha final.");
+    const salaryAmount = readNumber("salary", { maximumDecimals: 4 });
+    const annualBonusDays = readNumber("annualDays", { maximumDecimals: 2 });
+    const nonEligibleDays = readNumber("nonEligibleDays", { maximumDecimals: 0 });
+    const receivedField = getField<HTMLInputElement>("receivedAmount");
+    const receivedAmount = receivedField?.value.trim()
+      ? readNumber("receivedAmount", { maximumDecimals: 2 })
+      : undefined;
+
+    if (!hireDate || !endDate || salaryAmount === null || annualBonusDays === null || nonEligibleDays === null || receivedAmount === null) {
+      showFormError("Completa o corrige los campos señalados antes de calcular.");
+      return;
+    }
+
+    const absenceConfirmation = getField<HTMLInputElement>("absenceConfirmation");
+    if (nonEligibleDays > 0 && !absenceConfirmation?.checked) {
+      setFieldError("absenceConfirmation", "Confirma que revisaste la ayuda antes de descontar días.");
+      showFormError("Confirma el tratamiento de los días que deseas descontar.");
+      return;
+    }
+
+    try {
+      const result = calculateProportionalAnnualBonus({
+        employmentStatus: getMode(),
+        hireDate,
+        endDate,
+        today,
+        salaryAmount,
+        salaryFrequency: (getField<HTMLSelectElement>("salaryFrequency")?.value ?? "monthly") as SalaryFrequency,
+        annualBonusDays,
+        nonEligibleDays,
+        projectToYearEnd: Boolean(projectionInput?.checked),
+        ...(receivedAmount !== undefined ? { receivedAmount } : {}),
+      });
+      renderResult(result);
+      resultRegion?.focus({ preventScroll: true });
+      resultRegion?.scrollIntoView({ behavior: "smooth", block: "start" });
+    } catch (error) {
+      handleCalculationError(error);
+    }
+  });
+
+  modeInputs.forEach((input) => {
+    input.addEventListener("change", () => {
+      updateModeUi();
+      invalidateResult();
+    });
+  });
+
+  trackedFields.forEach((field) => {
+    field.addEventListener(field instanceof HTMLSelectElement || field.type === "checkbox" ? "change" : "input", () => {
+      setFieldError(field.dataset.field ?? "");
+      if (field === endInput) updateProjectionAvailability();
+      invalidateResult();
+    });
+  });
+
+  clearButton?.addEventListener("click", () => {
+    form?.reset();
+    if (endInput) endInput.value = today;
+    clearErrors();
+    updateModeUi();
+    resetResult();
+    getField<HTMLInputElement>("hireDate")?.focus();
+  });
+
+  copyButton?.addEventListener("click", async () => {
+    if (!copyText) return;
+    try {
+      await navigator.clipboard.writeText(copyText);
+      if (copyLabel) copyLabel.textContent = "Copiado";
+      if (copyStatus) copyStatus.textContent = "Resultado copiado.";
+    } catch {
+      if (copyStatus) copyStatus.textContent = "No se pudo copiar automáticamente.";
+    }
+    window.clearTimeout(copyTimeout);
+    copyTimeout = window.setTimeout(() => {
+      if (copyLabel) copyLabel.textContent = "Copiar resultado";
+      if (copyStatus) copyStatus.textContent = "";
+    }, 2000);
+  });
+
+  if (resultRegion && "IntersectionObserver" in window) {
+    const observer = new IntersectionObserver(([entry]) => {
+      resultIsVisible = entry.isIntersecting;
+      updateMobileSummary();
+    }, { threshold: 0.25 });
+    observer.observe(resultRegion);
+  }
+
+  updateModeUi();
+  resetResult();
+</script>

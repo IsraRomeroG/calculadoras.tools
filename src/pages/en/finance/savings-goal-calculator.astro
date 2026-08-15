@@ -1,0 +1,671 @@
+---
+import BaseLayout from "@layouts/BaseLayout.astro";
+import AdSlot from "@components/ads/AdSlot.astro";
+import Container from "@components/layout/Container.astro";
+import PageShell from "@components/layout/PageShell.astro";
+import FaqSection from "@components/shared/FaqSection.astro";
+import PageHero from "@components/shared/PageHero.astro";
+import SectionIntro from "@components/shared/SectionIntro.astro";
+import { buildAlternateLinks } from "@lib/i18n/routing";
+import { buildFaqJsonLd } from "@lib/seo";
+
+const title = "Savings goal calculator: create your monthly plan";
+const description =
+  "Calculate how much to save each month to reach a goal, when you will reach it and how changes to the term, contribution, return and inflation affect the plan.";
+const canonical = "/en/finance/savings-goal-calculator";
+const spanishCanonical = "/finanzas/calculadora-de-ahorro-para-un-objetivo";
+const alternates = buildAlternateLinks({ es: spanishCanonical, en: canonical }, Astro.site ?? Astro.url);
+const faqs = [
+  {
+    question: "How do I calculate how much to save each month?",
+    answer:
+      "Define your goal, current savings and target month. The calculator spreads the gap across available contributions and can include an estimated return.",
+  },
+  {
+    question: "Should I include investment returns in my plan?",
+    answer:
+      "Only to explore that assumption. The calculator also shows a conservative 0% return scenario because future returns are not guaranteed.",
+  },
+  {
+    question: "How does inflation affect a future goal?",
+    answer:
+      "If the goal is today's price for something you will buy later, inflation can raise the amount needed. Enable the adjustment to estimate future cost.",
+  },
+  {
+    question: "What if I cannot save the recommended amount?",
+    answer:
+      "Try quick scenarios to extend the term or use fixed-contribution mode to estimate when a sustainable amount would reach the goal.",
+  },
+  {
+    question: "Why can the last contribution be smaller?",
+    answer:
+      "The calculator reduces the last contribution to the amount needed to reach the goal without overfunding.",
+  },
+  {
+    question: "Does the calculator guarantee I will reach my goal?",
+    answer:
+      "No. It is an educational estimate assuming constant contributions, returns and inflation. It excludes taxes, fees and market changes.",
+  },
+];
+const faqJsonLd = buildFaqJsonLd(faqs);
+---
+
+<BaseLayout title={title} description={description} canonical={canonical} locale="en" alternates={alternates}>
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={JSON.stringify(faqJsonLd)} />
+  </Fragment>
+
+  <PageShell>
+    <PageHero
+      title="Savings goal calculator"
+      description="Turn a goal into a monthly plan, explore alternatives and see how much it depends on expected returns."
+      kicker="Finance"
+      collapseBreadcrumbOnMobile
+      containerClass="py-6 md:py-8"
+      breadcrumbs={[
+        { label: "Home", href: "/en", ariaLabel: "Home" },
+        { label: "Finance", href: "/en/finance", optional: true },
+        { label: "Savings goal calculator", truncate: true },
+      ]}
+    />
+
+    <Container as="section" class="py-6 md:py-8">
+      <section
+        class="overflow-hidden rounded-lg border border-gray-700 bg-gray-950 shadow-xl shadow-gray-950/30"
+        aria-labelledby="calculator-heading"
+      >
+        <div class="grid lg:grid-cols-[minmax(0,1.08fr)_minmax(19rem,0.92fr)]">
+          <div class="p-4 sm:p-6">
+            <p class="text-sm font-semibold uppercase tracking-wide text-amber-400">
+              Create your plan
+            </p>
+            <h2 id="calculator-heading" class="mt-2 text-2xl font-semibold">
+              What do you want to find out?
+            </h2>
+
+            <div
+              class="mt-5 grid grid-cols-2 rounded-lg border border-gray-700 bg-gray-900 p-1"
+              role="group"
+              aria-label="Calculation mode"
+            >
+              <button class="mode-button is-active" type="button" data-mode="date" aria-pressed="true">
+                I have a target date
+              </button>
+              <button class="mode-button" type="button" data-mode="contribution" aria-pressed="false">
+                I know how much I can save
+              </button>
+            </div>
+
+            <form class="mt-6" novalidate data-savings-form>
+              <div class="grid gap-4 sm:grid-cols-2">
+                <div>
+                  <label class="field-label" for="goal-target">Savings goal</label>
+                  <div class="field-shell">
+                    <span class="field-affix">$</span>
+                    <input id="goal-target" class="field-input" type="text" inputmode="decimal" autocomplete="off" placeholder="80000" aria-describedby="goal-target-error" data-field="target" />
+                  </div>
+                  <p id="goal-target-error" class="field-error" data-error-for="target"></p>
+                </div>
+                <div>
+                  <label class="field-label" for="goal-current">Current savings</label>
+                  <div class="field-shell">
+                    <span class="field-affix">$</span>
+                    <input id="goal-current" class="field-input" type="text" inputmode="decimal" autocomplete="off" value="0" aria-describedby="goal-current-error" data-field="current" />
+                  </div>
+                  <p id="goal-current-error" class="field-error" data-error-for="current"></p>
+                </div>
+              </div>
+
+              <div class="mt-4" data-date-group>
+                <label class="field-label" for="goal-date">Target month</label>
+                <input id="goal-date" class="field" type="month" aria-describedby="goal-date-error" data-field="date" />
+                <p id="goal-date-error" class="field-error" data-error-for="date"></p>
+                <div class="mt-3 flex flex-wrap gap-2" aria-label="Quick terms">
+                  <button class="chip-button" type="button" data-quick-years="1">1 year</button>
+                  <button class="chip-button" type="button" data-quick-years="2">2 years</button>
+                  <button class="chip-button" type="button" data-quick-years="5">5 years</button>
+                </div>
+              </div>
+
+              <div class="mt-4 hidden" data-contribution-group>
+                <label class="field-label" for="goal-contribution">Monthly contribution</label>
+                <div class="field-shell">
+                  <span class="field-affix">$</span>
+                  <input id="goal-contribution" class="field-input" type="text" inputmode="decimal" autocomplete="off" placeholder="4000" aria-describedby="goal-contribution-error" data-field="contribution" />
+                </div>
+                <p id="goal-contribution-error" class="field-error" data-error-for="contribution"></p>
+              </div>
+
+              <details class="mt-5 rounded-lg border border-gray-700 bg-gray-900/60 p-4">
+                <summary class="cursor-pointer font-semibold text-white">Advanced options</summary>
+                <div class="mt-4 grid gap-4">
+                  <div>
+                    <label class="field-label" for="goal-rate">Estimated annual return</label>
+                    <div class="field-shell">
+                      <input id="goal-rate" class="field-input pl-3" type="text" inputmode="decimal" autocomplete="off" value="0" aria-describedby="goal-rate-help goal-rate-error" data-field="rate" />
+                      <span class="field-affix">%</span>
+                    </div>
+                    <p id="goal-rate-help" class="field-help">This is an assumption, not a guaranteed return.</p>
+                    <p id="goal-rate-error" class="field-error" data-error-for="rate"></p>
+                  </div>
+
+                  <label class="flex min-h-11 items-start gap-3 rounded-lg border border-gray-700 p-3">
+                    <input class="mt-1 size-4 accent-amber-400" type="checkbox" data-inflation-toggle />
+                    <span>
+                      <span class="block text-sm font-semibold text-white">My goal is expressed in today's money</span>
+                      <span class="mt-1 block text-xs leading-relaxed text-gray-400">Adjusts future cost using estimated inflation.</span>
+                    </span>
+                  </label>
+
+                  <div class="hidden" data-inflation-group>
+                    <label class="field-label" for="goal-inflation">Estimated annual inflation</label>
+                    <div class="field-shell">
+                      <input id="goal-inflation" class="field-input pl-3" type="text" inputmode="decimal" autocomplete="off" value="4" aria-describedby="goal-inflation-error" data-field="inflation" />
+                      <span class="field-affix">%</span>
+                    </div>
+                    <p id="goal-inflation-error" class="field-error" data-error-for="inflation"></p>
+                  </div>
+                </div>
+              </details>
+
+              <div class="mt-5 hidden rounded-lg border border-red-400/40 bg-red-400/10 p-4 text-sm text-red-200" role="alert" data-errors>
+                Check the highlighted fields to create your plan.
+              </div>
+
+              <div class="mt-6 flex flex-col gap-3 border-t border-gray-800 pt-5 sm:flex-row sm:flex-wrap">
+                <button class="primary-button" type="submit">Create my plan</button>
+                <button class="secondary-button" type="button" data-example>Use example</button>
+                <button class="secondary-button" type="button" data-clear>Clear</button>
+              </div>
+            </form>
+          </div>
+
+          <aside class="border-t border-gray-800 bg-gray-900/70 p-4 sm:p-6 lg:border-l lg:border-t-0" aria-live="polite" data-result-region>
+            <p class="text-sm font-semibold uppercase tracking-wide text-amber-400" data-result-kicker>Result</p>
+            <p class="mt-3 break-words text-3xl font-bold leading-tight text-white" data-main-result>Define your goal</p>
+            <p class="mt-3 text-sm leading-relaxed text-gray-300" data-explanation>
+              The monthly contribution or estimated date will appear here.
+            </p>
+            <div class="mt-5 grid grid-cols-2 gap-3" data-summary-grid>
+              <div class="col-span-2 rounded-lg border border-gray-800 bg-gray-950/70 p-4 text-sm text-gray-400">
+                You can start without assuming a return.
+              </div>
+            </div>
+            <div class="mt-4 hidden rounded-lg border border-amber-400/40 bg-amber-400/10 p-4 text-sm leading-relaxed text-amber-100" data-warning></div>
+            <details class="mt-4 rounded-lg border border-gray-800 p-4">
+              <summary class="cursor-pointer text-sm font-semibold text-white">Calculation assumptions</summary>
+              <ul class="mt-3 space-y-2 text-sm leading-relaxed text-gray-400">
+                <li>Contributions occur at the end of each month.</li>
+                <li>The first contribution occurs at the end of the current month.</li>
+                <li>The return is constant and compounds monthly.</li>
+                <li>Excludes taxes, fees and market changes.</li>
+              </ul>
+            </details>
+          </aside>
+        </div>
+      </section>
+
+      <div class="sticky bottom-3 z-20 mt-4 lg:hidden">
+        <button class="primary-button w-full shadow-lg shadow-gray-950/50" type="button" data-mobile-calculate>
+          Create my plan
+        </button>
+      </div>
+    </Container>
+
+    <div class="hidden" data-results>
+      <Container as="section" class="py-8">
+        <div class="grid gap-5 lg:grid-cols-2">
+          <section class="rounded-lg border border-amber-400/40 bg-amber-400/5 p-5 sm:p-6">
+            <p class="text-xs font-semibold uppercase tracking-wide text-amber-300">Your next step</p>
+            <h2 class="mt-2 text-2xl font-semibold text-white" data-next-action></h2>
+            <p class="mt-3 text-sm leading-relaxed text-gray-300" data-next-detail></p>
+          </section>
+          <section class="rounded-lg border border-gray-700 bg-gray-950 p-5 sm:p-6">
+            <p class="text-xs font-semibold uppercase tracking-wide text-gray-500">Conservative scenario</p>
+            <h2 class="mt-2 text-xl font-semibold text-white" data-conservative-title></h2>
+            <p class="mt-3 text-sm leading-relaxed text-gray-400" data-conservative-detail></p>
+          </section>
+        </div>
+      </Container>
+
+      <Container as="section" class="py-8">
+        <SectionIntro
+          title="Try a quick adjustment"
+          description="Compare alternatives and apply the one that best matches your situation."
+          class="mb-5"
+        />
+        <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4" data-scenarios></div>
+      </Container>
+
+      <Container as="section" class="py-8">
+        <div class="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(18rem,0.8fr)]">
+          <section class="rounded-lg border border-gray-700 bg-gray-950 p-5 sm:p-6">
+            <div class="flex items-end justify-between gap-4">
+              <div>
+                <p class="text-xs font-semibold uppercase tracking-wide text-gray-500">Current progress</p>
+                <h2 class="mt-2 text-2xl font-semibold text-white" data-progress-label></h2>
+              </div>
+              <p class="text-sm font-semibold text-amber-300" data-progress-percent></p>
+            </div>
+            <div class="mt-5 h-4 overflow-hidden rounded-full bg-gray-800" role="progressbar" aria-valuemin="0" aria-valuemax="100" data-progress-bar>
+              <div class="h-full rounded-full bg-amber-400 transition-all" data-progress-fill></div>
+            </div>
+            <div class="mt-5 grid gap-3 sm:grid-cols-3" data-progress-breakdown></div>
+          </section>
+          <section class="rounded-lg border border-gray-700 bg-gray-950 p-5 sm:p-6">
+            <h2 class="text-xl font-semibold text-white">Plan milestones</h2>
+            <div class="mt-4 grid gap-3" data-milestones></div>
+          </section>
+        </div>
+      </Container>
+
+      <Container as="section" class="py-8">
+        <div class="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
+          <SectionIntro title="Monthly detail" description="Review balance, return, contribution and progress for each month." />
+          <div class="flex flex-col gap-3 sm:flex-row">
+            <button class="primary-button" type="button" data-copy><span data-copy-label>Copy summary</span></button>
+            <button class="secondary-button" type="button" data-export>Exportar CSV</button>
+          </div>
+        </div>
+        <p class="sr-only" aria-live="polite" data-copy-status></p>
+        <details class="mt-5 rounded-lg border border-gray-700 bg-gray-950 p-4">
+          <summary class="cursor-pointer font-semibold text-white">View full schedule</summary>
+          <div class="mt-4 overflow-x-auto">
+            <table class="min-w-[58rem] w-full divide-y divide-gray-800 text-left text-sm">
+              <thead class="bg-gray-900 text-gray-300">
+                <tr>
+                  <th class="px-4 py-3">Month</th><th class="px-4 py-3">Date</th>
+                  <th class="px-4 py-3 text-right">Beginning balance</th><th class="px-4 py-3 text-right">Return</th>
+                  <th class="px-4 py-3 text-right">Contribution</th><th class="px-4 py-3 text-right">Ending balance</th>
+                  <th class="px-4 py-3 text-right">Current goal</th><th class="px-4 py-3 text-right">Progress</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-gray-800 text-gray-300" data-detail-body></tbody>
+            </table>
+          </div>
+        </details>
+      </Container>
+    </div>
+
+    <AdSlot placement="calculator-after-tool" />
+
+    <Container as="section" class="py-8">
+      <SectionIntro title="How to create a realistic plan" description="A useful figure should also show its assumptions and alternatives." class="mb-5" />
+      <div class="grid gap-4 md:grid-cols-3">
+        <article class="info-card"><h2 class="font-semibold text-white">Start conservatively</h2><p class="mt-2 text-sm leading-relaxed text-gray-400">Review the 0% scenario to see what you need without relying on returns.</p></article>
+        <article class="info-card"><h2 class="font-semibold text-white">Consider future cost</h2><p class="mt-2 text-sm leading-relaxed text-gray-400">For multi-year goals, inflation can make today's amount insufficient.</p></article>
+        <article class="info-card"><h2 class="font-semibold text-white">Adjust without abandoning the goal</h2><p class="mt-2 text-sm leading-relaxed text-gray-400">Extending the term or gradually increasing contributions can make the plan sustainable.</p></article>
+      </div>
+      <p class="mt-5 text-sm leading-relaxed text-gray-400">
+        Learn more in the guide
+        <a class="text-amber-300 underline hover:text-amber-200" href="/en/blog/finance">how much to save each month for a goal</a>
+        and see how real value changes with
+        <a class="text-amber-300 underline hover:text-amber-200" href="/en/blog/finance">inflation and compound interest</a>.
+      </p>
+    </Container>
+
+    <FaqSection faqs={faqs} />
+  </PageShell>
+</BaseLayout>
+
+<style is:global>
+  .field-label { display: block; font-size: .875rem; font-weight: 500; color: rgb(229 231 235); }
+  .field, .field-shell { margin-top: .5rem; min-height: 3rem; width: 100%; border-radius: .5rem; border: 1px solid rgb(55 65 81); background: rgb(17 24 39); color: white; outline: none; }
+  .field { padding: 0 1rem; }
+  .field-shell { display: flex; align-items: center; }
+  .field-input { min-height: 2.875rem; min-width: 0; width: 100%; background: transparent; padding: 0 .25rem; color: white; outline: none; }
+  .field-affix { padding: 0 .75rem; color: rgb(107 114 128); }
+  .field:focus, .field-shell:focus-within { border-color: rgb(251 191 36); box-shadow: 0 0 0 3px rgb(251 191 36 / .15); }
+  .field[aria-invalid="true"], .field-shell:has(.field-input[aria-invalid="true"]) { border-color: rgb(248 113 113); }
+  .field-help { margin-top: .4rem; font-size: .75rem; line-height: 1.4; color: rgb(107 114 128); }
+  .field-error { display: none; margin-top: .4rem; font-size: .8rem; color: rgb(252 165 165); }
+  .field-error:not(:empty) { display: block; }
+  .primary-button, .secondary-button, .chip-button, .mode-button { display: inline-flex; min-height: 2.75rem; align-items: center; justify-content: center; border-radius: .5rem; padding: .5rem 1rem; font-size: .875rem; font-weight: 700; }
+  .primary-button { background: rgb(251 191 36); color: rgb(3 7 18); }
+  .secondary-button, .chip-button { border: 1px solid rgb(55 65 81); color: rgb(229 231 235); }
+  .chip-button { min-height: 2.5rem; padding: .4rem .8rem; font-size: .75rem; }
+  .mode-button { color: rgb(156 163 175); }
+  .mode-button.is-active { background: rgb(251 191 36); color: rgb(3 7 18); }
+  .info-card { border-radius: .5rem; border: 1px solid rgb(55 65 81); background: rgb(3 7 18); padding: 1.25rem; }
+</style>
+
+<script>
+  import {
+    addMonthsToYearMonth,
+    addMonthsToYearMonthValue,
+    calculateConservativePlan,
+    calculateRequiredMonthlyPlan,
+    calculateTimeToGoalPlan,
+    monthsBetweenInclusive,
+    roundCurrency,
+  } from "@lib/calculators/finanzas/calculadora-de-ahorro-para-un-objetivo/savingsGoal.en";
+  import {
+    formatCurrency,
+    formatDuration,
+    formatPercent,
+    parseMoneyInput,
+    parseRateInput,
+  } from "@lib/calculators/finanzas/calculadora-de-interes-compuesto/compoundInterest.en";
+
+  const get = (selector) => document.querySelector(selector);
+  const form = get("[data-savings-form]");
+  const fields = Object.fromEntries([...document.querySelectorAll("[data-field]")].map((input) => [input.dataset.field, input]));
+  const inflationToggle = get("[data-inflation-toggle]");
+  let mode = "date";
+  let currentPlan = null;
+  let conservativePlan = null;
+  let currentInput = null;
+  let copyText = "";
+
+  const ERROR_MESSAGES = {
+    required: "This field is required.",
+    invalid: "Enter a valid number.",
+    negative: "The value cannot be negative.",
+    too_many_decimals: "Use fewer decimal places.",
+    greater_than_zero: "The value must be greater than zero.",
+    rate_high: "The return cannot exceed 50%.",
+    inflation_high: "Inflation cannot exceed 30%.",
+    date_invalid: "Choose the current month or a future month.",
+    date_far: "The term cannot exceed 1,200 months.",
+  };
+
+  function calculate({ showErrors = true, scroll = true } = {}) {
+    clearErrors();
+    const parsed = parseForm();
+
+    if (Object.keys(parsed.errors).length) {
+      if (showErrors) {
+        renderErrors(parsed.errors);
+        setInvalidState();
+      }
+      return;
+    }
+
+    currentInput = parsed.input;
+    currentPlan = mode === "date"
+      ? calculateRequiredMonthlyPlan(parsed.input)
+      : calculateTimeToGoalPlan(parsed.input);
+    conservativePlan = calculateConservativePlan(parsed.input);
+    renderResult();
+    renderScenarios();
+    renderProgress();
+    renderRows();
+    get("[data-results]").classList.remove("hidden");
+    copyText = buildCopyText();
+
+    if (scroll) get("[data-result-region]").scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
+  function parseForm() {
+    const errors = {};
+    const target = parseMoneyInput(fields.target.value);
+    const current = parseMoneyInput(fields.current.value);
+    const rate = parseRateInput(fields.rate.value);
+    const inflation = parseRateInput(fields.inflation.value);
+    const contribution = parseMoneyInput(fields.contribution.value);
+    const inflationActive = inflationToggle.checked;
+
+    validateParsed("target", target, errors, true);
+    validateParsed("current", current, errors);
+    validateParsed("rate", rate, errors);
+    if (inflationActive) validateParsed("inflation", inflation, errors);
+    if (mode === "contribution") validateParsed("contribution", contribution, errors, true);
+    if (rate.ok && rate.value > 50) errors.rate = "rate_high";
+    if (inflationActive && inflation.ok && inflation.value > 30) errors.inflation = "inflation_high";
+
+    const base = {
+      targetAmount: target.ok ? target.value : 0,
+      currentSavings: current.ok ? current.value : 0,
+      annualRate: rate.ok ? rate.value : 0,
+      adjustForInflation: inflationActive,
+      inflationRate: inflationActive && inflation.ok ? inflation.value : 0,
+      startYearMonth: currentYearMonth(),
+      maxMonths: 1200,
+    };
+
+    if (mode === "date") {
+      const durationMonths = monthsBetweenInclusive(base.startYearMonth, fields.date.value);
+      if (!fields.date.value || !Number.isFinite(durationMonths) || durationMonths <= 0) errors.date = "date_invalid";
+      else if (durationMonths > 1200) errors.date = "date_far";
+      return { errors, input: { ...base, durationMonths } };
+    }
+
+    return { errors, input: { ...base, monthlyContribution: contribution.ok ? contribution.value : 0 } };
+  }
+
+  function validateParsed(name, parsed, errors, greaterThanZero = false) {
+    if (!parsed.ok) errors[name] = parsed.error;
+    else if (greaterThanZero && parsed.value <= 0) errors[name] = "greater_than_zero";
+  }
+
+  function renderResult() {
+    const achievedDate = currentPlan.achievedMonth === 0 ? "today" : addMonthsToYearMonth(currentInput.startYearMonth, currentPlan.achievedMonth ?? currentPlan.months);
+    const completed = currentPlan.achievedMonth === 0;
+    get("[data-result-kicker]").textContent = completed ? "Goal reached" : mode === "date" ? "Suggested monthly contribution" : "Estimated date";
+    get("[data-main-result]").textContent = completed ? "You have already reached your goal" : mode === "date" ? formatCurrency(currentPlan.monthlyContribution) : currentPlan.viable ? achievedDate : "More than 100 years";
+    get("[data-explanation]").textContent = completed
+      ? "Your current savings already cover the entered goal."
+      : mode === "date"
+        ? `Make ${currentPlan.rows.length} contributions to reach ${formatCurrency(currentPlan.finalTargetAmount)}.`
+        : currentPlan.viable
+          ? `Contributing ${formatCurrency(currentInput.monthlyContribution)} per month would reach the goal in ${formatDuration(currentPlan.months)}.`
+          : "With these inputs, the goal is not reached within 1,200 months.";
+    get("[data-summary-grid]").innerHTML = [
+      ["Goal used", formatCurrency(currentPlan.finalTargetAmount)],
+      ["Current gap", formatCurrency(Math.max(currentPlan.finalTargetAmount - currentPlan.currentSavings, 0))],
+      ["Total contributed", formatCurrency(currentPlan.totalContributed)],
+      ["Estimated return", formatCurrency(currentPlan.interestEarned)],
+      ["Last contribution", formatCurrency(currentPlan.lastContribution)],
+      ["Duration", currentPlan.viable ? formatDuration(currentPlan.achievedMonth ?? currentPlan.months) : "More than 100 years"],
+    ].map(([label, value]) => summary(label, value)).join("");
+    const warning = get("[data-warning]");
+    warning.innerHTML = currentPlan.warnings.map((item) => `<p>${escapeHtml(item)}</p>`).join("");
+    warning.classList.toggle("hidden", currentPlan.warnings.length === 0);
+    renderNextStep();
+    renderConservative();
+  }
+
+  function renderNextStep() {
+    const next = currentPlan.nextContribution;
+    get("[data-next-action]").textContent = next > 0 ? `Set aside ${formatCurrency(next)} before the end of this month` : "You do not need an additional contribution this month";
+    get("[data-next-detail]").textContent = next > 0
+      ? `For reference, this equals ${formatCurrency(next / 2)} every two weeks. The plan calendar uses monthly contributions.`
+      : "Current savings and entered assumptions already cover the goal.";
+  }
+
+  function renderConservative() {
+    if (currentInput.annualRate <= 0) {
+      get("[data-conservative-title]").textContent = "This is already your conservative scenario";
+      get("[data-conservative-detail]").textContent = "The plan does not depend on earning a return.";
+      return;
+    }
+    if (mode === "date") {
+      const difference = conservativePlan.monthlyContribution - currentPlan.monthlyContribution;
+      get("[data-conservative-title]").textContent = `${formatCurrency(conservativePlan.monthlyContribution)} per month at a 0% return`;
+      get("[data-conservative-detail]").textContent = `The estimated return reduces the calculated contribution by ${formatCurrency(Math.max(difference, 0))}, but is not guaranteed.`;
+    } else {
+      get("[data-conservative-title]").textContent = conservativePlan.viable ? addMonthsToYearMonth(currentInput.startYearMonth, conservativePlan.months) : "More than 100 years at a 0% return";
+      get("[data-conservative-detail]").textContent = conservativePlan.viable
+        ? `Without returns, you would reach the goal in ${formatDuration(conservativePlan.months)}.`
+        : "Without returns, the goal is not reached within the calculated horizon.";
+    }
+  }
+
+  function renderScenarios() {
+    const scenarios = mode === "date"
+      ? [0, 3, 6, 12].map((offset) => {
+          const date = addMonthsToYearMonthValue(fields.date.value, offset);
+          const input = { ...currentInput, durationMonths: monthsBetweenInclusive(currentInput.startYearMonth, date) };
+          const plan = calculateRequiredMonthlyPlan(input);
+          return { label: offset === 0 ? "Selected date" : `+${offset} months`, value: formatCurrency(plan.monthlyContribution), action: date, active: offset === 0 };
+        })
+      : [0, 500, 1000].map((extra) => {
+          const amount = currentInput.monthlyContribution + extra;
+          const plan = calculateTimeToGoalPlan({ ...currentInput, monthlyContribution: amount });
+          return { label: extra === 0 ? "Selected contribution" : `+${formatCurrency(extra)} per month`, value: plan.viable ? addMonthsToYearMonth(currentInput.startYearMonth, plan.months) : "More than 100 years", action: String(amount), active: extra === 0 };
+        });
+
+    get("[data-scenarios]").innerHTML = scenarios.map((scenario) => `
+      <article class="rounded-lg border ${scenario.active ? "border-amber-400/60 bg-amber-400/5" : "border-gray-700 bg-gray-950"} p-4">
+        <p class="text-xs font-semibold uppercase tracking-wide ${scenario.active ? "text-amber-300" : "text-gray-500"}">${escapeHtml(scenario.label)}</p>
+        <p class="mt-2 text-lg font-semibold text-white">${escapeHtml(scenario.value)}</p>
+        ${scenario.active ? "" : `<button class="secondary-button mt-4 w-full" type="button" data-apply-scenario="${escapeHtml(scenario.action)}">Apply scenario</button>`}
+      </article>`).join("");
+  }
+
+  function renderProgress() {
+    const target = currentPlan.finalTargetAmount;
+    const percent = target > 0 ? Math.min((currentPlan.currentSavings / target) * 100, 100) : 100;
+    get("[data-progress-label]").textContent = `${formatCurrency(currentPlan.currentSavings)} of ${formatCurrency(target)}`;
+    get("[data-progress-percent]").textContent = formatPercent(percent);
+    get("[data-progress-fill]").style.width = `${percent}%`;
+    get("[data-progress-bar]").setAttribute("aria-valuenow", String(roundCurrency(percent)));
+    get("[data-progress-bar]").setAttribute("aria-label", `Current progress: ${formatPercent(percent)}`);
+    get("[data-progress-breakdown]").innerHTML = [
+      ["Current savings", formatCurrency(currentPlan.currentSavings)],
+      ["Future contributions", formatCurrency(currentPlan.totalFutureContributions)],
+      ["Estimated return", formatCurrency(currentPlan.interestEarned)],
+    ].map(([label, value]) => summary(label, value)).join("");
+    get("[data-milestones]").innerHTML = [25, 50, 75, 100].map((percentValue) => {
+      const milestone = currentPlan.milestones.find((item) => item.percent === percentValue);
+      return `<div class="flex items-center justify-between gap-4 rounded-lg border border-gray-800 p-3"><span class="font-semibold text-white">${percentValue}%</span><span class="text-right text-sm text-gray-400">${milestone ? escapeHtml(milestone.date) : "After the calculated horizon"}</span></div>`;
+    }).join("");
+  }
+
+  function renderRows() {
+    get("[data-detail-body]").innerHTML = currentPlan.rows.map((row) => `<tr class="hover:bg-gray-900/60"><td class="px-4 py-3">${row.month}</td><th class="px-4 py-3 font-semibold text-white">${escapeHtml(row.date)}</th><td class="px-4 py-3 text-right">${formatCurrency(row.beginningBalance)}</td><td class="px-4 py-3 text-right">${formatCurrency(row.interest)}</td><td class="px-4 py-3 text-right">${formatCurrency(row.contribution)}</td><td class="px-4 py-3 text-right font-semibold text-white">${formatCurrency(row.endingBalance)}</td><td class="px-4 py-3 text-right">${formatCurrency(row.targetAmount)}</td><td class="px-4 py-3 text-right">${formatPercent(row.progress)}</td></tr>`).join("");
+  }
+
+  function applyScenario(value) {
+    if (mode === "date") fields.date.value = value;
+    else fields.contribution.value = value;
+    calculate({ scroll: false });
+  }
+
+  function setMode(nextMode) {
+    mode = nextMode;
+    document.querySelectorAll("[data-mode]").forEach((button) => {
+      const active = button.dataset.mode === mode;
+      button.classList.toggle("is-active", active);
+      button.setAttribute("aria-pressed", String(active));
+    });
+    get("[data-date-group]").classList.toggle("hidden", mode !== "date");
+    get("[data-contribution-group]").classList.toggle("hidden", mode !== "contribution");
+    get("[data-results]").classList.add("hidden");
+    setInitialState();
+    clearErrors();
+  }
+
+  function fillExample() {
+    fields.target.value = "80000";
+    fields.current.value = "15000";
+    fields.date.value = addMonthsToYearMonthValue(currentYearMonth(), 17);
+    fields.contribution.value = "4000";
+    fields.rate.value = "0";
+    fields.inflation.value = "4";
+    inflationToggle.checked = false;
+    get("[data-inflation-group]").classList.add("hidden");
+    calculate();
+  }
+
+  function clearAll() {
+    if ((fields.target.value || fields.contribution.value) && !window.confirm("Do you want to clear your savings plan?")) return;
+    fields.target.value = "";
+    fields.current.value = "0";
+    fields.date.value = "";
+    fields.contribution.value = "";
+    fields.rate.value = "0";
+    fields.inflation.value = "4";
+    inflationToggle.checked = false;
+    get("[data-inflation-group]").classList.add("hidden");
+    get("[data-results]").classList.add("hidden");
+    clearErrors();
+    setInitialState();
+  }
+
+  function buildCopyText() {
+    const main = mode === "date"
+      ? `Monthly contribution: ${formatCurrency(currentPlan.monthlyContribution)}`
+      : `Estimated date: ${currentPlan.viable ? addMonthsToYearMonth(currentInput.startYearMonth, currentPlan.months) : "More than 100 years"}`;
+    const conservative = mode === "date"
+      ? `Contribution at 0% return: ${formatCurrency(conservativePlan.monthlyContribution)}`
+      : `Date at 0% return: ${conservativePlan.viable ? addMonthsToYearMonth(currentInput.startYearMonth, conservativePlan.months) : "More than 100 years"}`;
+    return ["Savings plan - calculadoras.tools", `Original goal: ${formatCurrency(currentInput.targetAmount)}`, `Goal used: ${formatCurrency(currentPlan.finalTargetAmount)}`, `Current savings: ${formatCurrency(currentInput.currentSavings)}`, main, `Next contribution: ${formatCurrency(currentPlan.nextContribution)}`, `Total contributed: ${formatCurrency(currentPlan.totalContributed)}`, `Estimated return: ${formatCurrency(currentPlan.interestEarned)}`, conservative, "", "Assumptions: end-of-month contributions; constant returns and inflation; excludes taxes and fees."].join("\n");
+  }
+
+  async function copyResult() {
+    if (!copyText) return;
+    try {
+      await navigator.clipboard.writeText(copyText);
+      get("[data-copy-label]").textContent = "Copied";
+      get("[data-copy-status]").textContent = "Summary copied.";
+      window.setTimeout(() => { get("[data-copy-label]").textContent = "Copy summary"; get("[data-copy-status]").textContent = ""; }, 2000);
+    } catch {
+      get("[data-copy-status]").textContent = "Could not copy the summary.";
+    }
+  }
+
+  function exportCsv() {
+    if (!currentPlan) return;
+    const lines = ["month,date,beginning_balance,return,contribution,ending_balance,current_goal,progress", ...currentPlan.rows.map((row) => [row.month, `"${row.date}"`, roundCurrency(row.beginningBalance), roundCurrency(row.interest), roundCurrency(row.contribution), roundCurrency(row.endingBalance), roundCurrency(row.targetAmount), roundCurrency(row.progress)].join(","))];
+    const url = URL.createObjectURL(new Blob([lines.join("\n")], { type: "text/csv;charset=utf-8" }));
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "savings-plan.csv";
+    document.body.append(link);
+    link.click();
+    link.remove();
+    URL.revokeObjectURL(url);
+  }
+
+  function renderErrors(errors) {
+    Object.entries(errors).forEach(([name, error]) => {
+      const message = ERROR_MESSAGES[error] ?? ERROR_MESSAGES.invalid;
+      const element = get(`[data-error-for="${name}"]`);
+      if (element) element.textContent = message;
+      fields[name]?.setAttribute("aria-invalid", "true");
+    });
+    get("[data-errors]").classList.remove("hidden");
+    const first = Object.keys(errors)[0];
+    fields[first]?.focus();
+  }
+
+  function clearErrors() {
+    document.querySelectorAll("[data-error-for]").forEach((element) => { element.textContent = ""; });
+    Object.values(fields).forEach((field) => field.removeAttribute("aria-invalid"));
+    get("[data-errors]").classList.add("hidden");
+  }
+
+  function setInitialState() {
+    get("[data-result-kicker]").textContent = "Result";
+    get("[data-main-result]").textContent = "Define your goal";
+    get("[data-explanation]").textContent = "The monthly contribution or estimated date will appear here.";
+    get("[data-summary-grid]").innerHTML = `<div class="col-span-2 rounded-lg border border-gray-800 bg-gray-950/70 p-4 text-sm text-gray-400">You can start without assuming a return.</div>`;
+    get("[data-warning]").classList.add("hidden");
+  }
+
+  function setInvalidState() {
+    get("[data-result-kicker]").textContent = "Check the fields";
+    get("[data-main-result]").textContent = "Cannot create the plan";
+    get("[data-explanation]").textContent = "Correct the highlighted values to continue.";
+    get("[data-summary-grid]").innerHTML = "";
+    get("[data-warning]").classList.add("hidden");
+  }
+
+  function summary(label, value) {
+    return `<div class="rounded-lg border border-gray-800 bg-gray-950/70 p-3"><span class="block text-xs font-semibold uppercase tracking-wide text-gray-500">${escapeHtml(label)}</span><span class="mt-2 block break-words text-base font-semibold text-white">${escapeHtml(value)}</span></div>`;
+  }
+  function currentYearMonth() { const date = new Date(); return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`; }
+  function escapeHtml(value) { return String(value).replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;").replaceAll("'", "&#039;"); }
+
+  form.addEventListener("submit", (event) => { event.preventDefault(); calculate(); });
+  get("[data-mobile-calculate]").addEventListener("click", () => calculate());
+  document.querySelectorAll("[data-mode]").forEach((button) => button.addEventListener("click", () => setMode(button.dataset.mode)));
+  document.querySelectorAll("[data-quick-years]").forEach((button) => button.addEventListener("click", () => { fields.date.value = addMonthsToYearMonthValue(currentYearMonth(), Number(button.dataset.quickYears) * 12 - 1); }));
+  inflationToggle.addEventListener("change", () => get("[data-inflation-group]").classList.toggle("hidden", !inflationToggle.checked));
+  get("[data-scenarios]").addEventListener("click", (event) => { const button = event.target.closest("[data-apply-scenario]"); if (button) applyScenario(button.dataset.applyScenario); });
+  get("[data-example]").addEventListener("click", fillExample);
+  get("[data-clear]").addEventListener("click", clearAll);
+  get("[data-copy]").addEventListener("click", copyResult);
+  get("[data-export]").addEventListener("click", exportCsv);
+</script>

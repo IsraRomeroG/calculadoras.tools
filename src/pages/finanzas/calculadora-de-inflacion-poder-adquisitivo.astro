@@ -1,5 +1,6 @@
 ---
 import BaseLayout from "@layouts/BaseLayout.astro";
+import { buildAlternateLinks } from "@lib/i18n/routing";
 import AdSlot from "@components/ads/AdSlot.astro";
 import Container from "@components/layout/Container.astro";
 import PageShell from "@components/layout/PageShell.astro";
@@ -12,6 +13,11 @@ const title = "Calculadora de inflación y poder adquisitivo";
 const description =
   "Calcula cuánto necesitarás en el futuro y cuánto poder adquisitivo conservará tu dinero con una tasa de inflación anual.";
 const canonical = "/finanzas/calculadora-de-inflacion-poder-adquisitivo";
+const englishCanonical = "/en/finance/inflation-purchasing-power-calculator";
+const alternates = buildAlternateLinks(
+  { es: canonical, en: englishCanonical },
+  Astro.site ?? Astro.url,
+);
 const faqs = [
   {
     question: "¿La calculadora usa inflación oficial?",
@@ -48,7 +54,7 @@ const faqs = [
 const faqJsonLd = buildFaqJsonLd(faqs);
 ---
 
-<BaseLayout title={title} description={description} canonical={canonical}>
+<BaseLayout title={title} description={description} canonical={canonical} alternates={alternates}>
   <Fragment slot="head">
     <script type="application/ld+json" set:html={JSON.stringify(faqJsonLd)} />
   </Fragment>

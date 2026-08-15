@@ -6,12 +6,18 @@ import FaqSection from "@components/shared/FaqSection.astro";
 import PageHero from "@components/shared/PageHero.astro";
 import SectionIntro from "@components/shared/SectionIntro.astro";
 import BaseLayout from "@layouts/BaseLayout.astro";
+import { buildAlternateLinks } from "@lib/i18n/routing";
 import { buildFaqJsonLd } from "@lib/seo";
 
 const title = "Calculadora renta vs compra";
 const description =
   "Compara el costo estimado de rentar o comprar vivienda con hipoteca, enganche, plusvalía y supuestos editables.";
 const canonical = "/inmuebles/calculadora-renta-vs-compra";
+const englishCanonical = "/en/real-estate/rent-vs-buy-calculator";
+const alternates = buildAlternateLinks(
+  { es: canonical, en: englishCanonical },
+  Astro.site ?? Astro.url,
+);
 
 const rentFields = [
   {
@@ -169,7 +175,7 @@ const explainerCards = [
 ];
 ---
 
-<BaseLayout title={title} description={description} canonical={canonical}>
+<BaseLayout title={title} description={description} canonical={canonical} alternates={alternates}>
   <Fragment slot="head">
     <script type="application/ld+json" set:html={JSON.stringify(faqJsonLd)} />
   </Fragment>

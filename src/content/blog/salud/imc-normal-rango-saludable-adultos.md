@@ -4,6 +4,7 @@ seoTitle: "IMC normal en adultos: rango saludable y ejemplos"
 description: "Conoce cuál es el rango de IMC considerado saludable en adultos y cómo interpretarlo con peso y altura."
 pubDate: 2026-05-04
 categorySlug: "salud"
+translationKey: "healthy-adult-bmi-range"
 tags:
   - imc normal
   - peso saludable

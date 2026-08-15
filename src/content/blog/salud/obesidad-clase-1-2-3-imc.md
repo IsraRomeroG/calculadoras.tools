@@ -4,6 +4,7 @@ seoTitle: "Obesidad según IMC: clases 1, 2 y 3 explicadas"
 description: "Conoce los rangos de obesidad según el IMC adulto, sus clases y las limitaciones de esta clasificación."
 pubDate: 2026-05-26
 categorySlug: "salud"
+translationKey: "obesity-classes-bmi"
 tags:
   - obesidad
   - imc

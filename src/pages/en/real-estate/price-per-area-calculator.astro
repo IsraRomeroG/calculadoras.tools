@@ -1,0 +1,1195 @@
+---
+import AdSlot from "@components/ads/AdSlot.astro";
+import Container from "@components/layout/Container.astro";
+import PageShell from "@components/layout/PageShell.astro";
+import FaqSection from "@components/shared/FaqSection.astro";
+import PageHero from "@components/shared/PageHero.astro";
+import SectionIntro from "@components/shared/SectionIntro.astro";
+import BaseLayout from "@layouts/BaseLayout.astro";
+import {
+  SURFACE_TYPES,
+  SURFACE_TYPE_LABELS,
+} from "@lib/calculators/inmuebles/calculadora-precio-por-metro-cuadrado/pricePerArea.en";
+import { buildAlternateLinks } from "@lib/i18n/routing";
+import { buildFaqJsonLd } from "@lib/seo";
+
+const title = "Price per area calculator";
+const description =
+  "Calculate price per square meter, include additional costs and compare properties with different areas.";
+const canonical = "/en/real-estate/price-per-area-calculator";
+const spanishCanonical = "/inmuebles/calculadora-precio-por-metro-cuadrado";
+const alternates = buildAlternateLinks(
+  { es: spanishCanonical, en: canonical },
+  Astro.site ?? Astro.url,
+);
+
+const areaUnitOptions = [
+  { value: "m2", label: "m²" },
+  { value: "ft2", label: "ft²" },
+  { value: "ha", label: "ha" },
+  { value: "acre", label: "acre" },
+] as const;
+
+const examples = [
+  {
+    label: "Apartment",
+    price: "3000000",
+    area: "120",
+    unit: "m2",
+    costs: "80000",
+  },
+  {
+    label: "Lot",
+    price: "1800000",
+    area: "450",
+    unit: "m2",
+    costs: "0",
+  },
+  {
+    label: "Commercial space in ft²",
+    price: "2400000",
+    area: "1600",
+    unit: "ft2",
+    costs: "50000",
+  },
+] as const;
+
+const faqs = [
+  {
+    question: "How is price per square meter calculated?",
+    answer:
+      "Divide the total price by the area converted to square meters. When additional costs apply, add them before dividing to calculate the effective price per square meter.",
+  },
+  {
+    question: "What is the difference between base and effective price per m²?",
+    answer:
+      "The base price uses only the purchase price. The effective price adds costs such as closing costs, commissions or initial improvements.",
+  },
+  {
+    question: "Should I use built, lot or rentable area?",
+    answer:
+      "It depends on what you want to compare. The calculator records the area type and warns when different concepts are mixed.",
+  },
+  {
+    question: "Can I compare properties of different sizes?",
+    answer:
+      "Yes. The tool normalizes all areas to m² and shows absolute and percentage differences from the option with the lowest effective price per m².",
+  },
+  {
+    question: "Is the option with the lowest price per m² always better?",
+    answer:
+      "Not necessarily. Location, condition, possible use, future expenses and area type can change the decision.",
+  },
+  {
+    question: "Does the calculator estimate market value?",
+    answer:
+      "No. It only calculates relationships between price and area using your inputs; it does not replace an appraisal or market analysis.",
+  },
+];
+
+const faqJsonLd = buildFaqJsonLd(faqs);
+---
+
+<BaseLayout title={title} description={description} canonical={canonical} locale="en" alternates={alternates}>
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={JSON.stringify(faqJsonLd)} />
+  </Fragment>
+
+  <PageShell>
+    <PageHero
+      title="Price per area calculator"
+      description="Calculate base and effective prices and compare options measured in m², ft², hectares or acres."
+      kicker="Real Estate"
+      kickerHref="/en/real-estate"
+      collapseBreadcrumbOnMobile
+      containerClass="py-6 md:py-8"
+      breadcrumbs={[
+        { label: "Home", href: "/en", ariaLabel: "Home" },
+        { label: "Real Estate", href: "/en/real-estate", optional: true },
+        { label: "Price per area", truncate: true },
+      ]}
+    />
+
+    <Container as="section" class="py-6 md:py-8">
+      <section
+        id="price-per-area-tool"
+        class="overflow-hidden rounded-lg border border-gray-700 bg-gray-950 shadow-xl shadow-gray-950/30"
+        aria-labelledby="calculator-heading"
+      >
+        <div class="grid lg:grid-cols-[minmax(0,1.05fr)_minmax(19rem,0.95fr)]">
+          <div class="p-4 sm:p-6">
+            <p class="text-sm font-semibold text-emerald-300">
+              Property comparison
+            </p>
+            <h2 id="calculator-heading" class="mt-2 text-2xl font-semibold">
+              Price by area
+            </h2>
+
+            <div
+              class="mt-5 grid grid-cols-2 rounded-lg border border-gray-700 bg-gray-900 p-1"
+              role="group"
+              aria-label="Calculation mode"
+            >
+              <button
+                class="min-h-11 rounded-md bg-emerald-400 px-3 py-2 text-sm font-semibold text-gray-950 transition focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-emerald-300/40"
+                type="button"
+                aria-pressed="true"
+                data-mode-button="price-per-area"
+              >
+                Price per m²
+              </button>
+              <button
+                class="min-h-11 rounded-md px-3 py-2 text-sm font-semibold text-gray-300 transition hover:bg-gray-800 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-emerald-300/30"
+                type="button"
+                aria-pressed="false"
+                data-mode-button="total-price"
+              >
+                Total price
+              </button>
+            </div>
+
+            <div class="mt-5 grid gap-4 sm:grid-cols-2">
+              <div data-total-price-field>
+                <label
+                  for="area-total-price"
+                  class="block text-sm font-semibold text-gray-200"
+                >
+                  Total price
+                </label>
+                <input
+                  id="area-total-price"
+                  class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-900 px-4 font-mono text-base text-white outline-none transition placeholder:text-gray-600 focus:border-emerald-400 focus:ring-3 focus:ring-emerald-400/15"
+                  type="text"
+                  inputmode="decimal"
+                  autocomplete="off"
+                  placeholder="$3,000,000"
+                  aria-describedby="price-area-error"
+                  data-total-price
+                />
+              </div>
+
+              <div class="hidden" data-price-per-m2-field>
+                <label
+                  for="area-price-per-m2"
+                  class="block text-sm font-semibold text-gray-200"
+                >
+                  Price per m²
+                </label>
+                <input
+                  id="area-price-per-m2"
+                  class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-900 px-4 font-mono text-base text-white outline-none transition placeholder:text-gray-600 focus:border-emerald-400 focus:ring-3 focus:ring-emerald-400/15"
+                  type="text"
+                  inputmode="decimal"
+                  autocomplete="off"
+                  placeholder="$25,000"
+                  aria-describedby="price-area-error"
+                  data-price-per-m2
+                />
+              </div>
+
+              <div>
+                <label
+                  for="area-additional-costs"
+                  class="block text-sm font-semibold text-gray-200"
+                >
+                  Additional costs
+                </label>
+                <input
+                  id="area-additional-costs"
+                  class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-900 px-4 font-mono text-base text-white outline-none transition placeholder:text-gray-600 focus:border-emerald-400 focus:ring-3 focus:ring-emerald-400/15"
+                  type="text"
+                  inputmode="decimal"
+                  autocomplete="off"
+                  placeholder="$80,000"
+                  aria-describedby="price-area-error"
+                  data-additional-costs
+                />
+              </div>
+            </div>
+
+            <div class="mt-5 grid gap-4 sm:grid-cols-[minmax(0,1fr)_8rem]">
+              <div>
+                <label
+                  for="area-value"
+                  class="block text-sm font-semibold text-gray-200"
+                >
+                  Area
+                </label>
+                <input
+                  id="area-value"
+                  class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-900 px-4 font-mono text-base text-white outline-none transition placeholder:text-gray-600 focus:border-emerald-400 focus:ring-3 focus:ring-emerald-400/15"
+                  type="text"
+                  inputmode="decimal"
+                  autocomplete="off"
+                  placeholder="120"
+                  aria-describedby="price-area-error"
+                  data-area-value
+                />
+              </div>
+              <div>
+                <label
+                  for="area-unit"
+                  class="block text-sm font-semibold text-gray-200"
+                >
+                  Unit
+                </label>
+                <select
+                  id="area-unit"
+                  class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-900 px-3 text-base text-white outline-none transition focus:border-emerald-400 focus:ring-3 focus:ring-emerald-400/15"
+                  data-area-unit
+                >
+                  {
+                    areaUnitOptions.map((unit) => (
+                      <option value={unit.value} selected={unit.value === "m2"}>
+                        {unit.label}
+                      </option>
+                    ))
+                  }
+                </select>
+              </div>
+            </div>
+
+            <div class="mt-5">
+              <label
+                for="area-surface-type"
+                class="block text-sm font-semibold text-gray-200"
+              >
+                Area type
+              </label>
+              <select
+                id="area-surface-type"
+                class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-900 px-4 text-base text-white outline-none transition focus:border-emerald-400 focus:ring-3 focus:ring-emerald-400/15"
+                data-surface-type
+              >
+                {
+                  SURFACE_TYPES.map((type) => (
+                    <option value={type} selected={type === "built"}>
+                      {SURFACE_TYPE_LABELS[type]}
+                    </option>
+                  ))
+                }
+              </select>
+            </div>
+
+            <p
+              id="price-area-error"
+              class="mt-4 hidden rounded-lg border border-red-400/25 bg-red-400/10 p-3 text-sm leading-relaxed text-red-200"
+              role="alert"
+              data-error-message
+            ></p>
+
+            <div class="mt-5 grid gap-2 sm:grid-cols-3">
+              {
+                examples.map((example) => (
+                  <button
+                    class="min-h-16 rounded-lg border border-gray-700 bg-gray-900 px-3 py-2 text-left text-sm text-gray-200 transition hover:border-emerald-400/60 hover:bg-gray-800 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-emerald-300/30"
+                    type="button"
+                    data-example-price={example.price}
+                    data-example-area={example.area}
+                    data-example-unit={example.unit}
+                    data-example-costs={example.costs}
+                  >
+                    <span class="block font-semibold">{example.label}</span>
+                    <span class="mt-1 block font-mono text-xs text-emerald-200">
+                      {example.area} {example.unit}
+                    </span>
+                  </button>
+                ))
+              }
+            </div>
+
+            <div class="mt-5 flex flex-col gap-3 sm:flex-row">
+              <button
+                class="min-h-11 rounded-lg border border-gray-700 px-4 py-2 text-sm font-semibold text-gray-200 transition hover:border-gray-500 hover:bg-gray-900 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-gray-400/30"
+                type="button"
+                data-clear-calculator
+              >
+                Clear
+              </button>
+            </div>
+          </div>
+
+          <aside
+            class="border-t border-gray-800 bg-gray-900/65 p-4 sm:p-6 lg:border-l lg:border-t-0"
+          >
+            <p class="text-xs font-semibold uppercase tracking-wide text-gray-500">
+              Main result
+            </p>
+            <p class="mt-2 text-sm font-semibold text-emerald-300" data-result-kicker>
+              Effective price per m²
+            </p>
+            <div class="mt-3 rounded-lg border border-gray-800 bg-gray-950 p-4">
+              <p
+                class="break-words text-3xl font-semibold text-emerald-100"
+                data-main-result
+              >
+                No calculation
+              </p>
+              <p
+                class="mt-3 min-h-10 text-sm leading-relaxed text-gray-400"
+                data-result-context
+              >
+                Enter a price and area to calculate.
+              </p>
+            </div>
+
+            <dl class="mt-4 grid grid-cols-2 gap-2">
+              <div class="rounded-lg border border-gray-800 bg-gray-950 p-3">
+                <dt class="text-xs font-semibold uppercase text-gray-500">
+                  Base m²
+                </dt>
+                <dd class="mt-1 font-mono text-base font-semibold text-white" data-base-price>
+                  -
+                </dd>
+              </div>
+              <div class="rounded-lg border border-gray-800 bg-gray-950 p-3">
+                <dt class="text-xs font-semibold uppercase text-gray-500">
+                  Effective m²
+                </dt>
+                <dd class="mt-1 font-mono text-base font-semibold text-white" data-effective-price>
+                  -
+                </dd>
+              </div>
+              <div class="rounded-lg border border-gray-800 bg-gray-950 p-3">
+                <dt class="text-xs font-semibold uppercase text-gray-500">
+                  Effective ft²
+                </dt>
+                <dd class="mt-1 font-mono text-base font-semibold text-white" data-price-ft2>
+                  -
+                </dd>
+              </div>
+              <div class="rounded-lg border border-gray-800 bg-gray-950 p-3">
+                <dt class="text-xs font-semibold uppercase text-gray-500">
+                  Effective total
+                </dt>
+                <dd class="mt-1 font-mono text-base font-semibold text-white" data-effective-total>
+                  -
+                </dd>
+              </div>
+            </dl>
+
+            <div class="mt-4 rounded-lg border border-gray-800 bg-gray-950 p-4">
+              <h3 class="text-sm font-semibold text-gray-200">
+                Converted area
+              </h3>
+              <dl class="mt-3 grid grid-cols-2 gap-2 text-sm">
+                <div>
+                  <dt class="text-gray-500">m²</dt>
+                  <dd class="font-mono text-gray-100" data-area-m2>-</dd>
+                </div>
+                <div>
+                  <dt class="text-gray-500">ft²</dt>
+                  <dd class="font-mono text-gray-100" data-area-ft2>-</dd>
+                </div>
+                <div>
+                  <dt class="text-gray-500">ha</dt>
+                  <dd class="font-mono text-gray-100" data-area-ha>-</dd>
+                </div>
+                <div>
+                  <dt class="text-gray-500">acre</dt>
+                  <dd class="font-mono text-gray-100" data-area-acre>-</dd>
+                </div>
+              </dl>
+            </div>
+
+            <p
+              class="mt-4 hidden rounded-lg border border-amber-300/25 bg-amber-300/10 p-3 text-sm leading-relaxed text-amber-100"
+              data-result-warning
+            ></p>
+
+            <div class="mt-4 flex flex-col gap-2 sm:flex-row sm:flex-wrap">
+              <button
+                class="hidden min-h-11 rounded-lg bg-emerald-400 px-4 py-2 text-sm font-semibold text-gray-950 transition hover:bg-emerald-300 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-emerald-300/40"
+                type="button"
+                data-copy-main
+              >
+                Copy result
+              </button>
+              <button
+                class="hidden min-h-11 rounded-lg border border-emerald-400/60 px-4 py-2 text-sm font-semibold text-emerald-200 transition hover:bg-emerald-400/10 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-emerald-300/40"
+                type="button"
+                data-share-main
+              >
+                Share
+              </button>
+            </div>
+            <p
+              class="sr-only"
+              role="status"
+              aria-live="polite"
+              data-live-status
+            ></p>
+            <p
+              class="mt-3 min-h-5 text-sm text-emerald-300"
+              role="status"
+              aria-live="polite"
+              data-copy-status
+            ></p>
+          </aside>
+        </div>
+
+        <div class="border-t border-gray-800 p-4 sm:p-6">
+          <div class="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+            <div>
+              <h3 class="text-lg font-semibold">Option comparison</h3>
+              <p class="mt-1 text-sm leading-relaxed text-gray-500">
+                Compare 2 to 5 options by effective price per m².
+              </p>
+            </div>
+            <button
+              class="min-h-11 rounded-lg border border-emerald-400/60 px-4 py-2 text-sm font-semibold text-emerald-200 transition hover:bg-emerald-400/10 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-emerald-300/40 disabled:cursor-not-allowed disabled:opacity-50"
+              type="button"
+              data-add-comparison
+            >
+              Add option
+            </button>
+          </div>
+
+          <div class="mt-4 grid gap-4" data-comparison-list></div>
+
+          <div
+            class="mt-4 rounded-lg border border-gray-800 bg-gray-900/60 p-4"
+            data-comparison-panel
+          >
+            <p class="text-sm font-semibold text-gray-200" data-comparison-summary>
+              Complete at least 2 options to compare.
+            </p>
+            <p
+              class="mt-3 hidden rounded-lg border border-amber-300/25 bg-amber-300/10 p-3 text-sm leading-relaxed text-amber-100"
+              data-comparison-warning
+            ></p>
+            <button
+              class="mt-4 hidden min-h-11 rounded-lg bg-emerald-400 px-4 py-2 text-sm font-semibold text-gray-950 transition hover:bg-emerald-300 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-emerald-300/40"
+              type="button"
+              data-copy-comparison
+            >
+              Copy comparison
+            </button>
+          </div>
+        </div>
+      </section>
+    </Container>
+
+    <AdSlot placement="calculator-after-tool" />
+
+    <Container as="section" class="py-6 md:py-8">
+      <SectionIntro
+        title="Base price and effective price"
+        description="The same purchase price can look different after adding initial costs or comparing different area types."
+      />
+      <div class="grid gap-4 md:grid-cols-3">
+        <article class="rounded-lg border border-gray-800 bg-gray-950 p-5">
+          <h3 class="text-lg font-semibold">Base price per m²</h3>
+          <p class="mt-3 text-sm leading-relaxed text-gray-400">
+            Uses only the purchase price divided by the area normalized to
+            square meters.
+          </p>
+        </article>
+        <article class="rounded-lg border border-gray-800 bg-gray-950 p-5">
+          <h3 class="text-lg font-semibold">Effective price per m²</h3>
+          <p class="mt-3 text-sm leading-relaxed text-gray-400">
+            Adds costs before dividing, making it easier to compare scenarios
+            with different upfront expenses.
+          </p>
+        </article>
+        <article class="rounded-lg border border-gray-800 bg-gray-950 p-5">
+          <h3 class="text-lg font-semibold">Comparability</h3>
+          <p class="mt-3 text-sm leading-relaxed text-gray-400">
+            Lot, built and rentable areas do not always represent the same
+            practical value.
+          </p>
+        </article>
+      </div>
+    </Container>
+
+    <FaqSection faqs={faqs} />
+  </PageShell>
+</BaseLayout>
+
+<script>
+  import {
+    AREA_UNITS,
+    SURFACE_TYPE_LABELS,
+    SURFACE_TYPES,
+    buildComparisonCopyText,
+    buildCopyText,
+    buildPropertyComparison,
+    calculatePricePerArea,
+    formatArea,
+    formatCurrency,
+    formatPercent,
+    isAreaUnit,
+    isSurfaceType,
+    parseLocalizedNumber,
+  } from "@lib/calculators/inmuebles/calculadora-precio-por-metro-cuadrado/pricePerArea.en";
+
+  const AREA_UNIT_UI_LABELS = {
+    m2: "m²",
+    ft2: "ft²",
+    ha: "ha",
+    acre: "acre",
+  };
+
+  function query(selector) {
+    const element = document.querySelector(selector);
+
+    if (!element) {
+      throw new Error(`Element ${selector} was not found.`);
+    }
+
+    return element;
+  }
+
+  const modeButtons = Array.from(document.querySelectorAll("[data-mode-button]"));
+  const totalPriceField = query("[data-total-price-field]");
+  const pricePerM2Field = query("[data-price-per-m2-field]");
+  const totalPriceInput = query("[data-total-price]");
+  const pricePerM2Input = query("[data-price-per-m2]");
+  const additionalCostsInput = query("[data-additional-costs]");
+  const areaInput = query("[data-area-value]");
+  const areaUnitSelect = query("[data-area-unit]");
+  const surfaceTypeSelect = query("[data-surface-type]");
+  const errorMessage = query("[data-error-message]");
+  const resultKicker = query("[data-result-kicker]");
+  const mainResult = query("[data-main-result]");
+  const resultContext = query("[data-result-context]");
+  const basePrice = query("[data-base-price]");
+  const effectivePrice = query("[data-effective-price]");
+  const priceFt2 = query("[data-price-ft2]");
+  const effectiveTotal = query("[data-effective-total]");
+  const areaM2 = query("[data-area-m2]");
+  const areaFt2 = query("[data-area-ft2]");
+  const areaHa = query("[data-area-ha]");
+  const areaAcre = query("[data-area-acre]");
+  const resultWarning = query("[data-result-warning]");
+  const copyMainButton = query("[data-copy-main]");
+  const shareMainButton = query("[data-share-main]");
+  const copyStatus = query("[data-copy-status]");
+  const liveStatus = query("[data-live-status]");
+  const clearButton = query("[data-clear-calculator]");
+  const comparisonList = query("[data-comparison-list]");
+  const addComparisonButton = query("[data-add-comparison]");
+  const comparisonSummary = query("[data-comparison-summary]");
+  const comparisonWarning = query("[data-comparison-warning]");
+  const copyComparisonButton = query("[data-copy-comparison]");
+
+  let currentMode = "price-per-area";
+  let currentCopyText = "";
+  let currentComparisonCopyText = "";
+  let copyTimer = 0;
+  let liveTimer = 0;
+  let comparisonOptions = [createComparisonOption(), createComparisonOption()];
+
+  function createComparisonOption(values = {}) {
+    return {
+      id: `option-${Date.now()}-${Math.random().toString(16).slice(2)}`,
+      name: "",
+      totalPrice: "",
+      area: "",
+      areaUnit: "m2",
+      surfaceType: "built",
+      additionalCosts: "",
+      note: "",
+      ...values,
+    };
+  }
+
+  function parseNumberField(rawValue, label, options = {}) {
+    const required = options.required ?? true;
+    const allowZero = options.allowZero ?? false;
+    const trimmed = rawValue.trim();
+
+    if (!trimmed) {
+      if (required) {
+        throw new Error(`${label} is required.`);
+      }
+
+      return null;
+    }
+
+    const parsed = parseLocalizedNumber(trimmed);
+
+    if (parsed === null) {
+      throw new Error(`${label} must be a valid number.`);
+    }
+
+    if (allowZero ? parsed < 0 : parsed <= 0) {
+      throw new Error(
+        allowZero
+          ? `${label} must be greater than or equal to zero.`
+          : `${label} must be greater than zero.`,
+      );
+    }
+
+    return parsed;
+  }
+
+  function getAreaUnit(value) {
+    return isAreaUnit(value) ? value : "m2";
+  }
+
+  function getSurfaceType(value) {
+    return isSurfaceType(value) ? value : "built";
+  }
+
+  function setMode(mode) {
+    currentMode = mode;
+    const isTotalMode = mode === "total-price";
+
+    totalPriceField.classList.toggle("hidden", isTotalMode);
+    pricePerM2Field.classList.toggle("hidden", !isTotalMode);
+
+    modeButtons.forEach((button) => {
+      const active = button.dataset.modeButton === mode;
+
+      button.setAttribute("aria-pressed", active ? "true" : "false");
+      button.classList.toggle("bg-emerald-400", active);
+      button.classList.toggle("text-gray-950", active);
+      button.classList.toggle("text-gray-300", !active);
+      button.classList.toggle("hover:bg-gray-800", !active);
+    });
+
+    renderMain();
+  }
+
+  function setError(message = "") {
+    errorMessage.textContent = message;
+    errorMessage.classList.toggle("hidden", !message);
+  }
+
+  function showEmpty(context) {
+    currentCopyText = "";
+    resultKicker.textContent =
+      currentMode === "total-price"
+        ? "Estimated total price"
+        : "Effective price per m²";
+    mainResult.textContent = "No calculation";
+    resultContext.textContent = context;
+    [basePrice, effectivePrice, priceFt2, effectiveTotal, areaM2, areaFt2, areaHa, areaAcre].forEach(
+      (element) => {
+        element.textContent = "-";
+      },
+    );
+    resultWarning.classList.add("hidden");
+    resultWarning.textContent = "";
+    copyMainButton.classList.add("hidden");
+    shareMainButton.classList.add("hidden");
+    scheduleAnnouncement("No calculation");
+  }
+
+  function getMainInput() {
+    const area = parseNumberField(areaInput.value, "The area", {
+      required: false,
+    });
+    const additionalCosts =
+      parseNumberField(additionalCostsInput.value, "Additional costs", {
+        required: false,
+        allowZero: true,
+      }) ?? 0;
+
+    if (area === null) {
+      return null;
+    }
+
+    if (currentMode === "price-per-area") {
+      const totalPrice = parseNumberField(
+        totalPriceInput.value,
+        "The total price",
+        { required: false },
+      );
+
+      if (totalPrice === null) {
+        return null;
+      }
+
+      return {
+        mode: currentMode,
+        totalPrice,
+        area,
+        areaUnit: getAreaUnit(areaUnitSelect.value),
+        surfaceType: getSurfaceType(surfaceTypeSelect.value),
+        additionalCosts,
+      };
+    }
+
+    const pricePerM2 = parseNumberField(
+      pricePerM2Input.value,
+      "The price per m²",
+      { required: false },
+    );
+
+    if (pricePerM2 === null) {
+      return null;
+    }
+
+    return {
+      mode: currentMode,
+      pricePerM2,
+      area,
+      areaUnit: getAreaUnit(areaUnitSelect.value),
+      surfaceType: getSurfaceType(surfaceTypeSelect.value),
+      additionalCosts,
+    };
+  }
+
+  function renderMain() {
+    try {
+      const input = getMainInput();
+
+      setError();
+
+      if (!input) {
+        showEmpty(
+          currentMode === "total-price"
+            ? "Enter an area and price per m² to estimate the total."
+            : "Enter a price and area to calculate.",
+        );
+        return;
+      }
+
+      const result = calculatePricePerArea(input);
+
+      resultKicker.textContent =
+        currentMode === "total-price"
+          ? "Estimated total price"
+          : "Effective price per m²";
+      mainResult.textContent =
+        currentMode === "total-price"
+          ? formatCurrency(result.effectiveTotal)
+          : `${formatCurrency(result.effectivePricePerM2)}/m²`;
+      resultContext.textContent =
+        `${SURFACE_TYPE_LABELS[result.surfaceType]} · ` +
+        `${formatAreaForUi(result.areaM2, "m2")} normalized.`;
+      basePrice.textContent = `${formatCurrency(result.basePricePerM2)}/m²`;
+      effectivePrice.textContent = `${formatCurrency(result.effectivePricePerM2)}/m²`;
+      priceFt2.textContent = `${formatCurrency(result.effectivePricePerFt2)}/ft²`;
+      effectiveTotal.textContent = formatCurrency(result.effectiveTotal);
+      areaM2.textContent = formatAreaForUi(result.areaConversions.m2, "m2");
+      areaFt2.textContent = formatAreaForUi(result.areaConversions.ft2, "ft2");
+      areaHa.textContent = formatAreaForUi(result.areaConversions.ha, "ha");
+      areaAcre.textContent = formatAreaForUi(result.areaConversions.acre, "acre");
+
+      if (result.additionalCosts > 0) {
+        resultWarning.textContent =
+          `The effective price includes ${formatCurrency(result.additionalCosts)} in additional costs.`;
+        resultWarning.classList.remove("hidden");
+      } else {
+        resultWarning.classList.add("hidden");
+        resultWarning.textContent = "";
+      }
+
+      currentCopyText = buildCopyText(result);
+      copyMainButton.classList.remove("hidden");
+      shareMainButton.classList.remove("hidden");
+      scheduleAnnouncement(`Result: ${mainResult.textContent}`);
+    } catch (error) {
+      setError(error instanceof Error ? error.message : "Check the inputs.");
+      showEmpty("Correct the marked inputs to calculate.");
+    }
+  }
+
+  function formatAreaForUi(value, unit) {
+    return formatArea(value, unit)
+      .replace("m2", "m²")
+      .replace("ft2", "ft²");
+  }
+
+  function renderComparisonCards() {
+    comparisonList.textContent = "";
+
+    comparisonOptions.forEach((option, index) => {
+      const card = document.createElement("article");
+      card.className =
+        "rounded-lg border border-gray-800 bg-gray-950 p-4 transition";
+      card.dataset.comparisonCard = option.id;
+      card.innerHTML = `
+        <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+          <div>
+            <p class="text-sm font-semibold text-gray-200">Option ${index + 1}</p>
+            <p class="mt-1 text-sm text-gray-500" data-comparison-result="${option.id}">No calculation</p>
+          </div>
+          <div class="flex gap-2">
+            <button class="min-h-10 rounded-md border border-gray-700 px-3 py-2 text-xs font-semibold text-gray-300 transition hover:border-emerald-400/60 hover:bg-gray-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/30 disabled:cursor-not-allowed disabled:opacity-50" type="button" data-duplicate-comparison="${option.id}">Duplicate</button>
+            <button class="min-h-10 rounded-md border border-gray-700 px-3 py-2 text-xs font-semibold text-gray-300 transition hover:border-red-300/60 hover:bg-red-300/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-300/30 disabled:cursor-not-allowed disabled:opacity-50" type="button" data-remove-comparison="${option.id}">Remove</button>
+          </div>
+        </div>
+        <div class="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          <label class="block">
+            <span class="text-sm font-semibold text-gray-300">Name</span>
+            <input class="mt-1 min-h-11 w-full rounded-lg border border-gray-700 bg-gray-900 px-3 text-base text-white outline-none transition placeholder:text-gray-600 focus:border-emerald-400 focus:ring-3 focus:ring-emerald-400/15" type="text" autocomplete="off" placeholder="House A" data-comparison-field="name" data-comparison-id="${option.id}" />
+          </label>
+          <label class="block">
+            <span class="text-sm font-semibold text-gray-300">Total price</span>
+            <input class="mt-1 min-h-11 w-full rounded-lg border border-gray-700 bg-gray-900 px-3 font-mono text-base text-white outline-none transition placeholder:text-gray-600 focus:border-emerald-400 focus:ring-3 focus:ring-emerald-400/15" type="text" inputmode="decimal" autocomplete="off" placeholder="$3,000,000" data-comparison-field="totalPrice" data-comparison-id="${option.id}" />
+          </label>
+          <label class="block">
+            <span class="text-sm font-semibold text-gray-300">Area</span>
+            <input class="mt-1 min-h-11 w-full rounded-lg border border-gray-700 bg-gray-900 px-3 font-mono text-base text-white outline-none transition placeholder:text-gray-600 focus:border-emerald-400 focus:ring-3 focus:ring-emerald-400/15" type="text" inputmode="decimal" autocomplete="off" placeholder="120" data-comparison-field="area" data-comparison-id="${option.id}" />
+          </label>
+          <label class="block">
+            <span class="text-sm font-semibold text-gray-300">Unit</span>
+            <select class="mt-1 min-h-11 w-full rounded-lg border border-gray-700 bg-gray-900 px-3 text-base text-white outline-none transition focus:border-emerald-400 focus:ring-3 focus:ring-emerald-400/15" data-comparison-field="areaUnit" data-comparison-id="${option.id}">
+              ${AREA_UNITS.map((unit) => `<option value="${unit}">${AREA_UNIT_UI_LABELS[unit]}</option>`).join("")}
+            </select>
+          </label>
+          <label class="block">
+            <span class="text-sm font-semibold text-gray-300">Type</span>
+            <select class="mt-1 min-h-11 w-full rounded-lg border border-gray-700 bg-gray-900 px-3 text-base text-white outline-none transition focus:border-emerald-400 focus:ring-3 focus:ring-emerald-400/15" data-comparison-field="surfaceType" data-comparison-id="${option.id}">
+              ${SURFACE_TYPES.map((type) => `<option value="${type}">${SURFACE_TYPE_LABELS[type]}</option>`).join("")}
+            </select>
+          </label>
+          <label class="block">
+            <span class="text-sm font-semibold text-gray-300">Additional costs</span>
+            <input class="mt-1 min-h-11 w-full rounded-lg border border-gray-700 bg-gray-900 px-3 font-mono text-base text-white outline-none transition placeholder:text-gray-600 focus:border-emerald-400 focus:ring-3 focus:ring-emerald-400/15" type="text" inputmode="decimal" autocomplete="off" placeholder="$0" data-comparison-field="additionalCosts" data-comparison-id="${option.id}" />
+          </label>
+          <label class="block sm:col-span-2 lg:col-span-3">
+            <span class="text-sm font-semibold text-gray-300">Note</span>
+            <input class="mt-1 min-h-11 w-full rounded-lg border border-gray-700 bg-gray-900 px-3 text-base text-white outline-none transition placeholder:text-gray-600 focus:border-emerald-400 focus:ring-3 focus:ring-emerald-400/15" type="text" autocomplete="off" placeholder="Location, condition or reference" data-comparison-field="note" data-comparison-id="${option.id}" />
+          </label>
+        </div>
+      `;
+      comparisonList.append(card);
+      setCardValues(card, option);
+    });
+
+    updateComparisonButtons();
+    updateComparison();
+  }
+
+  function setCardValues(card, option) {
+    card.querySelector('[data-comparison-field="name"]').value = option.name;
+    card.querySelector('[data-comparison-field="totalPrice"]').value =
+      option.totalPrice;
+    card.querySelector('[data-comparison-field="area"]').value = option.area;
+    card.querySelector('[data-comparison-field="areaUnit"]').value =
+      option.areaUnit;
+    card.querySelector('[data-comparison-field="surfaceType"]').value =
+      option.surfaceType;
+    card.querySelector('[data-comparison-field="additionalCosts"]').value =
+      option.additionalCosts;
+    card.querySelector('[data-comparison-field="note"]').value = option.note;
+  }
+
+  function updateComparisonButtons() {
+    addComparisonButton.disabled = comparisonOptions.length >= 5;
+    comparisonList.querySelectorAll("[data-remove-comparison]").forEach((button) => {
+      button.disabled = comparisonOptions.length <= 2;
+    });
+    comparisonList.querySelectorAll("[data-duplicate-comparison]").forEach((button) => {
+      button.disabled = comparisonOptions.length >= 5;
+    });
+  }
+
+  function updateComparisonState(element) {
+    const id = element.dataset.comparisonId;
+    const field = element.dataset.comparisonField;
+    const option = comparisonOptions.find((item) => item.id === id);
+
+    if (!option || !field || !(field in option)) {
+      return;
+    }
+
+    option[field] = element.value;
+  }
+
+  function parseComparisonOption(option, index) {
+    const totalPrice = parseNumberField(
+      option.totalPrice,
+      `The price of option ${index + 1}`,
+    );
+    const area = parseNumberField(
+      option.area,
+      `The area of option ${index + 1}`,
+    );
+    const additionalCosts =
+      parseNumberField(
+        option.additionalCosts,
+        `The costs of option ${index + 1}`,
+        { required: false, allowZero: true },
+      ) ?? 0;
+
+    return {
+      id: option.id,
+      name: option.name,
+      totalPrice,
+      area,
+      areaUnit: getAreaUnit(option.areaUnit),
+      surfaceType: getSurfaceType(option.surfaceType),
+      additionalCosts,
+      note: option.note,
+    };
+  }
+
+  function hasComparisonValues(option) {
+    return option.totalPrice.trim() !== "" || option.area.trim() !== "";
+  }
+
+  function resetComparisonResults() {
+    comparisonOptions.forEach((option) => {
+      const card = comparisonList.querySelector(`[data-comparison-card="${option.id}"]`);
+      const result = comparisonList.querySelector(`[data-comparison-result="${option.id}"]`);
+
+      if (card) {
+        card.classList.remove("border-emerald-400/70", "bg-emerald-400/5");
+      }
+
+      if (result) {
+        result.textContent = hasComparisonValues(option)
+          ? "Complete price and area"
+          : "No calculation";
+        result.className = "mt-1 text-sm text-gray-500";
+      }
+    });
+  }
+
+  function updateComparison() {
+    resetComparisonResults();
+
+    try {
+      const completeOptions = comparisonOptions.filter(
+        (option) =>
+          option.totalPrice.trim() !== "" &&
+          option.area.trim() !== "",
+      );
+
+      if (completeOptions.length < 2) {
+        currentComparisonCopyText = "";
+        comparisonSummary.textContent =
+          "Complete at least 2 options to compare.";
+        comparisonSummary.className = "text-sm font-semibold text-gray-200";
+        comparisonWarning.classList.add("hidden");
+        copyComparisonButton.classList.add("hidden");
+        return;
+      }
+
+      const comparison = buildPropertyComparison(
+        completeOptions.map((option, index) =>
+          parseComparisonOption(option, index),
+        ),
+      );
+
+      comparison.items.forEach((item) => {
+        const card = comparisonList.querySelector(`[data-comparison-card="${item.id}"]`);
+        const result = comparisonList.querySelector(`[data-comparison-result="${item.id}"]`);
+
+        if (!result) {
+          return;
+        }
+
+        if (item.isCheapest) {
+          result.textContent =
+            `${formatCurrency(item.effectivePricePerM2)}/m² effective · lowest price`;
+          result.className = "mt-1 text-sm font-semibold text-emerald-300";
+          card?.classList.add("border-emerald-400/70", "bg-emerald-400/5");
+        } else {
+          result.textContent =
+            `${formatCurrency(item.effectivePricePerM2)}/m² effective · ` +
+            `+${formatCurrency(item.differenceAbsolute)}/m² (${formatPercent(item.differencePercent)})`;
+          result.className = "mt-1 text-sm text-gray-300";
+        }
+      });
+
+      comparisonSummary.textContent =
+        `${comparison.cheapest.name} has the lowest effective price: ` +
+        `${formatCurrency(comparison.cheapest.effectivePricePerM2)}/m².`;
+      comparisonSummary.className = "text-sm font-semibold text-emerald-200";
+
+      if (comparison.warning) {
+        comparisonWarning.textContent = comparison.warning;
+        comparisonWarning.classList.remove("hidden");
+      } else {
+        comparisonWarning.textContent = "";
+        comparisonWarning.classList.add("hidden");
+      }
+
+      currentComparisonCopyText = buildComparisonCopyText(comparison);
+      copyComparisonButton.classList.remove("hidden");
+    } catch (error) {
+      currentComparisonCopyText = "";
+      comparisonSummary.textContent =
+        error instanceof Error ? error.message : "Check the options.";
+      comparisonSummary.className = "text-sm font-semibold text-red-200";
+      comparisonWarning.classList.add("hidden");
+      copyComparisonButton.classList.add("hidden");
+    }
+  }
+
+  function scheduleAnnouncement(message) {
+    window.clearTimeout(liveTimer);
+    liveTimer = window.setTimeout(() => {
+      liveStatus.textContent = message;
+    }, 350);
+  }
+
+  function showCopyStatus(message) {
+    copyStatus.textContent = message;
+    window.clearTimeout(copyTimer);
+    copyTimer = window.setTimeout(() => {
+      copyStatus.textContent = "";
+    }, 2200);
+  }
+
+  async function copyText(text, successMessage) {
+    if (!text) {
+      return;
+    }
+
+    try {
+      await navigator.clipboard.writeText(text);
+      showCopyStatus(successMessage);
+    } catch {
+      showCopyStatus("The text could not be copied automatically.");
+    }
+  }
+
+  [totalPriceInput, pricePerM2Input, additionalCostsInput, areaInput].forEach(
+    (input) => input.addEventListener("input", renderMain),
+  );
+  [areaUnitSelect, surfaceTypeSelect].forEach((select) => {
+    select.addEventListener("change", renderMain);
+  });
+
+  modeButtons.forEach((button) => {
+    button.addEventListener("click", () => {
+      setMode(button.dataset.modeButton);
+    });
+  });
+
+  document.addEventListener("click", (event) => {
+    if (!(event.target instanceof Element)) {
+      return;
+    }
+
+    const exampleButton = event.target.closest("[data-example-price]");
+
+    if (!exampleButton) {
+      return;
+    }
+
+    setMode("price-per-area");
+    totalPriceInput.value = exampleButton.dataset.examplePrice;
+    areaInput.value = exampleButton.dataset.exampleArea;
+    areaUnitSelect.value = exampleButton.dataset.exampleUnit;
+    additionalCostsInput.value = exampleButton.dataset.exampleCosts;
+    renderMain();
+    document.querySelector("#price-per-area-tool")?.scrollIntoView({
+      behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches
+        ? "auto"
+        : "smooth",
+      block: "start",
+    });
+  });
+
+  clearButton.addEventListener("click", () => {
+    totalPriceInput.value = "";
+    pricePerM2Input.value = "";
+    additionalCostsInput.value = "";
+    areaInput.value = "";
+    areaUnitSelect.value = "m2";
+    surfaceTypeSelect.value = "built";
+    comparisonOptions = [createComparisonOption(), createComparisonOption()];
+    setMode("price-per-area");
+    renderComparisonCards();
+    areaInput.focus();
+  });
+
+  copyMainButton.addEventListener("click", () => {
+    copyText(currentCopyText, "Result copied.");
+  });
+
+  shareMainButton.addEventListener("click", async () => {
+    if (!currentCopyText) {
+      return;
+    }
+
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: "Price per square meter",
+          text: currentCopyText,
+        });
+        return;
+      } catch {
+        return;
+      }
+    }
+
+    copyText(currentCopyText, "Result copied for sharing.");
+  });
+
+  addComparisonButton.addEventListener("click", () => {
+    if (comparisonOptions.length >= 5) {
+      return;
+    }
+
+    comparisonOptions.push(createComparisonOption());
+    renderComparisonCards();
+  });
+
+  comparisonList.addEventListener("input", (event) => {
+    if (!(event.target instanceof HTMLInputElement)) {
+      return;
+    }
+
+    updateComparisonState(event.target);
+    updateComparison();
+  });
+
+  comparisonList.addEventListener("change", (event) => {
+    if (!(event.target instanceof HTMLSelectElement)) {
+      return;
+    }
+
+    updateComparisonState(event.target);
+    updateComparison();
+  });
+
+  comparisonList.addEventListener("click", (event) => {
+    if (!(event.target instanceof Element)) {
+      return;
+    }
+
+    const removeButton = event.target.closest("[data-remove-comparison]");
+
+    if (removeButton) {
+      if (comparisonOptions.length <= 2) {
+        return;
+      }
+
+      const id = removeButton.dataset.removeComparison;
+      comparisonOptions = comparisonOptions.filter((option) => option.id !== id);
+      renderComparisonCards();
+      return;
+    }
+
+    const duplicateButton = event.target.closest("[data-duplicate-comparison]");
+
+    if (!duplicateButton || comparisonOptions.length >= 5) {
+      return;
+    }
+
+    const id = duplicateButton.dataset.duplicateComparison;
+    const option = comparisonOptions.find((item) => item.id === id);
+
+    if (!option) {
+      return;
+    }
+
+    const { id: _previousId, ...duplicatedValues } = option;
+
+    comparisonOptions.push(
+      createComparisonOption({
+        ...duplicatedValues,
+        name: option.name ? `${option.name} copy` : "",
+      }),
+    );
+    renderComparisonCards();
+  });
+
+  copyComparisonButton.addEventListener("click", () => {
+    copyText(currentComparisonCopyText, "Comparison copied.");
+  });
+
+  renderMain();
+  renderComparisonCards();
+</script>

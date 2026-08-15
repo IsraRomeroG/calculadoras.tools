@@ -1,5 +1,6 @@
 ---
 import BaseLayout from "@layouts/BaseLayout.astro";
+import { buildAlternateLinks } from "@lib/i18n/routing";
 import AdSlot from "@components/ads/AdSlot.astro";
 import Container from "@components/layout/Container.astro";
 import PageShell from "@components/layout/PageShell.astro";
@@ -12,6 +13,11 @@ const title = "Calculadora de precio de proyecto freelance";
 const description =
   "Calcula cuánto cobrar por un proyecto freelance, compara escenarios y analiza si un precio fijo cubre horas, gastos, riesgo y margen.";
 const canonical = "/finanzas/calculadora-de-precio-de-proyecto-freelance";
+const englishCanonical = "/en/finance/freelance-project-pricing-calculator";
+const alternates = buildAlternateLinks(
+  { es: canonical, en: englishCanonical },
+  Astro.site ?? Astro.url,
+);
 const faqs = [
   {
     question: "¿Cómo calculo cuánto cobrar por un proyecto freelance?",
@@ -52,7 +58,7 @@ const faqs = [
 const faqJsonLd = buildFaqJsonLd(faqs);
 ---
 
-<BaseLayout title={title} description={description} canonical={canonical}>
+<BaseLayout title={title} description={description} canonical={canonical} alternates={alternates}>
   <Fragment slot="head">
     <script type="application/ld+json" set:html={JSON.stringify(faqJsonLd)} />
   </Fragment>

@@ -10,12 +10,18 @@ import {
   SURFACE_TYPES,
   SURFACE_TYPE_LABELS,
 } from "@lib/calculators/inmuebles/calculadora-precio-por-metro-cuadrado/pricePerArea";
+import { buildAlternateLinks } from "@lib/i18n/routing";
 import { buildFaqJsonLd } from "@lib/seo";
 
 const title = "Calculadora de precio por metro cuadrado";
 const description =
   "Calcula el precio por metro cuadrado, suma costos adicionales y compara opciones con distintas superficies.";
 const canonical = "/inmuebles/calculadora-precio-por-metro-cuadrado";
+const englishCanonical = "/en/real-estate/price-per-area-calculator";
+const alternates = buildAlternateLinks(
+  { es: canonical, en: englishCanonical },
+  Astro.site ?? Astro.url,
+);
 
 const areaUnitOptions = [
   { value: "m2", label: "m²" },
@@ -84,7 +90,7 @@ const faqs = [
 const faqJsonLd = buildFaqJsonLd(faqs);
 ---
 
-<BaseLayout title={title} description={description} canonical={canonical}>
+<BaseLayout title={title} description={description} canonical={canonical} alternates={alternates}>
   <Fragment slot="head">
     <script type="application/ld+json" set:html={JSON.stringify(faqJsonLd)} />
   </Fragment>

@@ -1,0 +1,660 @@
+---
+import BaseLayout from "@layouts/BaseLayout.astro";
+import { buildAlternateLinks } from "@lib/i18n/routing";
+import AdSlot from "@components/ads/AdSlot.astro";
+import Container from "@components/layout/Container.astro";
+import PageShell from "@components/layout/PageShell.astro";
+import FaqSection from "@components/shared/FaqSection.astro";
+import PageHero from "@components/shared/PageHero.astro";
+import SectionIntro from "@components/shared/SectionIntro.astro";
+import {
+  EXERCISE_ACTIVITIES,
+  POPULAR_EXERCISE_ACTIVITIES,
+} from "@lib/calculators/salud/calculadora-de-calorias-quemadas-por-ejercicio/activities.en";
+import { buildFaqJsonLd } from "@lib/seo";
+
+const title = "Exercise Calories Burned Calculator";
+const description =
+  "Estimate total and active calories burned based on your weight, workout duration, and activity. Compare walking, running, cycling, and more.";
+const canonical = "/en/health/exercise-calories-burned-calculator";
+const spanishCanonical = "/salud/calculadora-de-calorias-quemadas-por-ejercicio";
+const alternates = buildAlternateLinks({ es: spanishCanonical, en: canonical }, Astro.site ?? Astro.url);
+const durationPresets = [15, 30, 45, 60];
+const faqs = [
+  {
+    question: "What is the difference between total and active calories?",
+    answer:
+      "Total calories include all estimated energy expenditure during the session. Active calories subtract the approximate energy you would have used at rest over the same period.",
+  },
+  {
+    question: "What is a MET?",
+    answer:
+      "A MET expresses the energy cost of an activity relative to a standard resting reference. It is useful for comparing activities, but it does not precisely measure an individual's energy expenditure.",
+  },
+  {
+    question: "How do I choose the right intensity?",
+    answer:
+      "Choose the option whose speed, pace, or description most closely matches what you did. A general label such as moderate can represent different effort levels for different people.",
+  },
+  {
+    question: "Why does my fitness tracker show a different result?",
+    answer:
+      "It may use your personal data, heart rate, a different MET value, or display active calories only. Sensors and algorithms also vary.",
+  },
+  {
+    question: "Can I enter a MET value manually?",
+    answer:
+      "Yes. Enable it under advanced options. The manual value replaces the documented MET for the selected activity and should be used only when you have an appropriate reference.",
+  },
+  {
+    question: "Should I add these calories to my TDEE?",
+    answer:
+      "Not automatically. The activity factor used to estimate TDEE may already include some of your exercise, so adding it again could double-count those calories.",
+  },
+];
+const faqJsonLd = buildFaqJsonLd(faqs);
+---
+
+<BaseLayout title={title} description={description} canonical={canonical} locale="en" alternates={alternates}>
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={JSON.stringify(faqJsonLd)} />
+  </Fragment>
+
+  <PageShell>
+    <PageHero
+      title="Exercise Calories Burned Calculator"
+      description="Estimate total and active calories by choosing an activity and a pace comparable to your workout."
+      kicker="Health"
+      collapseBreadcrumbOnMobile
+      containerClass="py-5 md:py-7"
+      breadcrumbs={[
+        { label: "Home", href: "/en", ariaLabel: "Home" },
+        { label: "Health", href: "/en/health", optional: true },
+        { label: "Exercise Calories", truncate: true },
+      ]}
+    />
+
+    <Container as="section" class="py-4 md:py-8">
+      <div class="mb-4 rounded-lg border border-sky-400/30 bg-sky-400/10 p-4 text-sm leading-relaxed text-sky-100/85">
+        This tool provides an educational estimate. Actual energy expenditure can
+        vary with intensity, technique, fitness level, and individual measurements.
+      </div>
+
+      <section class="overflow-hidden rounded-lg border border-gray-700 bg-gray-950 shadow-xl shadow-gray-950/30" aria-labelledby="exercise-calculator-heading">
+        <div class="grid gap-0 xl:grid-cols-[minmax(0,0.9fr)_minmax(23rem,0.8fr)]">
+          <form class="p-4 sm:p-6" data-calculator-form novalidate>
+            <div>
+              <p class="text-sm font-semibold uppercase tracking-wide text-amber-400">Your workout</p>
+              <h2 id="exercise-calculator-heading" class="mt-2 text-2xl font-semibold">Describe your activity</h2>
+              <p class="mt-2 text-sm leading-relaxed text-gray-400">
+                Choosing a comparable pace is more useful than a general intensity label.
+              </p>
+            </div>
+
+            <fieldset class="mt-6">
+              <legend class="text-sm font-semibold text-gray-200">1. Activity</legend>
+              <div class="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-3">
+                {POPULAR_EXERCISE_ACTIVITIES.map((activity) => (
+                  <button
+                    class="min-h-12 rounded-lg border border-gray-700 bg-gray-900 px-3 py-2 text-sm font-semibold text-gray-200 transition hover:border-amber-400/60 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/40"
+                    type="button"
+                    aria-pressed="false"
+                    data-popular-activity={activity.id}
+                  >
+                    {activity.label}
+                  </button>
+                ))}
+              </div>
+
+              <div class="mt-4">
+                <label for="exercise-activity-search" class="block text-sm font-semibold text-gray-200">
+                  Search for another activity
+                </label>
+                <input
+                  id="exercise-activity-search"
+                  class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-900 px-4 text-base text-white outline-none placeholder:text-gray-600 focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15"
+                  type="search"
+                  autocomplete="off"
+                  placeholder="E.g., rowing, stairs, or soccer"
+                  aria-describedby="activity-search-status"
+                  data-activity-search
+                />
+                <p id="activity-search-status" class="mt-2 text-xs text-gray-500" aria-live="polite" data-search-status>
+                  {EXERCISE_ACTIVITIES.length} activities available.
+                </p>
+              </div>
+
+              <div class="mt-4">
+                <label for="exercise-activity" class="block text-sm font-semibold text-gray-200">Selected activity</label>
+                <select
+                  id="exercise-activity"
+                  class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-900 px-4 text-base text-white outline-none focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15"
+                  data-input="activityId"
+                  data-field="activityId"
+                  aria-describedby="exercise-activity-error"
+                >
+                  {EXERCISE_ACTIVITIES.map((activity) => (
+                    <option value={activity.id} selected={activity.id === "walking"}>{activity.label}</option>
+                  ))}
+                </select>
+                <p id="exercise-activity-error" class="mt-2 hidden text-sm font-medium text-red-300" data-error-for="activityId"></p>
+              </div>
+            </fieldset>
+
+            <fieldset class="mt-7 border-t border-gray-800 pt-6">
+              <legend class="text-sm font-semibold text-gray-200">2. Pace or effort</legend>
+              <div class="mt-3 grid gap-2" data-variant-options></div>
+              <p class="mt-2 hidden text-sm font-medium text-red-300" data-error-for="variantId"></p>
+            </fieldset>
+
+            <fieldset class="mt-7 border-t border-gray-800 pt-6">
+              <legend class="text-sm font-semibold text-gray-200">3. Weight and duration</legend>
+              <div class="mt-3 grid grid-cols-2 gap-2 rounded-lg border border-gray-700 bg-gray-900 p-1" role="group" aria-label="Weight unit">
+                <button class="min-h-12 rounded-md bg-amber-400 px-3 py-2 text-sm font-bold text-gray-950" type="button" aria-pressed="true" data-unit="kg">Kilograms</button>
+                <button class="min-h-12 rounded-md px-3 py-2 text-sm font-semibold text-gray-300" type="button" aria-pressed="false" data-unit="lb">Pounds</button>
+              </div>
+
+              <div class="mt-4">
+                <label for="exercise-weight" class="block text-sm font-semibold text-gray-200">Weight</label>
+                <div class="mt-2 flex rounded-lg border border-gray-700 bg-gray-900 focus-within:border-amber-400 focus-within:ring-3 focus-within:ring-amber-400/15" data-wrapper-for="weight">
+                  <input
+                    id="exercise-weight"
+                    class="min-h-12 w-full bg-transparent px-4 text-base text-white outline-none placeholder:text-gray-600"
+                    type="text"
+                    inputmode="decimal"
+                    autocomplete="off"
+                    placeholder="70"
+                    data-input="weight"
+                    data-field="weight"
+                    aria-describedby="exercise-weight-error"
+                  />
+                  <span class="flex items-center px-4 text-sm text-gray-500" data-weight-unit>kg</span>
+                </div>
+                <p id="exercise-weight-error" class="mt-2 hidden text-sm font-medium text-red-300" data-error-for="weight"></p>
+              </div>
+
+              <div class="mt-5">
+                <label for="exercise-duration" class="block text-sm font-semibold text-gray-200">Duration</label>
+                <div class="mt-2 grid grid-cols-4 gap-2">
+                  {durationPresets.map((duration) => (
+                    <button class="min-h-11 rounded-lg border border-gray-700 bg-gray-900 px-2 text-sm font-semibold text-gray-300 hover:border-amber-400/60" type="button" data-duration-preset={duration}>
+                      {duration}
+                    </button>
+                  ))}
+                </div>
+                <div class="mt-3 flex rounded-lg border border-gray-700 bg-gray-900 focus-within:border-amber-400 focus-within:ring-3 focus-within:ring-amber-400/15" data-wrapper-for="durationMinutes">
+                  <input
+                    id="exercise-duration"
+                    class="min-h-12 w-full bg-transparent px-4 text-base text-white outline-none"
+                    type="text"
+                    inputmode="numeric"
+                    autocomplete="off"
+                    value="30"
+                    data-input="durationMinutes"
+                    data-field="durationMinutes"
+                    aria-describedby="exercise-duration-error"
+                  />
+                  <span class="flex items-center px-4 text-sm text-gray-500">min</span>
+                </div>
+                <p id="exercise-duration-error" class="mt-2 hidden text-sm font-medium text-red-300" data-error-for="durationMinutes"></p>
+              </div>
+            </fieldset>
+
+            <details class="mt-6 rounded-lg border border-gray-700 bg-gray-900/60" data-advanced>
+              <summary class="cursor-pointer px-4 py-3 text-sm font-semibold text-gray-200">Advanced options</summary>
+              <div class="border-t border-gray-800 p-4">
+                <label class="flex min-h-12 cursor-pointer items-start gap-3">
+                  <input class="mt-1 size-4 shrink-0 border-gray-600 bg-gray-950 text-amber-400 focus:ring-amber-400" type="checkbox" data-input="useManualMet" />
+                  <span>
+                    <span class="block text-sm font-semibold text-gray-200">Use a known MET value</span>
+                    <span class="mt-1 block text-xs leading-relaxed text-gray-500">This will replace the documented value for the selected activity.</span>
+                  </span>
+                </label>
+                <div class="mt-4 hidden" data-manual-met-panel>
+                  <label for="exercise-manual-met" class="block text-sm font-semibold text-gray-200">Manual MET</label>
+                  <input
+                    id="exercise-manual-met"
+                    class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-950 px-4 text-base text-white outline-none focus:border-amber-400"
+                    type="text"
+                    inputmode="decimal"
+                    placeholder="E.g., 7.5"
+                    data-input="manualMet"
+                    data-field="manualMet"
+                    aria-describedby="exercise-manual-met-error"
+                  />
+                  <p id="exercise-manual-met-error" class="mt-2 hidden text-sm font-medium text-red-300" data-error-for="manualMet"></p>
+                </div>
+              </div>
+            </details>
+
+            <p class="mt-4 hidden rounded-lg border border-red-400/30 bg-red-400/10 p-3 text-sm font-medium text-red-200" role="alert" data-general-error></p>
+
+            <div class="mt-6 grid gap-3 sm:grid-cols-3">
+              <button class="min-h-12 rounded-lg bg-amber-400 px-5 py-3 text-base font-bold text-gray-950 transition hover:bg-amber-300 sm:col-span-3" type="submit">Calculate calories</button>
+              <button class="min-h-12 rounded-lg border border-gray-700 px-4 py-3 text-sm font-semibold text-gray-200 hover:bg-gray-900 sm:col-span-2" type="button" data-example>Try an example</button>
+              <button class="min-h-12 rounded-lg border border-gray-700 px-4 py-3 text-sm font-semibold text-gray-300 hover:bg-gray-900" type="reset">Clear</button>
+            </div>
+          </form>
+
+          <aside class="border-t border-gray-800 bg-gray-900/45 p-4 sm:p-6 xl:border-l xl:border-t-0">
+            <div data-empty-result>
+              <p class="text-sm font-semibold uppercase tracking-wide text-amber-400">Result</p>
+              <h2 class="mt-2 text-2xl font-semibold text-white">Your estimate will appear here</h2>
+              <p class="mt-3 text-sm leading-relaxed text-gray-400">
+                You will see total calories, active calories, the MET used, and how the result changes at other paces or durations.
+              </p>
+            </div>
+
+            <div class="hidden" data-result>
+              <p class="text-sm font-semibold uppercase tracking-wide text-amber-400">Estimated total calories</p>
+              <h2 class="mt-2 text-5xl font-bold tracking-tight text-white outline-none" tabindex="-1" data-result-heading></h2>
+              <p class="mt-2 text-sm leading-relaxed text-gray-400" data-result-basis></p>
+
+              <div class="mt-5 rounded-lg border border-sky-400/30 bg-sky-400/10 p-4">
+                <p class="text-xs font-bold uppercase tracking-wide text-sky-200">Estimated active calories</p>
+                <p class="mt-2 text-3xl font-bold text-white" data-active-result></p>
+                <p class="mt-2 text-xs leading-relaxed text-sky-100/70">Additional to the estimated energy used at rest over the same period.</p>
+              </div>
+
+              <div class="mt-4 grid grid-cols-2 gap-3">
+                <div class="rounded-lg border border-gray-700 bg-gray-950/70 p-3">
+                  <p class="text-xs text-gray-500">MET used</p>
+                  <p class="mt-1 text-lg font-semibold text-white" data-met-result></p>
+                </div>
+                <div class="rounded-lg border border-gray-700 bg-gray-950/70 p-3">
+                  <p class="text-xs text-gray-500">Per minute</p>
+                  <p class="mt-1 text-lg font-semibold text-white" data-per-minute></p>
+                </div>
+              </div>
+
+              <div class="mt-4 hidden space-y-2" data-warnings></div>
+
+              <section class="mt-6 border-t border-gray-800 pt-6">
+                <h3 class="text-lg font-semibold text-white">Compare paces for the same activity</h3>
+                <div class="mt-3 grid gap-2" data-comparisons></div>
+              </section>
+
+              <section class="mt-6 border-t border-gray-800 pt-6">
+                <h3 class="text-lg font-semibold text-white">At the same pace</h3>
+                <div class="mt-3 grid grid-cols-2 gap-2" data-projections></div>
+                <p class="mt-3 text-xs leading-relaxed text-gray-500">The projection assumes the same pace or effort throughout.</p>
+              </section>
+
+              <div class="mt-6 grid gap-2 sm:grid-cols-2">
+                <button class="min-h-12 rounded-lg border border-amber-400/50 px-4 py-3 text-sm font-semibold text-amber-200 hover:bg-amber-400/10" type="button" data-copy>Copy result</button>
+                <button class="min-h-12 rounded-lg border border-gray-700 px-4 py-3 text-sm font-semibold text-gray-300 hover:bg-gray-800" type="button" data-new-calculation>New calculation</button>
+              </div>
+              <p class="sr-only" aria-live="polite" data-result-status></p>
+              <p class="sr-only" aria-live="polite" data-copy-status></p>
+            </div>
+          </aside>
+        </div>
+      </section>
+    </Container>
+
+    <AdSlot placement="calculator-after-tool" />
+
+    <Container as="section" class="py-8 md:py-12">
+      <SectionIntro title="How to interpret the result" description="The difference between total and active calories explains many discrepancies between tools." />
+      <div class="mt-6 grid gap-4 md:grid-cols-3">
+        <article class="rounded-lg border border-gray-800 bg-gray-950/60 p-5">
+          <h3 class="font-semibold text-white">Total calories</h3>
+          <p class="mt-2 text-sm leading-relaxed text-gray-400">These include all estimated energy expenditure during the session, including what you would have used at rest.</p>
+        </article>
+        <article class="rounded-lg border border-gray-800 bg-gray-950/60 p-5">
+          <h3 class="font-semibold text-white">Active calories</h3>
+          <p class="mt-2 text-sm leading-relaxed text-gray-400">These aim to represent only the additional expenditure associated with the activity.</p>
+        </article>
+        <article class="rounded-lg border border-gray-800 bg-gray-950/60 p-5">
+          <h3 class="font-semibold text-white">Pace matters</h3>
+          <p class="mt-2 text-sm leading-relaxed text-gray-400">Speed, incline, breaks, and technique can substantially change actual energy expenditure.</p>
+        </article>
+      </div>
+    </Container>
+
+    <Container as="section" class="py-8 md:py-12">
+      <SectionIntro title="Methodology and sources" description="The values used come from the 2024 Adult Compendium of Physical Activities." />
+      <div class="mt-6 grid gap-4 lg:grid-cols-2">
+        <article class="rounded-lg border border-gray-800 bg-gray-950/60 p-5">
+          <h3 class="font-semibold text-white">Standard formula</h3>
+          <p class="mt-3 text-sm leading-relaxed text-gray-400">Calories per minute = MET × 3.5 × weight in kg ÷ 200. Active calories use MET - 1, with a minimum result of zero.</p>
+        </article>
+        <article class="rounded-lg border border-amber-400/25 bg-amber-400/10 p-5">
+          <h3 class="font-semibold text-amber-100">Avoid double-counting</h3>
+          <p class="mt-3 text-sm leading-relaxed text-amber-50/75">Do not automatically add these calories to a TDEE whose activity factor already includes your usual exercise.</p>
+        </article>
+      </div>
+      <a class="mt-5 inline-flex min-h-11 items-center rounded-lg border border-amber-400/50 px-4 py-2 text-sm font-semibold text-amber-200 hover:bg-amber-400/10" href="https://pacompendium.com/" target="_blank" rel="noopener noreferrer">View the Compendium of Physical Activities</a>
+    </Container>
+
+    <FaqSection faqs={faqs} />
+  </PageShell>
+</BaseLayout>
+
+<script>
+  import { EXERCISE_ACTIVITIES, getExerciseActivity } from "@lib/calculators/salud/calculadora-de-calorias-quemadas-por-ejercicio/activities.en";
+  import {
+    buildExerciseCaloriesCopyText,
+    calculateExerciseCaloriesResult,
+    convertExerciseWeight,
+    formatExerciseCalories,
+    formatExerciseDecimal,
+    parseExerciseNumber,
+    validateExerciseCaloriesInput,
+  } from "@lib/calculators/salud/calculadora-de-calorias-quemadas-por-ejercicio/exerciseCalories.en";
+
+  const form = document.querySelector("[data-calculator-form]");
+  const inputs = {
+    activityId: document.querySelector('[data-input="activityId"]'),
+    weight: document.querySelector('[data-input="weight"]'),
+    durationMinutes: document.querySelector('[data-input="durationMinutes"]'),
+    useManualMet: document.querySelector('[data-input="useManualMet"]'),
+    manualMet: document.querySelector('[data-input="manualMet"]'),
+  };
+  const variantOptions = document.querySelector("[data-variant-options]");
+  const popularButtons = document.querySelectorAll("[data-popular-activity]");
+  const unitButtons = document.querySelectorAll("[data-unit]");
+  const durationButtons = document.querySelectorAll("[data-duration-preset]");
+  const searchInput = document.querySelector("[data-activity-search]");
+  const searchStatus = document.querySelector("[data-search-status]");
+  const manualMetPanel = document.querySelector("[data-manual-met-panel]");
+  const emptyResult = document.querySelector("[data-empty-result]");
+  const resultPanel = document.querySelector("[data-result]");
+  const resultHeading = document.querySelector("[data-result-heading]");
+  const resultBasis = document.querySelector("[data-result-basis]");
+  const activeResult = document.querySelector("[data-active-result]");
+  const metResult = document.querySelector("[data-met-result]");
+  const perMinute = document.querySelector("[data-per-minute]");
+  const warningPanel = document.querySelector("[data-warnings]");
+  const comparisons = document.querySelector("[data-comparisons]");
+  const projections = document.querySelector("[data-projections]");
+  const generalError = document.querySelector("[data-general-error]");
+  const resultStatus = document.querySelector("[data-result-status]");
+  const copyStatus = document.querySelector("[data-copy-status]");
+  const weightUnitLabel = document.querySelector("[data-weight-unit]");
+  const warningMessages = {
+    long_duration: "The duration exceeds 240 minutes. Confirm that you maintained a comparable effort throughout.",
+    very_high_met: "The MET used represents an extremely high intensity that is difficult to sustain.",
+    manual_met: "The result uses a manual MET instead of the documented value for the selected activity.",
+    tdee_overlap: "Do not automatically add this result to a TDEE that already includes your usual exercise.",
+  };
+  const intensityLabels = { light: "Light", moderate: "Moderate", vigorous: "Vigorous" };
+  const errorMessages = {
+    activityId: { required: "Select an activity." },
+    variantId: { required: "Select a pace or effort level." },
+    weight: {
+      required: "Enter your weight.",
+      invalid: "Enter a valid number.",
+      too_many_decimals: "Use no more than two decimal places.",
+      out_of_range: "Weight must be equivalent to 20-250 kg.",
+    },
+    durationMinutes: {
+      required: "Enter the duration.",
+      invalid: "Enter the duration in whole minutes.",
+      not_integer: "Duration must be entered in whole minutes.",
+      too_many_decimals: "Duration must be entered in whole minutes.",
+      out_of_range: "Duration must be between 1 and 720 minutes.",
+    },
+    manualMet: {
+      required: "Enter the manual MET value.",
+      invalid: "Enter a valid MET value.",
+      too_many_decimals: "Use no more than one decimal place.",
+      out_of_range: "MET must be between 1 and 25.",
+    },
+  };
+
+  let unit = "kg";
+  let selectedVariantId = "walking-moderate";
+  let canonicalWeightKg;
+  let currentResult;
+
+  function renderVariants() {
+    const activity = getExerciseActivity(inputs.activityId.value);
+    if (!activity) return;
+    if (!activity.variants.some((item) => item.id === selectedVariantId)) {
+      selectedVariantId = activity.defaultVariantId;
+    }
+    variantOptions.innerHTML = "";
+    activity.variants.forEach((variant) => {
+      const button = document.createElement("button");
+      const selected = variant.id === selectedVariantId;
+      button.type = "button";
+      button.dataset.variant = variant.id;
+      button.setAttribute("aria-pressed", String(selected));
+      button.className = `min-h-16 rounded-lg border p-3 text-left transition focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/40 ${selected ? "border-amber-400 bg-amber-400/10" : "border-gray-700 bg-gray-900 hover:border-amber-400/60"}`;
+      button.innerHTML = `<span class="flex items-start justify-between gap-3"><span><span class="block text-sm font-semibold text-white">${variant.label}</span><span class="mt-1 block text-xs leading-relaxed text-gray-400">${variant.description}</span></span><span class="shrink-0 rounded-full border border-gray-600 px-2 py-1 text-xs font-bold text-gray-300">${formatExerciseDecimal(variant.met)} MET</span></span>`;
+      button.addEventListener("click", () => {
+        selectedVariantId = variant.id;
+        clearFieldError("variantId");
+        renderVariants();
+        setNeutralResult();
+      });
+      variantOptions.append(button);
+    });
+    updatePopularButtons();
+  }
+
+  function updatePopularButtons() {
+    popularButtons.forEach((button) => {
+      const selected = button.dataset.popularActivity === inputs.activityId.value;
+      button.setAttribute("aria-pressed", String(selected));
+      button.classList.toggle("border-amber-400", selected);
+      button.classList.toggle("bg-amber-400/10", selected);
+    });
+  }
+
+  function setActivity(activityId) {
+    inputs.activityId.value = activityId;
+    selectedVariantId = getExerciseActivity(activityId)?.defaultVariantId ?? "";
+    renderVariants();
+    clearFieldError("activityId");
+    setNeutralResult();
+  }
+
+  function clearErrors() {
+    generalError.textContent = "";
+    generalError.classList.add("hidden");
+    document.querySelectorAll("[data-error-for]").forEach((element) => {
+      element.textContent = "";
+      element.classList.add("hidden");
+    });
+    document.querySelectorAll("[data-wrapper-for]").forEach((element) => element.classList.remove("border-red-400"));
+    document.querySelectorAll("[data-field]").forEach((element) => element.removeAttribute("aria-invalid"));
+  }
+
+  function clearFieldError(field) {
+    const error = document.querySelector(`[data-error-for="${field}"]`);
+    error?.classList.add("hidden");
+    document.querySelector(`[data-wrapper-for="${field}"]`)?.classList.remove("border-red-400");
+    document.querySelector(`[data-field="${field}"]`)?.removeAttribute("aria-invalid");
+  }
+
+  function showFieldError(field, code) {
+    const error = document.querySelector(`[data-error-for="${field}"]`);
+    if (error) {
+      error.textContent = errorMessages[field]?.[code] ?? "Check this value.";
+      error.classList.remove("hidden");
+    }
+    document.querySelector(`[data-wrapper-for="${field}"]`)?.classList.add("border-red-400");
+    document.querySelector(`[data-field="${field}"]`)?.setAttribute("aria-invalid", "true");
+  }
+
+  function readInput() {
+    const weight = parseExerciseNumber(inputs.weight.value);
+    const duration = parseExerciseNumber(inputs.durationMinutes.value, 0);
+    const manualMet = inputs.useManualMet.checked ? parseExerciseNumber(inputs.manualMet.value, 1) : undefined;
+    if (!weight.ok) showFieldError("weight", weight.error);
+    if (!duration.ok) showFieldError("durationMinutes", duration.error);
+    if (manualMet && !manualMet.ok) showFieldError("manualMet", manualMet.error);
+    if (!weight.ok || !duration.ok || (manualMet && !manualMet.ok)) return null;
+    const manualMetValue = manualMet?.ok ? manualMet.value : undefined;
+    const input = {
+      activityId: inputs.activityId.value,
+      variantId: selectedVariantId,
+      weight: weight.value,
+      weightUnit: unit,
+      durationMinutes: duration.value,
+      useManualMet: inputs.useManualMet.checked,
+      manualMet: manualMetValue,
+    };
+    const validation = validateExerciseCaloriesInput(input);
+    Object.entries(validation.errors).forEach(([field, code]) => showFieldError(field, code));
+    return validation.isValid ? input : null;
+  }
+
+  function calculateAndRender() {
+    clearErrors();
+    const input = readInput();
+    if (!input) {
+      setNeutralResult();
+      form.querySelector('[aria-invalid="true"]')?.focus();
+      return;
+    }
+    try {
+      renderResult(calculateExerciseCaloriesResult(input));
+    } catch {
+      generalError.textContent = "The result could not be calculated. Check your entries.";
+      generalError.classList.remove("hidden");
+    }
+  }
+
+  function renderResult(result) {
+    currentResult = result;
+    emptyResult.classList.add("hidden");
+    resultPanel.classList.remove("hidden");
+    resultHeading.textContent = formatExerciseCalories(result.totalCalories);
+    resultBasis.textContent = `${result.activityLabel}, ${result.variant.label.toLowerCase()}, for ${result.input.durationMinutes} minutes.`;
+    activeResult.textContent = formatExerciseCalories(result.activeCalories);
+    metResult.textContent = `${formatExerciseDecimal(result.metUsed)} MET · ${intensityLabels[result.intensity]}`;
+    perMinute.textContent = `${formatExerciseDecimal(result.totalCaloriesPerMinute)} kcal`;
+    warningPanel.innerHTML = "";
+    result.warnings.forEach((warning) => {
+      const item = document.createElement("p");
+      item.className = "rounded-lg border border-orange-400/25 bg-orange-400/10 p-3 text-sm leading-relaxed text-orange-100/85";
+      item.textContent = warningMessages[warning];
+      warningPanel.append(item);
+    });
+    warningPanel.classList.toggle("hidden", result.warnings.length === 0);
+    comparisons.innerHTML = "";
+    result.comparisons.forEach((comparison) => {
+      const item = document.createElement("article");
+      item.className = `rounded-lg border p-3 ${comparison.isSelected ? "border-amber-400/60 bg-amber-400/10" : "border-gray-700 bg-gray-950/70"}`;
+      item.innerHTML = `<div class="flex items-start justify-between gap-3"><div><p class="text-sm font-semibold text-white">${comparison.variant.label}${comparison.isSelected ? " · selected" : ""}</p><p class="mt-1 text-xs text-gray-500">${comparison.variant.description} · ${formatExerciseDecimal(comparison.variant.met)} MET</p></div><div class="text-right"><p class="font-semibold text-white">${formatExerciseCalories(comparison.totalCalories)}</p><p class="text-xs text-gray-500">${formatExerciseCalories(comparison.activeCalories)} active</p></div></div>`;
+      comparisons.append(item);
+    });
+    projections.innerHTML = "";
+    result.projections.forEach((projection) => {
+      const item = document.createElement("article");
+      item.className = "rounded-lg border border-gray-700 bg-gray-950/70 p-3";
+      item.innerHTML = `<p class="text-xs font-bold uppercase tracking-wide text-gray-500">${projection.durationMinutes} min</p><p class="mt-1 font-semibold text-white">${formatExerciseCalories(projection.totalCalories)}</p><p class="mt-1 text-xs text-gray-500">${formatExerciseCalories(projection.activeCalories)} active</p>`;
+      projections.append(item);
+    });
+    resultStatus.textContent = `Calculation complete: ${formatExerciseCalories(result.totalCalories)} total and ${formatExerciseCalories(result.activeCalories)} active.`;
+    resultHeading.focus({ preventScroll: true });
+    resultHeading.scrollIntoView({ behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block: "start" });
+  }
+
+  function setNeutralResult() {
+    currentResult = undefined;
+    emptyResult.classList.remove("hidden");
+    resultPanel.classList.add("hidden");
+    resultStatus.textContent = "";
+  }
+
+  function setUnit(nextUnit) {
+    if (nextUnit === unit) return;
+    const parsed = parseExerciseNumber(inputs.weight.value);
+    if (canonicalWeightKg === undefined && parsed.ok) canonicalWeightKg = convertExerciseWeight(parsed.value, unit, "kg");
+    unit = nextUnit;
+    if (canonicalWeightKg !== undefined) inputs.weight.value = String(Number(convertExerciseWeight(canonicalWeightKg, "kg", unit).toFixed(1)));
+    weightUnitLabel.textContent = unit;
+    updateUnitButtons();
+    setNeutralResult();
+  }
+
+  function updateUnitButtons() {
+    unitButtons.forEach((button) => {
+      const selected = button.dataset.unit === unit;
+      button.setAttribute("aria-pressed", String(selected));
+      button.classList.toggle("bg-amber-400", selected);
+      button.classList.toggle("text-gray-950", selected);
+      button.classList.toggle("font-bold", selected);
+      button.classList.toggle("text-gray-300", !selected);
+    });
+  }
+
+  function resetCalculator() {
+    unit = "kg";
+    canonicalWeightKg = undefined;
+    inputs.activityId.value = "walking";
+    selectedVariantId = "walking-moderate";
+    inputs.weight.value = "";
+    inputs.durationMinutes.value = "30";
+    inputs.useManualMet.checked = false;
+    inputs.manualMet.value = "";
+    searchInput.value = "";
+    Array.from(inputs.activityId.options).forEach((option) => option.hidden = false);
+    searchStatus.textContent = `${EXERCISE_ACTIVITIES.length} actividades disponibles.`;
+    manualMetPanel.classList.add("hidden");
+    document.querySelector("[data-advanced]")?.removeAttribute("open");
+    weightUnitLabel.textContent = "kg";
+    updateUnitButtons();
+    clearErrors();
+    renderVariants();
+    setNeutralResult();
+    inputs.weight.focus();
+  }
+
+  popularButtons.forEach((button) => button.addEventListener("click", () => setActivity(button.dataset.popularActivity)));
+  inputs.activityId.addEventListener("change", () => setActivity(inputs.activityId.value));
+  searchInput.addEventListener("input", () => {
+    const query = searchInput.value.trim().toLocaleLowerCase("en");
+    let matches = 0;
+    Array.from(inputs.activityId.options).forEach((option) => {
+      const matchesQuery = !query || option.textContent.toLocaleLowerCase("en").includes(query);
+      option.hidden = !matchesQuery;
+      if (matchesQuery) matches += 1;
+    });
+    searchStatus.textContent = `${matches} ${matches === 1 ? "activity found" : "activities found"}.`;
+  });
+  unitButtons.forEach((button) => button.addEventListener("click", () => setUnit(button.dataset.unit)));
+  durationButtons.forEach((button) => button.addEventListener("click", () => {
+    inputs.durationMinutes.value = button.dataset.durationPreset;
+    clearFieldError("durationMinutes");
+    setNeutralResult();
+  }));
+  inputs.useManualMet.addEventListener("change", () => {
+    manualMetPanel.classList.toggle("hidden", !inputs.useManualMet.checked);
+    clearFieldError("manualMet");
+    setNeutralResult();
+    if (inputs.useManualMet.checked) inputs.manualMet.focus();
+  });
+  inputs.weight.addEventListener("input", () => { canonicalWeightKg = undefined; clearFieldError("weight"); setNeutralResult(); });
+  inputs.durationMinutes.addEventListener("input", () => { clearFieldError("durationMinutes"); setNeutralResult(); });
+  inputs.manualMet.addEventListener("input", () => { clearFieldError("manualMet"); setNeutralResult(); });
+  form.addEventListener("submit", (event) => { event.preventDefault(); calculateAndRender(); });
+  form.addEventListener("reset", (event) => { event.preventDefault(); resetCalculator(); });
+  document.querySelector("[data-example]").addEventListener("click", () => {
+    resetCalculator();
+    setActivity("running");
+    selectedVariantId = "running-10-kmh";
+    inputs.weight.value = "70";
+    canonicalWeightKg = 70;
+    inputs.durationMinutes.value = "30";
+    renderVariants();
+    calculateAndRender();
+  });
+  document.querySelector("[data-copy]").addEventListener("click", async () => {
+    if (!currentResult) return;
+    try {
+      await navigator.clipboard.writeText(buildExerciseCaloriesCopyText(currentResult));
+      copyStatus.textContent = "Result copied.";
+    } catch {
+      copyStatus.textContent = "The result could not be copied.";
+    }
+  });
+  document.querySelector("[data-new-calculation]").addEventListener("click", resetCalculator);
+
+  renderVariants();
+  setNeutralResult();
+</script>

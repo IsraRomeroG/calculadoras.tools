@@ -4,6 +4,7 @@ seoTitle: "IMC en embarazo: límites y cómo interpretarlo con cuidado"
 description: "Conoce por qué el IMC actual durante el embarazo no se interpreta igual y qué precauciones considerar."
 pubDate: 2026-06-03
 categorySlug: "salud"
+translationKey: "bmi-during-pregnancy"
 tags:
   - embarazo
   - imc

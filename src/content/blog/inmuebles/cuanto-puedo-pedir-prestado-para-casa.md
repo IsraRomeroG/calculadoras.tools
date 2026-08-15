@@ -4,6 +4,7 @@ seoTitle: "Cuánto puedo pedir de hipoteca según mi mensualidad"
 description: "Aprende a estimar cuánto podrías pedir prestado para una casa según la mensualidad que puedes pagar, la tasa y el plazo."
 pubDate: 2026-05-21
 categorySlug: "inmuebles"
+translationKey: "how-much-mortgage-can-i-borrow"
 tags:
   - capacidad de pago
   - hipoteca

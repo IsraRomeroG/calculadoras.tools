@@ -13,6 +13,7 @@ import {
   getAttackScenario,
 } from "@lib/calculators/programacion/calculadora-entropia-contrasena/passwordEntropy";
 import { buildFaqJsonLd } from "@lib/seo";
+import { buildAlternateLinks } from "@lib/i18n/routing";
 
 const title = "Calculadora de entropía de contraseña";
 const description =
@@ -61,7 +62,7 @@ const faqs = [
 const faqJsonLd = buildFaqJsonLd(faqs);
 ---
 
-<BaseLayout title={title} description={description} canonical={canonical}>
+<BaseLayout title={title} description={description} canonical={canonical} alternates={buildAlternateLinks({ es: "/programacion/calculadora-entropia-contrasena", en: "/en/programming/password-entropy-calculator" }, Astro.site ?? Astro.url)}>
   <Fragment slot="head">
     <script type="application/ld+json" set:html={JSON.stringify(faqJsonLd)} />
   </Fragment>

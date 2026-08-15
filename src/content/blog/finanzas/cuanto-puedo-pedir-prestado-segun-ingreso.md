@@ -4,6 +4,7 @@ seoTitle: "Cuánto puedo pedir prestado: calcula una mensualidad manejable"
 description: "Aprende a estimar cuánto podrías pedir prestado según tu ingreso, deudas actuales, tasa, plazo y pago mensual."
 pubDate: 2026-05-27
 categorySlug: "finanzas"
+translationKey: "how-much-can-i-borrow"
 tags:
   - capacidad de pago
   - préstamo

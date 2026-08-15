@@ -4,6 +4,7 @@ seoTitle: "Porcentaje de ganancia, margen y markup con ejemplos"
 description: "Aprende a calcular porcentaje de ganancia, margen y markup para entender precios, costos y utilidad real."
 pubDate: 2026-04-20
 categorySlug: "finanzas"
+translationKey: "profit-margin-vs-markup"
 tags:
   - margen de ganancia
   - negocios

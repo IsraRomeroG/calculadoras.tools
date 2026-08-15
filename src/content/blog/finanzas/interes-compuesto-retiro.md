@@ -3,6 +3,7 @@ title: "Interes compuesto para el retiro: ejemplos a largo plazo"
 description: "Mira como el interes compuesto puede influir en el ahorro para el retiro con ejemplos a 20, 30 y 40 anos."
 pubDate: 2026-04-13
 categorySlug: "finanzas"
+translationKey: "compound-interest-for-retirement"
 tags:
   - retiro
   - interes compuesto

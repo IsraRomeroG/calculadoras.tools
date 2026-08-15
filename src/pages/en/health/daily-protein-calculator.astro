@@ -1,0 +1,716 @@
+---
+import BaseLayout from "@layouts/BaseLayout.astro";
+import { buildAlternateLinks } from "@lib/i18n/routing";
+import AdSlot from "@components/ads/AdSlot.astro";
+import Container from "@components/layout/Container.astro";
+import PageShell from "@components/layout/PageShell.astro";
+import FaqSection from "@components/shared/FaqSection.astro";
+import PageHero from "@components/shared/PageHero.astro";
+import SectionIntro from "@components/shared/SectionIntro.astro";
+import { buildFaqJsonLd } from "@lib/seo";
+
+const title = "Daily Protein Calculator by Weight and Goal";
+const description =
+  "Calculate an educational daily protein range based on your weight, activity, and goal, including grams per day, per meal, and food examples.";
+const canonical = "/en/health/daily-protein-calculator";
+const spanishCanonical = "/salud/calculadora-de-proteina-diaria";
+const alternates = buildAlternateLinks({ es: spanishCanonical, en: canonical }, Astro.site ?? Astro.url);
+
+const goalOptions = [
+  {
+    value: "maintain",
+    label: "General health and maintenance",
+    description: "A general reference for maintaining your habits and weight.",
+  },
+  {
+    value: "lose-fat",
+    label: "Lose fat",
+    description:
+      "May support fullness and muscle retention alongside an appropriate calorie deficit.",
+  },
+  {
+    value: "gain-muscle",
+    label: "Gain muscle",
+    description:
+      "May support strength training, which remains essential.",
+  },
+];
+
+const activityOptions = [
+  {
+    value: "unstructured",
+    label: "No structured training",
+    description: "Everyday activity without regular training sessions.",
+  },
+  {
+    value: "regular",
+    label: "Regular activity or training",
+    description: "Cardio, sports, or mixed training several times per week.",
+  },
+  {
+    value: "strength",
+    label: "Regular strength training",
+    description: "Progressive strength sessions several times per week.",
+  },
+];
+
+const foodExamples = [
+  ["3.5 oz (100 g) cooked chicken breast", "about 31 g"],
+  ["2 large eggs", "about 12 g"],
+  ["7 oz (200 g) plain Greek yogurt", "about 18-20 g"],
+  ["1 cup cooked lentils", "about 17-18 g"],
+  ["5.3 oz (150 g) firm tofu", "about 18-24 g"],
+];
+
+const faqs = [
+  {
+    question: "How much protein do I need per kilogram of body weight?",
+    answer:
+      "It depends on your goal and type of training. This calculator uses educational ranges between 0.8 and 2.2 g/kg for adults and explains which range it applied.",
+  },
+  {
+    question: "What is the difference between the range and the starting point?",
+    answer:
+      "The range reflects that there is no single exact figure for everyone. The practical starting point is simply the midpoint, rounded to the nearest 5 g for convenience.",
+  },
+  {
+    question: "Should I use the upper end of the range?",
+    answer:
+      "No. The upper end is not a requirement, and consuming more does not guarantee better results. You can start near the practical midpoint and adjust your diet.",
+  },
+  {
+    question: "Does eating more protein help build muscle?",
+    answer:
+      "Adequate intake can support the process, but building muscle requires progressive strength training, sufficient energy, and rest.",
+  },
+  {
+    question: "Does protein help with fat loss?",
+    answer:
+      "It may support fullness and muscle retention, but fat loss primarily depends on maintaining an appropriate calorie deficit.",
+  },
+  {
+    question: "Do I need to divide it evenly across meals?",
+    answer:
+      "No. Grams per meal are a simple reference obtained by dividing the practical midpoint. You do not need to eat exactly the same amount at every meal.",
+  },
+  {
+    question: "What if I have kidney disease?",
+    answer:
+      "An appropriate amount may require specific limits. This tool provides educational information, but you should not increase protein based on this result alone.",
+  },
+  {
+    question: "Can I use this calculator during pregnancy or breastfeeding?",
+    answer:
+      "Needs change by stage and individual circumstances. The calculator can show an educational range, but individualized professional guidance should take priority.",
+  },
+];
+
+const faqJsonLd = buildFaqJsonLd(faqs);
+---
+
+<BaseLayout title={title} description={description} canonical={canonical} locale="en" alternates={alternates}>
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={JSON.stringify(faqJsonLd)} />
+  </Fragment>
+
+  <PageShell>
+    <PageHero
+      title="Daily Protein Calculator"
+      description="Get an educational range, a practical starting point, and a simple way to divide it across meals."
+      kicker="Health"
+      collapseBreadcrumbOnMobile
+      containerClass="py-5 md:py-7"
+      breadcrumbs={[
+        { label: "Home", href: "/en", ariaLabel: "Home" },
+        { label: "Health", href: "/en/health", optional: true },
+        { label: "Daily Protein", truncate: true },
+      ]}
+    />
+
+    <Container as="section" class="py-4 md:py-8">
+      <div class="mb-4 rounded-lg border border-sky-400/30 bg-sky-400/10 p-4 text-sm leading-relaxed text-sky-100/85">
+        Designed for healthy adults. The result is an educational reference,
+        not a prescription or a guarantee of results.
+      </div>
+
+      <section
+        class="overflow-hidden rounded-lg border border-gray-700 bg-gray-950 shadow-xl shadow-gray-950/30"
+        aria-labelledby="protein-calculator-heading"
+      >
+        <div class="grid gap-0 xl:grid-cols-[minmax(0,1fr)_minmax(22rem,0.78fr)]">
+          <form class="p-4 sm:p-6" data-protein-form novalidate>
+            <div>
+              <p class="text-sm font-semibold uppercase tracking-wide text-amber-400">
+                Personalized reference
+              </p>
+              <h2 id="protein-calculator-heading" class="mt-2 text-2xl font-semibold">
+                Describe your goal and activity
+              </h2>
+              <p class="mt-2 text-sm leading-relaxed text-gray-400">
+                Your type of training affects the range. We will show how each
+                figure was calculated.
+              </p>
+            </div>
+
+            <fieldset class="mt-6">
+              <legend class="text-sm font-semibold text-gray-200">
+                1. Basic information
+              </legend>
+
+              <div
+                class="mt-3 grid grid-cols-2 gap-2 rounded-lg border border-gray-700 bg-gray-900 p-1"
+                role="group"
+                aria-label="Unit system"
+              >
+                <button
+                  class="min-h-12 rounded-md bg-amber-400 px-3 py-2 text-sm font-bold text-gray-950 transition focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-300/50"
+                  type="button"
+                  aria-pressed="true"
+                  data-unit-option="metric"
+                >
+                  Kilograms
+                </button>
+                <button
+                  class="min-h-12 rounded-md px-3 py-2 text-sm font-semibold text-gray-300 transition focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/40"
+                  type="button"
+                  aria-pressed="false"
+                  data-unit-option="imperial"
+                >
+                  Pounds
+                </button>
+              </div>
+
+              <div class="mt-4" data-unit-panel="metric">
+                <label for="protein-weight-kg" class="block text-sm font-semibold text-gray-200">
+                  Weight
+                </label>
+                <div
+                  class="mt-2 flex rounded-lg border border-gray-700 bg-gray-900 focus-within:border-amber-400 focus-within:ring-3 focus-within:ring-amber-400/15"
+                  data-wrapper-for="weightKg"
+                >
+                  <input
+                    id="protein-weight-kg"
+                    class="min-h-12 w-full bg-transparent px-4 text-base text-white outline-none"
+                    type="text"
+                    inputmode="decimal"
+                    autocomplete="off"
+                    placeholder="75"
+                    aria-describedby="protein-weight-error"
+                    data-input="weightKg"
+                  />
+                  <span class="flex items-center px-4 text-sm text-gray-500">kg</span>
+                </div>
+              </div>
+
+              <div class="mt-4 hidden" data-unit-panel="imperial">
+                <label for="protein-weight-lb" class="block text-sm font-semibold text-gray-200">
+                  Weight
+                </label>
+                <div
+                  class="mt-2 flex rounded-lg border border-gray-700 bg-gray-900 focus-within:border-amber-400 focus-within:ring-3 focus-within:ring-amber-400/15"
+                  data-wrapper-for="weightKg"
+                >
+                  <input
+                    id="protein-weight-lb"
+                    class="min-h-12 w-full bg-transparent px-4 text-base text-white outline-none"
+                    type="text"
+                    inputmode="decimal"
+                    autocomplete="off"
+                    placeholder="165"
+                    aria-describedby="protein-weight-error"
+                    data-input="weightLb"
+                  />
+                  <span class="flex items-center px-4 text-sm text-gray-500">lb</span>
+                </div>
+              </div>
+              <p id="protein-weight-error" class="mt-2 hidden text-sm font-medium text-red-300" data-error-for="weightKg"></p>
+
+              <label for="protein-age-group" class="mt-5 block text-sm font-semibold text-gray-200">
+                Age group
+              </label>
+              <select
+                id="protein-age-group"
+                class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-900 px-4 text-base text-white outline-none focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15"
+                aria-describedby="protein-age-error"
+                data-input="ageGroup"
+                data-wrapper-for="ageGroup"
+              >
+                <option value="">Select</option>
+                <option value="adult">18 years or older</option>
+                <option value="minor">Under 18 years old</option>
+              </select>
+              <p id="protein-age-error" class="mt-2 hidden text-sm font-medium text-red-300" data-error-for="ageGroup"></p>
+            </fieldset>
+
+            <fieldset class="mt-7 border-t border-gray-800 pt-6">
+              <legend class="text-sm font-semibold text-gray-200">2. Goal</legend>
+              <div class="mt-3 grid gap-2">
+                {goalOptions.map((option, index) => (
+                  <label class="cursor-pointer rounded-lg border border-gray-700 bg-gray-900/70 p-3 transition has-[:checked]:border-amber-400 has-[:checked]:bg-amber-400/10">
+                    <span class="flex min-h-11 items-start gap-3">
+                      <input
+                        class="mt-1 size-4 shrink-0 border-gray-600 bg-gray-950 text-amber-400 focus:ring-amber-400"
+                        type="radio"
+                        name="protein-goal"
+                        value={option.value}
+                        checked={index === 0}
+                        data-input="goal"
+                      />
+                      <span>
+                        <span class="block text-sm font-semibold text-gray-100">{option.label}</span>
+                        <span class="mt-1 block text-xs leading-relaxed text-gray-400">{option.description}</span>
+                      </span>
+                    </span>
+                  </label>
+                ))}
+              </div>
+            </fieldset>
+
+            <fieldset class="mt-7 border-t border-gray-800 pt-6">
+              <legend class="text-sm font-semibold text-gray-200">3. Activity</legend>
+              <div class="mt-3 grid gap-2">
+                {activityOptions.map((option, index) => (
+                  <label class="cursor-pointer rounded-lg border border-gray-700 bg-gray-900/70 p-3 transition has-[:checked]:border-amber-400 has-[:checked]:bg-amber-400/10">
+                    <span class="flex min-h-11 items-start gap-3">
+                      <input
+                        class="mt-1 size-4 shrink-0 border-gray-600 bg-gray-950 text-amber-400 focus:ring-amber-400"
+                        type="radio"
+                        name="protein-activity"
+                        value={option.value}
+                        checked={index === 1}
+                        data-input="activity"
+                      />
+                      <span>
+                        <span class="block text-sm font-semibold text-gray-100">{option.label}</span>
+                        <span class="mt-1 block text-xs leading-relaxed text-gray-400">{option.description}</span>
+                      </span>
+                    </span>
+                  </label>
+                ))}
+              </div>
+            </fieldset>
+
+            <fieldset class="mt-7 border-t border-gray-800 pt-6">
+              <legend class="text-sm font-semibold text-gray-200">
+                4. Distribution and health context
+              </legend>
+
+              <label for="protein-meals" class="mt-3 block text-sm font-semibold text-gray-200">
+                Meals per day
+              </label>
+              <div class="mt-2 grid grid-cols-[3rem_minmax(0,1fr)_3rem] overflow-hidden rounded-lg border border-gray-700 bg-gray-900" data-wrapper-for="meals">
+                <button class="min-h-12 border-r border-gray-700 text-xl font-semibold text-gray-200" type="button" aria-label="Remove one meal" data-meals-step="-1">−</button>
+                <input
+                  id="protein-meals"
+                  class="min-h-12 w-full bg-transparent text-center text-base font-semibold text-white outline-none"
+                  type="text"
+                  inputmode="numeric"
+                  value="3"
+                  aria-describedby="protein-meals-error"
+                  data-input="meals"
+                />
+                <button class="min-h-12 border-l border-gray-700 text-xl font-semibold text-gray-200" type="button" aria-label="Add one meal" data-meals-step="1">+</button>
+              </div>
+              <p id="protein-meals-error" class="mt-2 hidden text-sm font-medium text-red-300" data-error-for="meals"></p>
+
+              <p class="mt-5 text-sm font-semibold text-gray-200">
+                Check any situation that applies
+              </p>
+              <p class="mt-1 text-xs leading-relaxed text-gray-500">
+                The range will remain educational, but we will not present the
+                practical midpoint as personalized guidance.
+              </p>
+              <div class="mt-3 grid gap-2">
+                <label class="flex min-h-12 cursor-pointer items-start gap-3 rounded-lg border border-gray-800 bg-gray-900/70 p-3">
+                  <input class="mt-1 size-4 shrink-0 text-amber-400 focus:ring-amber-400" type="checkbox" data-input="pregnancyOrLactation" />
+                  <span class="text-sm text-gray-300">Pregnancy or breastfeeding</span>
+                </label>
+                <label class="flex min-h-12 cursor-pointer items-start gap-3 rounded-lg border border-gray-800 bg-gray-900/70 p-3">
+                  <input class="mt-1 size-4 shrink-0 text-amber-400 focus:ring-amber-400" type="checkbox" data-input="kidneyCondition" />
+                  <span class="text-sm text-gray-300">Kidney disease</span>
+                </label>
+                <label class="flex min-h-12 cursor-pointer items-start gap-3 rounded-lg border border-gray-800 bg-gray-900/70 p-3">
+                  <input class="mt-1 size-4 shrink-0 text-amber-400 focus:ring-amber-400" type="checkbox" data-input="professionalDiet" />
+                  <span class="text-sm text-gray-300">Diet prescribed by a healthcare professional</span>
+                </label>
+              </div>
+            </fieldset>
+
+            <div class="mt-7 flex flex-col gap-3 sm:flex-row">
+              <button class="min-h-12 flex-1 rounded-lg bg-amber-400 px-5 py-3 text-sm font-bold text-gray-950 transition hover:bg-amber-300 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-300/50" type="submit">
+                Calculate my range
+              </button>
+              <button class="min-h-12 rounded-lg border border-gray-700 px-5 py-3 text-sm font-semibold text-gray-300 transition hover:bg-gray-900" type="reset" data-clear>
+                Clear
+              </button>
+            </div>
+          </form>
+
+          <aside class="border-t border-gray-800 bg-gray-900/45 p-4 sm:p-6 xl:border-l xl:border-t-0">
+            <div data-empty-result>
+              <p class="text-sm font-semibold uppercase tracking-wide text-amber-400">Your result</p>
+              <h2 class="mt-2 text-2xl font-semibold text-white">A range with context</h2>
+              <p class="mt-3 text-sm leading-relaxed text-gray-400">
+                Complete the form to see a daily range, the criteria applied,
+                and an approximate distribution.
+              </p>
+            </div>
+
+            <div class="hidden" data-result aria-live="polite">
+              <div class="hidden rounded-lg border border-red-400/40 bg-red-400/10 p-4 text-sm leading-relaxed text-red-100" tabindex="-1" data-guidance-alert></div>
+
+              <div data-practical-result>
+                <p class="text-sm font-semibold uppercase tracking-wide text-amber-400">Practical starting point</p>
+                <h2 class="mt-2 text-5xl font-bold tracking-tight text-white" tabindex="-1" data-result-heading>
+                  <span data-result-practical></span>
+                  <span class="text-xl font-semibold text-gray-400">g/day</span>
+                </h2>
+                <p class="mt-2 text-xs leading-relaxed text-gray-500">
+                  This is the rounded midpoint of the range, not an exact optimal amount.
+                </p>
+              </div>
+
+              <div class="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-1">
+                <div class="rounded-lg border border-gray-700 bg-gray-950/70 p-4">
+                  <p class="text-xs font-semibold uppercase tracking-wide text-gray-500">Educational range</p>
+                  <p class="mt-2 text-2xl font-semibold text-white" data-result-range></p>
+                </div>
+                <div class="rounded-lg border border-gray-700 bg-gray-950/70 p-4" data-meal-result>
+                  <p class="text-xs font-semibold uppercase tracking-wide text-gray-500">Per meal</p>
+                  <p class="mt-2 text-2xl font-semibold text-white" data-result-meal></p>
+                </div>
+              </div>
+
+              <div class="mt-4 rounded-lg border border-sky-400/25 bg-sky-400/10 p-4 text-sm leading-relaxed text-sky-100/85">
+                <p class="font-semibold text-sky-100" data-result-reference></p>
+                <p class="mt-2" data-result-reason></p>
+              </div>
+
+              <div class="mt-4 space-y-2" data-result-warnings></div>
+
+              <details class="mt-5 rounded-lg border border-gray-700 bg-gray-950/60">
+                <summary class="cursor-pointer px-4 py-3 text-sm font-semibold text-gray-200">
+                  How we calculated your result
+                </summary>
+                <div class="border-t border-gray-800 px-4 py-3 text-sm leading-relaxed text-gray-400" data-result-method></div>
+              </details>
+
+              <div class="mt-5 flex flex-col gap-2 sm:flex-row">
+                <button class="min-h-11 rounded-lg border border-amber-400/50 px-4 py-2 text-sm font-semibold text-amber-200 transition hover:bg-amber-400/10" type="button" data-copy-result>
+                  Copy result
+                </button>
+                <a class="inline-flex min-h-11 items-center justify-center rounded-lg border border-gray-700 px-4 py-2 text-sm font-semibold text-gray-300 transition hover:bg-gray-800" href="/en/health/macro-calculator">
+                  Calculate all my macros
+                </a>
+              </div>
+
+              <a class="mt-3 hidden min-h-11 items-center justify-center rounded-lg border border-gray-700 px-4 py-2 text-center text-sm font-semibold text-gray-300 transition hover:bg-gray-800" href="/en/health/calorie-deficit-calculator" data-deficit-link>
+                Calculate a calorie deficit
+              </a>
+              <p class="mt-3 hidden text-sm font-medium text-emerald-300" data-copy-status></p>
+            </div>
+          </aside>
+        </div>
+      </section>
+    </Container>
+
+    <AdSlot placement="calculator-after-tool" />
+
+    <Container as="section" class="py-8 md:py-12">
+      <SectionIntro
+        title="Translate grams into foods"
+        description="These equivalents are approximate. One hundred grams of food does not equal one hundred grams of protein, and preparation can change the values."
+      />
+      <div class="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        {foodExamples.map(([food, protein]) => (
+          <article class="rounded-lg border border-gray-800 bg-gray-950/60 p-4">
+            <p class="text-sm font-semibold text-gray-100">{food}</p>
+            <p class="mt-2 text-sm text-amber-300">{protein} protein</p>
+          </article>
+        ))}
+      </div>
+    </Container>
+
+    <Container as="section" class="py-8 md:py-12">
+      <SectionIntro
+        title="How to interpret your range"
+        description="The result helps you choose a starting point; it does not establish an exact daily requirement."
+      />
+      <div class="mt-6 grid gap-4 md:grid-cols-3">
+        <article class="rounded-lg border border-gray-800 bg-gray-950/60 p-5">
+          <h3 class="font-semibold text-white">The range matters</h3>
+          <p class="mt-2 text-sm leading-relaxed text-gray-400">Needs vary with training, diet, available energy, and individual circumstances.</p>
+        </article>
+        <article class="rounded-lg border border-gray-800 bg-gray-950/60 p-5">
+          <h3 class="font-semibold text-white">More is not always better</h3>
+          <p class="mt-2 text-sm leading-relaxed text-gray-400">The upper end is not a requirement, and consuming more protein does not guarantee better results.</p>
+        </article>
+        <article class="rounded-lg border border-gray-800 bg-gray-950/60 p-5">
+          <h3 class="font-semibold text-white">Meals can vary</h3>
+          <p class="mt-2 text-sm leading-relaxed text-gray-400">You do not need to divide the amount evenly at every meal or hit an identical number every day.</p>
+        </article>
+      </div>
+    </Container>
+
+    <Container as="section" class="py-8 md:py-12">
+      <SectionIntro
+        title="Sources and transparency"
+        description="The ranges are educational references. The matrix combines general adult recommendations with research on protein and exercise."
+      />
+      <ul class="mt-6 space-y-3 text-sm text-gray-400">
+        <li><a class="text-amber-300 underline decoration-amber-400/40 underline-offset-4" href="https://nap.nationalacademies.org/read/10490/chapter/12" rel="noreferrer" target="_blank">National Academies: Dietary Reference Intakes for Protein and Amino Acids</a></li>
+        <li><a class="text-amber-300 underline decoration-amber-400/40 underline-offset-4" href="https://link.springer.com/article/10.1186/s12970-017-0177-8" rel="noreferrer" target="_blank">International Society of Sports Nutrition: Protein and Exercise</a></li>
+        <li><a class="text-amber-300 underline decoration-amber-400/40 underline-offset-4" href="https://bjsm.bmj.com/content/52/6/376" rel="noreferrer" target="_blank">British Journal of Sports Medicine: systematic review and meta-analysis</a></li>
+        <li><a class="text-amber-300 underline decoration-amber-400/40 underline-offset-4" href="https://kdigo.org/wp-content/uploads/2024/03/KDIGO-2024-CKD-Guideline.pdf" rel="noreferrer" target="_blank">KDIGO 2024: clinical practice guideline for chronic kidney disease</a></li>
+        <li><a class="text-amber-300 underline decoration-amber-400/40 underline-offset-4" href="https://fdc.nal.usda.gov/" rel="noreferrer" target="_blank">USDA FoodData Central: food examples</a></li>
+      </ul>
+    </Container>
+
+    <FaqSection faqs={faqs} />
+  </PageShell>
+</BaseLayout>
+
+<script>
+  import {
+    PROTEIN_ACTIVITY_LABELS,
+    PROTEIN_GOAL_LABELS,
+    buildDailyProteinCopyText,
+    calculateDailyProteinResult,
+    convertKgToLb,
+    convertLbToKg,
+    formatProteinPerKg,
+    formatProteinRange,
+    parseHealthInput,
+    roundTo,
+    validateDailyProteinInput,
+    type DailyProteinInput,
+    type DailyProteinResult,
+    type ProteinActivity,
+    type ProteinAgeGroup,
+    type ProteinGoal,
+    type ProteinUnit,
+    type ProteinWarning,
+  } from "@lib/calculators/salud/calculadora-de-proteina-diaria/dailyProtein.en";
+
+  const form = document.querySelector<HTMLFormElement>("[data-protein-form]");
+
+  if (form) {
+    const query = <T extends Element>(selector: string) =>
+      form.querySelector<T>(selector);
+    const pageQuery = <T extends Element>(selector: string) =>
+      document.querySelector<T>(selector);
+    const metricInput = query<HTMLInputElement>('[data-input="weightKg"]')!;
+    const imperialInput = query<HTMLInputElement>('[data-input="weightLb"]')!;
+    const ageInput = query<HTMLSelectElement>('[data-input="ageGroup"]')!;
+    const mealsInput = query<HTMLInputElement>('[data-input="meals"]')!;
+    const resultPanel = pageQuery<HTMLElement>("[data-result]")!;
+    const emptyResult = pageQuery<HTMLElement>("[data-empty-result]")!;
+    let unit: ProteinUnit = "metric";
+    let lastResult: DailyProteinResult | undefined;
+
+    const warningMessages: Record<ProteinWarning, string> = {
+      extreme_weight:
+        "At some body weights, calculating from total body weight alone may overestimate a useful range.",
+      one_meal:
+        "The one-meal distribution is mathematical; it does not mean that this is the most practical option for you.",
+      gain_without_strength:
+        "Building muscle requires progressive strength training; more protein alone does not build muscle.",
+      high_range:
+        "The upper end of the range is not a requirement and does not guarantee better results.",
+      pregnancy_or_lactation:
+        "Pregnancy or breastfeeding: needs change by stage and circumstances. Prioritize professional guidance.",
+      kidney_condition:
+        "Kidney disease: do not increase protein based on this calculator alone. Follow professional guidance.",
+      professional_diet:
+        "Prioritize the plan prescribed by your healthcare professional over this educational result.",
+    };
+
+    function parseNumber(input: HTMLInputElement) {
+      const parsed = parseHealthInput(input.value, { maxDecimals: 2 });
+      return parsed.ok ? parsed.value : Number.NaN;
+    }
+
+    function getInput(): DailyProteinInput {
+      const selectedGoal = query<HTMLInputElement>('[data-input="goal"]:checked')!;
+      const selectedActivity = query<HTMLInputElement>('[data-input="activity"]:checked')!;
+      const displayedWeight = unit === "metric" ? parseNumber(metricInput) : parseNumber(imperialInput);
+
+      return {
+        weightKg: unit === "metric" ? displayedWeight : convertLbToKg(displayedWeight),
+        ageGroup: (ageInput.value || undefined) as ProteinAgeGroup | undefined,
+        goal: selectedGoal.value as ProteinGoal,
+        activity: selectedActivity.value as ProteinActivity,
+        meals: parseNumber(mealsInput),
+        isPregnantOrLactating: query<HTMLInputElement>('[data-input="pregnancyOrLactation"]')!.checked,
+        hasKidneyCondition: query<HTMLInputElement>('[data-input="kidneyCondition"]')!.checked,
+        followsProfessionalDiet: query<HTMLInputElement>('[data-input="professionalDiet"]')!.checked,
+      };
+    }
+
+    function clearErrors() {
+      document.querySelectorAll<HTMLElement>("[data-error-for]").forEach((element) => {
+        element.textContent = "";
+        element.classList.add("hidden");
+      });
+      form.querySelectorAll<HTMLElement>("[data-wrapper-for]").forEach((element) => {
+        element.classList.remove("border-red-400");
+      });
+    }
+
+    function showError(field: string, message: string) {
+      const error = pageQuery<HTMLElement>(`[data-error-for="${field}"]`);
+      if (error) {
+        error.textContent = message;
+        error.classList.remove("hidden");
+      }
+      form.querySelectorAll<HTMLElement>(`[data-wrapper-for="${field}"]`).forEach((element) => {
+        element.classList.add("border-red-400");
+      });
+    }
+
+    function renderErrors(input: DailyProteinInput) {
+      const validation = validateDailyProteinInput(input);
+      clearErrors();
+
+      if (validation.errors.weightKg) {
+        showError("weightKg", "Enter a valid weight between 20 and 250 kg, or the equivalent in pounds.");
+      }
+      if (validation.errors.ageGroup === "not_adult") {
+        showError("ageGroup", "This calculator does not estimate needs for minors.");
+      } else if (validation.errors.ageGroup) {
+        showError("ageGroup", "Select your age group.");
+      }
+      if (validation.errors.meals) {
+        showError("meals", "Enter a whole number of meals between 1 and 8.");
+      }
+
+      return validation.isValid;
+    }
+
+    function renderResult(result: DailyProteinResult) {
+      lastResult = result;
+      emptyResult.classList.add("hidden");
+      resultPanel.classList.remove("hidden");
+
+      const practical = pageQuery<HTMLElement>("[data-practical-result]")!;
+      const mealResult = pageQuery<HTMLElement>("[data-meal-result]")!;
+      const guidance = pageQuery<HTMLElement>("[data-guidance-alert]")!;
+      practical.classList.toggle("hidden", result.requiresIndividualGuidance);
+      mealResult.classList.toggle("hidden", result.requiresIndividualGuidance);
+      guidance.classList.toggle("hidden", !result.requiresIndividualGuidance);
+      guidance.textContent = result.requiresIndividualGuidance
+        ? "Because of your health context, we show the range as educational information and do not present a practical midpoint as personalized guidance."
+        : "";
+
+      pageQuery<HTMLElement>("[data-result-practical]")!.textContent = String(result.displayedPracticalGrams);
+      pageQuery<HTMLElement>("[data-result-range]")!.textContent = `${formatProteinRange(result.displayedDailyGrams)}/day`;
+      pageQuery<HTMLElement>("[data-result-meal]")!.textContent = `about ${result.displayedGramsPerMeal} g`;
+      pageQuery<HTMLElement>("[data-result-reference]")!.textContent =
+        `Reference used: ${formatProteinPerKg(result.gramsPerKg)}`;
+      pageQuery<HTMLElement>("[data-result-reason]")!.textContent =
+        `We selected this range because you reported ${PROTEIN_ACTIVITY_LABELS[result.input.activity].toLowerCase()} and a goal to ${PROTEIN_GOAL_LABELS[result.input.goal].toLowerCase()}.`;
+
+      const warnings = pageQuery<HTMLElement>("[data-result-warnings]")!;
+      warnings.innerHTML = "";
+      result.warnings.forEach((warning) => {
+        const item = document.createElement("p");
+        item.className = "rounded-lg border border-amber-400/25 bg-amber-400/10 p-3 text-sm leading-relaxed text-amber-100/85";
+        item.textContent = warningMessages[warning];
+        warnings.append(item);
+      });
+
+      pageQuery<HTMLElement>("[data-result-method]")!.textContent =
+        `We converted your weight to ${roundTo(result.input.weightKg, 2)} kg, applied ${formatProteinPerKg(result.gramsPerKg)}, and multiplied both ends by your weight. The practical starting point is the midpoint rounded to the nearest 5 g.`;
+      pageQuery<HTMLElement>("[data-deficit-link]")!.classList.toggle(
+        "hidden",
+        result.input.goal !== "lose-fat",
+      );
+      pageQuery<HTMLElement>("[data-deficit-link]")!.classList.toggle(
+        "flex",
+        result.input.goal === "lose-fat",
+      );
+
+      const heading = pageQuery<HTMLElement>("[data-result-heading]");
+      (result.requiresIndividualGuidance ? guidance : heading)?.focus();
+    }
+
+    form.addEventListener("submit", (event) => {
+      event.preventDefault();
+      const input = getInput();
+      if (!renderErrors(input)) {
+        resultPanel.classList.add("hidden");
+        emptyResult.classList.remove("hidden");
+        return;
+      }
+      renderResult(calculateDailyProteinResult(input));
+    });
+
+    form.querySelectorAll<HTMLButtonElement>("[data-unit-option]").forEach((button) => {
+      button.addEventListener("click", () => {
+        const nextUnit = button.dataset.unitOption as ProteinUnit;
+        if (nextUnit === unit) return;
+
+        const currentValue = unit === "metric" ? parseNumber(metricInput) : parseNumber(imperialInput);
+        if (Number.isFinite(currentValue)) {
+          if (nextUnit === "imperial") {
+            imperialInput.value = String(roundTo(convertKgToLb(currentValue), 1));
+          } else {
+            metricInput.value = String(roundTo(convertLbToKg(currentValue), 1));
+          }
+        }
+        unit = nextUnit;
+        form.querySelectorAll<HTMLElement>("[data-unit-panel]").forEach((panel) => {
+          panel.classList.toggle("hidden", panel.dataset.unitPanel !== unit);
+        });
+        form.querySelectorAll<HTMLButtonElement>("[data-unit-option]").forEach((option) => {
+          const selected = option.dataset.unitOption === unit;
+          option.setAttribute("aria-pressed", String(selected));
+          option.classList.toggle("bg-amber-400", selected);
+          option.classList.toggle("text-gray-950", selected);
+          option.classList.toggle("font-bold", selected);
+          option.classList.toggle("text-gray-300", !selected);
+        });
+      });
+    });
+
+    form.querySelectorAll<HTMLButtonElement>("[data-meals-step]").forEach((button) => {
+      button.addEventListener("click", () => {
+        const current = Number.parseInt(mealsInput.value, 10) || 3;
+        const step = Number(button.dataset.mealsStep);
+        mealsInput.value = String(Math.min(8, Math.max(1, current + step)));
+      });
+    });
+
+    form.addEventListener("reset", () => {
+      window.setTimeout(() => {
+        unit = "metric";
+        metricInput.value = "";
+        imperialInput.value = "";
+        clearErrors();
+        resultPanel.classList.add("hidden");
+        emptyResult.classList.remove("hidden");
+        lastResult = undefined;
+        form.querySelectorAll<HTMLElement>("[data-unit-panel]").forEach((panel) => {
+          panel.classList.toggle("hidden", panel.dataset.unitPanel !== "metric");
+        });
+        form.querySelectorAll<HTMLButtonElement>("[data-unit-option]").forEach((option) => {
+          const selected = option.dataset.unitOption === "metric";
+          option.setAttribute("aria-pressed", String(selected));
+          option.classList.toggle("bg-amber-400", selected);
+          option.classList.toggle("text-gray-950", selected);
+          option.classList.toggle("font-bold", selected);
+          option.classList.toggle("text-gray-300", !selected);
+        });
+      });
+    });
+
+    pageQuery<HTMLButtonElement>("[data-copy-result]")?.addEventListener("click", async () => {
+      if (!lastResult) return;
+      await navigator.clipboard.writeText(buildDailyProteinCopyText(lastResult, unit));
+      const status = pageQuery<HTMLElement>("[data-copy-status]")!;
+      status.textContent = "Result copied.";
+      status.classList.remove("hidden");
+      window.setTimeout(() => status.classList.add("hidden"), 2500);
+    });
+  }
+</script>

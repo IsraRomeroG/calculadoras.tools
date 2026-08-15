@@ -6,6 +6,7 @@ import AdSlot from "@components/ads/AdSlot.astro";
 import FaqSection from "@components/shared/FaqSection.astro";
 import PageHero from "@components/shared/PageHero.astro";
 import SectionIntro from "@components/shared/SectionIntro.astro";
+import { buildAlternateLinks } from "@lib/i18n/routing";
 import { buildFaqJsonLd } from "@lib/seo";
 import {
   AREA_PERIMETER_UNITS,
@@ -16,6 +17,11 @@ const title = "Calculadora de Área y Perímetro — Fórmulas por Figura";
 const description =
   "Calcula área y perímetro de cuadrados, rectángulos, triángulos, círculos y polígonos regulares con fórmula y procedimiento.";
 const canonical = "/geometria/calculadora-de-area-y-perimetro";
+const englishCanonical = "/en/geometry/area-perimeter-calculator";
+const alternates = buildAlternateLinks(
+  { es: canonical, en: englishCanonical },
+  Astro.site ?? Astro.url,
+);
 
 const shapeOptions = [
   { value: "square", label: "Cuadrado" },
@@ -120,7 +126,7 @@ const faqs = [
 const faqJsonLd = buildFaqJsonLd(faqs);
 ---
 
-<BaseLayout title={title} description={description} canonical={canonical}>
+<BaseLayout title={title} description={description} canonical={canonical} alternates={alternates}>
   <Fragment slot="head">
     <script type="application/ld+json" set:html={JSON.stringify(faqJsonLd)} />
   </Fragment>

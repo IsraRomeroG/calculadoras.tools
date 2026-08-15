@@ -14,6 +14,7 @@ import {
   getNumberBaseLabel,
 } from "@lib/calculators/programacion/conversor-de-bases-numericas/numberBase";
 import { buildFaqJsonLd } from "@lib/seo";
+import { buildAlternateLinks } from "@lib/i18n/routing";
 
 const title =
   "Conversor de bases numéricas: binario, decimal y hexadecimal";
@@ -103,7 +104,7 @@ const faqs = [
 const faqJsonLd = buildFaqJsonLd(faqs);
 ---
 
-<BaseLayout title={title} description={description} canonical={canonical}>
+<BaseLayout title={title} description={description} canonical={canonical} alternates={buildAlternateLinks({ es: "/programacion/conversor-de-bases-numericas", en: "/en/programming/number-base-converter" }, Astro.site ?? Astro.url)}>
   <Fragment slot="head">
     <script type="application/ld+json" set:html={JSON.stringify(faqJsonLd)} />
   </Fragment>

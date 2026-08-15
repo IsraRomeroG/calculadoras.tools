@@ -6,6 +6,7 @@ import PageHero from "@components/shared/PageHero.astro";
 import SectionIntro from "@components/shared/SectionIntro.astro";
 import BaseLayout from "@layouts/BaseLayout.astro";
 import AdSlot from "@components/ads/AdSlot.astro";
+import { buildAlternateLinks } from "@lib/i18n/routing";
 import { buildFaqJsonLd } from "@lib/seo";
 import {
   PYTHAGOREAN_CANONICAL,
@@ -18,6 +19,11 @@ const title = "Calculadora del Teorema de Pitágoras — Hipotenusa y Catetos";
 const description =
   "Calcula la hipotenusa o un cateto con el teorema de Pitágoras. Consulta la fórmula, el procedimiento y ejemplos resueltos.";
 const canonical = PYTHAGOREAN_CANONICAL;
+const englishCanonical = "/en/geometry/pythagorean-theorem-calculator";
+const alternates = buildAlternateLinks(
+  { es: canonical, en: englishCanonical },
+  Astro.site ?? Astro.url,
+);
 
 const decimalOptions = [
   { value: "auto", label: "Automático" },
@@ -66,7 +72,7 @@ const faqs = [
 const faqJsonLd = buildFaqJsonLd(faqs);
 ---
 
-<BaseLayout title={title} description={description} canonical={canonical}>
+<BaseLayout title={title} description={description} canonical={canonical} alternates={alternates}>
   <Fragment slot="head">
     <script type="application/ld+json" set:html={JSON.stringify(faqJsonLd)} />
   </Fragment>

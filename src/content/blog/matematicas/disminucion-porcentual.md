@@ -4,6 +4,7 @@ seoTitle: "Disminución porcentual: cómo calcular una reducción"
 description: "Aprende cómo calcular la disminución porcentual entre un valor inicial y uno final con fórmula y ejemplos claros."
 pubDate: 2026-04-02
 categorySlug: "matematicas"
+translationKey: "percentage-decrease"
 tags:
   - disminución porcentual
   - variación porcentual

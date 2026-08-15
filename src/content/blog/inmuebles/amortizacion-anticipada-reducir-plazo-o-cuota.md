@@ -4,6 +4,7 @@ seoTitle: "Reducir plazo o cuota en una hipoteca: pagos anticipados"
 description: "Conoce la diferencia entre reducir plazo o reducir mensualidad al hacer pagos anticipados en una hipoteca."
 pubDate: 2026-06-17
 categorySlug: "inmuebles"
+translationKey: "mortgage-prepayment-reduce-term-or-payment"
 tags:
   - amortización anticipada
   - abono a capital

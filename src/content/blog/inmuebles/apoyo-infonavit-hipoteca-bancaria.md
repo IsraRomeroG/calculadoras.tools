@@ -4,6 +4,7 @@ seoTitle: "Apoyo Infonavit: cómo puede combinarse con una hipoteca bancaria"
 description: "Conoce de forma general cómo el apoyo Infonavit puede relacionarse con una hipoteca bancaria y qué datos revisar antes de contratar."
 pubDate: 2026-06-25
 categorySlug: "inmuebles"
+translationKey: "apoyo-infonavit-bank-mortgage"
 tags:
   - apoyo infonavit
   - hipoteca bancaria

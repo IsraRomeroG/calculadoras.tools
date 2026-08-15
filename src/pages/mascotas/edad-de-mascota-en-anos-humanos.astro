@@ -12,12 +12,18 @@ import {
   getPetAgeTable,
   type DogSize,
 } from "@lib/calculators/mascotas/edad-de-mascota-en-anos-humanos/petAge";
+import { buildAlternateLinks } from "@lib/i18n/routing";
 import { buildFaqJsonLd } from "@lib/seo";
 
 const title = "Edad de mascota en años humanos";
 const description =
   "Estima la edad equivalente de perros y gatos en años humanos con una tabla veterinaria orientativa por especie y talla adulta.";
 const canonical = "/mascotas/edad-de-mascota-en-anos-humanos";
+const englishCanonical = "/en/pets/pet-age-calculator";
+const alternates = buildAlternateLinks(
+  { es: canonical, en: englishCanonical },
+  Astro.site ?? Astro.url,
+);
 
 const faqs = [
   {
@@ -101,7 +107,7 @@ const tableTabs = [
 ];
 ---
 
-<BaseLayout title={title} description={description} canonical={canonical}>
+<BaseLayout title={title} description={description} canonical={canonical} alternates={alternates}>
   <Fragment slot="head">
     <script type="application/ld+json" set:html={JSON.stringify(faqJsonLd)} />
   </Fragment>

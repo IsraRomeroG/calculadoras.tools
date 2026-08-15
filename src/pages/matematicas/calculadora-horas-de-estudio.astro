@@ -1,5 +1,7 @@
+
 ---
 import BaseLayout from "@layouts/BaseLayout.astro";
+import { buildAlternateLinks } from "@lib/i18n/routing";
 import AdSlot from "@components/ads/AdSlot.astro";
 import Container from "@components/layout/Container.astro";
 import PageShell from "@components/layout/PageShell.astro";
@@ -16,6 +18,11 @@ const title = "Calculadora de horas de estudio necesarias";
 const description =
   "Calcula cuantas horas estudiar al dia, cuantas sesiones hacer y como repartir tu plan semanal antes de una fecha limite.";
 const canonical = STUDY_HOURS_CANONICAL_PATH;
+const englishCanonical = "/en/math/study-hours-calculator";
+const alternates = buildAlternateLinks(
+  { es: canonical, en: englishCanonical },
+  Astro.site ?? Astro.url,
+);
 
 const faqs = [
   {
@@ -49,7 +56,7 @@ const faqJsonLd = buildFaqJsonLd(faqs);
 const DEFAULT_STUDY_WEEKDAY_VALUES = new Set([1, 2, 3, 4, 5]);
 ---
 
-<BaseLayout title={title} description={description} canonical={canonical}>
+<BaseLayout title={title} description={description} canonical={canonical} alternates={alternates}>
   <Fragment slot="head">
     <script type="application/ld+json" set:html={JSON.stringify(faqJsonLd)} />
   </Fragment>

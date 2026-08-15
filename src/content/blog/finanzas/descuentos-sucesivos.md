@@ -4,6 +4,7 @@ seoTitle: "Descuentos sucesivos: fórmula para calcular rebajas acumuladas"
 description: "Aprende cómo calcular descuentos sucesivos y por qué dos rebajas se aplican una después de otra, no sumando porcentajes."
 pubDate: 2026-04-18
 categorySlug: "finanzas"
+translationKey: "successive-discounts"
 tags:
   - descuentos
   - compras

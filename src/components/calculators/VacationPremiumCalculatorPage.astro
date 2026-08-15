@@ -1,0 +1,848 @@
+---
+import AdSlot from "@components/ads/AdSlot.astro";
+import Container from "@components/layout/Container.astro";
+import PageShell from "@components/layout/PageShell.astro";
+import FaqSection from "@components/shared/FaqSection.astro";
+import PageHero from "@components/shared/PageHero.astro";
+import SectionIntro from "@components/shared/SectionIntro.astro";
+import BaseLayout from "@layouts/BaseLayout.astro";
+import { VACATION_PREMIUM_CANONICAL_PATH } from "@lib/calculators/legal-impuestos/calculadora-prima-vacacional/vacationPremium";
+import { MEXICO_VACATION_PREMIUM_RULE_2023 } from "@lib/calculators/legal-impuestos/calculadora-prima-vacacional/rules/mx/2023";
+import { buildFaqJsonLd } from "@lib/seo";
+
+const title = "Calculadora de prima vacacional en México";
+const description =
+  "Calcula tu prima vacacional en México con salario, días y porcentaje legal o contractual. Compara el mínimo de la LFT y estima su parte en un finiquito.";
+const minimumPercent =
+  MEXICO_VACATION_PREMIUM_RULE_2023.minimumPremiumRate * 100;
+
+const faqs = [
+  {
+    question: "¿Cuál es el porcentaje mínimo de prima vacacional en México?",
+    answer:
+      "El artículo 80 de la Ley Federal del Trabajo establece una prima no menor de 25 % sobre los salarios correspondientes al periodo de vacaciones. Un contrato o convenio puede reconocer un porcentaje mayor.",
+  },
+  {
+    question: "¿El salario de mis vacaciones es dinero adicional?",
+    answer:
+      "Normalmente no. Mientras continúa la relación laboral, conservas el salario ordinario correspondiente a los días de descanso y la prima vacacional es la cantidad adicional. En un finiquito, la remuneración de vacaciones pendientes sí se muestra junto con su prima.",
+  },
+  {
+    question: "¿Qué salario debo capturar?",
+    answer:
+      "El MVP pide salario fijo ordinario bruto. No uses automáticamente el salario diario integrado. Si recibes salario variable, comisiones, propinas o una mezcla de conceptos, la base puede requerir otra determinación.",
+  },
+  {
+    question: "¿Puedo calcular si no conozco mis días de vacaciones?",
+    answer:
+      "Sí. El modo guiado reutiliza la lógica de vacaciones proporcionales para estimar días adquiridos o días para finiquito según fechas, saldo anterior y días ya utilizados.",
+  },
+  {
+    question: "¿El resultado incluye ISR?",
+    answer:
+      "No. Todos los importes son brutos y antes de impuestos. La parte exenta y la retención dependen de reglas fiscales y de otros datos de nómina que este MVP no calcula.",
+  },
+  {
+    question: "¿La diferencia mostrada es una deuda confirmada?",
+    answer:
+      "No. Comparar un porcentaje ofrecido o pagado ayuda a detectar una posible diferencia, pero no determina por sí solo una deuda, incumplimiento o resolución legal.",
+  },
+];
+
+const faqJsonLd = buildFaqJsonLd(faqs);
+const inputClass =
+  "mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-900 px-4 text-base text-white outline-none transition placeholder:text-gray-600 focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15 disabled:cursor-not-allowed disabled:opacity-60";
+---
+
+<BaseLayout
+  title={title}
+  description={description}
+  canonical={VACATION_PREMIUM_CANONICAL_PATH}
+>
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={JSON.stringify(faqJsonLd)} />
+  </Fragment>
+
+  <PageShell class="pb-24 lg:pb-0">
+    <PageHero
+      title="Calculadora de prima vacacional"
+      description="Estima la cantidad adicional que te corresponde por tus vacaciones y distingue el salario ordinario del componente vacacional de un finiquito."
+      kicker="Legal e impuestos"
+      kickerHref="/legal-impuestos"
+      collapseBreadcrumbOnMobile
+      containerClass="py-6 md:py-8"
+      breadcrumbs={[
+        { label: "Inicio", href: "/", ariaLabel: "Inicio" },
+        { label: "Legal e impuestos", href: "/legal-impuestos", optional: true },
+        { label: "Prima vacacional", truncate: true },
+      ]}
+    />
+
+    <Container as="section" class="py-6 md:py-8">
+      <section
+        id="vacation-premium-calculator"
+        class="overflow-hidden rounded-xl border border-gray-700 bg-gray-950 shadow-xl shadow-gray-950/30"
+        aria-labelledby="vacation-premium-heading"
+      >
+        <div class="border-b border-gray-700 p-4 sm:p-6">
+          <p class="text-sm font-semibold uppercase tracking-wide text-amber-400">
+            Paso 1 · Tu situación
+          </p>
+          <h2 id="vacation-premium-heading" class="mt-2 text-xl font-semibold">
+            Calcula la prima sin confundirla con tu sueldo
+          </h2>
+          <p class="mt-2 max-w-3xl text-sm leading-relaxed text-gray-400">
+            Primero identifica si revisarás vacaciones durante el empleo o el
+            componente vacacional de un finiquito.
+          </p>
+        </div>
+
+        <div class="grid lg:grid-cols-[minmax(0,1.08fr)_minmax(19rem,0.92fr)]">
+          <form class="p-4 sm:p-6" data-premium-form novalidate>
+            <fieldset>
+              <legend class="sr-only">Situación laboral</legend>
+              <div class="grid gap-3 sm:grid-cols-2">
+                <label class="relative cursor-pointer rounded-xl border border-amber-400 bg-amber-400/10 p-4 transition focus-within:ring-3 focus-within:ring-amber-400/30" data-situation-card="active">
+                  <input class="sr-only" type="radio" name="premium-situation" value="active" checked data-situation />
+                  <span class="block font-semibold text-white">Voy a disfrutar o revisar mis vacaciones</span>
+                  <span class="mt-1 block text-sm leading-relaxed text-gray-400">La prima será el resultado adicional principal.</span>
+                </label>
+                <label class="relative cursor-pointer rounded-xl border border-gray-700 bg-gray-900 p-4 transition focus-within:ring-3 focus-within:ring-amber-400/30" data-situation-card="termination">
+                  <input class="sr-only" type="radio" name="premium-situation" value="termination" data-situation />
+                  <span class="block font-semibold text-white">Terminó mi relación laboral</span>
+                  <span class="mt-1 block text-sm leading-relaxed text-gray-400">Suma vacaciones pendientes y su prima, no todo el finiquito.</span>
+                </label>
+              </div>
+            </fieldset>
+
+            <div class="mt-5 rounded-lg border border-blue-900/70 bg-blue-950/30 p-4 text-sm text-blue-100">
+              <p class="font-medium">
+                México · LFT · sector privado · trabajo continuo · salario fijo
+              </p>
+              <details class="mt-2 text-blue-200/80">
+                <summary class="cursor-pointer font-semibold underline decoration-blue-500/50 underline-offset-4">
+                  Mi caso es diferente
+                </summary>
+                <p class="mt-2 leading-relaxed">
+                  Empleo público, trabajo de temporada o discontinuo, salario
+                  variable, comisiones, propinas y otros regímenes requieren una
+                  revisión distinta. No uses automáticamente el salario diario
+                  integrado como base.
+                </p>
+              </details>
+            </div>
+
+            <div class="mt-6">
+              <label for="premium-reference-date" class="block text-sm font-medium text-gray-200" data-reference-label>
+                Fecha de cálculo
+              </label>
+              <input id="premium-reference-date" class={inputClass} type="date" required data-field="referenceDate" aria-describedby="premium-reference-help premium-reference-error" />
+              <p id="premium-reference-help" class="mt-2 text-xs leading-relaxed text-gray-500">Selecciona la fecha a la que corresponde la estimación.</p>
+              <p id="premium-reference-error" class="mt-2 hidden text-sm text-red-300" data-error-for="referenceDate"></p>
+            </div>
+
+            <fieldset class="mt-6">
+              <legend class="text-sm font-semibold text-gray-200">¿Ya conoces tus días?</legend>
+              <div class="mt-3 grid grid-cols-2 gap-3">
+                <label class="cursor-pointer rounded-lg border border-amber-400 bg-amber-400/10 p-3 text-center text-sm font-semibold transition focus-within:ring-3 focus-within:ring-amber-400/30" data-days-source-card="direct">
+                  <input class="sr-only" type="radio" name="days-source" value="direct" checked data-days-source />
+                  Ya conozco mis días
+                </label>
+                <label class="cursor-pointer rounded-lg border border-gray-700 bg-gray-900 p-3 text-center text-sm font-semibold transition focus-within:ring-3 focus-within:ring-amber-400/30" data-days-source-card="guided">
+                  <input class="sr-only" type="radio" name="days-source" value="guided" data-days-source />
+                  Ayúdame a calcularlos
+                </label>
+              </div>
+            </fieldset>
+
+            <div class="mt-5" data-direct-days>
+              <label for="premium-vacation-days" class="block text-sm font-medium text-gray-200">
+                Días laborables de vacaciones
+              </label>
+              <div class="mt-2 flex rounded-lg border border-gray-700 bg-gray-900 focus-within:border-amber-400 focus-within:ring-3 focus-within:ring-amber-400/15">
+                <input id="premium-vacation-days" class="min-h-12 w-full bg-transparent px-4 text-base text-white outline-none placeholder:text-gray-600" type="text" inputmode="decimal" autocomplete="off" placeholder="12" data-field="vacationDays" aria-describedby="premium-days-help premium-days-error" />
+                <span class="flex items-center pr-4 text-xs font-semibold text-gray-500">días</span>
+              </div>
+              <p id="premium-days-help" class="mt-2 text-xs leading-relaxed text-gray-500">Usa días laborables, no días calendario.</p>
+              <p id="premium-days-error" class="mt-2 hidden text-sm text-red-300" data-error-for="vacationDays"></p>
+            </div>
+
+            <section class="mt-5 hidden rounded-xl border border-gray-800 bg-gray-900/50 p-4" data-guided-days aria-labelledby="guided-days-heading">
+              <h3 id="guided-days-heading" class="font-semibold text-white">Calcula primero tus días</h3>
+              <p class="mt-2 text-xs leading-relaxed text-gray-500">Reutilizamos la regla de vacaciones proporcionales; confirma el resultado antes de calcular dinero.</p>
+
+              <div class="mt-4">
+                <label for="premium-hire-date" class="block text-sm font-medium text-gray-200">Fecha de ingreso</label>
+                <input id="premium-hire-date" class={inputClass} type="date" data-field="hireDate" aria-describedby="premium-hire-error" />
+                <p id="premium-hire-error" class="mt-2 hidden text-sm text-red-300" data-error-for="hireDate"></p>
+              </div>
+
+              <div class="mt-4 grid gap-4 sm:grid-cols-2">
+                <div>
+                  <label for="premium-prior-balance" class="block text-sm font-medium text-gray-200">Saldo anterior informado</label>
+                  <input id="premium-prior-balance" class={inputClass} type="text" inputmode="decimal" autocomplete="off" value="0" data-field="priorBalance" aria-describedby="premium-prior-help premium-prior-error" />
+                  <p id="premium-prior-help" class="mt-2 text-xs leading-relaxed text-gray-500">Sólo si aparece en registros de tu empleador.</p>
+                  <p id="premium-prior-error" class="mt-2 hidden text-sm text-red-300" data-error-for="priorBalance"></p>
+                </div>
+                <div>
+                  <label for="premium-used-days" class="block text-sm font-medium text-gray-200">Días disfrutados o pagados</label>
+                  <input id="premium-used-days" class={inputClass} type="text" inputmode="decimal" autocomplete="off" value="0" data-field="usedDays" aria-describedby="premium-used-error" />
+                  <p id="premium-used-error" class="mt-2 hidden text-sm text-red-300" data-error-for="usedDays"></p>
+                </div>
+              </div>
+
+              <details class="mt-4 rounded-lg border border-gray-800 bg-gray-950/60 p-4" data-guided-contract>
+                <summary class="cursor-pointer text-sm font-semibold text-white">Mi contrato ofrece más días de vacaciones</summary>
+                <div class="mt-4 grid gap-4 sm:grid-cols-2">
+                  <div data-last-entitlement-wrap>
+                    <label for="premium-last-entitlement" class="block text-sm font-medium text-gray-200">Último año completado</label>
+                    <input id="premium-last-entitlement" class={inputClass} type="text" inputmode="decimal" autocomplete="off" data-field="lastEntitlement" aria-describedby="premium-last-min premium-last-error" />
+                    <p id="premium-last-min" class="mt-2 text-xs text-gray-500" data-last-min>Se verificará el mínimo legal.</p>
+                    <p id="premium-last-error" class="mt-2 hidden text-sm text-red-300" data-error-for="lastEntitlement"></p>
+                  </div>
+                  <div>
+                    <label for="premium-current-entitlement" class="block text-sm font-medium text-gray-200">Año de servicio en curso</label>
+                    <input id="premium-current-entitlement" class={inputClass} type="text" inputmode="decimal" autocomplete="off" data-field="currentEntitlement" aria-describedby="premium-current-min premium-current-error" />
+                    <p id="premium-current-min" class="mt-2 text-xs text-gray-500" data-current-min>Se verificará el mínimo legal.</p>
+                    <p id="premium-current-error" class="mt-2 hidden text-sm text-red-300" data-error-for="currentEntitlement"></p>
+                  </div>
+                </div>
+              </details>
+
+              <button class="mt-5 inline-flex min-h-12 w-full items-center justify-center rounded-lg border border-amber-400/70 px-4 py-3 text-sm font-semibold text-amber-300 transition hover:bg-amber-400/10 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/30" type="button" data-calculate-days>
+                Obtener días estimados
+              </button>
+
+              <div class="mt-4 hidden rounded-lg border border-emerald-800/60 bg-emerald-950/20 p-4" data-guided-confirmation>
+                <p class="text-sm font-semibold text-emerald-200" data-guided-summary></p>
+                <div class="mt-3">
+                  <label for="premium-guided-days-value" class="block text-sm font-medium text-gray-200" data-guided-days-label>Días que usarás en el cálculo</label>
+                  <input id="premium-guided-days-value" class={inputClass} type="text" inputmode="decimal" autocomplete="off" data-field="guidedDays" aria-describedby="premium-guided-days-help premium-guided-days-error" />
+                  <p id="premium-guided-days-help" class="mt-2 text-xs leading-relaxed text-gray-500" data-guided-days-help>Confirma o reduce los días antes de calcular.</p>
+                  <p id="premium-guided-days-error" class="mt-2 hidden text-sm text-red-300" data-error-for="guidedDays"></p>
+                </div>
+              </div>
+            </section>
+
+            <div class="mt-6 grid gap-5 sm:grid-cols-2">
+              <div>
+                <label for="premium-salary" class="block text-sm font-medium text-gray-200">Salario bruto fijo</label>
+                <div class="mt-2 flex rounded-lg border border-gray-700 bg-gray-900 focus-within:border-amber-400 focus-within:ring-3 focus-within:ring-amber-400/15">
+                  <span class="flex items-center pl-4 text-gray-500">$</span>
+                  <input id="premium-salary" class="min-h-12 w-full bg-transparent px-3 text-base text-white outline-none placeholder:text-gray-600" type="text" inputmode="decimal" autocomplete="off" placeholder="18,000" data-field="salary" aria-describedby="premium-salary-help premium-salary-error" />
+                  <span class="flex items-center pr-4 text-xs font-semibold text-gray-500">MXN</span>
+                </div>
+                <p id="premium-salary-help" class="mt-2 text-xs leading-relaxed text-gray-500">Salario ordinario antes de impuestos y descuentos.</p>
+                <p id="premium-salary-error" class="mt-2 hidden text-sm text-red-300" data-error-for="salary"></p>
+              </div>
+              <div>
+                <label for="premium-frequency" class="block text-sm font-medium text-gray-200">Frecuencia del salario</label>
+                <select id="premium-frequency" class={inputClass} data-field="salaryFrequency">
+                  <option value="daily">Diario</option>
+                  <option value="weekly">Semanal</option>
+                  <option value="biweekly">Quincenal</option>
+                  <option value="monthly" selected>Mensual</option>
+                </select>
+                <p class="mt-2 text-xs leading-relaxed text-gray-500">Semanal ÷ 7 · quincenal ÷ 15 · mensual ÷ 30.</p>
+              </div>
+            </div>
+
+            <details class="mt-6 rounded-xl border border-gray-800 bg-gray-900/50 p-4" data-premium-options>
+              <summary class="cursor-pointer list-none text-sm font-semibold text-white">
+                <span class="flex items-center justify-between gap-4">
+                  <span>Comparar porcentaje contractual o pagado</span>
+                  <span class="text-xs font-normal text-gray-500">Opcional</span>
+                </span>
+              </summary>
+
+              <div class="mt-5 space-y-5">
+                <label class="flex min-h-11 cursor-pointer items-start gap-3">
+                  <input class="mt-1 h-5 w-5 shrink-0 accent-amber-400" type="checkbox" data-field="useContractualRate" />
+                  <span>
+                    <span class="block text-sm font-semibold text-gray-200">Mi contrato ofrece una prima mayor</span>
+                    <span class="mt-1 block text-xs text-gray-500">El mínimo aplicable es {minimumPercent} %.</span>
+                  </span>
+                </label>
+                <div class="hidden" data-contractual-rate-wrap>
+                  <label for="premium-contractual-rate" class="block text-sm font-medium text-gray-200">Prima contractual</label>
+                  <div class="mt-2 flex rounded-lg border border-gray-700 bg-gray-900 focus-within:border-amber-400 focus-within:ring-3 focus-within:ring-amber-400/15">
+                    <input id="premium-contractual-rate" class="min-h-12 w-full bg-transparent px-4 text-base text-white outline-none" type="text" inputmode="decimal" autocomplete="off" value="25" data-field="contractualRate" aria-describedby="premium-contractual-error" />
+                    <span class="flex items-center pr-4 text-gray-500">%</span>
+                  </div>
+                  <p id="premium-contractual-error" class="mt-2 hidden text-sm text-red-300" data-error-for="contractualRate"></p>
+                </div>
+
+                <label class="flex min-h-11 cursor-pointer items-start gap-3">
+                  <input class="mt-1 h-5 w-5 shrink-0 accent-amber-400" type="checkbox" data-field="compareOfferedRate" />
+                  <span>
+                    <span class="block text-sm font-semibold text-gray-200">Quiero comparar un porcentaje ofrecido o pagado</span>
+                    <span class="mt-1 block text-xs text-gray-500">Puede ser menor al mínimo; no reemplazará la regla aplicable.</span>
+                  </span>
+                </label>
+                <div class="hidden" data-offered-rate-wrap>
+                  <label for="premium-offered-rate" class="block text-sm font-medium text-gray-200">Porcentaje ofrecido o pagado</label>
+                  <div class="mt-2 flex rounded-lg border border-gray-700 bg-gray-900 focus-within:border-amber-400 focus-within:ring-3 focus-within:ring-amber-400/15">
+                    <input id="premium-offered-rate" class="min-h-12 w-full bg-transparent px-4 text-base text-white outline-none" type="text" inputmode="decimal" autocomplete="off" placeholder="20" data-field="offeredRate" aria-describedby="premium-offered-error" />
+                    <span class="flex items-center pr-4 text-gray-500">%</span>
+                  </div>
+                  <p id="premium-offered-error" class="mt-2 hidden text-sm text-red-300" data-error-for="offeredRate"></p>
+                </div>
+
+                <label class="hidden min-h-11 cursor-pointer items-start gap-3 rounded-lg border border-amber-800/60 bg-amber-950/20 p-3" data-high-rate-confirmation>
+                  <input class="mt-1 h-5 w-5 shrink-0 accent-amber-400" type="checkbox" data-field="confirmHighRate" />
+                  <span class="text-sm text-amber-100">Confirmo que revisé el porcentaje superior a 100 %.</span>
+                </label>
+              </div>
+            </details>
+
+            <p class="mt-5 hidden rounded-lg border border-red-900/60 bg-red-950/30 p-3 text-sm leading-relaxed text-red-200 outline-none" role="alert" tabindex="-1" data-form-error></p>
+            <p class="sr-only" aria-live="polite" data-form-status></p>
+
+            <div class="mt-6 flex flex-col-reverse gap-3 border-t border-gray-800 pt-5 sm:flex-row sm:justify-between">
+              <button class="inline-flex min-h-12 items-center justify-center rounded-lg border border-gray-700 px-5 py-3 text-sm font-semibold text-gray-200 transition hover:border-amber-400 hover:text-white focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/40" type="button" data-clear>Limpiar</button>
+              <button class="inline-flex min-h-12 items-center justify-center rounded-lg bg-amber-400 px-6 py-3 text-sm font-bold text-gray-950 transition hover:bg-amber-300 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/40" type="submit">Calcular prima vacacional</button>
+            </div>
+          </form>
+
+          <aside id="vacation-premium-result" class="scroll-mt-4 border-t border-gray-800 bg-gray-900/70 p-4 outline-none sm:p-6 lg:border-l lg:border-t-0" aria-live="polite" aria-atomic="false" tabindex="-1" data-result-region>
+            <p class="text-sm font-semibold uppercase tracking-wide text-amber-400">Resultado</p>
+            <h3 class="mt-3 text-lg font-semibold text-gray-200" data-result-label>Prima vacacional adicional estimada</h3>
+            <p class="mt-2 break-words text-4xl font-bold leading-tight text-white sm:text-5xl" data-main-result>—</p>
+            <p class="mt-3 text-sm leading-relaxed text-gray-400" data-result-context>Selecciona tu situación y captura tus datos para comenzar.</p>
+
+            <div class="mt-6 hidden grid-cols-2 gap-3" data-result-metrics>
+              <div class="rounded-lg border border-gray-800 bg-gray-950/70 p-3"><p class="text-xs text-gray-500">Días laborables</p><p class="mt-1 font-semibold text-white" data-result-days>—</p></div>
+              <div class="rounded-lg border border-gray-800 bg-gray-950/70 p-3"><p class="text-xs text-gray-500">Salario diario</p><p class="mt-1 break-words text-sm font-semibold text-white" data-result-daily>—</p></div>
+              <div class="rounded-lg border border-gray-800 bg-gray-950/70 p-3"><p class="text-xs text-gray-500">Base vacacional</p><p class="mt-1 break-words text-sm font-semibold text-white" data-result-base>—</p></div>
+              <div class="rounded-lg border border-gray-800 bg-gray-950/70 p-3"><p class="text-xs text-gray-500">Porcentaje aplicado</p><p class="mt-1 font-semibold text-white" data-result-rate>—</p></div>
+            </div>
+
+            <div class="mt-5 hidden space-y-2" data-breakdown></div>
+
+            <div class="mt-5 hidden rounded-lg border border-blue-800/60 bg-blue-950/20 p-4" data-comparison-result>
+              <p class="text-sm font-semibold text-blue-100" data-comparison-label></p>
+              <p class="mt-1 text-xs leading-relaxed text-blue-200/70">Comparación informativa; no determina por sí sola una deuda o incumplimiento.</p>
+            </div>
+
+            <p class="mt-5 hidden rounded-lg border border-amber-800/70 bg-amber-950/30 p-3 text-sm leading-relaxed text-amber-100" data-result-warning></p>
+
+            <details class="mt-5 rounded-lg border border-gray-800 bg-gray-950/50 p-4">
+              <summary class="cursor-pointer text-sm font-semibold text-white">Cómo se calculó</summary>
+              <div class="mt-3 space-y-2 text-sm leading-relaxed text-gray-400" data-formula>Aquí aparecerán los valores sustituidos.</div>
+            </details>
+
+            <div class="mt-5 rounded-lg border border-gray-800 bg-gray-950/50 p-4">
+              <p class="text-sm font-semibold text-white">México · LFT · artículo 80 · mínimo {minimumPercent} %</p>
+              <p class="mt-2 text-xs text-gray-500">Regla {MEXICO_VACATION_PREMIUM_RULE_2023.ruleVersion} · Fuentes revisadas el {MEXICO_VACATION_PREMIUM_RULE_2023.reviewedAt}</p>
+              <div class="mt-3 flex flex-wrap gap-x-4 gap-y-2 text-sm">
+                {MEXICO_VACATION_PREMIUM_RULE_2023.sources.map((source) => (
+                  <a class="font-semibold text-amber-400 hover:text-amber-300 hover:underline" href={source.url} target="_blank" rel="noreferrer">{source.title}</a>
+                ))}
+              </div>
+            </div>
+
+            <p class="mt-5 text-xs leading-relaxed text-gray-500">Estimación informativa y bruta, antes de impuestos. No sustituye una resolución, asesoría legal ni revisión de documentos laborales.</p>
+
+            <button class="mt-5 hidden min-h-11 w-full items-center justify-center rounded-lg border border-amber-400/60 px-4 py-2 text-sm font-semibold text-amber-300 transition hover:bg-amber-400/10 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/30" type="button" data-copy-result><span data-copy-label>Copiar resultado</span></button>
+            <p class="sr-only" aria-live="polite" data-copy-status></p>
+          </aside>
+        </div>
+      </section>
+    </Container>
+
+    <AdSlot placement="calculator-after-tool" />
+
+    <Container as="section" class="py-8">
+      <SectionIntro title="Qué significa cada importe" description="La herramienta mantiene separados el sueldo ordinario, la prima adicional y el componente vacacional de un finiquito." />
+      <div class="grid gap-4 md:grid-cols-3">
+        <article class="rounded-xl border border-gray-700 bg-gray-950 p-5"><h3 class="font-semibold text-white">Base vacacional</h3><p class="mt-2 text-sm leading-relaxed text-gray-400">Es el salario diario ordinario multiplicado por los días laborables considerados. Durante el empleo no se presenta como dinero extra.</p></article>
+        <article class="rounded-xl border border-gray-700 bg-gray-950 p-5"><h3 class="font-semibold text-white">Prima adicional</h3><p class="mt-2 text-sm leading-relaxed text-gray-400">Se calcula sobre la base vacacional. El mínimo general es 25 %, pero tu contrato puede reconocer más.</p></article>
+        <article class="rounded-xl border border-gray-700 bg-gray-950 p-5"><h3 class="font-semibold text-white">Finiquito</h3><p class="mt-2 text-sm leading-relaxed text-gray-400">La calculadora suma únicamente vacaciones y prima. No incluye salarios pendientes, aguinaldo, indemnización ni otros conceptos.</p></article>
+      </div>
+    </Container>
+
+    <FaqSection faqs={faqs} />
+
+    <div class="fixed inset-x-0 bottom-0 z-40 hidden border-t border-gray-700 bg-gray-950/95 px-4 py-3 shadow-2xl backdrop-blur lg:hidden" style="padding-bottom: max(0.75rem, env(safe-area-inset-bottom));" data-mobile-summary>
+      <div class="mx-auto flex max-w-5xl items-center justify-between gap-4">
+        <div class="min-w-0"><p class="truncate text-xs font-semibold uppercase tracking-wide text-gray-500" data-mobile-label>Prima vacacional adicional</p><p class="truncate text-lg font-bold text-white" data-mobile-result>—</p></div>
+        <a class="shrink-0 rounded-lg border border-amber-400/60 px-3 py-2 text-sm font-semibold text-amber-300" href="#vacation-premium-result">Ver desglose</a>
+      </div>
+    </div>
+  </PageShell>
+</BaseLayout>
+
+<script>
+  import {
+    VacationPremiumValidationError,
+    calculateVacationPremium,
+    formatVacationPremiumMoney,
+    formatVacationPremiumNumber,
+    formatVacationPremiumPercent,
+    normalizeVacationPremiumDays,
+    parseVacationPremiumNumber,
+  } from "@lib/calculators/legal-impuestos/calculadora-prima-vacacional/vacationPremium";
+  import type {
+    VacationPremiumSalaryFrequency,
+    VacationPremiumSituation,
+  } from "@lib/calculators/legal-impuestos/calculadora-prima-vacacional/vacationPremium";
+  import {
+    VacationValidationError,
+    calculateProportionalVacation,
+    formatVacationDays,
+  } from "@lib/calculators/legal-impuestos/calculadora-vacaciones-proporcionales/proportionalVacation";
+
+  const form = document.querySelector<HTMLFormElement>("[data-premium-form]");
+  const trackedFields = Array.from(document.querySelectorAll<HTMLInputElement | HTMLSelectElement>("[data-field]"));
+  const situationInputs = Array.from(document.querySelectorAll<HTMLInputElement>("[data-situation]"));
+  const sourceInputs = Array.from(document.querySelectorAll<HTMLInputElement>("[data-days-source]"));
+  const referenceInput = getField<HTMLInputElement>("referenceDate");
+  const referenceLabel = document.querySelector<HTMLElement>("[data-reference-label]");
+  const directDaysSection = document.querySelector<HTMLElement>("[data-direct-days]");
+  const guidedDaysSection = document.querySelector<HTMLElement>("[data-guided-days]");
+  const contractualRateWrap = document.querySelector<HTMLElement>("[data-contractual-rate-wrap]");
+  const offeredRateWrap = document.querySelector<HTMLElement>("[data-offered-rate-wrap]");
+  const highRateConfirmation = document.querySelector<HTMLElement>("[data-high-rate-confirmation]");
+  const guidedConfirmation = document.querySelector<HTMLElement>("[data-guided-confirmation]");
+  const guidedSummary = document.querySelector<HTMLElement>("[data-guided-summary]");
+  const guidedDaysLabel = document.querySelector<HTMLElement>("[data-guided-days-label]");
+  const guidedDaysHelp = document.querySelector<HTMLElement>("[data-guided-days-help]");
+  const lastEntitlementWrap = document.querySelector<HTMLElement>("[data-last-entitlement-wrap]");
+  const lastMinimum = document.querySelector<HTMLElement>("[data-last-min]");
+  const currentMinimum = document.querySelector<HTMLElement>("[data-current-min]");
+  const formError = document.querySelector<HTMLElement>("[data-form-error]");
+  const formStatus = document.querySelector<HTMLElement>("[data-form-status]");
+  const resultRegion = document.querySelector<HTMLElement>("[data-result-region]");
+  const resultLabel = document.querySelector<HTMLElement>("[data-result-label]");
+  const mainResult = document.querySelector<HTMLElement>("[data-main-result]");
+  const resultContext = document.querySelector<HTMLElement>("[data-result-context]");
+  const resultMetrics = document.querySelector<HTMLElement>("[data-result-metrics]");
+  const breakdown = document.querySelector<HTMLElement>("[data-breakdown]");
+  const comparisonResult = document.querySelector<HTMLElement>("[data-comparison-result]");
+  const comparisonLabel = document.querySelector<HTMLElement>("[data-comparison-label]");
+  const resultWarning = document.querySelector<HTMLElement>("[data-result-warning]");
+  const formula = document.querySelector<HTMLElement>("[data-formula]");
+  const copyButton = document.querySelector<HTMLButtonElement>("[data-copy-result]");
+  const copyLabel = document.querySelector<HTMLElement>("[data-copy-label]");
+  const copyStatus = document.querySelector<HTMLElement>("[data-copy-status]");
+  const mobileSummary = document.querySelector<HTMLElement>("[data-mobile-summary]");
+  const mobileLabel = document.querySelector<HTMLElement>("[data-mobile-label]");
+  const mobileResult = document.querySelector<HTMLElement>("[data-mobile-result]");
+  let hasFreshResult = false;
+  let hasGuidedDays = false;
+  let copyText = "";
+  let copyTimeout = 0;
+
+  if (referenceInput) referenceInput.value = getLocalIsoDate();
+
+  function getLocalIsoDate() {
+    const now = new Date();
+    return [
+      String(now.getFullYear()).padStart(4, "0"),
+      String(now.getMonth() + 1).padStart(2, "0"),
+      String(now.getDate()).padStart(2, "0"),
+    ].join("-");
+  }
+
+  function getField<T extends HTMLInputElement | HTMLSelectElement>(name: string) {
+    return document.querySelector<T>(`[data-field="${name}"]`);
+  }
+
+  function getSituation(): VacationPremiumSituation {
+    return (document.querySelector<HTMLInputElement>("[data-situation]:checked")?.value ?? "active") as VacationPremiumSituation;
+  }
+
+  function getDaysSource() {
+    return document.querySelector<HTMLInputElement>("[data-days-source]:checked")?.value ?? "direct";
+  }
+
+  function setFieldError(name: string, message = "") {
+    const input = getField(name);
+    const error = document.querySelector<HTMLElement>(`[data-error-for="${name}"]`);
+    input?.setAttribute("aria-invalid", message ? "true" : "false");
+    if (error) {
+      error.textContent = message;
+      error.classList.toggle("hidden", !message);
+    }
+  }
+
+  function clearErrors() {
+    document.querySelectorAll<HTMLElement>("[data-error-for]").forEach((error) => {
+      error.textContent = "";
+      error.classList.add("hidden");
+    });
+    trackedFields.forEach((field) => field.setAttribute("aria-invalid", "false"));
+    if (formError) {
+      formError.textContent = "";
+      formError.classList.add("hidden");
+    }
+  }
+
+  function showFormError(message: string) {
+    if (!formError) return;
+    formError.textContent = message;
+    formError.classList.remove("hidden");
+    formError.focus();
+  }
+
+  function parseField(
+    name: string,
+    options: { required?: boolean; allowThousands?: boolean } = {},
+  ) {
+    const parsed = parseVacationPremiumNumber(getField<HTMLInputElement>(name)?.value ?? "", {
+      required: options.required ?? true,
+      maximumDecimals: 2,
+      allowThousands: options.allowThousands ?? false,
+    });
+    if (!parsed.ok) {
+      setFieldError(name, parsed.error === "too_many_decimals" ? "Usa como máximo dos decimales." : "Escribe un número válido mayor o igual a cero.");
+      return null;
+    }
+    setFieldError(name);
+    return parsed.value;
+  }
+
+  function updateSituationUi() {
+    const situation = getSituation();
+    document.querySelectorAll<HTMLElement>("[data-situation-card]").forEach((card) => {
+      const active = card.dataset.situationCard === situation;
+      card.classList.toggle("border-amber-400", active);
+      card.classList.toggle("bg-amber-400/10", active);
+      card.classList.toggle("border-gray-700", !active);
+      card.classList.toggle("bg-gray-900", !active);
+    });
+    if (referenceLabel) referenceLabel.textContent = situation === "termination" ? "Último día trabajado o fecha de pago" : "Fecha de cálculo o pago";
+    if (guidedDaysLabel) guidedDaysLabel.textContent = situation === "termination" ? "Días para finiquito que usarás" : "Días que disfrutarás o revisarás";
+    if (guidedDaysHelp) guidedDaysHelp.textContent = situation === "termination" ? "Confirma los días proporcionales antes de calcular importes." : "Puedes usar todo tu saldo estimado o reducirlo a los días que tomarás.";
+  }
+
+  function updateDaysSourceUi() {
+    const source = getDaysSource();
+    document.querySelectorAll<HTMLElement>("[data-days-source-card]").forEach((card) => {
+      const active = card.dataset.daysSourceCard === source;
+      card.classList.toggle("border-amber-400", active);
+      card.classList.toggle("bg-amber-400/10", active);
+      card.classList.toggle("border-gray-700", !active);
+      card.classList.toggle("bg-gray-900", !active);
+    });
+    directDaysSection?.classList.toggle("hidden", source !== "direct");
+    guidedDaysSection?.classList.toggle("hidden", source !== "guided");
+  }
+
+  function updateOptionalFields() {
+    contractualRateWrap?.classList.toggle("hidden", !getField<HTMLInputElement>("useContractualRate")?.checked);
+    offeredRateWrap?.classList.toggle("hidden", !getField<HTMLInputElement>("compareOfferedRate")?.checked);
+    const contractValue = Number((getField<HTMLInputElement>("contractualRate")?.value ?? "").replace(",", "."));
+    const offeredValue = Number((getField<HTMLInputElement>("offeredRate")?.value ?? "").replace(",", "."));
+    const needsConfirmation =
+      (getField<HTMLInputElement>("useContractualRate")?.checked && contractValue > 100) ||
+      (getField<HTMLInputElement>("compareOfferedRate")?.checked && offeredValue > 100);
+    highRateConfirmation?.classList.toggle("hidden", !needsConfirmation);
+    highRateConfirmation?.classList.toggle("flex", Boolean(needsConfirmation));
+    if (!needsConfirmation) {
+      const confirmation = getField<HTMLInputElement>("confirmHighRate");
+      if (confirmation) confirmation.checked = false;
+    }
+  }
+
+  function invalidateGuidedDays() {
+    if (getDaysSource() !== "guided") return;
+    hasGuidedDays = false;
+    const input = getField<HTMLInputElement>("guidedDays");
+    if (input) input.value = "";
+    guidedConfirmation?.classList.add("hidden");
+  }
+
+  function resetResult(message = "Selecciona tu situación y captura tus datos para comenzar.") {
+    hasFreshResult = false;
+    if (mainResult) mainResult.textContent = "—";
+    if (resultContext) resultContext.textContent = message;
+    resultMetrics?.classList.add("hidden");
+    resultMetrics?.classList.remove("grid");
+    breakdown?.classList.add("hidden");
+    breakdown?.replaceChildren();
+    comparisonResult?.classList.add("hidden");
+    resultWarning?.classList.add("hidden");
+    if (formula) formula.textContent = "Aquí aparecerán los valores sustituidos.";
+    copyButton?.classList.add("hidden");
+    copyButton?.classList.remove("flex");
+    mobileSummary?.classList.add("hidden");
+    copyText = "";
+  }
+
+  function invalidateResult() {
+    if (hasFreshResult) resetResult("Tus datos cambiaron. Vuelve a calcular para actualizar el resultado.");
+  }
+
+  function makeRow(label: string, value: string, emphasis = false) {
+    const row = document.createElement("div");
+    row.className = "flex items-start justify-between gap-4 rounded-lg border border-gray-800 bg-gray-950/70 px-3 py-2.5 text-sm";
+    const labelElement = document.createElement("span");
+    labelElement.className = "text-gray-400";
+    labelElement.textContent = label;
+    const valueElement = document.createElement(emphasis ? "strong" : "span");
+    valueElement.className = emphasis ? "shrink-0 text-white" : "shrink-0 font-medium text-gray-200";
+    valueElement.textContent = value;
+    row.append(labelElement, valueElement);
+    return row;
+  }
+
+  function calculateGuidedDays() {
+    clearErrors();
+    const hireDate = getField<HTMLInputElement>("hireDate")?.value ?? "";
+    const referenceDate = referenceInput?.value ?? "";
+    const priorBalance = parseField("priorBalance");
+    const usedDays = parseField("usedDays");
+    if (!hireDate) setFieldError("hireDate", "Selecciona una fecha de ingreso válida.");
+    if (!referenceDate) setFieldError("referenceDate", "Selecciona una fecha válida.");
+    if (!hireDate || !referenceDate || priorBalance === null || usedDays === null) return;
+
+    try {
+      const mode = getSituation() === "termination" ? "terminatedEmployment" : "activeEmployment";
+      const base = calculateProportionalVacation({ mode, hireDate, endDate: referenceDate });
+      if (lastMinimum) lastMinimum.textContent = `Mínimo legal: ${formatVacationDays(base.legalLastCompletedEntitlement)} días.`;
+      if (currentMinimum) currentMinimum.textContent = `Mínimo legal: ${formatVacationDays(base.legalCurrentCycleEntitlement)} días.`;
+      lastEntitlementWrap?.classList.toggle("hidden", base.completedYears === 0);
+
+      const useOverrides = document.querySelector<HTMLDetailsElement>("[data-guided-contract]")?.open ?? false;
+      let lastOverride: number | undefined;
+      let currentOverride: number | undefined;
+      if (useOverrides) {
+        const lastInput = getField<HTMLInputElement>("lastEntitlement");
+        const currentInput = getField<HTMLInputElement>("currentEntitlement");
+        if (lastInput && !lastInput.value && base.completedYears > 0) lastInput.value = String(base.legalLastCompletedEntitlement);
+        if (currentInput && !currentInput.value) currentInput.value = String(base.legalCurrentCycleEntitlement);
+        if (base.completedYears > 0) {
+          const parsedLast = parseField("lastEntitlement");
+          if (parsedLast === null) return;
+          lastOverride = parsedLast;
+        }
+        const parsedCurrent = parseField("currentEntitlement");
+        if (parsedCurrent === null) return;
+        currentOverride = parsedCurrent;
+      }
+
+      const result = calculateProportionalVacation({
+        mode,
+        hireDate,
+        endDate: referenceDate,
+        priorBalance,
+        usedDays,
+        lastCompletedEntitlementOverride: lastOverride,
+        currentCycleEntitlementOverride: currentOverride,
+      });
+      const originalDays = mode === "terminatedEmployment" ? result.terminationDays : result.availableDays;
+      const normalizedDays = normalizeVacationPremiumDays(originalDays);
+      if (normalizedDays <= 0) {
+        showFormError(mode === "terminatedEmployment" ? "No resultaron días positivos para el finiquito con estos datos." : "No resultó un saldo adquirido positivo. El avance del ciclo actual no se presenta como vacaciones disponibles.");
+        return;
+      }
+      const guidedInput = getField<HTMLInputElement>("guidedDays");
+      if (guidedInput) guidedInput.value = String(normalizedDays);
+      if (guidedSummary) guidedSummary.textContent = originalDays === normalizedDays
+        ? `Resultado estimado: ${formatVacationDays(normalizedDays)} días laborables.`
+        : `Resultado original: ${formatVacationDays(originalDays)} días. Usaremos ${formatVacationDays(normalizedDays)} días después de normalizar a dos decimales.`;
+      guidedConfirmation?.classList.remove("hidden");
+      hasGuidedDays = true;
+      invalidateResult();
+      formStatus!.textContent = "Días estimados actualizados. Revisa el valor y calcula la prima.";
+    } catch (error) {
+      if (error instanceof VacationValidationError) {
+        if (error.code === "invalid_hire_date") setFieldError("hireDate", "Selecciona una fecha de ingreso válida.");
+        else if (error.code === "invalid_end_date") setFieldError("referenceDate", "Selecciona una fecha válida.");
+        else if (error.code === "end_before_hire") setFieldError("referenceDate", "La fecha final no puede ser anterior al ingreso.");
+        else if (error.code === "contract_below_legal") showFormError("Los días contractuales no pueden ser inferiores al mínimo legal.");
+        else showFormError("Las fechas requieren una regla histórica que este MVP todavía no incorpora.");
+      } else {
+        showFormError("No se pudieron calcular los días con los datos capturados.");
+      }
+    }
+  }
+
+  function renderResult(result: ReturnType<typeof calculateVacationPremium>) {
+    const termination = result.situation === "termination";
+    const label = termination ? "Componente vacacional estimado del finiquito" : "Prima vacacional adicional estimada";
+    const context = termination
+      ? "Incluye únicamente vacaciones pendientes y prima vacacional; no es el finiquito completo."
+      : "El salario de estos días normalmente forma parte de tu sueldo ordinario; la prima es la cantidad adicional estimada.";
+    hasFreshResult = true;
+    if (resultLabel) resultLabel.textContent = label;
+    if (mainResult) mainResult.textContent = formatVacationPremiumMoney(result.primaryAmount);
+    if (resultContext) resultContext.textContent = context;
+    const daysMetric = document.querySelector<HTMLElement>("[data-result-days]");
+    const dailyMetric = document.querySelector<HTMLElement>("[data-result-daily]");
+    const baseMetric = document.querySelector<HTMLElement>("[data-result-base]");
+    const rateMetric = document.querySelector<HTMLElement>("[data-result-rate]");
+    if (daysMetric) daysMetric.textContent = `${formatVacationPremiumNumber(result.vacationDays)} días`;
+    if (dailyMetric) dailyMetric.textContent = formatVacationPremiumMoney(result.dailySalary);
+    if (baseMetric) baseMetric.textContent = formatVacationPremiumMoney(result.vacationBase);
+    if (rateMetric) rateMetric.textContent = formatVacationPremiumPercent(result.applicableRate);
+    resultMetrics?.classList.remove("hidden");
+    resultMetrics?.classList.add("grid");
+
+    const rows = [
+      makeRow("Prima mínima legal", formatVacationPremiumMoney(result.minimumPremium)),
+      makeRow("Prima aplicable", formatVacationPremiumMoney(result.applicablePremium), true),
+    ];
+    if (result.benefitAboveMinimum > 0) rows.push(makeRow("Beneficio sobre el mínimo", formatVacationPremiumMoney(result.benefitAboveMinimum)));
+    if (termination) rows.unshift(makeRow("Vacaciones pendientes en dinero", formatVacationPremiumMoney(result.vacationBase)));
+    breakdown?.replaceChildren(...rows);
+    breakdown?.classList.remove("hidden");
+
+    if (result.offeredPremium !== undefined && result.differenceFromApplicable !== undefined) {
+      const difference = result.differenceFromApplicable;
+      if (comparisonLabel) comparisonLabel.textContent = difference > 0
+        ? `Posible diferencia para revisar: ${formatVacationPremiumMoney(difference)}`
+        : difference < 0
+          ? `El importe comparado supera la prima aplicable por ${formatVacationPremiumMoney(Math.abs(difference))}`
+          : "El importe comparado coincide con la prima aplicable.";
+      comparisonResult?.classList.remove("hidden");
+    } else {
+      comparisonResult?.classList.add("hidden");
+    }
+
+    const warnings: string[] = [];
+    if (result.offeredRate !== undefined && result.offeredRate < result.legalMinimumRate) warnings.push("El porcentaje ofrecido o pagado es inferior al mínimo legal del preset.");
+    if (result.applicableRate > 1 || (result.offeredRate ?? 0) > 1) warnings.push("Se confirmó un porcentaje superior a 100 %.");
+    if (resultWarning) {
+      resultWarning.textContent = warnings.join(" ");
+      resultWarning.classList.toggle("hidden", warnings.length === 0);
+    }
+
+    const formulaLines = [
+      `Base vacacional: ${formatVacationPremiumMoney(result.dailySalary)} × ${formatVacationPremiumNumber(result.vacationDays)} días = ${formatVacationPremiumMoney(result.vacationBase)}`,
+      `Prima aplicable: ${formatVacationPremiumMoney(result.vacationBase)} × ${formatVacationPremiumPercent(result.applicableRate)} = ${formatVacationPremiumMoney(result.applicablePremium)}`,
+    ];
+    if (termination) formulaLines.push(`Componente vacacional: ${formatVacationPremiumMoney(result.vacationBase)} + ${formatVacationPremiumMoney(result.applicablePremium)} = ${formatVacationPremiumMoney(result.primaryAmount)}`);
+    formula?.replaceChildren(...formulaLines.map((line) => {
+      const paragraph = document.createElement("p");
+      paragraph.textContent = line;
+      return paragraph;
+    }));
+
+    copyText = [
+      `${label}: ${formatVacationPremiumMoney(result.primaryAmount)}`,
+      `Fecha: ${result.referenceDate}`,
+      `Días laborables: ${formatVacationPremiumNumber(result.vacationDays)}`,
+      `Salario diario ordinario: ${formatVacationPremiumMoney(result.dailySalary)}`,
+      `Base vacacional: ${formatVacationPremiumMoney(result.vacationBase)}`,
+      `Prima mínima legal: ${formatVacationPremiumMoney(result.minimumPremium)} (${formatVacationPremiumPercent(result.legalMinimumRate)})`,
+      `Prima aplicable: ${formatVacationPremiumMoney(result.applicablePremium)} (${formatVacationPremiumPercent(result.applicableRate)})`,
+      context,
+      "Estimación bruta antes de impuestos · México · LFT · artículo 80.",
+    ].join("\n");
+    copyButton?.classList.remove("hidden");
+    copyButton?.classList.add("flex");
+    if (mobileLabel) mobileLabel.textContent = label;
+    if (mobileResult) mobileResult.textContent = formatVacationPremiumMoney(result.primaryAmount);
+    mobileSummary?.classList.remove("hidden");
+    if (formStatus) formStatus.textContent = "Resultado de prima vacacional actualizado.";
+  }
+
+  function handleValidationError(error: unknown) {
+    if (!(error instanceof VacationPremiumValidationError)) {
+      showFormError("Revisa los datos capturados.");
+      return;
+    }
+    if (error.code === "invalid_reference_date") setFieldError("referenceDate", "Selecciona una fecha válida.");
+    else if (error.code === "unsupported_rule_period") showFormError("La fecha seleccionada no está cubierta por las reglas disponibles.");
+    else if (error.code === "days_not_positive" || error.code === "invalid_days") setFieldError(getDaysSource() === "guided" ? "guidedDays" : "vacationDays", "Los días deben ser mayores que cero.");
+    else if (error.code === "salary_not_positive" || error.code === "invalid_salary") setFieldError("salary", "El salario debe ser mayor que cero.");
+    else if (error.code === "contractual_rate_below_minimum") setFieldError("contractualRate", "El porcentaje contractual no puede ser menor que 25 %.");
+    else if (error.code === "negative_offered_rate" || error.code === "invalid_offered_rate") setFieldError("offeredRate", "Escribe un porcentaje válido mayor o igual a cero.");
+    else showFormError("Revisa los datos capturados.");
+  }
+
+  form?.addEventListener("submit", (event) => {
+    event.preventDefault();
+    clearErrors();
+    const referenceDate = referenceInput?.value ?? "";
+    const daysField = getDaysSource() === "guided" ? "guidedDays" : "vacationDays";
+    if (getDaysSource() === "guided" && !hasGuidedDays) {
+      showFormError("Obtén y confirma primero los días estimados.");
+      return;
+    }
+    const vacationDays = parseField(daysField);
+    const salaryAmount = parseField("salary", { allowThousands: true });
+    const useContractualRate = getField<HTMLInputElement>("useContractualRate")?.checked ?? false;
+    const compareOfferedRate = getField<HTMLInputElement>("compareOfferedRate")?.checked ?? false;
+    const contractualRate = useContractualRate ? parseField("contractualRate") : undefined;
+    const offeredRate = compareOfferedRate ? parseField("offeredRate") : undefined;
+    if (!referenceDate) setFieldError("referenceDate", "Selecciona una fecha válida.");
+    if (!referenceDate || vacationDays === null || salaryAmount === null || contractualRate === null || offeredRate === null) return;
+    const highRate = (contractualRate ?? 0) > 100 || (offeredRate ?? 0) > 100;
+    if (highRate && !getField<HTMLInputElement>("confirmHighRate")?.checked) {
+      showFormError("Confirma el porcentaje superior a 100 % antes de calcular.");
+      return;
+    }
+    try {
+      const result = calculateVacationPremium({
+        situation: getSituation(),
+        referenceDate,
+        vacationDays,
+        salaryAmount,
+        salaryFrequency: (getField<HTMLSelectElement>("salaryFrequency")?.value ?? "monthly") as VacationPremiumSalaryFrequency,
+        contractualRatePercent: useContractualRate ? contractualRate : undefined,
+        offeredRatePercent: compareOfferedRate ? offeredRate : undefined,
+      });
+      renderResult(result);
+      resultRegion?.focus({ preventScroll: true });
+    } catch (error) {
+      handleValidationError(error);
+    }
+  });
+
+  situationInputs.forEach((input) => input.addEventListener("change", () => {
+    updateSituationUi();
+    invalidateGuidedDays();
+    invalidateResult();
+  }));
+  sourceInputs.forEach((input) => input.addEventListener("change", () => {
+    updateDaysSourceUi();
+    invalidateResult();
+  }));
+  trackedFields.forEach((field) => {
+    field.addEventListener("input", () => {
+      setFieldError(field.dataset.field ?? "");
+      updateOptionalFields();
+      if (["referenceDate", "hireDate", "priorBalance", "usedDays", "lastEntitlement", "currentEntitlement"].includes(field.dataset.field ?? "")) invalidateGuidedDays();
+      invalidateResult();
+    });
+    field.addEventListener("change", updateOptionalFields);
+  });
+  document.querySelector("[data-calculate-days]")?.addEventListener("click", calculateGuidedDays);
+  document.querySelector("[data-clear]")?.addEventListener("click", () => {
+    form?.reset();
+    if (referenceInput) referenceInput.value = getLocalIsoDate();
+    const prior = getField<HTMLInputElement>("priorBalance");
+    const used = getField<HTMLInputElement>("usedDays");
+    const contractRate = getField<HTMLInputElement>("contractualRate");
+    if (prior) prior.value = "0";
+    if (used) used.value = "0";
+    if (contractRate) contractRate.value = "25";
+    hasGuidedDays = false;
+    guidedConfirmation?.classList.add("hidden");
+    clearErrors();
+    updateSituationUi();
+    updateDaysSourceUi();
+    updateOptionalFields();
+    resetResult();
+  });
+  copyButton?.addEventListener("click", async () => {
+    try {
+      await navigator.clipboard.writeText(copyText);
+      if (copyLabel) copyLabel.textContent = "Copiado";
+      if (copyStatus) copyStatus.textContent = "Resultado copiado.";
+      window.clearTimeout(copyTimeout);
+      copyTimeout = window.setTimeout(() => {
+        if (copyLabel) copyLabel.textContent = "Copiar resultado";
+      }, 1800);
+    } catch {
+      if (copyStatus) copyStatus.textContent = "No se pudo copiar automáticamente.";
+    }
+  });
+
+  updateSituationUi();
+  updateDaysSourceUi();
+  updateOptionalFields();
+</script>

@@ -4,6 +4,7 @@ seoTitle: "Tasa anual a mensual en hipoteca: fórmula y ejemplo"
 description: "Aprende cómo convertir una tasa anual a mensual para estimar la cuota de una hipoteca y evitar errores comunes."
 pubDate: 2026-06-12
 categorySlug: "inmuebles"
+translationKey: "annual-to-monthly-mortgage-rate"
 tags:
   - tasa anual
   - tasa mensual

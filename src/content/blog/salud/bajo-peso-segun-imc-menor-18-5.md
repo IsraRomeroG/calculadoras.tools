@@ -4,6 +4,7 @@ seoTitle: "Bajo peso según IMC: rangos, ejemplos y limitaciones"
 description: "Aprende qué significa un IMC menor a 18.5, cuáles son los rangos de delgadez y cómo interpretar el resultado."
 pubDate: 2026-06-27
 categorySlug: "salud"
+translationKey: "underweight-bmi-below-18-5"
 tags:
   - bajo peso
   - imc

@@ -3,6 +3,7 @@ title: "IVA en México: tasa general, frontera y tasa 0%"
 description: "Conoce la tasa general de IVA en México, cuándo se habla de 8% en frontera y por qué la tasa 0% no es lo mismo que no tener IVA."
 pubDate: 2026-03-16
 categorySlug: "legal-impuestos"
+translationKey: "mexico-vat"
 tags:
   - iva mexico
   - sat

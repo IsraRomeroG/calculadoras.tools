@@ -4,6 +4,7 @@ seoTitle: "Qué es TDEE: fórmula, ejemplo y calculadora de calorías diarias"
 description: "Aprende qué significa TDEE, cómo se calcula el gasto energético diario y cómo usarlo como punto de partida para tus calorías."
 pubDate: 2026-07-13
 categorySlug: "salud"
+translationKey: "what-is-tdee"
 tags:
   - tdee
   - calorías

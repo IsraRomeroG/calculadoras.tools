@@ -1,0 +1,909 @@
+
+
+
+
+
+---
+import BaseLayout from "@layouts/BaseLayout.astro";
+import { buildAlternateLinks } from "@lib/i18n/routing";
+import AdSlot from "@components/ads/AdSlot.astro";
+import Container from "@components/layout/Container.astro";
+import PageShell from "@components/layout/PageShell.astro";
+import FaqSection from "@components/shared/FaqSection.astro";
+import PageHero from "@components/shared/PageHero.astro";
+import SectionIntro from "@components/shared/SectionIntro.astro";
+import { STATISTICS_EXAMPLES } from "@lib/calculators/matematicas/calculadora-de-estadistica-basica/basicStatistics.en";
+import { buildFaqJsonLd } from "@lib/seo";
+
+const title = "Mean, median and mode calculator - Basic statistics";
+const description =
+  "Calculate the mean, median, mode, range and frequencies of a list of numbers with explanations and examples.";
+const canonical = "/en/math/basic-statistics-calculator";
+const spanishCanonical = "/matematicas/calculadora-de-estadistica-basica";
+const alternates = buildAlternateLinks(
+  { es: spanishCanonical, en: canonical },
+  Astro.site ?? Astro.url,
+);
+
+const faqs = [
+  {
+    question: "How do you calculate the mean?",
+    answer:
+      "Add all values and divide by the number of data points. For example, if the sum is 83 and there are 5 values, the mean is 83 / 5 = 16.6.",
+  },
+  {
+    question: "How do you calculate the median?",
+    answer:
+      "Sort the data from lowest to highest. With an odd count, take the middle value. With an even count, average the two middle values.",
+  },
+  {
+    question: "How do you calculate the mode?",
+    answer:
+      "Count how often each value appears. The mode is the most frequent value. If every value appears once, the list has no mode.",
+  },
+  {
+    question: "What happens if there are two modes?",
+    answer:
+      "A list can be multimodal. The calculator shows every value tied for the highest frequency when that frequency is greater than 1.",
+  },
+  {
+    question: "Can a list have no mode?",
+    answer:
+      "If no value repeats, there is no mode. In a one-value list, that value is shown as the mode because it is the only and most frequent value.",
+  },
+  {
+    question: "What is the difference between mean and median?",
+    answer:
+      "The mean uses every value and can change substantially with outliers. The median looks at the center of the sorted list and is usually more resistant to extremes.",
+  },
+  {
+    question: "How do you calculate the range?",
+    answer:
+      "Subtract the minimum from the maximum. If the maximum is 20 and the minimum is 12, the range is 8.",
+  },
+  {
+    question: "Can I use decimal or negative numbers?",
+    answer:
+      "Yes. You can use a decimal point or comma. When using comma decimals, separate values with semicolons, for example: 1,5; 2,5; 3,75.",
+  },
+];
+
+const faqJsonLd = buildFaqJsonLd(faqs);
+---
+
+<BaseLayout title={title} description={description} canonical={canonical} locale="en" alternates={alternates}>
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={JSON.stringify(faqJsonLd)} />
+  </Fragment>
+
+  <PageShell>
+    <PageHero
+      title="Mean, median and mode calculator"
+      description="Enter a list of numbers and review the mean, median, mode, range and frequencies with a clear explanation of each result."
+      kicker="Math"
+      collapseBreadcrumbOnMobile
+      containerClass="py-6 md:py-8"
+      breadcrumbs={[
+        { label: "Home", href: "/en", ariaLabel: "Home" },
+        { label: "Math", href: "/en/math", optional: true },
+        { label: "Mean, median and mode", truncate: true },
+      ]}
+    />
+
+    <Container as="section" class="py-6 md:py-8">
+      <div
+        id="basic-statistics-calculator"
+        class="overflow-hidden rounded-lg border border-gray-700 bg-gray-950 shadow-xl shadow-gray-950/30"
+      >
+        <div
+          class="grid gap-0 lg:grid-cols-[minmax(0,1fr)_minmax(20rem,0.72fr)]"
+        >
+          <section class="p-4 sm:p-6" aria-labelledby="calculator-heading">
+            <h2 id="calculator-heading" class="text-xl font-semibold">
+              Data
+            </h2>
+
+            <div class="mt-5">
+              <label
+                for="statistics-input"
+                class="block text-sm font-medium text-gray-200"
+              >
+                Enter or paste your numbers
+              </label>
+              <textarea
+                id="statistics-input"
+                class="mt-2 max-h-80 min-h-48 w-full resize-y rounded-lg border border-gray-700 bg-gray-900 px-4 py-3 text-base text-white outline-none transition placeholder:text-gray-600 focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15"
+                rows="8"
+                maxlength="10000"
+                inputmode="decimal"
+                autocomplete="off"
+                spellcheck="false"
+                placeholder="Example: 12; 15; 18; 18; 20"
+                aria-describedby="statistics-help statistics-error statistics-count"
+                data-statistics-input
+              ></textarea>
+              <div class="mt-2 flex flex-wrap items-center justify-between gap-2">
+                <p
+                  id="statistics-help"
+                  class="text-sm leading-relaxed text-gray-400"
+                >
+                  Separate with line breaks, semicolons or spaces. For
+                  comma decimals, use semicolons: 1,5; 2,5; 3,75.
+                </p>
+                <p id="statistics-count" class="text-xs text-gray-500">
+                  <span data-character-count>0</span>/10000
+                </p>
+              </div>
+              <p
+                id="statistics-error"
+                class="mt-2 hidden rounded-lg border border-red-400/30 bg-red-400/10 px-3 py-2 text-sm text-red-200"
+                data-statistics-error
+              ></p>
+            </div>
+
+            <details class="mt-4 rounded-lg border border-gray-800 bg-gray-900/70 p-4">
+              <summary class="cursor-pointer text-sm font-semibold text-gray-100">
+                Accepted formats
+              </summary>
+              <div class="mt-3 grid gap-2 text-sm leading-relaxed text-gray-400">
+                <p>1 2 3 4</p>
+                <p>1; 2; 3; 4</p>
+                <p>1, 2, 3, 4</p>
+                <p>1,5; 2,5; 3,75</p>
+              <p>Do not use thousands separators: enter 1500, not 1,500.</p>
+              </div>
+            </details>
+
+            <div class="mt-5 grid gap-4 sm:grid-cols-[minmax(0,1fr)_12rem]">
+              <div>
+                <p class="text-sm font-medium text-gray-200">Examples</p>
+                <div
+                  class="mt-2 flex flex-wrap gap-2"
+                  role="group"
+                  aria-label="Load example"
+                >
+                  {
+                    STATISTICS_EXAMPLES.map((example) => (
+                      <button
+                        class="min-h-11 rounded-lg border border-gray-700 px-3 py-2 text-sm font-semibold text-gray-200 transition hover:border-amber-400 hover:text-white focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/40"
+                        type="button"
+                        data-example-value={example.value}
+                        title={example.description}
+                      >
+                        {example.label}
+                      </button>
+                    ))
+                  }
+                </div>
+              </div>
+
+              <div>
+                <label
+                  for="statistics-decimals"
+                  class="block text-sm font-medium text-gray-200"
+                >
+                  Decimals
+                </label>
+                <select
+                  id="statistics-decimals"
+                  class="mt-2 min-h-11 w-full rounded-lg border border-gray-700 bg-gray-900 px-3 text-base text-white outline-none transition focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15"
+                  data-statistics-decimals
+                >
+                  <option value="0">0</option>
+                  <option value="1">1</option>
+                  <option value="2" selected>2</option>
+                  <option value="3">3</option>
+                  <option value="4">4</option>
+                  <option value="5">5</option>
+                  <option value="6">6</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="mt-5 flex flex-wrap gap-3">
+              <button
+                class="hidden min-h-11 items-center justify-center rounded-lg bg-amber-400 px-4 py-2 text-sm font-semibold text-gray-950 transition hover:bg-amber-300 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/40"
+                type="button"
+                data-copy-summary
+              >
+                Copy summary
+              </button>
+              <button
+                class="hidden min-h-11 items-center justify-center rounded-lg border border-gray-700 px-4 py-2 text-sm font-semibold text-gray-200 transition hover:border-amber-400 hover:text-white focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/40"
+                type="button"
+                data-copy-table
+              >
+                Copy table
+              </button>
+              <button
+                class="hidden min-h-11 items-center justify-center rounded-lg border border-gray-700 px-4 py-2 text-sm font-semibold text-gray-200 transition hover:border-amber-400 hover:text-white focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/40"
+                type="button"
+                data-copy-link
+              >
+                Copy link
+              </button>
+              <button
+                class="inline-flex min-h-11 items-center justify-center rounded-lg border border-gray-700 px-4 py-2 text-sm font-semibold text-gray-200 transition hover:border-amber-400 hover:text-white focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/40"
+                type="button"
+                data-clear-statistics
+              >
+                Clear
+              </button>
+            </div>
+            <p class="mt-3 min-h-5 text-sm text-emerald-300" data-copy-status>
+            </p>
+          </section>
+
+          <aside
+            class="border-t border-gray-800 bg-gray-900/60 p-4 sm:p-6 lg:border-l lg:border-t-0"
+          >
+            <div
+              class="rounded-lg border border-gray-700 bg-gray-950 p-5"
+              aria-live="polite"
+              data-result-region
+            >
+              <p class="text-sm font-semibold uppercase text-amber-400">
+                Result
+              </p>
+              <div class="mt-4 grid gap-3 sm:grid-cols-3 lg:grid-cols-1">
+                <div class="rounded-lg border border-gray-800 bg-gray-900 p-4">
+                  <p class="text-xs font-semibold uppercase text-gray-400">
+                    Mean
+                  </p>
+                  <p
+                    class="mt-2 break-words text-2xl font-semibold text-white"
+                    data-result-mean
+                  >
+                    -
+                  </p>
+                </div>
+                <div class="rounded-lg border border-gray-800 bg-gray-900 p-4">
+                  <p class="text-xs font-semibold uppercase text-gray-400">
+                    Meanna
+                  </p>
+                  <p
+                    class="mt-2 break-words text-2xl font-semibold text-white"
+                    data-result-median
+                  >
+                    -
+                  </p>
+                </div>
+                <div class="rounded-lg border border-gray-800 bg-gray-900 p-4">
+                  <p class="text-xs font-semibold uppercase text-gray-400">
+                    Mode
+                  </p>
+                  <p
+                    class="mt-2 break-words text-2xl font-semibold text-white"
+                    data-result-mode
+                  >
+                    -
+                  </p>
+                </div>
+              </div>
+
+              <p
+                class="mt-4 rounded-lg border border-gray-800 bg-gray-900 px-4 py-3 text-sm leading-relaxed text-gray-300"
+                data-interpretation
+              >
+                Paste a list to calculate the main measures.
+              </p>
+
+              <p
+                class="mt-3 hidden rounded-lg border border-sky-400/30 bg-sky-400/10 px-3 py-2 text-sm leading-relaxed text-sky-100"
+                data-rounding-note
+              >
+                Calculations use full values; the
+                decimal setting only changes how they are displayed.
+              </p>
+
+              <dl class="mt-5 grid grid-cols-2 gap-3 text-sm" data-summary-grid>
+                <div>
+                  <dt class="text-gray-500">Data</dt>
+                  <dd class="font-semibold text-gray-100" data-summary-count>
+                    -
+                  </dd>
+                </div>
+                <div>
+                  <dt class="text-gray-500">Sum</dt>
+                  <dd class="font-semibold text-gray-100" data-summary-sum>
+                    -
+                  </dd>
+                </div>
+                <div>
+                  <dt class="text-gray-500">Minimum</dt>
+                  <dd class="font-semibold text-gray-100" data-summary-min>
+                    -
+                  </dd>
+                </div>
+                <div>
+                  <dt class="text-gray-500">Maximum</dt>
+                  <dd class="font-semibold text-gray-100" data-summary-max>
+                    -
+                  </dd>
+                </div>
+                <div>
+                  <dt class="text-gray-500">Range</dt>
+                  <dd class="font-semibold text-gray-100" data-summary-range>
+                    -
+                  </dd>
+                </div>
+              </dl>
+            </div>
+          </aside>
+        </div>
+
+        <div class="border-t border-gray-800 p-4 sm:p-6">
+          <div class="grid gap-4 lg:grid-cols-3">
+            <details class="rounded-lg border border-gray-800 bg-gray-900/60 p-4">
+              <summary class="cursor-pointer text-base font-semibold text-white">
+                Sorted data
+              </summary>
+              <p
+                class="mt-3 break-words text-sm leading-relaxed text-gray-300"
+                data-sorted-values
+              >
+                There is no sorted data yet.
+              </p>
+            </details>
+
+            <details
+              class="rounded-lg border border-gray-800 bg-gray-900/60 p-4 lg:col-span-2"
+            >
+              <summary class="cursor-pointer text-base font-semibold text-white">
+                Frequency table
+              </summary>
+              <div class="mt-4 overflow-x-auto">
+                <table class="min-w-full text-left text-sm">
+                  <thead class="text-xs uppercase text-gray-500">
+                    <tr>
+                      <th class="px-3 py-2 font-semibold">Value</th>
+                      <th class="px-3 py-2 font-semibold">Frequency</th>
+                      <th class="px-3 py-2 font-semibold">Percentage</th>
+                    </tr>
+                  </thead>
+                  <tbody
+                    class="divide-y divide-gray-800 text-gray-200"
+                    data-frequency-body
+                  >
+                    <tr>
+                      <td class="px-3 py-3 text-gray-500" colspan="3">
+                        The table will appear with a valid list.
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <button
+                class="mt-4 hidden min-h-10 rounded-lg border border-gray-700 px-3 py-2 text-sm font-semibold text-gray-200 transition hover:border-amber-400 hover:text-white focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/40"
+                type="button"
+                data-toggle-frequency
+              >
+                Show more rows
+              </button>
+            </details>
+          </div>
+
+          <details class="mt-4 rounded-lg border border-gray-800 bg-gray-900/60 p-4">
+            <summary class="cursor-pointer text-base font-semibold text-white">
+              How it was calculated
+            </summary>
+            <div class="mt-4 grid gap-3 md:grid-cols-2">
+              <div class="rounded-lg border border-gray-800 bg-gray-950 p-4">
+                <h3 class="text-sm font-semibold text-amber-300">Mean</h3>
+                <p class="mt-2 text-sm leading-relaxed text-gray-300" data-step-mean>
+                  -
+                </p>
+              </div>
+              <div class="rounded-lg border border-gray-800 bg-gray-950 p-4">
+                <h3 class="text-sm font-semibold text-amber-300">Median</h3>
+                <p class="mt-2 text-sm leading-relaxed text-gray-300" data-step-median>
+                  -
+                </p>
+              </div>
+              <div class="rounded-lg border border-gray-800 bg-gray-950 p-4">
+                <h3 class="text-sm font-semibold text-amber-300">Mode</h3>
+                <p class="mt-2 text-sm leading-relaxed text-gray-300" data-step-mode>
+                  -
+                </p>
+              </div>
+              <div class="rounded-lg border border-gray-800 bg-gray-950 p-4">
+                <h3 class="text-sm font-semibold text-amber-300">Range</h3>
+                <p class="mt-2 text-sm leading-relaxed text-gray-300" data-step-range>
+                  -
+                </p>
+              </div>
+            </div>
+          </details>
+        </div>
+      </div>
+    </Container>
+
+    <AdSlot placement="calculator-after-tool" />
+
+    <Container as="section" class="py-6 md:py-8">
+      <SectionIntro
+        title="Worked examples"
+        description="Use these examples to see how the measures change with the data."
+      />
+
+      <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+        {
+          STATISTICS_EXAMPLES.map((example) => (
+            <article class="rounded-lg border border-gray-700 bg-gray-950 p-5">
+              <h3 class="text-base font-semibold text-white">{example.label}</h3>
+              <p class="mt-2 text-sm leading-relaxed text-gray-400">
+                {example.description}
+              </p>
+              <p class="mt-4 break-words rounded-lg border border-gray-800 bg-gray-900 px-3 py-2 text-sm text-gray-300">
+                {example.value}
+              </p>
+            </article>
+          ))
+        }
+      </div>
+    </Container>
+
+    <Container as="section" class="py-6 md:py-8">
+      <SectionIntro
+        title="What each measure means"
+        description="These measures summarize the list from different perspectives."
+      />
+
+      <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+        <article class="rounded-lg border border-gray-700 bg-gray-950 p-5">
+          <h3 class="text-lg font-semibold text-white">Mean</h3>
+          <p class="mt-3 text-sm leading-relaxed text-gray-400">
+            The arithmetic average: the sum of values divided by the number
+            of values.
+          </p>
+        </article>
+        <article class="rounded-lg border border-gray-700 bg-gray-950 p-5">
+          <h3 class="text-lg font-semibold text-white">Median</h3>
+          <p class="mt-3 text-sm leading-relaxed text-gray-400">
+            It is the center of the sorted list. If there are two middle values, they are averaged.
+          </p>
+        </article>
+        <article class="rounded-lg border border-gray-700 bg-gray-950 p-5">
+          <h3 class="text-lg font-semibold text-white">Mode</h3>
+          <p class="mt-3 text-sm leading-relaxed text-gray-400">
+            It is the most frequent value. A list may have no mode or
+            several modes.
+          </p>
+        </article>
+        <article class="rounded-lg border border-gray-700 bg-gray-950 p-5">
+          <h3 class="text-lg font-semibold text-white">Range</h3>
+          <p class="mt-3 text-sm leading-relaxed text-gray-400">
+            The difference between the maximum and minimum. It shows how far apart
+            the extremes are.
+          </p>
+        </article>
+      </div>
+    </Container>
+
+    <Container as="section" class="py-6 md:py-8">
+      <div class="rounded-lg border border-gray-700 bg-gray-950 p-5">
+        <h2 class="text-xl font-semibold">Next step</h2>
+        <p class="mt-3 text-sm leading-relaxed text-gray-400">
+          If you need variance, standard deviation, quartiles or outliers,
+          those measures belong to a more advanced analysis of dispersion.
+          This calculator focuses on a basic summary and frequencies.
+        </p>
+      </div>
+    </Container>
+
+    <FaqSection faqs={faqs} />
+  </PageShell>
+</BaseLayout>
+
+<script>
+  import {
+    STATISTICS_CANONICAL_PATH,
+    buildCalculationSteps,
+    buildFrequencyTableText,
+    buildShareableStatisticsUrl,
+    buildStatisticsInterpretation,
+    buildStatisticsSummary,
+    calculateBasicStatistics,
+    formatFlexibleStatistic,
+    formatFrequencyPercentage,
+    formatStatistic,
+    parseStatisticsInput,
+    shouldShowRoundingNote,
+  } from "@lib/calculators/matematicas/calculadora-de-estadistica-basica/basicStatistics.en";
+
+  const MAX_VISIBLE_FREQUENCY_ROWS = 20;
+
+  const input = document.querySelector("[data-statistics-input]");
+  const decimalsSelect = document.querySelector("[data-statistics-decimals]");
+  const characterCount = document.querySelector("[data-character-count]");
+  const errorMessage = document.querySelector("[data-statistics-error]");
+  const resultMean = document.querySelector("[data-result-mean]");
+  const resultMeann = document.querySelector("[data-result-median]");
+  const resultMode = document.querySelector("[data-result-mode]");
+  const interpretation = document.querySelector("[data-interpretation]");
+  const roundingNote = document.querySelector("[data-rounding-note]");
+  const summaryCount = document.querySelector("[data-summary-count]");
+  const summarySum = document.querySelector("[data-summary-sum]");
+  const summaryMin = document.querySelector("[data-summary-min]");
+  const summaryMax = document.querySelector("[data-summary-max]");
+  const summaryRange = document.querySelector("[data-summary-range]");
+  const sortedValues = document.querySelector("[data-sorted-values]");
+  const frequencyBody = document.querySelector("[data-frequency-body]");
+  const toggleFrequency = document.querySelector("[data-toggle-frequency]");
+  const stepMean = document.querySelector("[data-step-mean]");
+  const stepMeann = document.querySelector("[data-step-median]");
+  const stepMode = document.querySelector("[data-step-mode]");
+  const stepRange = document.querySelector("[data-step-range]");
+  const copySummaryButton = document.querySelector("[data-copy-summary]");
+  const copyTableButton = document.querySelector("[data-copy-table]");
+  const copyLinkButton = document.querySelector("[data-copy-link]");
+  const copyStatus = document.querySelector("[data-copy-status]");
+  const clearButton = document.querySelector("[data-clear-statistics]");
+  const exampleButtons = Array.from(
+    document.querySelectorAll("[data-example-value]"),
+  );
+
+  let currentSummaryText = "";
+  let currentTableText = "";
+  let currentSharePath = null;
+  let currentStatistics = null;
+  let showAllFrequencies = false;
+  let copyStatusTimeout = 0;
+
+  function getDecimals() {
+    if (!(decimalsSelect instanceof HTMLSelectElement)) {
+      return 2;
+    }
+
+    return Number(decimalsSelect.value);
+  }
+
+  function render() {
+    if (!(input instanceof HTMLTextAreaElement)) {
+      return;
+    }
+
+    const rawValue = input.value;
+    showCharacterCount(rawValue.length);
+
+    const parsed = parseStatisticsInput(rawValue);
+
+    if (!parsed.ok) {
+      renderInvalidState(parsed.message);
+      replaceUrl(null);
+      return;
+    }
+
+    if (parsed.values.length === 0) {
+      renderEmptyState();
+      replaceUrl(null);
+      return;
+    }
+
+    const decimals = getDecimals();
+    const statistics = calculateBasicStatistics(parsed.values);
+    const modeText = statistics.hasMode
+      ? statistics.modes
+          .map((value) => formatStatistic(value, decimals))
+          .join(", ")
+      : "No mode";
+    const steps = buildCalculationSteps(parsed.values, statistics, decimals);
+
+    currentStatistics = statistics;
+    currentSummaryText = buildStatisticsSummary(
+      parsed.values,
+      statistics,
+      decimals,
+    );
+    currentTableText = buildFrequencyTableText(
+      statistics.frequencyTable,
+      decimals,
+    );
+    currentSharePath = buildShareableStatisticsUrl(parsed.values);
+
+    setInputValidity(false);
+    setText(errorMessage, "");
+    hideElement(errorMessage);
+    setText(resultMean, formatStatistic(statistics.mean, decimals));
+    setText(resultMeann, formatStatistic(statistics.median, decimals));
+    setText(resultMode, modeText);
+    setText(
+      interpretation,
+      buildStatisticsInterpretation(statistics, decimals),
+    );
+    setText(roundingNote, roundingNote?.textContent ?? "");
+    toggleElement(roundingNote, shouldShowRoundingNote(parsed.values, decimals));
+    setText(summaryCount, String(statistics.count));
+    setText(summarySum, formatStatistic(statistics.sum, decimals));
+    setText(summaryMin, formatStatistic(statistics.min, decimals));
+    setText(summaryMax, formatStatistic(statistics.max, decimals));
+    setText(summaryRange, formatStatistic(statistics.range, decimals));
+    setText(
+      sortedValues,
+      statistics.sortedValues.map((value) => formatFlexibleStatistic(value)).join(", "),
+    );
+    setText(stepMean, steps.mean);
+    setText(stepMeann, steps.median);
+    setText(stepMode, steps.mode);
+    setText(stepRange, steps.range);
+    renderFrequencyTable();
+    setActionButtonsVisible(true);
+    replaceUrl(currentSharePath);
+  }
+
+  function renderFrequencyTable() {
+    if (!frequencyBody || !currentStatistics) {
+      return;
+    }
+
+    frequencyBody.innerHTML = "";
+
+    const decimals = getDecimals();
+    const rows = showAllFrequencies
+      ? currentStatistics.frequencyTable
+      : currentStatistics.frequencyTable.slice(0, MAX_VISIBLE_FREQUENCY_ROWS);
+
+    rows.forEach((row) => {
+      const tableRow = document.createElement("tr");
+      const valueCell = document.createElement("td");
+      const frequencyCell = document.createElement("td");
+      const percentageCell = document.createElement("td");
+      const barWrapper = document.createElement("div");
+      const bar = document.createElement("div");
+      const label = document.createElement("span");
+      const percentageText = `${formatFrequencyPercentage(row.percentage)}%`;
+
+      valueCell.className = "px-3 py-3 font-medium text-white";
+      frequencyCell.className = "px-3 py-3";
+      percentageCell.className = "px-3 py-3 min-w-40";
+      barWrapper.className =
+        "flex min-w-36 items-center gap-3";
+      bar.className = "h-2 rounded-full bg-amber-400";
+      bar.style.width = `${Math.max(4, row.percentage)}%`;
+      bar.setAttribute(
+        "aria-label",
+        `${percentageText} of the data have value ${formatStatistic(
+          row.value,
+          decimals,
+        )}`,
+      );
+      label.className = "shrink-0 text-gray-200";
+      label.textContent = percentageText;
+      valueCell.textContent = formatStatistic(row.value, decimals);
+      frequencyCell.textContent = String(row.frequency);
+      barWrapper.append(bar, label);
+      percentageCell.append(barWrapper);
+      tableRow.append(valueCell, frequencyCell, percentageCell);
+      frequencyBody.append(tableRow);
+    });
+
+    const hasHiddenRows =
+      currentStatistics.frequencyTable.length > MAX_VISIBLE_FREQUENCY_ROWS;
+
+    toggleElement(toggleFrequency, hasHiddenRows);
+    setText(
+      toggleFrequency,
+      showAllFrequencies ? "Show fewer rows" : "Show more rows",
+    );
+  }
+
+  function renderInvalidState(message) {
+    setInputValidity(true);
+    setText(errorMessage, message);
+    toggleElement(errorMessage, true);
+    setText(resultMean, "-");
+    setText(resultMeann, "-");
+    setText(resultMode, "-");
+    setText(interpretation, "Correct the list to continue.");
+    toggleElement(roundingNote, false);
+    resetSummary();
+    resetDetails();
+    setActionButtonsVisible(false);
+    currentStatistics = null;
+    currentSummaryText = "";
+    currentTableText = "";
+    currentSharePath = null;
+  }
+
+  function renderEmptyState() {
+    setInputValidity(false);
+    setText(errorMessage, "");
+    hideElement(errorMessage);
+    setText(resultMean, "-");
+    setText(resultMeann, "-");
+    setText(resultMode, "-");
+    setText(interpretation, "Paste a list to calculate the main measures.");
+    toggleElement(roundingNote, false);
+    resetSummary();
+    resetDetails();
+    setActionButtonsVisible(false);
+    currentStatistics = null;
+    currentSummaryText = "";
+    currentTableText = "";
+    currentSharePath = null;
+  }
+
+  function resetSummary() {
+    [summaryCount, summarySum, summaryMin, summaryMax, summaryRange].forEach(
+      (element) => setText(element, "-"),
+    );
+  }
+
+  function resetDetails() {
+    setText(sortedValues, "There is no sorted data yet.");
+    if (frequencyBody) {
+      frequencyBody.innerHTML =
+        '<tr><td class="px-3 py-3 text-gray-500" colspan="3">The table will appear with a valid list.</td></tr>';
+    }
+    toggleElement(toggleFrequency, false);
+    [stepMean, stepMeann, stepMode, stepRange].forEach((element) =>
+      setText(element, "-"),
+    );
+  }
+
+  function setActionButtonsVisible(isVisible) {
+    [copySummaryButton, copyTableButton, copyLinkButton].forEach((button) => {
+      button?.classList.toggle("hidden", !isVisible);
+      button?.classList.toggle("inline-flex", isVisible);
+    });
+  }
+
+  function showCharacterCount(count) {
+    setText(characterCount, String(count));
+  }
+
+  function setInputValidity(isInvalid) {
+    if (input instanceof HTMLTextAreaElement) {
+      input.setAttribute("aria-invalid", String(isInvalid));
+    }
+  }
+
+  function setText(element, value) {
+    if (element) {
+      element.textContent = value;
+    }
+  }
+
+  function toggleElement(element, isVisible) {
+    element?.classList.toggle("hidden", !isVisible);
+  }
+
+  function hideElement(element) {
+    element?.classList.add("hidden");
+  }
+
+  function replaceUrl(sharePath) {
+    if (!window.history?.replaceState) {
+      return;
+    }
+
+    const nextPath = sharePath ?? STATISTICS_CANONICAL_PATH;
+
+    if (`${window.location.pathname}${window.location.search}` !== nextPath) {
+      window.history.replaceState(null, "", nextPath);
+    }
+  }
+
+  async function copyText(text, successMessage) {
+    if (!text) {
+      setCopyStatus("There is no data to copy.");
+      return;
+    }
+
+    try {
+      if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(text);
+      } else {
+        const textArea = document.createElement("textarea");
+        textArea.value = text;
+        textArea.setAttribute("readonly", "true");
+        textArea.style.position = "fixed";
+        textArea.style.opacity = "0";
+        document.body.append(textArea);
+        textArea.select();
+        document.execCommand("copy");
+        textArea.remove();
+      }
+
+      setCopyStatus(successMessage);
+    } catch {
+      setCopyStatus("Could not copy.");
+    }
+  }
+
+  function setCopyStatus(message) {
+    setText(copyStatus, message);
+    window.clearTimeout(copyStatusTimeout);
+    copyStatusTimeout = window.setTimeout(() => setText(copyStatus, ""), 2500);
+  }
+
+  function copyShareLink() {
+    if (!currentSharePath) {
+      setCopyStatus("This list is too long for a link; copy the summary instead.");
+      return;
+    }
+
+    copyText(`${window.location.origin}${currentSharePath}`, "Link copied.");
+  }
+
+  function loadExample(value) {
+    if (!(input instanceof HTMLTextAreaElement)) {
+      return;
+    }
+
+    if (
+      input.value.trim() &&
+      input.value.trim() !== value &&
+      !window.confirm("Loading this example will replace the current data.")
+    ) {
+      return;
+    }
+
+    input.value = value;
+    showAllFrequencies = false;
+    render();
+    input.focus();
+  }
+
+  function hydrateFromUrl() {
+    if (!(input instanceof HTMLTextAreaElement)) {
+      return;
+    }
+
+    const params = new URLSearchParams(window.location.search);
+    const sharedData = params.get("data");
+
+    if (!sharedData) {
+      render();
+      return;
+    }
+
+    const parsed = parseStatisticsInput(sharedData);
+
+    if (parsed.ok && parsed.values.length > 0 && buildShareableStatisticsUrl(parsed.values)) {
+      input.value = sharedData;
+    }
+
+    render();
+  }
+
+  input?.addEventListener("input", () => {
+    showAllFrequencies = false;
+    render();
+  });
+  decimalsSelect?.addEventListener("change", render);
+  toggleFrequency?.addEventListener("click", () => {
+    showAllFrequencies = !showAllFrequencies;
+    renderFrequencyTable();
+  });
+  copySummaryButton?.addEventListener("click", () =>
+    copyText(currentSummaryText, "Summary copied."),
+  );
+  copyTableButton?.addEventListener("click", () =>
+      copyText(currentTableText, "Table copied."),
+  );
+  copyLinkButton?.addEventListener("click", copyShareLink);
+  clearButton?.addEventListener("click", () => {
+    if (input instanceof HTMLTextAreaElement) {
+      input.value = "";
+      showAllFrequencies = false;
+      render();
+      input.focus();
+    }
+  });
+  exampleButtons.forEach((button) => {
+    button.addEventListener("click", () => {
+      if (button instanceof HTMLButtonElement) {
+        loadExample(button.dataset.exampleValue ?? "");
+      }
+    });
+  });
+
+  hydrateFromUrl();
+</script>
+
+
+
+
+
+

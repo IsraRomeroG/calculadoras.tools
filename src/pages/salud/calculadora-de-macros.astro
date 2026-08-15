@@ -1,5 +1,6 @@
 ---
 import BaseLayout from "@layouts/BaseLayout.astro";
+import { buildAlternateLinks } from "@lib/i18n/routing";
 import AdSlot from "@components/ads/AdSlot.astro";
 import Container from "@components/layout/Container.astro";
 import PageShell from "@components/layout/PageShell.astro";
@@ -16,6 +17,8 @@ const title = "Calculadora de Macros — Proteínas, Carbohidratos y Grasas";
 const description =
   "Calcula tus macros diarios estimados según tus calorías, peso y objetivo. Obtén gramos de proteína, carbohidratos y grasas como punto de partida.";
 const canonical = "/salud/calculadora-de-macros";
+const englishCanonical = "/en/health/macro-calculator";
+const alternates = buildAlternateLinks({ es: canonical, en: englishCanonical }, Astro.site ?? Astro.url);
 
 const faqs = [
   {
@@ -140,7 +143,7 @@ const sources = [
 ];
 ---
 
-<BaseLayout title={title} description={description} canonical={canonical}>
+<BaseLayout title={title} description={description} canonical={canonical} alternates={alternates}>
   <Fragment slot="head">
     <script type="application/ld+json" set:html={JSON.stringify(faqJsonLd)} />
   </Fragment>

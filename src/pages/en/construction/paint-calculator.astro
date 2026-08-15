@@ -40,27 +40,27 @@ const faqs = [
   {
     question: "Why must you enter paint coverage?",
     answer:
-      "Porque cambia por tipo de pintura, superficie, color previo y forma de aplicacion. Usar el rendimiento de la etiqueta mejora la estimacion.",
+      "It varies by paint type, surface, previous colour and application method. Using the coverage stated on the label improves the estimate.",
   },
   {
     question: "How do you account for two coats?",
     answer:
-      "Multiplica la superficie neta por 2 antes de dividir entre el rendimiento. La calculadora lo hace automaticamente desde el campo de manos.",
+      "Multiply the net surface area by 2 before dividing by the coverage rate. The calculator does this automatically from the number-of-coats field.",
   },
   {
     question: "How much extra paint should you buy?",
     answer:
-      "El margen es una decision editable. Puede servir si la pared esta porosa, hay manchas o el color anterior es muy oscuro, pero no es una regla universal.",
+      "The waste allowance is editable. It can help when a wall is porous, stained or previously painted a very dark colour, but it is not a universal rule.",
   },
   {
     question: "How do you calculate doors and windows measured in centimeters?",
     answer:
-      "Puedes capturar ancho y alto en cm dentro del detalle de aberturas. La calculadora convierte a metros antes de sumar el area.",
+      "You can enter opening width and height in centimetres. The calculator converts them to metres before adding the area.",
   },
   {
     question: "How do you choose container size?",
     answer:
-      "Usa el tamano real disponible para la pintura que vas a comprar. La calculadora redondea hacia arriba y muestra el sobrante estimado.",
+      "Use an actual container size available for the paint you plan to buy. The calculator rounds up and shows the estimated remainder.",
   },
 ];
 
@@ -126,7 +126,7 @@ const faqJsonLd = buildFaqJsonLd(faqs);
             <div class="mt-5 grid gap-6">
               <section data-room-panel>
                 <span class="block text-sm font-semibold text-gray-200">
-                  Que quieres pintar?
+                  What do you want to paint?
                 </span>
                 <div class="mt-2 grid grid-cols-3 gap-2" aria-label="Surface to paint">
                   <button
@@ -493,7 +493,7 @@ const faqJsonLd = buildFaqJsonLd(faqs);
               Enter your measurements
             </p>
             <p class="mt-2 min-h-5 text-sm leading-relaxed text-gray-400" data-result-note>
-              El resultado aparecera aqui junto con la compra estimada.
+              The result and estimated purchase quantity will appear here.
             </p>
 
             <div class="mt-5 grid gap-3" data-shopping-list></div>
@@ -547,19 +547,19 @@ const faqJsonLd = buildFaqJsonLd(faqs);
         <article class="rounded-lg border border-gray-800 bg-gray-950 p-5">
           <h3 class="text-lg font-semibold">Walls</h3>
           <p class="mt-3 text-sm leading-relaxed text-gray-400">
-            Se calcula como 2 x (largo + ancho) x altura.
+            Calculated as 2 × (length + width) × height.
           </p>
         </article>
         <article class="rounded-lg border border-gray-800 bg-gray-950 p-5">
           <h3 class="text-lg font-semibold">Ceiling</h3>
           <p class="mt-3 text-sm leading-relaxed text-gray-400">
-            Se calcula como largo x ancho y no descuenta puertas ni ventanas.
+            Calculated as length × width, without subtracting doors or windows.
           </p>
         </article>
         <article class="rounded-lg border border-gray-800 bg-gray-950 p-5">
           <h3 class="text-lg font-semibold">Openings</h3>
           <p class="mt-3 text-sm leading-relaxed text-gray-400">
-            Suma puertas y ventanas para descontarlas de la superficie de paredes.
+            Add doors and windows to subtract them from the wall area.
           </p>
         </article>
       </div>
@@ -569,14 +569,14 @@ const faqJsonLd = buildFaqJsonLd(faqs);
       <div class="rounded-lg border border-gray-800 bg-gray-950 p-5">
         <SectionIntro
           title="Nonrectangular surfaces"
-          description="Si necesitas medir una pared por partes o una forma irregular, calcula primero el area y pega el total en el modo Manual area."
+          description="For a wall measured in sections or an irregular shape, calculate the area first and enter the total in Manual area mode."
           class="mb-4"
         />
         <a
           class="inline-flex min-h-11 items-center rounded-lg border border-gray-700 px-4 py-2 text-sm font-semibold text-gray-200 transition hover:border-emerald-400 hover:text-white focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-emerald-400/30"
-          href="/geometria/calculadora-de-area-y-perimetro"
+          href="/en/geometry/area-perimeter-calculator"
         >
-          Abrir calculadora de area y perimetro
+            Open the area and perimeter calculator
         </a>
       </div>
     </Container>
@@ -643,11 +643,11 @@ const faqJsonLd = buildFaqJsonLd(faqs);
   };
 
   const FIELD_MESSAGES = {
-    required: "Completa este campo para calcular.",
+    required: "Complete this field to calculate.",
     invalid: "Escribe un numero valido.",
-    negative: "Usa un numero mayor o igual a cero.",
-    zero: "Usa un numero mayor a cero.",
-    integer: "Usa un numero entero.",
+    negative: "Use a number greater than or equal to zero.",
+    zero: "Use a number greater than zero.",
+    integer: "Use a whole number.",
     tooHigh: "Check this value before continuing.",
   };
 
@@ -868,14 +868,14 @@ const faqJsonLd = buildFaqJsonLd(faqs);
 
       if (!quantity.ok || !width.ok || !height.ok) {
         row.querySelector("[data-row-error]").textContent =
-          "Completa cantidad, ancho y alto con numeros validos.";
+          "Enter valid values for quantity, width and height.";
         ok = false;
         return;
       }
 
       if (!Number.isInteger(quantity.value) || quantity.value < 0) {
         row.querySelector("[data-row-error]").textContent =
-          "La cantidad debe ser un entero mayor o igual a cero.";
+          "Quantity must be a whole number greater than or equal to zero.";
         ok = false;
         return;
       }
@@ -886,7 +886,7 @@ const faqJsonLd = buildFaqJsonLd(faqs);
 
       if (width.unit && height.unit && width.unit !== height.unit) {
         row.querySelector("[data-row-error]").textContent =
-          "Usa la misma unidad para ancho y alto.";
+          "Use the same unit for width and height.";
         ok = false;
         return;
       }
@@ -975,7 +975,7 @@ const faqJsonLd = buildFaqJsonLd(faqs);
       typeof height !== "number" ||
       !openings.ok
     ) {
-      setNeutralResult("Completa las medidas de la habitacion.");
+      setNeutralResult("Complete the room measurements.");
       return;
     }
 
@@ -1044,7 +1044,7 @@ const faqJsonLd = buildFaqJsonLd(faqs);
         syncUrl,
       );
     } catch (error) {
-      setNeutralResult(error instanceof Error ? error.message : "No fue posible calcular.");
+      setNeutralResult(error instanceof Error ? error.message : "The calculation could not be completed.");
     }
   }
 
@@ -1053,7 +1053,7 @@ const faqJsonLd = buildFaqJsonLd(faqs);
     const manualOpenings = readOptionalArea("manualOpenings");
 
     if (typeof totalArea !== "number" || typeof manualOpenings !== "number") {
-      setNeutralResult("Completa la superficie total para calcular.");
+      setNeutralResult("Enter the total surface area to calculate.");
       return;
     }
 
@@ -1109,7 +1109,7 @@ const faqJsonLd = buildFaqJsonLd(faqs);
         syncUrl,
       );
     } catch (error) {
-      setNeutralResult(error instanceof Error ? error.message : "No fue posible calcular.");
+      setNeutralResult(error instanceof Error ? error.message : "The calculation could not be completed.");
     }
   }
 
@@ -1133,7 +1133,7 @@ const faqJsonLd = buildFaqJsonLd(faqs);
     mainResult.textContent = primaryText;
     resultNote.textContent = containers
       ? `${formatPaintNumber(liters.litersWithMargin)} l needed; estimated purchase rounded by container.`
-      : "Litros estimados con margen incluido.";
+      : "Estimated litres including the waste allowance.";
 
     const shoppingItems = [
       ["Net area", `${formatPaintNumber(area.netArea)} m²`],
@@ -1159,7 +1159,7 @@ const faqJsonLd = buildFaqJsonLd(faqs);
     const breakdownItems = [
       ["Net area", `${formatPaintNumber(area.netArea)} m²`],
       [
-        `${liters.coats} mano${liters.coats === 1 ? "" : "s"}`,
+        `${liters.coats} coat${liters.coats === 1 ? "" : "s"}`,
         `${formatPaintNumber(liters.accumulatedArea)} m² accumulated`,
       ],
       ["Base paint", `${formatPaintNumber(liters.litersBase)} l`],
@@ -1233,7 +1233,7 @@ const faqJsonLd = buildFaqJsonLd(faqs);
       `Coats: ${formatPaintNumber(area.netArea)} x ${liters.coats} = ${formatPaintNumber(
         liters.accumulatedArea,
       )} m² accumulated`,
-      `Litros: ${formatPaintNumber(liters.accumulatedArea)} ÷ ${formatPaintNumber(
+      `Litres: ${formatPaintNumber(liters.accumulatedArea)} ÷ ${formatPaintNumber(
         liters.coverage,
       )} = ${formatPaintNumber(liters.litersBase)} l`,
       `Margin: ${formatPaintNumber(liters.litersBase)} x ${formatPaintCompactNumber(
@@ -1493,7 +1493,7 @@ const faqJsonLd = buildFaqJsonLd(faqs);
   });
 
   copyButton.addEventListener("click", () => {
-    copyText(currentShareText, "Result copiado.");
+    copyText(currentShareText, "Result copied.");
   });
 
   copyUrlButton.addEventListener("click", () => {

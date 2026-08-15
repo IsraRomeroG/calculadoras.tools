@@ -4,6 +4,7 @@ seoTitle: "Seguro mensual de crédito: impacto en mensualidad, CAT y costo total
 description: "Conoce cómo un seguro mensual puede aumentar el pago de un préstamo y qué revisar antes de aceptar un crédito."
 pubDate: 2026-05-08
 categorySlug: "finanzas"
+translationKey: "monthly-loan-insurance"
 tags:
   - seguro de crédito
   - préstamo

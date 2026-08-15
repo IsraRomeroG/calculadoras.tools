@@ -124,6 +124,42 @@ export const CALCULATORS: LegacyCalculatorDirectoryItem[] = [
     order: 22,
   },
   {
+    id: "calculadora-vacaciones-proporcionales",
+    title: "Calculadora de vacaciones proporcionales",
+    description:
+      "Estima vacaciones adquiridas o la parte proporcional para finiquito según antigüedad y la LFT de México.",
+    href: "/legal-impuestos/calculadora-vacaciones-proporcionales",
+    categorySlug: "legal-impuestos",
+    order: 23,
+  },
+  {
+    id: "calculadora-aguinaldo-proporcional",
+    title: "Calculadora de aguinaldo proporcional",
+    description:
+      "Estima el aguinaldo bruto generado en México según salario fijo, fechas, días elegibles y la LFT.",
+    href: "/legal-impuestos/calculadora-aguinaldo-proporcional",
+    categorySlug: "legal-impuestos",
+    order: 23.5,
+  },
+  {
+    id: "calculadora-prima-vacacional",
+    title: "Calculadora de prima vacacional",
+    description:
+      "Calcula la prima vacacional en México y compara el mínimo legal con un porcentaje contractual o pagado.",
+    href: "/legal-impuestos/calculadora-prima-vacacional",
+    categorySlug: "legal-impuestos",
+    order: 23.75,
+  },
+  {
+    id: "calculadora-finiquito-liquidacion",
+    title: "Calculadora de finiquito y liquidación",
+    description:
+      "Estima el finiquito bruto, prestaciones proporcionales y escenarios condicionados de indemnización en México.",
+    href: "/legal-impuestos/calculadora-finiquito-liquidacion",
+    categorySlug: "legal-impuestos",
+    order: 24,
+  },
+  {
     id: "calculadora-de-interes-compuesto",
     title: "Calculadora de interés compuesto",
     description:
@@ -855,6 +891,188 @@ const ENGLISH_CALCULATOR_METADATA: Partial<
     slug: "percentage-calculator",
     published: true,
   },
+  "calculadora-de-regla-de-tres": {
+    title: "Rule of three calculator",
+    description:
+      "Solve direct and inverse proportions with step-by-step work and verification.",
+    slug: "rule-of-three-calculator",
+    published: true,
+  },
+  "calculadora-mcd-mcm": {
+    title: "GCD and LCM calculator",
+    description:
+      "Calculate the greatest common divisor and least common multiple with steps and prime factors.",
+    slug: "gcd-lcm-calculator",
+    published: true,
+  },
+  "calculadora-ecuaciones-cuadraticas": {
+    title: "Quadratic equation calculator",
+    description:
+      "Solve quadratic equations with the discriminant, real or complex roots, vertex and steps.",
+    slug: "quadratic-equation-calculator",
+    published: true,
+  },
+  "calculadora-sistema-ecuaciones-2x2": {
+    title: "2x2 system of equations calculator",
+    description:
+      "Solve a 2x2 linear system with determinants, Cramer's rule and verification.",
+    slug: "linear-system-2x2-calculator",
+    published: true,
+  },
+  "calculadora-de-estadistica-basica": {
+    title: "Basic statistics calculator",
+    description:
+      "Calculate mean, median, mode, range and frequencies for a list of numbers.",
+    slug: "basic-statistics-calculator",
+    published: true,
+  },
+  "calculadora-promedio-escolar-gpa": {
+    title: "Grade average and GPA calculator",
+    description:
+      "Calculate simple and weighted averages, approximate GPA and the grade needed for a target.",
+    slug: "gpa-calculator",
+    published: true,
+  },
+  "calculadora-nota-minima-para-aprobar": {
+    title: "Minimum grade calculator",
+    description:
+      "Calculate the grade needed on a pending assessment to pass or reach a target.",
+    slug: "minimum-grade-calculator",
+    published: true,
+  },
+  "calculadora-calificacion-ponderada": {
+    title: "Weighted grade calculator",
+    description:
+      "Calculate accumulated and projected grades from weighted assessments and a target.",
+    slug: "weighted-grade-calculator",
+    published: true,
+  },
+  "calculadora-horas-de-estudio": {
+    title: "Study hours calculator",
+    description:
+      "Calculate daily study hours, sessions and a weekly plan before a deadline.",
+    slug: "study-hours-calculator",
+    published: true,
+  },
+  "calculadora-porcentaje-asistencia-escolar": {
+    title: "School attendance percentage calculator",
+    description:
+      "Calculate attendance percentage, available absences and classes needed to meet a minimum.",
+    slug: "attendance-percentage-calculator",
+    published: true,
+  },
+  "calculadora-de-area-y-perimetro": {
+    title: "Area and perimeter calculator",
+    description:
+      "Calculate the area and perimeter of squares, rectangles, triangles, circles and regular polygons.",
+    slug: "area-perimeter-calculator",
+    published: true,
+  },
+  "calculadora-del-teorema-de-pitagoras": {
+    title: "Pythagorean theorem calculator",
+    description:
+      "Calculate a right triangle's hypotenuse or missing leg with formulas and step-by-step work.",
+    slug: "pythagorean-theorem-calculator",
+    published: true,
+  },
+  "edad-de-mascota-en-anos-humanos": {
+    title: "Pet age calculator",
+    description:
+      "Estimate a dog's or cat's equivalent age in human years using a veterinary reference table.",
+    slug: "pet-age-calculator",
+    published: true,
+  },
+  "calorias-diarias-para-perro-o-gato": {
+    title: "Pet calorie calculator",
+    description:
+      "Estimate a daily calorie range for adult dogs and cats based on weight, profile and body condition.",
+    slug: "pet-calorie-calculator",
+    published: true,
+  },
+  "calculadora-de-interes-compuesto": {
+    title: "Compound interest calculator",
+    description:
+      "Calculate compound growth with periodic contributions, inflation, and a year-by-year projection.",
+    slug: "compound-interest-calculator",
+    published: true,
+  },
+  "calculadora-de-inflacion-poder-adquisitivo": {
+    title: "Inflation and purchasing power calculator",
+    description:
+      "Estimate future prices and how much purchasing power money retains over time.",
+    slug: "inflation-purchasing-power-calculator",
+    published: true,
+  },
+  "calculadora-de-interes-simple": {
+    title: "Simple interest calculator",
+    description:
+      "Calculate simple interest and total value using daily, monthly, or annual rates.",
+    slug: "simple-interest-calculator",
+    published: true,
+  },
+  "calculadora-de-prestamo": {
+    title: "Loan calculator",
+    description:
+      "Estimate monthly loan payments, interest, total cost, and an amortization schedule.",
+    slug: "loan-calculator",
+    published: true,
+  },
+  "plan-de-pago-de-deudas": {
+    title: "Debt payoff calculator",
+    description:
+      "Compare snowball and avalanche strategies, estimate interest, and build a monthly debt payoff plan.",
+    slug: "debt-payoff-calculator",
+    published: true,
+  },
+  "calculadora-de-ahorro-para-un-objetivo": {
+    title: "Savings goal calculator",
+    description:
+      "Calculate how much to save each month, when a goal can be reached, and how to adjust the plan.",
+    slug: "savings-goal-calculator",
+    published: true,
+  },
+  "calculadora-de-roi": {
+    title: "ROI calculator",
+    description:
+      "Calculate return on investment, profit, break-even amount, and progress toward a target ROI.",
+    slug: "roi-calculator",
+    published: true,
+  },
+  "calculadora-de-margen-y-markup": {
+    title: "Margin and markup calculator",
+    description:
+      "Calculate profit, margin, markup, break-even price, and a target selling price including fees.",
+    slug: "margin-markup-calculator",
+    published: true,
+  },
+  "calculadora-de-punto-de-equilibrio": {
+    title: "Break-even calculator",
+    description:
+      "Calculate the sales needed to cover costs, evaluate a projection, and reach a target profit.",
+    slug: "break-even-calculator",
+    published: true,
+  },
+  "calculadora-de-tarifa-por-hora-freelance": {
+    title: "Freelance hourly rate calculator",
+    description:
+      "Calculate a sustainable freelance rate from income goals, expenses, taxes, fees, and billable hours.",
+    slug: "freelance-hourly-rate-calculator",
+    published: true,
+  },
+  "calculadora-de-precio-de-proyecto-freelance": {
+    title: "Freelance project pricing calculator",
+    description:
+      "Price a freelance project, compare scenarios, and check whether a fixed quote covers hours, expenses, risk, and margin.",
+    slug: "freelance-project-pricing-calculator",
+    published: true,
+  },
+  "calculadora-dca-costo-promedio": {
+    title: "DCA average cost calculator",
+    description:
+      "Calculate average purchase price, effective cost including fees, and the impact of a future purchase.",
+    slug: "dca-average-cost-calculator",
+    published: true,
+  },
   "calculadora-de-iva": {
     title: "VAT calculator",
     description:
@@ -874,6 +1092,76 @@ const ENGLISH_CALCULATOR_METADATA: Partial<
     description:
       "Estimate net salary in Mexico after income tax, subsidies and entered deductions with a clear breakdown.",
     slug: "net-salary-calculator",
+    published: true,
+  },
+  "calculadora-vacaciones-proporcionales": {
+    title: "Proportional vacation calculator",
+    description:
+      "Estimate vested vacation days or proportional vacation for a final settlement under Mexico's Federal Labor Law.",
+    slug: "proportional-vacation-calculator",
+    published: true,
+  },
+  "calculadora-aguinaldo-proporcional": {
+    title: "Mexico proportional annual bonus calculator",
+    description:
+      "Estimate the gross proportional annual bonus earned under Mexico's Federal Labor Law.",
+    slug: "mexico-proportional-annual-bonus-calculator",
+    published: false,
+  },
+  "calculadora-finiquito-liquidacion": {
+    title: "Termination pay calculator",
+    description:
+      "Estimate gross final pay, proportional benefits and conditional severance scenarios under Mexico's Federal Labor Law.",
+    slug: "termination-pay-calculator",
+    published: true,
+  },
+  "calculadora-de-hipoteca": {
+    title: "Mortgage calculator",
+    description:
+      "Estimate monthly mortgage payments, total interest and a month-by-month amortization schedule.",
+    slug: "mortgage-calculator",
+    published: true,
+  },
+  "calculadora-capacidad-compra-vivienda": {
+    title: "Home affordability calculator",
+    description:
+      "Estimate an affordable home price from income, debts, available cash, mortgage rate and term.",
+    slug: "home-affordability-calculator",
+    published: true,
+  },
+  "calculadora-renta-vs-compra": {
+    title: "Rent vs. buy calculator",
+    description:
+      "Compare renting and investing with buying using a mortgage, upfront costs, appreciation and editable assumptions.",
+    slug: "rent-vs-buy-calculator",
+    published: true,
+  },
+  "calculadora-cap-rate-rentabilidad": {
+    title: "Cap rate calculator",
+    description:
+      "Calculate cap rate, NOI, gross yield, cash flow and cash-on-cash return for a rental property.",
+    slug: "cap-rate-calculator",
+    published: true,
+  },
+  "calculadora-gastos-escrituracion": {
+    title: "Closing costs calculator",
+    description:
+      "Estimate editable buyer and seller closing costs, cash required and seller proceeds.",
+    slug: "closing-costs-calculator",
+    published: true,
+  },
+  "calculadora-plusvalia-estimada": {
+    title: "Property appreciation calculator",
+    description:
+      "Project a property's future value with compound appreciation and conservative, base and optimistic scenarios.",
+    slug: "property-appreciation-calculator",
+    published: true,
+  },
+  "calculadora-precio-por-metro-cuadrado": {
+    title: "Price per area calculator",
+    description:
+      "Calculate base and effective price per area and compare properties with different measurements and costs.",
+    slug: "price-per-area-calculator",
     published: true,
   },
   "calculadora-de-edad": {
@@ -1049,6 +1337,180 @@ const ENGLISH_CALCULATOR_METADATA: Partial<
     description:
       "Compare International, US, EU, UK and MX clothing sizes and measurement ranges.",
     slug: "clothing-size-converter",
+    published: true,
+  },
+  "calculadora-de-imc": {
+    title: "BMI calculator",
+    description: "Calculate body mass index and view the estimated healthy weight range for your height.",
+    slug: "bmi-calculator",
+    published: true,
+  },
+  "calculadora-de-porcentaje-de-grasa-corporal": {
+    title: "Body fat percentage calculator",
+    description: "Estimate body fat percentage from circumference measurements and review measurement sensitivity.",
+    slug: "body-fat-percentage-calculator",
+    published: true,
+  },
+  "calculadora-de-calorias-diarias-tdee": {
+    title: "TDEE calculator",
+    description: "Estimate basal metabolic rate, total daily energy expenditure, and calorie targets by goal.",
+    slug: "tdee-calculator",
+    published: true,
+  },
+  "calculadora-de-macros": {
+    title: "Macro calculator",
+    description: "Calculate daily protein, carbohydrate, and fat targets from calories, weight, and goal.",
+    slug: "macro-calculator",
+    published: true,
+  },
+  "calculadora-de-calorias-quemadas-por-ejercicio": {
+    title: "Exercise calories burned calculator",
+    description: "Estimate total and active calories burned from weight, duration, activity, and intensity.",
+    slug: "exercise-calories-burned-calculator",
+    published: true,
+  },
+  "calculadora-de-proteina-diaria": {
+    title: "Daily protein calculator",
+    description: "Calculate a daily protein range based on weight, goal, and type of training.",
+    slug: "daily-protein-calculator",
+    published: true,
+  },
+  "calculadora-deficit-calorico": {
+    title: "Calorie deficit calculator",
+    description: "Estimate daily calories, calorie deficit, weekly weight-loss rate, and goal timeline.",
+    slug: "calorie-deficit-calculator",
+    published: true,
+  },
+  "fecha-probable-de-parto": {
+    title: "Pregnancy due date calculator",
+    description: "Estimate due date, gestational age, delivery window, and confidence from LMP, ultrasound, IVF, or an official due date.",
+    slug: "pregnancy-due-date-calculator",
+    published: true,
+  },
+  "calculadora-de-ovulacion": {
+    title: "Ovulation calculator",
+    description: "Estimate the fertile window, probable ovulation, next period, and confidence level from cycle information.",
+    slug: "ovulation-calculator",
+    published: true,
+  },
+  "calculadora-de-frecuencia-cardiaca-maxima": {
+    title: "Maximum heart rate calculator",
+    description: "Estimate maximum heart rate by age and view general ranges for moderate and vigorous activity.",
+    slug: "maximum-heart-rate-calculator",
+    published: true,
+  },
+  "calculadora-de-zonas-de-frecuencia-cardiaca": {
+    title: "Heart rate zones calculator",
+    description: "Calculate five training zones from maximum heart rate percentage or the Karvonen heart rate reserve method.",
+    slug: "heart-rate-zones-calculator",
+    published: true,
+  },
+  "calculadora-de-agua-diaria": {
+    title: "Daily water intake calculator",
+    description: "Estimate a practical hydration range from weight, exercise, sweat level, and heat exposure.",
+    slug: "daily-water-intake-calculator",
+    published: true,
+  },
+  "calculadora-1rm-repeticion-maxima": {
+    title: "One-rep max calculator",
+    description: "Estimate your one-repetition maximum, compare Epley and Brzycki, and calculate practical training loads.",
+    slug: "one-rep-max-calculator",
+    published: true,
+  },
+  "calculadora-vo2-max": {
+    title: "VO2 max calculator",
+    description: "Estimate VO2 max using the Cooper or Rockport test and compare results from the same method.",
+    slug: "vo2-max-calculator",
+    published: true,
+  },
+  "calculadora-de-pace-ritmo-de-carrera": {
+    title: "Running pace calculator",
+    description: "Calculate pace, time, or distance and view equivalent speeds and cumulative race splits.",
+    slug: "running-pace-calculator",
+    published: true,
+  },
+  "calculadora-prediccion-tiempo-carrera": {
+    title: "Race time predictor",
+    description: "Predict race times and paces for other distances from a recent performance and assess prediction quality.",
+    slug: "race-time-predictor",
+    published: true,
+  },
+  "calculadora-combinaciones-permutaciones": {
+    title: "Combinations and permutations calculator",
+    description: "Calculate combinations, arrangements and permutations with or without repetition and view the exact result.",
+    slug: "combinations-permutations-calculator",
+    published: true,
+  },
+  "calculadora-distribucion-normal-z-score": {
+    title: "Normal distribution and Z-score calculator",
+    description: "Calculate Z-scores, percentiles, probabilities and critical values for a normal distribution.",
+    slug: "normal-distribution-z-score-calculator",
+    published: true,
+  },
+  "calculadora-probabilidad-basica": {
+    title: "Basic probability calculator",
+    description: "Calculate simple, union, intersection, complement and conditional probabilities.",
+    slug: "basic-probability-calculator",
+    published: true,
+  },
+  "calculadora-entropia-contrasena": {
+    title: "Password entropy calculator",
+    description: "Estimate entropy, search space, predictable patterns and approximate attack times locally.",
+    slug: "password-entropy-calculator",
+    published: true,
+  },
+  "calculadora-velocidad-descarga": {
+    title: "Download time calculator",
+    description: "Estimate download time or required speed from file size, connection speed and efficiency.",
+    slug: "download-time-calculator",
+    published: true,
+  },
+  "conversor-de-bases-numericas": {
+    title: "Number base converter",
+    description: "Convert exact integers between binary, octal, decimal, hexadecimal and bases 2 through 36.",
+    slug: "number-base-converter",
+    published: true,
+  },
+  "paleta-hex-rgb-hsl": {
+    title: "HEX, RGB and HSL color converter",
+    description: "Convert colors, generate a CSS color scale and check WCAG contrast.",
+    slug: "hex-rgb-hsl-color-converter",
+    published: true,
+  },
+  "calculadora-de-consumo-de-gasolina": {
+    title: "Fuel consumption calculator",
+    description: "Calculate fuel economy in km/L, L/100 km and US mpg or estimate fuel for a trip.",
+    slug: "fuel-consumption-calculator",
+    published: true,
+  },
+  "calculadora-de-costo-por-kilometro": {
+    title: "Cost per kilometer calculator",
+    description: "Estimate fuel, total trip cost, cost per kilometer and cost per passenger.",
+    slug: "cost-per-kilometer-calculator",
+    published: true,
+  },
+  "calculadora-de-depreciacion-del-vehiculo": {
+    title: "Vehicle depreciation calculator",
+    description: "Estimate depreciation, future value, accumulated loss and equivalent annual rate.",
+    slug: "vehicle-depreciation-calculator",
+    published: true,
+  },
+  "calculadora-de-gastos-anuales-del-vehiculo": {
+    title: "Annual vehicle cost calculator",
+    description: "Estimate annual, monthly and per-kilometer vehicle expenses with an editable reserve.",
+    slug: "annual-vehicle-cost-calculator",
+    published: true,
+  },
+  "calculadora-de-propina": {
+    title: "Tip calculator",
+    description: "Calculate a tip, final total, rounded total and payment per person.",
+    slug: "tip-calculator",
+    published: true,
+  },
+  "dividir-cuenta-en-restaurante": {
+    title: "Restaurant bill splitting calculator",
+    description: "Split a bill, add an optional tip and distribute exact or rounded payments.",
+    slug: "restaurant-bill-split-calculator",
     published: true,
   },
 };

@@ -1,0 +1,1093 @@
+---
+import BaseLayout from "@layouts/BaseLayout.astro";
+import { buildAlternateLinks } from "@lib/i18n/routing";
+import AdSlot from "@components/ads/AdSlot.astro";
+import Container from "@components/layout/Container.astro";
+import PageShell from "@components/layout/PageShell.astro";
+import FaqSection from "@components/shared/FaqSection.astro";
+import PageHero from "@components/shared/PageHero.astro";
+import SectionIntro from "@components/shared/SectionIntro.astro";
+import { buildFaqJsonLd } from "@lib/seo";
+
+const title = "Body Fat Percentage Calculator";
+const description =
+  "Estimate your body fat percentage from waist, neck, height, and hip measurements. Includes measurement guidance and sensitivity analysis.";
+const canonical = "/en/health/body-fat-percentage-calculator";
+const spanishCanonical = "/salud/calculadora-de-porcentaje-de-grasa-corporal";
+const alternates = buildAlternateLinks({ es: spanishCanonical, en: canonical }, Astro.site ?? Astro.url);
+
+const faqs = [
+  {
+    question: "How accurate is this calculator?",
+    answer:
+      "This is an estimate based on body circumferences and a population-derived formula. Measurement technique, fat distribution, and small differences in tape placement can change the result. It is not equivalent to a clinical measurement.",
+  },
+  {
+    question: "How should I measure my neck, waist, and hips?",
+    answer:
+      "Use a flexible tape without compressing the skin. Measure the neck below the larynx; the male formula uses the abdomen at navel level, while the female formula uses the natural waist and the widest part of the hips.",
+  },
+  {
+    question: "Why does a one-centimeter difference change the result?",
+    answer:
+      "The formula uses differences between circumferences, so a small change in the waist, neck, or hips can affect the estimate. The calculator shows a conservative ±1 cm sensitivity range.",
+  },
+  {
+    question: "Do I need to know my weight?",
+    answer:
+      "No. Weight is not used to calculate the percentage. It is only used to estimate fat mass and fat-free mass.",
+  },
+  {
+    question: "Is fat-free mass the same as muscle mass?",
+    answer:
+      "No. Fat-free mass includes muscle, water, bones, organs, and other tissues. This calculator does not estimate muscle mass.",
+  },
+  {
+    question: "Is this suitable for athletes?",
+    answer:
+      "It may be less accurate for high-performance athletes, bodybuilders, and people with high muscle mass or body-fat distributions unlike the population used to develop the formula.",
+  },
+  {
+    question: "Can it be used during pregnancy?",
+    answer:
+      "The formula should not be interpreted during pregnancy because physical changes mean circumferences no longer represent body composition in the same way.",
+  },
+  {
+    question: "Is this the same as BMI?",
+    answer:
+      "No. BMI relates weight to height; this tool uses circumferences to estimate what proportion of body weight is fat.",
+    relatedHref: "/en/blog/health",
+    relatedLabel: "Explore health articles",
+  },
+];
+
+const faqJsonLd = buildFaqJsonLd(faqs);
+---
+
+<BaseLayout title={title} description={description} canonical={canonical} locale="en" alternates={alternates}>
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={JSON.stringify(faqJsonLd)} />
+  </Fragment>
+
+  <PageShell>
+    <PageHero
+      title="Body fat percentage calculator"
+      description="Estimate body fat percentage from circumferences and see how small measurement differences may affect the result."
+      kicker="Health"
+      collapseBreadcrumbOnMobile
+      containerClass="py-5 md:py-7"
+      breadcrumbs={[
+        { label: "Home", href: "/en", ariaLabel: "Home" },
+        { label: "Health", href: "/en/health", optional: true },
+        { label: "Body fat", truncate: true },
+      ]}
+    />
+
+    <Container as="section" class="py-4 md:py-8">
+      <div
+        class="mb-4 rounded-lg border border-amber-400/30 bg-amber-400/10 p-4 text-sm leading-relaxed text-amber-100/85"
+      >
+        This tool provides an estimate for adults. It should not be interpreted
+        during pregnancy or treated as a diagnosis or clinical measurement.
+      </div>
+
+      <section
+        id="body-fat-calculator"
+        class="overflow-hidden rounded-lg border border-gray-700 bg-gray-950 shadow-xl shadow-gray-950/30"
+        aria-labelledby="calculator-heading"
+      >
+        <div
+          class="grid gap-0 xl:grid-cols-[minmax(0,0.92fr)_minmax(22rem,0.78fr)]"
+        >
+          <form class="p-4 sm:p-6" data-calculator-form novalidate>
+            <div>
+              <p
+                class="text-sm font-semibold uppercase tracking-wide text-amber-400"
+              >
+                Circumference method
+              </p>
+              <h2 id="calculator-heading" class="mt-2 text-2xl font-semibold">
+                Enter your measurements
+              </h2>
+              <p class="mt-2 text-sm leading-relaxed text-gray-400">
+                For comparable results, measure at the same locations and under
+                similar conditions each time.
+              </p>
+            </div>
+
+            <fieldset class="mt-6">
+              <legend class="text-sm font-semibold text-gray-200">
+                1. Formula
+              </legend>
+              <p class="mt-2 text-xs leading-relaxed text-gray-500">
+                Select the formula that corresponds to your physiology. This
+                choice only determines which equation is used.
+              </p>
+              <div
+                class="mt-3 grid gap-2 rounded-lg border border-gray-700 bg-gray-900 p-1 sm:grid-cols-2"
+                role="group"
+                aria-label="Body fat formula"
+                data-formula-group
+              >
+                <button
+                  class="min-h-12 rounded-md px-3 py-2 text-sm font-semibold text-gray-300 transition hover:bg-gray-800 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/40"
+                  type="button"
+                  aria-pressed="false"
+                  data-formula-option="male"
+                >
+                  Male formula
+                </button>
+                <button
+                  class="min-h-12 rounded-md px-3 py-2 text-sm font-semibold text-gray-300 transition hover:bg-gray-800 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/40"
+                  type="button"
+                  aria-pressed="false"
+                  data-formula-option="female"
+                >
+                  Female formula
+                </button>
+              </div>
+              <p
+                class="mt-2 hidden text-sm font-medium text-red-300"
+                data-formula-error
+              >
+                Select the formula you want to use.
+              </p>
+            </fieldset>
+
+            <fieldset class="mt-6">
+              <legend class="text-sm font-semibold text-gray-200">
+                2. Unit system
+              </legend>
+              <div
+                class="mt-3 grid grid-cols-2 gap-2 rounded-lg border border-gray-700 bg-gray-900 p-1"
+                role="group"
+                aria-label="Unit system"
+              >
+                <button
+                  class="min-h-12 rounded-md bg-amber-400 px-3 py-2 text-sm font-bold text-gray-950 transition focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-300/50"
+                  type="button"
+                  aria-pressed="true"
+                  data-unit-option="metric"
+                >
+                  Metric
+                </button>
+                <button
+                  class="min-h-12 rounded-md px-3 py-2 text-sm font-semibold text-gray-300 transition hover:bg-gray-800 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/40"
+                  type="button"
+                  aria-pressed="false"
+                  data-unit-option="imperial"
+                >
+                  Imperial
+                </button>
+              </div>
+            </fieldset>
+
+            <div class="mt-6" data-unit-panel="metric">
+              <div class="grid gap-5">
+                <div>
+                  <label
+                    for="body-fat-height-cm"
+                    class="block text-sm font-semibold text-gray-200"
+                  >
+                    Height
+                  </label>
+                  <div
+                    class="mt-2 flex rounded-lg border border-gray-700 bg-gray-900 transition focus-within:border-amber-400 focus-within:ring-3 focus-within:ring-amber-400/15"
+                    data-wrapper-for="height"
+                  >
+                    <input
+                      id="body-fat-height-cm"
+                      class="min-h-12 w-full bg-transparent px-4 text-base text-white outline-none placeholder:text-gray-600"
+                      type="text"
+                      inputmode="decimal"
+                      autocomplete="off"
+                      placeholder="180"
+                      aria-describedby="body-fat-height-help body-fat-height-error"
+                      data-input="heightCm"
+                      data-field="height"
+                    />
+                    <span class="flex items-center px-4 text-sm text-gray-500">
+                      cm
+                    </span>
+                  </div>
+                  <details
+                    id="body-fat-height-help"
+                    class="mt-2 text-xs leading-relaxed text-gray-500"
+                  >
+                    <summary
+                      class="min-h-11 cursor-pointer py-2 font-semibold text-amber-300"
+                    >
+                      How to measure
+                    </summary>
+                    <p>
+                      Measure without shoes, standing upright and looking ahead.
+                      Use your exact total height when available.
+                    </p>
+                  </details>
+                  <p
+                    id="body-fat-height-error"
+                    class="mt-2 hidden text-sm font-medium text-red-300"
+                    data-error-for="height"
+                  >
+                  </p>
+                </div>
+
+                <div>
+                  <label
+                    for="body-fat-neck-cm"
+                    class="block text-sm font-semibold text-gray-200"
+                  >
+                    Neck
+                  </label>
+                  <div
+                    class="mt-2 flex rounded-lg border border-gray-700 bg-gray-900 transition focus-within:border-amber-400 focus-within:ring-3 focus-within:ring-amber-400/15"
+                    data-wrapper-for="neck"
+                  >
+                    <input
+                      id="body-fat-neck-cm"
+                      class="min-h-12 w-full bg-transparent px-4 text-base text-white outline-none placeholder:text-gray-600"
+                      type="text"
+                      inputmode="decimal"
+                      autocomplete="off"
+                      placeholder="40"
+                      aria-describedby="body-fat-neck-help body-fat-neck-error"
+                      data-input="neckCm"
+                      data-field="neck"
+                    />
+                    <span class="flex items-center px-4 text-sm text-gray-500">
+                      cm
+                    </span>
+                  </div>
+                  <details
+                    id="body-fat-neck-help"
+                    class="mt-2 text-xs leading-relaxed text-gray-500"
+                  >
+                    <summary
+                      class="min-h-11 cursor-pointer py-2 font-semibold text-amber-300"
+                    >
+                      How to measure
+                    </summary>
+                    <p>
+                      Place the tape below the larynx, angled slightly downward
+                      at the front, without compressing the skin.
+                    </p>
+                  </details>
+                  <p
+                    id="body-fat-neck-error"
+                    class="mt-2 hidden text-sm font-medium text-red-300"
+                    data-error-for="neck"
+                  >
+                  </p>
+                </div>
+
+                <div>
+                  <label
+                    for="body-fat-waist-cm"
+                    class="block text-sm font-semibold text-gray-200"
+                  >
+                    Waist
+                  </label>
+                  <div
+                    class="mt-2 flex rounded-lg border border-gray-700 bg-gray-900 transition focus-within:border-amber-400 focus-within:ring-3 focus-within:ring-amber-400/15"
+                    data-wrapper-for="waist"
+                  >
+                    <input
+                      id="body-fat-waist-cm"
+                      class="min-h-12 w-full bg-transparent px-4 text-base text-white outline-none placeholder:text-gray-600"
+                      type="text"
+                      inputmode="decimal"
+                      autocomplete="off"
+                      placeholder="90"
+                      aria-describedby="body-fat-waist-help body-fat-waist-error"
+                      data-input="waistCm"
+                      data-field="waist"
+                    />
+                    <span class="flex items-center px-4 text-sm text-gray-500">
+                      cm
+                    </span>
+                  </div>
+                  <details
+                    id="body-fat-waist-help"
+                    class="mt-2 text-xs leading-relaxed text-gray-500"
+                  >
+                    <summary
+                      class="min-h-11 cursor-pointer py-2 font-semibold text-amber-300"
+                    >
+                      How to measure
+                    </summary>
+                    <p data-waist-guide>
+                      Select a formula to view the correct measurement location.
+                    </p>
+                  </details>
+                  <p
+                    id="body-fat-waist-error"
+                    class="mt-2 hidden text-sm font-medium text-red-300"
+                    data-error-for="waist"
+                  >
+                  </p>
+                </div>
+
+                <div class="hidden" data-hip-panel>
+                  <label
+                    for="body-fat-hip-cm"
+                    class="block text-sm font-semibold text-gray-200"
+                  >
+                    Hips
+                  </label>
+                  <div
+                    class="mt-2 flex rounded-lg border border-gray-700 bg-gray-900 transition focus-within:border-amber-400 focus-within:ring-3 focus-within:ring-amber-400/15"
+                    data-wrapper-for="hip"
+                  >
+                    <input
+                      id="body-fat-hip-cm"
+                      class="min-h-12 w-full bg-transparent px-4 text-base text-white outline-none placeholder:text-gray-600"
+                      type="text"
+                      inputmode="decimal"
+                      autocomplete="off"
+                      placeholder="100"
+                      aria-describedby="body-fat-hip-help body-fat-hip-error"
+                      data-input="hipCm"
+                      data-field="hip"
+                    />
+                    <span class="flex items-center px-4 text-sm text-gray-500">
+                      cm
+                    </span>
+                  </div>
+                  <details
+                    id="body-fat-hip-help"
+                    class="mt-2 text-xs leading-relaxed text-gray-500"
+                  >
+                    <summary
+                      class="min-h-11 cursor-pointer py-2 font-semibold text-amber-300"
+                    >
+                      How to measure
+                    </summary>
+                    <p>
+                      Measure around the widest part of the buttocks and hips,
+                      keeping the tape parallel to the floor.
+                    </p>
+                  </details>
+                  <p
+                    id="body-fat-hip-error"
+                    class="mt-2 hidden text-sm font-medium text-red-300"
+                    data-error-for="hip"
+                  >
+                  </p>
+                </div>
+
+                <div>
+                  <label
+                    for="body-fat-weight-kg"
+                    class="block text-sm font-semibold text-gray-200"
+                  >
+                    Weight <span class="font-normal text-gray-500">optional</span>
+                  </label>
+                  <div
+                    class="mt-2 flex rounded-lg border border-gray-700 bg-gray-900 transition focus-within:border-amber-400 focus-within:ring-3 focus-within:ring-amber-400/15"
+                    data-wrapper-for="weight"
+                  >
+                    <input
+                      id="body-fat-weight-kg"
+                      class="min-h-12 w-full bg-transparent px-4 text-base text-white outline-none placeholder:text-gray-600"
+                      type="text"
+                      inputmode="decimal"
+                      autocomplete="off"
+                      placeholder="80"
+                      aria-describedby="body-fat-weight-help body-fat-weight-error"
+                      data-input="weightKg"
+                      data-field="weight"
+                    />
+                    <span class="flex items-center px-4 text-sm text-gray-500">
+                      kg
+                    </span>
+                  </div>
+                  <p
+                    id="body-fat-weight-help"
+                    class="mt-2 text-xs leading-relaxed text-gray-500"
+                  >
+                    Used only to estimate fat mass and fat-free mass.
+                  </p>
+                  <p
+                    id="body-fat-weight-error"
+                    class="mt-2 hidden text-sm font-medium text-red-300"
+                    data-error-for="weight"
+                  >
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div class="mt-6 hidden" data-unit-panel="imperial">
+              <div class="grid gap-5">
+                <div>
+                  <span class="block text-sm font-semibold text-gray-200">
+                    Height
+                  </span>
+                  <div class="mt-2 grid grid-cols-2 gap-3">
+                    <div
+                      class="flex rounded-lg border border-gray-700 bg-gray-900 transition focus-within:border-amber-400 focus-within:ring-3 focus-within:ring-amber-400/15"
+                      data-wrapper-for="height"
+                    >
+                      <input
+                        class="min-h-12 min-w-0 w-full bg-transparent px-3 text-base text-white outline-none placeholder:text-gray-600"
+                        type="text"
+                      inputmode="numeric"
+                      autocomplete="off"
+                      placeholder="5"
+                      aria-label="Height in feet"
+                      aria-describedby="body-fat-height-imperial-help body-fat-height-imperial-error"
+                      data-input="heightFt"
+                      data-field="height"
+                    />
+                      <span class="flex items-center px-3 text-sm text-gray-500">
+                        ft
+                      </span>
+                    </div>
+                    <div
+                      class="flex rounded-lg border border-gray-700 bg-gray-900"
+                      data-wrapper-for="height"
+                    ><input class="min-h-12 min-w-0 w-full bg-transparent px-3" type="text" inputmode="decimal" placeholder="11" aria-label="Height in inches" data-input="heightIn" data-field="height" /><span class="flex items-center px-3 text-sm text-gray-500">in</span></div>
+                  </div>
+                  <p class="mt-2 hidden text-sm text-red-300" data-error-for="height"></p>
+                </div>
+                <div><label class="block text-sm font-semibold text-gray-200">Neck</label><div class="mt-2 flex rounded-lg border border-gray-700 bg-gray-900"><input class="min-h-12 w-full bg-transparent px-4" type="text" inputmode="decimal" placeholder="15.7" data-input="neckIn" data-field="neck" /><span class="px-4 self-center text-gray-500">in</span></div><p class="hidden" data-error-for="neck"></p></div>
+                <div><label class="block text-sm font-semibold text-gray-200">Waist</label><div class="mt-2 flex rounded-lg border border-gray-700 bg-gray-900"><input class="min-h-12 w-full bg-transparent px-4" type="text" inputmode="decimal" placeholder="35" data-input="waistIn" data-field="waist" /><span class="px-4 self-center text-gray-500">in</span></div><p class="mt-2 text-xs text-gray-500" data-waist-guide>Select a formula to view the measurement location.</p><p class="hidden" data-error-for="waist"></p></div>
+                <div class="hidden" data-hip-panel><label class="block text-sm font-semibold text-gray-200">Hips</label><div class="mt-2 flex rounded-lg border border-gray-700 bg-gray-900"><input class="min-h-12 w-full bg-transparent px-4" type="text" inputmode="decimal" placeholder="39" data-input="hipIn" data-field="hip" /><span class="px-4 self-center text-gray-500">in</span></div><p class="hidden" data-error-for="hip"></p></div>
+                <div><label class="block text-sm font-semibold text-gray-200">Weight <span class="font-normal text-gray-500">(optional)</span></label><div class="mt-2 flex rounded-lg border border-gray-700 bg-gray-900"><input class="min-h-12 w-full bg-transparent px-4" type="text" inputmode="decimal" placeholder="165" data-input="weightLb" data-field="weight" /><span class="px-4 self-center text-gray-500">lb</span></div><p class="hidden" data-error-for="weight"></p></div>
+              </div>
+            </div>
+            <p class="mt-5 hidden rounded-lg border border-red-400/30 bg-red-400/10 p-3 text-sm text-red-200" data-calculation-error></p>
+            <button class="mt-6 min-h-12 w-full rounded-lg bg-amber-400 px-5 py-3 font-bold text-gray-950" type="submit">Calculate body fat percentage</button>
+            <div class="mt-3 grid grid-cols-2 gap-3"><button class="min-h-12 rounded-lg border border-gray-700" type="button" data-fill-example>Try an example</button><button class="min-h-12 rounded-lg border border-gray-700" type="button" data-clear-button>Clear</button></div>
+          </form>
+          <aside class="border-t border-gray-800 bg-gray-900/70 p-4 sm:p-6 xl:border-l xl:border-t-0" aria-live="polite">
+            <h2 class="text-sm font-semibold uppercase tracking-wide text-amber-400" data-result-heading>Estimated result</h2>
+            <div data-result-placeholder><p class="mt-3 text-3xl font-bold" data-placeholder-text>Complete the form</p><p class="mt-3 text-sm text-gray-400">Your estimated body fat percentage will appear here.</p></div>
+            <div class="hidden" data-result-content><p class="mt-3 text-sm text-emerald-300" data-result-status>Estimated body fat</p><p class="mt-2 text-5xl font-bold" data-main-result>-</p><p class="mt-4 text-sm text-gray-300" data-sensitivity></p><p class="mt-1 text-sm text-gray-500" data-sensitivity-note></p>
+              <div class="mt-5 hidden grid gap-3 sm:grid-cols-2" data-composition-panel><div class="rounded-lg border border-gray-800 p-4"><span>Estimated fat mass</span><strong class="block mt-2" data-fat-mass>-</strong></div><div class="rounded-lg border border-gray-800 p-4"><span>Estimated fat-free mass</span><strong class="block mt-2" data-fat-free-mass>-</strong></div></div>
+              <p class="mt-4 hidden rounded-lg border border-amber-400/40 bg-amber-400/10 p-3 text-sm text-amber-100" data-unusual-warning></p>
+              <div class="mt-5 rounded-lg border border-gray-800 p-4 text-sm"><p><strong>Formula:</strong> <span data-formula-label>-</span></p><p class="mt-2 text-gray-400" data-measurement-summary>-</p></div>
+              <button class="mt-5 hidden min-h-11 rounded-lg bg-amber-400 px-4 font-semibold text-gray-950" type="button" data-copy-button><span data-copy-label>Copy result</span></button><span class="sr-only" data-copy-status></span>
+            </div>
+          </aside>
+        </div>
+      </section>
+    </Container>
+    <AdSlot placement="calculator-after-tool" />
+    <Container as="section" class="py-8 md:py-10"><SectionIntro title="How to interpret the estimate" description="Tape-measure formulas are useful for tracking trends, but they are not a direct measurement of body composition." /><p class="rounded-lg border border-gray-800 bg-gray-950/70 p-5 text-sm leading-relaxed text-gray-300">Measure under similar conditions each time and focus on the trend. Hydration, tape placement, posture, and breathing can affect the result. Consult a qualified professional when clinical accuracy matters.</p></Container>
+    <FaqSection faqs={faqs} />
+  </PageShell>
+</BaseLayout>
+
+<script>
+  import { BodyFatCalculationError, buildBodyFatCopyText, calculateBodyFatResult, convertCmToIn, convertInToCm, convertKgToLb, convertLbToKg, formatBodyFatMass, formatBodyFatMeasurementSummary, formatBodyFatPercentage, getBodyFatFormulaLabel, validateBodyFatInput } from "@lib/calculators/salud/calculadora-de-porcentaje-de-grasa-corporal/bodyFat.en";
+  import { parseHealthInput, roundTo } from "@lib/calculators/salud/calculadora-de-imc/bmi.en";
+  const form = document.querySelector("[data-calculator-form]");
+  const formulaButtons = document.querySelectorAll("[data-formula-option]");
+  const unitButtons = document.querySelectorAll("[data-unit-option]");
+  const unitPanels = document.querySelectorAll("[data-unit-panel]");
+  const hipPanels = document.querySelectorAll("[data-hip-panel]");
+  const waistGuides = document.querySelectorAll("[data-waist-guide]");
+  const formulaGroup = document.querySelector("[data-formula-group]");
+  const formulaError = document.querySelector("[data-formula-error]");
+  const calculationError = document.querySelector("[data-calculation-error]");
+  const resultHeading = document.querySelector("[data-result-heading]");
+  const resultPlaceholder = document.querySelector("[data-result-placeholder]");
+  const placeholderText = document.querySelector("[data-placeholder-text]");
+  const resultContent = document.querySelector("[data-result-content]");
+  const resultStatus = document.querySelector("[data-result-status]");
+  const mainResult = document.querySelector("[data-main-result]");
+  const sensitivity = document.querySelector("[data-sensitivity]");
+  const sensitivityNote = document.querySelector("[data-sensitivity-note]");
+  const compositionPanel = document.querySelector("[data-composition-panel]");
+  const fatMass = document.querySelector("[data-fat-mass]");
+  const fatFreeMass = document.querySelector("[data-fat-free-mass]");
+  const unusualWarning = document.querySelector("[data-unusual-warning]");
+  const formulaLabel = document.querySelector("[data-formula-label]");
+  const measurementSummary = document.querySelector("[data-measurement-summary]");
+  const fillExampleButton = document.querySelector("[data-fill-example]");
+  const clearButton = document.querySelector("[data-clear-button]");
+  const copyButton = document.querySelector("[data-copy-button]");
+  const copyLabel = document.querySelector("[data-copy-label]");
+  const copyStatus = document.querySelector("[data-copy-status]");
+  const inputs = {
+    heightCm: document.querySelector('[data-input="heightCm"]'),
+    neckCm: document.querySelector('[data-input="neckCm"]'),
+    waistCm: document.querySelector('[data-input="waistCm"]'),
+    hipCm: document.querySelector('[data-input="hipCm"]'),
+    weightKg: document.querySelector('[data-input="weightKg"]'),
+    heightFt: document.querySelector('[data-input="heightFt"]'),
+    heightIn: document.querySelector('[data-input="heightIn"]'),
+    neckIn: document.querySelector('[data-input="neckIn"]'),
+    waistIn: document.querySelector('[data-input="waistIn"]'),
+    hipIn: document.querySelector('[data-input="hipIn"]'),
+    weightLb: document.querySelector('[data-input="weightLb"]'),
+  };
+
+  const parseMessages = {
+    required: "This field is required.",
+    invalid: "Enter a valid number.",
+    negative: "Enter a positive value.",
+    too_many_decimals: "Use no more than two decimal places.",
+  };
+  const validationMessages = {
+    height: {
+      required: "Enter your height.",
+      out_of_range: "Height must be between 100 and 250 cm, or the equivalent.",
+    },
+    neck: {
+      required: "Enter your neck measurement.",
+      out_of_range: "Neck measurement must be between 20 and 80 cm, or the equivalent.",
+    },
+    waist: {
+      required: "Enter your waist measurement.",
+      out_of_range: "Waist measurement must be between 40 and 250 cm, or the equivalent.",
+      waist_not_above_neck:
+        "For the male formula, the waist measurement must be greater than the neck measurement.",
+    },
+    hip: {
+      required: "The female formula requires a hip measurement.",
+      out_of_range: "Hip measurement must be between 50 and 250 cm, or the equivalent.",
+      invalid_female_combination:
+        "This combination of waist, hip, and neck measurements cannot be used in the formula.",
+    },
+    weight: {
+      out_of_range: "Weight must be between 20 and 500 kg, or the equivalent.",
+    },
+  };
+  const fieldMap = {
+    heightCm: "height",
+    neckCm: "neck",
+    waistCm: "waist",
+    hipCm: "hip",
+    weightKg: "weight",
+  };
+
+  let currentFormula = null;
+  let currentUnit = "metric";
+  let currentResult = null;
+  let copyResetTimeout = 0;
+
+  function updateChoiceButtons(buttons, dataKey, selectedValue) {
+    buttons.forEach((button) => {
+      const isSelected = button.dataset[dataKey] === selectedValue;
+      button.setAttribute("aria-pressed", String(isSelected));
+      button.classList.toggle("bg-amber-400", isSelected);
+      button.classList.toggle("text-gray-950", isSelected);
+      button.classList.toggle("font-bold", isSelected);
+      button.classList.toggle("text-gray-300", !isSelected);
+      button.classList.toggle("font-semibold", !isSelected);
+      button.classList.toggle("hover:bg-gray-800", !isSelected);
+    });
+  }
+
+  function updateControls() {
+    updateChoiceButtons(formulaButtons, "formulaOption", currentFormula);
+    updateChoiceButtons(unitButtons, "unitOption", currentUnit);
+
+    unitPanels.forEach((panel) => {
+      panel.classList.toggle("hidden", panel.dataset.unitPanel !== currentUnit);
+    });
+
+    const usesHip = currentFormula === "female";
+    hipPanels.forEach((panel) => {
+      panel.classList.toggle("hidden", !usesHip);
+    });
+
+    waistGuides.forEach((guide) => {
+      guide.textContent =
+        currentFormula === "male"
+          ? "Measure the abdomen at navel level while relaxed, at the end of a normal exhalation."
+          : currentFormula === "female"
+            ? "Measure the natural waist, usually at the narrowest point of the torso."
+            : "Select a formula to view the correct measurement location.";
+    });
+  }
+
+  function clearErrors() {
+    formulaError.classList.add("hidden");
+    formulaGroup.classList.remove("border-red-400");
+    calculationError.textContent = "";
+    calculationError.classList.add("hidden");
+
+    document.querySelectorAll("[data-error-for]").forEach((element) => {
+      element.textContent = "";
+      element.classList.add("hidden");
+    });
+    document.querySelectorAll("[data-wrapper-for]").forEach((element) => {
+      element.classList.remove("border-red-400");
+    });
+    document.querySelectorAll("[data-field]").forEach((input) => {
+      input.removeAttribute("aria-invalid");
+    });
+  }
+
+  function clearFieldError(field) {
+    document.querySelectorAll(`[data-error-for="${field}"]`).forEach((element) => {
+      element.textContent = "";
+      element.classList.add("hidden");
+    });
+    document.querySelectorAll(`[data-wrapper-for="${field}"]`).forEach((element) => {
+      element.classList.remove("border-red-400");
+    });
+    document.querySelectorAll(`[data-field="${field}"]`).forEach((input) => {
+      input.removeAttribute("aria-invalid");
+    });
+  }
+
+  function showFieldError(field, message) {
+    document.querySelectorAll(`[data-error-for="${field}"]`).forEach((element) => {
+      element.textContent = message;
+      element.classList.remove("hidden");
+    });
+    document.querySelectorAll(`[data-wrapper-for="${field}"]`).forEach((element) => {
+      element.classList.add("border-red-400");
+    });
+    getActiveFieldInputs(field).forEach((input) => {
+      input.setAttribute("aria-invalid", "true");
+    });
+  }
+
+  function getActiveFieldInputs(field) {
+    const activePanel = document.querySelector(`[data-unit-panel="${currentUnit}"]`);
+    return Array.from(activePanel.querySelectorAll(`[data-field="${field}"]`));
+  }
+
+  function showFormulaError() {
+    formulaError.classList.remove("hidden");
+    formulaGroup.classList.add("border-red-400");
+  }
+
+  function showCalculationError(message) {
+    calculationError.textContent = message;
+    calculationError.classList.remove("hidden");
+  }
+
+  function parseRequired(rawValue, field, options = {}) {
+    const parsed = parseHealthInput(rawValue, options);
+
+    if (!parsed.ok) {
+      showFieldError(field, parseMessages[parsed.error]);
+      return null;
+    }
+
+    return parsed.value;
+  }
+
+  function parseOptional(rawValue, field) {
+    if (!rawValue.trim()) {
+      return undefined;
+    }
+
+    const parsed = parseHealthInput(rawValue);
+
+    if (!parsed.ok) {
+      showFieldError(field, parseMessages[parsed.error]);
+      return null;
+    }
+
+    return parsed.value;
+  }
+
+  function readMetricInput() {
+    const heightCm = parseRequired(inputs.heightCm.value, "height", {
+      convertMetersToCentimeters: true,
+    });
+    const neckCm = parseRequired(inputs.neckCm.value, "neck");
+    const waistCm = parseRequired(inputs.waistCm.value, "waist");
+    const hipCm =
+      currentFormula === "female"
+        ? parseRequired(inputs.hipCm.value, "hip")
+        : undefined;
+    const weightKg = parseOptional(inputs.weightKg.value, "weight");
+
+    if (
+      heightCm === null ||
+      neckCm === null ||
+      waistCm === null ||
+      hipCm === null ||
+      weightKg === null
+    ) {
+      return null;
+    }
+
+    return {
+      formula: currentFormula,
+      heightCm,
+      neckCm,
+      waistCm,
+      hipCm,
+      weightKg,
+    };
+  }
+
+  function readImperialInput() {
+    const heightFt = parseRequired(inputs.heightFt.value, "height", {
+      maxDecimals: 0,
+    });
+    const heightIn = parseRequired(inputs.heightIn.value, "height");
+    const neckIn = parseRequired(inputs.neckIn.value, "neck");
+    const waistIn = parseRequired(inputs.waistIn.value, "waist");
+    const hipIn =
+      currentFormula === "female"
+        ? parseRequired(inputs.hipIn.value, "hip")
+        : undefined;
+    const weightLb = parseOptional(inputs.weightLb.value, "weight");
+
+    if (
+      heightFt === null ||
+      heightIn === null ||
+      neckIn === null ||
+      waistIn === null ||
+      hipIn === null ||
+      weightLb === null
+    ) {
+      return null;
+    }
+
+    if (heightIn >= 12) {
+      showFieldError(
+        "height",
+        "Enter a height in inches from 0 to less than 12.",
+      );
+      return null;
+    }
+
+    return {
+      formula: currentFormula,
+      heightCm: convertInToCm(heightFt * 12 + heightIn),
+      neckCm: convertInToCm(neckIn),
+      waistCm: convertInToCm(waistIn),
+      hipCm: hipIn === undefined ? undefined : convertInToCm(hipIn),
+      weightKg: weightLb === undefined ? undefined : convertLbToKg(weightLb),
+    };
+  }
+
+  function readInput() {
+    if (!currentFormula) {
+      showFormulaError();
+      return null;
+    }
+
+    const input =
+      currentUnit === "metric" ? readMetricInput() : readImperialInput();
+
+    if (!input) {
+      return null;
+    }
+
+    const validation = validateBodyFatInput(input);
+
+    if (!validation.isValid) {
+      Object.entries(validation.errors).forEach(([canonicalField, code]) => {
+        const field = fieldMap[canonicalField];
+        const message =
+          validationMessages[field]?.[code] ?? "Review this value.";
+        showFieldError(field, message);
+      });
+      return null;
+    }
+
+    return input;
+  }
+
+  function calculateAndRender({ focusResult = true } = {}) {
+    clearErrors();
+    const input = readInput();
+
+    if (!input) {
+      setInvalidResult("Review the highlighted fields before calculating.");
+      focusFirstError();
+      return;
+    }
+
+    try {
+      renderResult(calculateBodyFatResult(input), focusResult);
+    } catch (error) {
+      setInvalidResult(
+        "The result falls outside the usable range of this formula.",
+      );
+
+      if (error instanceof BodyFatCalculationError) {
+        showCalculationError(
+          error.code === "result_out_of_range"
+            ? "The result falls outside the usable range. Review where and how you took the measurements."
+            : error.message,
+        );
+      } else {
+        showCalculationError(
+          "Unable to calculate the estimate. Review your measurements.",
+        );
+      }
+    }
+  }
+
+  function renderResult(result, focusResult) {
+    currentResult = result;
+    resultHeading.textContent = "Your body fat estimate";
+    resultPlaceholder.classList.add("hidden");
+    resultContent.classList.remove("hidden");
+    mainResult.textContent = formatBodyFatPercentage(result.percentage);
+
+    if (result.sensitivity) {
+      sensitivity.textContent = `${formatBodyFatPercentage(result.sensitivity.minPercentage)} to ${formatBodyFatPercentage(result.sensitivity.maxPercentage)}`;
+      sensitivityNote.textContent =
+        "A conservative scenario if each circumference varied by up to ±1 cm; this is not a clinical confidence interval.";
+    } else {
+      sensitivity.textContent = "Not available";
+      sensitivityNote.textContent =
+        "A ±1 cm variation would produce a result outside the usable range. Review your measurements.";
+    }
+
+    const hasComposition = Boolean(result.composition);
+    compositionPanel.classList.toggle("hidden", !hasComposition);
+    compositionPanel.classList.toggle("grid", hasComposition);
+
+    if (result.composition) {
+      const unit = currentUnit === "metric" ? "kg" : "lb";
+      const fatValue =
+        currentUnit === "metric"
+          ? result.composition.fatMassKg
+          : convertKgToLb(result.composition.fatMassKg);
+      const fatFreeValue =
+        currentUnit === "metric"
+          ? result.composition.fatFreeMassKg
+          : convertKgToLb(result.composition.fatFreeMassKg);
+
+      fatMass.textContent = formatBodyFatMass(fatValue, unit);
+      fatFreeMass.textContent = formatBodyFatMass(fatFreeValue, unit);
+    }
+
+    unusualWarning.classList.toggle("hidden", !result.isUnusual);
+    formulaLabel.textContent = getBodyFatFormulaLabel(result.input.formula);
+    measurementSummary.textContent = formatBodyFatMeasurementSummary(
+      result.input,
+      currentUnit,
+    );
+    resultStatus.textContent =
+      `Calculation complete. Estimated percentage: ${formatBodyFatPercentage(result.percentage)}.`;
+
+    if (focusResult) {
+      resultHeading.focus({ preventScroll: true });
+      const reduceMotion = window.matchMedia(
+        "(prefers-reduced-motion: reduce)",
+      ).matches;
+      resultHeading.scrollIntoView({
+        behavior: reduceMotion ? "auto" : "smooth",
+        block: "start",
+      });
+    }
+  }
+
+  function setNeutralResult() {
+    currentResult = null;
+    resultHeading.textContent = "Your estimate will appear here";
+    placeholderText.textContent =
+      "Select a formula and enter your measurements. Weight is optional.";
+    resultPlaceholder.classList.remove("hidden");
+    resultContent.classList.add("hidden");
+    resultStatus.textContent = "";
+    copyStatus.textContent = "";
+    resetCopyLabel();
+  }
+
+  function setInvalidResult(message) {
+    currentResult = null;
+    resultHeading.textContent = "Review your information";
+    placeholderText.textContent = message;
+    resultPlaceholder.classList.remove("hidden");
+    resultContent.classList.add("hidden");
+    resultStatus.textContent = message;
+    copyStatus.textContent = "";
+    resetCopyLabel();
+  }
+
+  function focusFirstError() {
+    const formulaInvalid = !currentFormula;
+
+    if (formulaInvalid) {
+      formulaButtons[0]?.focus();
+      return;
+    }
+
+    const firstInvalid = form.querySelector('[aria-invalid="true"]');
+    firstInvalid?.focus();
+  }
+
+  function setFormula(formula) {
+    currentFormula = formula;
+    updateControls();
+    clearErrors();
+    setNeutralResult();
+  }
+
+  function switchUnit(nextUnit) {
+    if (nextUnit === currentUnit) {
+      return;
+    }
+
+    if (currentUnit === "metric") {
+      convertMetricInputsToImperial();
+    } else {
+      convertImperialInputsToMetric();
+    }
+
+    currentUnit = nextUnit;
+    updateControls();
+    clearErrors();
+    setNeutralResult();
+  }
+
+  function parseForConversion(value, options = {}) {
+    const parsed = parseHealthInput(value, options);
+    return parsed.ok ? parsed.value : undefined;
+  }
+
+  function convertMetricInputsToImperial() {
+    const heightCm = parseForConversion(inputs.heightCm.value, {
+      convertMetersToCentimeters: true,
+    });
+
+    if (heightCm !== undefined) {
+      const totalInches = convertCmToIn(heightCm);
+      const feet = Math.floor(totalInches / 12);
+      inputs.heightFt.value = String(feet);
+      inputs.heightIn.value = String(roundTo(totalInches - feet * 12, 1));
+    } else {
+      inputs.heightFt.value = "";
+      inputs.heightIn.value = "";
+    }
+
+    convertInput(inputs.neckCm, inputs.neckIn, convertCmToIn);
+    convertInput(inputs.waistCm, inputs.waistIn, convertCmToIn);
+    convertInput(inputs.hipCm, inputs.hipIn, convertCmToIn);
+    convertInput(inputs.weightKg, inputs.weightLb, convertKgToLb);
+  }
+
+  function convertImperialInputsToMetric() {
+    const feet = parseForConversion(inputs.heightFt.value, { maxDecimals: 0 });
+    const inches = parseForConversion(inputs.heightIn.value);
+
+    if (feet !== undefined && inches !== undefined) {
+      inputs.heightCm.value = String(roundTo(convertInToCm(feet * 12 + inches), 1));
+    } else {
+      inputs.heightCm.value = "";
+    }
+
+    convertInput(inputs.neckIn, inputs.neckCm, convertInToCm);
+    convertInput(inputs.waistIn, inputs.waistCm, convertInToCm);
+    convertInput(inputs.hipIn, inputs.hipCm, convertInToCm);
+    convertInput(inputs.weightLb, inputs.weightKg, convertLbToKg);
+  }
+
+  function convertInput(source, target, converter) {
+    if (!source.value.trim()) {
+      target.value = "";
+      return;
+    }
+
+    const value = parseForConversion(source.value);
+
+    if (value !== undefined) {
+      target.value = String(roundTo(converter(value), 1));
+    } else {
+      target.value = "";
+    }
+  }
+
+  function fillExample() {
+    currentFormula = "male";
+    currentUnit = "metric";
+    form.reset();
+    inputs.heightCm.value = "180";
+    inputs.neckCm.value = "40";
+    inputs.waistCm.value = "90";
+    inputs.weightKg.value = "80";
+    updateControls();
+    calculateAndRender();
+  }
+
+  function clearCalculator() {
+    currentFormula = null;
+    currentUnit = "metric";
+    form.reset();
+    updateControls();
+    clearErrors();
+    setNeutralResult();
+    formulaButtons[0]?.focus();
+  }
+
+  function resetCopyLabel() {
+    window.clearTimeout(copyResetTimeout);
+    copyLabel.textContent = "Copy result";
+  }
+
+  async function copyResult() {
+    if (!currentResult) {
+      return;
+    }
+
+    const text = buildBodyFatCopyText(currentResult, currentUnit);
+
+    try {
+      if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(text);
+      } else {
+        const textArea = document.createElement("textarea");
+        textArea.value = text;
+        textArea.setAttribute("readonly", "");
+        textArea.style.position = "fixed";
+        textArea.style.opacity = "0";
+        document.body.append(textArea);
+        textArea.select();
+        document.execCommand("copy");
+        textArea.remove();
+      }
+
+      copyLabel.textContent = "Result copied";
+      copyStatus.textContent = "Result copied to the clipboard.";
+    } catch {
+      copyLabel.textContent = "Unable to copy";
+      copyStatus.textContent = "Unable to copy the result.";
+    }
+
+    window.clearTimeout(copyResetTimeout);
+    copyResetTimeout = window.setTimeout(resetCopyLabel, 2500);
+  }
+
+  form.addEventListener("submit", (event) => {
+    event.preventDefault();
+    calculateAndRender();
+  });
+
+  formulaButtons.forEach((button) => {
+    button.addEventListener("click", () => {
+      setFormula(button.dataset.formulaOption);
+    });
+  });
+
+  unitButtons.forEach((button) => {
+    button.addEventListener("click", () => {
+      switchUnit(button.dataset.unitOption);
+    });
+  });
+
+  Object.values(inputs).forEach((input) => {
+    input.addEventListener("input", () => {
+      clearFieldError(input.dataset.field);
+      calculationError.textContent = "";
+      calculationError.classList.add("hidden");
+
+      if (currentResult) {
+        setNeutralResult();
+      }
+    });
+  });
+
+  fillExampleButton.addEventListener("click", fillExample);
+  clearButton.addEventListener("click", clearCalculator);
+  copyButton.addEventListener("click", copyResult);
+
+  updateControls();
+  setNeutralResult();
+</script>

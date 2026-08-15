@@ -1,0 +1,703 @@
+---
+import BaseLayout from "@layouts/BaseLayout.astro";
+import { buildAlternateLinks } from "@lib/i18n/routing";
+import AdSlot from "@components/ads/AdSlot.astro";
+import Container from "@components/layout/Container.astro";
+import PageShell from "@components/layout/PageShell.astro";
+import FaqSection from "@components/shared/FaqSection.astro";
+import PageHero from "@components/shared/PageHero.astro";
+import SectionIntro from "@components/shared/SectionIntro.astro";
+import { ONE_REP_MAX_PERCENTAGES } from "@lib/calculators/salud/calculadora-1rm-repeticion-maxima/oneRepMax.en";
+import { buildFaqJsonLd } from "@lib/seo";
+
+const title = "One-Rep Max Calculator: Estimate Your 1RM and Training Loads";
+const description =
+  "Estimate your one-rep max with the Epley and Brzycki formulas, compare their range, and calculate practical loads by repetitions or percentage.";
+const canonical = "/en/health/one-rep-max-calculator";
+const spanishCanonical = "/salud/calculadora-1rm-repeticion-maxima";
+const alternates = buildAlternateLinks({ es: spanishCanonical, en: canonical }, Astro.site ?? Astro.url);
+
+const faqs = [
+  {
+    question: "What is a one-rep max (1RM)?",
+    answer:
+      "It is the heaviest load a person can lift once in a specific exercise. This tool estimates it from a submaximal set.",
+  },
+  {
+    question: "Do I need to test my actual 1RM?",
+    answer:
+      "No. You can use a multi-repetition set to obtain a useful estimate without attempting a maximal load.",
+  },
+  {
+    question: "Which formula is better, Epley or Brzycki?",
+    answer:
+      "Neither is exact for every person and exercise. That is why we show both, highlight one as the primary estimate, and make the difference visible.",
+  },
+  {
+    question: "What does RIR mean?",
+    answer:
+      "RIR means repetitions in reserve: the number of additional repetitions you believe you could have completed with acceptable technique.",
+  },
+  {
+    question: "Why does the estimate change with high-repetition sets?",
+    answer:
+      "The formulas can diverge more, and muscular endurance has a greater influence when a set contains many repetitions.",
+  },
+  {
+    question: "What weight should I use for 8 or 10 repetitions?",
+    answer:
+      "The planner estimates a mathematical load and rounds it to your available increment. It is a reference, not a guarantee that you will complete those repetitions.",
+  },
+  {
+    question: "Why is the practical load different from the exact load?",
+    answer:
+      "The exact load may not be possible with your plates, dumbbells, or machine. The practical load is rounded to the increment you enter.",
+  },
+  {
+    question: "Is my 1RM the same for every exercise?",
+    answer:
+      "No. Technique, range of motion, equipment, fatigue, and experience affect the result. Calculate each exercise separately.",
+  },
+];
+
+const faqJsonLd = buildFaqJsonLd(faqs);
+---
+
+<BaseLayout title={title} description={description} canonical={canonical} locale="en" alternates={alternates}>
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={JSON.stringify(faqJsonLd)} />
+  </Fragment>
+
+  <PageShell>
+    <PageHero
+      title="One-Rep Max and Training Load Calculator"
+      description="Estimate your one-rep max, compare formulas, and turn the result into a practical training load."
+      kicker="Health"
+      collapseBreadcrumbOnMobile
+      containerClass="py-5 md:py-7"
+      breadcrumbs={[
+        { label: "Home", href: "/en", ariaLabel: "Home" },
+        { label: "Health", href: "/en/health", optional: true },
+        { label: "1RM Calculator", truncate: true },
+      ]}
+    />
+
+    <Container as="section" class="py-4 md:py-8">
+      <div class="mb-4 rounded-lg border border-sky-400/30 bg-sky-400/10 p-4 text-sm leading-relaxed text-sky-100/85">
+        You do not need to test your actual 1RM. Use a controlled set and treat
+        the result as a reference for planning loads.
+      </div>
+
+      <section
+        class="overflow-hidden rounded-lg border border-gray-700 bg-gray-950 shadow-xl shadow-gray-950/30"
+        aria-labelledby="one-rm-calculator-heading"
+      >
+        <div class="grid gap-0 xl:grid-cols-[minmax(0,0.86fr)_minmax(25rem,1.14fr)]">
+          <form class="p-4 sm:p-6" data-calculator-form novalidate>
+            <div>
+              <p class="text-sm font-semibold uppercase tracking-wide text-amber-400">
+                Your set
+              </p>
+              <h2 id="one-rm-calculator-heading" class="mt-2 text-2xl font-semibold">
+                Estimate your one-rep max
+              </h2>
+              <p class="mt-2 text-sm leading-relaxed text-gray-400">
+                Enter a recent set of the same exercise you want to analyze.
+              </p>
+            </div>
+
+            <fieldset class="mt-6">
+              <legend class="text-sm font-semibold text-gray-200">Unit</legend>
+              <div
+                class="mt-2 grid grid-cols-2 gap-2 rounded-lg border border-gray-700 bg-gray-900 p-1"
+                role="group"
+                aria-label="Weight unit"
+              >
+                <button class="min-h-12 rounded-md bg-amber-400 px-3 py-2 text-sm font-bold text-gray-950" type="button" aria-pressed="true" data-unit="kg">Kilograms</button>
+                <button class="min-h-12 rounded-md px-3 py-2 text-sm font-semibold text-gray-300" type="button" aria-pressed="false" data-unit="lb">Pounds</button>
+              </div>
+            </fieldset>
+
+            <div class="mt-5 grid gap-4 sm:grid-cols-2">
+              <div>
+                <label for="one-rm-weight" class="block text-sm font-semibold text-gray-200">
+                  Weight lifted
+                </label>
+                <div class="mt-2 flex rounded-lg border border-gray-700 bg-gray-900 focus-within:border-amber-400 focus-within:ring-3 focus-within:ring-amber-400/15" data-wrapper="weight">
+                  <input id="one-rm-weight" class="min-h-12 w-full bg-transparent px-4 text-base text-white outline-none" type="text" inputmode="decimal" autocomplete="off" placeholder="80" aria-describedby="one-rm-weight-error" data-input="weight" />
+                  <span class="flex items-center px-4 text-sm text-gray-500" data-unit-label>kg</span>
+                </div>
+                <p id="one-rm-weight-error" class="mt-2 hidden text-sm font-medium text-red-300" data-error="weight"></p>
+              </div>
+
+              <div>
+                <label for="one-rm-repetitions" class="block text-sm font-semibold text-gray-200">
+                  Repetitions completed
+                </label>
+                <div class="mt-2 flex rounded-lg border border-gray-700 bg-gray-900 focus-within:border-amber-400 focus-within:ring-3 focus-within:ring-amber-400/15" data-wrapper="repetitions">
+                  <input id="one-rm-repetitions" class="min-h-12 w-full bg-transparent px-4 text-base text-white outline-none" type="text" inputmode="numeric" autocomplete="off" value="5" aria-describedby="one-rm-repetitions-error" data-input="repetitions" />
+                  <span class="flex items-center px-4 text-sm text-gray-500">reps</span>
+                </div>
+                <p id="one-rm-repetitions-error" class="mt-2 hidden text-sm font-medium text-red-300" data-error="repetitions"></p>
+              </div>
+            </div>
+
+            <div class="mt-5">
+              <label for="one-rm-rir" class="block text-sm font-semibold text-gray-200">
+                How many more repetitions could you have completed?
+              </label>
+              <select id="one-rm-rir" class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-900 px-4 text-base text-white outline-none focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15" aria-describedby="one-rm-rir-help" data-input="rir">
+                <option value="unknown">I don't know</option>
+                <option value="0">0, no more with good technique</option>
+                <option value="1">1 more repetition</option>
+                <option value="2">2 more repetitions</option>
+                <option value="3+">3 or more</option>
+              </select>
+              <p id="one-rm-rir-help" class="mt-2 text-xs leading-relaxed text-gray-500">
+                This is known as RIR, or repetitions in reserve. If you are
+                unsure, leave “I don't know” selected.
+              </p>
+            </div>
+
+            <details class="mt-5 rounded-lg border border-gray-700 bg-gray-900/60">
+              <summary class="cursor-pointer px-4 py-3 text-sm font-semibold text-gray-200">
+                Advanced options
+              </summary>
+              <div class="grid gap-4 border-t border-gray-800 p-4 sm:grid-cols-2">
+                <div>
+                  <label for="one-rm-formula" class="block text-sm font-semibold text-gray-200">
+                    Primary formula
+                  </label>
+                  <select id="one-rm-formula" class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-950 px-4 text-base text-white outline-none focus:border-amber-400" data-input="formula">
+                    <option value="epley">Epley</option>
+                    <option value="brzycki">Brzycki</option>
+                  </select>
+                </div>
+                <div>
+                  <label for="one-rm-increment" class="block text-sm font-semibold text-gray-200">
+                    Available increment
+                  </label>
+                  <div class="mt-2 flex rounded-lg border border-gray-700 bg-gray-950 focus-within:border-amber-400" data-wrapper="increment">
+                    <input id="one-rm-increment" class="min-h-12 w-full bg-transparent px-4 text-base text-white outline-none" type="text" inputmode="decimal" value="2.5" aria-describedby="one-rm-increment-error" data-input="increment" />
+                    <span class="flex items-center px-4 text-sm text-gray-500" data-unit-label>kg</span>
+                  </div>
+                  <p id="one-rm-increment-error" class="mt-2 hidden text-sm font-medium text-red-300" data-error="increment"></p>
+                </div>
+              </div>
+            </details>
+
+            <p class="mt-4 hidden rounded-lg border border-red-400/30 bg-red-400/10 p-3 text-sm font-medium text-red-200" role="alert" data-general-error></p>
+
+            <div class="mt-6 grid gap-3 sm:grid-cols-3">
+              <button class="min-h-12 rounded-lg bg-amber-400 px-5 py-3 text-sm font-bold text-gray-950 transition hover:bg-amber-300 sm:col-span-3" type="submit">
+                Calculate my 1RM
+              </button>
+              <button class="min-h-12 rounded-lg border border-gray-700 px-4 py-3 text-sm font-semibold text-gray-200 transition hover:bg-gray-900 sm:col-span-2" type="button" data-example>
+                Try an example
+              </button>
+              <button class="min-h-12 rounded-lg border border-gray-700 px-4 py-3 text-sm font-semibold text-gray-300 transition hover:bg-gray-900" type="reset">
+                Clear
+              </button>
+            </div>
+          </form>
+
+          <aside class="border-t border-gray-800 bg-gray-900/45 p-4 sm:p-6 xl:border-l xl:border-t-0">
+            <div data-empty-result>
+              <p class="text-sm font-semibold uppercase tracking-wide text-amber-400">Result</p>
+              <h2 class="mt-2 text-2xl font-semibold text-white">Your estimate will appear here</h2>
+              <p class="mt-3 text-sm leading-relaxed text-gray-400">
+                You will see both formulas, contextual quality, and loads you
+                can assemble with the available increment.
+              </p>
+            </div>
+
+            <div class="hidden" aria-live="polite" data-result>
+              <p class="text-sm font-semibold uppercase tracking-wide text-amber-400" data-result-kicker>
+                Estimated 1RM
+              </p>
+              <h2 class="mt-2 text-5xl font-bold tracking-tight text-white outline-none" tabindex="-1" data-result-heading></h2>
+              <p class="mt-2 text-sm leading-relaxed text-gray-400" data-result-basis></p>
+
+              <div class="mt-4 flex flex-wrap items-center gap-2">
+                <span class="rounded-full border px-3 py-1 text-sm font-semibold" data-quality></span>
+                <span class="rounded-full border border-gray-700 px-3 py-1 text-sm text-gray-300" data-formula-label></span>
+              </div>
+
+              <div class="mt-5 grid gap-3 sm:grid-cols-2">
+                <div class="rounded-lg border border-gray-700 bg-gray-950/70 p-4">
+                  <p class="text-xs font-semibold uppercase tracking-wide text-gray-500">Range between formulas</p>
+                  <p class="mt-2 text-xl font-semibold text-white" data-range></p>
+                  <p class="mt-1 text-xs leading-relaxed text-gray-500" data-difference></p>
+                </div>
+                <div class="rounded-lg border border-gray-700 bg-gray-950/70 p-4">
+                  <p class="text-xs font-semibold uppercase tracking-wide text-gray-500">Comparison</p>
+                  <dl class="mt-2 space-y-2 text-sm">
+                    <div class="flex justify-between gap-3"><dt class="text-gray-400">Epley</dt><dd class="font-semibold text-white" data-epley></dd></div>
+                    <div class="flex justify-between gap-3"><dt class="text-gray-400">Brzycki</dt><dd class="font-semibold text-white" data-brzycki></dd></div>
+                  </dl>
+                </div>
+              </div>
+
+              <div class="mt-4 hidden space-y-2" data-warnings></div>
+
+              <section class="mt-6 border-t border-gray-800 pt-6" aria-labelledby="planner-heading">
+                <p class="text-sm font-semibold uppercase tracking-wide text-sky-300">Next step</p>
+                <h3 id="planner-heading" class="mt-2 text-xl font-semibold text-white">
+                  Choose your next load
+                </h3>
+                <div class="mt-4 grid grid-cols-2 gap-2 rounded-lg border border-gray-700 bg-gray-950 p-1" role="group" aria-label="Planner mode">
+                  <button class="min-h-12 rounded-md bg-sky-400 px-2 py-2 text-sm font-bold text-gray-950" type="button" aria-pressed="true" data-planner-mode="repetitions">By repetitions</button>
+                  <button class="min-h-12 rounded-md px-2 py-2 text-sm font-semibold text-gray-300" type="button" aria-pressed="false" data-planner-mode="percentage">By percentage</button>
+                </div>
+
+                <div class="mt-4">
+                  <label for="planner-target" class="block text-sm font-semibold text-gray-200" data-planner-label>Target repetitions</label>
+                  <div class="mt-2 flex rounded-lg border border-gray-700 bg-gray-950 focus-within:border-sky-400">
+                    <input id="planner-target" class="min-h-12 w-full bg-transparent px-4 text-base text-white outline-none" type="text" inputmode="numeric" value="8" data-planner-target />
+                    <span class="flex items-center px-4 text-sm text-gray-500" data-planner-suffix>reps</span>
+                  </div>
+                  <p class="mt-2 hidden text-sm font-medium text-red-300" data-planner-error></p>
+                </div>
+
+                <div class="mt-4 rounded-lg border border-sky-400/30 bg-sky-400/10 p-4">
+                  <p class="text-xs font-semibold uppercase tracking-wide text-sky-200">Nearest practical load</p>
+                  <p class="mt-2 text-4xl font-bold text-white" data-planner-nearest></p>
+                  <p class="mt-2 text-sm text-sky-100/75" data-planner-exact></p>
+                  <p class="mt-2 hidden text-sm text-sky-100/75" data-planner-lower></p>
+                  <p class="mt-3 text-xs leading-relaxed text-sky-100/65">
+                    This is a mathematical reference; it does not guarantee
+                    that you will complete the selected repetitions.
+                  </p>
+                </div>
+              </section>
+
+              <section class="mt-6 border-t border-gray-800 pt-6" aria-labelledby="percentage-loads-heading">
+                <h3 id="percentage-loads-heading" class="text-lg font-semibold text-white">
+                  Loads by percentage
+                </h3>
+                <div class="mt-3 overflow-hidden rounded-lg border border-gray-700">
+                  <div class="grid grid-cols-[4rem_minmax(0,1fr)_minmax(0,1fr)] bg-gray-950 px-3 py-2 text-xs font-semibold uppercase tracking-wide text-gray-500">
+                    <span>%</span><span>Practical</span><span>Exact</span>
+                  </div>
+                  <div class="divide-y divide-gray-800" data-percentage-loads>
+                    {ONE_REP_MAX_PERCENTAGES.map((percentage) => (
+                      <div class="grid grid-cols-[4rem_minmax(0,1fr)_minmax(0,1fr)] px-3 py-3 text-sm" data-percentage-row={percentage}>
+                        <span class="font-semibold text-amber-300">{percentage}%</span>
+                        <span class="font-semibold text-white" data-percentage-nearest></span>
+                        <span class="text-gray-400" data-percentage-exact></span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </section>
+
+              <div class="mt-6 grid gap-2 sm:grid-cols-2">
+                <button class="min-h-12 rounded-lg border border-amber-400/50 px-4 py-3 text-sm font-semibold text-amber-200 transition hover:bg-amber-400/10" type="button" data-copy>
+                  Copy result
+                </button>
+                <button class="min-h-12 rounded-lg border border-gray-700 px-4 py-3 text-sm font-semibold text-gray-300 transition hover:bg-gray-800" type="button" data-result-clear>
+                  New calculation
+                </button>
+              </div>
+              <p class="sr-only" aria-live="polite" data-copy-status></p>
+            </div>
+          </aside>
+        </div>
+      </section>
+    </Container>
+
+    <AdSlot placement="calculator-after-tool" />
+
+    <Container as="section" class="py-8 md:py-12">
+      <SectionIntro
+        title="How to interpret the result"
+        description="The calculated 1RM is a decision-making reference, not an exact measurement or a guaranteed load."
+      />
+      <div class="mt-6 grid gap-4 md:grid-cols-3">
+        <article class="rounded-lg border border-gray-800 bg-gray-950/60 p-5">
+          <h3 class="font-semibold text-white">The set matters</h3>
+          <p class="mt-2 text-sm leading-relaxed text-gray-400">A lower-repetition set and a clear RIR estimate usually provide a more useful basis.</p>
+        </article>
+        <article class="rounded-lg border border-gray-800 bg-gray-950/60 p-5">
+          <h3 class="font-semibold text-white">The range shows the difference</h3>
+          <p class="mt-2 text-sm leading-relaxed text-gray-400">Epley and Brzycki do not always agree. The displayed range is not a statistical confidence interval.</p>
+        </article>
+        <article class="rounded-lg border border-gray-800 bg-gray-950/60 p-5">
+          <h3 class="font-semibold text-white">The practical load is usable</h3>
+          <p class="mt-2 text-sm leading-relaxed text-gray-400">We round the mathematical load to your available increment and show a lower alternative when appropriate.</p>
+        </article>
+      </div>
+    </Container>
+
+    <Container as="section" class="py-8 md:py-12">
+      <SectionIntro
+        title="Methodology and safety"
+        description="The tool combines two established equations and explains their limits to avoid false precision."
+      />
+      <div class="mt-6 grid gap-4 lg:grid-cols-2">
+        <article class="rounded-lg border border-gray-800 bg-gray-950/60 p-5">
+          <h3 class="font-semibold text-white">Formulas used</h3>
+          <p class="mt-3 text-sm leading-relaxed text-gray-400"><strong class="text-gray-200">Epley:</strong> weight × (1 + effective repetitions / 30).</p>
+          <p class="mt-2 text-sm leading-relaxed text-gray-400"><strong class="text-gray-200">Brzycki:</strong> weight × 36 / (37 - effective repetitions).</p>
+          <p class="mt-3 text-sm leading-relaxed text-gray-400">If you know your RIR and it is between 0 and 2, it is added to the completed repetitions to better represent the set's capacity.</p>
+        </article>
+        <article class="rounded-lg border border-amber-400/25 bg-amber-400/10 p-5">
+          <h3 class="font-semibold text-amber-100">Train with context</h3>
+          <p class="mt-3 text-sm leading-relaxed text-amber-50/75">
+            Prioritize controlled technique, a proper warm-up, gradual
+            progression, and supervision when the exercise requires it. Fatigue,
+            exercise selection, range of motion, and experience can change the result.
+          </p>
+        </article>
+      </div>
+    </Container>
+
+    <FaqSection faqs={faqs} />
+  </PageShell>
+</BaseLayout>
+
+<script>
+  import {
+    FORMULA_LABELS,
+    QUALITY_LABELS,
+    buildOneRepMaxCopyText,
+    calculateOneRepMaxResult,
+    calculatePercentageLoad,
+    calculateTargetRepetitionLoad,
+    convertWeight,
+    formatWeight,
+    parseWeightInput,
+    type OneRepMaxFormula,
+    type OneRepMaxResult,
+    type PlannerSelection,
+    type RirValue,
+    type WeightUnit,
+  } from "@lib/calculators/salud/calculadora-1rm-repeticion-maxima/oneRepMax.en";
+
+  const form = document.querySelector<HTMLFormElement>("[data-calculator-form]");
+
+  if (form) {
+    const pageQuery = <T extends Element>(selector: string) =>
+      document.querySelector<T>(selector);
+    const weightInput = form.querySelector<HTMLInputElement>('[data-input="weight"]')!;
+    const repetitionsInput = form.querySelector<HTMLInputElement>('[data-input="repetitions"]')!;
+    const rirInput = form.querySelector<HTMLSelectElement>('[data-input="rir"]')!;
+    const formulaInput = form.querySelector<HTMLSelectElement>('[data-input="formula"]')!;
+    const incrementInput = form.querySelector<HTMLInputElement>('[data-input="increment"]')!;
+    const resultPanel = pageQuery<HTMLElement>("[data-result]")!;
+    const emptyResult = pageQuery<HTMLElement>("[data-empty-result]")!;
+    const plannerTarget = pageQuery<HTMLInputElement>("[data-planner-target]")!;
+    let unit: WeightUnit = "kg";
+    let plannerMode: PlannerSelection["mode"] = "repetitions";
+    let currentResult: OneRepMaxResult | undefined;
+    let currentPlanner: PlannerSelection | undefined;
+    let canonicalWeightKg: number | undefined;
+    let canonicalIncrementKg: number | undefined = 2.5;
+
+    const warningMessages = {
+      high_repetitions:
+        "With more than 10 effective repetitions, the formulas generally provide less consistent estimates.",
+      unknown_rir:
+        "We do not know how close the set was to technical failure, so treat the result with greater caution.",
+      far_from_failure:
+        "The set stopped well short of technical failure and probably underestimates your 1RM.",
+      formulas_diverge:
+        "The formulas differ by at least 5%. The range is more useful than a single figure.",
+    };
+    const qualityClasses = {
+      lifted: ["border-emerald-400/40", "bg-emerald-400/10", "text-emerald-200"],
+      better: ["border-emerald-400/40", "bg-emerald-400/10", "text-emerald-200"],
+      orientation: ["border-amber-400/40", "bg-amber-400/10", "text-amber-200"],
+      low: ["border-orange-400/40", "bg-orange-400/10", "text-orange-200"],
+    };
+
+    function readInput() {
+      const weight = parseWeightInput(weightInput.value);
+      const increment = parseWeightInput(incrementInput.value);
+      return {
+        weight: weight ?? Number.NaN,
+        unit,
+        repetitions: Number(repetitionsInput.value),
+        rir: parseRir(rirInput.value),
+        increment: increment ?? Number.NaN,
+        primaryFormula: formulaInput.value as OneRepMaxFormula,
+      };
+    }
+
+    function parseRir(value: string): RirValue {
+      if (value === "0" || value === "1" || value === "2") return Number(value) as 0 | 1 | 2;
+      return value as RirValue;
+    }
+
+    function clearErrors() {
+      document.querySelectorAll<HTMLElement>("[data-error]").forEach((element) => {
+        element.textContent = "";
+        element.classList.add("hidden");
+      });
+      form.querySelectorAll<HTMLElement>("[data-wrapper]").forEach((element) => {
+        element.classList.remove("border-red-400");
+      });
+      pageQuery<HTMLElement>("[data-general-error]")!.classList.add("hidden");
+    }
+
+    function showError(field: "weight" | "repetitions" | "increment", message: string) {
+      const error = pageQuery<HTMLElement>(`[data-error="${field}"]`)!;
+      error.textContent = message;
+      error.classList.remove("hidden");
+      form.querySelector<HTMLElement>(`[data-wrapper="${field}"]`)?.classList.add("border-red-400");
+    }
+
+    function validateAndCalculate(focusResult = true) {
+      clearErrors();
+      const displayedInput = readInput();
+      const weightKg =
+        canonicalWeightKg ??
+        convertWeight(displayedInput.weight, unit, "kg");
+      const incrementKg =
+        canonicalIncrementKg ??
+        convertWeight(displayedInput.increment, unit, "kg");
+      let valid = true;
+
+      if (!Number.isFinite(displayedInput.weight) || weightKg < 0.5 || weightKg > 2000) {
+        showError("weight", "Enter a valid weight between 0.5 and 2,000 kg, or the equivalent.");
+        valid = false;
+      }
+      if (!Number.isInteger(displayedInput.repetitions) || displayedInput.repetitions < 1 || displayedInput.repetitions > 15) {
+        showError("repetitions", "Enter a whole number of repetitions between 1 and 15.");
+        valid = false;
+      }
+      if (!Number.isFinite(displayedInput.increment) || incrementKg < 0.1 || incrementKg > 100) {
+        showError("increment", "Enter a valid positive increment.");
+        valid = false;
+      }
+
+      if (!valid) {
+        resultPanel.classList.add("hidden");
+        emptyResult.classList.remove("hidden");
+        form.querySelector<HTMLElement>('[data-wrapper].border-red-400 input')?.focus();
+        return;
+      }
+
+      canonicalWeightKg = weightKg;
+      canonicalIncrementKg = incrementKg;
+      renderResult(
+        calculateOneRepMaxResult({
+          ...displayedInput,
+          weight: convertWeight(weightKg, "kg", unit),
+          increment: convertWeight(incrementKg, "kg", unit),
+        }),
+        focusResult,
+      );
+    }
+
+    function renderResult(result: OneRepMaxResult, focusResult: boolean) {
+      currentResult = result;
+      emptyResult.classList.add("hidden");
+      resultPanel.classList.remove("hidden");
+      const isLifted = result.quality === "lifted";
+      pageQuery<HTMLElement>("[data-result-kicker]")!.textContent = isLifted ? "Actual 1RM lifted" : "Estimated 1RM";
+      pageQuery<HTMLElement>("[data-result-heading]")!.textContent = formatWeight(result.estimate.primary, unit);
+      pageQuery<HTMLElement>("[data-result-basis]")!.textContent =
+        `Based on ${formatWeight(result.input.weight, unit)} × ${result.input.repetitions} repetitions. ${result.effectiveRepetitions !== result.input.repetitions ? `${result.effectiveRepetitions} effective repetitions were used based on the reported RIR.` : ""}`;
+      pageQuery<HTMLElement>("[data-formula-label]")!.textContent = `Primary: ${FORMULA_LABELS[result.input.primaryFormula]}`;
+      pageQuery<HTMLElement>("[data-range]")!.textContent = `${formatWeight(result.estimate.min, unit)}-${formatWeight(result.estimate.max, unit)}`;
+      pageQuery<HTMLElement>("[data-difference]")!.textContent = `Relative difference: ${result.estimate.differencePercent.toFixed(1)}%`;
+      pageQuery<HTMLElement>("[data-epley]")!.textContent = formatWeight(result.estimate.epley, unit);
+      pageQuery<HTMLElement>("[data-brzycki]")!.textContent = formatWeight(result.estimate.brzycki, unit);
+
+      const quality = pageQuery<HTMLElement>("[data-quality]")!;
+      quality.className = "rounded-full border px-3 py-1 text-sm font-semibold";
+      qualityClasses[result.quality].forEach((className) => quality.classList.add(className));
+      quality.textContent = QUALITY_LABELS[result.quality];
+
+      const warnings = pageQuery<HTMLElement>("[data-warnings]")!;
+      warnings.innerHTML = "";
+      result.warnings.forEach((warning) => {
+        const item = document.createElement("p");
+        item.className = "rounded-lg border border-orange-400/25 bg-orange-400/10 p-3 text-sm leading-relaxed text-orange-100/85";
+        item.textContent = warningMessages[warning];
+        warnings.append(item);
+      });
+      warnings.classList.toggle("hidden", result.warnings.length === 0);
+
+      result.percentageLoads.forEach((load) => {
+        const row = pageQuery<HTMLElement>(`[data-percentage-row="${load.percentage}"]`)!;
+        row.querySelector<HTMLElement>("[data-percentage-nearest]")!.textContent = formatWeight(load.nearest, unit);
+        row.querySelector<HTMLElement>("[data-percentage-exact]")!.textContent = formatWeight(load.exact, unit);
+      });
+
+      renderPlanner();
+      if (focusResult) {
+        const heading = pageQuery<HTMLElement>("[data-result-heading]")!;
+        heading.focus({ preventScroll: true });
+        heading.scrollIntoView({
+          behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth",
+          block: "start",
+        });
+      }
+    }
+
+    function renderPlanner() {
+      if (!currentResult) return;
+      const target = Number(plannerTarget.value);
+      const error = pageQuery<HTMLElement>("[data-planner-error]")!;
+      error.classList.add("hidden");
+
+      try {
+        const load =
+          plannerMode === "repetitions"
+            ? calculateTargetRepetitionLoad(
+                currentResult.estimate.primary,
+                target,
+                currentResult.input.primaryFormula,
+                currentResult.input.increment,
+              )
+            : calculatePercentageLoad(
+                currentResult.estimate.primary,
+                target,
+                currentResult.input.increment,
+              );
+        currentPlanner = { mode: plannerMode, target, load };
+        pageQuery<HTMLElement>("[data-planner-nearest]")!.textContent = formatWeight(load.nearest, unit);
+        pageQuery<HTMLElement>("[data-planner-exact]")!.textContent = `Mathematical load: ${formatWeight(load.exact, unit)} using ${FORMULA_LABELS[currentResult.input.primaryFormula]}.`;
+        const lower = pageQuery<HTMLElement>("[data-planner-lower]")!;
+        lower.classList.toggle("hidden", !load.nearestRoundsUp);
+        lower.textContent = load.nearestRoundsUp
+          ? `Lower conservative alternative: ${formatWeight(load.lower, unit)}.`
+          : "";
+      } catch {
+        currentPlanner = undefined;
+        error.textContent =
+          plannerMode === "repetitions"
+            ? "Use a whole number between 1 and 15."
+            : "Use a percentage between 40 and 100.";
+        error.classList.remove("hidden");
+      }
+    }
+
+    function setUnit(nextUnit: WeightUnit) {
+      if (nextUnit === unit) return;
+      const displayedWeight = parseWeightInput(weightInput.value);
+      const displayedIncrement = parseWeightInput(incrementInput.value);
+      if (canonicalWeightKg === undefined && displayedWeight !== undefined) {
+        canonicalWeightKg = convertWeight(displayedWeight, unit, "kg");
+      }
+      if (canonicalIncrementKg === undefined && displayedIncrement !== undefined) {
+        canonicalIncrementKg = convertWeight(displayedIncrement, unit, "kg");
+      }
+      unit = nextUnit;
+      if (canonicalWeightKg !== undefined) weightInput.value = displayInput(convertWeight(canonicalWeightKg, "kg", unit));
+      if (canonicalIncrementKg !== undefined) {
+        incrementInput.value = displayInput(convertWeight(canonicalIncrementKg, "kg", unit));
+      }
+      document.querySelectorAll<HTMLElement>("[data-unit-label]").forEach((label) => label.textContent = unit);
+      form.querySelectorAll<HTMLButtonElement>("[data-unit]").forEach((button) => {
+        const selected = button.dataset.unit === unit;
+        button.setAttribute("aria-pressed", String(selected));
+        button.classList.toggle("bg-amber-400", selected);
+        button.classList.toggle("text-gray-950", selected);
+        button.classList.toggle("font-bold", selected);
+        button.classList.toggle("text-gray-300", !selected);
+      });
+      if (currentResult) validateAndCalculate(false);
+    }
+
+    function setPlannerMode(mode: PlannerSelection["mode"]) {
+      plannerMode = mode;
+      plannerTarget.value = mode === "repetitions" ? "8" : "80";
+      pageQuery<HTMLElement>("[data-planner-label]")!.textContent =
+        mode === "repetitions" ? "Target repetitions" : "Target percentage";
+      pageQuery<HTMLElement>("[data-planner-suffix]")!.textContent =
+        mode === "repetitions" ? "reps" : "%";
+      document.querySelectorAll<HTMLButtonElement>("[data-planner-mode]").forEach((button) => {
+        const selected = button.dataset.plannerMode === mode;
+        button.setAttribute("aria-pressed", String(selected));
+        button.classList.toggle("bg-sky-400", selected);
+        button.classList.toggle("text-gray-950", selected);
+        button.classList.toggle("font-bold", selected);
+        button.classList.toggle("text-gray-300", !selected);
+      });
+      renderPlanner();
+    }
+
+    function displayInput(value: number) {
+      return Number(value.toFixed(unit === "kg" ? 2 : 1)).toString();
+    }
+
+    function clearCalculator() {
+      unit = "kg";
+      plannerMode = "repetitions";
+      currentResult = undefined;
+      currentPlanner = undefined;
+      canonicalWeightKg = undefined;
+      canonicalIncrementKg = 2.5;
+      weightInput.value = "";
+      repetitionsInput.value = "5";
+      rirInput.value = "unknown";
+      formulaInput.value = "epley";
+      incrementInput.value = "2.5";
+      plannerTarget.value = "8";
+      clearErrors();
+      resultPanel.classList.add("hidden");
+      emptyResult.classList.remove("hidden");
+      document.querySelectorAll<HTMLElement>("[data-unit-label]").forEach((label) => label.textContent = "kg");
+      form.querySelectorAll<HTMLButtonElement>("[data-unit]").forEach((button) => {
+        const selected = button.dataset.unit === "kg";
+        button.setAttribute("aria-pressed", String(selected));
+        button.classList.toggle("bg-amber-400", selected);
+        button.classList.toggle("text-gray-950", selected);
+        button.classList.toggle("font-bold", selected);
+        button.classList.toggle("text-gray-300", !selected);
+      });
+      setPlannerMode("repetitions");
+      weightInput.focus();
+    }
+
+    form.addEventListener("submit", (event) => {
+      event.preventDefault();
+      validateAndCalculate();
+    });
+    form.addEventListener("reset", (event) => {
+      event.preventDefault();
+      clearCalculator();
+    });
+    form.querySelectorAll<HTMLButtonElement>("[data-unit]").forEach((button) => {
+      button.addEventListener("click", () => setUnit(button.dataset.unit as WeightUnit));
+    });
+    form.querySelector<HTMLButtonElement>("[data-example]")!.addEventListener("click", () => {
+      if (unit !== "kg") setUnit("kg");
+      canonicalWeightKg = 80;
+      canonicalIncrementKg = 2.5;
+      weightInput.value = "80";
+      repetitionsInput.value = "5";
+      rirInput.value = "0";
+      formulaInput.value = "epley";
+      incrementInput.value = "2.5";
+      plannerTarget.value = "8";
+      validateAndCalculate();
+    });
+    pageQuery<HTMLButtonElement>("[data-result-clear]")!.addEventListener("click", clearCalculator);
+    document.querySelectorAll<HTMLButtonElement>("[data-planner-mode]").forEach((button) => {
+      button.addEventListener("click", () => setPlannerMode(button.dataset.plannerMode as PlannerSelection["mode"]));
+    });
+    plannerTarget.addEventListener("input", renderPlanner);
+    weightInput.addEventListener("input", () => {
+      canonicalWeightKg = undefined;
+    });
+    incrementInput.addEventListener("input", () => {
+      canonicalIncrementKg = undefined;
+    });
+    incrementInput.addEventListener("change", () => currentResult && validateAndCalculate(false));
+    formulaInput.addEventListener("change", () => currentResult && validateAndCalculate(false));
+    pageQuery<HTMLButtonElement>("[data-copy]")!.addEventListener("click", async () => {
+      if (!currentResult) return;
+      const status = pageQuery<HTMLElement>("[data-copy-status]")!;
+      try {
+        await navigator.clipboard.writeText(buildOneRepMaxCopyText(currentResult, currentPlanner));
+        status.textContent = "Result copied.";
+      } catch {
+        status.textContent = "The result could not be copied.";
+      }
+    });
+  }
+</script>

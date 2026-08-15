@@ -1,0 +1,964 @@
+---
+import AdSlot from "@components/ads/AdSlot.astro";
+import Container from "@components/layout/Container.astro";
+import PageShell from "@components/layout/PageShell.astro";
+import FaqSection from "@components/shared/FaqSection.astro";
+import PageHero from "@components/shared/PageHero.astro";
+import SectionIntro from "@components/shared/SectionIntro.astro";
+import BaseLayout from "@layouts/BaseLayout.astro";
+import {
+  VACATION_CANONICAL_PATH,
+  VACATION_ENGLISH_CANONICAL_PATH,
+} from "@lib/calculators/legal-impuestos/calculadora-vacaciones-proporcionales/proportionalVacation";
+import { MEXICO_VACATION_RULE_2023 } from "@lib/calculators/legal-impuestos/calculadora-vacaciones-proporcionales/rules/mx/2023";
+import type { Locale } from "@lib/i18n/config";
+import { buildAlternateLinks } from "@lib/i18n/routing";
+import { buildFaqJsonLd } from "@lib/seo";
+
+interface Props {
+  locale?: Locale;
+}
+
+const { locale = "es" } = Astro.props;
+const isEnglish = locale === "en";
+const canonical = isEnglish
+  ? VACATION_ENGLISH_CANONICAL_PATH
+  : VACATION_CANONICAL_PATH;
+const alternates = buildAlternateLinks(
+  {
+    es: VACATION_CANONICAL_PATH,
+    en: VACATION_ENGLISH_CANONICAL_PATH,
+  },
+  Astro.site ?? Astro.url,
+);
+const copy = isEnglish
+  ? {
+      title: "Proportional vacation calculator for Mexico",
+      metaTitle: "Mexico proportional vacation calculator",
+      description:
+        "Estimate vested vacation days or proportional vacation for a final settlement under Mexico's Federal Labor Law.",
+      hero:
+        "Separate vested days from progress toward your next work anniversary and see the calculation step by step.",
+      category: "Legal & Taxes",
+      categoryHref: "/en/legal-tax",
+      breadcrumb: "Proportional vacation",
+      step: "Step 1 · Your situation",
+      formTitle: "What do you want to estimate?",
+      formDescription:
+        "Choose a situation first. The proportional amount has a different meaning when employment ends.",
+      active: "I'm still employed",
+      activeHelp: "See vested days and progress toward your next anniversary.",
+      ended: "My employment ended",
+      endedHelp: "Estimate proportional days that may be part of a final settlement.",
+      scope:
+        "This estimate uses Mexico's Federal Labor Law for continuous private-sector employment.",
+      scopeMore: "When does it not apply?",
+      scopeDetail:
+        "Public employment, seasonal or discontinuous work, special regimes, absences and historical balances may require a different calculation.",
+      hireDate: "Employment start date",
+      endDateActive: "Calculation date",
+      endDateEnded: "Last day worked",
+      inclusive: "The selected day is included.",
+      prior: "Balance before the latest anniversary",
+      priorHelp:
+        "Use a balance supported by an employer record. We cannot reconstruct it from the start date alone.",
+      used: "Days taken or already paid since then",
+      advanced: "Advanced options",
+      optional: "Optional",
+      contractToggle: "My contract grants more vacation days",
+      contractHelp:
+        "Legal minimums will appear after valid dates are entered.",
+      lastEntitlement: "Days for the last completed service year",
+      currentEntitlement: "Days for the current service year",
+      calculate: "Calculate vacation",
+      clear: "Clear",
+      result: "Result",
+      neutral: "Enter your start date to begin.",
+      sourceLabel: "Mexico · Federal Labor Law · current legal minimum",
+      reviewed: "Sources reviewed",
+      copyResult: "Copy result",
+      copied: "Copied",
+      formulaTitle: "How it was calculated",
+      formulaEmpty: "The dates and substituted values will appear here.",
+      disclaimer:
+        "Informational estimate only. It is not a binding decision or legal advice.",
+      firstYearLabel: "Progress toward your first vacation period",
+      availableLabel: "Estimated available balance",
+      terminationLabel: "Estimated vacation for final settlement",
+      workingDays: "working days",
+      notVested:
+        "This is informational progress; it is not shown as currently available vacation.",
+      terminationNote:
+        "Salary, vacation premium and other settlement items are not included.",
+      completedYears: "Completed years",
+      acquired: "Latest vested entitlement",
+      priorMetric: "Prior balance entered",
+      usedMetric: "Days taken or paid",
+      progress: "Current-cycle progress",
+      advancedMetric: "Days advanced or paid in excess",
+      nextAnniversary: "Next anniversary",
+      cycle: "Current cycle",
+      legalRule: "Legal rule",
+      legalRuleText:
+        "The general minimum is 12 working days after the first service year, increasing with seniority under article 76.",
+      interpretation: "Understand your result",
+      interpretationText:
+        "A vested balance and proportional progress are different. While you remain employed, progress toward the next anniversary is shown separately. When employment ends, it is included as a proportional estimate.",
+      tableTitle: "Current minimum vacation table",
+      tableDescription:
+        "The first five service years grant 12, 14, 16, 18 and 20 working days. Years 6–10 grant 22 days, then two more days per five-year block.",
+    }
+  : {
+      title: "Calculadora de vacaciones proporcionales",
+      metaTitle: "Calculadora de vacaciones proporcionales en México",
+      description:
+        "Estima vacaciones adquiridas o la parte proporcional para finiquito según tu antigüedad y la Ley Federal del Trabajo de México.",
+      hero:
+        "Separa los días adquiridos del avance hacia tu próximo aniversario y revisa el cálculo paso a paso.",
+      category: "Legal e impuestos",
+      categoryHref: "/legal-impuestos",
+      breadcrumb: "Vacaciones proporcionales",
+      step: "Paso 1 · Tu situación",
+      formTitle: "¿Qué quieres estimar?",
+      formDescription:
+        "Elige primero tu situación. La parte proporcional tiene un significado distinto cuando termina la relación laboral.",
+      active: "Sigo trabajando",
+      activeHelp: "Consulta días adquiridos y avance hacia tu próximo aniversario.",
+      ended: "Terminó mi relación laboral",
+      endedHelp: "Estima los días proporcionales que podrían integrar tu finiquito.",
+      scope:
+        "Esta estimación usa la LFT de México para trabajo continuo en el sector privado.",
+      scopeMore: "¿Cuándo no aplica?",
+      scopeDetail:
+        "El empleo público, trabajo discontinuo o de temporada, regímenes especiales, ausencias y saldos históricos pueden requerir otro cálculo.",
+      hireDate: "Fecha de ingreso",
+      endDateActive: "Fecha de cálculo",
+      endDateEnded: "Último día trabajado",
+      inclusive: "El día seleccionado se incluye.",
+      prior: "Saldo anterior al último aniversario",
+      priorHelp:
+        "Usa un saldo respaldado por una constancia o registro del empleador. No podemos reconstruirlo sólo con la fecha de ingreso.",
+      used: "Días disfrutados o ya pagados desde entonces",
+      advanced: "Opciones avanzadas",
+      optional: "Opcional",
+      contractToggle: "Mi contrato ofrece más días de vacaciones",
+      contractHelp:
+        "Los mínimos legales aparecerán después de capturar fechas válidas.",
+      lastEntitlement: "Días del último año de servicio completado",
+      currentEntitlement: "Días del año de servicio en curso",
+      calculate: "Calcular vacaciones",
+      clear: "Limpiar",
+      result: "Resultado",
+      neutral: "Captura tu fecha de ingreso para comenzar.",
+      sourceLabel: "México · LFT · mínimo legal vigente",
+      reviewed: "Fuentes revisadas",
+      copyResult: "Copiar resultado",
+      copied: "Copiado",
+      formulaTitle: "Cómo se calculó",
+      formulaEmpty: "Aquí aparecerán las fechas y valores sustituidos.",
+      disclaimer:
+        "Estimación informativa. No constituye resolución vinculante ni asesoría legal.",
+      firstYearLabel: "Avance hacia tu primer periodo vacacional",
+      availableLabel: "Saldo disponible estimado",
+      terminationLabel: "Vacaciones estimadas para finiquito",
+      workingDays: "días laborables",
+      notVested:
+        "Este avance es informativo; no se presenta como vacaciones actualmente disponibles.",
+      terminationNote:
+        "No incluye salario, prima vacacional ni otras prestaciones del finiquito.",
+      completedYears: "Años completados",
+      acquired: "Derecho del último aniversario",
+      priorMetric: "Saldo anterior informado",
+      usedMetric: "Días disfrutados o pagados",
+      progress: "Avance del ciclo actual",
+      advancedMetric: "Días adelantados o pagados en exceso",
+      nextAnniversary: "Próximo aniversario",
+      cycle: "Ciclo actual",
+      legalRule: "Regla legal",
+      legalRuleText:
+        "El mínimo general es de 12 días laborables al completar el primer año y aumenta con la antigüedad conforme al artículo 76.",
+      interpretation: "Entiende tu resultado",
+      interpretationText:
+        "El saldo adquirido y el avance proporcional son distintos. Si sigues trabajando, el avance hacia el siguiente aniversario aparece por separado. Si terminó la relación, se incorpora como estimación proporcional.",
+      tableTitle: "Tabla mínima vigente",
+      tableDescription:
+        "Los primeros cinco años de servicio otorgan 12, 14, 16, 18 y 20 días laborables. Del año 6 al 10 corresponden 22 días y después aumentan dos por cada bloque de cinco años.",
+    };
+
+const faqs = isEnglish
+  ? [
+      {
+        question: "Are proportional days already available to take?",
+        answer:
+          "Not necessarily. While employment continues, the calculator separates vested vacation from informational progress toward the next anniversary. On termination, it includes that progress as a proportional settlement estimate.",
+      },
+      {
+        question: "Does this calculator include the vacation premium?",
+        answer:
+          "No. The MVP estimates working days only. Article 80 establishes a vacation premium of at least 25%, but salary and monetary settlement calculations are outside this tool.",
+      },
+      {
+        question: "Why do I need to enter a prior balance?",
+        answer:
+          "A start date does not reveal which older days were taken, paid, recognized or disputed. Enter only a balance supported by your employer's records.",
+      },
+      {
+        question: "Are vacation days calendar days?",
+        answer:
+          "The general Mexican entitlement is expressed in working days. Calendar days are used only to measure elapsed time between work anniversaries for this estimate.",
+      },
+      {
+        question: "Is the result official?",
+        answer:
+          "No. It is an informational estimate under the general Federal Labor Law rules. Contracts, collective agreements, employment regimes and specific facts can change the result.",
+      },
+    ]
+  : [
+      {
+        question: "¿Los días proporcionales ya están disponibles para tomarlos?",
+        answer:
+          "No necesariamente. Mientras continúa la relación laboral, la calculadora separa las vacaciones adquiridas del avance informativo hacia el próximo aniversario. En una terminación, incorpora ese avance como estimación proporcional para finiquito.",
+      },
+      {
+        question: "¿La calculadora incluye la prima vacacional?",
+        answer:
+          "No. El MVP estima únicamente días laborables. El artículo 80 establece una prima vacacional mínima de 25 %, pero el salario y el cálculo monetario quedan fuera de esta herramienta.",
+      },
+      {
+        question: "¿Por qué debo capturar un saldo anterior?",
+        answer:
+          "La fecha de ingreso no indica qué días antiguos fueron disfrutados, pagados, reconocidos o controvertidos. Captura únicamente un saldo respaldado por los registros de tu empleador.",
+      },
+      {
+        question: "¿Las vacaciones se calculan en días naturales?",
+        answer:
+          "La prestación general mexicana se expresa en días laborables. Los días calendario sólo se utilizan para medir el tiempo transcurrido entre aniversarios en esta estimación.",
+      },
+      {
+        question: "¿El resultado es oficial?",
+        answer:
+          "No. Es una estimación informativa con las reglas generales de la Ley Federal del Trabajo. El contrato, convenio colectivo, régimen laboral y hechos específicos pueden cambiar el resultado.",
+      },
+    ];
+
+const faqJsonLd = buildFaqJsonLd(faqs);
+const inputClass =
+  "mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-900 px-4 text-base text-white outline-none transition placeholder:text-gray-600 focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15 disabled:cursor-not-allowed disabled:opacity-60";
+---
+
+<BaseLayout
+  title={copy.metaTitle}
+  description={copy.description}
+  canonical={canonical}
+  locale={locale}
+  alternates={alternates}
+>
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={JSON.stringify(faqJsonLd)} />
+  </Fragment>
+
+  <PageShell class="pb-24 lg:pb-0">
+    <PageHero
+      locale={locale}
+      title={copy.title}
+      description={copy.hero}
+      kicker={copy.category}
+      kickerHref={copy.categoryHref}
+      collapseBreadcrumbOnMobile
+      containerClass="py-6 md:py-8"
+      breadcrumbs={[
+        {
+          label: isEnglish ? "Home" : "Inicio",
+          href: isEnglish ? "/en" : "/",
+          ariaLabel: isEnglish ? "Home" : "Inicio",
+        },
+        { label: copy.category, href: copy.categoryHref, optional: true },
+        { label: copy.breadcrumb, truncate: true },
+      ]}
+    />
+
+    <Container as="section" class="py-6 md:py-8">
+      <section
+        id="vacation-calculator"
+        class="overflow-hidden rounded-xl border border-gray-700 bg-gray-950 shadow-xl shadow-gray-950/30"
+        aria-labelledby="vacation-calculator-heading"
+      >
+        <div class="border-b border-gray-700 p-4 sm:p-6">
+          <p class="text-sm font-semibold uppercase tracking-wide text-amber-400">
+            {copy.step}
+          </p>
+          <h2 id="vacation-calculator-heading" class="mt-2 text-xl font-semibold">
+            {copy.formTitle}
+          </h2>
+          <p class="mt-2 max-w-3xl text-sm leading-relaxed text-gray-400">
+            {copy.formDescription}
+          </p>
+        </div>
+
+        <div class="grid lg:grid-cols-[minmax(0,1.08fr)_minmax(19rem,0.92fr)]">
+          <form class="p-4 sm:p-6" data-vacation-form novalidate>
+            <fieldset>
+              <legend class="sr-only">{copy.formTitle}</legend>
+              <div class="grid gap-3 sm:grid-cols-2">
+                <label class="relative cursor-pointer rounded-xl border border-amber-400 bg-amber-400/10 p-4 transition focus-within:ring-3 focus-within:ring-amber-400/30" data-mode-card="activeEmployment">
+                  <input class="sr-only" type="radio" name="vacation-mode" value="activeEmployment" checked data-mode />
+                  <span class="block font-semibold text-white">{copy.active}</span>
+                  <span class="mt-1 block text-sm leading-relaxed text-gray-400">{copy.activeHelp}</span>
+                </label>
+                <label class="relative cursor-pointer rounded-xl border border-gray-700 bg-gray-900 p-4 transition focus-within:ring-3 focus-within:ring-amber-400/30" data-mode-card="terminatedEmployment">
+                  <input class="sr-only" type="radio" name="vacation-mode" value="terminatedEmployment" data-mode />
+                  <span class="block font-semibold text-white">{copy.ended}</span>
+                  <span class="mt-1 block text-sm leading-relaxed text-gray-400">{copy.endedHelp}</span>
+                </label>
+              </div>
+            </fieldset>
+
+            <div class="mt-5 rounded-lg border border-blue-900/70 bg-blue-950/30 p-4 text-sm text-blue-100">
+              <p class="font-medium">{copy.scope}</p>
+              <details class="mt-2 text-blue-200/80">
+                <summary class="cursor-pointer font-semibold underline decoration-blue-500/50 underline-offset-4">
+                  {copy.scopeMore}
+                </summary>
+                <p class="mt-2 leading-relaxed">{copy.scopeDetail}</p>
+              </details>
+            </div>
+
+            <div class="mt-6 grid gap-5 sm:grid-cols-2">
+              <div>
+                <label for="vacation-hire-date" class="block text-sm font-medium text-gray-200">
+                  {copy.hireDate}
+                </label>
+                <input id="vacation-hire-date" class={inputClass} type="date" required aria-describedby="vacation-hire-date-error" data-date="hireDate" />
+                <p id="vacation-hire-date-error" class="mt-2 hidden text-sm text-red-300" data-error-for="hireDate"></p>
+              </div>
+              <div>
+                <label for="vacation-end-date" class="block text-sm font-medium text-gray-200" data-end-date-label>
+                  {copy.endDateActive}
+                </label>
+                <input id="vacation-end-date" class={inputClass} type="date" required aria-describedby="vacation-end-date-help vacation-end-date-error" data-date="endDate" />
+                <p id="vacation-end-date-help" class="mt-2 text-xs text-gray-500">{copy.inclusive}</p>
+                <p id="vacation-end-date-error" class="mt-2 hidden text-sm text-red-300" data-error-for="endDate"></p>
+              </div>
+            </div>
+
+            <div class="mt-5 grid gap-5 sm:grid-cols-2">
+              <div data-prior-field>
+                <label for="vacation-prior-balance" class="block text-sm font-medium text-gray-200">
+                  {copy.prior}
+                </label>
+                <input id="vacation-prior-balance" class={inputClass} type="text" inputmode="decimal" autocomplete="off" value="0" aria-describedby="vacation-prior-help vacation-prior-error" data-days="priorBalance" />
+                <p id="vacation-prior-help" class="mt-2 text-xs leading-relaxed text-gray-500">{copy.priorHelp}</p>
+                <p id="vacation-prior-error" class="mt-2 hidden text-sm text-red-300" data-error-for="priorBalance"></p>
+              </div>
+              <div>
+                <label for="vacation-used-days" class="block text-sm font-medium text-gray-200">
+                  {copy.used}
+                </label>
+                <input id="vacation-used-days" class={inputClass} type="text" inputmode="decimal" autocomplete="off" value="0" aria-describedby="vacation-used-error" data-days="usedDays" />
+                <p id="vacation-used-error" class="mt-2 hidden text-sm text-red-300" data-error-for="usedDays"></p>
+              </div>
+            </div>
+
+            <details class="mt-6 rounded-xl border border-gray-800 bg-gray-900/50 p-4" data-advanced>
+              <summary class="cursor-pointer list-none text-sm font-semibold text-white">
+                <span class="flex items-center justify-between gap-4">
+                  <span>{copy.advanced}</span>
+                  <span class="text-xs font-normal text-gray-500">{copy.optional}</span>
+                </span>
+              </summary>
+              <div class="mt-5">
+                <label class="flex min-h-11 cursor-pointer items-start gap-3">
+                  <input class="mt-1 h-5 w-5 shrink-0 accent-amber-400" type="checkbox" data-contract-toggle />
+                  <span>
+                    <span class="block text-sm font-semibold text-gray-200">{copy.contractToggle}</span>
+                    <span class="mt-1 block text-xs leading-relaxed text-gray-500">{copy.contractHelp}</span>
+                  </span>
+                </label>
+                <div class="mt-5 hidden grid gap-5 sm:grid-cols-2" data-contract-fields>
+                  <div data-last-entitlement-field>
+                    <label for="vacation-last-entitlement" class="block text-sm font-medium text-gray-200">{copy.lastEntitlement}</label>
+                    <input id="vacation-last-entitlement" class={inputClass} type="text" inputmode="decimal" autocomplete="off" data-days="lastEntitlement" aria-describedby="vacation-last-entitlement-help vacation-last-entitlement-error" />
+                    <p id="vacation-last-entitlement-help" class="mt-2 text-xs text-gray-500" data-legal-minimum="last"></p>
+                    <p id="vacation-last-entitlement-error" class="mt-2 hidden text-sm text-red-300" data-error-for="lastEntitlement"></p>
+                  </div>
+                  <div>
+                    <label for="vacation-current-entitlement" class="block text-sm font-medium text-gray-200">{copy.currentEntitlement}</label>
+                    <input id="vacation-current-entitlement" class={inputClass} type="text" inputmode="decimal" autocomplete="off" data-days="currentEntitlement" aria-describedby="vacation-current-entitlement-help vacation-current-entitlement-error" />
+                    <p id="vacation-current-entitlement-help" class="mt-2 text-xs text-gray-500" data-legal-minimum="current"></p>
+                    <p id="vacation-current-entitlement-error" class="mt-2 hidden text-sm text-red-300" data-error-for="currentEntitlement"></p>
+                  </div>
+                </div>
+              </div>
+            </details>
+
+            <p class="mt-5 hidden rounded-lg border border-red-900/60 bg-red-950/30 p-3 text-sm leading-relaxed text-red-200" role="alert" data-form-error></p>
+            <p class="sr-only" aria-live="polite" data-form-status></p>
+
+            <div class="mt-6 flex flex-col-reverse gap-3 border-t border-gray-800 pt-5 sm:flex-row sm:justify-between">
+              <button class="inline-flex min-h-12 items-center justify-center rounded-lg border border-gray-700 px-5 py-3 text-sm font-semibold text-gray-200 transition hover:border-amber-400 hover:text-white focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/40" type="button" data-clear>
+                {copy.clear}
+              </button>
+              <button class="inline-flex min-h-12 items-center justify-center rounded-lg bg-amber-400 px-6 py-3 text-sm font-bold text-gray-950 transition hover:bg-amber-300 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/40" type="submit">
+                {copy.calculate}
+              </button>
+            </div>
+          </form>
+
+          <aside id="vacation-result" class="border-t border-gray-800 bg-gray-900/70 p-4 sm:p-6 lg:border-l lg:border-t-0" aria-live="polite" aria-atomic="false" data-result-region>
+            <p class="text-sm font-semibold uppercase tracking-wide text-amber-400" data-result-kicker>{copy.result}</p>
+            <h3 class="mt-3 text-lg font-semibold text-gray-200" data-result-label>{copy.availableLabel}</h3>
+            <p class="mt-2 break-words text-4xl font-bold leading-tight text-white" data-main-result>—</p>
+            <p class="mt-3 text-sm leading-relaxed text-gray-400" data-result-context>{copy.neutral}</p>
+
+            <div class="mt-6 hidden grid-cols-2 gap-3" data-result-metrics>
+              <div class="rounded-lg border border-gray-800 bg-gray-950/70 p-3">
+                <p class="text-xs text-gray-500">{copy.completedYears}</p>
+                <p class="mt-1 font-semibold text-white" data-completed-years>—</p>
+              </div>
+              <div class="rounded-lg border border-gray-800 bg-gray-950/70 p-3">
+                <p class="text-xs text-gray-500">{copy.nextAnniversary}</p>
+                <p class="mt-1 text-sm font-semibold text-white" data-next-anniversary>—</p>
+              </div>
+            </div>
+
+            <div class="mt-5 hidden space-y-2" data-breakdown></div>
+
+            <p class="mt-5 hidden rounded-lg border border-amber-800/70 bg-amber-950/30 p-3 text-sm leading-relaxed text-amber-100" data-result-warning></p>
+
+            <details class="mt-5 rounded-lg border border-gray-800 bg-gray-950/50 p-4" data-formula-details>
+              <summary class="cursor-pointer text-sm font-semibold text-white">{copy.formulaTitle}</summary>
+              <div class="mt-3 space-y-2 text-sm leading-relaxed text-gray-400" data-formula>{copy.formulaEmpty}</div>
+            </details>
+
+            <div class="mt-5 rounded-lg border border-gray-800 bg-gray-950/50 p-4">
+              <p class="text-sm font-semibold text-white">{copy.sourceLabel}</p>
+              <p class="mt-2 text-xs text-gray-500">
+                {copy.reviewed}: {MEXICO_VACATION_RULE_2023.reviewedAt}
+              </p>
+              <div class="mt-3 flex flex-wrap gap-x-4 gap-y-2 text-sm">
+                {MEXICO_VACATION_RULE_2023.sources.map((source) => (
+                  <a class="font-semibold text-amber-400 hover:text-amber-300 hover:underline" href={source.url} target="_blank" rel="noreferrer">{source.title}</a>
+                ))}
+              </div>
+            </div>
+
+            <p class="mt-5 text-xs leading-relaxed text-gray-500">{copy.disclaimer}</p>
+
+            <button class="mt-5 hidden min-h-11 w-full items-center justify-center rounded-lg border border-amber-400/60 px-4 py-2 text-sm font-semibold text-amber-300 transition hover:bg-amber-400/10 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/30" type="button" data-copy-result>
+              <span data-copy-label>{copy.copyResult}</span>
+            </button>
+            <p class="sr-only" aria-live="polite" data-copy-status></p>
+          </aside>
+        </div>
+      </section>
+    </Container>
+
+    <AdSlot placement="calculator-after-tool" />
+
+    <Container as="section" class="py-8">
+      <SectionIntro title={copy.interpretation} description={copy.interpretationText} />
+      <div class="grid gap-4 md:grid-cols-2">
+        <article class="rounded-xl border border-gray-700 bg-gray-950 p-5">
+          <h3 class="font-semibold text-white">{copy.legalRule}</h3>
+          <p class="mt-2 text-sm leading-relaxed text-gray-400">{copy.legalRuleText}</p>
+        </article>
+        <article class="rounded-xl border border-gray-700 bg-gray-950 p-5">
+          <h3 class="font-semibold text-white">{copy.tableTitle}</h3>
+          <p class="mt-2 text-sm leading-relaxed text-gray-400">{copy.tableDescription}</p>
+        </article>
+      </div>
+    </Container>
+
+    <FaqSection faqs={faqs} />
+
+    <div class="fixed inset-x-0 bottom-0 z-40 hidden border-t border-gray-700 bg-gray-950/95 px-4 py-3 shadow-2xl backdrop-blur lg:hidden" style="padding-bottom: max(0.75rem, env(safe-area-inset-bottom));" data-mobile-summary>
+      <div class="mx-auto flex max-w-5xl items-center justify-between gap-4">
+        <div class="min-w-0">
+          <p class="truncate text-xs font-semibold uppercase tracking-wide text-gray-500" data-mobile-label>{copy.result}</p>
+          <p class="truncate text-lg font-bold text-white" data-mobile-result>—</p>
+        </div>
+        <a class="shrink-0 rounded-lg border border-amber-400/60 px-3 py-2 text-sm font-semibold text-amber-300" href="#vacation-result">
+          {isEnglish ? "View details" : "Ver desglose"}
+        </a>
+      </div>
+    </div>
+  </PageShell>
+</BaseLayout>
+
+<script>
+  import {
+    VacationValidationError,
+    calculateProportionalVacation,
+    formatVacationDate,
+    formatVacationDays,
+    parseDaysInput,
+    parseOptionalDaysInput,
+  } from "@lib/calculators/legal-impuestos/calculadora-vacaciones-proporcionales/proportionalVacation";
+
+  const isEnglish = document.documentElement.lang.startsWith("en");
+  const locale = isEnglish ? "en-US" : "es-MX";
+  const messages = isEnglish
+    ? {
+        endActive: "Calculation date",
+        endTerminated: "Last day worked",
+        requiredDate: "Select a valid date.",
+        endBeforeHire: "The final date cannot be before the start date.",
+        unsupported: "The selected dates require a historical rule not available in this MVP.",
+        invalidNumber: "Enter a valid non-negative number.",
+        tooManyDecimals: "Use no more than two decimal places.",
+        belowLegal: "Contract days cannot be below the legal minimum.",
+        legalMinimum: "Legal minimum",
+        result: "Result",
+        stale: "Your data changed. Calculate again to update the result.",
+        neutral: "Enter your start date to begin.",
+        firstYear: "Progress toward your first vacation period",
+        available: "Estimated available balance",
+        termination: "Estimated vacation for final settlement",
+        workingDays: "working days",
+        firstYearNote: "Informational progress only; it is not shown as currently available vacation.",
+        terminationNote: "Salary, vacation premium and other settlement items are not included.",
+        activeNote: "Current-cycle progress is shown separately and is not added to the available balance.",
+        completedYears: "Completed years",
+        acquired: "Latest vested entitlement",
+        prior: "Prior balance entered",
+        used: "Days taken or paid",
+        progress: "Current-cycle progress",
+        advanced: "Days advanced or paid in excess",
+        cycle: "Current cycle",
+        next: "Next anniversary",
+        days: "days",
+        copied: "Copied",
+        copy: "Copy result",
+        copySuccess: "Result copied.",
+        copyFailure: "The result could not be copied automatically.",
+        formulaProgress: "Current-cycle progress",
+        formulaBalance: "Vested balance",
+        formulaTermination: "Settlement estimate",
+        statusUpdated: "Vacation result updated.",
+      }
+    : {
+        endActive: "Fecha de cálculo",
+        endTerminated: "Último día trabajado",
+        requiredDate: "Selecciona una fecha válida.",
+        endBeforeHire: "La fecha final no puede ser anterior a la fecha de ingreso.",
+        unsupported: "Las fechas requieren una regla histórica que este MVP todavía no incorpora.",
+        invalidNumber: "Escribe un número válido mayor o igual a cero.",
+        tooManyDecimals: "Usa como máximo dos decimales.",
+        belowLegal: "Los días contractuales no pueden ser inferiores al mínimo legal.",
+        legalMinimum: "Mínimo legal",
+        result: "Resultado",
+        stale: "Tus datos cambiaron. Calcula de nuevo para actualizar el resultado.",
+        neutral: "Captura tu fecha de ingreso para comenzar.",
+        firstYear: "Avance hacia tu primer periodo vacacional",
+        available: "Saldo disponible estimado",
+        termination: "Vacaciones estimadas para finiquito",
+        workingDays: "días laborables",
+        firstYearNote: "Es un avance informativo; no se presenta como vacaciones actualmente disponibles.",
+        terminationNote: "No incluye salario, prima vacacional ni otras prestaciones del finiquito.",
+        activeNote: "El avance del ciclo actual aparece por separado y no se suma al saldo disponible.",
+        completedYears: "Años completados",
+        acquired: "Derecho del último aniversario",
+        prior: "Saldo anterior informado",
+        used: "Días disfrutados o pagados",
+        progress: "Avance del ciclo actual",
+        advanced: "Días adelantados o pagados en exceso",
+        cycle: "Ciclo actual",
+        next: "Próximo aniversario",
+        days: "días",
+        copied: "Copiado",
+        copy: "Copiar resultado",
+        copySuccess: "Resultado copiado.",
+        copyFailure: "No se pudo copiar el resultado automáticamente.",
+        formulaProgress: "Avance del ciclo actual",
+        formulaBalance: "Saldo adquirido",
+        formulaTermination: "Estimación para finiquito",
+        statusUpdated: "Resultado de vacaciones actualizado.",
+      };
+
+  const form = document.querySelector("[data-vacation-form]");
+  const modes = Array.from(document.querySelectorAll("[data-mode]"));
+  const modeCards = Array.from(document.querySelectorAll("[data-mode-card]"));
+  const dateInputs = Array.from(document.querySelectorAll("[data-date]"));
+  const dayInputs = Array.from(document.querySelectorAll("[data-days]"));
+  const endDateLabel = document.querySelector("[data-end-date-label]");
+  const contractToggle = document.querySelector("[data-contract-toggle]");
+  const contractFields = document.querySelector("[data-contract-fields]");
+  const lastEntitlementField = document.querySelector("[data-last-entitlement-field]");
+  const priorField = document.querySelector("[data-prior-field]");
+  const formError = document.querySelector("[data-form-error]");
+  const formStatus = document.querySelector("[data-form-status]");
+  const resultKicker = document.querySelector("[data-result-kicker]");
+  const resultLabel = document.querySelector("[data-result-label]");
+  const mainResult = document.querySelector("[data-main-result]");
+  const resultContext = document.querySelector("[data-result-context]");
+  const resultMetrics = document.querySelector("[data-result-metrics]");
+  const completedYearsElement = document.querySelector("[data-completed-years]");
+  const nextAnniversaryElement = document.querySelector("[data-next-anniversary]");
+  const breakdown = document.querySelector("[data-breakdown]");
+  const resultWarning = document.querySelector("[data-result-warning]");
+  const formula = document.querySelector("[data-formula]");
+  const copyButton = document.querySelector("[data-copy-result]");
+  const copyLabel = document.querySelector("[data-copy-label]");
+  const copyStatus = document.querySelector("[data-copy-status]");
+  const clearButton = document.querySelector("[data-clear]");
+  const mobileSummary = document.querySelector("[data-mobile-summary]");
+  const mobileLabel = document.querySelector("[data-mobile-label]");
+  const mobileResult = document.querySelector("[data-mobile-result]");
+  let copyText = "";
+  let copyTimeout = 0;
+  let hasResult = false;
+
+  function getMode() {
+    return document.querySelector("[data-mode]:checked")?.value ?? "activeEmployment";
+  }
+
+  function getDateInput(name) {
+    return document.querySelector(`[data-date="${name}"]`);
+  }
+
+  function getDaysInput(name) {
+    return document.querySelector(`[data-days="${name}"]`);
+  }
+
+  function setFieldError(name, message = "") {
+    const input = getDateInput(name) ?? getDaysInput(name);
+    const error = document.querySelector(`[data-error-for="${name}"]`);
+    input?.setAttribute("aria-invalid", message ? "true" : "false");
+    if (error) {
+      error.textContent = message;
+      error.classList.toggle("hidden", !message);
+    }
+  }
+
+  function clearErrors() {
+    [...dateInputs, ...dayInputs].forEach((input) => {
+      setFieldError(input.dataset.date ?? input.dataset.days);
+    });
+    formError.textContent = "";
+    formError.classList.add("hidden");
+  }
+
+  function showFormError(message) {
+    formError.textContent = message;
+    formError.classList.remove("hidden");
+  }
+
+  function readDays(name, required = false) {
+    const input = getDaysInput(name);
+    const parsed = required
+      ? parseDaysInput(input?.value ?? "")
+      : parseOptionalDaysInput(input?.value ?? "");
+
+    if (!parsed.ok) {
+      const message = parsed.error === "too_many_decimals"
+        ? messages.tooManyDecimals
+        : messages.invalidNumber;
+      setFieldError(name, message);
+      return null;
+    }
+
+    setFieldError(name);
+    return parsed.value;
+  }
+
+  function formatDays(value) {
+    return `${formatVacationDays(value, locale)} ${messages.days}`;
+  }
+
+  function makeBreakdownRow(label, value, emphasis = false) {
+    const row = document.createElement("div");
+    row.className = "flex items-start justify-between gap-4 rounded-lg border border-gray-800 bg-gray-950/70 px-3 py-2.5 text-sm";
+    const labelElement = document.createElement("span");
+    labelElement.className = "text-gray-400";
+    labelElement.textContent = label;
+    const valueElement = document.createElement(emphasis ? "strong" : "span");
+    valueElement.className = emphasis ? "shrink-0 text-white" : "shrink-0 font-medium text-gray-200";
+    valueElement.textContent = value;
+    row.append(labelElement, valueElement);
+    return row;
+  }
+
+  function updateModeUi() {
+    const mode = getMode();
+    endDateLabel.textContent = mode === "terminatedEmployment"
+      ? messages.endTerminated
+      : messages.endActive;
+    modeCards.forEach((card) => {
+      const active = card.dataset.modeCard === mode;
+      card.classList.toggle("border-amber-400", active);
+      card.classList.toggle("bg-amber-400/10", active);
+      card.classList.toggle("border-gray-700", !active);
+      card.classList.toggle("bg-gray-900", !active);
+    });
+  }
+
+  function updateContractMinimums(baseResult, overwrite = false) {
+    const lastInput = getDaysInput("lastEntitlement");
+    const currentInput = getDaysInput("currentEntitlement");
+    const lastHelp = document.querySelector('[data-legal-minimum="last"]');
+    const currentHelp = document.querySelector('[data-legal-minimum="current"]');
+    const hasCompletedYear = baseResult.completedYears > 0;
+
+    lastEntitlementField.classList.toggle("hidden", !hasCompletedYear);
+    priorField.classList.toggle("hidden", !hasCompletedYear);
+    if (!hasCompletedYear) getDaysInput("priorBalance").value = "0";
+    if (lastHelp) lastHelp.textContent = `${messages.legalMinimum}: ${formatDays(baseResult.legalLastCompletedEntitlement)}`;
+    if (currentHelp) currentHelp.textContent = `${messages.legalMinimum}: ${formatDays(baseResult.legalCurrentCycleEntitlement)}`;
+    if (overwrite || !lastInput.value) lastInput.value = String(baseResult.legalLastCompletedEntitlement);
+    if (overwrite || !currentInput.value) currentInput.value = String(baseResult.legalCurrentCycleEntitlement);
+  }
+
+  function getBaseResult() {
+    const hireDate = getDateInput("hireDate")?.value ?? "";
+    const endDate = getDateInput("endDate")?.value ?? "";
+    if (!hireDate || !endDate) return null;
+
+    try {
+      return calculateProportionalVacation({
+        mode: getMode(),
+        hireDate,
+        endDate,
+      });
+    } catch {
+      return null;
+    }
+  }
+
+  function resetResult(message = messages.neutral) {
+    hasResult = false;
+    resultKicker.textContent = messages.result;
+    mainResult.textContent = "—";
+    resultContext.textContent = message;
+    resultMetrics.classList.add("hidden");
+    resultMetrics.classList.remove("grid");
+    breakdown.classList.add("hidden");
+    breakdown.replaceChildren();
+    resultWarning.classList.add("hidden");
+    resultWarning.textContent = "";
+    copyButton.classList.add("hidden");
+    copyButton.classList.remove("flex");
+    mobileSummary.classList.add("hidden");
+    formula.textContent = isEnglish
+      ? "The dates and substituted values will appear here."
+      : "Aquí aparecerán las fechas y valores sustituidos.";
+    copyText = "";
+  }
+
+  function invalidateResult() {
+    if (hasResult) resetResult(messages.stale);
+  }
+
+  function renderResult(result) {
+    const firstYearActive = result.mode === "activeEmployment" && result.isFirstServiceYear;
+    const label = result.mode === "terminatedEmployment"
+      ? messages.termination
+      : firstYearActive
+        ? messages.firstYear
+        : messages.available;
+    const displayedDays = firstYearActive ? result.cycleProgress : result.mainDays;
+    const note = result.mode === "terminatedEmployment"
+      ? messages.terminationNote
+      : firstYearActive
+        ? messages.firstYearNote
+        : messages.activeNote;
+
+    hasResult = true;
+    resultKicker.textContent = messages.result;
+    resultLabel.textContent = label;
+    mainResult.textContent = formatDays(displayedDays);
+    resultContext.textContent = note;
+    completedYearsElement.textContent = String(result.completedYears);
+    nextAnniversaryElement.textContent = formatVacationDate(result.nextAnniversary, locale);
+    resultMetrics.classList.remove("hidden");
+    resultMetrics.classList.add("grid");
+
+    const rows = [
+      makeBreakdownRow(messages.acquired, formatDays(result.lastCompletedEntitlement)),
+      makeBreakdownRow(messages.prior, formatDays(result.priorBalance)),
+      makeBreakdownRow(messages.used, `−${formatDays(result.usedDays)}`),
+      makeBreakdownRow(messages.progress, formatDays(result.cycleProgress), true),
+    ];
+    if (result.advancedDays > 0) {
+      rows.push(makeBreakdownRow(messages.advanced, formatDays(result.advancedDays), true));
+    }
+    breakdown.replaceChildren(...rows);
+    breakdown.classList.remove("hidden");
+
+    if (result.advancedDays > 0) {
+      resultWarning.textContent = `${messages.advanced}: ${formatDays(result.advancedDays)}.`;
+      resultWarning.classList.remove("hidden");
+    } else {
+      resultWarning.classList.add("hidden");
+    }
+
+    const progressFormula = `${formatVacationDays(result.currentCycleEntitlement, locale)} × ${result.elapsedCycleDays} / ${result.totalCycleDays} = ${formatVacationDays(result.cycleProgress, locale)}`;
+    const balanceFormula = `${formatVacationDays(result.priorBalance, locale)} + ${formatVacationDays(result.lastCompletedEntitlement, locale)} − ${formatVacationDays(result.usedDays, locale)} = ${formatVacationDays(result.acquiredBalanceRaw, locale)}`;
+    const formulaRows = [
+      `${messages.cycle}: ${formatVacationDate(result.currentCycleStart, locale)} → ${formatVacationDate(result.nextAnniversary, locale)}`,
+      `${messages.formulaProgress}: ${progressFormula}`,
+      `${messages.formulaBalance}: ${balanceFormula}`,
+    ];
+    if (result.mode === "terminatedEmployment") {
+      formulaRows.push(`${messages.formulaTermination}: max(0, ${formatVacationDays(result.acquiredBalanceRaw, locale)} + ${formatVacationDays(result.cycleProgress, locale)}) = ${formatVacationDays(result.terminationDays, locale)}`);
+    }
+    formula.replaceChildren(...formulaRows.map((text) => {
+      const paragraph = document.createElement("p");
+      paragraph.textContent = text;
+      return paragraph;
+    }));
+
+    copyButton.classList.remove("hidden");
+    copyButton.classList.add("flex");
+    mobileLabel.textContent = label;
+    mobileResult.textContent = formatDays(displayedDays);
+    mobileSummary.classList.remove("hidden");
+    copyText = [
+      `${label}: ${formatDays(displayedDays)}`,
+      `${messages.completedYears}: ${result.completedYears}`,
+      `${messages.acquired}: ${formatDays(result.lastCompletedEntitlement)}`,
+      `${messages.prior}: ${formatDays(result.priorBalance)}`,
+      `${messages.used}: ${formatDays(result.usedDays)}`,
+      `${messages.progress}: ${formatDays(result.cycleProgress)}`,
+      `${messages.cycle}: ${result.currentCycleStart} - ${result.nextAnniversary}`,
+      note,
+    ].join("\n");
+    formStatus.textContent = messages.statusUpdated;
+  }
+
+  function handleValidationError(error) {
+    if (!(error instanceof VacationValidationError)) {
+      showFormError(messages.invalidNumber);
+      return;
+    }
+
+    if (error.code === "invalid_hire_date") {
+      setFieldError("hireDate", messages.requiredDate);
+    } else if (error.code === "invalid_end_date") {
+      setFieldError("endDate", messages.requiredDate);
+    } else if (error.code === "end_before_hire") {
+      setFieldError("endDate", messages.endBeforeHire);
+    } else if (error.code === "unsupported_rule_period") {
+      showFormError(messages.unsupported);
+    } else if (error.code === "contract_below_legal") {
+      showFormError(messages.belowLegal);
+    } else {
+      showFormError(messages.invalidNumber);
+    }
+  }
+
+  function calculate(showErrors = true) {
+    clearErrors();
+    const priorBalance = readDays("priorBalance");
+    const usedDays = readDays("usedDays");
+    if (priorBalance === null || usedDays === null) return;
+
+    const baseInput = {
+      mode: getMode(),
+      hireDate: getDateInput("hireDate")?.value ?? "",
+      endDate: getDateInput("endDate")?.value ?? "",
+      priorBalance,
+      usedDays,
+    };
+
+    try {
+      const baseResult = calculateProportionalVacation(baseInput);
+      updateContractMinimums(baseResult);
+      let result = baseResult;
+
+      if (contractToggle.checked) {
+        const lastOverride = baseResult.completedYears > 0
+          ? readDays("lastEntitlement", true)
+          : undefined;
+        const currentOverride = readDays("currentEntitlement", true);
+        if (lastOverride === null || currentOverride === null) return;
+        if (
+          (lastOverride !== undefined && lastOverride < baseResult.legalLastCompletedEntitlement) ||
+          currentOverride < baseResult.legalCurrentCycleEntitlement
+        ) {
+          showFormError(messages.belowLegal);
+          return;
+        }
+        result = calculateProportionalVacation({
+          ...baseInput,
+          ...(lastOverride !== undefined
+            ? { lastCompletedEntitlementOverride: lastOverride }
+            : {}),
+          currentCycleEntitlementOverride: currentOverride,
+        });
+      }
+
+      renderResult(result);
+    } catch (error) {
+      if (showErrors) handleValidationError(error);
+      resetResult();
+    }
+  }
+
+  form?.addEventListener("submit", (event) => {
+    event.preventDefault();
+    calculate(true);
+  });
+
+  modes.forEach((input) => {
+    input.addEventListener("change", () => {
+      updateModeUi();
+      invalidateResult();
+    });
+  });
+
+  [...dateInputs, ...dayInputs].forEach((input) => {
+    input.addEventListener("input", () => {
+      setFieldError(input.dataset.date ?? input.dataset.days);
+      invalidateResult();
+      if (input.dataset.date) {
+        const baseResult = getBaseResult();
+        if (baseResult) updateContractMinimums(baseResult, true);
+      }
+    });
+  });
+
+  contractToggle?.addEventListener("change", () => {
+    contractFields.classList.toggle("hidden", !contractToggle.checked);
+    const baseResult = getBaseResult();
+    if (baseResult) updateContractMinimums(baseResult, true);
+    invalidateResult();
+  });
+
+  clearButton?.addEventListener("click", () => {
+    form?.reset();
+    getDateInput("endDate").value = getLocalIsoDate();
+    contractFields.classList.add("hidden");
+    clearErrors();
+    updateModeUi();
+    resetResult();
+    getDateInput("hireDate")?.focus();
+  });
+
+  copyButton?.addEventListener("click", async () => {
+    if (!copyText) return;
+    try {
+      await navigator.clipboard.writeText(copyText);
+      copyLabel.textContent = messages.copied;
+      copyStatus.textContent = messages.copySuccess;
+    } catch {
+      copyStatus.textContent = messages.copyFailure;
+    }
+    window.clearTimeout(copyTimeout);
+    copyTimeout = window.setTimeout(() => {
+      copyLabel.textContent = messages.copy;
+      copyStatus.textContent = "";
+    }, 2000);
+  });
+
+  function getLocalIsoDate() {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, "0");
+    const day = String(now.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
+  }
+
+  getDateInput("endDate").value = getLocalIsoDate();
+  updateModeUi();
+  resetResult();
+</script>

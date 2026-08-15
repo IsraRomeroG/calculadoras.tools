@@ -40,12 +40,12 @@ const faqs = [
   {
     question: "How do you find the yield per bag?",
     answer:
-      "Debe venir en la ficha o empaque del fabricante. Si el empaque indica litros de mezcla, divide los litros entre 1000 para obtener m³ por saco.",
+      "Use the yield stated on the manufacturer's technical sheet or packaging. If it is given in litres of mix, divide by 1,000 to obtain cubic metres per bag.",
   },
   {
     question: "Are cement and concrete the same?",
     answer:
-      "No. El cemento es un componente; el concreto combina cemento, agregados y agua. Esta calculadora estima concreto por volumen y sacos/premezclado.",
+      "No. Cement is one component; concrete combines cement, aggregates and water. This calculator estimates concrete volume and bags or ready-mix requirements.",
   },
   {
     question: "Does the calculator estimate sand and gravel?",
@@ -640,13 +640,13 @@ const faqJsonLd = buildFaqJsonLd(faqs);
   function parseInput() {
     const globalErrors = {};
     const sectionErrors = {};
-    const waste = parseRequiredNumber(globalFields.waste.value, "desperdicio", globalErrors, "waste");
+    const waste = parseRequiredNumber(globalFields.waste.value, "waste", globalErrors, "waste");
     const bagYield = estimateMode === "bags"
-      ? parseOptionalNumber(globalFields.bagYield.value, "rendimiento por saco", globalErrors, "bagYield")
+      ? parseOptionalNumber(globalFields.bagYield.value, "yield per bag", globalErrors, "bagYield")
       : undefined;
-    const pricePerM3 = parseOptionalNumber(globalFields.priceM3.value, "precio por m³", globalErrors, "priceM3");
+    const pricePerM3 = parseOptionalNumber(globalFields.priceM3.value, "price per m³", globalErrors, "priceM3");
     const pricePerBag = estimateMode === "bags"
-      ? parseOptionalNumber(globalFields.priceBag.value, "precio por saco", globalErrors, "priceBag")
+      ? parseOptionalNumber(globalFields.priceBag.value, "price per bag", globalErrors, "priceBag")
       : undefined;
     const parsedSections = [];
 
@@ -657,18 +657,18 @@ const faqJsonLd = buildFaqJsonLd(faqs);
       if (!name) {
         errors.push("Enter a name for this section.");
       } else if (name.length > 60) {
-        errors.push("El nombre no puede superar 60 caracteres.");
+        errors.push("The name cannot exceed 60 characters.");
       }
 
       const quantity = parseConcreteNumberInput(section.quantity);
       if (!quantity.ok || !Number.isInteger(quantity.value) || quantity.value < 1 || quantity.value > 10000) {
-        errors.push("La cantidad debe ser un entero entre 1 y 10000.");
+        errors.push("Quantity must be a whole number between 1 and 10,000.");
       }
 
-      const first = parseDimension(section.first, errors, "primera medida");
-      const second = parseDimension(section.second, errors, "segunda medida");
+      const first = parseDimension(section.first, errors, "first measurement");
+      const second = parseDimension(section.second, errors, "second measurement");
       const third = section.shape === "rectangular-prism"
-        ? parseDimension(section.third, errors, "tercera medida")
+        ? parseDimension(section.third, errors, "third measurement")
         : undefined;
 
       if (errors.length) {
@@ -690,7 +690,7 @@ const faqJsonLd = buildFaqJsonLd(faqs);
     if (Object.keys(globalErrors).length || Object.keys(sectionErrors).length) {
       return {
         ok: false,
-        message: "Completa las medidas marcadas para calcular.",
+        message: "Complete the highlighted measurements to calculate.",
         globalErrors,
         sectionErrors,
       };
@@ -751,11 +751,11 @@ const faqJsonLd = buildFaqJsonLd(faqs);
 
   function renderResult(result, input) {
     if (input.mode === "bags" && typeof result.bagCount === "number") {
-      mainResult.textContent = `Purchase ${result.bagCount} saco${result.bagCount === 1 ? "" : "s"}`;
+      mainResult.textContent = `Purchase ${result.bagCount} bag${result.bagCount === 1 ? "" : "s"}`;
       resultNote.textContent = `${formatConcreteNumber(result.totalVolume)} m³ required including waste.`;
     } else if (input.mode === "bags") {
       mainResult.textContent = `${formatConcreteNumber(result.totalVolume)} m³`;
-      resultNote.textContent = "Agrega rendimiento por saco para estimar la compra.";
+      resultNote.textContent = "Add the yield per bag to estimate the purchase quantity.";
     } else {
       mainResult.textContent = `Order ${formatConcreteNumber(result.totalVolume)} m³`;
       resultNote.textContent = "Volume including waste.";
@@ -914,7 +914,7 @@ const faqJsonLd = buildFaqJsonLd(faqs);
       navigator.clipboard
         .writeText(text)
         .then(() => {
-          copyStatus.textContent = "Result copiado.";
+          copyStatus.textContent = "Result copied.";
         })
         .catch(() => {
           copyStatus.textContent = "The result could not be copied automatically.";
