@@ -11,15 +11,19 @@ import {
   MEXICO_ISR_FREQUENCIES,
   MEXICO_ISR_PRESET,
 } from "@lib/calculators/legal-impuestos/calculadora-isr-irpf/incomeTax";
-import { buildAlternateLinks } from "@lib/i18n/routing";
+import { buildRegionalAlternateLinks } from "@lib/i18n/routing";
 import { buildFaqJsonLd } from "@lib/seo";
 
 const title = "Calculadora de ISR en México 2026";
 const description =
   "Estima tu ISR en México por periodo o por año, consulta tu tasa efectiva y compara el impuesto con tus retenciones.";
 const canonical = ISR_CANONICAL_PATH;
-const englishCanonical = "/en/legal-tax/income-tax-calculator";
-const alternates = buildAlternateLinks({ es: canonical, en: englishCanonical }, Astro.site ?? Astro.url);
+const englishCanonical = "/en/legal-tax/mexico-income-tax-calculator";
+const alternates = buildRegionalAlternateLinks(
+  { "es-MX": canonical, "en-MX": englishCanonical },
+  Astro.site ?? Astro.url,
+  canonical,
+);
 
 const faqs = [
   {

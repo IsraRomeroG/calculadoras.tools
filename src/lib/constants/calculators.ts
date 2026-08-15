@@ -1074,31 +1074,31 @@ const ENGLISH_CALCULATOR_METADATA: Partial<
     published: true,
   },
   "calculadora-de-iva": {
-    title: "VAT calculator",
+    title: "VAT, GST and sales tax calculator",
     description:
-      "Add VAT to a base price or extract the tax included in a total using editable rates and country presets.",
-    slug: "vat-calculator",
+      "Choose a country before estimating VAT, GST, GST/HST, sales tax or IVA with jurisdiction-specific coverage.",
+    slug: "indirect-tax-calculator",
     published: true,
   },
   "calculadora-isr-irpf": {
-    title: "Income tax calculator",
+    title: "Mexico income tax calculator",
     description:
       "Estimate Mexican income tax by pay period or year, view the effective rate and compare withholding.",
-    slug: "income-tax-calculator",
+    slug: "mexico-income-tax-calculator",
     published: true,
   },
   "calculadora-salario-neto": {
-    title: "Net salary calculator",
+    title: "Mexico net salary calculator",
     description:
       "Estimate net salary in Mexico after income tax, subsidies and entered deductions with a clear breakdown.",
-    slug: "net-salary-calculator",
+    slug: "mexico-net-salary-calculator",
     published: true,
   },
   "calculadora-vacaciones-proporcionales": {
-    title: "Proportional vacation calculator",
+    title: "Mexico proportional vacation calculator",
     description:
       "Estimate vested vacation days or proportional vacation for a final settlement under Mexico's Federal Labor Law.",
-    slug: "proportional-vacation-calculator",
+    slug: "mexico-proportional-vacation-calculator",
     published: true,
   },
   "calculadora-aguinaldo-proporcional": {
@@ -1109,10 +1109,10 @@ const ENGLISH_CALCULATOR_METADATA: Partial<
     published: false,
   },
   "calculadora-finiquito-liquidacion": {
-    title: "Termination pay calculator",
+    title: "Mexico termination pay calculator",
     description:
       "Estimate gross final pay, proportional benefits and conditional severance scenarios under Mexico's Federal Labor Law.",
-    slug: "termination-pay-calculator",
+    slug: "mexico-termination-pay-calculator",
     published: true,
   },
   "calculadora-de-hipoteca": {

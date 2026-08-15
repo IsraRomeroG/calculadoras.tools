@@ -12,7 +12,7 @@ tags: [Spain VAT, IVA Spain, invoicing]
 readTime: "8 min read"
 relatedCalculator:
   label: "VAT calculator"
-  href: "/en/legal-tax/vat-calculator"
+  href: "/en/legal-tax/indirect-tax-calculator"
 ---
 
 Spain’s standard VAT (`IVA`) rate is 21%, with reduced rates of 10% and 4% for qualifying transactions. A 0% rate also applies in defined cases. Classification depends on the transaction and the rate in force when tax becomes chargeable.
@@ -43,4 +43,4 @@ An invoice with several rates must separate the taxable base and VAT amount for 
 
 Calculating one invoice is not the same as preparing a periodic VAT return, which may involve deductible input VAT, adjustments and filing rules. The Canary Islands use IGIC rather than Spanish mainland IVA.
 
-Use the [VAT calculator](/en/legal-tax/vat-calculator) for arithmetic. Check the exact product or service in the Spanish Tax Agency’s [official 2026 VAT rate guidance](https://sede.agenciatributaria.gob.es/Sede/iva/calculo-iva-repercutido-clientes/tipos-impositivos-iva.html).
+Use the [VAT calculator](/en/legal-tax/indirect-tax-calculator) for arithmetic. Check the exact product or service in the Spanish Tax Agency’s [official 2026 VAT rate guidance](https://sede.agenciatributaria.gob.es/Sede/iva/calculo-iva-repercutido-clientes/tipos-impositivos-iva.html).

@@ -12,7 +12,7 @@ import {
 } from "@lib/calculators/legal-impuestos/calculadora-finiquito-liquidacion/terminationPay";
 import { MEXICO_TERMINATION_RULE_2026 } from "@lib/calculators/legal-impuestos/calculadora-finiquito-liquidacion/rules/mx/2026";
 import type { Locale } from "@lib/i18n/config";
-import { buildAlternateLinks } from "@lib/i18n/routing";
+import { buildRegionalAlternateLinks } from "@lib/i18n/routing";
 import { buildFaqJsonLd } from "@lib/seo";
 
 interface Props {
@@ -24,12 +24,13 @@ const isEnglish = locale === "en";
 const canonical = isEnglish
   ? TERMINATION_ENGLISH_CANONICAL_PATH
   : TERMINATION_CANONICAL_PATH;
-const alternates = buildAlternateLinks(
+const alternates = buildRegionalAlternateLinks(
   {
-    es: TERMINATION_CANONICAL_PATH,
-    en: TERMINATION_ENGLISH_CANONICAL_PATH,
+    "es-MX": TERMINATION_CANONICAL_PATH,
+    "en-MX": TERMINATION_ENGLISH_CANONICAL_PATH,
   },
   Astro.site ?? Astro.url,
+  TERMINATION_CANONICAL_PATH,
 );
 
 const copy = isEnglish
@@ -339,6 +340,7 @@ const fieldErrorClass = "mt-2 hidden text-sm text-red-300";
   description={copy.description}
   canonical={canonical}
   locale={locale}
+  htmlLang={isEnglish ? "en-MX" : "es-MX"}
   alternates={alternates}
 >
   <Fragment slot="head">

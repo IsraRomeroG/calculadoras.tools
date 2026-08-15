@@ -11,7 +11,7 @@ tags: [VAT rates, international tax, sales tax]
 readTime: "5 min read"
 relatedCalculator:
   label: "VAT calculator"
-  href: "/en/legal-tax/vat-calculator"
+  href: "/en/legal-tax/indirect-tax-calculator"
 ---
 
 This table is a calculation reference, not tax advice. Rates change, reduced rates coexist with general rates, and the applicable treatment depends on the product, customer, location and date.
@@ -27,4 +27,4 @@ For a net price of 100, the corresponding gross totals would be 116, 119, 118 an
 
 Do not select a rate from the country name alone. Check reduced, zero-rated, exempt and excluded categories; special territories; cross-border rules; and the tax point date. Verify with SAT in Mexico, DIAN in Colombia, SUNAT in Peru or Agencia Tributaria in Spain.
 
-Use the [VAT calculator](/en/legal-tax/vat-calculator) after identifying the correct current rate. The country guides for [Mexico](/en/blog/legal-tax/mexico-vat), [Colombia](/en/blog/legal-tax/colombia-vat), [Peru](/en/blog/legal-tax/peru-igv) and [Spain](/en/blog/legal-tax/spain-vat) provide calculation examples.
+Use the [VAT calculator](/en/legal-tax/indirect-tax-calculator) after identifying the correct current rate. The country guides for [Mexico](/en/blog/legal-tax/mexico-vat), [Colombia](/en/blog/legal-tax/colombia-vat), [Peru](/en/blog/legal-tax/peru-igv) and [Spain](/en/blog/legal-tax/spain-vat) provide calculation examples.

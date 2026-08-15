@@ -34,7 +34,7 @@ describe("English legal and tax calculator localization", () => {
       comparableRetention: 2_000,
     });
 
-    expect(ISR_CANONICAL_PATH).toBe("/en/legal-tax/income-tax-calculator");
+    expect(ISR_CANONICAL_PATH).toBe("/en/legal-tax/mexico-income-tax-calculator");
     expect(result.frequency.label).toBe("Monthly");
     expect(result.balanceLabel).toBe("amount due");
     expect(result.warnings.join(" ")).toContain("The calculation uses");

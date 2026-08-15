@@ -11,7 +11,7 @@ tags: [VAT, tax calculation, tax-inclusive price]
 readTime: "5 min read"
 relatedCalculator:
   label: "VAT calculator"
-  href: "/en/legal-tax/vat-calculator"
+  href: "/en/legal-tax/indirect-tax-calculator"
 ---
 
 VAT is calculated from a taxable base using the rate that applies to the transaction. Confirm the country, date, product and tax treatment before using any rate.
@@ -38,4 +38,4 @@ For a total of 580 at 16%, `580 / 1.16 = 500`; VAT is 80.
 
 Round according to the invoicing and tax rules that apply, preferably after calculating from unrounded values. Zero-rated, exempt and out-of-scope transactions are legal classifications, not interchangeable mathematical labels.
 
-Use the [VAT calculator](/en/legal-tax/vat-calculator) to add or extract tax, then verify the rate with the relevant tax authority.
+Use the [VAT calculator](/en/legal-tax/indirect-tax-calculator) to add or extract tax, then verify the rate with the relevant tax authority.

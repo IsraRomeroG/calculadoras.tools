@@ -6,9 +6,31 @@ import {
 } from "./config";
 
 export interface AlternateLink {
-  locale: Locale | "x-default";
+  locale: string;
   hreflang: string;
   href: string;
+}
+
+export function buildRegionalAlternateLinks(
+  pathsByHreflang: Record<string, string>,
+  site: URL | string,
+  xDefaultPath?: string,
+): AlternateLink[] {
+  const links = Object.entries(pathsByHreflang).map(([hreflang, path]) => ({
+    locale: hreflang,
+    hreflang,
+    href: buildCanonicalUrl(path, site),
+  }));
+
+  if (xDefaultPath) {
+    links.push({
+      locale: "x-default",
+      hreflang: "x-default",
+      href: buildCanonicalUrl(xDefaultPath, site),
+    });
+  }
+
+  return links;
 }
 
 export function normalizePath(path: string): string {

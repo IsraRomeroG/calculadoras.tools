@@ -5,7 +5,7 @@ import PageShell from "@components/layout/PageShell.astro";
 import FaqSection from "@components/shared/FaqSection.astro";
 import PageHero from "@components/shared/PageHero.astro";
 import SectionIntro from "@components/shared/SectionIntro.astro";
-import { buildAlternateLinks } from "@lib/i18n/routing";
+import { buildRegionalAlternateLinks } from "@lib/i18n/routing";
 import BaseLayout from "@layouts/BaseLayout.astro";
 import {
   ISR_CANONICAL_PATH,
@@ -19,7 +19,11 @@ const description =
   "Estimate income tax (ISR) in Mexico by pay period or year, review the effective rate, and compare tax with withholding."
 const canonical = ISR_CANONICAL_PATH;
 const spanishCanonical = "/legal-impuestos/calculadora-isr-irpf";
-const alternates = buildAlternateLinks({ es: spanishCanonical, en: canonical }, Astro.site ?? Astro.url);
+const alternates = buildRegionalAlternateLinks(
+  { "es-MX": spanishCanonical, "en-MX": canonical },
+  Astro.site ?? Astro.url,
+  spanishCanonical,
+);
 
 const faqs = [
   {
@@ -54,7 +58,7 @@ const fieldClass =
   "mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-900 px-4 text-base text-white outline-none transition placeholder:text-gray-600 focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15";
 ---
 
-<BaseLayout title={title} description={description} canonical={canonical} locale="en" alternates={alternates}>
+<BaseLayout title={title} description={description} canonical={canonical} locale="en" htmlLang="en-MX" alternates={alternates}>
   <Fragment slot="head">
     <script type="application/ld+json" set:html={JSON.stringify(faqJsonLd)} />
   </Fragment>

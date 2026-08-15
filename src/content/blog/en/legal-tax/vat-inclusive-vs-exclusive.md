@@ -11,7 +11,7 @@ tags: [VAT inclusive, VAT exclusive, price comparison]
 readTime: "4 min read"
 relatedCalculator:
   label: "VAT calculator"
-  href: "/en/legal-tax/vat-calculator"
+  href: "/en/legal-tax/indirect-tax-calculator"
 ---
 
 A VAT-exclusive price is the taxable base before VAT. “500 plus 20% VAT” means VAT of 100 and a gross total of 600.
@@ -27,4 +27,4 @@ gross = net x (1 + rate)
 net = gross / (1 + rate)
 ```
 
-The [VAT calculator](/en/legal-tax/vat-calculator) has separate add-tax and extract-tax modes. Legal display requirements and the applicable rate vary by jurisdiction.
+The [VAT calculator](/en/legal-tax/indirect-tax-calculator) has separate add-tax and extract-tax modes. Legal display requirements and the applicable rate vary by jurisdiction.

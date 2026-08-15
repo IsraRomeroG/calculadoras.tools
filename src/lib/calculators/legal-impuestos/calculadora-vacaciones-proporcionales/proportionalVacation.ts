@@ -6,7 +6,7 @@ import {
 export const VACATION_CANONICAL_PATH =
   "/legal-impuestos/calculadora-vacaciones-proporcionales";
 export const VACATION_ENGLISH_CANONICAL_PATH =
-  "/en/legal-tax/proportional-vacation-calculator";
+  "/en/legal-tax/mexico-proportional-vacation-calculator";
 
 export type VacationMode = "activeEmployment" | "terminatedEmployment";
 

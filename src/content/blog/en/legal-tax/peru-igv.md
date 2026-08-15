@@ -11,7 +11,7 @@ tags: [Peru IGV, VAT Peru, sales tax]
 readTime: "5 min read"
 relatedCalculator:
   label: "VAT calculator"
-  href: "/en/legal-tax/vat-calculator"
+  href: "/en/legal-tax/indirect-tax-calculator"
 ---
 
 Peru calls its consumption tax *Impuesto General a las Ventas* (IGV). SUNAT states that the applicable rate in 2026 is 18%, including the Municipal Promotion Tax component.
@@ -30,4 +30,4 @@ net = 1180 / 1.18 = 1000
 IGV = 180
 ```
 
-Exemptions and transactions outside the tax’s scope require legal classification; do not infer them from the arithmetic alone. Use the [VAT calculator](/en/legal-tax/vat-calculator) with 18% and verify the transaction with [SUNAT’s official IGV guidance](https://emprender.sunat.gob.pe/principales-impuestos/impuesto-general-las-ventas-igv/impuesto-general-las-ventas).
+Exemptions and transactions outside the tax’s scope require legal classification; do not infer them from the arithmetic alone. Use the [VAT calculator](/en/legal-tax/indirect-tax-calculator) with 18% and verify the transaction with [SUNAT’s official IGV guidance](https://emprender.sunat.gob.pe/principales-impuestos/impuesto-general-las-ventas-igv/impuesto-general-las-ventas).

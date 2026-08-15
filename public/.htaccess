@@ -16,6 +16,13 @@ RewriteRule ^(.*)$ https://calculadoras.tools/$1 [R=301,L]
 <IfModule mod_rewrite.c>
   RewriteEngine On
 
+  # Preserve the meaning of the former generic English legal-tax URLs.
+  RewriteRule ^en/legal-tax/vat-calculator/?$ /en/legal-tax/indirect-tax-calculator [R=301,L,NE]
+  RewriteRule ^en/legal-tax/income-tax-calculator/?$ /en/legal-tax/mexico-income-tax-calculator [R=301,L,NE]
+  RewriteRule ^en/legal-tax/net-salary-calculator/?$ /en/legal-tax/mexico-net-salary-calculator [R=301,L,NE]
+  RewriteRule ^en/legal-tax/proportional-vacation-calculator/?$ /en/legal-tax/mexico-proportional-vacation-calculator [R=301,L,NE]
+  RewriteRule ^en/legal-tax/termination-pay-calculator/?$ /en/legal-tax/mexico-termination-pay-calculator [R=301,L,NE]
+
   # Redirect requested URLs with trailing slashes to their canonical form.
   # THE_REQUEST prevents internal rewrites from triggering this redirect.
   RewriteCond %{THE_REQUEST} \s/+(.+?)/+[?\s] [NC]

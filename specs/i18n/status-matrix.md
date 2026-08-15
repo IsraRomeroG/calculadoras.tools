@@ -167,9 +167,11 @@ Nota: las 118 traducciones EN publicadas están distribuidas entre `src/content/
 
 | Ruta ES | Ruta EN | Estado | Origen |
 | --- | --- | --- | --- |
-| /legal-impuestos/calculadora-de-iva | /en/legal-tax/vat-calculator | ✅ Traducida / publicada | `src/pages/legal-impuestos/calculadora-de-iva.astro → src/pages/en/legal-tax/vat-calculator.astro` |
-| /legal-impuestos/calculadora-isr-irpf | /en/legal-tax/income-tax-calculator | ✅ Traducida / publicada | `src/pages/legal-impuestos/calculadora-isr-irpf.astro → src/pages/en/legal-tax/income-tax-calculator.astro` |
-| /legal-impuestos/calculadora-salario-neto | /en/legal-tax/net-salary-calculator | ✅ Traducida / publicada | `src/pages/legal-impuestos/calculadora-salario-neto.astro → src/pages/en/legal-tax/net-salary-calculator.astro` |
+| /legal-impuestos/calculadora-de-iva | /en/legal-tax/indirect-tax-calculator | ✅ Adaptada / publicada | Hub EN con selección obligatoria de mercado; sin país implícito. |
+| /legal-impuestos/calculadora-isr-irpf | /en/legal-tax/mexico-income-tax-calculator | ✅ Traducida / publicada | Variante `en-MX`; las variantes anglófonas usan rule sets propios. |
+| /legal-impuestos/calculadora-salario-neto | /en/legal-tax/mexico-net-salary-calculator | ✅ Traducida / publicada | Variante `en-MX`; cobertura mexicana visible. |
+| /legal-impuestos/calculadora-vacaciones-proporcionales | /en/legal-tax/mexico-proportional-vacation-calculator | ✅ Traducida / publicada | Variante `en-MX`; mínimo de la LFT visible. |
+| /legal-impuestos/calculadora-finiquito-liquidacion | /en/legal-tax/mexico-termination-pay-calculator | ✅ Traducida / publicada | Variante `en-MX`; conceptos mexicanos no se reutilizan en otros mercados. |
 
 ### Mascotas
 

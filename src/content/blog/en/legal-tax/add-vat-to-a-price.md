@@ -11,7 +11,7 @@ tags: [add VAT, net price, invoices]
 readTime: "4 min read"
 relatedCalculator:
   label: "VAT calculator"
-  href: "/en/legal-tax/vat-calculator"
+  href: "/en/legal-tax/indirect-tax-calculator"
 ---
 
 When a price is stated before tax:
@@ -31,4 +31,4 @@ gross total = net price x 1.16
 
 Replace `1.16` with the multiplier for the applicable rate. A professional quotation should distinguish the taxable base, rate, tax amount and final total. If several rates apply, calculate each line or tax base separately rather than applying one rate to the entire invoice.
 
-Use the [VAT calculator](/en/legal-tax/vat-calculator) and verify current rates and invoice requirements with the relevant national tax authority.
+Use the [VAT calculator](/en/legal-tax/indirect-tax-calculator) and verify current rates and invoice requirements with the relevant national tax authority.

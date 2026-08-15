@@ -11,7 +11,7 @@ tags: [VAT mistakes, tax calculation, invoicing]
 readTime: "5 min read"
 relatedCalculator:
   label: "VAT calculator"
-  href: "/en/legal-tax/vat-calculator"
+  href: "/en/legal-tax/indirect-tax-calculator"
 ---
 
 ## Subtracting the rate from a gross price
@@ -38,4 +38,4 @@ Keep sufficient precision in line calculations and apply the legally required ro
 
 Do not assume that taxes are simply added. One charge may form part of another tax’s base. Calculate each under its own rules.
 
-Use the [VAT calculator](/en/legal-tax/vat-calculator) for arithmetic, but consult official guidance or a qualified adviser for the applicable rate, tax base, exemptions and filing treatment.
+Use the [VAT calculator](/en/legal-tax/indirect-tax-calculator) for arithmetic, but consult official guidance or a qualified adviser for the applicable rate, tax base, exemptions and filing treatment.

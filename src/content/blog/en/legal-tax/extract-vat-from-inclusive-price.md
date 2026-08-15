@@ -11,7 +11,7 @@ tags: [VAT included, reverse VAT, net price]
 readTime: "4 min read"
 relatedCalculator:
   label: "VAT calculator"
-  href: "/en/legal-tax/vat-calculator"
+  href: "/en/legal-tax/indirect-tax-calculator"
 ---
 
 To extract VAT, treat the displayed total as 100% plus the tax rate:
@@ -38,4 +38,4 @@ Subtracting 16% of 1,160 would give 974.40, which is wrong because 16% was origi
 | 19% | 1.19 |
 | 21% | 1.21 |
 
-Confirm that the price truly includes VAT and that the rate applies to that item. Use the [VAT calculator](/en/legal-tax/vat-calculator) for precision and consult a tax professional for filing or classification questions.
+Confirm that the price truly includes VAT and that the rate applies to that item. Use the [VAT calculator](/en/legal-tax/indirect-tax-calculator) for precision and consult a tax professional for filing or classification questions.

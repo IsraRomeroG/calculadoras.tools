@@ -11,7 +11,7 @@ tags: [Colombia VAT, IVA Colombia, tax rates]
 readTime: "5 min read"
 relatedCalculator:
   label: "VAT calculator"
-  href: "/en/legal-tax/vat-calculator"
+  href: "/en/legal-tax/indirect-tax-calculator"
 ---
 
 Colombia’s general VAT (`IVA`) rate is 19%. Certain goods and services may use a reduced 5% rate or receive exempt or excluded treatment under the tax code.
@@ -32,4 +32,4 @@ VAT = 190
 
 “Exempt” and “excluded” are not synonyms and can have different compliance and input-tax consequences. Confirm product classification and the current rule before invoicing.
 
-Use the [VAT calculator](/en/legal-tax/vat-calculator) for the arithmetic. DIAN’s legal compilation confirms the [19% general rate and statutory exceptions](https://normograma.dian.gov.co/dian/compilacion/docs/oficio_dian_8857_2025.htm).
+Use the [VAT calculator](/en/legal-tax/indirect-tax-calculator) for the arithmetic. DIAN’s legal compilation confirms the [19% general rate and statutory exceptions](https://normograma.dian.gov.co/dian/compilacion/docs/oficio_dian_8857_2025.htm).

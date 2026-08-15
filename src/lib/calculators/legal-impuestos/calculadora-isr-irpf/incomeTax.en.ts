@@ -24,7 +24,7 @@ export type EnglishIncomeTaxResult = Omit<
   frequency: TaxFrequencyRule;
 };
 
-export const ISR_CANONICAL_PATH = "/en/legal-tax/income-tax-calculator";
+export const ISR_CANONICAL_PATH = "/en/legal-tax/mexico-income-tax-calculator";
 export const MEXICO_ISR_FREQUENCIES: TaxFrequencyRule[] =
   base.MEXICO_ISR_FREQUENCIES.map((frequency) => ({
     ...frequency,

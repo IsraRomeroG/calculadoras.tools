@@ -15,6 +15,7 @@ interface Props {
   description?: string;
   canonical?: string;
   locale?: Locale;
+  htmlLang?: string;
   alternates?: AlternateLink[];
 }
 
@@ -23,6 +24,7 @@ const {
   description,
   canonical,
   locale: localeProp,
+  htmlLang,
   alternates = [],
 } = Astro.props;
 const locale = localeProp ?? getLocaleFromPathname(Astro.url.pathname);
@@ -31,7 +33,7 @@ const canonicalUrl = canonical
   : undefined;
 ---
 
-<html lang={LOCALE_CONFIG[locale].htmlLang}>
+<html lang={htmlLang ?? LOCALE_CONFIG[locale].htmlLang}>
   <head>
     <meta charset="utf-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />

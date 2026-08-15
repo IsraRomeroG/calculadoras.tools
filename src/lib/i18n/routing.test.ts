@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   buildAlternateLinks,
   buildCanonicalUrl,
+  buildRegionalAlternateLinks,
   getLocaleFromPathname,
   normalizePath,
   prefixLocalePath,
@@ -74,6 +75,33 @@ describe("i18n routing helpers", () => {
         locale: "x-default",
         hreflang: "x-default",
         href: "https://calculadoras.tools/matematicas",
+      },
+    ]);
+  });
+
+  it("builds reciprocal market alternates with an explicit selector default", () => {
+    expect(buildRegionalAlternateLinks(
+      {
+        "en-US": "/en/legal-tax/us-paycheck-calculator",
+        "en-GB": "/en/legal-tax/uk-take-home-pay-calculator",
+      },
+      site,
+      "/en/legal-tax/take-home-pay-calculators",
+    )).toEqual([
+      {
+        locale: "en-US",
+        hreflang: "en-US",
+        href: "https://calculadoras.tools/en/legal-tax/us-paycheck-calculator",
+      },
+      {
+        locale: "en-GB",
+        hreflang: "en-GB",
+        href: "https://calculadoras.tools/en/legal-tax/uk-take-home-pay-calculator",
+      },
+      {
+        locale: "x-default",
+        hreflang: "x-default",
+        href: "https://calculadoras.tools/en/legal-tax/take-home-pay-calculators",
       },
     ]);
   });

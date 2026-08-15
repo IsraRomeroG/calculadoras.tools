@@ -19,7 +19,7 @@ export { normalizeDailySalary } from "./salary";
 export const TERMINATION_CANONICAL_PATH =
   "/legal-impuestos/calculadora-finiquito-liquidacion";
 export const TERMINATION_ENGLISH_CANONICAL_PATH =
-  "/en/legal-tax/termination-pay-calculator";
+  "/en/legal-tax/mexico-termination-pay-calculator";
 
 export type TerminationSituation =
   | "resignation"

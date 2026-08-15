@@ -12,7 +12,7 @@ import {
 } from "@lib/calculators/legal-impuestos/calculadora-vacaciones-proporcionales/proportionalVacation";
 import { MEXICO_VACATION_RULE_2023 } from "@lib/calculators/legal-impuestos/calculadora-vacaciones-proporcionales/rules/mx/2023";
 import type { Locale } from "@lib/i18n/config";
-import { buildAlternateLinks } from "@lib/i18n/routing";
+import { buildRegionalAlternateLinks } from "@lib/i18n/routing";
 import { buildFaqJsonLd } from "@lib/seo";
 
 interface Props {
@@ -24,12 +24,13 @@ const isEnglish = locale === "en";
 const canonical = isEnglish
   ? VACATION_ENGLISH_CANONICAL_PATH
   : VACATION_CANONICAL_PATH;
-const alternates = buildAlternateLinks(
+const alternates = buildRegionalAlternateLinks(
   {
-    es: VACATION_CANONICAL_PATH,
-    en: VACATION_ENGLISH_CANONICAL_PATH,
+    "es-MX": VACATION_CANONICAL_PATH,
+    "en-MX": VACATION_ENGLISH_CANONICAL_PATH,
   },
   Astro.site ?? Astro.url,
+  VACATION_CANONICAL_PATH,
 );
 const copy = isEnglish
   ? {
@@ -251,6 +252,7 @@ const inputClass =
   description={copy.description}
   canonical={canonical}
   locale={locale}
+  htmlLang={isEnglish ? "en-MX" : "es-MX"}
   alternates={alternates}
 >
   <Fragment slot="head">

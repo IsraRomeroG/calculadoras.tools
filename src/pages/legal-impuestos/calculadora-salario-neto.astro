@@ -10,15 +10,19 @@ import {
   MEXICO_SALARY_PRESET,
   formatMoney,
 } from "@lib/calculators/legal-impuestos/calculadora-de-salario-neto/netSalary";
-import { buildAlternateLinks } from "@lib/i18n/routing";
+import { buildRegionalAlternateLinks } from "@lib/i18n/routing";
 import { buildFaqJsonLd } from "@lib/seo";
 
 const title = "Calculadora de salario neto en México 2026";
 const description =
   "Estima tu salario neto en México después de ISR, subsidios y deducciones, con desglose, supuestos y fuentes oficiales.";
 const canonical = "/legal-impuestos/calculadora-salario-neto";
-const englishCanonical = "/en/legal-tax/net-salary-calculator";
-const alternates = buildAlternateLinks({ es: canonical, en: englishCanonical }, Astro.site ?? Astro.url);
+const englishCanonical = "/en/legal-tax/mexico-net-salary-calculator";
+const alternates = buildRegionalAlternateLinks(
+  { "es-MX": canonical, "en-MX": englishCanonical },
+  Astro.site ?? Astro.url,
+  canonical,
+);
 
 const faqs = [
   {
