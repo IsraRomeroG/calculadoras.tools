@@ -25,6 +25,7 @@ export type CalculatorFamilyId =
   | "take-home-pay"
   | "paid-leave"
   | "final-pay"
+  | "redundancy"
   | "termination-pay";
 
 export type Coverage = "complete" | "partial" | "manual-only";
@@ -117,6 +118,14 @@ export type RuleResolution<T> =
   | { status: "expired"; availablePeriods: string[] };
 
 export type CalculationRowStatus = "calculated" | "manual" | "not-included" | "not-applicable";
+
+export type EmploymentComponentStatus =
+  | "calculated-official"
+  | "calculated-contractual"
+  | "manual-scenario"
+  | "not-applicable"
+  | "not-determined"
+  | "out-of-scope";
 
 export interface CalculationRow {
   id: string;

@@ -1,5 +1,6 @@
 import { INDIRECT_TAX_PAGE_DEFINITIONS } from "./indirectTax/variants";
 import { INCOME_TAX_PAGE_DEFINITIONS, PAYROLL_PAGE_DEFINITIONS } from "./incomeTax/variants";
+import { EMPLOYMENT_PAGE_DEFINITIONS } from "./employment/variants";
 
 export interface LegalTaxDirectoryEntry {
   id: string;
@@ -35,4 +36,13 @@ export const LEGAL_TAX_MARKET_DIRECTORY_ITEMS: LegalTaxDirectoryEntry[] = [
   ...pageItems(INCOME_TAX_PAGE_DEFINITIONS, 21, "income-tax"),
   { id: "take-home-pay-market-hub", title: "Take-home pay calculators by country", description: "Choose the country and jurisdiction before projecting taxes, employee contributions and net pay.", href: "/en/legal-tax/take-home-pay-calculators", categoryId: "legal-impuestos", categorySlug: "legal-impuestos", order: 22 },
   ...pageItems(PAYROLL_PAGE_DEFINITIONS, 22, "take-home-pay"),
+  ...EMPLOYMENT_PAGE_DEFINITIONS.map((page, index) => ({
+    id: page.variantId,
+    title: page.heading,
+    description: page.description,
+    href: page.path,
+    categoryId: "legal-impuestos" as const,
+    categorySlug: "legal-impuestos" as const,
+    order: 23 + (index + 1) / 100,
+  })),
 ];

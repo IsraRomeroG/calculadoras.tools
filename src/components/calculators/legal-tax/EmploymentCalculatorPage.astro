@@ -1,0 +1,121 @@
+---
+import Container from "@components/layout/Container.astro";
+import PageShell from "@components/layout/PageShell.astro";
+import PageHero from "@components/shared/PageHero.astro";
+import BaseLayout from "@layouts/BaseLayout.astro";
+import { EMPLOYMENT_PAGE_DEFINITIONS } from "@lib/calculators/legal-tax/employment/variants";
+import { EMPLOYMENT_RULE_SETS } from "@lib/calculators/legal-tax/employment/rules";
+import { MARKET_DEFINITIONS } from "@lib/calculators/legal-tax/markets";
+
+interface Props { variantId: string }
+const { variantId } = Astro.props;
+const page = EMPLOYMENT_PAGE_DEFINITIONS.find((item) => item.variantId === variantId);
+if (!page) throw new Error(`Unknown employment calculator variant: ${variantId}`);
+const envelope = EMPLOYMENT_RULE_SETS.find((item) => item.id === page.ruleSetId)!;
+const market = MARKET_DEFINITIONS[page.marketId];
+const inputClass = "mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-900 px-4 text-base text-white outline-none transition focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15";
+const jsonLd = { "@context": "https://schema.org", "@type": "WebApplication", name: page.heading, applicationCategory: "FinanceApplication", operatingSystem: "Any", inLanguage: market.locale, spatialCoverage: envelope.rules.jurisdictionLabel, url: new URL(page.path, Astro.site ?? Astro.url).toString() };
+---
+
+<BaseLayout title={page.title} description={page.description} canonical={page.path} locale="en" htmlLang={market.locale}>
+  <Fragment slot="head"><script type="application/ld+json" set:html={JSON.stringify(jsonLd)} /></Fragment>
+  <PageShell>
+    <PageHero title={page.heading} description={page.description} kicker="Legal & Tax" breadcrumbs={[
+      { label: "Home", href: "/en", ariaLabel: "Home" },
+      { label: "Legal & Taxes", href: "/en/legal-tax" },
+      { label: market.countryName, truncate: true },
+    ]} />
+    <Container as="section" class="py-6 md:py-10">
+      <div data-employment-root data-rule-set={page.ruleSetId} data-locale={market.locale} data-currency={market.currency} class="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(20rem,0.85fr)]">
+        <form class="rounded-lg border border-gray-700 bg-gray-950 p-4 sm:p-6" data-form novalidate>
+          <p class="text-sm font-semibold uppercase tracking-wide text-amber-400">{envelope.rules.jurisdictionLabel}</p>
+          <h2 class="mt-2 text-2xl font-semibold text-white">Confirm scope before amounts</h2>
+          <p class="mt-2 text-sm leading-relaxed text-gray-400">{envelope.rules.coverageStatement}</p>
+          <div class="mt-6 grid gap-5 sm:grid-cols-2">
+            {page.fields.map((field) => (
+              <div class={field.help ? "sm:col-span-2" : ""}>
+                <label class="text-sm font-semibold text-gray-200" for={`${variantId}-${field.name}`}>{field.label}</label>
+                {field.kind === "select" ? (
+                  <select id={`${variantId}-${field.name}`} class={inputClass} data-input data-name={field.name} data-required={field.required !== false ? "true" : "false"} aria-describedby={`${variantId}-${field.name}-help ${variantId}-${field.name}-error`}>
+                    {field.options?.map((option) => <option value={option.value} selected={option.value === field.defaultValue}>{option.label}</option>)}
+                  </select>
+                ) : (
+                  <input id={`${variantId}-${field.name}`} class={inputClass} type="number" min={field.min} max={field.max} step={field.step ?? 0.01} inputmode="decimal" autocomplete="off" placeholder={field.placeholder} value={field.defaultValue} data-input data-name={field.name} data-required={field.required !== false ? "true" : "false"} aria-describedby={`${variantId}-${field.name}-help ${variantId}-${field.name}-error`} />
+                )}
+                {field.help && <p id={`${variantId}-${field.name}-help`} class="mt-2 text-xs leading-relaxed text-gray-500">{field.help}</p>}
+                <p id={`${variantId}-${field.name}-error`} class="mt-2 hidden text-sm text-red-300" data-error={field.name}></p>
+              </div>
+            ))}
+          </div>
+          <div class="mt-6 flex flex-col gap-3 border-t border-gray-800 pt-5 sm:flex-row">
+            <button class="min-h-11 rounded-lg bg-amber-400 px-5 py-2 text-sm font-bold text-gray-950 hover:bg-amber-300" type="submit">{page.submitLabel}</button>
+            <button class="min-h-11 rounded-lg border border-gray-700 px-5 py-2 text-sm font-semibold text-gray-200 hover:border-amber-400" type="button" data-clear>Clear</button>
+          </div>
+        </form>
+
+        <aside class="h-fit rounded-lg border border-gray-700 bg-gray-900/80 p-4 sm:p-6 lg:sticky lg:top-6" aria-labelledby={`${variantId}-result-heading`}>
+          <p class="text-sm font-semibold uppercase tracking-wide text-amber-400" data-status>Result</p>
+          <h2 id={`${variantId}-result-heading`} class="mt-2 text-xl font-semibold text-white">Jurisdiction-specific estimate</h2>
+          <p class="mt-3 break-words text-4xl font-bold text-white" data-total>—</p>
+          <p class="mt-3 text-sm leading-relaxed text-gray-400" data-context>Complete the required scope and amount fields.</p>
+          <div class="mt-5 hidden space-y-4" data-components></div>
+          <div class="mt-5 hidden rounded-lg border border-amber-400/25 bg-amber-400/10 p-3 text-sm leading-relaxed text-amber-100" data-missing></div>
+          <div class="mt-5 border-t border-gray-800 pt-4 text-xs leading-relaxed text-gray-500">Rule set <strong class="text-gray-300">{envelope.id}</strong> · period {envelope.periodId} · reviewed {envelope.reviewedAt} · <a class="text-amber-400 hover:underline" href={envelope.sources[0].url} target="_blank" rel="noreferrer">{envelope.sources[0].authority}</a></div>
+          <p class="sr-only" role="status" aria-live="polite" data-live></p>
+        </aside>
+      </div>
+      <div class="mt-8 rounded-lg border border-gray-800 bg-gray-950/70 p-4 text-sm leading-relaxed text-gray-400">This is a gross estimate for the exact jurisdiction and regime shown above, not a legal determination. Earned final pay, conditional redundancy, tax and any out-of-scope components remain separate. Check the cited authority or a qualified professional.</div>
+    </Container>
+  </PageShell>
+</BaseLayout>
+
+<script>
+  import { calculateEmployment } from "@lib/calculators/legal-tax/employment/calculator";
+
+  const root = document.querySelector("[data-employment-root]");
+  if (root instanceof HTMLElement) {
+    const form = root.querySelector("[data-form]");
+    const inputs = [...root.querySelectorAll("[data-input]")];
+    const total = root.querySelector("[data-total]");
+    const context = root.querySelector("[data-context]");
+    const status = root.querySelector("[data-status]");
+    const componentsNode = root.querySelector("[data-components]");
+    const missing = root.querySelector("[data-missing]");
+    const live = root.querySelector("[data-live]");
+    const escapeHtml = (value) => String(value).replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;").replaceAll("'", "&#039;");
+    const money = (value) => new Intl.NumberFormat(root.dataset.locale, { style: "currency", currency: root.dataset.currency }).format(value);
+    const resetResult = () => { if (status) status.textContent = "Result"; if (total) total.textContent = "—"; if (context) context.textContent = "Complete the required scope and amount fields."; componentsNode?.classList.add("hidden"); missing?.classList.add("hidden"); if (live) live.textContent = ""; };
+    const setError = (name, message = "") => { const node = root.querySelector(`[data-error="${name}"]`); if (node) { node.textContent = message; node.classList.toggle("hidden", !message); } };
+    inputs.forEach((input) => input.addEventListener("change", resetResult));
+    form?.addEventListener("submit", (event) => {
+      event.preventDefault();
+      const values = {}; let invalid = false;
+      inputs.forEach((input) => {
+        if (!(input instanceof HTMLInputElement || input instanceof HTMLSelectElement)) return;
+        const name = input.dataset.name; if (!name) return;
+        setError(name);
+        if (input.dataset.required === "true" && input.value === "") { setError(name, "Complete this field."); invalid = true; }
+        if (input instanceof HTMLInputElement && input.value !== "" && !input.checkValidity()) { setError(name, "Enter a value within the supported range."); invalid = true; }
+        values[name] = input.value === "" ? undefined : input.type === "number" ? Number(input.value) : input.value;
+      });
+      if (invalid) { if (live) live.textContent = "Correct the highlighted fields."; return; }
+      try {
+        const result = calculateEmployment({ ruleSetId: root.dataset.ruleSet ?? "", values });
+        const primary = result.components.find((item) => item.amount !== undefined) ?? result.components.find((item) => item.quantity !== undefined);
+        if (status) status.textContent = result.coverage === "manual-only" ? "Contractual policy result" : "Jurisdiction-specific result";
+        if (total) total.textContent = primary?.amount !== undefined ? money(primary.amount) : primary?.quantity !== undefined ? `${primary.quantity} ${primary.unit}` : "Not calculated";
+        if (context) context.textContent = `${result.jurisdictionLabel} · ${result.periodId}`;
+        if (componentsNode) {
+          componentsNode.innerHTML = result.components.map((item) => {
+            const value = item.amount !== undefined ? money(item.amount) : item.quantity !== undefined ? `${item.quantity} ${item.unit}` : "No numeric result";
+            return `<section class="rounded-lg border border-gray-800 bg-gray-950/60 p-3"><div class="flex items-start justify-between gap-3"><h3 class="font-semibold text-white">${escapeHtml(item.label)}</h3><span class="rounded bg-gray-800 px-2 py-1 text-[0.7rem] font-semibold text-amber-300">${escapeHtml(item.status)}</span></div><p class="mt-2 text-lg font-bold text-white">${escapeHtml(value)}</p><p class="mt-1 text-xs leading-relaxed text-gray-500">${escapeHtml(item.formula)}</p></section>`;
+          }).join("");
+          componentsNode.classList.remove("hidden");
+        }
+        if (missing) { missing.innerHTML = `<strong>Not included:</strong> ${escapeHtml(result.missingConcepts.join("; "))}.`; missing.classList.remove("hidden"); }
+        if (live) live.textContent = `Calculation complete for ${result.jurisdictionLabel}.`;
+      } catch (error) { if (live) live.textContent = error instanceof Error ? error.message : "The estimate could not be completed."; }
+    });
+    root.querySelector("[data-clear]")?.addEventListener("click", () => { form?.reset(); inputs.forEach((input) => { if (input instanceof HTMLInputElement || input instanceof HTMLSelectElement) setError(input.dataset.name ?? ""); }); resetResult(); });
+  }
+</script>

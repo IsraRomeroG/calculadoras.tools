@@ -542,7 +542,7 @@ describe("calculator category directory", () => {
           id: "legal-impuestos",
           slug: "legal-tax",
           label: "Legal & Taxes",
-          count: 25,
+          count: 36,
         }),
       ]),
     );
