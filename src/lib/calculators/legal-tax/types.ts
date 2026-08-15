@@ -67,6 +67,22 @@ export interface LegalSource {
   primary: boolean;
 }
 
+export interface SourceAuditRecord {
+  sourceId: string;
+  authority: string;
+  title: string;
+  canonicalUrl: string;
+  jurisdictionCode: string;
+  appliesToRuleIds: string[];
+  sourceVersion?: string;
+  publishedAt?: string;
+  effectiveFrom?: string;
+  effectiveTo?: string;
+  accessedAt: string;
+  reviewedBy: string;
+  reviewNotes: string;
+}
+
 export interface OfficialFixtureRef {
   id: string;
   sourceId: string;

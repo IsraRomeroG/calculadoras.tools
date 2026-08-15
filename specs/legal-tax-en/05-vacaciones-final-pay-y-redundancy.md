@@ -313,4 +313,3 @@ campos `annualBonus`, `vacationPremium`, `seniorityPremium`, `threeMonths` y
 - No se usa la LFT mexicana fuera de `mx-en`.
 - El usuario puede reproducir cada componente con fórmula, inputs y fuente.
 - Un caso fuera del MVP se bloquea y dirige a la autoridad correcta.
-

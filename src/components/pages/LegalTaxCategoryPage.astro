@@ -1,0 +1,65 @@
+---
+import Card from "@components/shared/Card.astro";
+import Container from "@components/layout/Container.astro";
+import PageShell from "@components/layout/PageShell.astro";
+import PageHero from "@components/shared/PageHero.astro";
+import BaseLayout from "@layouts/BaseLayout.astro";
+import { getCalculatorsByCategoryId, getPublishedCalculators } from "@lib/calculator-directory";
+import { LEGAL_TAX_MARKET_DIRECTORY_ITEMS, type LegalTaxTaskGroup } from "@lib/calculators/legal-tax/catalog";
+import { buildAlternateLinks } from "@lib/i18n/routing";
+
+interface Props { categoryId: "legal-impuestos" }
+const { categoryId } = Astro.props;
+const calculators = getCalculatorsByCategoryId(getPublishedCalculators("en"), categoryId);
+const catalogMetadata = new Map(LEGAL_TAX_MARKET_DIRECTORY_ITEMS.map((item) => [item.href, item]));
+const legacyMetadata = new Map([
+  ["/en/legal-tax/indirect-tax-calculator", { taskGroup: "indirect-tax" as const, countryLabel: "Choose a country" }],
+  ["/en/legal-tax/mexico-income-tax-calculator", { taskGroup: "income-tax" as const, countryLabel: "Mexico" }],
+  ["/en/legal-tax/mexico-net-salary-calculator", { taskGroup: "take-home-pay" as const, countryLabel: "Mexico" }],
+  ["/en/legal-tax/mexico-proportional-vacation-calculator", { taskGroup: "employment" as const, countryLabel: "Mexico" }],
+  ["/en/legal-tax/mexico-termination-pay-calculator", { taskGroup: "employment" as const, countryLabel: "Mexico" }],
+]);
+const groupDefinitions: Array<{ id: LegalTaxTaskGroup; title: string; description: string }> = [
+  { id: "indirect-tax", title: "VAT, GST and sales tax", description: "Choose the place-of-supply rules before adding or extracting indirect tax." },
+  { id: "income-tax", title: "Income tax", description: "Annual liability estimates use a named country, jurisdiction, profile and rule period." },
+  { id: "take-home-pay", title: "Take-home pay", description: "Payroll projections keep employee contributions and excluded modules visible." },
+  { id: "employment", title: "Paid leave, final pay and redundancy", description: "Employment-law tools apply only to the exact statutory, federal, NES, GB or contractual scope shown." },
+];
+const grouped = groupDefinitions.map((group) => {
+  const items = calculators.flatMap((calculator) => {
+    const metadata = catalogMetadata.get(calculator.href) ?? legacyMetadata.get(calculator.href);
+    return metadata?.taskGroup === group.id ? [{ calculator, countryLabel: metadata.countryLabel }] : [];
+  });
+  const countries = [...new Set(items.map((item) => item.countryLabel))].sort((a, b) => a === "Choose a country" ? -1 : b === "Choose a country" ? 1 : a.localeCompare(b, "en"));
+  return { ...group, countries: countries.map((countryLabel) => ({ countryLabel, calculators: items.filter((item) => item.countryLabel === countryLabel).map((item) => item.calculator) })) };
+});
+const canonical = "/en/legal-tax";
+const alternates = buildAlternateLinks({ es: "/legal-impuestos", en: canonical }, Astro.site ?? Astro.url);
+---
+
+<BaseLayout title="Legal & Tax calculators by country" description="Choose a legal or tax task, then the country and jurisdiction whose rules apply." canonical={canonical} locale="en" alternates={alternates}>
+  <PageShell>
+    <PageHero title="Legal & Tax calculators by country" description="Choose a task first, then the country, jurisdiction and rule period. English is the interface language; it does not select the law." kicker="Legal & Taxes" breadcrumbs={[{ label: "Home", href: "/en", ariaLabel: "Home" }, { label: "Legal & Taxes", truncate: true }]} />
+    <Container as="div" class="py-8 md:py-10">
+      <div class="space-y-12">
+        {grouped.map((group) => (
+          <section aria-labelledby={`${group.id}-heading`}>
+            <h2 id={`${group.id}-heading`} class="text-2xl font-semibold text-white">{group.title}</h2>
+            <p class="mt-2 max-w-3xl text-sm leading-relaxed text-gray-400">{group.description}</p>
+            <div class="mt-6 space-y-8">
+              {group.countries.map((country) => (
+                <section aria-labelledby={`${group.id}-${country.countryLabel.toLowerCase().replaceAll(" ", "-")}`}>
+                  <h3 id={`${group.id}-${country.countryLabel.toLowerCase().replaceAll(" ", "-")}`} class="border-b border-gray-800 pb-2 text-sm font-semibold uppercase tracking-wide text-amber-400">{country.countryLabel}</h3>
+                  <div class="mt-4 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                    {country.calculators.map((calculator) => <Card href={calculator.href} title={calculator.title} description={calculator.description} cta="Use ->" />)}
+                  </div>
+                </section>
+              ))}
+            </div>
+          </section>
+        ))}
+      </div>
+      <div class="mt-12 rounded-lg border border-amber-400/25 bg-amber-400/10 p-4 text-sm leading-relaxed text-amber-100">These calculators are estimates based on the selected jurisdiction and rule period. Each calculator lists its coverage, excluded concepts and primary authority; unsupported cases are blocked instead of falling back to another country.</div>
+    </Container>
+  </PageShell>
+</BaseLayout>
