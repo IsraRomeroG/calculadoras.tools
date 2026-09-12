@@ -6,15 +6,37 @@ import PageShell from "@components/layout/PageShell.astro";
 import FaqSection from "@components/shared/FaqSection.astro";
 import PageHero from "@components/shared/PageHero.astro";
 import SectionIntro from "@components/shared/SectionIntro.astro";
+import { getPublishedCalculators } from "@lib/calculator-directory";
 import { buildAlternateLinks } from "@lib/i18n/routing";
 import { buildFaqJsonLd } from "@lib/seo";
 
-const title = "Calculadora de Diferencia entre Fechas - Días, Semanas y Meses";
+const title = "Diferencia entre fechas: calculadora de días, semanas y meses";
 const description =
-  "Calcula cuántos días hay entre dos fechas, cuántos días faltan para un evento o qué fecha será dentro de X días. Incluye días hábiles sin fines de semana.";
+  "Calcula días, semanas, meses y años entre dos fechas. Conteo estándar o inclusivo. Días hábiles de lunes a viernes; no descuenta festivos.";
 const canonical = "/fecha-tiempo/diferencia-entre-fechas";
 const englishCanonical = "/en/date-time/date-difference-calculator";
 const alternates = buildAlternateLinks({ es: canonical, en: englishCanonical }, Astro.site ?? Astro.url);
+const publishedCalculators = getPublishedCalculators("es");
+const relatedLinks = [
+  {
+    id: "calculadora-fecha-limite-countdown",
+    title: "Calcular una fecha límite y cuenta regresiva",
+    description: "Sigue el tiempo restante con una fecha o una hora exacta.",
+  },
+  {
+    id: "calculadora-de-edad",
+    title: "Calcular edad exacta en años, meses y días",
+    description: "Calcula edad, días vividos y próximo cumpleaños.",
+  },
+  {
+    id: "calculadora-de-horas-trabajadas",
+    title: "Calcular horas trabajadas y pago estimado",
+    description: "Suma turnos, resta descansos y revisa horas extra.",
+  },
+].flatMap((related) => {
+  const calculator = publishedCalculators.find((item) => item.id === related.id);
+  return calculator ? [{ ...related, href: calculator.href }] : [];
+});
 
 const faqs = [
   {
@@ -45,12 +67,27 @@ const faqs = [
   {
     question: "¿La calculadora descuenta festivos?",
     answer:
-      "En este MVP no. Los días hábiles solo excluyen sábados y domingos. Los festivos por país quedan para una fase posterior con dataset local mantenible.",
+      "No. Los días hábiles de esta versión solo excluyen sábados y domingos; no descuentan festivos de ningún país.",
   },
   {
     question: "¿Sirve para plazos legales o laborales?",
     answer:
       "Sirve como ayuda de cálculo, pero no sustituye reglas legales, laborales, fiscales ni contractuales. Verifica siempre el criterio aplicable a tu caso.",
+  },
+  {
+    question: "¿Qué pasa si una fecha cae en sábado o domingo?",
+    answer:
+      "Los días naturales siguen contando todos los días. Si eliges días hábiles, los sábados y domingos no se incluyen; el conteo inclusivo solo añade un extremo si cae de lunes a viernes.",
+  },
+  {
+    question: "¿Cómo se calculan los meses y años entre dos fechas?",
+    answer:
+      "La calculadora muestra años, meses y días de calendario completos. Un mes no siempre equivale a 30 días y un año no siempre equivale a 365, por lo que se respeta el calendario real del intervalo.",
+  },
+  {
+    question: "¿Se tienen en cuenta los años bisiestos?",
+    answer:
+      "Sí. Las fechas se validan con el calendario gregoriano, incluido el 29 de febrero en los años bisiestos.",
   },
 ];
 
@@ -105,6 +142,17 @@ const dateUnits = [
       ]}
     />
 
+    <Container as="section" class="py-4 md:py-5">
+      <p class="max-w-3xl text-base leading-relaxed text-gray-300">
+        Calcula la diferencia entre dos fechas en días naturales (también llamados
+        días calendario), semanas, meses y años. Elige un conteo estándar o
+        inclusivo y consulta los días hábiles
+        de lunes a viernes, sin descontar festivos. También puedes sumar o
+        restar tiempo a una fecha, o calcular cuánto falta para un evento con
+        una fecha base.
+      </p>
+    </Container>
+
     <Container as="section" class="py-6 md:py-8">
       <section
         id="date-difference-calculator"
@@ -147,7 +195,10 @@ const dateUnits = [
             <div class="mt-6 space-y-6">
               <div data-mode-panel="difference">
                 <div class="grid gap-4 lg:grid-cols-2">
-                  <fieldset class="rounded-lg border border-gray-800 bg-gray-900/60 p-4">
+                  <fieldset
+                    class="rounded-lg border border-gray-800 bg-gray-900/60 p-4"
+                    aria-describedby="difference-error"
+                  >
                     <div class="flex flex-wrap items-center justify-between gap-3">
                       <legend class="text-sm font-semibold text-gray-200">
                         Fecha inicial
@@ -220,7 +271,10 @@ const dateUnits = [
                     </div>
                   </fieldset>
 
-                  <fieldset class="rounded-lg border border-gray-800 bg-gray-900/60 p-4">
+                  <fieldset
+                    class="rounded-lg border border-gray-800 bg-gray-900/60 p-4"
+                    aria-describedby="difference-error"
+                  >
                     <div class="flex flex-wrap items-center justify-between gap-3">
                       <legend class="text-sm font-semibold text-gray-200">
                         Fecha final
@@ -346,7 +400,7 @@ const dateUnits = [
                           checked
                           data-option-input
                         />
-                        Todos
+                        Días naturales
                       </label>
                       <label class="flex min-h-11 items-center rounded-lg border border-gray-700 bg-gray-900 px-3 text-sm text-gray-200">
                         <input
@@ -374,7 +428,10 @@ const dateUnits = [
               </div>
 
               <div class="hidden" data-mode-panel="add">
-                <fieldset class="rounded-lg border border-gray-800 bg-gray-900/60 p-4">
+                <fieldset
+                  class="rounded-lg border border-gray-800 bg-gray-900/60 p-4"
+                  aria-describedby="operation-error"
+                >
                   <div class="flex flex-wrap items-center justify-between gap-3">
                     <legend class="text-sm font-semibold text-gray-200">
                       Fecha de inicio
@@ -516,6 +573,7 @@ const dateUnits = [
                 </div>
 
                 <p
+                  id="operation-error"
                   class="mt-3 hidden text-sm text-red-300"
                   data-error="operation"
                 >
@@ -524,7 +582,10 @@ const dateUnits = [
 
               <div class="hidden" data-mode-panel="event">
                 <div class="grid gap-4 lg:grid-cols-2">
-                  <fieldset class="rounded-lg border border-gray-800 bg-gray-900/60 p-4">
+                  <fieldset
+                    class="rounded-lg border border-gray-800 bg-gray-900/60 p-4"
+                    aria-describedby="event-error"
+                  >
                     <legend class="text-sm font-semibold text-gray-200">
                       Fecha del evento
                     </legend>
@@ -606,7 +667,10 @@ const dateUnits = [
                     </div>
                   </fieldset>
 
-                  <fieldset class="rounded-lg border border-gray-800 bg-gray-900/60 p-4">
+                  <fieldset
+                    class="rounded-lg border border-gray-800 bg-gray-900/60 p-4"
+                    aria-describedby="event-error"
+                  >
                     <div class="flex flex-wrap items-center justify-between gap-3">
                       <legend class="text-sm font-semibold text-gray-200">
                         Fecha base
@@ -722,7 +786,7 @@ const dateUnits = [
                           checked
                           data-option-input
                         />
-                        Todos
+                        Días naturales
                       </label>
                       <label class="flex min-h-11 items-center rounded-lg border border-gray-700 bg-gray-900 px-3 text-sm text-gray-200">
                         <input
@@ -738,7 +802,11 @@ const dateUnits = [
                   </fieldset>
                 </div>
 
-                <p class="mt-3 hidden text-sm text-red-300" data-error="event">
+                <p
+                  id="event-error"
+                  class="mt-3 hidden text-sm text-red-300"
+                  data-error="event"
+                >
                 </p>
               </div>
             </div>
@@ -773,7 +841,6 @@ const dateUnits = [
 
           <aside
             class="border-t border-gray-800 bg-gray-900/70 p-4 sm:p-6 xl:border-l xl:border-t-0"
-            aria-live="polite"
             data-result-region
           >
             <p class="text-sm font-semibold text-amber-400" data-result-kicker>
@@ -788,6 +855,7 @@ const dateUnits = [
             <p class="mt-3 text-sm leading-relaxed text-gray-400" data-result-note>
               Completa los campos para ver el cálculo.
             </p>
+            <p class="sr-only" aria-live="polite" data-result-announcement></p>
 
             <div
               class="mt-5 hidden rounded-lg border border-amber-400/40 bg-amber-400/10 p-4"
@@ -813,32 +881,186 @@ const dateUnits = [
 
     <Container as="section" class="py-6 md:py-8">
       <SectionIntro
-        title="Cómo se cuentan los días"
-        description="El conteo estándar no cuenta la fecha inicial. El conteo inclusivo suma la fecha inicial cuando necesitas contar ambos extremos del periodo."
+        title="Cómo calcular los días entre dos fechas"
+        description="La diferencia de fechas se calcula con la fecha final menos la fecha inicial. El conteo estándar mide el tiempo transcurrido; el inclusivo cuenta ambos extremos del periodo."
+      />
+
+      <div class="grid gap-4 md:grid-cols-2">
+        <article class="rounded-lg border border-gray-800 bg-gray-950 p-5">
+          <h3 class="text-lg font-semibold">Conteo estándar</h3>
+          <p class="mt-3 text-sm leading-relaxed text-gray-400">
+            El resultado es la diferencia entre la fecha final y la fecha
+            inicial. No cuenta el extremo cronológicamente anterior e incluye
+            el posterior. Del 1 al 2 de enero hay 1 día estándar.
+          </p>
+        </article>
+        <article class="rounded-lg border border-gray-800 bg-gray-950 p-5">
+          <h3 class="text-lg font-semibold">Conteo inclusivo</h3>
+          <p class="mt-3 text-sm leading-relaxed text-gray-400">
+            Suma un día para incluir ambos extremos. Del 1 al 2 de enero hay 2
+            días inclusivos. Si las fechas están invertidas, el resultado
+            numérico sigue siendo absoluto y se informa la dirección por
+            separado.
+          </p>
+        </article>
+      </div>
+
+      <p class="mt-4 text-sm leading-relaxed text-gray-400">
+        Este cálculo usa fechas de calendario, no horas exactas. Por eso las
+        horas y los minutos que aparecen como equivalencia son aproximados.
+      </p>
+    </Container>
+
+    <Container as="section" class="py-6 md:py-8">
+      <SectionIntro
+        title="Semanas, meses y años entre fechas"
+        description="El total de días naturales y el desglose de calendario responden a preguntas distintas; ambos se muestran con etiquetas separadas."
       />
 
       <div class="grid gap-4 md:grid-cols-3">
-        <div class="rounded-lg border border-gray-800 bg-gray-950 p-5">
-          <h3 class="text-lg font-semibold">Estándar</h3>
+        <article class="rounded-lg border border-gray-800 bg-gray-950 p-5">
+          <h3 class="text-lg font-semibold">Semanas entre fechas</h3>
           <p class="mt-3 text-sm leading-relaxed text-gray-400">
-            Del 1 al 2 de enero hay 1 día. Es la convención más común para
-            medir tiempo transcurrido.
+            Las semanas completas y los días restantes se derivan del total de
+            días naturales según el conteo estándar o inclusivo seleccionado.
+            No son semanas laborales, aunque el resultado principal esté en
+            modo de días hábiles.
           </p>
-        </div>
-        <div class="rounded-lg border border-gray-800 bg-gray-950 p-5">
-          <h3 class="text-lg font-semibold">Inclusivo</h3>
+        </article>
+        <article class="rounded-lg border border-gray-800 bg-gray-950 p-5">
+          <h3 class="text-lg font-semibold">Meses y días</h3>
           <p class="mt-3 text-sm leading-relaxed text-gray-400">
-            Cuenta la fecha inicial. Es útil para estancias, reportes o
-            conteos donde ambos extremos forman parte del periodo.
+            El desglose de calendario muestra meses completos y días restantes.
+            Un mes no equivale siempre a 30 días, así que no se convierte el
+            intervalo a meses decimales de forma aproximada.
           </p>
-        </div>
-        <div class="rounded-lg border border-gray-800 bg-gray-950 p-5">
-          <h3 class="text-lg font-semibold">Hábiles</h3>
+        </article>
+        <article class="rounded-lg border border-gray-800 bg-gray-950 p-5">
+          <h3 class="text-lg font-semibold">Años y años bisiestos</h3>
           <p class="mt-3 text-sm leading-relaxed text-gray-400">
-            En esta versión se excluyen sábados y domingos. Los festivos por
-            país quedan fuera del MVP.
+            Los años se cuentan con el calendario real y no dividiendo siempre
+            los días entre 365. Los años bisiestos incluyen el 29 de febrero.
           </p>
-        </div>
+        </article>
+      </div>
+
+      <div class="mt-5 rounded-lg border border-amber-400/30 bg-amber-400/10 p-5">
+        <h3 class="text-lg font-semibold text-amber-100">Ejemplo de desglose</h3>
+        <p class="mt-3 text-sm leading-relaxed text-amber-50/80">
+          Del 15 de enero de 2026 al 30 de septiembre de 2026 hay 258 días
+          estándar, equivalentes a 36 semanas y 6 días naturales. El desglose
+          de calendario estándar es de 8 meses y 15 días. Con conteo inclusivo
+          hay 259 días, equivalentes a 37 semanas; el desglose de calendario
+          sigue identificado como estándar.
+        </p>
+      </div>
+    </Container>
+
+    <Container as="section" class="py-6 md:py-8">
+      <SectionIntro
+        title="Días naturales y días hábiles"
+        description="Elige el criterio que corresponde a tu caso antes de interpretar el resultado."
+      />
+
+      <div class="grid gap-4 md:grid-cols-3">
+        <article class="rounded-lg border border-gray-800 bg-gray-950 p-5">
+          <h3 class="text-lg font-semibold">Días naturales</h3>
+          <p class="mt-3 text-sm leading-relaxed text-gray-400">
+            También llamados días calendario, incluyen lunes, martes, fines de
+            semana y cualquier otro día dentro del intervalo.
+          </p>
+        </article>
+        <article class="rounded-lg border border-gray-800 bg-gray-950 p-5">
+          <h3 class="text-lg font-semibold">Días hábiles</h3>
+          <p class="mt-3 text-sm leading-relaxed text-gray-400">
+            Esta versión cuenta de lunes a viernes y excluye sábados y
+            domingos. No descuenta festivos oficiales ni días de descanso
+            particulares de un país, empresa o contrato.
+          </p>
+        </article>
+        <article class="rounded-lg border border-gray-800 bg-gray-950 p-5">
+          <h3 class="text-lg font-semibold">¿Cuál elegir?</h3>
+          <p class="mt-3 text-sm leading-relaxed text-gray-400">
+            Usa días naturales para periodos transcurridos y días hábiles para
+            tareas de lunes a viernes. Para un plazo legal o laboral, verifica
+            siempre la regla aplicable.
+          </p>
+        </article>
+      </div>
+    </Container>
+
+    <Container as="section" class="py-6 md:py-8">
+      <SectionIntro
+        title="Sumar o restar tiempo a una fecha"
+        description="El modo Sumar o restar permite obtener una fecha futura o pasada usando días, días hábiles, semanas, meses o años."
+      />
+
+      <div class="grid gap-4 md:grid-cols-2">
+        <article class="rounded-lg border border-gray-800 bg-gray-950 p-5">
+          <h3 class="text-lg font-semibold">Ejemplos de uso</h3>
+          <p class="mt-3 text-sm leading-relaxed text-gray-400">
+            Puedes calcular qué fecha será después de 30 días, 30 días hábiles,
+            4 semanas, 3 meses o 1 año. Al usar días hábiles se omiten sábados
+            y domingos, pero no festivos.
+          </p>
+        </article>
+        <article class="rounded-lg border border-gray-800 bg-gray-950 p-5">
+          <h3 class="text-lg font-semibold">Fin de mes</h3>
+          <p class="mt-3 text-sm leading-relaxed text-gray-400">
+            Si el día no existe en el mes destino, la calculadora ajusta el
+            resultado al último día válido. Por ejemplo, sumar un mes al 31 de
+            enero produce el 28 de febrero, o el 29 en un año bisiesto.
+          </p>
+        </article>
+      </div>
+    </Container>
+
+    <Container as="section" class="py-6 md:py-8">
+      <SectionIntro
+        title="Hasta un evento"
+        description="Introduce una fecha base, una fecha del evento y, si quieres, un nombre para consultar cuánto falta o cuánto tiempo ha pasado."
+      />
+      <p class="max-w-3xl text-sm leading-relaxed text-gray-400">
+        Este modo cuenta días naturales o hábiles con la regla seleccionada.
+        Para una cuenta regresiva en vivo, una hora exacta o un evento que
+        quieras añadir al calendario, usa la
+        <a
+          href="/fecha-tiempo/calculadora-fecha-limite-countdown"
+          class="font-semibold text-amber-400 hover:text-amber-300 hover:underline"
+        >
+          calculadora de fecha límite y cuenta regresiva
+        </a>.
+      </p>
+    </Container>
+
+    <Container as="section" class="py-6 md:py-8">
+      <SectionIntro
+        title="Ejemplos de diferencia entre fechas"
+        description="Estos ejemplos son fijos y sirven para comprobar la regla de conteo; no representan un resultado personalizado."
+      />
+
+      <div class="grid gap-4 md:grid-cols-3">
+        <article class="rounded-lg border border-gray-800 bg-gray-950 p-5">
+          <h3 class="text-lg font-semibold">Ejemplo 1</h3>
+          <p class="mt-3 text-sm leading-relaxed text-gray-400">
+            Del 1 al 2 de enero: 1 día estándar y 2 días inclusivos.
+          </p>
+        </article>
+        <article class="rounded-lg border border-gray-800 bg-gray-950 p-5">
+          <h3 class="text-lg font-semibold">Ejemplo 2</h3>
+          <p class="mt-3 text-sm leading-relaxed text-gray-400">
+            Del 28 de febrero de 2024 al 1 de marzo de 2024: 2 días estándar y
+            3 días inclusivos. El 29 de febrero se cuenta porque 2024 es
+            bisiesto.
+          </p>
+        </article>
+        <article class="rounded-lg border border-gray-800 bg-gray-950 p-5">
+          <h3 class="text-lg font-semibold">Ejemplo 3</h3>
+          <p class="mt-3 text-sm leading-relaxed text-gray-400">
+            Del viernes 11 al lunes 14 de septiembre de 2026: 3 días naturales,
+            1 hábil y 2 de fin de semana en estándar; 4, 2 y 2 en inclusivo.
+          </p>
+        </article>
       </div>
     </Container>
 
@@ -850,6 +1072,28 @@ const dateUnits = [
           legales, laborales, fiscales ni contractuales. Verifica siempre el
           criterio aplicable a tu caso.
         </p>
+      </div>
+    </Container>
+
+    <Container as="section" class="py-6 md:py-8">
+      <SectionIntro
+        title="Calculadoras relacionadas"
+        description="Elige otra herramienta según el tipo de fecha o periodo que necesitas resolver."
+      />
+      <div class="grid gap-4 md:grid-cols-3">
+        {
+          relatedLinks.map((related) => (
+            <a
+              href={related.href}
+              class="rounded-lg border border-gray-800 bg-gray-950 p-5 transition hover:border-amber-400"
+            >
+              <h3 class="font-semibold text-white">{related.title}</h3>
+              <p class="mt-2 text-sm leading-relaxed text-gray-400">
+                {related.description}
+              </p>
+            </a>
+          ))
+        }
       </div>
     </Container>
 
@@ -876,6 +1120,10 @@ const dateUnits = [
     parseDateParts,
     todayInLocalTimeZone,
   } from "@lib/calculators/fecha-tiempo/diferencia-entre-fechas/date-difference";
+  import {
+    trackDateDifferenceMetric,
+    type DateDifferenceMetric,
+  } from "@lib/analytics/client";
 
   const ERROR_MESSAGES = {
     required: "Completa día, mes y año.",
@@ -932,6 +1180,7 @@ const dateUnits = [
   const resultKicker = document.querySelector("[data-result-kicker]");
   const mainResult = document.querySelector("[data-main-result]");
   const resultNote = document.querySelector("[data-result-note]");
+  const resultAnnouncement = document.querySelector("[data-result-announcement]");
   const detailList = document.querySelector("[data-detail-list]");
   const warningPanel = document.querySelector("[data-warning-panel]");
   const warningList = document.querySelector("[data-warning-list]");
@@ -946,6 +1195,13 @@ const dateUnits = [
   let currentMode = "difference";
   let currentCopyText = "";
   let copiedTimeout = 0;
+  let resultAnnouncementTimeout = 0;
+  let calculationMetricTimeout = 0;
+  let pendingCalculationMetricState = "";
+  let lastCalculationMetricState = "";
+  let calculationInteractionEligible = false;
+  let calculatorHasInteraction = false;
+  let lastValidationMetricKey = "";
   let differenceStartUsesToday = true;
   let operationStartUsesToday = true;
   let eventBaseUsesToday = true;
@@ -1006,6 +1262,9 @@ const dateUnits = [
 
   function setNeutralState() {
     currentCopyText = "";
+    clearCalculationMetricTimer();
+    lastCalculationMetricState = "";
+    clearResultAnnouncement();
     resultKicker.textContent = "Resultado";
     mainResult.textContent = "Ingresa las fechas";
     resultNote.textContent = "Completa los campos para ver el cálculo.";
@@ -1016,6 +1275,9 @@ const dateUnits = [
 
   function setInvalidState(mode, message) {
     currentCopyText = "";
+    clearCalculationMetricTimer();
+    lastCalculationMetricState = "";
+    clearResultAnnouncement();
     resultKicker.textContent = "Revisa los campos";
     mainResult.textContent = "No se puede calcular todavía";
     resultNote.textContent = message;
@@ -1025,7 +1287,117 @@ const dateUnits = [
     showError(errors[mode], message);
   }
 
-  function updateCalculator() {
+  function clearResultAnnouncement() {
+    window.clearTimeout(resultAnnouncementTimeout);
+    resultAnnouncementTimeout = 0;
+    resultAnnouncement.textContent = "";
+  }
+
+  function scheduleResultAnnouncement() {
+    window.clearTimeout(resultAnnouncementTimeout);
+    resultAnnouncementTimeout = window.setTimeout(() => {
+      resultAnnouncement.textContent = mainResult.textContent;
+    }, 800);
+  }
+
+  function clearCalculationMetricTimer() {
+    window.clearTimeout(calculationMetricTimeout);
+    calculationMetricTimeout = 0;
+    pendingCalculationMetricState = "";
+  }
+
+  function buildCalculationMetricState(mode, fields = {}) {
+    const groups =
+      mode === "difference"
+        ? [DATE_GROUPS["difference-start"], DATE_GROUPS["difference-end"]]
+        : mode === "add"
+          ? [DATE_GROUPS["operation-start"]]
+          : [DATE_GROUPS.event, DATE_GROUPS["event-base"]];
+
+    return JSON.stringify({
+      mode,
+      dates: groups.map((group) =>
+        [group.day, group.month, group.year]
+          .map((input) => input?.value.trim() ?? "")
+          .join("-"),
+      ),
+      ...fields,
+    });
+  }
+
+  function scheduleCalculationMetric(
+    metric: DateDifferenceMetric,
+    state: string,
+  ) {
+    if (!calculationInteractionEligible || state === lastCalculationMetricState) {
+      return;
+    }
+
+    window.clearTimeout(calculationMetricTimeout);
+    pendingCalculationMetricState = state;
+    calculationMetricTimeout = window.setTimeout(() => {
+      if (
+        !calculationInteractionEligible ||
+        pendingCalculationMetricState !== state
+      ) {
+        return;
+      }
+
+      trackDateDifferenceMetric(metric);
+      lastCalculationMetricState = state;
+      pendingCalculationMetricState = "";
+      calculationMetricTimeout = 0;
+    }, 1000);
+  }
+
+  function getValidationErrorCode(mode) {
+    if (mode === "difference") {
+      const start = parseDateFromGroup(DATE_GROUPS["difference-start"]);
+      const end = parseDateFromGroup(DATE_GROUPS["difference-end"]);
+      return !start.ok ? start.error : !end.ok ? end.error : "";
+    }
+
+    if (mode === "add") {
+      const start = parseDateFromGroup(DATE_GROUPS["operation-start"]);
+      if (!start.ok) return start.error;
+      const amount = parseAmount();
+      return amount.ok ? "" : amount.error;
+    }
+
+    const eventDate = parseDateFromGroup(DATE_GROUPS.event);
+    const baseDate = parseDateFromGroup(DATE_GROUPS["event-base"]);
+    return !eventDate.ok ? eventDate.error : !baseDate.ok ? baseDate.error : "";
+  }
+
+  function reportValidationMetric(mode) {
+    const error = getValidationErrorCode(mode);
+
+    if (!error) {
+      lastValidationMetricKey = "";
+      return;
+    }
+
+    if (!calculatorHasInteraction) return;
+
+    const key = mode + ":" + error;
+    if (key === lastValidationMetricKey) return;
+
+    trackDateDifferenceMetric({
+      event: "date_difference_validation_error",
+      mode,
+      error,
+    });
+    lastValidationMetricKey = key;
+  }
+
+  function updateCalculator({ userInitiated = false } = {}) {
+    calculationInteractionEligible = userInitiated;
+
+    if (!userInitiated) {
+      clearCalculationMetricTimer();
+      lastCalculationMetricState = "";
+    }
+
     clearErrors();
 
     if (!hasCurrentModeStarted()) {
@@ -1078,6 +1450,7 @@ const dateUnits = [
       dayType === "business" ? "día hábil" : "día",
       dayType === "business" ? "días hábiles" : "días",
     );
+    const countLabel = getCountLabel(countMode);
 
     resultKicker.textContent =
       dayType === "business" ? "Días hábiles" : "Días entre fechas";
@@ -1086,14 +1459,17 @@ const dateUnits = [
     renderDetails([
       ["Fecha inicial", formatFullPlainDate(start.value)],
       ["Fecha final", formatFullPlainDate(end.value)],
-      ["Equivalente calendario", formatCompactDuration(result.calendar)],
-      ["Semanas", formatWeekDuration(result.weeks)],
-      ["Días calendario", formatUnit(result.totalDays, "día", "días")],
       [
-        "Días hábiles sin festivos",
+        "Desglose de calendario (conteo estándar)",
+        formatCompactDuration(result.calendar),
+      ],
+      [`Semanas y días naturales (${countLabel})`, formatWeekDuration(result.weeks)],
+      [`Días naturales (${countLabel})`, formatUnit(result.totalDays, "día", "días")],
+      [
+        `Días hábiles sin festivos (${countLabel})`,
         formatUnit(result.businessDays, "día hábil", "días hábiles"),
       ],
-      ["Fines de semana", formatUnit(result.weekendDays, "día", "días")],
+      [`Fines de semana (${countLabel})`, formatUnit(result.weekendDays, "día", "días")],
       ["Horas aprox.", `${formatNumber(result.totalDays * 24)} h`],
       ["Minutos aprox.", `${formatNumber(result.totalDays * 24 * 60)} min`],
     ]);
@@ -1105,6 +1481,16 @@ const dateUnits = [
       countMode,
       result,
     });
+    scheduleCalculationMetric(
+      {
+        event: "date_difference_calculation_completed",
+        mode: "difference",
+        countMode: countMode === "inclusive" ? "inclusive" : "standard",
+        dayType: dayType === "business" ? "business" : "calendar",
+      },
+      buildCalculationMetricState("difference", { countMode, dayType }),
+    );
+    scheduleResultAnnouncement();
   }
 
   function renderOperationMode() {
@@ -1172,6 +1558,25 @@ const dateUnits = [
       `Semana ISO: ${formatNumber(result.isoWeek)}`,
       `Día del año: ${formatNumber(result.dayOfYear)}`,
     ].join("\n");
+    scheduleCalculationMetric(
+      {
+        event: "date_difference_calculation_completed",
+        mode: "add",
+        unit:
+          unit === "businessDays" ||
+          unit === "weeks" ||
+          unit === "months" ||
+          unit === "years"
+            ? unit
+            : "days",
+      },
+      buildCalculationMetricState("add", {
+        operation,
+        amount: amountInput?.value.trim() ?? "",
+        unit,
+      }),
+    );
+    scheduleResultAnnouncement();
   }
 
   function renderEventMode() {
@@ -1201,6 +1606,7 @@ const dateUnits = [
       dayType === "business" ? "día hábil" : "día",
       dayType === "business" ? "días hábiles" : "días",
     );
+    const countLabel = getCountLabel(countMode);
 
     resultKicker.textContent = "Cuenta hacia evento";
     mainResult.textContent = buildEventHeadline(result.sign, primaryText, label);
@@ -1208,14 +1614,17 @@ const dateUnits = [
     renderDetails([
       ["Fecha base", formatFullPlainDate(baseDate.value)],
       ["Fecha del evento", formatFullPlainDate(eventDate.value)],
-      ["Equivalente calendario", formatCompactDuration(result.calendar)],
-      ["Semanas", formatWeekDuration(result.weeks)],
-      ["Días calendario", formatUnit(result.totalDays, "día", "días")],
       [
-        "Días hábiles sin festivos",
+        "Desglose de calendario (conteo estándar)",
+        formatCompactDuration(result.calendar),
+      ],
+      [`Semanas y días naturales (${countLabel})`, formatWeekDuration(result.weeks)],
+      [`Días naturales (${countLabel})`, formatUnit(result.totalDays, "día", "días")],
+      [
+        `Días hábiles sin festivos (${countLabel})`,
         formatUnit(result.businessDays, "día hábil", "días hábiles"),
       ],
-      ["Fines de semana", formatUnit(result.weekendDays, "día", "días")],
+      [`Fines de semana (${countLabel})`, formatUnit(result.weekendDays, "día", "días")],
     ]);
     renderWarnings(buildDateWarnings(result, dayType, countMode));
     setCopyVisible(true);
@@ -1225,9 +1634,27 @@ const dateUnits = [
       `Fecha base: ${formatFullPlainDate(baseDate.value)}`,
       `Fecha del evento: ${formatFullPlainDate(eventDate.value)}`,
       `Resultado: ${mainResult.textContent}`,
-      `Semanas: ${formatWeekDuration(result.weeks)}`,
-      `Días hábiles sin festivos: ${formatNumber(result.businessDays)}`,
+      `Conteo: ${countLabel}`,
+      `Días naturales (${countLabel}): ${formatUnit(result.totalDays, "día", "días")}`,
+      `Desglose de calendario (conteo estándar): ${formatCompactDuration(result.calendar)}`,
+      `Semanas y días naturales (${countLabel}): ${formatWeekDuration(result.weeks)}`,
+      `Días hábiles sin festivos (${countLabel}): ${formatNumber(result.businessDays)}`,
+      `Fines de semana (${countLabel}): ${formatNumber(result.weekendDays)}`,
     ].join("\n");
+    scheduleCalculationMetric(
+      {
+        event: "date_difference_calculation_completed",
+        mode: "event",
+        countMode: countMode === "inclusive" ? "inclusive" : "standard",
+        dayType: dayType === "business" ? "business" : "calendar",
+      },
+      buildCalculationMetricState("event", {
+        countMode,
+        dayType,
+        label,
+      }),
+    );
+    scheduleResultAnnouncement();
   }
 
   function buildDifferenceHeadline(sign, primaryText) {
@@ -1406,7 +1833,7 @@ const dateUnits = [
       panel.classList.toggle("hidden", panel.dataset.modePanel !== mode);
     });
 
-    updateCalculator();
+    updateCalculator({ userInitiated: true });
   }
 
   function setDateGroupToToday(groupKey) {
@@ -1425,7 +1852,7 @@ const dateUnits = [
       eventBaseUsesToday = true;
     }
 
-    updateCalculator();
+    updateCalculator({ userInitiated: true });
   }
 
   function swapDifferenceDates() {
@@ -1447,7 +1874,7 @@ const dateUnits = [
     DATE_GROUPS["difference-end"].month.value = start.month;
     DATE_GROUPS["difference-end"].year.value = start.year;
     differenceStartUsesToday = false;
-    updateCalculator();
+    updateCalculator({ userInitiated: true });
   }
 
   function fillExample() {
@@ -1591,6 +2018,10 @@ const dateUnits = [
     return `${formatNumber(value)} ${value === 1 ? singular : plural}`;
   }
 
+  function getCountLabel(countMode) {
+    return countMode === "inclusive" ? "inclusivo" : "estándar";
+  }
+
   function formatAmountUnit(value, unit) {
     const labels = {
       days: ["día", "días"],
@@ -1610,12 +2041,14 @@ const dateUnits = [
 
   modeButtons.forEach((button) => {
     button.addEventListener("click", () => {
+      calculatorHasInteraction = true;
       setMode(button.dataset.modeButton);
     });
   });
 
   allDateInputs.forEach((input) => {
     input.addEventListener("input", () => {
+      calculatorHasInteraction = true;
       const key = input.dataset.dateInput ?? "";
 
       if (key.startsWith("difference-start")) {
@@ -1630,25 +2063,46 @@ const dateUnits = [
         eventBaseUsesToday = false;
       }
 
-      updateCalculator();
+      updateCalculator({ userInitiated: true });
     });
-    input.addEventListener("change", updateCalculator);
+    input.addEventListener("change", () => {
+      calculatorHasInteraction = true;
+      updateCalculator({ userInitiated: true });
+    });
+    input.addEventListener("blur", () => reportValidationMetric(currentMode));
   });
 
   optionInputs.forEach((input) => {
-    input.addEventListener("change", updateCalculator);
+    input.addEventListener("change", () => {
+      calculatorHasInteraction = true;
+      updateCalculator({ userInitiated: true });
+    });
   });
 
   todayButtons.forEach((button) => {
     button.addEventListener("click", () => {
+      calculatorHasInteraction = true;
       setDateGroupToToday(button.dataset.useToday);
     });
   });
 
-  amountInput?.addEventListener("input", updateCalculator);
-  unitSelect?.addEventListener("change", updateCalculator);
-  eventLabelInput?.addEventListener("input", updateCalculator);
-  swapButton?.addEventListener("click", swapDifferenceDates);
+  amountInput?.addEventListener("input", () => {
+    calculatorHasInteraction = true;
+    updateCalculator({ userInitiated: true });
+  });
+  amountInput?.addEventListener("blur", () => reportValidationMetric(currentMode));
+  unitSelect?.addEventListener("change", () => {
+    calculatorHasInteraction = true;
+    updateCalculator({ userInitiated: true });
+  });
+  eventLabelInput?.addEventListener("input", () => {
+    calculatorHasInteraction = true;
+    updateCalculator({ userInitiated: true });
+  });
+  swapButton?.addEventListener("click", () => {
+    calculatorHasInteraction = true;
+    swapDifferenceDates();
+  });
   exampleButton?.addEventListener("click", fillExample);
   clearButton?.addEventListener("click", clearCalculator);
   copyButton?.addEventListener("click", copyResult);

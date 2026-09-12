@@ -11,7 +11,7 @@ import { buildFaqJsonLd } from "@lib/seo";
 
 const title = "Date difference calculator — Days, weeks, and months";
 const description =
-  "Calculate the days between two dates, the days remaining until an event, or the date after a given number of days. Includes weekdays excluding weekends.";
+  "Calculate days, weeks, months, and years between two dates. Standard or inclusive counting. Weekdays run Monday to Friday; holidays are not excluded.";
 const canonical = "/en/date-time/date-difference-calculator";
 const spanishCanonical = "/fecha-tiempo/diferencia-entre-fechas";
 const alternates = buildAlternateLinks({ es: spanishCanonical, en: canonical }, Astro.site ?? Astro.url);
@@ -45,7 +45,7 @@ const faqs = [
   {
     question: "Does the calculator exclude holidays?",
     answer:
-      "Not in this version. Weekdays only exclude Saturdays and Sundays. Country-specific holidays may be added later with a maintainable local dataset.",
+      "No. Weekdays in this calculator exclude Saturdays and Sundays only; holidays from any country are not excluded.",
   },
   {
     question: "Can I use it for legal or employment deadlines?",
@@ -148,7 +148,10 @@ const dateUnits = [
             <div class="mt-6 space-y-6">
               <div data-mode-panel="difference">
                 <div class="grid gap-4 lg:grid-cols-2">
-                  <fieldset class="rounded-lg border border-gray-800 bg-gray-900/60 p-4">
+                  <fieldset
+                    class="rounded-lg border border-gray-800 bg-gray-900/60 p-4"
+                    aria-describedby="difference-error"
+                  >
                     <div class="flex flex-wrap items-center justify-between gap-3">
                       <legend class="text-sm font-semibold text-gray-200">
                         Start date
@@ -221,7 +224,10 @@ const dateUnits = [
                     </div>
                   </fieldset>
 
-                  <fieldset class="rounded-lg border border-gray-800 bg-gray-900/60 p-4">
+                  <fieldset
+                    class="rounded-lg border border-gray-800 bg-gray-900/60 p-4"
+                    aria-describedby="difference-error"
+                  >
                     <div class="flex flex-wrap items-center justify-between gap-3">
                       <legend class="text-sm font-semibold text-gray-200">
                         End date
@@ -348,7 +354,7 @@ const dateUnits = [
                           checked
                           data-option-input
                         />
-                        All days
+                        Calendar days
                       </label>
                       <label class="flex min-h-11 items-center rounded-lg border border-gray-700 bg-gray-900 px-3 text-sm text-gray-200">
                         <input
@@ -376,7 +382,10 @@ const dateUnits = [
               </div>
 
               <div class="hidden" data-mode-panel="add">
-                <fieldset class="rounded-lg border border-gray-800 bg-gray-900/60 p-4">
+                <fieldset
+                  class="rounded-lg border border-gray-800 bg-gray-900/60 p-4"
+                  aria-describedby="operation-error"
+                >
                   <div class="flex flex-wrap items-center justify-between gap-3">
                     <legend class="text-sm font-semibold text-gray-200">
                       Start date
@@ -518,6 +527,7 @@ const dateUnits = [
                   </div>
                 </div>
                 <p
+                  id="operation-error"
                   class="mt-3 hidden text-sm text-red-300"
                   data-error="operation"
                 >
@@ -526,7 +536,10 @@ const dateUnits = [
 
               <div class="hidden" data-mode-panel="event">
                 <div class="grid gap-4 lg:grid-cols-2">
-                  <fieldset class="rounded-lg border border-gray-800 bg-gray-900/60 p-4">
+                  <fieldset
+                    class="rounded-lg border border-gray-800 bg-gray-900/60 p-4"
+                    aria-describedby="event-error"
+                  >
                     <legend class="text-sm font-semibold text-gray-200">
                       Event date
                     </legend>
@@ -608,7 +621,10 @@ const dateUnits = [
                     </div>
                   </fieldset>
 
-                  <fieldset class="rounded-lg border border-gray-800 bg-gray-900/60 p-4">
+                  <fieldset
+                    class="rounded-lg border border-gray-800 bg-gray-900/60 p-4"
+                    aria-describedby="event-error"
+                  >
                     <div class="flex flex-wrap items-center justify-between gap-3">
                       <legend class="text-sm font-semibold text-gray-200">
                         Base date
@@ -724,7 +740,7 @@ const dateUnits = [
                           checked
                           data-option-input
                         />
-                        All days
+                        Calendar days
                       </label>
                       <label class="flex min-h-11 items-center rounded-lg border border-gray-700 bg-gray-900 px-3 text-sm text-gray-200">
                         <input
@@ -740,7 +756,11 @@ const dateUnits = [
                   </fieldset>
                 </div>
 
-                <p class="mt-3 hidden text-sm text-red-300" data-error="event">
+                <p
+                  id="event-error"
+                  class="mt-3 hidden text-sm text-red-300"
+                  data-error="event"
+                >
                 </p>
               </div>
             </div>
@@ -775,7 +795,6 @@ const dateUnits = [
 
           <aside
             class="border-t border-gray-800 bg-gray-900/70 p-4 sm:p-6 xl:border-l xl:border-t-0"
-            aria-live="polite"
             data-result-region
           >
             <p class="text-sm font-semibold text-amber-400" data-result-kicker>
@@ -790,6 +809,7 @@ const dateUnits = [
             <p class="mt-3 text-sm leading-relaxed text-gray-400" data-result-note>
               Complete the fields to see the calculation.
             </p>
+            <p class="sr-only" aria-live="polite" data-result-announcement></p>
 
             <div
               class="mt-5 hidden rounded-lg border border-amber-400/40 bg-amber-400/10 p-4"
@@ -878,6 +898,10 @@ const dateUnits = [
     parseDateParts,
     todayInLocalTimeZone,
   } from "@lib/calculators/fecha-tiempo/diferencia-entre-fechas/date-difference.en";
+  import {
+    trackDateDifferenceMetric,
+    type DateDifferenceMetric,
+  } from "@lib/analytics/client";
 
   const ERROR_MESSAGES = {
     required: "Enter the day, month, and year.",
@@ -934,6 +958,7 @@ const dateUnits = [
   const resultKicker = document.querySelector("[data-result-kicker]");
   const mainResult = document.querySelector("[data-main-result]");
   const resultNote = document.querySelector("[data-result-note]");
+  const resultAnnouncement = document.querySelector("[data-result-announcement]");
   const detailList = document.querySelector("[data-detail-list]");
   const warningPanel = document.querySelector("[data-warning-panel]");
   const warningList = document.querySelector("[data-warning-list]");
@@ -948,6 +973,13 @@ const dateUnits = [
   let currentMode = "difference";
   let currentCopyText = "";
   let copiedTimeout = 0;
+  let resultAnnouncementTimeout = 0;
+  let calculationMetricTimeout = 0;
+  let pendingCalculationMetricState = "";
+  let lastCalculationMetricState = "";
+  let calculationInteractionEligible = false;
+  let calculatorHasInteraction = false;
+  let lastValidationMetricKey = "";
   let differenceStartUsesToday = true;
   let operationStartUsesToday = true;
   let eventBaseUsesToday = true;
@@ -1009,6 +1041,9 @@ const dateUnits = [
 
   function setNeutralState() {
     currentCopyText = "";
+    clearCalculationMetricTimer();
+    lastCalculationMetricState = "";
+    clearResultAnnouncement();
     resultKicker.textContent = "Result";
     mainResult.textContent = "Enter the dates";
     resultNote.textContent = "Complete the fields to see the calculation.";
@@ -1019,6 +1054,9 @@ const dateUnits = [
 
   function setInvalidState(mode, message) {
     currentCopyText = "";
+    clearCalculationMetricTimer();
+    lastCalculationMetricState = "";
+    clearResultAnnouncement();
     resultKicker.textContent = "Check the fields";
     mainResult.textContent = "Cannot calculate yet";
     resultNote.textContent = message;
@@ -1028,7 +1066,117 @@ const dateUnits = [
     showError(errors[mode], message);
   }
 
-  function updateCalculator() {
+  function clearResultAnnouncement() {
+    window.clearTimeout(resultAnnouncementTimeout);
+    resultAnnouncementTimeout = 0;
+    resultAnnouncement.textContent = "";
+  }
+
+  function scheduleResultAnnouncement() {
+    window.clearTimeout(resultAnnouncementTimeout);
+    resultAnnouncementTimeout = window.setTimeout(() => {
+      resultAnnouncement.textContent = mainResult.textContent;
+    }, 800);
+  }
+
+  function clearCalculationMetricTimer() {
+    window.clearTimeout(calculationMetricTimeout);
+    calculationMetricTimeout = 0;
+    pendingCalculationMetricState = "";
+  }
+
+  function buildCalculationMetricState(mode, fields = {}) {
+    const groups =
+      mode === "difference"
+        ? [DATE_GROUPS["difference-start"], DATE_GROUPS["difference-end"]]
+        : mode === "add"
+          ? [DATE_GROUPS["operation-start"]]
+          : [DATE_GROUPS.event, DATE_GROUPS["event-base"]];
+
+    return JSON.stringify({
+      mode,
+      dates: groups.map((group) =>
+        [group.day, group.month, group.year]
+          .map((input) => input?.value.trim() ?? "")
+          .join("-"),
+      ),
+      ...fields,
+    });
+  }
+
+  function scheduleCalculationMetric(
+    metric: DateDifferenceMetric,
+    state: string,
+  ) {
+    if (!calculationInteractionEligible || state === lastCalculationMetricState) {
+      return;
+    }
+
+    window.clearTimeout(calculationMetricTimeout);
+    pendingCalculationMetricState = state;
+    calculationMetricTimeout = window.setTimeout(() => {
+      if (
+        !calculationInteractionEligible ||
+        pendingCalculationMetricState !== state
+      ) {
+        return;
+      }
+
+      trackDateDifferenceMetric(metric);
+      lastCalculationMetricState = state;
+      pendingCalculationMetricState = "";
+      calculationMetricTimeout = 0;
+    }, 1000);
+  }
+
+  function getValidationErrorCode(mode) {
+    if (mode === "difference") {
+      const start = parseDateFromGroup(DATE_GROUPS["difference-start"]);
+      const end = parseDateFromGroup(DATE_GROUPS["difference-end"]);
+      return !start.ok ? start.error : !end.ok ? end.error : "";
+    }
+
+    if (mode === "add") {
+      const start = parseDateFromGroup(DATE_GROUPS["operation-start"]);
+      if (!start.ok) return start.error;
+      const amount = parseAmount();
+      return amount.ok ? "" : amount.error;
+    }
+
+    const eventDate = parseDateFromGroup(DATE_GROUPS.event);
+    const baseDate = parseDateFromGroup(DATE_GROUPS["event-base"]);
+    return !eventDate.ok ? eventDate.error : !baseDate.ok ? baseDate.error : "";
+  }
+
+  function reportValidationMetric(mode) {
+    const error = getValidationErrorCode(mode);
+
+    if (!error) {
+      lastValidationMetricKey = "";
+      return;
+    }
+
+    if (!calculatorHasInteraction) return;
+
+    const key = mode + ":" + error;
+    if (key === lastValidationMetricKey) return;
+
+    trackDateDifferenceMetric({
+      event: "date_difference_validation_error",
+      mode,
+      error,
+    });
+    lastValidationMetricKey = key;
+  }
+
+  function updateCalculator({ userInitiated = false } = {}) {
+    calculationInteractionEligible = userInitiated;
+
+    if (!userInitiated) {
+      clearCalculationMetricTimer();
+      lastCalculationMetricState = "";
+    }
+
     clearErrors();
 
     if (!hasCurrentModeStarted()) {
@@ -1081,6 +1229,7 @@ const dateUnits = [
       dayType === "business" ? "weekday" : "day",
       dayType === "business" ? "weekdays" : "days",
     );
+    const countLabel = getCountLabel(countMode);
 
     resultKicker.textContent =
       dayType === "business" ? "Weekdays" : "Days between dates";
@@ -1089,14 +1238,17 @@ const dateUnits = [
     renderDetails([
       ["Start date", formatFullPlainDate(start.value)],
       ["End date", formatFullPlainDate(end.value)],
-      ["Calendar equivalent", formatCompactDuration(result.calendar)],
-      ["Weeks", formatWeekDuration(result.weeks)],
-      ["Calendar days", formatUnit(result.totalDays, "day", "days")],
       [
-        "Weekdays excluding holidays",
+        "Calendar breakdown (standard count)",
+        formatCompactDuration(result.calendar),
+      ],
+      [`Weeks and calendar days (${countLabel})`, formatWeekDuration(result.weeks)],
+      [`Calendar days (${countLabel})`, formatUnit(result.totalDays, "day", "days")],
+      [
+        `Weekdays (holidays not excluded; ${countLabel})`,
         formatUnit(result.businessDays, "weekday", "weekdays"),
       ],
-      ["Weekend days", formatUnit(result.weekendDays, "day", "days")],
+      [`Weekend days (${countLabel})`, formatUnit(result.weekendDays, "day", "days")],
       ["Approx. hours", `${formatNumber(result.totalDays * 24)} h`],
       ["Approx. minutes", `${formatNumber(result.totalDays * 24 * 60)} min`],
     ]);
@@ -1108,6 +1260,16 @@ const dateUnits = [
       countMode,
       result,
     });
+    scheduleCalculationMetric(
+      {
+        event: "date_difference_calculation_completed",
+        mode: "difference",
+        countMode: countMode === "inclusive" ? "inclusive" : "standard",
+        dayType: dayType === "business" ? "business" : "calendar",
+      },
+      buildCalculationMetricState("difference", { countMode, dayType }),
+    );
+    scheduleResultAnnouncement();
   }
 
   function renderOperationMode() {
@@ -1169,13 +1331,32 @@ const dateUnits = [
     renderWarnings(buildOperationWarnings(result, unit));
     setCopyVisible(true);
     currentCopyText = [
-      "Date difference calculator - calculadoras.tools",
+      "Date difference calculator — calculadoras.tools",
       `Start date: ${formatFullPlainDate(start.value)}`,
       `Operation: ${operation === "add" ? "add" : "subtract"} ${unitLabel}`,
       `Result: ${formatFullPlainDate(result.date)}`,
       `ISO week: ${formatNumber(result.isoWeek)}`,
       `Day of the year: ${formatNumber(result.dayOfYear)}`,
     ].join("\n");
+    scheduleCalculationMetric(
+      {
+        event: "date_difference_calculation_completed",
+        mode: "add",
+        unit:
+          unit === "businessDays" ||
+          unit === "weeks" ||
+          unit === "months" ||
+          unit === "years"
+            ? unit
+            : "days",
+      },
+      buildCalculationMetricState("add", {
+        operation,
+        amount: amountInput?.value.trim() ?? "",
+        unit,
+      }),
+    );
+    scheduleResultAnnouncement();
   }
 
   function renderEventMode() {
@@ -1205,6 +1386,7 @@ const dateUnits = [
       dayType === "business" ? "weekday" : "day",
       dayType === "business" ? "weekdays" : "days",
     );
+    const countLabel = getCountLabel(countMode);
 
     resultKicker.textContent = "Countdown to event";
     mainResult.textContent = buildEventHeadline(result.sign, primaryText, label);
@@ -1212,14 +1394,17 @@ const dateUnits = [
     renderDetails([
       ["Base date", formatFullPlainDate(baseDate.value)],
       ["Event date", formatFullPlainDate(eventDate.value)],
-      ["Calendar equivalent", formatCompactDuration(result.calendar)],
-      ["Weeks", formatWeekDuration(result.weeks)],
-      ["Calendar days", formatUnit(result.totalDays, "day", "days")],
       [
-        "Weekdays excluding holidays",
+        "Calendar breakdown (standard count)",
+        formatCompactDuration(result.calendar),
+      ],
+      [`Weeks and calendar days (${countLabel})`, formatWeekDuration(result.weeks)],
+      [`Calendar days (${countLabel})`, formatUnit(result.totalDays, "day", "days")],
+      [
+        `Weekdays (holidays not excluded; ${countLabel})`,
         formatUnit(result.businessDays, "weekday", "weekdays"),
       ],
-      ["Weekend days", formatUnit(result.weekendDays, "day", "days")],
+      [`Weekend days (${countLabel})`, formatUnit(result.weekendDays, "day", "days")],
     ]);
     renderWarnings(buildDateWarnings(result, dayType, countMode));
     setCopyVisible(true);
@@ -1229,9 +1414,27 @@ const dateUnits = [
       `Base date: ${formatFullPlainDate(baseDate.value)}`,
       `Event date: ${formatFullPlainDate(eventDate.value)}`,
       `Result: ${mainResult.textContent}`,
-      `Weeks: ${formatWeekDuration(result.weeks)}`,
-      `Weekdays excluding holidays: ${formatNumber(result.businessDays)}`,
+      `Counting: ${countLabel}`,
+      `Calendar days (${countLabel}): ${formatUnit(result.totalDays, "day", "days")}`,
+      `Calendar breakdown (standard count): ${formatCompactDuration(result.calendar)}`,
+      `Weeks and calendar days (${countLabel}): ${formatWeekDuration(result.weeks)}`,
+      `Weekdays (holidays not excluded; ${countLabel}): ${formatNumber(result.businessDays)}`,
+      `Weekend days (${countLabel}): ${formatNumber(result.weekendDays)}`,
     ].join("\n");
+    scheduleCalculationMetric(
+      {
+        event: "date_difference_calculation_completed",
+        mode: "event",
+        countMode: countMode === "inclusive" ? "inclusive" : "standard",
+        dayType: dayType === "business" ? "business" : "calendar",
+      },
+      buildCalculationMetricState("event", {
+        countMode,
+        dayType,
+        label,
+      }),
+    );
+    scheduleResultAnnouncement();
   }
 
   function buildDifferenceHeadline(sign, primaryText) {
@@ -1412,7 +1615,7 @@ const dateUnits = [
       panel.classList.toggle("hidden", panel.dataset.modePanel !== mode);
     });
 
-    updateCalculator();
+    updateCalculator({ userInitiated: true });
   }
 
   function setDateGroupToToday(groupKey) {
@@ -1431,7 +1634,7 @@ const dateUnits = [
       eventBaseUsesToday = true;
     }
 
-    updateCalculator();
+    updateCalculator({ userInitiated: true });
   }
 
   function swapDifferenceDates() {
@@ -1453,7 +1656,7 @@ const dateUnits = [
     DATE_GROUPS["difference-end"].month.value = start.month;
     DATE_GROUPS["difference-end"].year.value = start.year;
     differenceStartUsesToday = false;
-    updateCalculator();
+    updateCalculator({ userInitiated: true });
   }
 
   function fillExample() {
@@ -1598,6 +1801,10 @@ const dateUnits = [
     return `${formatNumber(value)} ${value === 1 ? singular : plural}`;
   }
 
+  function getCountLabel(countMode) {
+    return countMode === "inclusive" ? "inclusive" : "standard";
+  }
+
   function formatAmountUnit(value, unit) {
     const labels = {
       days: ["day", "days"],
@@ -1617,12 +1824,14 @@ const dateUnits = [
 
   modeButtons.forEach((button) => {
     button.addEventListener("click", () => {
+      calculatorHasInteraction = true;
       setMode(button.dataset.modeButton);
     });
   });
 
   allDateInputs.forEach((input) => {
     input.addEventListener("input", () => {
+      calculatorHasInteraction = true;
       const key = input.dataset.dateInput ?? "";
 
       if (key.startsWith("difference-start")) {
@@ -1637,25 +1846,46 @@ const dateUnits = [
         eventBaseUsesToday = false;
       }
 
-      updateCalculator();
+      updateCalculator({ userInitiated: true });
     });
-    input.addEventListener("change", updateCalculator);
+    input.addEventListener("change", () => {
+      calculatorHasInteraction = true;
+      updateCalculator({ userInitiated: true });
+    });
+    input.addEventListener("blur", () => reportValidationMetric(currentMode));
   });
 
   optionInputs.forEach((input) => {
-    input.addEventListener("change", updateCalculator);
+    input.addEventListener("change", () => {
+      calculatorHasInteraction = true;
+      updateCalculator({ userInitiated: true });
+    });
   });
 
   todayButtons.forEach((button) => {
     button.addEventListener("click", () => {
+      calculatorHasInteraction = true;
       setDateGroupToToday(button.dataset.useToday);
     });
   });
 
-  amountInput?.addEventListener("input", updateCalculator);
-  unitSelect?.addEventListener("change", updateCalculator);
-  eventLabelInput?.addEventListener("input", updateCalculator);
-  swapButton?.addEventListener("click", swapDifferenceDates);
+  amountInput?.addEventListener("input", () => {
+    calculatorHasInteraction = true;
+    updateCalculator({ userInitiated: true });
+  });
+  amountInput?.addEventListener("blur", () => reportValidationMetric(currentMode));
+  unitSelect?.addEventListener("change", () => {
+    calculatorHasInteraction = true;
+    updateCalculator({ userInitiated: true });
+  });
+  eventLabelInput?.addEventListener("input", () => {
+    calculatorHasInteraction = true;
+    updateCalculator({ userInitiated: true });
+  });
+  swapButton?.addEventListener("click", () => {
+    calculatorHasInteraction = true;
+    swapDifferenceDates();
+  });
   exampleButton?.addEventListener("click", fillExample);
   clearButton?.addEventListener("click", clearCalculator);
   copyButton?.addEventListener("click", copyResult);

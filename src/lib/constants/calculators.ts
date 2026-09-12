@@ -478,7 +478,7 @@ export const CALCULATORS: LegacyCalculatorDirectoryItem[] = [
     id: "diferencia-entre-fechas",
     title: "Calculadora de diferencia entre fechas",
     description:
-      "Cuenta días entre fechas, suma o resta tiempo y calcula días hábiles sin fines de semana.",
+      "Calcula días, semanas, meses y años entre fechas, suma o resta tiempo y cuenta días hábiles de lunes a viernes sin festivos.",
     href: "/fecha-tiempo/diferencia-entre-fechas",
     categorySlug: "fecha-tiempo",
     order: 62,
@@ -1174,7 +1174,7 @@ const ENGLISH_CALCULATOR_METADATA: Partial<
   "diferencia-entre-fechas": {
     title: "Date difference calculator",
     description:
-      "Calculate days between dates, add or subtract time and count weekdays excluding weekends.",
+      "Calculate days, weeks, months, and years between dates, add or subtract time, and count weekdays from Monday to Friday; holidays are not excluded.",
     slug: "date-difference-calculator",
     published: true,
   },

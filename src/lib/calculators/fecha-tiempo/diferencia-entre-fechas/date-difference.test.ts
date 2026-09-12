@@ -8,6 +8,7 @@ import {
   countWeekendDays,
   diffCalendarParts,
   diffTotalDays,
+  buildDateDifferenceCopyText,
   formatCompactDuration,
   formatFullPlainDate,
   formatWeekDuration,
@@ -96,6 +97,14 @@ describe("date differences", () => {
         "inclusive",
       ),
     ).toBe(1);
+
+    const result = calculateDateDifference({
+      startDate: { year: 2026, month: 1, day: 1 },
+      endDate: { year: 2026, month: 1, day: 1 },
+      countMode: "inclusive",
+    });
+
+    expect(result.businessDays + result.weekendDays).toBe(result.totalDays);
   });
 
   it("keeps the sign for inverted date ranges", () => {
@@ -127,6 +136,41 @@ describe("date differences", () => {
         { year: 2026, month: 9, day: 30 },
       ),
     ).toBe(74);
+  });
+
+  it("keeps business and weekend counts partitioned in both directions and modes", () => {
+    const dates = [
+      [
+        { year: 2026, month: 9, day: 11 },
+        { year: 2026, month: 9, day: 14 },
+      ],
+      [
+        { year: 2026, month: 9, day: 14 },
+        { year: 2026, month: 9, day: 11 },
+      ],
+    ] as const;
+
+    expect(
+      dates.map(([startDate, endDate]) =>
+        calculateDateDifference({ startDate, endDate }),
+      ),
+    ).toEqual([
+      expect.objectContaining({ totalDays: 3, businessDays: 1, weekendDays: 2 }),
+      expect.objectContaining({ totalDays: 3, businessDays: 1, weekendDays: 2 }),
+    ]);
+
+    expect(
+      dates.map(([startDate, endDate]) =>
+        calculateDateDifference({
+          startDate,
+          endDate,
+          countMode: "inclusive",
+        }),
+      ),
+    ).toEqual([
+      expect.objectContaining({ totalDays: 4, businessDays: 2, weekendDays: 2 }),
+      expect.objectContaining({ totalDays: 4, businessDays: 2, weekendDays: 2 }),
+    ]);
   });
 
   it("keeps end-of-month calendar duration behavior stable", () => {
@@ -258,5 +302,25 @@ describe("event and formatting helpers", () => {
     expect(formatWeekDuration({ weeks: 36, days: 6 })).toBe(
       "36 semanas y 6 días",
     );
+  });
+
+  it("copies explicit count labels and calendar limitations", () => {
+    const result = calculateDateDifference({
+      startDate: { year: 2026, month: 1, day: 15 },
+      endDate: { year: 2026, month: 9, day: 30 },
+      countMode: "inclusive",
+    });
+    const copy = buildDateDifferenceCopyText({
+      startDate: { year: 2026, month: 1, day: 15 },
+      endDate: { year: 2026, month: 9, day: 30 },
+      countMode: "inclusive",
+      result,
+    });
+
+    expect(copy).toContain("Días naturales (inclusivo): 259 días");
+    expect(copy).toContain(
+      "Desglose de calendario (conteo estándar): 8 meses y 15 días",
+    );
+    expect(copy).toContain("Fines de semana (inclusivo): 74");
   });
 });

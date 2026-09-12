@@ -541,15 +541,25 @@ export function buildDateDifferenceCopyText({
   result,
   locale = DEFAULT_LOCALE,
 }: DateDifferenceCopyInput): string {
+  const countLabel = countMode === "inclusive" ? "inclusivo" : "estándar";
+
   return [
     "Calculadora de diferencia entre fechas - calculadoras.tools",
     `Desde: ${formatFullPlainDate(startDate, locale)}`,
     `Hasta: ${formatFullPlainDate(endDate, locale)}`,
     `Conteo: ${countMode === "inclusive" ? "inclusivo" : "estándar"}`,
-    `Total: ${formatUnit(result.totalDays, "día", "días")}`,
-    `Equivalente calendario: ${formatCompactDuration(result.calendar)}`,
-    `Semanas: ${formatWeekDuration(result.weeks)}`,
-    `Días hábiles sin festivos: ${formatNumber(result.businessDays, locale)}`,
+    `Dirección: ${
+      result.sign > 0
+        ? "la fecha final es posterior a la fecha inicial"
+        : result.sign < 0
+          ? "la fecha final es anterior a la fecha inicial"
+          : "las fechas son iguales"
+    }`,
+    `Días naturales (${countLabel}): ${formatUnit(result.totalDays, "día", "días")}`,
+    `Desglose de calendario (conteo estándar): ${formatCompactDuration(result.calendar)}`,
+    `Semanas y días naturales (${countLabel}): ${formatWeekDuration(result.weeks)}`,
+    `Días hábiles sin festivos (${countLabel}): ${formatNumber(result.businessDays, locale)}`,
+    `Fines de semana (${countLabel}): ${formatNumber(result.weekendDays, locale)}`,
   ].join("\n");
 }
 

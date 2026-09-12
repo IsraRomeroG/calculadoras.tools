@@ -66,7 +66,7 @@ describe("English date and time calculator localization", () => {
         endDate: { year: 2026, month: 9, day: 30 },
         result: difference,
       }),
-    ).toContain("Business days excluding holidays: 184");
+    ).toContain("Weekdays (holidays not excluded; standard): 184");
   });
 
   it("localizes deadline and work-hours output", () => {

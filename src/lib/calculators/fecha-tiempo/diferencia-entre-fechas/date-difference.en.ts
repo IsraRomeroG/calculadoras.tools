@@ -95,15 +95,18 @@ export function buildDateDifferenceCopyText({
   countMode = DEFAULT_COUNT_MODE,
   result,
 }: DateDifferenceCopyInput) {
+  const countLabel = countMode === "inclusive" ? "inclusive" : "standard";
+
   return [
     "Date difference calculator — calculadoras.tools",
     `From: ${formatFullPlainDate(startDate)}`,
     `To: ${formatFullPlainDate(endDate)}`,
-    `Counting: ${countMode === "inclusive" ? "inclusive" : "standard"}`,
-    `Total: ${unit(result.totalDays, "day", "days")}`,
-    `Calendar equivalent: ${formatCompactDuration(result.calendar)}`,
-    `Weeks: ${formatWeekDuration(result.weeks)}`,
-    `Business days excluding holidays: ${formatNumber(result.businessDays)}`,
+    `Counting: ${countLabel}`,
+    `Calendar days (${countLabel}): ${unit(result.totalDays, "day", "days")}`,
+    `Calendar breakdown (standard count): ${formatCompactDuration(result.calendar)}`,
+    `Weeks and calendar days (${countLabel}): ${formatWeekDuration(result.weeks)}`,
+    `Weekdays (holidays not excluded; ${countLabel}): ${formatNumber(result.businessDays)}`,
+    `Weekend days (${countLabel}): ${formatNumber(result.weekendDays)}`,
   ].join("\n");
 }
 
