@@ -1,0 +1,217 @@
+---
+import Container from "@components/layout/Container.astro";
+import { ATTENDANCE_EXAMPLES as ES_EXAMPLES } from "@lib/calculators/matematicas/calculadora-porcentaje-asistencia-escolar/attendance";
+import { ATTENDANCE_EXAMPLES as EN_EXAMPLES } from "@lib/calculators/matematicas/calculadora-porcentaje-asistencia-escolar/attendance.en";
+
+interface Props {
+  locale: "es" | "en";
+}
+
+const { locale } = Astro.props;
+const isEs = locale === "es";
+const examples = isEs ? ES_EXAMPLES : EN_EXAMPLES;
+const t = isEs
+  ? {
+      heading: "Datos de asistencia",
+      intro: "Calcula tu situación actual y, si conoces las clases restantes, proyecta el final del curso.",
+      total: "Clases realizadas",
+      totalHelp: "Cuenta solo las clases que ya se impartieron. Usa un entero entre 1 y 1000.",
+      minimum: "Mínimo requerido (%)",
+      minimumHelp: "Usa el requisito de tu escuela; 80% es solo el valor inicial.",
+      capture: "Capturar por",
+      attended: "Asistidas",
+      absences: "Faltas",
+      attendedLabel: "Clases asistidas",
+      absencesLabel: "Faltas acumuladas",
+      remaining: "Clases restantes (opcional)",
+      remainingHelp: "Déjalo vacío si no lo sabes. Escribe 0 si el curso terminó.",
+      equalWeight: "Todas las clases cuentan igual.",
+      copy: "Copiar resumen",
+      clear: "Limpiar",
+      examples: "Ejemplos",
+      noJs: "Activa JavaScript para realizar el cálculo. Las fórmulas y explicaciones siguen disponibles en esta página.",
+      result: "Resultado",
+      initial: "Introduce las clases realizadas y las asistidas o faltas para calcular.",
+      current: "Situación actual",
+      projection: "Proyección final",
+      attendance: "Asistencia actual",
+      status: "Estado actual",
+      available: "Faltas futuras disponibles",
+      needed: "Asistencias necesarias",
+      summary: "Resumen de cantidades",
+      completed: "Realizadas",
+      attendedShort: "Asistidas",
+      absencesShort: "Faltas acumuladas",
+      minimumShort: "Mínimo",
+      margin: "Margen",
+      remainingShort: "Restantes",
+      finalTotal: "Total final",
+      maxAbsences: "Faltas máximas totales",
+      excess: "Excedente de faltas",
+      maxFinal: "Máximo final posible",
+      recovery: "Clases seguidas para alcanzar el mínimo actual",
+      manualCopy: "Selecciona y copia este resumen manualmente:",
+    }
+  : {
+      heading: "Attendance inputs",
+      intro: "Calculate your current situation and, if you know the remaining classes, project the end of the course.",
+      total: "Completed classes",
+      totalHelp: "Count only classes that have already taken place. Use a whole number from 1 to 1000.",
+      minimum: "Required minimum (%)",
+      minimumHelp: "Use your school's requirement; 80% is only the initial value.",
+      capture: "Enter",
+      attended: "Attendances",
+      absences: "Absences",
+      attendedLabel: "Attended classes",
+      absencesLabel: "Accumulated absences",
+      remaining: "Remaining classes (optional)",
+      remainingHelp: "Leave blank if you do not know. Enter 0 if the course is finished.",
+      equalWeight: "All classes have equal weight.",
+      copy: "Copy summary",
+      clear: "Clear",
+      examples: "Examples",
+      noJs: "Enable JavaScript to perform the calculation. The formulas and explanations remain available on this page.",
+      result: "Result",
+      initial: "Enter completed classes and either attended classes or absences to calculate.",
+      current: "Current situation",
+      projection: "Final projection",
+      attendance: "Current attendance",
+      status: "Current status",
+      available: "Future absences available",
+      needed: "Required attendances",
+      summary: "Quantity summary",
+      completed: "Completed",
+      attendedShort: "Attended",
+      absencesShort: "Accumulated absences",
+      minimumShort: "Minimum",
+      margin: "Margin",
+      remainingShort: "Remaining",
+      finalTotal: "Final total",
+      maxAbsences: "Maximum total absences",
+      excess: "Excess absences",
+      maxFinal: "Maximum possible final",
+      recovery: "Consecutive classes to reach the current minimum",
+      manualCopy: "Select and copy this summary manually:",
+    };
+const prefix = `attendance-${locale}`;
+---
+
+<Container as="section" class="py-6 md:py-8">
+  <div
+    class="overflow-hidden rounded-lg border border-gray-700 bg-gray-950 shadow-xl shadow-gray-950/30"
+    data-attendance-calculator
+    data-locale={locale}
+  >
+    <div class="grid min-w-0 gap-0 lg:grid-cols-[minmax(0,1fr)_minmax(20rem,0.78fr)]">
+      <section class="min-w-0 p-4 sm:p-6" aria-labelledby={`${prefix}-heading`}>
+        <h2 id={`${prefix}-heading`} class="text-xl font-semibold">{t.heading}</h2>
+        <p class="mt-2 text-sm leading-relaxed text-gray-400">{t.intro}</p>
+
+        <div class="mt-5 grid min-w-0 gap-5 sm:grid-cols-2">
+          <div class="min-w-0">
+            <label for={`${prefix}-total`} class="block text-sm font-medium text-gray-200">{t.total}</label>
+            <input id={`${prefix}-total`} class="mt-2 min-h-12 w-full min-w-0 rounded-lg border border-gray-700 bg-gray-900 px-4 text-base text-white outline-none transition focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15" type="text" inputmode="numeric" autocomplete="off" data-field="totalClasses" aria-describedby={`${prefix}-total-help ${prefix}-total-error`} />
+            <p id={`${prefix}-total-help`} class="mt-2 text-sm text-gray-400">{t.totalHelp}</p>
+            <p id={`${prefix}-total-error`} class="mt-2 hidden text-sm text-red-300" data-error-for="totalClasses"></p>
+          </div>
+          <div class="min-w-0">
+            <label for={`${prefix}-minimum`} class="block text-sm font-medium text-gray-200">{t.minimum}</label>
+            <input id={`${prefix}-minimum`} class="mt-2 min-h-12 w-full min-w-0 rounded-lg border border-gray-700 bg-gray-900 px-4 text-base text-white outline-none transition focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15" type="text" inputmode="decimal" autocomplete="off" value="80" data-field="requiredPercent" aria-describedby={`${prefix}-minimum-help ${prefix}-minimum-error`} />
+            <p id={`${prefix}-minimum-help`} class="mt-2 text-sm text-gray-400">{t.minimumHelp}</p>
+            <p id={`${prefix}-minimum-error`} class="mt-2 hidden text-sm text-red-300" data-error-for="requiredPercent"></p>
+          </div>
+        </div>
+
+        <div class="mt-5">
+          <span class="block text-sm font-medium text-gray-200">{t.capture}</span>
+          <div class="mt-2 inline-flex max-w-full rounded-lg border border-gray-700 bg-gray-900 p-1" role="group" aria-label={t.capture}>
+            <button class="min-h-11 rounded-md px-4 py-2 text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/40" type="button" data-mode-button="attended" aria-pressed="true">{t.attended}</button>
+            <button class="min-h-11 rounded-md px-4 py-2 text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/40" type="button" data-mode-button="absences" aria-pressed="false">{t.absences}</button>
+          </div>
+        </div>
+
+        <div class="mt-5 grid min-w-0 gap-5 sm:grid-cols-2">
+          <div class="min-w-0" data-attended-wrapper>
+            <label for={`${prefix}-attended`} class="block text-sm font-medium text-gray-200">{t.attendedLabel}</label>
+            <input id={`${prefix}-attended`} class="mt-2 min-h-12 w-full min-w-0 rounded-lg border border-gray-700 bg-gray-900 px-4 text-base text-white outline-none transition focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15" type="text" inputmode="numeric" autocomplete="off" data-field="attendedClasses" aria-describedby={`${prefix}-attended-error`} />
+            <p id={`${prefix}-attended-error`} class="mt-2 hidden text-sm text-red-300" data-error-for="attendedClasses"></p>
+          </div>
+          <div class="hidden min-w-0" data-absences-wrapper>
+            <label for={`${prefix}-absences`} class="block text-sm font-medium text-gray-200">{t.absencesLabel}</label>
+            <input id={`${prefix}-absences`} class="mt-2 min-h-12 w-full min-w-0 rounded-lg border border-gray-700 bg-gray-900 px-4 text-base text-white outline-none transition focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15" type="text" inputmode="numeric" autocomplete="off" data-field="absences" aria-describedby={`${prefix}-absences-error`} />
+            <p id={`${prefix}-absences-error`} class="mt-2 hidden text-sm text-red-300" data-error-for="absences"></p>
+          </div>
+          <div class="min-w-0">
+            <label for={`${prefix}-remaining`} class="block text-sm font-medium text-gray-200">{t.remaining}</label>
+            <input id={`${prefix}-remaining`} class="mt-2 min-h-12 w-full min-w-0 rounded-lg border border-gray-700 bg-gray-900 px-4 text-base text-white outline-none transition focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15" type="text" inputmode="numeric" autocomplete="off" data-field="remainingClasses" aria-describedby={`${prefix}-remaining-help ${prefix}-remaining-error`} />
+            <p id={`${prefix}-remaining-help`} class="mt-2 text-sm text-gray-400">{t.remainingHelp}</p>
+            <p id={`${prefix}-remaining-error`} class="mt-2 hidden text-sm text-red-300" data-error-for="remainingClasses"></p>
+          </div>
+        </div>
+        <p class="mt-4 text-sm text-gray-400">{t.equalWeight}</p>
+
+        <div class="mt-5 flex flex-wrap gap-3">
+          <button class="inline-flex min-h-11 items-center justify-center rounded-lg bg-amber-400 px-4 py-2 text-sm font-semibold text-gray-950 transition hover:bg-amber-300 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/40 disabled:cursor-not-allowed disabled:opacity-50" type="button" data-copy-summary disabled>{t.copy}</button>
+          <button class="inline-flex min-h-11 items-center justify-center rounded-lg border border-gray-700 px-4 py-2 text-sm font-semibold text-gray-200 transition hover:border-amber-400 hover:text-white focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/40" type="button" data-clear>{t.clear}</button>
+        </div>
+        <div class="mt-3 min-h-6 text-sm" role="status" aria-live="polite" data-action-status></div>
+        <div class="mt-3 hidden" data-manual-copy>
+          <label class="block text-sm text-amber-200" for={`${prefix}-manual`}>{t.manualCopy}</label>
+          <textarea id={`${prefix}-manual`} class="mt-2 min-h-32 w-full min-w-0 rounded-lg border border-amber-500 bg-gray-900 p-3 text-sm text-white" readonly data-manual-copy-text></textarea>
+        </div>
+
+        <div class="mt-5">
+          <p class="text-sm font-medium text-gray-200">{t.examples}</p>
+          <div class="mt-2 flex flex-wrap gap-2">
+            {examples.map((example) => <button class="min-h-11 rounded-lg border border-gray-700 px-3 py-2 text-sm font-semibold text-gray-200 transition hover:border-amber-400 hover:text-white focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/40" type="button" data-example-id={example.id}>{example.label}</button>)}
+          </div>
+        </div>
+        <noscript><p class="mt-5 rounded-lg border border-amber-700 bg-amber-950/30 p-4 text-sm text-amber-100">{t.noJs}</p></noscript>
+      </section>
+
+      <aside class="min-w-0 border-t border-gray-800 bg-gray-900/60 p-4 sm:p-6 lg:border-t-0 lg:border-l" aria-labelledby={`${prefix}-result-heading`}>
+        <h2 id={`${prefix}-result-heading`} class="text-sm font-semibold uppercase text-amber-400">{t.result}</h2>
+        <p class="mt-4 rounded-lg border border-gray-700 bg-gray-950 p-5 text-base leading-relaxed text-gray-300" data-initial-result>{t.initial}</p>
+        <div class="hidden min-w-0" data-results>
+          <section class="mt-4 rounded-lg border border-gray-700 bg-gray-950 p-5" aria-labelledby={`${prefix}-current-heading`}>
+            <h3 id={`${prefix}-current-heading`} class="text-xs font-semibold uppercase text-gray-400">{t.current}</h3>
+            <p class="mt-2 break-words text-3xl font-bold text-white" data-result-percent></p>
+            <p class="mt-2 text-base font-semibold" data-result-current-status></p>
+            <p class="mt-2 text-sm text-amber-200" data-result-rounding></p>
+          </section>
+          <section class="mt-3 rounded-lg border border-gray-700 bg-gray-950 p-5" aria-labelledby={`${prefix}-projection-heading`}>
+            <h3 id={`${prefix}-projection-heading`} class="text-xs font-semibold uppercase text-gray-400">{t.projection}</h3>
+            <p class="mt-2 text-lg font-semibold text-white" data-result-projection></p>
+            <p class="mt-2 break-words text-base leading-relaxed text-white" data-result-action></p>
+            <p class="mt-2 text-sm leading-relaxed text-gray-400" data-result-condition></p>
+            <div class="mt-4 grid min-w-0 gap-3 sm:grid-cols-2">
+              <div class="min-w-0 rounded-lg border border-gray-800 p-3"><p class="text-xs uppercase text-gray-500">{t.available}</p><p class="mt-1 break-words text-xl font-semibold" data-result-available></p></div>
+              <div class="min-w-0 rounded-lg border border-gray-800 p-3"><p class="text-xs uppercase text-gray-500">{t.needed}</p><p class="mt-1 break-words text-xl font-semibold" data-result-needed></p></div>
+            </div>
+          </section>
+          <details class="mt-3 rounded-lg border border-gray-800 bg-gray-950 p-4" open>
+            <summary class="cursor-pointer font-semibold text-gray-200">{t.summary}</summary>
+            <dl class="mt-4 grid min-w-0 grid-cols-2 gap-x-3 gap-y-2 text-sm text-gray-300">
+              <dt>{t.completed}</dt><dd class="break-words text-right" data-detail-total></dd>
+              <dt>{t.attendedShort}</dt><dd class="break-words text-right" data-detail-attended></dd>
+              <dt>{t.absencesShort}</dt><dd class="break-words text-right" data-detail-absences></dd>
+              <dt>{t.minimumShort}</dt><dd class="break-words text-right" data-detail-minimum></dd>
+              <dt>{t.margin}</dt><dd class="break-words text-right" data-detail-margin></dd>
+              <dt>{t.remainingShort}</dt><dd class="break-words text-right" data-detail-remaining></dd>
+              <dt data-known-detail>{t.finalTotal}</dt><dd class="break-words text-right" data-known-detail data-detail-final-total></dd>
+              <dt data-known-detail>{t.maxAbsences}</dt><dd class="break-words text-right" data-known-detail data-detail-max-absences></dd>
+              <dt data-known-detail>{t.excess}</dt><dd class="break-words text-right" data-known-detail data-detail-excess></dd>
+              <dt data-known-detail>{t.maxFinal}</dt><dd class="break-words text-right" data-known-detail data-detail-max-final></dd>
+              <dt class="col-span-2 mt-2">{t.recovery}</dt><dd class="col-span-2 break-words text-left text-gray-100" data-detail-recovery></dd>
+            </dl>
+          </details>
+        </div>
+      </aside>
+    </div>
+  </div>
+</Container>
+
+<script>
+  import { initAttendanceCalculators } from "@lib/calculators/matematicas/calculadora-porcentaje-asistencia-escolar/attendance-controller";
+  initAttendanceCalculators();
+</script>
