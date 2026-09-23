@@ -5,6 +5,7 @@ import {
   initAttendanceCalculators,
 } from "./attendance-controller";
 import {
+  ATTENDANCE_EXAMPLES,
   buildAttendanceSummary,
   calculateAttendance,
   ceilDiv,
@@ -516,6 +517,33 @@ describe("presentation and language parity", () => {
     expect(en.buildAttendanceSummary(enResult)).not.toMatch(
       /Asistencias|Faltas|Viabilidad/,
     );
+  });
+
+  it("keeps the interactive example data synchronized across locales", () => {
+    expect(ATTENDANCE_EXAMPLES.map(({ id, values }) => ({ id, values }))).toEqual(
+      en.ATTENDANCE_EXAMPLES.map(({ id, values }) => ({ id, values })),
+    );
+    expect(ATTENDANCE_EXAMPLES.map(({ id }) => id)).toEqual([
+      "regular",
+      "recover",
+      "no-margin",
+      "impossible",
+      "unknown",
+    ]);
+    expect(ATTENDANCE_EXAMPLES.map(({ label }) => label)).toEqual([
+      "Con margen al final",
+      "Recuperar el mínimo",
+      "Sin faltas disponibles",
+      "No alcanzan las restantes",
+      "Solo asistencia actual",
+    ]);
+    expect(en.ATTENDANCE_EXAMPLES.map(({ label }) => label)).toEqual([
+      "Final-course margin",
+      "Recover",
+      "No absences available",
+      "Not enough classes left",
+      "Current attendance only",
+    ]);
   });
 });
 

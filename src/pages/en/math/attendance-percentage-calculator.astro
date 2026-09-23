@@ -50,19 +50,22 @@ const faqJsonLd = buildFaqJsonLd(faqs);
           <ol class="mt-3 list-decimal space-y-3 pl-5 text-sm leading-relaxed text-gray-300">
             <li>Current attendance = attended ÷ completed × 100.</li>
             <li>Final total = completed + remaining.</li>
-            <li>Minimum final attendances = round up (final total × minimum ÷ 100).</li>
+            <li>Minimum final attendances = ceiling(final total × minimum ÷ 100), rounding that fraction up.</li>
             <li>Subtract current attendances to find how many are still needed. If that exceeds the remaining classes, the requirement cannot be met within that schedule.</li>
+            <li>Maximum total absences = final total − minimum final attendances. Future absences available start with that maximum minus accumulated absences, capped by the remaining classes.</li>
+            <li>Recovering the minimum today counts consecutive classes against the current total; meeting it at the end uses the final total and the remaining-class schedule.</li>
           </ol>
         </article>
         <article class="rounded-lg border border-gray-700 bg-gray-950 p-5">
           <h2 class="text-lg font-semibold text-white">Worked example</h2>
-          <p class="mt-3 text-sm leading-relaxed text-gray-300">With 40 completed classes, 34 attendances, an 80% minimum and 10 remaining classes, current attendance is 85%. The final total is 50 and at least 40 attendances are required. You need 6 more attendances, so you may miss 4 of the 10 remaining classes if you attend the other 6. This is an end-of-course margin; the percentage may fall temporarily.</p>
+          <p class="mt-3 text-sm leading-relaxed text-gray-300">With 40 completed classes, 34 attendances, an 80% minimum and 10 remaining classes, current attendance is 85%. The final total is 50 and at least 40 attendances are required. You need 6 more attendances, so you may miss 4 of the 10 remaining classes if you attend the other 6. This margin is calculated for the end: the minimum is not guaranteed at every intermediate point and the percentage may fall temporarily. The display may round percentages for readability; that formatting is not your school's rounding rule.</p>
         </article>
       </div>
-      <div class="mt-4 grid gap-4 md:grid-cols-3">
+      <div class="mt-4 grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <article class="rounded-lg border border-gray-700 bg-gray-950 p-5"><h3 class="font-semibold text-white">Accumulated absences</h3><p class="mt-2 text-sm text-gray-400">Absences already recorded among completed classes.</p></article>
+        <article class="rounded-lg border border-gray-700 bg-gray-950 p-5"><h3 class="font-semibold text-white">Maximum total absences</h3><p class="mt-2 text-sm text-gray-400">The maximum number of absences allowed in the final total while still reaching the minimum.</p></article>
         <article class="rounded-lg border border-gray-700 bg-gray-950 p-5"><h3 class="font-semibold text-white">Future absences available</h3><p class="mt-2 text-sm text-gray-400">Possible absences among remaining classes, provided you attend the others.</p></article>
-        <article class="rounded-lg border border-gray-700 bg-gray-950 p-5"><h3 class="font-semibold text-white">Theoretical recovery</h3><p class="mt-2 text-sm text-gray-400">Adds attended classes to the current total; it is not the need within a fixed final schedule.</p></article>
+        <article class="rounded-lg border border-gray-700 bg-gray-950 p-5"><h3 class="font-semibold text-white">Theoretical recovery</h3><p class="mt-2 text-sm text-gray-400">Adds attended classes to the current total to reach today's minimum; it is not the need within a fixed final schedule.</p></article>
       </div>
     </Container>
     <FaqSection faqs={faqs} />
