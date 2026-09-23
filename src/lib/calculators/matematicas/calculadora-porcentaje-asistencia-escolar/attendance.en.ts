@@ -53,6 +53,7 @@ export {
   serializeAttendancePolicy,
   summarizeCalendar,
   upsertCalendarEvent,
+  validateAttendanceHistorySnapshot,
   validateCalendarEvent,
 } from "./attendance-phase2";
 export type {

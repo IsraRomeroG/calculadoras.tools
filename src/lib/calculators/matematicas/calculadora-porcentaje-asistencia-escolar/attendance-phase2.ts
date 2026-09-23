@@ -1,7 +1,12 @@
 import type { AttendancePercent } from "./attendance-core";
 import {
   PERCENT_SCALE,
+  normalizeAttendanceCalendar,
   normalizeAttendancePercent,
+  parseAttendanceCourseTotal,
+  parseAttendanceInteger,
+  parseAttendancePercent,
+  parseAttendanceRemaining,
 } from "./attendance-core";
 
 /** Versioned constants are intentionally independent from the page URL. */
@@ -396,7 +401,13 @@ export interface AttendanceCalendarCounts {
 }
 
 export function validateCalendarEvent(event: AttendanceCalendarEvent): AttendanceCalendarEvent {
-  if (!event || typeof event.id !== "string" || !event.id.trim() || event.id.length > 120) {
+  if (
+    !event ||
+    typeof event.id !== "string" ||
+    !event.id.trim() ||
+    event.id.length > 120 ||
+    /[\u0000-\u001f\u007f]/.test(event.id)
+  ) {
     throw new RangeError("Calendar event ID is required.");
   }
   if (!isLocalDate(event.date)) throw new RangeError("Calendar dates must use YYYY-MM-DD.");
@@ -508,6 +519,8 @@ export interface ManualAttendanceValues {
   absences: string;
   requiredPercent: string;
   remainingClasses: string;
+  justifiedAbsences?: string;
+  tardyClasses?: string;
   calendarMode?: "remaining" | "total";
   courseTotalClasses?: string;
 }
@@ -534,6 +547,8 @@ export function createAttendanceSubject(name = "Subject 1", id = createStableId(
       absences: "",
       requiredPercent: "80",
       remainingClasses: "",
+      justifiedAbsences: "",
+      tardyClasses: "",
       calendarMode: "remaining",
       courseTotalClasses: "",
     },
@@ -596,10 +611,61 @@ export interface AttendanceHistorySnapshot {
   schemaVersion: number;
   rulesVersion: string;
   subject: { id: string; name: string };
-  input: ManualAttendanceValues | { events: AttendanceCalendarEvent[]; calendarComplete: boolean };
+  input: ManualAttendanceValues | {
+    events: AttendanceCalendarEvent[];
+    calendarComplete: boolean;
+    requiredPercent?: string;
+  };
   policy: AttendancePolicy;
   source: AttendanceSource;
   result: unknown;
+}
+
+export interface PreparedAttendanceRestore {
+  subject: AttendanceSubject;
+  subjects: AttendanceSubject[];
+}
+
+/**
+ * Builds a restored subject from the snapshot and that subject's own saved state.
+ * Manual snapshots do not contain calendar data, so they retain only the events
+ * and calendar-complete flag persisted for the matching subject ID.
+ */
+export function prepareAttendanceRestore(
+  subjects: readonly AttendanceSubject[],
+  snapshot: AttendanceHistorySnapshot,
+): PreparedAttendanceRestore {
+  const persistedSubject = subjects.find((item) => item.id === snapshot.subject.id);
+  const subjectState = persistedSubject ?? createAttendanceSubject(
+    snapshot.subject.name,
+    snapshot.subject.id,
+  );
+  const manual = snapshot.source === "manual"
+    ? { ...(snapshot.input as ManualAttendanceValues) }
+    : {
+        ...subjectState.manual,
+        requiredPercent: (snapshot.input as { requiredPercent?: string }).requiredPercent ??
+          String((snapshot.result as PolicyAttendanceResult).requiredPercent),
+      };
+  const events = snapshot.source === "manual"
+    ? subjectState.events
+    : (snapshot.input as { events: AttendanceCalendarEvent[] }).events;
+  const restoredSubject: AttendanceSubject = {
+    id: snapshot.subject.id,
+    name: snapshot.subject.name,
+    source: snapshot.source,
+    manual,
+    events: events.map((event) => ({ ...event })),
+    calendarComplete: snapshot.source === "calendar"
+      ? (snapshot.input as { calendarComplete: boolean }).calendarComplete
+      : subjectState.calendarComplete,
+    policy: normalizeAttendancePolicy(snapshot.policy),
+  };
+  const nextSubjects = persistedSubject
+    ? subjects.map((item) => item.id === restoredSubject.id ? restoredSubject : item)
+    : [...subjects, restoredSubject];
+
+  return { subject: restoredSubject, subjects: nextSubjects };
 }
 
 export interface StorageLike {
@@ -609,12 +675,12 @@ export interface StorageLike {
 }
 
 export type HistoryReadResult =
-  | { ok: true; snapshots: AttendanceHistorySnapshot[] }
-  | { ok: false; snapshots: []; reason: "unavailable" | "corrupt" };
+  | { ok: true; snapshots: AttendanceHistorySnapshot[]; ignoredCount?: number }
+  | { ok: false; snapshots: []; reason: "unavailable" | "corrupt"; ignoredCount?: number };
 
 export type HistorySaveResult =
-  | { ok: true; snapshots: AttendanceHistorySnapshot[] }
-  | { ok: false; reason: "unavailable" | "full" | "serialization"; snapshots: AttendanceHistorySnapshot[] };
+  | { ok: true; snapshots: AttendanceHistorySnapshot[]; ignoredCount?: number }
+  | { ok: false; reason: "unavailable" | "corrupt" | "full" | "serialization"; snapshots: AttendanceHistorySnapshot[]; ignoredCount?: number };
 
 export function readAttendanceHistory(storage: StorageLike | null | undefined): HistoryReadResult {
   if (!storage) return { ok: false, snapshots: [], reason: "unavailable" };
@@ -624,14 +690,29 @@ export function readAttendanceHistory(storage: StorageLike | null | undefined): 
   } catch {
     return { ok: false, snapshots: [], reason: "unavailable" };
   }
-  if (!raw) return { ok: true, snapshots: [] };
+  if (raw === null) return { ok: true, snapshots: [] };
   try {
     const parsed: unknown = JSON.parse(raw);
-    if (!Array.isArray(parsed) || parsed.length > MAX_ATTENDANCE_HISTORY) {
+    if (!Array.isArray(parsed)) {
       return { ok: false, snapshots: [], reason: "corrupt" };
     }
-    const snapshots = parsed.map(parseHistorySnapshot);
-    return { ok: true, snapshots };
+    const snapshots: AttendanceHistorySnapshot[] = [];
+    const ids = new Set<string>();
+    let ignoredCount = 0;
+    for (const item of parsed) {
+      try {
+        const snapshot = parseHistorySnapshot(item);
+        if (ids.has(snapshot.id)) throw new TypeError("History snapshot ID is duplicated.");
+        ids.add(snapshot.id);
+        snapshots.push(snapshot);
+      } catch {
+        ignoredCount += 1;
+      }
+    }
+    if (snapshots.length > MAX_ATTENDANCE_HISTORY) {
+      return { ok: false, snapshots: [], reason: "corrupt" };
+    }
+    return ignoredCount ? { ok: true, snapshots, ignoredCount } : { ok: true, snapshots };
   } catch {
     return { ok: false, snapshots: [], reason: "corrupt" };
   }
@@ -646,16 +727,48 @@ export function appendAttendanceHistory(
     return { ok: false, reason: read.reason, snapshots: [] };
   }
   if (read.snapshots.length >= MAX_ATTENDANCE_HISTORY) {
-    return { ok: false, reason: "full", snapshots: read.snapshots };
+    return {
+      ok: false,
+      reason: "full",
+      snapshots: read.snapshots,
+      ...(read.ignoredCount ? { ignoredCount: read.ignoredCount } : {}),
+    };
   }
-  const validated = parseHistorySnapshot(snapshot);
+  let validated: AttendanceHistorySnapshot;
+  try {
+    validated = parseHistorySnapshot(snapshot);
+  } catch {
+    return {
+      ok: false,
+      reason: "serialization",
+      snapshots: read.snapshots,
+      ...(read.ignoredCount ? { ignoredCount: read.ignoredCount } : {}),
+    };
+  }
+  if (read.snapshots.some((item) => item.id === validated.id)) {
+    return {
+      ok: false,
+      reason: "serialization",
+      snapshots: read.snapshots,
+      ...(read.ignoredCount ? { ignoredCount: read.ignoredCount } : {}),
+    };
+  }
   const snapshots = [validated, ...read.snapshots];
   try {
     storage?.setItem(ATTENDANCE_HISTORY_KEY, JSON.stringify(snapshots));
   } catch {
-    return { ok: false, reason: "unavailable", snapshots: read.snapshots };
+    return {
+      ok: false,
+      reason: "unavailable",
+      snapshots: read.snapshots,
+      ...(read.ignoredCount ? { ignoredCount: read.ignoredCount } : {}),
+    };
   }
-  return { ok: true, snapshots };
+  return {
+    ok: true,
+    snapshots,
+    ...(read.ignoredCount ? { ignoredCount: read.ignoredCount } : {}),
+  };
 }
 
 export function deleteAttendanceHistorySnapshot(
@@ -672,7 +785,11 @@ export function deleteAttendanceHistorySnapshot(
   } catch {
     return { ok: false, snapshots: read.snapshots, reason: "unavailable" };
   }
-  return { ok: true, snapshots };
+  return {
+    ok: true,
+    snapshots,
+    ...(read.ignoredCount ? { ignoredCount: read.ignoredCount } : {}),
+  };
 }
 
 export function clearAttendanceHistory(storage: StorageLike | null | undefined): HistoryReadResult {
@@ -697,6 +814,10 @@ export function createAttendanceHistorySnapshot(
   };
 }
 
+export function validateAttendanceHistorySnapshot(value: unknown): AttendanceHistorySnapshot {
+  return parseHistorySnapshot(value);
+}
+
 export function isAttendanceHistoryCurrent(snapshot: AttendanceHistorySnapshot): boolean {
   return snapshot.schemaVersion === ATTENDANCE_PHASE2_SCHEMA_VERSION &&
     snapshot.rulesVersion === ATTENDANCE_PHASE2_RULES_VERSION;
@@ -705,22 +826,32 @@ export function isAttendanceHistoryCurrent(snapshot: AttendanceHistorySnapshot):
 function parseHistorySnapshot(value: unknown): AttendanceHistorySnapshot {
   if (!isRecord(value)) throw new TypeError("History snapshot must be an object.");
   if (
-    typeof value.id !== "string" ||
+    !isSafeIdentifier(value.id) ||
     typeof value.savedAt !== "string" ||
     value.schemaVersion !== ATTENDANCE_PHASE2_SCHEMA_VERSION ||
     typeof value.rulesVersion !== "string" ||
+    !value.rulesVersion.trim() ||
+    value.rulesVersion.trim() !== value.rulesVersion ||
+    value.rulesVersion.length > 100 ||
+    /[\u0000-\u001f\u007f]/.test(value.rulesVersion) ||
     !isRecord(value.subject) ||
-    typeof value.subject.id !== "string" ||
+    !isSafeIdentifier(value.subject.id) ||
     typeof value.subject.name !== "string" ||
     (value.source !== "manual" && value.source !== "calendar") ||
     !isRecord(value.policy)
   ) {
     throw new TypeError("History snapshot has an incompatible shape.");
   }
-  if (!("result" in value)) throw new TypeError("History snapshot result is missing.");
-  const policy = normalizeAttendancePolicy(value.policy as Partial<AttendancePolicy>);
-  const input = value.input;
-  if (!isRecord(input)) throw new TypeError("History input is invalid.");
+  const savedAt = new Date(value.savedAt);
+  if (Number.isNaN(savedAt.getTime()) || savedAt.toISOString() !== value.savedAt) {
+    throw new TypeError("History timestamp is invalid.");
+  }
+  const subjectName = normalizeSubjectName(value.subject.name);
+  const policy = parseHistoryPolicy(value.policy);
+  const rawInput = value.input;
+  if (!isRecord(rawInput)) throw new TypeError("History input is invalid.");
+  let input: AttendanceHistorySnapshot["input"];
+  let facts: HistoryInputFacts;
   if (value.source === "manual") {
     const manualKeys = [
       "totalClasses",
@@ -731,32 +862,376 @@ function parseHistorySnapshot(value: unknown): AttendanceHistorySnapshot {
       "remainingClasses",
     ] as const;
     if (
-      manualKeys.some((key) => typeof input[key] !== "string") ||
-      (input.mode !== "attended" && input.mode !== "absences") ||
-      (input.calendarMode !== undefined && input.calendarMode !== "remaining" && input.calendarMode !== "total") ||
-      (input.courseTotalClasses !== undefined && typeof input.courseTotalClasses !== "string")
+      manualKeys.some((key) => typeof rawInput[key] !== "string") ||
+      (rawInput.justifiedAbsences !== undefined && typeof rawInput.justifiedAbsences !== "string") ||
+      (rawInput.tardyClasses !== undefined && typeof rawInput.tardyClasses !== "string") ||
+      (rawInput.mode !== "attended" && rawInput.mode !== "absences") ||
+      (rawInput.calendarMode !== undefined && rawInput.calendarMode !== "remaining" && rawInput.calendarMode !== "total") ||
+      (rawInput.courseTotalClasses !== undefined && typeof rawInput.courseTotalClasses !== "string")
     ) {
       throw new TypeError("History manual input is invalid.");
     }
-  } else if (
-    !Array.isArray(input.events) ||
-    typeof input.calendarComplete !== "boolean"
-  ) {
-    throw new TypeError("History calendar input is invalid.");
+    const manual = normalizeHistoryManualInput(rawInput as unknown as ManualAttendanceValues);
+    input = manual.input;
+    facts = manual.facts;
   } else {
-    input.events = input.events.map((event) => validateCalendarEvent(event as AttendanceCalendarEvent));
+    if (
+      !Array.isArray(rawInput.events) ||
+      typeof rawInput.calendarComplete !== "boolean" ||
+      (rawInput.requiredPercent !== undefined && typeof rawInput.requiredPercent !== "string")
+    ) {
+      throw new TypeError("History calendar input is invalid.");
+    }
+    const events = rawInput.events.map((event) => validateCalendarEvent(event as AttendanceCalendarEvent));
+    const eventIds = new Set(events.map((event) => event.id));
+    if (eventIds.size !== events.length) throw new TypeError("History calendar event IDs must be unique.");
+    assertCalendarLimits(events);
+    const counts = summarizeCalendar(events, rawInput.calendarComplete);
+    if (counts.completedClasses < 1) throw new TypeError("History calendar has no completed classes.");
+    const requiredPercent = rawInput.requiredPercent as string | undefined;
+    const parsedPercent = requiredPercent === undefined
+      ? null
+      : parseAttendancePercent(requiredPercent);
+    if (parsedPercent && !parsedPercent.ok) throw new TypeError("History calendar minimum is invalid.");
+    input = {
+      events,
+      calendarComplete: rawInput.calendarComplete,
+      ...(requiredPercent !== undefined ? { requiredPercent } : {}),
+    };
+    facts = {
+      totalClasses: counts.completedClasses,
+      attendedClasses: counts.attendedClasses,
+      justifiedAbsences: counts.justifiedAbsences,
+      tardyClasses: counts.tardyClasses,
+      requiredPercentScaled: parsedPercent?.ok ? parsedPercent.scaled : null,
+      remainingClasses: counts.remainingClasses,
+    };
   }
+  const result = validateHistoryResult(value.result, facts, policy);
   return {
-    id: value.id,
+    id: value.id.trim(),
     savedAt: value.savedAt,
     schemaVersion: value.schemaVersion,
     rulesVersion: value.rulesVersion,
-    subject: { id: value.subject.id, name: value.subject.name },
-    input: input as AttendanceHistorySnapshot["input"],
+    subject: { id: value.subject.id.trim(), name: subjectName },
+    input,
     policy,
     source: value.source,
-    result: value.result,
+    result,
   };
+}
+
+interface HistoryInputFacts {
+  totalClasses: number;
+  attendedClasses: number;
+  justifiedAbsences: number;
+  tardyClasses: number;
+  requiredPercentScaled: number | null;
+  remainingClasses: number | null;
+}
+
+function normalizeHistoryManualInput(input: ManualAttendanceValues): {
+  input: ManualAttendanceValues;
+  facts: HistoryInputFacts;
+} {
+  const total = parseAttendanceInteger(input.totalClasses, { allowZero: false, max: 1_000 });
+  const percent = parseAttendancePercent(input.requiredPercent);
+  if (!total.ok || !percent.ok) throw new TypeError("History manual totals or minimum are invalid.");
+  if (input.mode !== "attended" && input.mode !== "absences") {
+    throw new TypeError("History manual mode is invalid.");
+  }
+  const activeCount = parseAttendanceInteger(
+    input.mode === "attended" ? input.attendedClasses : input.absences,
+    { allowZero: true, max: total.value },
+  );
+  if (!activeCount.ok) throw new TypeError("History active class count is invalid.");
+  const attendedClasses = input.mode === "attended" ? activeCount.value : total.value - activeCount.value;
+  const originalAbsences = total.value - attendedClasses;
+  const justifiedAbsencesInput = input.justifiedAbsences ?? "";
+  const tardyClassesInput = input.tardyClasses ?? "";
+  const justifiedAbsences = justifiedAbsencesInput.trim()
+    ? parseAttendanceInteger(justifiedAbsencesInput, { allowZero: true, max: originalAbsences })
+    : { ok: true as const, value: 0, normalized: "" };
+  const tardyClasses = tardyClassesInput.trim()
+    ? parseAttendanceInteger(tardyClassesInput, { allowZero: true, max: attendedClasses })
+    : { ok: true as const, value: 0, normalized: "" };
+  if (!justifiedAbsences.ok || !tardyClasses.ok) {
+    throw new TypeError("History manual policy counts are invalid.");
+  }
+  const calendarMode = input.calendarMode ?? "remaining";
+  let remainingClasses: number | null;
+  let calendarModeNormalized: "remaining" | "total";
+  let courseTotalClasses = input.courseTotalClasses ?? "";
+  if (calendarMode === "remaining") {
+    const parsedRemaining = parseAttendanceRemaining(input.remainingClasses);
+    if (!parsedRemaining.ok) throw new TypeError("History remaining classes are invalid.");
+    const calendar = normalizeAttendanceCalendar({
+      totalClasses: total.value,
+      calendarMode,
+      remainingClasses: parsedRemaining.value,
+    });
+    remainingClasses = calendar.remainingClasses;
+    calendarModeNormalized = "remaining";
+  } else if (calendarMode === "total") {
+    const parsedCourseTotal = parseAttendanceCourseTotal(courseTotalClasses, total.value);
+    if (!parsedCourseTotal.ok) throw new TypeError("History course total is invalid.");
+    const calendar = normalizeAttendanceCalendar({
+      totalClasses: total.value,
+      calendarMode,
+      courseTotalClasses: parsedCourseTotal.value,
+    });
+    remainingClasses = calendar.remainingClasses;
+    calendarModeNormalized = "total";
+  } else {
+    throw new TypeError("History calendar mode is invalid.");
+  }
+  return {
+    input: {
+      totalClasses: input.totalClasses,
+      mode: input.mode,
+      attendedClasses: input.attendedClasses,
+      absences: input.absences,
+      requiredPercent: input.requiredPercent,
+      remainingClasses: input.remainingClasses,
+      justifiedAbsences: justifiedAbsencesInput,
+      tardyClasses: tardyClassesInput,
+      calendarMode: calendarModeNormalized,
+      courseTotalClasses,
+    },
+    facts: {
+      totalClasses: total.value,
+      attendedClasses,
+      justifiedAbsences: justifiedAbsences.value,
+      tardyClasses: tardyClasses.value,
+      requiredPercentScaled: percent.scaled,
+      remainingClasses,
+    },
+  };
+}
+
+function validateHistoryResult(
+  value: unknown,
+  facts: HistoryInputFacts,
+  policy: AttendancePolicy,
+): PolicyAttendanceResult {
+  if (!isRecord(value) || !isRecord(value.policy) || !isRecord(value.projection)) {
+    throw new TypeError("History result must contain calculation and projection data.");
+  }
+  const resultPolicy = parseHistoryPolicy(value.policy);
+  if (serializeAttendancePolicy(resultPolicy) !== serializeAttendancePolicy(policy)) {
+    throw new TypeError("History result policy does not match its snapshot.");
+  }
+  const totalClasses = requireHistoryInteger(value.totalClasses, 1, 1_000, "result total");
+  const attendedClasses = requireHistoryInteger(value.attendedClasses, 0, totalClasses, "result attended");
+  const originalAbsences = requireHistoryInteger(value.originalAbsences, 0, totalClasses, "result absences");
+  const justifiedAbsences = requireHistoryInteger(value.justifiedAbsences, 0, originalAbsences, "result justified absences");
+  const tardyClasses = requireHistoryInteger(value.tardyClasses, 0, attendedClasses, "result tardies");
+  if (
+    totalClasses !== facts.totalClasses ||
+    attendedClasses !== facts.attendedClasses ||
+    originalAbsences !== totalClasses - attendedClasses ||
+    justifiedAbsences !== facts.justifiedAbsences ||
+    tardyClasses !== facts.tardyClasses
+  ) {
+    throw new TypeError("History result counts do not match the saved inputs.");
+  }
+  if (typeof value.requiredPercent !== "number") {
+    throw new TypeError("History result minimum is invalid.");
+  }
+  const requiredPercent = normalizeAttendancePercent(value.requiredPercent);
+  const requiredPercentScaled = requireHistoryInteger(value.requiredPercentScaled, 0, 1_000_000, "result minimum");
+  if (
+    requiredPercent.scaled !== requiredPercentScaled ||
+    (facts.requiredPercentScaled !== null && facts.requiredPercentScaled !== requiredPercentScaled)
+  ) {
+    throw new TypeError("History result minimum does not match its saved inputs.");
+  }
+  const effectiveTotalClasses = requireHistoryInteger(value.effectiveTotalClasses, 0, totalClasses, "effective total");
+  const effectiveAttendedClasses = requireHistoryInteger(value.effectiveAttendedClasses, 0, effectiveTotalClasses, "effective attendance");
+  const effectiveAbsences = requireHistoryInteger(value.effectiveAbsences, 0, effectiveTotalClasses, "effective absences");
+  const tardyPenalty = requireHistoryInteger(value.tardyPenalty, 0, tardyClasses, "tardy penalty");
+  const tardyRemainder = requireHistoryInteger(value.tardyRemainder, 0, tardyClasses, "tardy remainder");
+  if (
+    effectiveAbsences !== Math.max(0, effectiveTotalClasses - effectiveAttendedClasses)
+  ) {
+    throw new TypeError("History effective attendance counts are inconsistent.");
+  }
+  const currentPercent = requireHistoryOptionalPercent(value.currentPercent, effectiveTotalClasses === 0);
+  const currentEvaluatedPercent = requireHistoryOptionalPercent(value.currentEvaluatedPercent, effectiveTotalClasses === 0);
+  if (
+    currentPercent !== null &&
+    Math.abs(currentPercent - (100 * effectiveAttendedClasses) / effectiveTotalClasses) > 1e-10
+  ) {
+    throw new TypeError("History current percentage does not match its effective attendance counts.");
+  }
+  if (
+    effectiveTotalClasses === 0
+      ? value.currentStatus !== "undefined"
+      : value.currentStatus !== "meets" && value.currentStatus !== "below"
+  ) {
+    throw new TypeError("History current status is invalid.");
+  }
+  const projection = validateHistoryProjection(value.projection, {
+    effectiveTotalClasses,
+    effectiveAttendedClasses,
+    effectiveAbsences,
+    remainingClasses: facts.remainingClasses,
+  });
+  return {
+    totalClasses,
+    attendedClasses,
+    originalAbsences,
+    justifiedAbsences,
+    tardyClasses,
+    requiredPercent: requiredPercent.value,
+    requiredPercentScaled,
+    policy,
+    effectiveTotalClasses,
+    effectiveAttendedClasses,
+    effectiveAbsences,
+    tardyPenalty,
+    tardyRemainder,
+    currentPercent,
+    currentEvaluatedPercent,
+    currentStatus: value.currentStatus,
+    projection,
+  };
+}
+
+function parseHistoryPolicy(value: Record<string, any>): AttendancePolicy {
+  if (
+    !("justified" in value) ||
+    !("tardyConversion" in value) ||
+    !("rounding" in value) ||
+    value.justified === undefined ||
+    value.tardyConversion === undefined ||
+    value.rounding === undefined ||
+    value.rounding === null
+  ) {
+    throw new TypeError("History policy is incomplete.");
+  }
+  const policy = normalizeAttendancePolicy(value as Partial<AttendancePolicy>);
+  if (
+    value.justified !== policy.justified ||
+    value.tardyConversion !== policy.tardyConversion ||
+    (policy.rounding === "exact"
+      ? value.rounding !== "exact"
+      : !isRecord(value.rounding) ||
+        value.rounding.mode !== "half-up" ||
+        value.rounding.decimals !== policy.rounding.decimals)
+  ) {
+    throw new TypeError("History policy is not normalized.");
+  }
+  return policy;
+}
+
+function validateHistoryProjection(
+  value: Record<string, any>,
+  facts: Pick<HistoryInputFacts, "remainingClasses"> & {
+    effectiveTotalClasses: number;
+    effectiveAttendedClasses: number;
+    effectiveAbsences: number;
+  },
+): PolicyAttendanceResult["projection"] {
+  if (value.status === "unknown") {
+    if (facts.remainingClasses !== null || value.remainingClasses !== null) {
+      throw new TypeError("Unknown history projection has invalid remaining classes.");
+    }
+    return { status: "unknown", remainingClasses: null };
+  }
+  const remainingClasses = requireHistoryInteger(value.remainingClasses, 0, 1_000, "projection remaining classes");
+  if (facts.remainingClasses !== remainingClasses) throw new TypeError("History projection does not match its saved calendar.");
+  if (value.status === "undefined") {
+    if (
+      facts.effectiveTotalClasses + remainingClasses !== 0 ||
+      value.finalTotalClasses !== 0 ||
+      [
+        value.minimumAttendancesFinal,
+        value.maximumFinalAbsences,
+        value.availableAbsences,
+        value.exceededAbsences,
+        value.requiredAttendancesFromRemaining,
+        value.maxPossiblePercent,
+        value.finalEvaluatedPercent,
+      ].some((item) => item !== null)
+    ) {
+      throw new TypeError("Undefined history projection is inconsistent.");
+    }
+    return {
+      status: "undefined",
+      remainingClasses,
+      finalTotalClasses: 0,
+      minimumAttendancesFinal: null,
+      maximumFinalAbsences: null,
+      availableAbsences: null,
+      exceededAbsences: null,
+      requiredAttendancesFromRemaining: null,
+      maxPossiblePercent: null,
+      finalEvaluatedPercent: null,
+    };
+  }
+  const validStatuses = ["finished_meets", "finished_below", "impossible", "guaranteed", "possible"];
+  if (!validStatuses.includes(value.status)) throw new TypeError("History projection status is invalid.");
+  const finalTotalClasses = requireHistoryInteger(value.finalTotalClasses, 1, 2_000, "final total");
+  const minimumAttendancesFinal = requireHistoryInteger(value.minimumAttendancesFinal, 0, finalTotalClasses, "final minimum");
+  const maximumFinalAbsences = requireHistoryInteger(value.maximumFinalAbsences, 0, finalTotalClasses, "maximum final absences");
+  const availableAbsences = requireHistoryInteger(value.availableAbsences, 0, remainingClasses, "available absences");
+  const exceededAbsences = requireHistoryInteger(value.exceededAbsences, 0, 2_000, "exceeded absences");
+  const requiredAttendancesFromRemaining = requireHistoryInteger(value.requiredAttendancesFromRemaining, 0, finalTotalClasses, "required remaining attendances");
+  const maxPossiblePercent = requireHistoryPercent(value.maxPossiblePercent, "maximum possible percentage");
+  const finalEvaluatedPercent = requireHistoryPercent(value.finalEvaluatedPercent, "evaluated final percentage");
+  const rawAvailableAbsences = finalTotalClasses - minimumAttendancesFinal - facts.effectiveAbsences;
+  if (
+    finalTotalClasses !== facts.effectiveTotalClasses + remainingClasses ||
+    maximumFinalAbsences !== finalTotalClasses - minimumAttendancesFinal ||
+    requiredAttendancesFromRemaining !== Math.max(0, minimumAttendancesFinal - facts.effectiveAttendedClasses) ||
+    availableAbsences !== Math.max(0, Math.min(remainingClasses, rawAvailableAbsences)) ||
+    exceededAbsences !== Math.max(0, -rawAvailableAbsences) ||
+    Math.abs(maxPossiblePercent - (100 * (facts.effectiveAttendedClasses + remainingClasses)) / finalTotalClasses) > 1e-10
+  ) {
+    throw new TypeError("History projection counts are inconsistent.");
+  }
+  return {
+    status: value.status,
+    remainingClasses,
+    finalTotalClasses,
+    minimumAttendancesFinal,
+    maximumFinalAbsences,
+    availableAbsences,
+    exceededAbsences,
+    requiredAttendancesFromRemaining,
+    maxPossiblePercent,
+    finalEvaluatedPercent,
+  };
+}
+
+function requireHistoryInteger(value: unknown, min: number, max: number, label: string): number {
+  if (!Number.isSafeInteger(value) || (value as number) < min || (value as number) > max) {
+    throw new TypeError(`History ${label} is invalid.`);
+  }
+  return value as number;
+}
+
+function requireHistoryPercent(value: unknown, label: string): number {
+  if (typeof value !== "number" || !Number.isFinite(value) || value < 0 || value > 100) {
+    throw new TypeError(`History ${label} is invalid.`);
+  }
+  return value;
+}
+
+function requireHistoryOptionalPercent(value: unknown, shouldBeNull: boolean): number | null {
+  if (shouldBeNull) {
+    if (value !== null) throw new TypeError("History percentage should be undefined.");
+    return null;
+  }
+  return requireHistoryPercent(value, "percentage");
+}
+
+function isSafeIdentifier(value: unknown): value is string {
+  return typeof value === "string" &&
+    Boolean(value.trim()) &&
+    value.length <= 120 &&
+    !/[\u0000-\u001f\u007f]/.test(value);
 }
 
 function isRecord(value: unknown): value is Record<string, any> {
@@ -771,6 +1246,10 @@ export const ATTENDANCE_CSV_COLUMNS = [
   "total_original",
   "attended_original",
   "absences_original",
+  "justified_absences",
+  "tardy_classes",
+  "tardy_penalty",
+  "tardy_remainder",
   "minimum",
   "remaining",
   "policy",
@@ -838,6 +1317,10 @@ export function policyAttendanceToCsvRow(
     total_original: result.totalClasses,
     attended_original: result.attendedClasses,
     absences_original: result.originalAbsences,
+    justified_absences: result.justifiedAbsences,
+    tardy_classes: result.tardyClasses,
+    tardy_penalty: result.tardyPenalty,
+    tardy_remainder: result.tardyRemainder,
     minimum: result.requiredPercent,
     remaining: projection.status === "unknown" ? null : projection.remainingClasses,
     policy: serializeAttendancePolicy(result.policy),

@@ -151,6 +151,12 @@ const phase2 = isEs
       policyUsed: "Política utilizada",
       originUsed: "Origen",
       effective: "Interpretación efectiva",
+      justifiedCount: "Faltas justificadas (J)",
+      justifiedHelp: "Opcional; vacío equivale a 0. Límite: 0 a F faltas.",
+      tardyCount: "Clases con retardo (L)",
+      tardyHelp: "Opcional; vacío equivale a 0. Límite: 0 a A asistencias.",
+      tardyPenalty: "Asistencias descontadas por retardos",
+      tardyRemainder: "Retardos restantes tras conversión",
     }
   : {
       subject: "Subject",
@@ -192,6 +198,12 @@ const phase2 = isEs
       policyUsed: "Policy used",
       originUsed: "Origin",
       effective: "Effective interpretation",
+      justifiedCount: "Justified absences (J)",
+      justifiedHelp: "Optional; blank means 0. Limit: 0 to F absences.",
+      tardyCount: "Tardy classes (L)",
+      tardyHelp: "Optional; blank means 0. Limit: 0 to A attendances.",
+      tardyPenalty: "Attendances deducted for tardies",
+      tardyRemainder: "Tardy remainder after conversion",
     };
 ---
 
@@ -259,6 +271,20 @@ const phase2 = isEs
             <input id={`${prefix}-minimum`} class="mt-2 min-h-12 w-full min-w-0 rounded-lg border border-gray-700 bg-gray-900 px-4 text-base text-white outline-none transition focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15" type="text" inputmode="decimal" autocomplete="off" value="80" data-field="requiredPercent" aria-describedby={`${prefix}-minimum-help ${prefix}-minimum-error`} />
             <p id={`${prefix}-minimum-help`} class="mt-2 text-sm text-gray-400">{t.minimumHelp}</p>
             <p id={`${prefix}-minimum-error`} class="mt-2 hidden text-sm text-red-300" data-error-for="requiredPercent"></p>
+          </div>
+          <div class="min-w-0 sm:col-span-2 grid min-w-0 gap-4 sm:grid-cols-2" data-manual-source-fields>
+            <div class="min-w-0">
+              <label for={`${prefix}-justified-count`} class="block text-sm font-medium text-gray-200">{phase2.justifiedCount}</label>
+              <input id={`${prefix}-justified-count`} class="mt-2 min-h-12 w-full min-w-0 rounded-lg border border-gray-700 bg-gray-900 px-4 text-base text-white outline-none transition focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15" type="text" inputmode="numeric" autocomplete="off" data-field="justifiedAbsences" aria-describedby={`${prefix}-justified-count-help ${prefix}-justified-count-error`} />
+              <p id={`${prefix}-justified-count-help`} class="mt-2 text-sm text-gray-400" data-policy-count-help="justifiedAbsences">{phase2.justifiedHelp}</p>
+              <p id={`${prefix}-justified-count-error`} class="mt-2 hidden text-sm text-red-300" data-error-for="justifiedAbsences" role="alert"></p>
+            </div>
+            <div class="min-w-0">
+              <label for={`${prefix}-tardy-count`} class="block text-sm font-medium text-gray-200">{phase2.tardyCount}</label>
+              <input id={`${prefix}-tardy-count`} class="mt-2 min-h-12 w-full min-w-0 rounded-lg border border-gray-700 bg-gray-900 px-4 text-base text-white outline-none transition focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15" type="text" inputmode="numeric" autocomplete="off" data-field="tardyClasses" aria-describedby={`${prefix}-tardy-count-help ${prefix}-tardy-count-error`} />
+              <p id={`${prefix}-tardy-count-help`} class="mt-2 text-sm text-gray-400" data-policy-count-help="tardyClasses">{phase2.tardyHelp}</p>
+              <p id={`${prefix}-tardy-count-error`} class="mt-2 hidden text-sm text-red-300" data-error-for="tardyClasses" role="alert"></p>
+            </div>
           </div>
           <div class="min-w-0 sm:col-span-2" data-calendar-schedule>
             <span class="block text-sm font-medium text-gray-200">{t.courseCalendar}</span>
@@ -365,6 +391,10 @@ const phase2 = isEs
               <dt class="min-w-0 break-words">{t.completed}</dt><dd class="min-w-0 break-words text-right" data-detail-total></dd>
               <dt class="min-w-0 break-words">{t.attendedShort}</dt><dd class="min-w-0 break-words text-right" data-detail-attended></dd>
               <dt class="min-w-0 break-words">{t.absencesShort}</dt><dd class="min-w-0 break-words text-right" data-detail-absences></dd>
+              <dt class="min-w-0 break-words">{phase2.justifiedCount}</dt><dd class="min-w-0 break-words text-right" data-detail-justified></dd>
+              <dt class="min-w-0 break-words">{phase2.tardyCount}</dt><dd class="min-w-0 break-words text-right" data-detail-tardy></dd>
+              <dt class="min-w-0 break-words">{phase2.tardyPenalty}</dt><dd class="min-w-0 break-words text-right" data-detail-tardy-penalty></dd>
+              <dt class="min-w-0 break-words" data-detail-tardy-remainder-label>{phase2.tardyRemainder}</dt><dd class="min-w-0 break-words text-right" data-detail-tardy-remainder></dd>
               <dt class="min-w-0 break-words">{t.minimumShort}</dt><dd class="min-w-0 break-words text-right" data-detail-minimum></dd>
               <dt class="min-w-0 break-words">{t.margin}</dt><dd class="min-w-0 break-words text-right" data-detail-margin></dd>
               <dt class="min-w-0 break-words">{t.remainingShort}</dt><dd class="min-w-0 break-words text-right" data-detail-remaining></dd>
@@ -377,6 +407,20 @@ const phase2 = isEs
             </dl>
           </details>
         </div>
+        <section class="mt-4 hidden rounded-lg border border-amber-800 bg-amber-950/20 p-4" data-history-comparison aria-live="polite">
+          <h3 class="font-semibold text-amber-200" data-history-comparison-heading></h3>
+          <div class="mt-3 grid min-w-0 gap-3 sm:grid-cols-2">
+            <div class="min-w-0 rounded-lg border border-gray-800 bg-gray-950 p-3">
+              <h4 class="text-sm font-semibold text-gray-200" data-history-saved-label></h4>
+              <p class="mt-2 whitespace-pre-line break-words text-sm text-gray-300" data-history-saved-result></p>
+            </div>
+            <div class="min-w-0 rounded-lg border border-gray-800 bg-gray-950 p-3">
+              <h4 class="text-sm font-semibold text-gray-200" data-history-recalculated-label></h4>
+              <p class="mt-2 whitespace-pre-line break-words text-sm text-gray-300" data-history-recalculated-result></p>
+            </div>
+          </div>
+          <p class="mt-3 text-sm font-medium text-amber-200" data-history-differences></p>
+        </section>
       </aside>
     </div>
   </div>

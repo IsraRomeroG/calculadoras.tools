@@ -15,7 +15,9 @@ type FieldName =
   | "attendedClasses"
   | "absences"
   | "remainingClasses"
-  | "courseTotalClasses";
+  | "courseTotalClasses"
+  | "justifiedAbsences"
+  | "tardyClasses";
 
 const TEXT = {
   es: {
@@ -457,6 +459,8 @@ function initAttendanceCalculator(root: HTMLElement): void {
     setValue("requiredPercent", example.values.requiredPercent);
     setValue("remainingClasses", example.values.remainingClasses);
     setValue("courseTotalClasses", example.values.courseTotalClasses ?? "");
+    setValue("justifiedAbsences", "");
+    setValue("tardyClasses", "");
     clearAllErrors();
     updateModeUi();
     updateCalculator();
@@ -465,6 +469,9 @@ function initAttendanceCalculator(root: HTMLElement): void {
   }
 
   function clearCalculator(): void {
+    if (query<HTMLButtonElement>('[data-source-button="calendar"]')?.getAttribute("aria-pressed") === "true") {
+      return;
+    }
     invalidateAttendanceContext(root);
     clearStatus();
     mode = "attended";
@@ -475,6 +482,8 @@ function initAttendanceCalculator(root: HTMLElement): void {
     setValue("requiredPercent", "80");
     setValue("remainingClasses", "");
     setValue("courseTotalClasses", "");
+    setValue("justifiedAbsences", "");
+    setValue("tardyClasses", "");
     clearAllErrors();
     hideManualCopy();
     updateModeUi();
@@ -564,6 +573,8 @@ function initAttendanceCalculator(root: HTMLElement): void {
 
   function clearAllErrors(): void {
     clearCurrentErrors();
+    clearError("justifiedAbsences");
+    clearError("tardyClasses");
     queryAll<HTMLInputElement>("[data-field]").forEach((input) => delete input.dataset.touched);
   }
 

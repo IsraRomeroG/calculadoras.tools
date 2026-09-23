@@ -22,6 +22,7 @@ import {
   deleteAttendanceHistorySnapshot,
   downloadAttendanceCsv,
   normalizeAttendancePolicy,
+  prepareAttendanceRestore,
   policyAttendanceToCsvRow,
   readAttendanceHistory,
   isAttendanceHistoryCurrent,
@@ -32,7 +33,9 @@ import {
   upsertCalendarEvent,
   validateCalendarEvent,
   ATTENDANCE_SUBJECTS_KEY,
+  ATTENDANCE_PHASE2_RULES_VERSION,
   DEFAULT_ATTENDANCE_POLICY,
+  validateAttendanceHistorySnapshot,
   type AttendanceCalendarEvent,
   type AttendanceEventStatus,
   type AttendanceHistorySnapshot,
@@ -59,10 +62,15 @@ const TEXT = {
     renamePrompt: "Escribe el nuevo nombre de la materia.",
     deleteConfirm: "¿Eliminar esta materia y sus datos? Esta acción no se puede deshacer.",
     deleted: "Materia eliminada.",
+    cleared: "Formulario limpio.",
     saved: "Resultado guardado en esta sesión.",
     historyFull: "El historial alcanzó 50 instantáneas. Borra alguna antes de guardar otra.",
     historyUnavailable: "No se pudo guardar en esta sesión; el cálculo sigue disponible.",
-    historyCorrupt: "Se ignoraron datos guardados incompatibles.",
+    historySaveInvalid: "No se guardó la instantánea porque sus datos no son válidos.",
+    historyCorrupt: "El historial no está disponible porque los datos guardados están dañados.",
+    historyIgnored: (count: number) => count === 1
+      ? "Se ignoró 1 instantánea inválida."
+      : `Se ignoraron ${count} instantáneas inválidas.`,
     restored: "Entradas restauradas y recalculadas con las reglas actuales.",
     deletedHistory: "Instantánea eliminada.",
     clearedHistory: "Historial borrado.",
@@ -84,8 +92,30 @@ const TEXT = {
     eventDelete: "Eliminar",
     eventEdit: "Editar",
     restore: "Restaurar",
+    viewSavedResult: "Consultar resultado guardado",
+    savedWithRules: (version: string) => `Resultado guardado con reglas ${version}`,
+    historyComparison: "Comparación con el resultado guardado",
+    savedResultLabel: "Resultado guardado",
+    recalculatedResultLabel: "Recalculado con reglas actuales",
+    historyNumbersChanged: "Cambiaron las cifras.",
+    historyStatusChanged: "Cambió el estado.",
+    historyNoChanges: "No cambiaron las cifras ni el estado.",
+    historyCurrent: "Asistencia actual",
+    historyProjection: "Proyección final",
+    historyMinimumFinal: "Asistencias mínimas al final",
+    historyAvailableAbsences: "Faltas disponibles",
+    historyNeededAttendances: "Asistencias necesarias",
+    historyMaximumFinal: "Porcentaje máximo final",
     historyInvalid: "No se pudo restaurar esta instantánea.",
     policy: "Política utilizada",
+    justifiedCount: "Faltas justificadas (J)",
+    tardyCount: "Clases con retardo (L)",
+    tardyPenalty: "Asistencias descontadas por retardos",
+    tardyRemainder: "Retardos restantes tras conversión",
+    tardyUnconverted: "Retardos sin convertir",
+    optionalCountHelp: (max: string, unit: string) => `Opcional; vacío equivale a 0. Límite: 0 a ${max} ${unit}.`,
+    policyCountNegative: "No se permiten valores negativos.",
+    policyCountRange: (max: number, unit: string) => `Usa un entero entre 0 y ${max} ${unit}.`,
   },
   en: {
     initial: "Enter valid data to calculate.",
@@ -97,10 +127,15 @@ const TEXT = {
     renamePrompt: "Enter the new subject name.",
     deleteConfirm: "Delete this subject and its data? This cannot be undone.",
     deleted: "Subject deleted.",
+    cleared: "Inputs cleared.",
     saved: "Result saved in this session.",
     historyFull: "The history has 50 snapshots. Delete one before saving another.",
     historyUnavailable: "This session could not save the result; the calculation is still available.",
-    historyCorrupt: "Incompatible saved data was ignored.",
+    historySaveInvalid: "The snapshot was not saved because its data is invalid.",
+    historyCorrupt: "History is unavailable because its stored data is corrupt.",
+    historyIgnored: (count: number) => count === 1
+      ? "1 invalid snapshot was ignored."
+      : `${count} invalid snapshots were ignored.`,
     restored: "Inputs restored and recalculated with the current rules.",
     deletedHistory: "Snapshot deleted.",
     clearedHistory: "History deleted.",
@@ -122,8 +157,30 @@ const TEXT = {
     eventDelete: "Delete",
     eventEdit: "Edit",
     restore: "Restore",
+    viewSavedResult: "View saved result",
+    savedWithRules: (version: string) => `Saved result under rules ${version}`,
+    historyComparison: "Comparison with saved result",
+    savedResultLabel: "Saved result",
+    recalculatedResultLabel: "Recalculated with current rules",
+    historyNumbersChanged: "The figures changed.",
+    historyStatusChanged: "The status changed.",
+    historyNoChanges: "The figures and status did not change.",
+    historyCurrent: "Current attendance",
+    historyProjection: "Final projection",
+    historyMinimumFinal: "Minimum final attendances",
+    historyAvailableAbsences: "Available absences",
+    historyNeededAttendances: "Required attendances",
+    historyMaximumFinal: "Maximum final percentage",
     historyInvalid: "This snapshot could not be restored.",
     policy: "Policy used",
+    justifiedCount: "Justified absences (J)",
+    tardyCount: "Tardy classes (L)",
+    tardyPenalty: "Attendances deducted for tardies",
+    tardyRemainder: "Tardy remainder after conversion",
+    tardyUnconverted: "Unconverted tardies",
+    optionalCountHelp: (max: string, unit: string) => `Optional; blank means 0. Limit: 0 to ${max} ${unit}.`,
+    policyCountNegative: "Negative values are not allowed.",
+    policyCountRange: (max: number, unit: string) => `Use a whole number from 0 to ${max} ${unit}.`,
   },
 } as const;
 
@@ -166,6 +223,7 @@ function initAttendancePhase2Calculator(root: HTMLElement): void {
   const historyPanel = query<HTMLElement>("[data-history-panel]");
   const historyNote = query<HTMLElement>("[data-history-note]");
   const historyList = query<HTMLElement>("[data-history-list]");
+  const historyComparison = query<HTMLElement>("[data-history-comparison]");
   const calendarError = query<HTMLElement>("[data-calendar-error]");
   queryAll<HTMLElement>("[data-requires-js]").forEach((element) => element.removeAttribute("disabled"));
   root.addEventListener(ATTENDANCE_CONTEXT_EVENT, () => {
@@ -176,6 +234,9 @@ function initAttendancePhase2Calculator(root: HTMLElement): void {
 
   function update(): void {
     if (syncing) return;
+    historyComparison?.classList.add("hidden");
+    updateManualPolicyCountHelp();
+    if (source !== "manual") clearManualPolicyCountErrors();
     saveSubjectDraft();
     const result = readActiveInput();
     const presentation = result ? createPresentation(result) : null;
@@ -232,11 +293,21 @@ function initAttendancePhase2Calculator(root: HTMLElement): void {
         allowZero: true,
         max: total.ok ? total.value : 1000,
       });
-      if (!total.ok || !percent.ok || !calendar.ok || !active.ok) return null;
+      if (!total.ok || !active.ok) {
+        clearManualPolicyCountErrors();
+        return null;
+      }
       const attended = mode === "attended" ? active.value : total.value - active.value;
+      const absences = total.value - attended;
+      const justifiedAbsences = readOptionalManualPolicyCount("justifiedAbsences", absences, "absences");
+      const tardyClasses = readOptionalManualPolicyCount("tardyClasses", attended, "attendances");
+      if (justifiedAbsences === null || tardyClasses === null) return null;
+      if (!percent.ok || !calendar.ok) return null;
       return calculatePolicyAttendance({
         totalClasses: total.value,
         attendedClasses: attended,
+        justifiedAbsences,
+        tardyClasses,
         requiredPercent: percent,
         remainingClasses: calendar.value,
         policy,
@@ -250,6 +321,75 @@ function initAttendancePhase2Calculator(root: HTMLElement): void {
     const parsed = adapter.parseAttendancePercent(value("requiredPercent"));
     if (!parsed.ok) throw new RangeError("Invalid minimum.");
     return parsed.value;
+  }
+
+  function readOptionalManualPolicyCount(
+    name: "justifiedAbsences" | "tardyClasses",
+    max: number,
+    unit: "absences" | "attendances",
+  ): number | null {
+    const raw = value(name).trim();
+    const parsed = raw
+      ? adapter.parseAttendanceInteger(raw, { allowZero: true, max })
+      : { ok: true as const, value: 0, normalized: "" };
+    const input = field(name);
+    const error = query<HTMLElement>(`[data-error-for="${name}"]`);
+    if (!parsed.ok) {
+      input?.setAttribute("aria-invalid", "true");
+      if (error) {
+        error.textContent = parsed.error === "negative"
+          ? text.policyCountNegative
+          : text.policyCountRange(max, unit === "absences"
+            ? locale === "en" ? "absences" : "faltas"
+            : locale === "en" ? "attendances" : "asistencias");
+        error.classList.remove("hidden");
+      }
+      return null;
+    }
+    input?.removeAttribute("aria-invalid");
+    if (error) {
+      error.textContent = "";
+      error.classList.add("hidden");
+    }
+    return parsed.value;
+  }
+
+  function updateManualPolicyCountHelp(): void {
+    const total = adapter.parseAttendanceInteger(value("totalClasses"), { allowZero: false, max: 1_000 });
+    let maxAbsences: number | null = null;
+    let maxAttendances: number | null = null;
+    if (total.ok) {
+      const mode = getManualMode();
+      const active = adapter.parseAttendanceInteger(
+        value(mode === "attended" ? "attendedClasses" : "absences"),
+        { allowZero: true, max: total.value },
+      );
+      if (active.ok) {
+        maxAttendances = mode === "attended" ? active.value : total.value - active.value;
+        maxAbsences = total.value - maxAttendances;
+      }
+    }
+    const justifiedHelp = query<HTMLElement>('[data-policy-count-help="justifiedAbsences"]');
+    const tardyHelp = query<HTMLElement>('[data-policy-count-help="tardyClasses"]');
+    if (justifiedHelp) justifiedHelp.textContent = text.optionalCountHelp(
+      maxAbsences === null ? "F" : String(maxAbsences),
+      locale === "en" ? "absences" : "faltas",
+    );
+    if (tardyHelp) tardyHelp.textContent = text.optionalCountHelp(
+      maxAttendances === null ? "A" : String(maxAttendances),
+      locale === "en" ? "attendances" : "asistencias",
+    );
+  }
+
+  function clearManualPolicyCountErrors(): void {
+    for (const name of ["justifiedAbsences", "tardyClasses"] as const) {
+      field(name)?.removeAttribute("aria-invalid");
+      const error = query<HTMLElement>(`[data-error-for="${name}"]`);
+      if (error) {
+        error.textContent = "";
+        error.classList.add("hidden");
+      }
+    }
   }
 
   function readPolicy(): AttendancePolicy {
@@ -401,17 +541,18 @@ function initAttendancePhase2Calculator(root: HTMLElement): void {
   }
 
   function buildSummary(
-    context: Pick<AttendanceCalculatorContext, "subject" | "source" | "mode" | "policy" | "presentation">,
+    context: Pick<AttendanceCalculatorContext, "subject" | "source" | "mode" | "policy" | "presentation" | "result">,
   ): string {
     const presentation = context.presentation;
-    if (!presentation) return "";
+    if (!presentation || !context.result) return "";
     const english = locale === "en";
     const subject = (english ? "Subject: " : "Materia: ") + context.subject.name;
     const origin = (english ? "Origin: " : "Origen: ") +
       (context.source === "manual" ? text.originManual : text.originCalendar);
     const policy = text.policy + ": " + formatPolicy(context.policy);
+    const policyCounts = formatManualPolicyCounts(context.result);
     if (presentation.kind === "base") {
-      return [subject, origin, policy, adapter.buildAttendanceSummary(presentation.result)].join("\n");
+      return [subject, origin, policy, ...policyCounts, adapter.buildAttendanceSummary(presentation.result)].join("\n");
     }
     const fields = presentation.fields;
     return [
@@ -419,10 +560,11 @@ function initAttendancePhase2Calculator(root: HTMLElement): void {
       subject,
       origin,
       (english ? "Input mode: " : "Modo de captura: ") +
-        (context.mode === "attended"
+      (context.mode === "attended"
           ? (english ? "Attendances" : "Asistencias")
           : (english ? "Absences" : "Faltas")),
       policy,
+      ...policyCounts,
       (english ? "Minimum: " : "Mínimo: ") + fields.minimum,
       (english ? "Classes held: " : "Clases impartidas: ") + fields.total,
       (english ? "Attended: " : "Asistidas: ") + fields.attended,
@@ -439,6 +581,29 @@ function initAttendancePhase2Calculator(root: HTMLElement): void {
       fields.action,
       fields.condition,
     ].filter(Boolean).join("\n");
+  }
+
+  function formatManualPolicyCounts(result: PolicyAttendanceResult): string[] {
+    const remainderLabel = result.policy.tardyConversion === null
+      ? text.tardyUnconverted
+      : text.tardyRemainder;
+    return [
+      `${text.justifiedCount}: ${formatCount(result.justifiedAbsences)}`,
+      `${text.tardyCount}: ${formatCount(result.tardyClasses)}`,
+      `${text.tardyPenalty}: ${formatCount(result.tardyPenalty)}`,
+      `${remainderLabel}: ${formatCount(result.tardyRemainder)}`,
+    ];
+  }
+
+  function renderManualPolicyCounts(result: PolicyAttendanceResult | null): void {
+    if (!result) return;
+    setText("[data-detail-justified]", formatCount(result.justifiedAbsences));
+    setText("[data-detail-tardy]", formatCount(result.tardyClasses));
+    setText("[data-detail-tardy-penalty]", formatCount(result.tardyPenalty));
+    setText("[data-detail-tardy-remainder]", formatCount(result.tardyRemainder));
+    setText("[data-detail-tardy-remainder-label]", result.policy.tardyConversion === null
+      ? text.tardyUnconverted
+      : text.tardyRemainder);
   }
 
   function renderBaseResult(
@@ -475,6 +640,7 @@ function initAttendancePhase2Calculator(root: HTMLElement): void {
       setText("[data-detail-excess]", result.presentation.exceededLabel);
       setText("[data-detail-max-final]", adapter.formatAttendancePercent(result.projection.maxPossiblePercent));
     }
+    renderManualPolicyCounts(context.result);
     queryAll<HTMLElement>("[data-excess-detail]").forEach((element) => element.classList.toggle("hidden", !known || !result.presentation.exceededLabel));
     const currentColor = result.currentStatus === "meets" ? "text-emerald-300" : "text-amber-300";
     const projectionColor = result.projection.status === "impossible" || result.projection.status === "finished_below"
@@ -512,6 +678,7 @@ function initAttendancePhase2Calculator(root: HTMLElement): void {
     setText("[data-detail-max-absences]", fields.maxAbsences);
     setText("[data-detail-excess]", fields.excess);
     setText("[data-detail-max-final]", fields.maxFinal);
+    renderManualPolicyCounts(context.result);
     const known = context.result.projection.status !== "unknown" && context.result.projection.status !== "undefined";
     queryAll<HTMLElement>("[data-known-detail]").forEach((element) => element.classList.toggle("hidden", !known));
     queryAll<HTMLElement>("[data-excess-detail]").forEach((element) => element.classList.toggle("hidden", !known || !context.result?.projection.exceededAbsences));
@@ -551,6 +718,8 @@ function initAttendancePhase2Calculator(root: HTMLElement): void {
       absences: value("absences"),
       requiredPercent: value("requiredPercent"),
       remainingClasses: value("remainingClasses"),
+      justifiedAbsences: value("justifiedAbsences"),
+      tardyClasses: value("tardyClasses"),
       calendarMode: getCalendarMode(),
       courseTotalClasses: value("courseTotalClasses"),
     };
@@ -615,18 +784,38 @@ function initAttendancePhase2Calculator(root: HTMLElement): void {
   function renderHistory(): void {
     const list = historyList;
     if (!list) return;
-    const snapshots = history.ok ? history.snapshots : [];
-    historyPanel?.classList.toggle("hidden", snapshots.length === 0 && history.ok);
-    historyNote?.replaceChildren(document.createTextNode(history.ok ? (snapshots.length ? `${snapshots.length}/50` : text.noSaved) : text.historyCorrupt));
+    const snapshots = history.snapshots;
+    const ignoredCount = history.ignoredCount ?? 0;
+    historyPanel?.classList.toggle("hidden", snapshots.length === 0 && history.ok && ignoredCount === 0);
+    const note = history.ok
+      ? snapshots.length ? `${snapshots.length}/50` : text.noSaved
+      : history.reason === "corrupt"
+        ? text.historyCorrupt
+        : history.reason === "full"
+          ? text.historyFull
+          : history.reason === "serialization"
+            ? text.historySaveInvalid
+            : text.historyUnavailable;
+    historyNote?.replaceChildren(document.createTextNode(ignoredCount ? `${text.historyIgnored(ignoredCount)} ${note}` : note));
     list.replaceChildren(...snapshots.map((snapshot) => {
       const item = document.createElement("li");
       item.className = "flex min-w-0 flex-wrap items-center justify-between gap-2 rounded-lg border border-gray-800 p-3";
       const label = document.createElement("span");
       label.className = "min-w-0 break-words";
       const versionNote = isAttendanceHistoryCurrent(snapshot) ? "" : ` · ${locale === "en" ? "historical rules" : "reglas históricas"}`;
-      label.textContent = `${snapshot.subject.name} · ${new Date(snapshot.savedAt).toLocaleString(locale === "en" ? "en-US" : "es-MX")} · ${formatPolicy(snapshot.policy)}${versionNote}`;
+      const origin = snapshot.source === "manual" ? text.originManual : text.originCalendar;
+      label.textContent = `${snapshot.subject.name} · ${new Date(snapshot.savedAt).toLocaleString(locale === "en" ? "en-US" : "es-MX")} · ${origin} · ${formatPolicy(snapshot.policy)} · ${snapshot.rulesVersion}${versionNote}`;
       const actions = document.createElement("span");
       actions.className = "flex shrink-0 gap-2";
+      const view = document.createElement("details");
+      view.className = "basis-full rounded-md border border-gray-800 p-3";
+      const viewSummary = document.createElement("summary");
+      viewSummary.className = "cursor-pointer font-medium text-gray-200";
+      viewSummary.textContent = text.viewSavedResult;
+      const viewResult = document.createElement("p");
+      viewResult.className = "mt-2 whitespace-pre-line break-words text-sm text-gray-300";
+      viewResult.textContent = text.savedWithRules(snapshot.rulesVersion) + "\n" + formatHistoryResult(snapshot.result as PolicyAttendanceResult);
+      view.append(viewSummary, viewResult);
       const restore = document.createElement("button");
       restore.type = "button";
       restore.className = "min-h-11 rounded-lg border border-gray-700 px-3 text-xs";
@@ -638,7 +827,7 @@ function initAttendancePhase2Calculator(root: HTMLElement): void {
       remove.textContent = text.eventDelete;
       remove.dataset.historyDelete = snapshot.id;
       actions.append(restore, remove);
-      item.append(label, actions);
+      item.append(label, actions, view);
       return item;
     }));
   }
@@ -662,6 +851,8 @@ function initAttendancePhase2Calculator(root: HTMLElement): void {
     setValue("requiredPercent", subject.manual.requiredPercent || "80");
     setValue("remainingClasses", subject.manual.remainingClasses);
     setValue("courseTotalClasses", subject.manual.courseTotalClasses ?? "");
+    setValue("justifiedAbsences", subject.manual.justifiedAbsences ?? "");
+    setValue("tardyClasses", subject.manual.tardyClasses ?? "");
     const targetMode = query<HTMLButtonElement>(`[data-mode-button="${subject.manual.mode}"]`);
     targetMode?.click();
     const targetCalendarMode = query<HTMLButtonElement>(`[data-calendar-mode-button="${subject.manual.calendarMode ?? "remaining"}"]`);
@@ -710,7 +901,11 @@ function initAttendancePhase2Calculator(root: HTMLElement): void {
       subject: context.subject,
       input: context.input.kind === "manual"
         ? { ...context.input.values }
-        : { events: [...context.input.events], calendarComplete: context.input.calendarComplete },
+        : {
+            events: [...context.input.events],
+            calendarComplete: context.input.calendarComplete,
+            requiredPercent: value("requiredPercent"),
+          },
       policy: context.policy,
       source: context.source,
       result: context.result,
@@ -718,7 +913,16 @@ function initAttendancePhase2Calculator(root: HTMLElement): void {
     const stored = appendAttendanceHistory(getSessionStorage(), snapshot);
     history = stored;
     if (stored.ok) setStatus(text.saved, "success");
-    else setStatus(stored.reason === "full" ? text.historyFull : text.historyUnavailable, "error");
+    else setStatus(
+      stored.reason === "full"
+        ? text.historyFull
+        : stored.reason === "corrupt"
+          ? text.historyCorrupt
+          : stored.reason === "serialization"
+            ? text.historySaveInvalid
+            : text.historyUnavailable,
+      "error",
+    );
     renderHistory();
   }
 
@@ -730,31 +934,106 @@ function initAttendancePhase2Calculator(root: HTMLElement): void {
     setStatus(text.csv, "success");
   }
 
-  function restoreSnapshot(snapshot: AttendanceHistorySnapshot): void {
-    const target = subjects.find((item) => item.id === snapshot.subject.id);
-    if (target) subject = target;
-    else if (subjects.length < 20) {
-      subject = createAttendanceSubject(snapshot.subject.name, snapshot.subject.id);
-      subjects = [...subjects, subject];
-    } else {
-      setStatus(text.subjectLimit, "error");
+  function restoreSnapshot(value: unknown): void {
+    let snapshot: AttendanceHistorySnapshot | null = null;
+    let recalculated: PolicyAttendanceResult | null = null;
+    let prepared: ReturnType<typeof prepareAttendanceRestore> | null = null;
+    try {
+      snapshot = validateAttendanceHistorySnapshot(value);
+      recalculated = recalculateSnapshot(snapshot);
+      const subjectExists = subjects.some((item) => item.id === snapshot.subject.id);
+      if (!subjectExists && subjects.length >= 20) {
+        setStatus(text.subjectLimit, "error");
+        return;
+      }
+      prepared = prepareAttendanceRestore(subjects, snapshot);
+    } catch {
+      setStatus(text.historyInvalid, "error");
       return;
     }
-    source = snapshot.source;
-    subject.source = source;
-    subject.policy = snapshot.policy;
-    if (source === "manual") subject.manual = { ...(snapshot.input as ManualAttendanceValues) };
-    else {
-      const calendar = snapshot.input as { events: AttendanceCalendarEvent[]; calendarComplete: boolean };
-      events = [...calendar.events];
-      subject.events = [...events];
-      subject.calendarComplete = calendar.calendarComplete;
+    if (!snapshot || !recalculated || !prepared) {
+      setStatus(text.historyInvalid, "error");
+      return;
     }
-    subjects = subjects.map((item) => item.id === subject.id ? subject : item);
+
+    subjects = prepared.subjects;
+    subject = prepared.subject;
+    source = subject.source;
+    events = subject.events.map((event) => ({ ...event }));
+    editingEventId = null;
     persistSubjects(subjects);
     syncSubjectToForm();
-    setStatus(text.restored, "success");
     update();
+    setStatus(text.restored, "success");
+    showHistoryComparison(snapshot, recalculated);
+  }
+
+  function recalculateSnapshot(snapshot: AttendanceHistorySnapshot): PolicyAttendanceResult {
+    if (snapshot.source === "manual") {
+      const input = snapshot.input as ManualAttendanceValues;
+      const total = adapter.parseAttendanceInteger(input.totalClasses, { allowZero: false, max: 1_000 });
+      const minimum = adapter.parseAttendancePercent(input.requiredPercent);
+      if (!total.ok || !minimum.ok) throw new RangeError("Invalid restored manual inputs.");
+      const mode = input.mode;
+      const active = adapter.parseAttendanceInteger(
+        mode === "attended" ? input.attendedClasses : input.absences,
+        { allowZero: true, max: total.value },
+      );
+      if (!active.ok) throw new RangeError("Invalid restored attendance count.");
+      const attendedClasses = mode === "attended" ? active.value : total.value - active.value;
+      const justifiedInput = input.justifiedAbsences ?? "";
+      const tardyInput = input.tardyClasses ?? "";
+      const justifiedAbsences = justifiedInput.trim()
+        ? adapter.parseAttendanceInteger(justifiedInput, { allowZero: true, max: total.value - attendedClasses })
+        : { ok: true as const, value: 0 };
+      const tardyClasses = tardyInput.trim()
+        ? adapter.parseAttendanceInteger(tardyInput, { allowZero: true, max: attendedClasses })
+        : { ok: true as const, value: 0 };
+      if (!justifiedAbsences.ok || !tardyClasses.ok) throw new RangeError("Invalid restored policy counts.");
+      let remainingClasses: number | null;
+      if ((input.calendarMode ?? "remaining") === "remaining") {
+        const remaining = adapter.parseAttendanceRemaining(input.remainingClasses);
+        if (!remaining.ok) throw new RangeError("Invalid restored remaining classes.");
+        remainingClasses = remaining.value;
+      } else {
+        const courseTotal = adapter.parseAttendanceInteger(input.courseTotalClasses ?? "", { allowZero: true, max: 2_000 });
+        if (!courseTotal.ok || courseTotal.value === 0 || courseTotal.value < total.value || courseTotal.value - total.value > 1_000) {
+          if (input.courseTotalClasses?.trim()) throw new RangeError("Invalid restored course total.");
+          remainingClasses = null;
+        } else {
+          remainingClasses = courseTotal.value - total.value;
+        }
+      }
+      return calculatePolicyAttendance({
+        totalClasses: total.value,
+        attendedClasses,
+        justifiedAbsences: justifiedAbsences.value,
+        tardyClasses: tardyClasses.value,
+        requiredPercent: minimum,
+        remainingClasses,
+        policy: snapshot.policy,
+      });
+    }
+
+    const input = snapshot.input as {
+      events: AttendanceCalendarEvent[];
+      calendarComplete: boolean;
+      requiredPercent?: string;
+    };
+    const counts = summarizeCalendar(input.events, input.calendarComplete);
+    const minimum = adapter.parseAttendancePercent(
+      input.requiredPercent ?? String((snapshot.result as PolicyAttendanceResult).requiredPercent),
+    );
+    if (!minimum.ok || counts.completedClasses < 1) throw new RangeError("Invalid restored calendar inputs.");
+    return calculatePolicyAttendance({
+      totalClasses: counts.completedClasses,
+      attendedClasses: counts.attendedClasses,
+      justifiedAbsences: counts.justifiedAbsences,
+      tardyClasses: counts.tardyClasses,
+      requiredPercent: minimum,
+      remainingClasses: counts.remainingClasses,
+      policy: snapshot.policy,
+    });
   }
 
   function setStatus(message: string, kind: "success" | "error"): void {
@@ -798,6 +1077,92 @@ function initAttendancePhase2Calculator(root: HTMLElement): void {
     const tardy = policy.tardyConversion ? `k=${policy.tardyConversion}` : (locale === "en" ? "tardies=none" : "retardos=ninguno");
     const rounding = policy.rounding === "exact" ? (locale === "en" ? "rounding=exact" : "redondeo=exacto") : `${locale === "en" ? "rounding" : "redondeo"}=${policy.rounding.decimals}`;
     return `${justified}; ${tardy}; ${rounding}`;
+  }
+
+  function formatHistoryResult(result: PolicyAttendanceResult): string {
+    const projection = result.projection;
+    const statusLabels: Record<string, string> = {
+      unknown: text.unknown,
+      undefined: text.noClasses,
+      finished_meets: text.finishedMeets,
+      finished_below: text.finishedBelow,
+      impossible: text.impossible,
+      guaranteed: text.guaranteed,
+      possible: text.possible,
+    };
+    const lines = [
+      text.historyCurrent + ": " +
+        (result.currentPercent === null ? text.noClasses : formatPercent(result.currentPercent)) +
+        " · " + (result.currentStatus === "meets" ? text.meets : result.currentStatus === "below" ? text.below : text.noClasses),
+      `${text.justifiedCount}: ${formatCount(result.justifiedAbsences)}`,
+      `${text.tardyCount}: ${formatCount(result.tardyClasses)}`,
+      `${text.tardyPenalty}: ${formatCount(result.tardyPenalty)}`,
+      `${result.policy.tardyConversion === null ? text.tardyUnconverted : text.tardyRemainder}: ${formatCount(result.tardyRemainder)}`,
+      text.historyProjection + ": " + (statusLabels[projection.status] ?? projection.status),
+    ];
+    if (projection.status !== "unknown" && projection.status !== "undefined") {
+      lines.push(
+        text.historyMinimumFinal + ": " + formatCount(projection.minimumAttendancesFinal),
+        text.historyAvailableAbsences + ": " + formatCount(projection.availableAbsences),
+        text.historyNeededAttendances + ": " + formatCount(projection.requiredAttendancesFromRemaining),
+        text.historyMaximumFinal + ": " + formatPercent(projection.maxPossiblePercent),
+      );
+    }
+    lines.push(text.policy + ": " + formatPolicy(result.policy));
+    return lines.join("\n");
+  }
+
+  function showHistoryComparison(
+    snapshot: AttendanceHistorySnapshot,
+    recalculated: PolicyAttendanceResult,
+  ): void {
+    if (isAttendanceHistoryCurrent(snapshot)) {
+      historyComparison?.classList.add("hidden");
+      return;
+    }
+    const saved = snapshot.result as PolicyAttendanceResult;
+    setText("[data-history-comparison-heading]", text.historyComparison + " · " + snapshot.subject.name);
+    setText("[data-history-saved-label]", text.savedResultLabel + " · " + snapshot.rulesVersion);
+    setText("[data-history-recalculated-label]", text.recalculatedResultLabel + " · " + ATTENDANCE_PHASE2_RULES_VERSION);
+    setText("[data-history-saved-result]", formatHistoryResult(saved));
+    setText("[data-history-recalculated-result]", formatHistoryResult(recalculated));
+    const statusChanged = saved.currentStatus !== recalculated.currentStatus ||
+      saved.projection.status !== recalculated.projection.status;
+    const numbersChanged = JSON.stringify(historyResultNumbers(saved)) !== JSON.stringify(historyResultNumbers(recalculated));
+    const changes = [
+      ...(statusChanged ? [text.historyStatusChanged] : []),
+      ...(numbersChanged ? [text.historyNumbersChanged] : []),
+    ];
+    setText("[data-history-differences]", changes.length ? changes.join(" ") : text.historyNoChanges);
+    historyComparison?.classList.remove("hidden");
+  }
+
+  function historyResultNumbers(result: PolicyAttendanceResult): unknown[] {
+    const projection = result.projection;
+    return [
+      result.totalClasses,
+      result.attendedClasses,
+      result.originalAbsences,
+      result.justifiedAbsences,
+      result.tardyClasses,
+      result.requiredPercentScaled,
+      result.effectiveTotalClasses,
+      result.effectiveAttendedClasses,
+      result.effectiveAbsences,
+      result.tardyPenalty,
+      result.tardyRemainder,
+      result.currentPercent,
+      result.currentEvaluatedPercent,
+      projection.status === "unknown" ? null : projection.remainingClasses,
+      projection.status === "unknown" || projection.status === "undefined" ? null : projection.finalTotalClasses,
+      projection.status === "unknown" || projection.status === "undefined" ? null : projection.minimumAttendancesFinal,
+      projection.status === "unknown" || projection.status === "undefined" ? null : projection.maximumFinalAbsences,
+      projection.status === "unknown" || projection.status === "undefined" ? null : projection.availableAbsences,
+      projection.status === "unknown" || projection.status === "undefined" ? null : projection.exceededAbsences,
+      projection.status === "unknown" || projection.status === "undefined" ? null : projection.requiredAttendancesFromRemaining,
+      projection.status === "unknown" || projection.status === "undefined" ? null : projection.maxPossiblePercent,
+      projection.status === "unknown" || projection.status === "undefined" ? null : projection.finalEvaluatedPercent,
+    ];
   }
 
   query<HTMLSelectElement>("[data-subject-select]")?.addEventListener("change", (event) => selectSubject((event.target as HTMLSelectElement).value));
@@ -870,14 +1235,19 @@ function initAttendancePhase2Calculator(root: HTMLElement): void {
   query<HTMLButtonElement>("[data-clear]")?.addEventListener("click", () => {
     window.setTimeout(() => {
       if (source === "calendar") { events = []; subject.events = []; subject.calendarComplete = false; }
-      else subject.manual = { totalClasses: "", mode: "attended", attendedClasses: "", absences: "", requiredPercent: "80", remainingClasses: "", calendarMode: "remaining", courseTotalClasses: "" };
+      else subject.manual = { totalClasses: "", mode: "attended", attendedClasses: "", absences: "", requiredPercent: "80", remainingClasses: "", justifiedAbsences: "", tardyClasses: "", calendarMode: "remaining", courseTotalClasses: "" };
       saveSubjectDraft();
       update();
+      setStatus(text.cleared, "success");
     }, 0);
   });
   saveButton?.addEventListener("click", saveResult);
   exportButton?.addEventListener("click", exportResult);
-  query<HTMLButtonElement>("[data-delete-history]")?.addEventListener("click", () => { history = clearAttendanceHistory(getSessionStorage()); renderHistory(); setStatus(text.clearedHistory, "success"); });
+  query<HTMLButtonElement>("[data-delete-history]")?.addEventListener("click", () => {
+    history = clearAttendanceHistory(getSessionStorage());
+    renderHistory();
+    setStatus(history.ok ? text.clearedHistory : text.historyUnavailable, history.ok ? "success" : "error");
+  });
   historyList?.addEventListener("click", (event) => {
     const target = event.target as HTMLElement;
     const restoreId = target.dataset.historyRestore;
@@ -886,7 +1256,11 @@ function initAttendancePhase2Calculator(root: HTMLElement): void {
       const snapshot = history.snapshots.find((item) => item.id === restoreId);
       if (snapshot) restoreSnapshot(snapshot);
     }
-    if (deleteId) { history = deleteAttendanceHistorySnapshot(getSessionStorage(), deleteId); renderHistory(); setStatus(text.deletedHistory, "success"); }
+    if (deleteId) {
+      history = deleteAttendanceHistorySnapshot(getSessionStorage(), deleteId);
+      renderHistory();
+      setStatus(history.ok ? text.deletedHistory : history.reason === "corrupt" ? text.historyCorrupt : text.historyUnavailable, history.ok ? "success" : "error");
+    }
   });
 
   syncSubjectToForm();
@@ -903,6 +1277,11 @@ function loadSubjects(): AttendanceSubject[] {
     if (!Array.isArray(parsed) || parsed.length === 0 || parsed.length > 20) return [];
     return parsed.filter(isSubject).map((item) => ({
       ...item,
+      manual: {
+        ...item.manual,
+        justifiedAbsences: typeof item.manual.justifiedAbsences === "string" ? item.manual.justifiedAbsences : "",
+        tardyClasses: typeof item.manual.tardyClasses === "string" ? item.manual.tardyClasses : "",
+      },
       policy: normalizeAttendancePolicy(item.policy),
       events: item.events.filter((event) => { try { validateCalendarEvent(event); return true; } catch { return false; } }),
     }));
