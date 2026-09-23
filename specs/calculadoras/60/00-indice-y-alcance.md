@@ -1,6 +1,10 @@
 # Asistencia escolar v2: índice y alcance
 
-Estado: especificado; pendiente de implementación. Fecha: 2026-09-22.
+Estado: pasos 01–05 implementados según confirmación del usuario; ampliaciones 06
+y mejora 07 pendientes de implementación. Fecha: 2026-09-22.
+La evidencia y las verificaciones manuales pendientes de la base se conservan en
+[05: registro de validación](05-registro-de-validacion.md); no se consideran
+ejecutadas por esta actualización documental.
 
 ## Objetivo
 
@@ -21,11 +25,16 @@ criterios de aceptación de v2.
 | 4 | [04: contenido e integración](04-contenido-seo-e-integracion.md) | Explicaciones, ejemplos, ES/EN y arquitectura |
 | 5 | [05: pruebas y aceptación](05-pruebas-y-aceptacion.md) | Regresiones, escenarios y lista de cierre |
 | 6 | [06: ampliaciones](06-ampliaciones-de-fase-2.md) | Materias, calendario, historial, CSV y políticas configurables |
+| 7 | [07: nombres y calendario del curso](07-nombres-y-calendario-del-curso.md) | Clases impartidas hasta hoy y captura por restantes o total del curso |
 
 La entrega v2 base incluye íntegramente 01–05. La 06 es una entrega posterior
 especificada, no un requisito para cerrar la corrección base. No debe aparecer
 en la interfaz ninguna función de la 06 antes de implementarse y validarse.
-Crear estos documentos no marca como realizado ningún cambio de aplicación.
+01–05 se conservan como referencia de la base implementada. La siguiente mejora
+es 07, independiente de 06 y con prioridad sobre ella; la numeración conserva las
+referencias existentes. 07 sustituye únicamente los nombres y la captura del
+calendario que señala expresamente, manteniendo las demás reglas de 01–05.
+Crear la spec 07 no marca su funcionalidad como implementada.
 
 ## Invariantes
 
@@ -42,13 +51,17 @@ Crear estos documentos no marca como realizado ningún cambio de aplicación.
 - ES usa `es-MX`; EN usa la convención de formato inglesa ya adoptada por el sitio.
   Ambos idiomas deben compartir reglas y resultados numéricos.
 
-## Archivos de aplicación afectados en una implementación futura
+## Archivos de aplicación de referencia
 
 - `src/pages/matematicas/calculadora-porcentaje-asistencia-escolar.astro`.
 - `src/pages/en/math/attendance-percentage-calculator.astro`.
 - `src/lib/calculators/matematicas/calculadora-porcentaje-asistencia-escolar/attendance.ts`.
 - `src/lib/calculators/matematicas/calculadora-porcentaje-asistencia-escolar/attendance.en.ts`.
 - `src/lib/calculators/matematicas/calculadora-porcentaje-asistencia-escolar/attendance.test.ts`.
+- `src/components/calculators/AttendanceCalculator.astro`.
+- `src/lib/calculators/matematicas/calculadora-porcentaje-asistencia-escolar/attendance-controller.ts`.
+- `src/lib/calculators/matematicas/calculadora-porcentaje-asistencia-escolar/attendance-core.ts`.
+- `src/lib/calculators/matematicas/calculadora-porcentaje-asistencia-escolar/attendance-integration.test.ts`.
 
 La ubicación exacta de módulos nuevos es una decisión de implementación; los
 contratos, criterios de aceptación y rutas públicas de este conjunto son obligatorios.

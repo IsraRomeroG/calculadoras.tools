@@ -12,19 +12,19 @@ import { buildAlternateLinks } from "@lib/i18n/routing";
 import { buildFaqJsonLd } from "@lib/seo";
 
 const title = "Calculadora de porcentaje de asistencia escolar";
-const description = "Calcula tu porcentaje de asistencia escolar y, si sabes cuántas clases quedan, estima las faltas disponibles y las asistencias necesarias.";
+const description = "Calcula tu porcentaje de asistencia escolar y, si conoces las clases restantes o el total del curso, estima las faltas disponibles y las asistencias necesarias.";
 const canonical = ATTENDANCE_CANONICAL_PATH;
 const englishCanonical = "/en/math/attendance-percentage-calculator";
 const alternates = buildAlternateLinks({ es: canonical, en: englishCanonical }, Astro.site ?? Astro.url);
 const faqs = [
-  { question: "¿Cómo se calcula el porcentaje de asistencia?", answer: "Divide las clases asistidas entre las clases realizadas y multiplica el resultado por 100. Las clases futuras no forman parte del porcentaje actual." },
+  { question: "¿Cómo se calcula el porcentaje de asistencia?", answer: "Divide las clases asistidas entre las clases impartidas hasta hoy y multiplica el resultado por 100. Las clases futuras no forman parte del porcentaje actual." },
   { question: "¿Cuántas faltas puedo tener?", answer: "Para estimar faltas futuras debes indicar cuántas clases quedan. El margen supone que asistirás a las demás clases y se calcula para el final del curso." },
   { question: "¿Qué pasa si estoy por debajo del mínimo?", answer: "La recuperación teórica indica cuántas clases seguidas necesitarías para alcanzar el mínimo actual. La proyección final comprueba por separado si esas clases caben en el calendario indicado." },
-  { question: "¿Puedo considerar clases restantes?", answer: "Sí. Déjalas vacías si no sabes cuántas quedan; escribe 0 solamente si el curso terminó." },
+  { question: "¿Puedo introducir las clases restantes o el total del curso?", answer: "Sí. Basta conocer una de las dos cantidades, además de las clases impartidas hasta hoy. Déjala vacía si no la sabes; usa 0 en restantes solo si el curso terminó." },
   { question: "¿Qué significa que ya no sea posible?", answer: "Significa que ni asistiendo a todas las clases restantes se alcanzaría el mínimo al final del calendario indicado." },
   { question: "¿Las faltas justificadas cuentan para el porcentaje?", answer: "En este cálculo base todas las ausencias introducidas cuentan igual. Consulta las reglas de tu escuela para saber cómo trata las faltas justificadas y los retardos." },
   { question: "¿Por qué aparece el mismo porcentaje que el mínimo pero dice que no cumplo?", answer: "La pantalla redondea porcentajes para facilitar la lectura, pero la decisión usa la fracción exacta y el mínimo completo que introdujiste." },
-  { question: "¿Cumplir ahora garantiza cumplir al final?", answer: "No siempre. El porcentaje actual y la proyección final son estados distintos. Solo se muestra una garantía cuando ya reuniste las asistencias mínimas para el total final indicado." },
+  { question: "¿Cumplir ahora garantiza cumplir al final?", answer: "No siempre. El porcentaje actual y la proyección final son estados distintos. Solo se muestra una garantía cuando ya reuniste las asistencias mínimas para el total del curso indicado." },
 ];
 const faqJsonLd = buildFaqJsonLd(faqs);
 ---
@@ -34,7 +34,7 @@ const faqJsonLd = buildFaqJsonLd(faqs);
   <PageShell>
     <PageHero
       title="Calculadora de asistencia escolar"
-      description="Calcula tu asistencia actual con las clases realizadas y las asistidas o faltas. Añade las clases restantes solo si quieres proyectar el final del curso."
+      description="Calcula tu asistencia actual con las clases impartidas hasta hoy y las asistidas o faltas. Para proyectar el curso, indica las clases restantes o el total del curso."
       kicker="Matemáticas"
       collapseBreadcrumbOnMobile
       containerClass="py-6 md:py-8"
@@ -48,22 +48,22 @@ const faqJsonLd = buildFaqJsonLd(faqs);
         <article class="rounded-lg border border-gray-700 bg-gray-950 p-5">
           <h2 class="text-lg font-semibold text-white">Fórmulas</h2>
           <ol class="mt-3 list-decimal space-y-3 pl-5 text-sm leading-relaxed text-gray-300">
-            <li>Asistencia actual = asistidas ÷ realizadas × 100.</li>
-            <li>Total final = realizadas + restantes.</li>
-            <li>Asistencias mínimas finales = techo(total final × mínimo ÷ 100), es decir, el redondeo hacia arriba de esa fracción.</li>
+            <li>Asistencia actual = asistidas ÷ clases impartidas hasta hoy × 100.</li>
+            <li>Total del curso = impartidas hasta hoy + restantes; si conoces el total, restantes = total del curso − impartidas hasta hoy.</li>
+            <li>Asistencias mínimas finales = techo(total del curso × mínimo ÷ 100), es decir, el redondeo hacia arriba de esa fracción.</li>
             <li>Resta las asistencias actuales para saber cuántas faltan. Si son más que las clases restantes, no es posible cumplir dentro de ese calendario.</li>
-            <li>Faltas máximas totales = total final − asistencias mínimas finales. Las faltas futuras disponibles parten de ese máximo menos las faltas acumuladas, sin superar las clases restantes.</li>
-            <li>Recuperar el mínimo hoy cuenta clases consecutivas sobre el total actual; cumplir al final usa el total final y el calendario de clases restantes.</li>
+            <li>Faltas máximas totales = total del curso − asistencias mínimas finales. Las faltas futuras disponibles parten de ese máximo menos las faltas acumuladas, sin superar las clases restantes.</li>
+            <li>Recuperar el mínimo hoy cuenta clases consecutivas sobre las impartidas hasta hoy; cumplir al final usa el total del curso y el calendario de clases restantes.</li>
           </ol>
         </article>
         <article class="rounded-lg border border-gray-700 bg-gray-950 p-5">
           <h2 class="text-lg font-semibold text-white">Ejemplo resuelto</h2>
-          <p class="mt-3 text-sm leading-relaxed text-gray-300">Con 40 clases realizadas, 34 asistidas, un mínimo de 80% y 10 clases restantes, la asistencia actual es 85%. El total final será 50 y se necesitan al menos 40 asistencias. Faltan 6 asistencias, por lo que puedes faltar a 4 de las 10 restantes si asistes a las otras 6. Ese margen se calcula para el final: el mínimo no está garantizado en cada punto intermedio y el porcentaje puede bajar temporalmente. La pantalla puede redondear los porcentajes para facilitar la lectura; ese formato no es una regla de redondeo de tu escuela.</p>
+          <p class="mt-3 text-sm leading-relaxed text-gray-300">Con 40 clases impartidas hasta hoy, 34 asistidas, un mínimo de 80% y 10 clases restantes —o un total del curso de 50—, la asistencia actual es 85%. Se necesitan al menos 40 asistencias al final. Faltan 6 asistencias, por lo que puedes faltar a 4 de las 10 restantes si asistes a las otras 6. Ese margen se calcula para el final: el mínimo no está garantizado en cada punto intermedio y el porcentaje puede bajar temporalmente. La pantalla puede redondear los porcentajes para facilitar la lectura; ese formato no es una regla de redondeo de tu escuela.</p>
         </article>
       </div>
       <div class="mt-4 grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <article class="rounded-lg border border-gray-700 bg-gray-950 p-5"><h3 class="font-semibold text-white">Faltas acumuladas</h3><p class="mt-2 text-sm text-gray-400">Son las ausencias ya registradas dentro de las clases realizadas.</p></article>
-        <article class="rounded-lg border border-gray-700 bg-gray-950 p-5"><h3 class="font-semibold text-white">Faltas máximas totales</h3><p class="mt-2 text-sm text-gray-400">Es el máximo de ausencias que admite el total final para alcanzar el mínimo requerido.</p></article>
+        <article class="rounded-lg border border-gray-700 bg-gray-950 p-5"><h3 class="font-semibold text-white">Faltas acumuladas</h3><p class="mt-2 text-sm text-gray-400">Son las ausencias ya registradas dentro de las clases impartidas hasta hoy.</p></article>
+        <article class="rounded-lg border border-gray-700 bg-gray-950 p-5"><h3 class="font-semibold text-white">Faltas máximas totales</h3><p class="mt-2 text-sm text-gray-400">Es el máximo de ausencias que admite el total del curso para alcanzar el mínimo requerido.</p></article>
         <article class="rounded-lg border border-gray-700 bg-gray-950 p-5"><h3 class="font-semibold text-white">Faltas futuras disponibles</h3><p class="mt-2 text-sm text-gray-400">Son ausencias posibles entre las clases restantes, condicionadas a asistir a las demás.</p></article>
         <article class="rounded-lg border border-gray-700 bg-gray-950 p-5"><h3 class="font-semibold text-white">Recuperación teórica</h3><p class="mt-2 text-sm text-gray-400">Añade clases asistidas al total actual para alcanzar el mínimo de hoy; no equivale a la necesidad dentro de un calendario final fijo.</p></article>
       </div>

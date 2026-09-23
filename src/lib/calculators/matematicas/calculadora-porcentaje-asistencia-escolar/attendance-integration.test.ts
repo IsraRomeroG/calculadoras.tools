@@ -39,12 +39,12 @@ describe("attendance calculator source contracts", () => {
       'title="Calculadora de asistencia escolar"',
     );
     expect(spanish).toContain(
-      'const description = "Calcula tu porcentaje de asistencia escolar y, si sabes cuántas clases quedan, estima las faltas disponibles y las asistencias necesarias."',
+      'const description = "Calcula tu porcentaje de asistencia escolar y, si conoces las clases restantes o el total del curso, estima las faltas disponibles y las asistencias necesarias."',
     );
     for (const phrase of [
-      "Asistencia actual = asistidas ÷ realizadas × 100",
-      "Total final = realizadas + restantes",
-      "techo(total final × mínimo ÷ 100)",
+      "Asistencia actual = asistidas ÷ clases impartidas hasta hoy × 100",
+      "Total del curso = impartidas hasta hoy + restantes; si conoces el total, restantes = total del curso − impartidas hasta hoy",
+      "techo(total del curso × mínimo ÷ 100)",
       "Faltas máximas totales",
       "Faltas futuras disponibles",
       "Recuperación teórica",
@@ -56,9 +56,9 @@ describe("attendance calculator source contracts", () => {
     expect(english).toContain('const title = "School attendance percentage calculator"');
     expect(english).toContain('title="School attendance calculator"');
     for (const phrase of [
-      "Current attendance = attended ÷ completed × 100",
-      "Final total = completed + remaining",
-      "ceiling(final total × minimum ÷ 100)",
+      "Current attendance = attended ÷ classes held so far × 100",
+      "Course total = held so far + remaining; if you know the total, remaining = course total − held so far",
+      "ceiling(course total × minimum ÷ 100)",
       "Maximum total absences",
       "Future absences available",
       "Theoretical recovery",

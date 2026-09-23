@@ -933,6 +933,7 @@ describe("presentation and language parity", () => {
       "no-margin",
       "impossible",
       "unknown",
+      "course-total",
     ]);
     expect(ATTENDANCE_EXAMPLES.map(({ label }) => label)).toEqual([
       "Con margen al final",
@@ -940,6 +941,7 @@ describe("presentation and language parity", () => {
       "Sin faltas disponibles",
       "No alcanzan las restantes",
       "Solo asistencia actual",
+      "Total del curso",
     ]);
     expect(en.ATTENDANCE_EXAMPLES.map(({ label }) => label)).toEqual([
       "Final-course margin",
@@ -947,6 +949,7 @@ describe("presentation and language parity", () => {
       "No absences available",
       "Not enough classes left",
       "Current attendance only",
+      "Course total",
     ]);
   });
 

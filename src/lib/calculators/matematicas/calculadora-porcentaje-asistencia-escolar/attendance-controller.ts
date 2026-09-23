@@ -1,7 +1,8 @@
 import * as es from "./attendance";
 import * as en from "./attendance.en";
-import type { AttendanceInputMode, AttendancePercent } from "./attendance-core";
+import type { AttendanceCalendarMode, AttendanceInputMode, AttendancePercent } from "./attendance-core";
 import type { AttendanceResult } from "./attendance-presenter";
+import { initAttendancePhase2Calculators } from "./attendance-phase2-controller";
 
 type Locale = "es" | "en";
 type FieldName =
@@ -9,7 +10,8 @@ type FieldName =
   | "requiredPercent"
   | "attendedClasses"
   | "absences"
-  | "remainingClasses";
+  | "remainingClasses"
+  | "courseTotalClasses";
 
 const TEXT = {
   es: {
@@ -29,11 +31,17 @@ const TEXT = {
     },
     totalRange: "Usa un entero entre 1 y 1000.",
     remainingRange: "Usa un entero entre 0 y 1000.",
-    tooManyAttended: (total: number) => `Las asistencias no pueden superar las ${total} clases realizadas.`,
-    tooManyAbsences: (total: number) => `Las faltas no pueden superar las ${total} clases realizadas.`,
+    courseTotalRange: "Usa un entero entre 1 y 2000.",
+    courseTotalTooSmall: "El total del curso no puede ser menor que las clases impartidas hasta hoy.",
+    courseTotalTooMany: "El total del curso admite como máximo 1000 clases restantes.",
+    calculatedTotal: (value: number) => `Calculado automáticamente: total del curso = ${value}`,
+    calculatedRemaining: (value: number) => `Calculado automáticamente: clases restantes = ${value}`,
+    tooManyAttended: (total: number) => `Las asistencias no pueden superar las ${total} clases impartidas hasta hoy.`,
+    tooManyAbsences: (total: number) => `Las faltas no pueden superar las ${total} clases impartidas hasta hoy.`,
     incomplete: "Completa los campos obligatorios con valores válidos.",
-    initial: "Introduce las clases realizadas y las asistidas o faltas para calcular.",
+    initial: "Introduce las clases impartidas hasta hoy y las asistidas o faltas. Después indica las restantes o el total del curso.",
     remainingInvalid: "Revisa las clases restantes.",
+    calendarInvalid: "Revisa el total del curso.",
     updated: "Resultado actualizado.",
     example: "Ejemplo cargado.",
     cleared: "Formulario limpio.",
@@ -59,11 +67,17 @@ const TEXT = {
     },
     totalRange: "Use a whole number from 1 to 1000.",
     remainingRange: "Use a whole number from 0 to 1000.",
-    tooManyAttended: (total: number) => `Attendances cannot exceed the ${total} completed classes.`,
-    tooManyAbsences: (total: number) => `Absences cannot exceed the ${total} completed classes.`,
+    courseTotalRange: "Use a whole number from 1 to 2000.",
+    courseTotalTooSmall: "The course total cannot be lower than the classes held so far.",
+    courseTotalTooMany: "The course total allows at most 1000 remaining classes.",
+    calculatedTotal: (value: number) => `Calculated automatically: total classes in the course = ${value}`,
+    calculatedRemaining: (value: number) => `Calculated automatically: remaining classes = ${value}`,
+    tooManyAttended: (total: number) => `Attendances cannot exceed the ${total} classes held so far.`,
+    tooManyAbsences: (total: number) => `Absences cannot exceed the ${total} classes held so far.`,
     incomplete: "Complete the required fields with valid values.",
-    initial: "Enter completed classes and either attendances or absences to calculate.",
+    initial: "Enter classes held so far and either attendances or absences. Then provide remaining classes or the course total.",
     remainingInvalid: "Check the remaining classes.",
+    calendarInvalid: "Check the course total.",
     updated: "Result updated.",
     example: "Example loaded.",
     cleared: "Form cleared.",
@@ -113,6 +127,7 @@ export function initAttendanceCalculators(): void {
       if (root.dataset.initialized === "true") return;
       root.dataset.initialized = "true";
       initAttendanceCalculator(root);
+      initAttendancePhase2Calculators();
     });
 }
 
@@ -121,8 +136,10 @@ function initAttendanceCalculator(root: HTMLElement): void {
   const adapter = locale === "es" ? es : en;
   const text = TEXT[locale];
   let mode: AttendanceInputMode = "attended";
+  let calendarMode: AttendanceCalendarMode = "remaining";
   let currentSummary = "";
   let currentResult: AttendanceResult | null = null;
+  let calendarValid = false;
   let resultVersion = 0;
   let statusTimer = 0;
 
@@ -138,6 +155,7 @@ function initAttendanceCalculator(root: HTMLElement): void {
   };
 
   const modeButtons = queryAll<HTMLButtonElement>("[data-mode-button]");
+  const calendarModeButtons = queryAll<HTMLButtonElement>("[data-calendar-mode-button]");
   const copyButton = query<HTMLButtonElement>("[data-copy-summary]");
   const clearButton = query<HTMLButtonElement>("[data-clear]");
   const status = query<HTMLElement>("[data-action-status]");
@@ -159,6 +177,7 @@ function initAttendanceCalculator(root: HTMLElement): void {
     if (!parsed.ok) {
       currentResult = null;
       currentSummary = "";
+      calendarValid = false;
       showInitial(parsed.message);
       copyButton?.setAttribute("disabled", "");
       return;
@@ -168,13 +187,19 @@ function initAttendanceCalculator(root: HTMLElement): void {
       const result = adapter.calculateAttendance(parsed.input);
       currentResult = result;
       currentSummary = adapter.buildAttendanceSummary(result);
+      calendarValid = parsed.calendarValid;
       renderResult(result);
-      copyButton?.removeAttribute("disabled");
+      if (parsed.calendarValid) copyButton?.removeAttribute("disabled");
+      else {
+        copyButton?.setAttribute("disabled", "");
+        renderInvalidCalendarState();
+      }
       syncAlternateField(result);
       if (announce) setStatus(text.updated, "success");
     } catch (error) {
       currentResult = null;
       currentSummary = "";
+      calendarValid = false;
       showInitial(error instanceof Error ? error.message : text.incomplete);
       copyButton?.setAttribute("disabled", "");
     }
@@ -191,6 +216,7 @@ function initAttendanceCalculator(root: HTMLElement): void {
           requiredPercent: AttendancePercent;
           remainingClasses: number | null;
         };
+        calendarValid: boolean;
       }
     | { ok: false; message: string } {
     clearCurrentErrors();
@@ -204,15 +230,7 @@ function initAttendanceCalculator(root: HTMLElement): void {
     const percent = adapter.parseAttendancePercent(value("requiredPercent"));
     if (!percent.ok) setError("requiredPercent", text.percent[percent.error]);
 
-    const remaining = adapter.parseAttendanceRemaining(value("remainingClasses"));
-    if (!remaining.ok) {
-      setError(
-        "remainingClasses",
-        remaining.error === "negative"
-          ? text.integer.negative
-          : text.remainingRange,
-      );
-    }
+    const calendar = readCalendar(total.ok ? total.value : null);
     const activeName: FieldName = mode === "attended" ? "attendedClasses" : "absences";
     const active = parseIntegerField(
       activeName,
@@ -225,10 +243,10 @@ function initAttendanceCalculator(root: HTMLElement): void {
         : undefined,
     );
 
-    if (!total.ok || !percent.ok || !active.ok || !remaining.ok) {
+    if (!total.ok || !percent.ok || !active.ok) {
       return {
         ok: false,
-        message: !remaining.ok ? text.remainingInvalid : text.incomplete,
+        message: text.incomplete,
       };
     }
 
@@ -241,9 +259,79 @@ function initAttendanceCalculator(root: HTMLElement): void {
           ? { attendedClasses: active.value }
           : { absences: active.value }),
         requiredPercent: percent,
-        remainingClasses: remaining.value,
+        remainingClasses: calendar.ok ? calendar.value : null,
       },
+      calendarValid: calendar.ok,
     };
+  }
+
+  function readCalendar(total: number | null):
+    | { ok: true; value: number | null }
+    | { ok: false } {
+    if (calendarMode === "remaining") {
+      const remaining = adapter.parseAttendanceRemaining(value("remainingClasses"));
+      if (!remaining.ok) {
+        setError(
+          "remainingClasses",
+          remaining.error === "negative" ? text.integer.negative : text.remainingRange,
+        );
+        setText("[data-calendar-derived]", "");
+        setValue("courseTotalClasses", "");
+        return { ok: false };
+      }
+      setValue("courseTotalClasses", total === null || remaining.value === null ? "" : String(total + remaining.value));
+      setText("[data-calendar-derived]", total === null || remaining.value === null ? "" : text.calculatedTotal(total + remaining.value));
+      return { ok: true, value: remaining.value };
+    }
+
+    if (!value("courseTotalClasses").trim()) {
+      setValue("remainingClasses", "");
+      setText("[data-calendar-derived]", "");
+      return { ok: true, value: null };
+    }
+    const courseTotal = adapter.parseAttendanceInteger(value("courseTotalClasses"), {
+      allowZero: true,
+      max: 2000,
+    });
+    if (!courseTotal.ok) {
+      setError(
+        "courseTotalClasses",
+        courseTotal.error === "negative"
+          ? text.integer.negative
+          : courseTotal.error === "too_large"
+            ? text.courseTotalRange
+            : text.courseTotalRange,
+      );
+      setValue("remainingClasses", "");
+      setText("[data-calendar-derived]", "");
+      return { ok: false };
+    }
+    if (courseTotal.value === 0) {
+      setError("courseTotalClasses", text.courseTotalRange);
+      setValue("remainingClasses", "");
+      setText("[data-calendar-derived]", "");
+      return { ok: false };
+    }
+    if (total === null) {
+      setText("[data-calendar-derived]", "");
+      setValue("remainingClasses", "");
+      return { ok: true, value: null };
+    }
+    if (courseTotal.value < total) {
+      setError("courseTotalClasses", text.courseTotalTooSmall);
+      setValue("remainingClasses", "");
+      setText("[data-calendar-derived]", "");
+      return { ok: false };
+    }
+    if (courseTotal.value - total > 1000) {
+      setError("courseTotalClasses", text.courseTotalTooMany);
+      setValue("remainingClasses", "");
+      setText("[data-calendar-derived]", "");
+      return { ok: false };
+    }
+    setValue("remainingClasses", String(courseTotal.value - total));
+    setText("[data-calendar-derived]", text.calculatedRemaining(courseTotal.value - total));
+    return { ok: true, value: courseTotal.value - total };
   }
 
   function parseIntegerField(
@@ -327,6 +415,19 @@ function initAttendanceCalculator(root: HTMLElement): void {
     setColor(query("[data-result-action]"), projectionColor);
   }
 
+  function renderInvalidCalendarState(): void {
+    setText("[data-result-projection]", text.calendarInvalid);
+    setText("[data-result-action]", text.calendarInvalid);
+    setText("[data-result-condition]", "");
+    setText("[data-result-available]", "—");
+    setText("[data-result-needed]", "—");
+    setText("[data-detail-remaining]", text.calendarInvalid);
+    queryAll<HTMLElement>("[data-known-detail]").forEach((element) => element.classList.add("hidden"));
+    queryAll<HTMLElement>("[data-excess-detail]").forEach((element) => element.classList.add("hidden"));
+    setColor(query("[data-result-projection]"), "text-red-300");
+    setColor(query("[data-result-action]"), "text-red-300");
+  }
+
   function showInitial(message: string): void {
     results?.classList.add("hidden");
     initialResult?.classList.remove("hidden");
@@ -366,6 +467,67 @@ function initAttendanceCalculator(root: HTMLElement): void {
     });
     query<HTMLElement>("[data-attended-wrapper]")?.classList.toggle("hidden", mode !== "attended");
     query<HTMLElement>("[data-absences-wrapper]")?.classList.toggle("hidden", mode !== "absences");
+    updateCalendarModeUi();
+  }
+
+  function setCalendarMode(nextMode: string | undefined): void {
+    const normalized: AttendanceCalendarMode = nextMode === "total" ? "total" : "remaining";
+    if (normalized === calendarMode) return;
+    const total = adapter.parseAttendanceInteger(value("totalClasses"), {
+      allowZero: false,
+      max: 1000,
+    });
+    const source = calendarMode === "remaining"
+      ? adapter.parseAttendanceRemaining(value("remainingClasses"))
+      : adapter.parseAttendanceInteger(value("courseTotalClasses"), { allowZero: true, max: 2000 });
+    let canConvert = false;
+    if (total.ok && source.ok) {
+      const sourceValue = source.value;
+      if (
+        calendarMode === "remaining" &&
+        sourceValue !== null &&
+        normalized === "total"
+      ) {
+        setValue("courseTotalClasses", String(total.value + sourceValue));
+        canConvert = true;
+      } else if (
+        calendarMode === "total" &&
+        sourceValue > 0 &&
+        normalized === "remaining" &&
+        sourceValue >= total.value &&
+        sourceValue - total.value <= 1000
+      ) {
+        setValue("remainingClasses", String(sourceValue - total.value));
+        canConvert = true;
+      }
+    }
+    if (!canConvert) {
+      setValue(normalized === "total" ? "courseTotalClasses" : "remainingClasses", "");
+      const target = field(normalized === "total" ? "courseTotalClasses" : "remainingClasses");
+      if (target) target.dataset.touched = "true";
+    }
+    calendarMode = normalized;
+    updateModeUi();
+    updateCalculator(true);
+  }
+
+  function updateCalendarModeUi(): void {
+    calendarModeButtons.forEach((button) => {
+      const active = button.dataset.calendarModeButton === calendarMode;
+      button.setAttribute("aria-pressed", String(active));
+      button.classList.toggle("border-amber-400", active);
+      button.classList.toggle("text-amber-300", active);
+    });
+    query<HTMLElement>("[data-calendar-remaining-wrapper]")?.classList.remove("hidden");
+    query<HTMLElement>("[data-calendar-total-wrapper]")?.classList.remove("hidden");
+    queryAll<HTMLElement>("[data-calendar-derived-label]").forEach((label) => {
+      label.classList.toggle("hidden", label.dataset.calendarDerivedLabel !== (calendarMode === "remaining" ? "total" : "remaining"));
+    });
+    const remainingInput = field("remainingClasses");
+    const courseTotalInput = field("courseTotalClasses");
+    if (remainingInput) remainingInput.readOnly = calendarMode === "total";
+    if (courseTotalInput) courseTotalInput.readOnly = calendarMode === "remaining";
+    if (calendarMode === "total") setText("[data-calendar-derived]", "");
   }
 
   function syncAlternateField(result: AttendanceResult): void {
@@ -379,10 +541,15 @@ function initAttendanceCalculator(root: HTMLElement): void {
     const example = adapter.ATTENDANCE_EXAMPLES.find((item) => item.id === id);
     if (!example) return;
     mode = example.values.mode;
-    (Object.keys(example.values) as Array<keyof typeof example.values>).forEach((name) => {
-      if (name !== "mode") setValue(name, example.values[name]);
-    });
+    calendarMode = example.values.calendarMode ?? "remaining";
+    setValue("totalClasses", example.values.totalClasses);
+    setValue("attendedClasses", example.values.attendedClasses);
+    setValue("absences", example.values.absences);
+    setValue("requiredPercent", example.values.requiredPercent);
+    setValue("remainingClasses", example.values.remainingClasses);
+    setValue("courseTotalClasses", example.values.courseTotalClasses ?? "");
     clearAllErrors();
+    updateModeUi();
     updateCalculator();
     trigger.focus();
     setStatus(text.example, "success");
@@ -392,11 +559,13 @@ function initAttendanceCalculator(root: HTMLElement): void {
     resultVersion += 1;
     clearStatus();
     mode = "attended";
+    calendarMode = "remaining";
     setValue("totalClasses", "");
     setValue("attendedClasses", "");
     setValue("absences", "");
     setValue("requiredPercent", "80");
     setValue("remainingClasses", "");
+    setValue("courseTotalClasses", "");
     currentResult = null;
     currentSummary = "";
     clearAllErrors();
@@ -409,7 +578,7 @@ function initAttendanceCalculator(root: HTMLElement): void {
   }
 
   async function copySummary(): Promise<void> {
-    if (!currentSummary || !currentResult) {
+    if (!currentSummary || !currentResult || !calendarValid) {
       setStatus(text.noSummary, "error");
       return;
     }
@@ -479,7 +648,7 @@ function initAttendanceCalculator(root: HTMLElement): void {
   }
 
   function clearCurrentErrors(): void {
-    (Object.keys({ totalClasses: 0, requiredPercent: 0, attendedClasses: 0, absences: 0, remainingClasses: 0 }) as FieldName[]).forEach(clearError);
+    (Object.keys({ totalClasses: 0, requiredPercent: 0, attendedClasses: 0, absences: 0, remainingClasses: 0, courseTotalClasses: 0 }) as FieldName[]).forEach(clearError);
   }
 
   function clearAllErrors(): void {
@@ -528,6 +697,9 @@ function initAttendanceCalculator(root: HTMLElement): void {
   });
   modeButtons.forEach((button) =>
     button.addEventListener("click", () => setMode(button.dataset.modeButton)),
+  );
+  calendarModeButtons.forEach((button) =>
+    button.addEventListener("click", () => setCalendarMode(button.dataset.calendarModeButton)),
   );
   queryAll<HTMLButtonElement>("[data-example-id]").forEach((button) =>
     button.addEventListener("click", () => loadExample(button.dataset.exampleId, button)),

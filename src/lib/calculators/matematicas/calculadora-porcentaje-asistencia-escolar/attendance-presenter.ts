@@ -6,7 +6,7 @@ import {
 } from "./attendance-core";
 
 export interface AttendanceExample {
-  id: "regular" | "recover" | "no-margin" | "impossible" | "unknown";
+  id: "regular" | "recover" | "no-margin" | "impossible" | "unknown" | "course-total";
   label: string;
   values: {
     totalClasses: string;
@@ -15,6 +15,8 @@ export interface AttendanceExample {
     absences: string;
     requiredPercent: string;
     remainingClasses: string;
+    calendarMode?: "remaining" | "total";
+    courseTotalClasses?: string;
   };
 }
 

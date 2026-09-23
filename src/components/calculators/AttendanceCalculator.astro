@@ -14,26 +14,32 @@ const t = isEs
   ? {
       heading: "Datos de asistencia",
       intro: "Calcula tu situación actual y, si conoces las clases restantes, proyecta el final del curso.",
-      total: "Clases realizadas",
-      totalHelp: "Cuenta solo las clases que ya se impartieron. Usa un entero entre 1 y 1000.",
+      total: "Clases impartidas hasta hoy",
+      totalHelp: "Incluye las clases a las que asististe y aquellas a las que faltaste. No cuentes clases futuras ni canceladas. Usa un entero entre 1 y 1000.",
       minimum: "Mínimo requerido (%)",
       minimumHelp: "Usa un porcentaje de 0 a 100 con hasta 4 decimales. 80% es solo el valor inicial; usa el requisito de tu escuela.",
       capture: "Capturar por",
       attended: "Asistidas",
       absences: "Faltas",
       attendedLabel: "Clases asistidas",
-      attendedHelp: "Usa un entero entre 0 y las clases realizadas.",
+      attendedHelp: "Usa un entero entre 0 y las clases impartidas hasta hoy.",
       absencesLabel: "Faltas acumuladas",
-      absencesHelp: "Usa un entero entre 0 y las clases realizadas.",
-      remaining: "Clases restantes (opcional)",
-      remainingHelp: "Déjalo vacío si no lo sabes. Si lo indicas, usa un entero entre 0 y 1000; escribe 0 si el curso terminó.",
+      absencesHelp: "Usa un entero entre 0 y las clases impartidas hasta hoy.",
+      remaining: "Clases restantes",
+      remainingHelp: "Déjalo vacío si no lo sabes. Usa un entero entre 0 y 1000; escribe 0 si el curso terminó.",
+      courseCalendar: "Calendario del curso (opcional)",
+      calendarRemainingMode: "Conozco las clases restantes",
+      calendarTotalMode: "Conozco el total del curso",
+      courseTotal: "Clases totales del curso",
+      courseTotalHelp: "Incluye las clases impartidas hasta hoy y las que faltan para terminar el curso. Usa un entero entre 1 y 2000.",
+      calculatedAutomatically: "Calculado automáticamente",
       equalWeight: "Todas las clases cuentan igual.",
       copy: "Copiar resumen",
       clear: "Limpiar",
       examples: "Ejemplos",
       noJs: "Activa JavaScript para realizar el cálculo. Las fórmulas y explicaciones siguen disponibles en esta página.",
       result: "Resultado",
-      initial: "Introduce las clases realizadas y las asistidas o faltas para calcular.",
+      initial: "Introduce las clases impartidas hasta hoy y las asistidas o faltas. Después indica las restantes o el total del curso.",
       current: "Situación actual",
       projection: "Proyección final",
       attendance: "Asistencia actual",
@@ -41,13 +47,13 @@ const t = isEs
       available: "Faltas futuras disponibles",
       needed: "Asistencias necesarias",
       summary: "Resumen de cantidades",
-      completed: "Realizadas",
+      completed: "Impartidas hasta hoy",
       attendedShort: "Asistidas",
       absencesShort: "Faltas acumuladas",
       minimumShort: "Mínimo",
       margin: "Margen",
       remainingShort: "Restantes",
-      finalTotal: "Total final",
+      finalTotal: "Total del curso",
       maxAbsences: "Faltas máximas totales",
       excess: "Excedente de faltas",
       maxFinal: "Máximo final posible",
@@ -57,26 +63,32 @@ const t = isEs
   : {
       heading: "Attendance inputs",
       intro: "Calculate your current situation and, if you know the remaining classes, project the end of the course.",
-      total: "Completed classes",
-      totalHelp: "Count only classes that have already taken place. Use a whole number from 1 to 1000.",
+      total: "Classes held so far",
+      totalHelp: "Include classes you attended and classes you missed. Do not count future or cancelled classes. Use a whole number from 1 to 1000.",
       minimum: "Required minimum (%)",
       minimumHelp: "Use a percentage from 0 to 100 with up to 4 decimals. 80% is only the initial value; use your school's requirement.",
       capture: "Enter",
       attended: "Attendances",
       absences: "Absences",
       attendedLabel: "Attended classes",
-      attendedHelp: "Use a whole number from 0 to the completed class count.",
+      attendedHelp: "Use a whole number from 0 to the classes held so far.",
       absencesLabel: "Accumulated absences",
-      absencesHelp: "Use a whole number from 0 to the completed class count.",
-      remaining: "Remaining classes (optional)",
-      remainingHelp: "Leave blank if you do not know. If provided, use a whole number from 0 to 1000; enter 0 if the course is finished.",
+      absencesHelp: "Use a whole number from 0 to the classes held so far.",
+      remaining: "Remaining classes",
+      remainingHelp: "Leave blank if you do not know. Use a whole number from 0 to 1000; enter 0 if the course is finished.",
+      courseCalendar: "Course schedule (optional)",
+      calendarRemainingMode: "I know the remaining classes",
+      calendarTotalMode: "I know the course total",
+      courseTotal: "Total classes in the course",
+      courseTotalHelp: "Include classes held so far and those remaining until the course ends. Use a whole number from 1 to 2000.",
+      calculatedAutomatically: "Calculated automatically",
       equalWeight: "All classes have equal weight.",
       copy: "Copy summary",
       clear: "Clear",
       examples: "Examples",
       noJs: "Enable JavaScript to perform the calculation. The formulas and explanations remain available on this page.",
       result: "Result",
-      initial: "Enter completed classes and either attended classes or absences to calculate.",
+      initial: "Enter classes held so far and either attendances or absences. Then provide remaining classes or the course total.",
       current: "Current situation",
       projection: "Final projection",
       attendance: "Current attendance",
@@ -84,13 +96,13 @@ const t = isEs
       available: "Future absences available",
       needed: "Required attendances",
       summary: "Quantity summary",
-      completed: "Completed",
+      completed: "Held so far",
       attendedShort: "Attended",
       absencesShort: "Accumulated absences",
       minimumShort: "Minimum",
       margin: "Margin",
       remainingShort: "Remaining",
-      finalTotal: "Final total",
+      finalTotal: "Total classes in the course",
       maxAbsences: "Maximum total absences",
       excess: "Excess absences",
       maxFinal: "Maximum possible final",
@@ -98,6 +110,89 @@ const t = isEs
       manualCopy: "Select and copy this summary manually:",
     };
 const prefix = `attendance-${locale}`;
+const phase2 = isEs
+  ? {
+      subject: "Materia",
+      subjectHelp: "Las materias se mantienen separadas en este navegador.",
+      addSubject: "Nueva materia",
+      renameSubject: "Renombrar",
+      deleteSubject: "Eliminar materia",
+      source: "Origen de los datos",
+      manualSource: "Totales manuales",
+      calendarSource: "Registro de clases",
+      calendarHelp: "Registra cada clase; las fechas son locales y no se inventan desde totales.",
+      advanced: "Política escolar (opcional)",
+      justified: "Faltas justificadas",
+      justifiedAbsence: "Cuentan como falta",
+      justifiedExclude: "Excluir del denominador",
+      justifiedCredit: "Cuentan como asistencia",
+      tardy: "Retardos",
+      tardyNone: "No convertir retardos",
+      tardyRule: "Cada k retardos equivalen a una falta",
+      rounding: "Redondeo para evaluar el mínimo",
+      exact: "Exacto (sin redondeo)",
+      calendarComplete: "El calendario restante está completo",
+      eventDate: "Fecha local",
+      eventLabel: "Etiqueta (opcional)",
+      eventStatus: "Estado",
+      addEvent: "Agregar clase",
+      eventAttended: "Asistida",
+      eventAbsence: "Falta",
+      eventJustified: "Justificada",
+      eventTardy: "Retardo",
+      eventScheduled: "Programada",
+      eventCancelled: "Cancelada",
+      history: "Historial de esta sesión",
+      save: "Guardar resultado",
+      export: "Exportar CSV",
+      deleteAll: "Borrar historial",
+      noHistory: "Aún no hay resultados guardados.",
+      historyHelp: "Se guarda solo en la sesión de este navegador; no hay sincronización ni permanencia garantizada.",
+      policyUsed: "Política utilizada",
+      originUsed: "Origen",
+      effective: "Interpretación efectiva",
+    }
+  : {
+      subject: "Subject",
+      subjectHelp: "Subjects stay separate in this browser.",
+      addSubject: "New subject",
+      renameSubject: "Rename",
+      deleteSubject: "Delete subject",
+      source: "Data source",
+      manualSource: "Manual totals",
+      calendarSource: "Class register",
+      calendarHelp: "Register each class; dates are local and are never invented from totals.",
+      advanced: "School policy (optional)",
+      justified: "Justified absences",
+      justifiedAbsence: "Count as absence",
+      justifiedExclude: "Exclude from denominator",
+      justifiedCredit: "Count as attendance",
+      tardy: "Tardies",
+      tardyNone: "Do not convert tardies",
+      tardyRule: "Every k tardies equal one absence",
+      rounding: "Rounding used to evaluate the minimum",
+      exact: "Exact (no rounding)",
+      calendarComplete: "The remaining calendar is complete",
+      eventDate: "Local date",
+      eventLabel: "Label (optional)",
+      eventStatus: "Status",
+      addEvent: "Add class",
+      eventAttended: "Attended",
+      eventAbsence: "Absence",
+      eventJustified: "Justified",
+      eventTardy: "Tardy",
+      eventScheduled: "Scheduled",
+      eventCancelled: "Cancelled",
+      history: "This-session history",
+      save: "Save result",
+      export: "Export CSV",
+      deleteAll: "Delete history",
+      noHistory: "No saved results yet.",
+      historyHelp: "Saved only in this browser session; there is no synchronization or permanence guarantee.",
+      policyUsed: "Policy used",
+      originUsed: "Origin",
+      effective: "Effective interpretation",
+    };
 ---
 
 <Container as="section" class="py-6 md:py-8">
@@ -111,7 +206,25 @@ const prefix = `attendance-${locale}`;
         <h2 id={`${prefix}-heading`} class="text-xl font-semibold">{t.heading}</h2>
         <p class="mt-2 text-sm leading-relaxed text-gray-400">{t.intro}</p>
 
-        <div class="mt-5 min-w-0">
+        <div class="mt-5 rounded-lg border border-gray-800 bg-gray-900/60 p-4" data-phase2-subjects>
+          <label for={`${prefix}-subject`} class="block text-sm font-medium text-gray-200">{phase2.subject}</label>
+          <div class="mt-2 flex min-w-0 flex-wrap gap-2">
+            <select id={`${prefix}-subject`} class="min-h-11 min-w-0 flex-1 rounded-lg border border-gray-700 bg-gray-950 px-3 text-sm text-white disabled:cursor-not-allowed disabled:opacity-50" data-subject-select data-requires-js disabled aria-describedby={`${prefix}-subject-help`}></select>
+            <button class="min-h-11 rounded-lg border border-gray-700 px-3 py-2 text-sm font-semibold text-gray-200 hover:border-amber-400 disabled:cursor-not-allowed disabled:opacity-50" type="button" data-add-subject data-requires-js disabled>{phase2.addSubject}</button>
+            <button class="min-h-11 rounded-lg border border-gray-700 px-3 py-2 text-sm font-semibold text-gray-200 hover:border-amber-400 disabled:cursor-not-allowed disabled:opacity-50" type="button" data-rename-subject data-requires-js disabled>{phase2.renameSubject}</button>
+            <button class="min-h-11 rounded-lg border border-gray-700 px-3 py-2 text-sm font-semibold text-gray-200 hover:border-amber-400 disabled:cursor-not-allowed disabled:opacity-50" type="button" data-delete-subject data-requires-js disabled>{phase2.deleteSubject}</button>
+          </div>
+          <p id={`${prefix}-subject-help`} class="mt-2 text-sm text-gray-400">{phase2.subjectHelp}</p>
+          <div class="mt-4">
+            <span class="block text-sm font-medium text-gray-200">{phase2.source}</span>
+            <div class="mt-2 flex flex-wrap gap-2" role="group" aria-label={phase2.source}>
+              <button class="min-h-11 rounded-lg border border-gray-700 px-3 py-2 text-sm font-semibold text-gray-200 disabled:cursor-not-allowed disabled:opacity-50" type="button" data-source-button="manual" data-requires-js disabled aria-pressed="true">{phase2.manualSource}</button>
+              <button class="min-h-11 rounded-lg border border-gray-700 px-3 py-2 text-sm font-semibold text-gray-200 disabled:cursor-not-allowed disabled:opacity-50" type="button" data-source-button="calendar" data-requires-js disabled aria-pressed="false">{phase2.calendarSource}</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-5 min-w-0" data-manual-source-fields>
           <div class="min-w-0">
             <label for={`${prefix}-total`} class="block text-sm font-medium text-gray-200">{t.total}</label>
             <input id={`${prefix}-total`} class="mt-2 min-h-12 w-full min-w-0 rounded-lg border border-gray-700 bg-gray-900 px-4 text-base text-white outline-none transition focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15" type="text" inputmode="numeric" autocomplete="off" data-field="totalClasses" aria-describedby={`${prefix}-total-help ${prefix}-total-error`} />
@@ -120,7 +233,7 @@ const prefix = `attendance-${locale}`;
           </div>
         </div>
 
-        <div class="mt-5">
+        <div class="mt-5" data-manual-source-fields>
           <span class="block text-sm font-medium text-gray-200">{t.capture}</span>
           <div class="mt-2 inline-flex max-w-full rounded-lg border border-gray-700 bg-gray-900 p-1" role="group" aria-label={t.capture}>
             <button class="min-h-11 rounded-md px-4 py-2 text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/40 disabled:cursor-not-allowed disabled:opacity-50" type="button" data-mode-button="attended" data-requires-js aria-pressed="true" disabled>{t.attended}</button>
@@ -128,7 +241,7 @@ const prefix = `attendance-${locale}`;
           </div>
         </div>
 
-        <div class="mt-5 grid min-w-0 gap-5 sm:grid-cols-2">
+        <div class="mt-5 grid min-w-0 gap-5 sm:grid-cols-2" data-manual-source-fields>
           <div class="min-w-0" data-attended-wrapper>
             <label for={`${prefix}-attended`} class="block text-sm font-medium text-gray-200">{t.attendedLabel}</label>
             <input id={`${prefix}-attended`} class="mt-2 min-h-12 w-full min-w-0 rounded-lg border border-gray-700 bg-gray-900 px-4 text-base text-white outline-none transition focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15" type="text" inputmode="numeric" autocomplete="off" data-field="attendedClasses" aria-describedby={`${prefix}-attended-help ${prefix}-attended-error`} />
@@ -147,26 +260,75 @@ const prefix = `attendance-${locale}`;
             <p id={`${prefix}-minimum-help`} class="mt-2 text-sm text-gray-400">{t.minimumHelp}</p>
             <p id={`${prefix}-minimum-error`} class="mt-2 hidden text-sm text-red-300" data-error-for="requiredPercent"></p>
           </div>
-          <div class="min-w-0">
-            <label for={`${prefix}-remaining`} class="block text-sm font-medium text-gray-200">{t.remaining}</label>
-            <input id={`${prefix}-remaining`} class="mt-2 min-h-12 w-full min-w-0 rounded-lg border border-gray-700 bg-gray-900 px-4 text-base text-white outline-none transition focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15" type="text" inputmode="numeric" autocomplete="off" data-field="remainingClasses" aria-describedby={`${prefix}-remaining-help ${prefix}-remaining-error`} />
-            <p id={`${prefix}-remaining-help`} class="mt-2 text-sm text-gray-400">{t.remainingHelp}</p>
-            <p id={`${prefix}-remaining-error`} class="mt-2 hidden text-sm text-red-300" data-error-for="remainingClasses"></p>
+          <div class="min-w-0 sm:col-span-2" data-calendar-schedule>
+            <span class="block text-sm font-medium text-gray-200">{t.courseCalendar}</span>
+            <div class="mt-2 flex min-w-0 flex-wrap gap-2" role="group" aria-label={t.courseCalendar}>
+              <button class="min-h-11 rounded-lg border border-gray-700 px-3 py-2 text-sm font-semibold text-gray-200 disabled:cursor-not-allowed disabled:opacity-50" type="button" data-calendar-mode-button="remaining" data-requires-js aria-pressed="true" disabled>{t.calendarRemainingMode}</button>
+              <button class="min-h-11 rounded-lg border border-gray-700 px-3 py-2 text-sm font-semibold text-gray-200 disabled:cursor-not-allowed disabled:opacity-50" type="button" data-calendar-mode-button="total" data-requires-js aria-pressed="false" disabled>{t.calendarTotalMode}</button>
+            </div>
+            <div class="mt-3 grid min-w-0 gap-4 sm:grid-cols-2">
+              <div class="min-w-0" data-calendar-remaining-wrapper>
+                <label for={`${prefix}-remaining`} class="block text-sm font-medium text-gray-200">{t.remaining} <span class="hidden text-xs font-normal text-gray-400" data-calendar-derived-label="remaining">({t.calculatedAutomatically})</span></label>
+                <input id={`${prefix}-remaining`} class="mt-2 min-h-12 w-full min-w-0 rounded-lg border border-gray-700 bg-gray-900 px-4 text-base text-white outline-none transition focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15" type="text" inputmode="numeric" autocomplete="off" data-field="remainingClasses" aria-describedby={`${prefix}-remaining-help ${prefix}-remaining-error`} />
+                <p id={`${prefix}-remaining-help`} class="mt-2 text-sm text-gray-400">{t.remainingHelp}</p>
+                <p id={`${prefix}-remaining-error`} class="mt-2 hidden text-sm text-red-300" data-error-for="remainingClasses"></p>
+              </div>
+              <div class="min-w-0" data-calendar-total-wrapper>
+                <label for={`${prefix}-course-total`} class="block text-sm font-medium text-gray-200">{t.courseTotal} <span class="text-xs font-normal text-gray-400" data-calendar-derived-label="total">({t.calculatedAutomatically})</span></label>
+                <input id={`${prefix}-course-total`} class="mt-2 min-h-12 w-full min-w-0 rounded-lg border border-gray-700 bg-gray-900 px-4 text-base text-white outline-none transition focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15 read-only:opacity-70" type="text" inputmode="numeric" autocomplete="off" readonly data-field="courseTotalClasses" aria-describedby={`${prefix}-course-total-help ${prefix}-course-total-error`} />
+                <p id={`${prefix}-course-total-help`} class="mt-2 text-sm text-gray-400">{t.courseTotalHelp}</p>
+                <p id={`${prefix}-course-total-error`} class="mt-2 hidden text-sm text-red-300" data-error-for="courseTotalClasses"></p>
+              </div>
+            </div>
+            <p class="mt-2 text-sm text-gray-400" data-calendar-derived></p>
           </div>
         </div>
-        <p class="mt-4 text-sm text-gray-400">{t.equalWeight}</p>
+        <p class="mt-4 text-sm text-gray-400" data-manual-source-fields>{t.equalWeight}</p>
+
+        <section class="mt-5 hidden rounded-lg border border-gray-800 bg-gray-900/60 p-4" data-calendar-panel aria-labelledby={`${prefix}-calendar-heading`}>
+          <h3 id={`${prefix}-calendar-heading`} class="font-semibold text-gray-200">{phase2.calendarSource}</h3>
+          <p class="mt-2 text-sm text-gray-400">{phase2.calendarHelp}</p>
+          <div class="mt-4 grid min-w-0 gap-3 sm:grid-cols-[minmax(0,10rem)_minmax(0,1fr)_minmax(0,12rem)_auto]">
+            <div class="min-w-0"><label for={`${prefix}-event-date`} class="block text-sm text-gray-300">{phase2.eventDate}</label><input id={`${prefix}-event-date`} class="mt-1 min-h-11 w-full min-w-0 rounded-lg border border-gray-700 bg-gray-950 px-3 text-sm text-white" type="date" data-event-date /></div>
+            <div class="min-w-0"><label for={`${prefix}-event-label`} class="block text-sm text-gray-300">{phase2.eventLabel}</label><input id={`${prefix}-event-label`} class="mt-1 min-h-11 w-full min-w-0 rounded-lg border border-gray-700 bg-gray-950 px-3 text-sm text-white" type="text" maxlength="200" data-event-label /></div>
+            <div class="min-w-0"><label for={`${prefix}-event-status`} class="block text-sm text-gray-300">{phase2.eventStatus}</label><select id={`${prefix}-event-status`} class="mt-1 min-h-11 w-full min-w-0 rounded-lg border border-gray-700 bg-gray-950 px-3 text-sm text-white" data-event-status><option value="attended">{phase2.eventAttended}</option><option value="absence">{phase2.eventAbsence}</option><option value="justified">{phase2.eventJustified}</option><option value="tardy">{phase2.eventTardy}</option><option value="scheduled">{phase2.eventScheduled}</option><option value="cancelled">{phase2.eventCancelled}</option></select></div>
+            <button class="min-h-11 self-end rounded-lg bg-amber-400 px-3 py-2 text-sm font-semibold text-gray-950 disabled:cursor-not-allowed disabled:opacity-50" type="button" data-add-event data-requires-js disabled>{phase2.addEvent}</button>
+          </div>
+          <label class="mt-4 flex min-h-11 items-center gap-3 text-sm text-gray-200"><input class="h-5 w-5 accent-amber-400" type="checkbox" data-calendar-complete />{phase2.calendarComplete}</label>
+          <p class="mt-3 hidden text-sm text-red-300" data-calendar-error role="alert"></p>
+          <ul class="mt-4 space-y-2 text-sm text-gray-300" data-event-list></ul>
+        </section>
+
+        <details class="mt-5 rounded-lg border border-gray-800 bg-gray-900/60 p-4" data-policy-panel>
+          <summary class="cursor-pointer font-semibold text-gray-200">{phase2.advanced}</summary>
+          <div class="mt-4 grid min-w-0 gap-4 sm:grid-cols-2">
+            <div class="min-w-0"><label for={`${prefix}-justified-policy`} class="block text-sm text-gray-300">{phase2.justified}</label><select id={`${prefix}-justified-policy`} class="mt-1 min-h-11 w-full min-w-0 rounded-lg border border-gray-700 bg-gray-950 px-3 text-sm text-white" data-policy-justified><option value="absence">{phase2.justifiedAbsence}</option><option value="exclude">{phase2.justifiedExclude}</option><option value="credit">{phase2.justifiedCredit}</option></select></div>
+            <div class="min-w-0"><label for={`${prefix}-tardy-k`} class="block text-sm text-gray-300">{phase2.tardy}</label><select id={`${prefix}-tardy-k`} class="mt-1 min-h-11 w-full min-w-0 rounded-lg border border-gray-700 bg-gray-950 px-3 text-sm text-white" data-policy-tardy><option value="">{phase2.tardyNone}</option>{Array.from({ length: 100 }, (_, index) => <option value={index + 1}>{phase2.tardyRule.replace("k", String(index + 1))}</option>)}</select></div>
+            <div class="min-w-0 sm:col-span-2"><label for={`${prefix}-rounding`} class="block text-sm text-gray-300">{phase2.rounding}</label><select id={`${prefix}-rounding`} class="mt-1 min-h-11 w-full min-w-0 rounded-lg border border-gray-700 bg-gray-950 px-3 text-sm text-white" data-policy-rounding><option value="exact">{phase2.exact}</option><option value="0">0 decimals, half-up</option><option value="1">1 decimal, half-up</option><option value="2">2 decimals, half-up</option></select></div>
+          </div>
+        </details>
 
         <div class="mt-5 flex flex-wrap gap-3">
           <button class="inline-flex min-h-11 items-center justify-center rounded-lg bg-amber-400 px-4 py-2 text-sm font-semibold text-gray-950 transition hover:bg-amber-300 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/40 disabled:cursor-not-allowed disabled:opacity-50" type="button" data-copy-summary disabled>{t.copy}</button>
           <button class="inline-flex min-h-11 items-center justify-center rounded-lg border border-gray-700 px-4 py-2 text-sm font-semibold text-gray-200 transition hover:border-amber-400 hover:text-white focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/40 disabled:cursor-not-allowed disabled:opacity-50" type="button" data-clear data-requires-js disabled>{t.clear}</button>
         </div>
         <div class="mt-3 min-h-6 text-sm" role="status" aria-live="polite" data-action-status></div>
+        <div class="mt-4 flex flex-wrap gap-3" data-phase2-actions>
+          <button class="inline-flex min-h-11 items-center justify-center rounded-lg border border-gray-700 px-4 py-2 text-sm font-semibold text-gray-200 hover:border-amber-400 disabled:cursor-not-allowed disabled:opacity-50" type="button" data-save-result data-requires-js disabled>{phase2.save}</button>
+          <button class="inline-flex min-h-11 items-center justify-center rounded-lg border border-gray-700 px-4 py-2 text-sm font-semibold text-gray-200 hover:border-amber-400 disabled:cursor-not-allowed disabled:opacity-50" type="button" data-export-csv data-requires-js disabled>{phase2.export}</button>
+        </div>
+        <section class="mt-4 hidden rounded-lg border border-gray-800 bg-gray-900/60 p-4" data-history-panel aria-labelledby={`${prefix}-history-heading`}>
+          <div class="flex flex-wrap items-center justify-between gap-3"><h3 id={`${prefix}-history-heading`} class="font-semibold text-gray-200">{phase2.history}</h3><button class="min-h-11 rounded-lg border border-gray-700 px-3 py-2 text-sm text-gray-200 disabled:cursor-not-allowed disabled:opacity-50" type="button" data-delete-history data-requires-js disabled>{phase2.deleteAll}</button></div>
+          <p class="mt-2 text-sm text-gray-400" data-history-note>{phase2.noHistory}</p>
+          <p class="mt-1 text-xs text-gray-500">{phase2.historyHelp}</p>
+          <ul class="mt-3 space-y-2 text-sm text-gray-300" data-history-list></ul>
+        </section>
         <div class="mt-3 hidden" data-manual-copy>
           <label class="block text-sm text-amber-200" for={`${prefix}-manual`}>{t.manualCopy}</label>
           <textarea id={`${prefix}-manual`} class="mt-2 min-h-32 w-full min-w-0 rounded-lg border border-amber-500 bg-gray-900 p-3 text-sm text-white" readonly data-manual-copy-text></textarea>
         </div>
 
-        <div class="mt-5">
+        <div class="mt-5" data-manual-only>
           <p class="text-sm font-medium text-gray-200">{t.examples}</p>
           <div class="mt-2 flex flex-wrap gap-2">
             {examples.map((example) => <button class="min-h-11 rounded-lg border border-gray-700 px-3 py-2 text-sm font-semibold text-gray-200 transition hover:border-amber-400 hover:text-white focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/40 disabled:cursor-not-allowed disabled:opacity-50" type="button" data-example-id={example.id} data-requires-js disabled>{example.label}</button>)}
@@ -184,6 +346,8 @@ const prefix = `attendance-${locale}`;
             <p class="mt-2 break-words text-3xl font-bold text-white" data-result-percent></p>
             <p class="mt-2 text-base font-semibold" data-result-current-status></p>
             <p class="mt-2 text-sm text-amber-200" data-result-rounding></p>
+            <p class="mt-2 text-sm text-gray-400" data-result-policy></p>
+            <p class="mt-1 text-sm text-gray-400" data-result-origin></p>
           </section>
           <section class="mt-3 rounded-lg border border-gray-700 bg-gray-950 p-5" aria-labelledby={`${prefix}-projection-heading`}>
             <h3 id={`${prefix}-projection-heading`} class="text-xs font-semibold uppercase text-gray-400">{t.projection}</h3>
@@ -209,6 +373,7 @@ const prefix = `attendance-${locale}`;
               <dt class="min-w-0 break-words" data-known-detail data-excess-detail>{t.excess}</dt><dd class="min-w-0 break-words text-right" data-known-detail data-excess-detail data-detail-excess></dd>
               <dt class="min-w-0 break-words" data-known-detail>{t.maxFinal}</dt><dd class="min-w-0 break-words text-right" data-known-detail data-detail-max-final></dd>
               <dt class="col-span-2 mt-2">{t.recovery}</dt><dd class="col-span-2 break-words text-left text-gray-100" data-detail-recovery></dd>
+              <dt class="min-w-0 break-words" data-phase2-detail>{phase2.effective}</dt><dd class="min-w-0 break-words text-right" data-phase2-detail data-detail-effective></dd>
             </dl>
           </details>
         </div>

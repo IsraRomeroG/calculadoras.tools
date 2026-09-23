@@ -5,6 +5,11 @@ valiosas de v1 aún ausentes, con alcance y aceptación propios. No bloquean las
 correcciones de 01–05 ni autorizan a anunciar funcionalidades todavía inexistentes.
 
 Secuencia: A (materias), E (políticas), B (calendario), C (historial), D (CSV).
+Antes de estas ampliaciones se prioriza la [mejora 07](07-nombres-y-calendario-del-curso.md),
+que permite introducir restantes o total del curso sin registrar fechas ni eventos.
+Cuando se implemente 06, los totales manuales incorporarán ese selector; en el
+origen por registro de clases, T y R seguirán derivándose exclusivamente de los
+eventos y del control de calendario completo definidos en B.
 A usa inicialmente las reglas base; E añade configuración explícita. B se apoya
 en ambas para evitar dos fuentes de conteo incompatibles. C y D consumen el modelo
 versionado resultante. Cada ampliación mantiene paridad funcional ES/EN.

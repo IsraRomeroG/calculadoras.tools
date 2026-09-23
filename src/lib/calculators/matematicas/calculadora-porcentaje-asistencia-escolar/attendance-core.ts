@@ -1,4 +1,5 @@
 export type AttendanceInputMode = "attended" | "absences";
+export type AttendanceCalendarMode = "remaining" | "total";
 export type AttendanceStatus = "meets" | "below";
 export type AttendanceProjectionStatus =
   | "unknown"
@@ -69,6 +70,13 @@ export type ParseAttendanceRemainingResult =
       error: "invalid" | "negative" | "too_large";
     };
 
+export type ParseAttendanceCourseTotalResult =
+  | { ok: true; value: number | null; normalized: string }
+  | {
+      ok: false;
+      error: "invalid" | "negative" | "zero" | "too_large" | "too_small" | "too_many_remaining";
+    };
+
 export type ParseAttendancePercentResult =
   | ({ ok: true } & AttendancePercent)
   | {
@@ -82,9 +90,16 @@ export type ParseAttendancePercentResult =
     };
 
 export const MAX_ATTENDANCE_CLASSES = 1000;
+export const MAX_COURSE_TOTAL_CLASSES = 2000;
 export const MAX_PERCENT_DECIMALS = 4;
 export const PERCENT_SCALE = 10_000;
 export const ATTENDANCE_RATIO_SCALE = 100 * PERCENT_SCALE;
+
+export interface AttendanceCalendarState {
+  calendarMode: AttendanceCalendarMode;
+  remainingClasses: number | null;
+  courseTotalClasses: number | null;
+}
 
 export function calculateAttendanceCore(input: AttendanceInput): AttendanceResult {
   const totalClasses = normalizeInteger(
@@ -218,6 +233,76 @@ export function parseAttendanceRemaining(
     };
   }
   return parsed;
+}
+
+export function parseAttendanceCourseTotal(
+  value: string,
+  totalClasses?: number,
+): ParseAttendanceCourseTotalResult {
+  if (!value.trim()) return { ok: true, value: null, normalized: "" };
+  const parsed = parseAttendanceInteger(value, {
+    allowZero: true,
+    max: MAX_COURSE_TOTAL_CLASSES,
+  });
+  if (!parsed.ok) {
+    return {
+      ok: false,
+      error:
+        parsed.error === "negative"
+          ? "negative"
+          : parsed.error === "too_large"
+            ? "too_large"
+            : "invalid",
+    };
+  }
+  if (parsed.value === 0) return { ok: false, error: "zero" };
+  if (totalClasses !== undefined) {
+    if (!Number.isSafeInteger(totalClasses) || totalClasses < 1 || totalClasses > MAX_ATTENDANCE_CLASSES) {
+      throw new RangeError("Total classes must be an integer between 1 and 1000.");
+    }
+    if (parsed.value < totalClasses) return { ok: false, error: "too_small" };
+    if (parsed.value - totalClasses > MAX_ATTENDANCE_CLASSES) {
+      return { ok: false, error: "too_many_remaining" };
+    }
+  }
+  return parsed;
+}
+
+export function normalizeAttendanceCalendar(input: {
+  totalClasses: number;
+  calendarMode: AttendanceCalendarMode;
+  remainingClasses?: number | null;
+  courseTotalClasses?: number | null;
+}): AttendanceCalendarState {
+  if (input.calendarMode !== "remaining" && input.calendarMode !== "total") {
+    throw new RangeError("Calendar mode must be remaining or total.");
+  }
+  if (!Number.isSafeInteger(input.totalClasses) || input.totalClasses < 1 || input.totalClasses > MAX_ATTENDANCE_CLASSES) {
+    throw new RangeError("Total classes must be an integer between 1 and 1000.");
+  }
+  if (input.calendarMode === "remaining") {
+    const remaining = input.remainingClasses ?? null;
+    if (remaining !== null && (!Number.isSafeInteger(remaining) || remaining < 0 || remaining > MAX_ATTENDANCE_CLASSES)) {
+      throw new RangeError("Remaining classes must be an integer between 0 and 1000 or null.");
+    }
+    return {
+      calendarMode: input.calendarMode,
+      remainingClasses: remaining,
+      courseTotalClasses: remaining === null ? null : input.totalClasses + remaining,
+    };
+  }
+  const courseTotal = input.courseTotalClasses ?? null;
+  if (courseTotal === null) {
+    return { calendarMode: input.calendarMode, remainingClasses: null, courseTotalClasses: null };
+  }
+  if (!Number.isSafeInteger(courseTotal) || courseTotal < input.totalClasses || courseTotal > input.totalClasses + MAX_ATTENDANCE_CLASSES) {
+    throw new RangeError("Course total must be at least the classes held so far and no more than 1000 remaining classes.");
+  }
+  return {
+    calendarMode: input.calendarMode,
+    remainingClasses: courseTotal - input.totalClasses,
+    courseTotalClasses: courseTotal,
+  };
 }
 
 export function parseAttendancePercent(
