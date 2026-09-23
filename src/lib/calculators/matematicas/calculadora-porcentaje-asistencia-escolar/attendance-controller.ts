@@ -22,11 +22,13 @@ const TEXT = {
     },
     percent: {
       required: "Campo obligatorio.",
-      invalid: "Usa un porcentaje de 0 a 100 con hasta 4 decimales.",
+      invalid: "Usa un porcentaje de 0 a 100 con hasta 4 decimales. Escribe 0.5 en lugar de .5.",
       negative: "No se permiten porcentajes negativos.",
       too_large: "El porcentaje no puede superar 100.",
       too_many_decimals: "Usa un porcentaje de 0 a 100 con hasta 4 decimales.",
     },
+    totalRange: "Usa un entero entre 1 y 1000.",
+    remainingRange: "Usa un entero entre 0 y 1000.",
     tooManyAttended: (total: number) => `Las asistencias no pueden superar las ${total} clases realizadas.`,
     tooManyAbsences: (total: number) => `Las faltas no pueden superar las ${total} clases realizadas.`,
     incomplete: "Completa los campos obligatorios con valores válidos.",
@@ -49,11 +51,13 @@ const TEXT = {
     },
     percent: {
       required: "This field is required.",
-      invalid: "Use a percentage from 0 to 100 with up to 4 decimals.",
+      invalid: "Use a percentage from 0 to 100 with up to 4 decimals. Write 0.5 instead of .5.",
       negative: "Negative percentages are not allowed.",
       too_large: "The percentage cannot exceed 100.",
       too_many_decimals: "Use a percentage from 0 to 100 with up to 4 decimals.",
     },
+    totalRange: "Use a whole number from 1 to 1000.",
+    remainingRange: "Use a whole number from 0 to 1000.",
     tooManyAttended: (total: number) => `Attendances cannot exceed the ${total} completed classes.`,
     tooManyAbsences: (total: number) => `Absences cannot exceed the ${total} completed classes.`,
     incomplete: "Complete the required fields with valid values.",
@@ -153,14 +157,25 @@ function initAttendanceCalculator(root: HTMLElement): void {
       }
     | { ok: false; message: string } {
     clearCurrentErrors();
-    const total = parseIntegerField("totalClasses", false, 1000);
+    const total = parseIntegerField(
+      "totalClasses",
+      false,
+      1000,
+      undefined,
+      text.totalRange,
+    );
     const percent = adapter.parseAttendancePercent(value("requiredPercent"));
     if (!percent.ok) setError("requiredPercent", text.percent[percent.error]);
 
-    const remainingRaw = value("remainingClasses");
-    const remaining = remainingRaw.trim()
-      ? parseIntegerField("remainingClasses", true, 1000)
-      : { ok: true as const, value: null };
+    const remaining = adapter.parseAttendanceRemaining(value("remainingClasses"));
+    if (!remaining.ok) {
+      setError(
+        "remainingClasses",
+        remaining.error === "negative"
+          ? text.integer.negative
+          : text.remainingRange,
+      );
+    }
     const activeName: FieldName = mode === "attended" ? "attendedClasses" : "absences";
     const active = parseIntegerField(
       activeName,
@@ -199,6 +214,7 @@ function initAttendanceCalculator(root: HTMLElement): void {
     allowZero: boolean,
     max: number,
     tooLargeMessage?: string,
+    rangeMessage?: string,
   ) {
     const parsed = adapter.parseAttendanceInteger(value(name), {
       allowZero,
@@ -209,6 +225,11 @@ function initAttendanceCalculator(root: HTMLElement): void {
         name,
         parsed.error === "too_large" && tooLargeMessage
           ? tooLargeMessage
+          : rangeMessage &&
+              (parsed.error === "invalid" ||
+                parsed.error === "zero" ||
+                parsed.error === "too_large")
+            ? rangeMessage
           : text.integer[parsed.error],
       );
     }

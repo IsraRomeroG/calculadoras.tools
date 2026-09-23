@@ -9,6 +9,7 @@ export type {
   AttendanceStatus,
   ParseAttendanceIntegerResult,
   ParseAttendancePercentResult,
+  ParseAttendanceRemainingResult,
 } from "./attendance-core";
 export type { AttendanceResult } from "./attendance-presenter";
 export {
@@ -19,6 +20,7 @@ export {
   ceilDiv,
   parseAttendanceInteger,
   parseAttendancePercent,
+  parseAttendanceRemaining,
 } from "./attendance-core";
 
 export const ATTENDANCE_CANONICAL_PATH = "/en/math/attendance-percentage-calculator";

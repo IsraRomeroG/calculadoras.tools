@@ -62,6 +62,13 @@ export type ParseAttendanceIntegerResult =
       error: "required" | "invalid" | "negative" | "zero" | "too_large";
     };
 
+export type ParseAttendanceRemainingResult =
+  | { ok: true; value: number | null; normalized: string }
+  | {
+      ok: false;
+      error: "invalid" | "negative" | "too_large";
+    };
+
 export type ParseAttendancePercentResult =
   | ({ ok: true } & AttendancePercent)
   | {
@@ -150,25 +157,31 @@ export function calculateAttendanceCore(input: AttendanceInput): AttendanceResul
 
 export function parseAttendanceInteger(
   value: string,
-  options: { required?: boolean; allowZero?: boolean; max?: number } = {},
+  options: { allowZero?: boolean; max?: number } = {},
 ): ParseAttendanceIntegerResult {
-  const required = options.required ?? true;
   const allowZero = options.allowZero ?? true;
   const max = options.max ?? MAX_ATTENDANCE_CLASSES;
   const trimmed = value.trim();
 
   if (!trimmed) {
-    return required
-      ? { ok: false, error: "required" }
-      : { ok: true, value: 0, normalized: "" };
+    return { ok: false, error: "required" };
   }
-  if (/[-+\u2212]/.test(trimmed)) {
+  if (/^[-\u2212]/.test(trimmed)) {
     return { ok: false, error: "negative" };
   }
 
   const normalized = normalizeIntegerText(trimmed);
   if (normalized === null) {
     return { ok: false, error: "invalid" };
+  }
+
+  const significantDigits = normalized.replace(/^0+/, "") || "0";
+  const maxText = String(max);
+  if (
+    significantDigits.length > maxText.length ||
+    (significantDigits.length === maxText.length && significantDigits > maxText)
+  ) {
+    return { ok: false, error: "too_large" };
   }
 
   const parsed = Number(normalized);
@@ -184,19 +197,38 @@ export function parseAttendanceInteger(
   return { ok: true, value: parsed, normalized };
 }
 
+export function parseAttendanceRemaining(
+  value: string,
+): ParseAttendanceRemainingResult {
+  if (!value.trim()) {
+    return { ok: true, value: null, normalized: "" };
+  }
+
+  const parsed = parseAttendanceInteger(value, {
+    allowZero: true,
+    max: MAX_ATTENDANCE_CLASSES,
+  });
+  if (!parsed.ok) {
+    return {
+      ok: false,
+      error:
+        parsed.error === "required" || parsed.error === "zero"
+          ? "invalid"
+          : parsed.error,
+    };
+  }
+  return parsed;
+}
+
 export function parseAttendancePercent(
   value: string,
-  options: { required?: boolean } = {},
 ): ParseAttendancePercentResult {
-  const required = options.required ?? true;
   const trimmed = value.trim();
 
   if (!trimmed) {
-    return required
-      ? { ok: false, error: "required" }
-      : { ok: false, error: "required" };
+    return { ok: false, error: "required" };
   }
-  if (/[-+\u2212]/.test(trimmed)) {
+  if (/^[-\u2212]/.test(trimmed)) {
     return { ok: false, error: "negative" };
   }
 
@@ -212,6 +244,14 @@ export function parseAttendancePercent(
 
   const integerPart = match[1];
   const fractionPart = match[2] ?? "";
+  const significantIntegerPart = integerPart.replace(/^0+/, "") || "0";
+  if (
+    significantIntegerPart.length > 3 ||
+    Number(significantIntegerPart) > 100 ||
+    (Number(significantIntegerPart) === 100 && /[1-9]/.test(fractionPart))
+  ) {
+    return { ok: false, error: "too_large" };
+  }
   const scaled =
     Number(integerPart) * PERCENT_SCALE +
     Number(fractionPart.padEnd(MAX_PERCENT_DECIMALS, "0") || "0");
@@ -237,7 +277,8 @@ export function ceilDiv(numerator: number, denominator: number): number {
   if (!Number.isSafeInteger(denominator) || denominator <= 0) {
     throw new RangeError("The denominator must be a positive safe integer.");
   }
-  return Math.floor((numerator + denominator - 1) / denominator);
+  const quotient = Math.floor(numerator / denominator);
+  return quotient + (numerator % denominator === 0 ? 0 : 1);
 }
 
 function calculateProjection({

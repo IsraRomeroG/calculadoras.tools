@@ -4,8 +4,10 @@ import { initAttendanceCalculators } from "./attendance-controller";
 import {
   buildAttendanceSummary,
   calculateAttendance,
+  ceilDiv,
   parseAttendanceInteger,
   parseAttendancePercent,
+  parseAttendanceRemaining,
 } from "./attendance";
 
 function calculate(
@@ -81,6 +83,7 @@ describe("exact attendance model", () => {
     });
     expect(result.consecutiveClassesToRecover).toBe(1);
     expect(result.presentation.currentRoundingNotice).toContain("antes de redondear");
+    expect(result.presentation.marginLabel).toContain("Déficit menor de 0.01");
   });
 
   it("reports a small positive exact margin", () => {
@@ -155,6 +158,7 @@ describe("exact attendance model", () => {
           for (const r of [0, 1, 10, 1000]) {
             const result = calculate(t, a, p, r);
             const projection = result.projection;
+            expect(result.attendedClasses + result.currentAbsences).toBe(t);
             if (projection.status === "unknown") continue;
             expect(projection.availableAbsences).toBeGreaterThanOrEqual(0);
             expect(projection.availableAbsences).toBeLessThanOrEqual(r);
@@ -165,6 +169,16 @@ describe("exact attendance model", () => {
             } else {
               expect(projection.availableAbsences).toBe(0);
               expect(projection.exceededAbsences).toBe(q - r);
+            }
+            if (projection.status === "guaranteed") {
+              expect(result.currentStatus).toBe("meets");
+            }
+            if (r === 0) {
+              expect(projection.status).toBe(
+                result.currentStatus === "meets"
+                  ? "finished_meets"
+                  : "finished_below",
+              );
             }
             const n = result.consecutiveClassesToRecover;
             if (n !== null && n > 0) {
@@ -187,6 +201,46 @@ describe("exact attendance model", () => {
     });
     expect(result.attendedClasses).toBe(34);
     expect(result.projection).toMatchObject({ availableAbsences: 4 });
+  });
+
+  it("ignores the inactive attendance field", () => {
+    expect(
+      calculateAttendance({
+        totalClasses: 40,
+        mode: "attended",
+        attendedClasses: 34,
+        absences: 999,
+        requiredPercent: 80,
+        remainingClasses: null,
+      }).currentAbsences,
+    ).toBe(6);
+    expect(
+      calculateAttendance({
+        totalClasses: 40,
+        mode: "absences",
+        attendedClasses: 999,
+        absences: 6,
+        requiredPercent: 80,
+        remainingClasses: null,
+      }).attendedClasses,
+    ).toBe(34);
+  });
+
+  it("treats an omitted remaining count as unknown and explicit zero as finished", () => {
+    const base = {
+      totalClasses: 40,
+      mode: "attended" as const,
+      attendedClasses: 34,
+      requiredPercent: 80,
+    };
+
+    expect(calculateAttendance(base).projection.status).toBe("unknown");
+    expect(calculateAttendance({ ...base, remainingClasses: null }).projection.status).toBe(
+      "unknown",
+    );
+    expect(calculateAttendance({ ...base, remainingClasses: 0 }).projection.status).toBe(
+      "finished_meets",
+    );
   });
 
   it("rejects invalid direct inputs and unknown modes", () => {
@@ -216,6 +270,46 @@ describe("exact attendance model", () => {
         requiredPercent: { value: 80, scaled: 800000, normalized: "90" },
       }),
     ).toThrow();
+  });
+
+  it.each([
+    { totalClasses: 0 },
+    { totalClasses: 1001 },
+    { totalClasses: Number.POSITIVE_INFINITY },
+    { attendedClasses: 11 },
+    { attendedClasses: 1.5 },
+    { remainingClasses: -1 },
+    { remainingClasses: 1001 },
+    { remainingClasses: Number.NaN },
+  ])("rejects invalid direct numeric input %#", (override) => {
+    expect(() =>
+      calculateAttendance({
+        totalClasses: 10,
+        mode: "attended",
+        attendedClasses: 8,
+        requiredPercent: 80,
+        remainingClasses: null,
+        ...override,
+      }),
+    ).toThrow();
+  });
+
+  it("rejects absences above the completed total", () => {
+    expect(() =>
+      calculateAttendance({
+        totalClasses: 10,
+        mode: "absences",
+        absences: 11,
+        requiredPercent: 80,
+      }),
+    ).toThrow();
+  });
+
+  it("uses overflow-safe integer ceiling division", () => {
+    expect(ceilDiv(0, 7)).toBe(0);
+    expect(ceilDiv(20, 5)).toBe(4);
+    expect(ceilDiv(21, 5)).toBe(5);
+    expect(ceilDiv(Number.MAX_SAFE_INTEGER, 2)).toBe(4_503_599_627_370_496);
   });
 });
 
@@ -250,12 +344,58 @@ describe("strict attendance parsing", () => {
     (text) => expect(parseAttendancePercent(text)).toMatchObject({ ok: false }),
   );
 
+  it("distinguishes negative signs from other invalid signs", () => {
+    expect(parseAttendancePercent("-1")).toEqual({ ok: false, error: "negative" });
+    expect(parseAttendancePercent("+1")).toEqual({ ok: false, error: "invalid" });
+    expect(parseAttendanceInteger("−1")).toEqual({ ok: false, error: "negative" });
+    expect(parseAttendanceInteger("+1")).toEqual({ ok: false, error: "invalid" });
+  });
+
+  it("distinguishes unknown remaining classes from a finished course", () => {
+    expect(parseAttendanceRemaining("  ")).toEqual({
+      ok: true,
+      value: null,
+      normalized: "",
+    });
+    expect(parseAttendanceRemaining("0")).toEqual({
+      ok: true,
+      value: 0,
+      normalized: "0",
+    });
+    expect(parseAttendanceRemaining("-1")).toEqual({
+      ok: false,
+      error: "negative",
+    });
+  });
+
+  it("classifies arbitrarily large percentages as above the limit", () => {
+    expect(parseAttendancePercent("999999999999999999999")).toEqual({
+      ok: false,
+      error: "too_large",
+    });
+  });
+
   it("accepts valid thousands grouping only for class counts", () => {
     expect(parseAttendanceInteger("1,000")).toMatchObject({ ok: true, value: 1000 });
     expect(parseAttendanceInteger("1.000")).toMatchObject({ ok: true, value: 1000 });
     for (const text of ["12.5", "12,5", "1 0", "1e2"]) {
       expect(parseAttendanceInteger(text)).toMatchObject({ ok: false });
     }
+  });
+
+  it("distinguishes required and upper-limit errors for class counts", () => {
+    expect(parseAttendanceInteger("   ")).toEqual({
+      ok: false,
+      error: "required",
+    });
+    expect(parseAttendanceInteger("41", { max: 40 })).toEqual({
+      ok: false,
+      error: "too_large",
+    });
+    expect(parseAttendanceInteger("999999999999999999999")).toEqual({
+      ok: false,
+      error: "too_large",
+    });
   });
 });
 
@@ -269,6 +409,34 @@ describe("presentation and language parity", () => {
     expect(summary).toContain("Faltas acumuladas: 15");
     expect(summary).toContain("Asistencias necesarias de las restantes: 11");
     expect(summary).toContain("Excedente de faltas: 6");
+  });
+
+  it("preserves four-decimal minimums and warns about a rounded final maximum", () => {
+    const precise = parseAttendancePercent("99.9999");
+    if (!precise.ok) throw new Error("Expected valid percent");
+    expect(
+      buildAttendanceSummary(
+        calculateAttendance({
+          totalClasses: 1000,
+          mode: "attended",
+          attendedClasses: 1000,
+          requiredPercent: precise,
+          remainingClasses: null,
+        }),
+      ),
+    ).toContain("99.9999%");
+
+    const rounded = parseAttendancePercent("66.67");
+    if (!rounded.ok) throw new Error("Expected valid percent");
+    const result = calculateAttendance({
+      totalClasses: 2,
+      mode: "attended",
+      attendedClasses: 1,
+      requiredPercent: rounded,
+      remainingClasses: 1,
+    });
+    expect(result.projection.status).toBe("impossible");
+    expect(result.presentation.finalRoundingNotice).toContain("antes de redondear");
   });
 
   it("uses the same core states and numbers in English", () => {
