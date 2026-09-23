@@ -105,6 +105,20 @@ describe("exact attendance model", () => {
     expect(result.presentation.marginLabel).toContain("menor de 0.01");
   });
 
+  it("reports a nonzero negative margin when it rounds to zero", () => {
+    const result = calculate(1000, 500, 50.005, null);
+
+    expect(result.marginPoints).toBe(-0.005);
+    expect(result.presentation.marginLabel).toContain("Déficit menor de 0.01");
+  });
+
+  it("only shows a rounding warning when the displayed values look equal", () => {
+    const result = calculate(3, 1, 33.3334, null);
+
+    expect(result.currentStatus).toBe("below");
+    expect(result.presentation.currentRoundingNotice).toBe("");
+  });
+
   it.each([
     [40, 40, 80, 0, "finished_meets"],
     [40, 30, 80, 0, "finished_below"],
@@ -831,6 +845,19 @@ describe("presentation and language parity", () => {
     const allRemaining = calculate(20, 16, 80, 4);
     expect(allRemaining.presentation.actionMessage).toContain(
       "Debes asistir a las 4 clases restantes",
+    );
+  });
+
+  it("explains that a below-current margin is still calculated for the final course", () => {
+    const result = calculate(40, 30, 80, 20);
+
+    expect(result.projection).toMatchObject({
+      status: "possible",
+      requiredAttendancesFromRemaining: 18,
+      availableAbsences: 2,
+    });
+    expect(result.presentation.conditionMessage).toContain(
+      "Este margen se calcula para el final del curso",
     );
   });
 

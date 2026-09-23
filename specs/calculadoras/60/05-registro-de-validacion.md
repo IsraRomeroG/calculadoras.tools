@@ -7,11 +7,12 @@
 - Se cubren los parsers de porcentajes y clases, la representación escalada,
   entradas directas inválidas, invariantes, ambos modos de captura y los cinco
   ejemplos de 04 en ES y EN.
-- `attendance-integration.test.ts` verifica rutas, metadata, contenido estático,
-  FAQ visible/JSON-LD, orden del formulario, estados accesibles, copia manual,
-  limpieza y límites de idioma.
-- Resultado observado: suite focalizada, 2 archivos y 117 pruebas correctas;
-  suite completa, 136 archivos y 1573 pruebas correctas.
+- `attendance-integration.test.ts` verifica mediante contratos de fuente las rutas,
+  metadata, contenido estático, FAQ visible/JSON-LD, orden del formulario,
+  hooks de accesibilidad, copia manual, limpieza y límites de idioma. No ejecuta
+  el DOM ni sustituye la verificación manual de navegador.
+- Resultado observado: suite focalizada, 2 archivos y 120 pruebas correctas;
+  suite completa, 136 archivos y 1576 pruebas correctas.
 - `astro sync` terminó correctamente y generó los tipos del proyecto.
 - La suite focalizada y la suite completa deben ejecutarse con `--configLoader
   native`; no se consideran aquí comandos de desarrollo o build.

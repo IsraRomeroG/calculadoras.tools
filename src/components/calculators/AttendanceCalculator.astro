@@ -17,14 +17,16 @@ const t = isEs
       total: "Clases realizadas",
       totalHelp: "Cuenta solo las clases que ya se impartieron. Usa un entero entre 1 y 1000.",
       minimum: "Mínimo requerido (%)",
-      minimumHelp: "Usa el requisito de tu escuela; 80% es solo el valor inicial.",
+      minimumHelp: "Usa un porcentaje de 0 a 100 con hasta 4 decimales. 80% es solo el valor inicial; usa el requisito de tu escuela.",
       capture: "Capturar por",
       attended: "Asistidas",
       absences: "Faltas",
       attendedLabel: "Clases asistidas",
+      attendedHelp: "Usa un entero entre 0 y las clases realizadas.",
       absencesLabel: "Faltas acumuladas",
+      absencesHelp: "Usa un entero entre 0 y las clases realizadas.",
       remaining: "Clases restantes (opcional)",
-      remainingHelp: "Déjalo vacío si no lo sabes. Escribe 0 si el curso terminó.",
+      remainingHelp: "Déjalo vacío si no lo sabes. Si lo indicas, usa un entero entre 0 y 1000; escribe 0 si el curso terminó.",
       equalWeight: "Todas las clases cuentan igual.",
       copy: "Copiar resumen",
       clear: "Limpiar",
@@ -47,7 +49,7 @@ const t = isEs
       remainingShort: "Restantes",
       finalTotal: "Total final",
       maxAbsences: "Faltas máximas totales",
-      excess: "Límite del curso",
+      excess: "Excedente de faltas",
       maxFinal: "Máximo final posible",
       recovery: "Clases seguidas para alcanzar el mínimo actual",
       manualCopy: "Selecciona y copia este resumen manualmente:",
@@ -58,14 +60,16 @@ const t = isEs
       total: "Completed classes",
       totalHelp: "Count only classes that have already taken place. Use a whole number from 1 to 1000.",
       minimum: "Required minimum (%)",
-      minimumHelp: "Use your school's requirement; 80% is only the initial value.",
+      minimumHelp: "Use a percentage from 0 to 100 with up to 4 decimals. 80% is only the initial value; use your school's requirement.",
       capture: "Enter",
       attended: "Attendances",
       absences: "Absences",
       attendedLabel: "Attended classes",
+      attendedHelp: "Use a whole number from 0 to the completed class count.",
       absencesLabel: "Accumulated absences",
+      absencesHelp: "Use a whole number from 0 to the completed class count.",
       remaining: "Remaining classes (optional)",
-      remainingHelp: "Leave blank if you do not know. Enter 0 if the course is finished.",
+      remainingHelp: "Leave blank if you do not know. If provided, use a whole number from 0 to 1000; enter 0 if the course is finished.",
       equalWeight: "All classes have equal weight.",
       copy: "Copy summary",
       clear: "Clear",
@@ -88,7 +92,7 @@ const t = isEs
       remainingShort: "Remaining",
       finalTotal: "Final total",
       maxAbsences: "Maximum total absences",
-      excess: "Course limit",
+      excess: "Excess absences",
       maxFinal: "Maximum possible final",
       recovery: "Consecutive classes to reach the current minimum",
       manualCopy: "Select and copy this summary manually:",
@@ -127,12 +131,14 @@ const prefix = `attendance-${locale}`;
         <div class="mt-5 grid min-w-0 gap-5 sm:grid-cols-2">
           <div class="min-w-0" data-attended-wrapper>
             <label for={`${prefix}-attended`} class="block text-sm font-medium text-gray-200">{t.attendedLabel}</label>
-            <input id={`${prefix}-attended`} class="mt-2 min-h-12 w-full min-w-0 rounded-lg border border-gray-700 bg-gray-900 px-4 text-base text-white outline-none transition focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15" type="text" inputmode="numeric" autocomplete="off" data-field="attendedClasses" aria-describedby={`${prefix}-attended-error`} />
+            <input id={`${prefix}-attended`} class="mt-2 min-h-12 w-full min-w-0 rounded-lg border border-gray-700 bg-gray-900 px-4 text-base text-white outline-none transition focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15" type="text" inputmode="numeric" autocomplete="off" data-field="attendedClasses" aria-describedby={`${prefix}-attended-help ${prefix}-attended-error`} />
+            <p id={`${prefix}-attended-help`} class="mt-2 text-sm text-gray-400">{t.attendedHelp}</p>
             <p id={`${prefix}-attended-error`} class="mt-2 hidden text-sm text-red-300" data-error-for="attendedClasses"></p>
           </div>
           <div class="hidden min-w-0" data-absences-wrapper>
             <label for={`${prefix}-absences`} class="block text-sm font-medium text-gray-200">{t.absencesLabel}</label>
-            <input id={`${prefix}-absences`} class="mt-2 min-h-12 w-full min-w-0 rounded-lg border border-gray-700 bg-gray-900 px-4 text-base text-white outline-none transition focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15" type="text" inputmode="numeric" autocomplete="off" data-field="absences" aria-describedby={`${prefix}-absences-error`} />
+            <input id={`${prefix}-absences`} class="mt-2 min-h-12 w-full min-w-0 rounded-lg border border-gray-700 bg-gray-900 px-4 text-base text-white outline-none transition focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15" type="text" inputmode="numeric" autocomplete="off" data-field="absences" aria-describedby={`${prefix}-absences-help ${prefix}-absences-error`} />
+            <p id={`${prefix}-absences-help`} class="mt-2 text-sm text-gray-400">{t.absencesHelp}</p>
             <p id={`${prefix}-absences-error`} class="mt-2 hidden text-sm text-red-300" data-error-for="absences"></p>
           </div>
           <div class="min-w-0">

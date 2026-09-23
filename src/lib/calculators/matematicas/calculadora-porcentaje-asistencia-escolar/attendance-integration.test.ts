@@ -5,7 +5,7 @@ import { describe, expect, it } from "vitest";
 const root = process.cwd();
 const read = (path: string) => readFileSync(resolve(root, path), "utf8");
 
-describe("attendance calculator integration", () => {
+describe("attendance calculator source contracts", () => {
   it("keeps both public routes and their localized shared calculator", () => {
     const spanish = read(
       "src/pages/matematicas/calculadora-porcentaje-asistencia-escolar.astro",
@@ -84,7 +84,7 @@ describe("attendance calculator integration", () => {
     }
   });
 
-  it("places the form before results and exposes accessible feedback", () => {
+  it("keeps form order and accessibility hooks in the component source", () => {
     const component = read("src/components/calculators/AttendanceCalculator.astro");
 
     const formOrder = [
@@ -104,6 +104,12 @@ describe("attendance calculator integration", () => {
     expect(component).toContain("data-manual-copy-text");
     expect(component).toContain("data-requires-js");
     expect(component).toContain("data-excess-detail");
+    expect(component).toContain('excess: "Excedente de faltas"');
+    expect(component).toContain('excess: "Excess absences"');
+    expect(component).toContain("attended-help");
+    expect(component).toContain("absences-help");
+    expect(component).toContain("0 a 100 con hasta 4 decimales");
+    expect(component).toContain("0 to 100 with up to 4 decimals");
     expect(component).toContain('data-field="totalClasses"');
     expect(component).toContain('data-field="requiredPercent"');
     expect(component).toContain('data-field="remainingClasses"');

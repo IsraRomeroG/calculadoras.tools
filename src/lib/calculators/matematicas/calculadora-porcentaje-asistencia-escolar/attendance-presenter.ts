@@ -219,6 +219,9 @@ export function createAttendanceAdapter(config: AttendanceLocaleConfig) {
             localizedCount(projection.remainingClasses),
             minimum,
           );
+          if (projection.availableAbsences > 0) {
+            conditionMessage = config.messages.temporaryMarginCondition;
+          }
         } else if (projection.availableAbsences > 0) {
           actionMessage = config.messages.possibleAvailable(
             localizedCount(projection.availableAbsences),
@@ -257,7 +260,6 @@ export function createAttendanceAdapter(config: AttendanceLocaleConfig) {
       currentRoundingNotice: getRoundingNotice(
         result.currentPercent,
         result.currentStatus,
-        result.requiredPercent,
         minimum,
       ),
       finalRoundingNotice:
@@ -265,7 +267,6 @@ export function createAttendanceAdapter(config: AttendanceLocaleConfig) {
           ? getRoundingNotice(
               projection.maxPossiblePercent,
               "below",
-              result.requiredPercent,
               minimum,
             )
           : "",
@@ -273,7 +274,8 @@ export function createAttendanceAdapter(config: AttendanceLocaleConfig) {
   }
 
   function formatMargin(value: number): string {
-    if (value !== 0 && Math.abs(value) < 0.005) {
+    const rounded = normalizeNegativeZero(round(value, 2));
+    if (value !== 0 && rounded === 0) {
       return value < 0 ? config.messages.smallDeficit : config.messages.smallMargin;
     }
     return formatSignedNumber(value);
@@ -282,13 +284,9 @@ export function createAttendanceAdapter(config: AttendanceLocaleConfig) {
   function getRoundingNotice(
     percentage: number,
     status: "meets" | "below",
-    requiredPercent: number,
     minimum: string,
   ): string {
-    if (
-      status === "below" &&
-      round(percentage, 2) === round(requiredPercent, 2)
-    ) {
+    if (status === "below" && formatPercent(percentage) === minimum) {
       return config.messages.roundingBelow(minimum);
     }
     return "";
