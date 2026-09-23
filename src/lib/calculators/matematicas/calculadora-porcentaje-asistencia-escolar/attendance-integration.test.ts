@@ -104,6 +104,13 @@ describe("attendance calculator integration", () => {
     expect(component).toContain("data-manual-copy-text");
     expect(component).toContain("data-requires-js");
     expect(component).toContain("data-excess-detail");
+    expect(component).toContain('data-field="totalClasses"');
+    expect(component).toContain('data-field="requiredPercent"');
+    expect(component).toContain('data-field="remainingClasses"');
+    expect(component).toContain('for={`${prefix}-total`}');
+    expect(component).toContain('for={`${prefix}-minimum`}');
+    expect(component).toContain('for={`${prefix}-remaining`}');
+    expect(component).toContain("min-h-11");
     const noScriptButtons = component.match(/<button[^>]*data-requires-js[^>]*>/g) ?? [];
     expect(noScriptButtons.length).toBeGreaterThan(0);
     expect(noScriptButtons.every((button) => button.includes("disabled"))).toBe(true);
@@ -121,7 +128,30 @@ describe("attendance calculator integration", () => {
     );
     expect(controller).toContain('button.removeAttribute("disabled")');
     expect(controller).toContain('manualCopy.classList.remove("hidden")');
+    expect(controller).toContain('manualCopyText.focus()');
+    expect(controller).toContain('setStatus(text.copyFailed, "error", false)');
     expect(controller).toContain("textarea.remove()");
     expect(controller).toContain("restoreFocus?.focus()");
+    expect(controller).toContain('input.setAttribute("aria-invalid", "true")');
+    expect(controller).toContain('field("totalClasses")?.focus()');
+    expect(controller).toContain('setStatus(text.cleared, "success")');
+    expect(controller).toContain('if (root.dataset.initialized === "true") return');
+  });
+
+  it("keeps the acceptance paths and localization boundaries intact", () => {
+    const spanish = read(
+      "src/pages/matematicas/calculadora-porcentaje-asistencia-escolar.astro",
+    );
+    const english = read(
+      "src/pages/en/math/attendance-percentage-calculator.astro",
+    );
+
+    expect(spanish).toContain("buildAlternateLinks({ es: canonical, en: englishCanonical }");
+    expect(english).toContain("buildAlternateLinks({ es: spanishCanonical, en: canonical }");
+    expect(spanish).toContain('breadcrumbs={[{ label: "Inicio"');
+    expect(english).toContain('breadcrumbs={[{ label: "Home"');
+    expect(english).not.toMatch(/\b(Calculadora|faltas|asistencias|mínimo)\b/);
+    expect(spanish).not.toContain("MVP");
+    expect(english).not.toContain("MVP");
   });
 });

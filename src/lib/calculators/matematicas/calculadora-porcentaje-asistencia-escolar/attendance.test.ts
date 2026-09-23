@@ -266,6 +266,9 @@ describe("exact attendance model", () => {
     ).toThrow();
     expect(() => calculate(10, 10, 80.12345, null)).toThrow();
     expect(() => calculate(10, 10, Number.NaN, null)).toThrow();
+    expect(() => calculate(10, 10, Number.POSITIVE_INFINITY, null)).toThrow();
+    expect(() => calculate(10, 10, 101, null)).toThrow();
+    expect(() => calculate(10, 10, -1, null)).toThrow();
     expect(() =>
       calculateAttendance({
         totalClasses: 10,
@@ -279,11 +282,15 @@ describe("exact attendance model", () => {
   it.each([
     { totalClasses: 0 },
     { totalClasses: 1001 },
+    { totalClasses: 1.5 },
     { totalClasses: Number.POSITIVE_INFINITY },
     { attendedClasses: 11 },
+    { attendedClasses: -1 },
     { attendedClasses: 1.5 },
     { remainingClasses: -1 },
+    { remainingClasses: 1.5 },
     { remainingClasses: 1001 },
+    { remainingClasses: Number.POSITIVE_INFINITY },
     { remainingClasses: Number.NaN },
   ])("rejects invalid direct numeric input %#", (override) => {
     expect(() =>
@@ -307,6 +314,52 @@ describe("exact attendance model", () => {
         requiredPercent: 80,
       }),
     ).toThrow();
+    expect(() =>
+      calculateAttendance({
+        totalClasses: 10,
+        mode: "absences",
+        absences: 1.5,
+        requiredPercent: 80,
+      }),
+    ).toThrow();
+    expect(() =>
+      calculateAttendance({
+        totalClasses: 10,
+        mode: "attended",
+        requiredPercent: 80,
+      }),
+    ).toThrow();
+    expect(() =>
+      calculateAttendance({
+        totalClasses: 10,
+        mode: "absences",
+        requiredPercent: 80,
+      }),
+    ).toThrow();
+  });
+
+  it("uses the same scaled contract for parsed and numeric percentages", () => {
+    const parsed = parseAttendancePercent("80.125");
+    if (!parsed.ok) throw new Error("Expected valid percent");
+    const fromText = calculateAttendance({
+      totalClasses: 40,
+      mode: "attended",
+      attendedClasses: 33,
+      requiredPercent: parsed,
+      remainingClasses: 10,
+    });
+    const fromNumber = calculateAttendance({
+      totalClasses: 40,
+      mode: "attended",
+      attendedClasses: 33,
+      requiredPercent: 80.125,
+      remainingClasses: 10,
+    });
+    expect({ ...fromText, presentation: undefined }).toEqual({
+      ...fromNumber,
+      presentation: undefined,
+    });
+    expect(fromText.requiredPercentScaled).toBe(801250);
   });
 
   it("uses overflow-safe integer ceiling division", () => {
@@ -317,8 +370,333 @@ describe("exact attendance model", () => {
   });
 });
 
+describe("mandatory acceptance matrix", () => {
+  const matrix = [
+    {
+      name: "current attendance without a calendar",
+      total: 40,
+      attended: 34,
+      minimum: 80,
+      remaining: null,
+      currentStatus: "meets",
+      projection: "unknown",
+      recovery: 0,
+    },
+    {
+      name: "final margin",
+      total: 40,
+      attended: 34,
+      minimum: 80,
+      remaining: 10,
+      currentStatus: "meets",
+      projection: "possible",
+      finalTotal: 50,
+      minimumAttendances: 40,
+      needed: 6,
+      available: 4,
+      exceeded: 0,
+      recovery: 0,
+      maximum: 88,
+    },
+    {
+      name: "exact recovery",
+      total: 40,
+      attended: 30,
+      minimum: 80,
+      remaining: 10,
+      currentStatus: "below",
+      projection: "possible",
+      finalTotal: 50,
+      minimumAttendances: 40,
+      needed: 10,
+      available: 0,
+      exceeded: 0,
+      recovery: 10,
+      maximum: 80,
+    },
+    {
+      name: "impossible final calendar",
+      total: 40,
+      attended: 25,
+      minimum: 80,
+      remaining: 5,
+      currentStatus: "below",
+      projection: "impossible",
+      finalTotal: 45,
+      minimumAttendances: 36,
+      needed: 11,
+      available: 0,
+      exceeded: 6,
+      recovery: 35,
+      maximum: 66.6666666667,
+    },
+    {
+      name: "corrected no-margin example",
+      total: 20,
+      attended: 16,
+      minimum: 80,
+      remaining: 4,
+      currentStatus: "meets",
+      projection: "possible",
+      finalTotal: 24,
+      minimumAttendances: 20,
+      needed: 4,
+      available: 0,
+      exceeded: 0,
+      recovery: 0,
+      maximum: 83.3333333333,
+    },
+    {
+      name: "old no-margin data has one available absence",
+      total: 20,
+      attended: 16,
+      minimum: 80,
+      remaining: 5,
+      currentStatus: "meets",
+      projection: "possible",
+      finalTotal: 25,
+      minimumAttendances: 20,
+      needed: 4,
+      available: 1,
+      exceeded: 0,
+      recovery: 0,
+      maximum: 84,
+    },
+    {
+      name: "rounded threshold below",
+      total: 3,
+      attended: 2,
+      minimum: 66.67,
+      remaining: 0,
+      currentStatus: "below",
+      projection: "finished_below",
+      finalTotal: 3,
+      minimumAttendances: 3,
+      needed: 1,
+      available: 0,
+      exceeded: 1,
+      recovery: 1,
+      maximum: 66.6666666667,
+    },
+    {
+      name: "rounded threshold above",
+      total: 3,
+      attended: 1,
+      minimum: 33.3332,
+      remaining: 0,
+      currentStatus: "meets",
+      projection: "finished_meets",
+      finalTotal: 3,
+      minimumAttendances: 1,
+      needed: 0,
+      available: 0,
+      exceeded: 0,
+      recovery: 0,
+      maximum: 33.3333333333,
+    },
+    {
+      name: "finished with margin",
+      total: 40,
+      attended: 40,
+      minimum: 80,
+      remaining: 0,
+      currentStatus: "meets",
+      projection: "finished_meets",
+      finalTotal: 40,
+      minimumAttendances: 32,
+      needed: 0,
+      available: 0,
+      exceeded: 0,
+      recovery: 0,
+      maximum: 100,
+    },
+    {
+      name: "finished below",
+      total: 40,
+      attended: 30,
+      minimum: 80,
+      remaining: 0,
+      currentStatus: "below",
+      projection: "finished_below",
+      finalTotal: 40,
+      minimumAttendances: 32,
+      needed: 2,
+      available: 0,
+      exceeded: 2,
+      recovery: 10,
+      maximum: 75,
+    },
+    {
+      name: "final guarantee",
+      total: 40,
+      attended: 40,
+      minimum: 80,
+      remaining: 5,
+      currentStatus: "meets",
+      projection: "guaranteed",
+      finalTotal: 45,
+      minimumAttendances: 36,
+      needed: 0,
+      available: 5,
+      exceeded: 0,
+      recovery: 0,
+      maximum: 100,
+    },
+    {
+      name: "zero minimum",
+      total: 10,
+      attended: 0,
+      minimum: 0,
+      remaining: 5,
+      currentStatus: "meets",
+      projection: "guaranteed",
+      finalTotal: 15,
+      minimumAttendances: 0,
+      needed: 0,
+      available: 5,
+      exceeded: 0,
+      recovery: 0,
+      maximum: 33.3333333333,
+    },
+    {
+      name: "100 percent with recorded absence",
+      total: 10,
+      attended: 9,
+      minimum: 100,
+      remaining: 100,
+      currentStatus: "below",
+      projection: "impossible",
+      finalTotal: 110,
+      minimumAttendances: 110,
+      needed: 101,
+      available: 0,
+      exceeded: 1,
+      recovery: null,
+      maximum: 99.0909090909,
+    },
+    {
+      name: "100 percent without recorded absence",
+      total: 10,
+      attended: 10,
+      minimum: 100,
+      remaining: 5,
+      currentStatus: "meets",
+      projection: "possible",
+      finalTotal: 15,
+      minimumAttendances: 15,
+      needed: 5,
+      available: 0,
+      exceeded: 0,
+      recovery: 0,
+      maximum: 100,
+    },
+    {
+      name: "recovery beyond one thousand",
+      total: 1000,
+      attended: 0,
+      minimum: 99.9,
+      remaining: 1000,
+      currentStatus: "below",
+      projection: "impossible",
+      finalTotal: 2000,
+      minimumAttendances: 1998,
+      needed: 1998,
+      available: 0,
+      exceeded: 998,
+      recovery: 999000,
+      maximum: 50,
+    },
+    {
+      name: "maximum precision recovery without calendar",
+      total: 1000,
+      attended: 0,
+      minimum: 99.9999,
+      remaining: null,
+      currentStatus: "below",
+      projection: "unknown",
+      recovery: 999999000,
+    },
+    {
+      name: "maximum final total",
+      total: 1000,
+      attended: 1000,
+      minimum: 80,
+      remaining: 1000,
+      currentStatus: "meets",
+      projection: "possible",
+      finalTotal: 2000,
+      minimumAttendances: 1600,
+      needed: 600,
+      available: 400,
+      exceeded: 0,
+      recovery: 0,
+      maximum: 100,
+    },
+  ] as const;
+
+  it.each(matrix)("keeps exact quantities for $name", (testCase) => {
+    const result = calculate(
+      testCase.total,
+      testCase.attended,
+      testCase.minimum,
+      testCase.remaining,
+    );
+
+    expect(result.currentStatus).toBe(testCase.currentStatus);
+    expect(result.currentPercent).toBe((100 * testCase.attended) / testCase.total);
+    expect(result.attendedClasses + result.currentAbsences).toBe(testCase.total);
+    expect(result.consecutiveClassesToRecover).toBe(testCase.recovery);
+    if (testCase.projection === "unknown") {
+      expect(result.projection).toEqual({ status: "unknown", remainingClasses: null });
+      return;
+    }
+
+    expect(result.projection).toMatchObject({
+      status: testCase.projection,
+      finalTotalClasses: testCase.finalTotal,
+      minimumAttendancesFinal: testCase.minimumAttendances,
+      maximumFinalAbsences: testCase.finalTotal - testCase.minimumAttendances,
+      requiredAttendancesFromRemaining: testCase.needed,
+      availableAbsences: testCase.available,
+      exceededAbsences: testCase.exceeded,
+    });
+    expect(result.projection.maxPossiblePercent).toBeCloseTo(testCase.maximum, 8);
+  });
+
+  it.each([
+    [40, 34, 80, 10],
+    [40, 25, 80, 5],
+    [3, 2, 66.67, 0],
+    [10, 10, 100, 5],
+  ] as const)("keeps the same result when capturing %s/%s as absences", (total, attended, minimum, remaining) => {
+    const fromAttendances = calculateAttendance({
+      totalClasses: total,
+      mode: "attended",
+      attendedClasses: attended,
+      requiredPercent: minimum,
+      remainingClasses: remaining,
+    });
+    const fromAbsences = calculateAttendance({
+      totalClasses: total,
+      mode: "absences",
+      absences: total - attended,
+      requiredPercent: minimum,
+      remainingClasses: remaining,
+    });
+    const { inputMode: _absencesMode, ...absencesResult } = fromAbsences;
+    const { inputMode: _attendedMode, ...attendedResult } = fromAttendances;
+    expect({ ...absencesResult, presentation: undefined }).toEqual({
+      ...attendedResult,
+      presentation: undefined,
+    });
+  });
+});
+
 describe("strict attendance parsing", () => {
   it.each([
+    ["0", 0, 0],
+    ["100", 100, 1000000],
+    ["99.9999", 99.9999, 999999],
     ["80.125", 80.125, 801250],
     ["80,125", 80.125, 801250],
     ["0.001", 0.001, 10],
@@ -326,7 +704,6 @@ describe("strict attendance parsing", () => {
     ["80.000", 80, 800000],
     ["87,5%", 87.5, 875000],
     [" 87.5 % ", 87.5, 875000],
-    ["99.9999", 99.9999, 999999],
   ])("parses %s as an ungrouped percentage", (text, value, scaled) => {
     expect(parseAttendancePercent(text)).toMatchObject({ ok: true, value, scaled });
   });
@@ -544,6 +921,70 @@ describe("presentation and language parity", () => {
       "Not enough classes left",
       "Current attendance only",
     ]);
+  });
+
+  it.each([
+    ["regular", "possible", 6, 4],
+    ["recover", "possible", 10, 0],
+    ["no-margin", "possible", 4, 0],
+    ["impossible", "impossible", 11, 0],
+    ["unknown", "unknown", null, null],
+  ] as const)("produces the documented %s example in both adapters", (id, status, needed, available) => {
+    for (const [examples, adapter] of [
+      [ATTENDANCE_EXAMPLES, { calculateAttendance, buildAttendanceSummary }],
+      [en.ATTENDANCE_EXAMPLES, en],
+    ] as const) {
+      const example = examples.find((item) => item.id === id);
+      if (!example) throw new Error(`Missing example ${id}`);
+      const result = adapter.calculateAttendance({
+        totalClasses: Number(example.values.totalClasses),
+        mode: example.values.mode,
+        attendedClasses: Number(example.values.attendedClasses),
+        absences: Number(example.values.absences),
+        requiredPercent: Number(example.values.requiredPercent),
+        remainingClasses: example.values.remainingClasses
+          ? Number(example.values.remainingClasses)
+          : null,
+      });
+      expect(result.projection.status).toBe(status);
+      if (status === "unknown") {
+        expect(result.projection).toEqual({ status: "unknown", remainingClasses: null });
+      } else {
+        expect(result.projection).toMatchObject({
+          requiredAttendancesFromRemaining: needed,
+          availableAbsences: available,
+        });
+      }
+      expect(adapter.buildAttendanceSummary(result)).toContain(
+        result.presentation.projectionLabel,
+      );
+    }
+  });
+
+  it("does not mix rounded equality, current compliance, and final excess", () => {
+    const result = calculate(3, 2, 66.67, 0);
+    expect(result.currentStatus).toBe("below");
+    expect(result.presentation.currentStatusLabel).not.toContain("Cumples");
+    expect(result.presentation.exceededLabel).toContain("1 falta");
+    expect(result.presentation.recoveryLabel).toContain("1 clase");
+    expect(result.presentation.currentRoundingNotice).toContain("66.67%");
+  });
+
+  it("omits unknown final metrics from the copy summary", () => {
+    const spanish = buildAttendanceSummary(calculate(40, 34, 80, null));
+    const english = en.buildAttendanceSummary(
+      en.calculateAttendance({
+        totalClasses: 40,
+        mode: "attended",
+        attendedClasses: 34,
+        requiredPercent: 80,
+        remainingClasses: null,
+      }),
+    );
+    expect(spanish).toContain("Clases restantes: No indicadas");
+    expect(spanish).not.toContain("Total final:");
+    expect(english).toContain("Remaining classes: Not provided");
+    expect(english).not.toContain("Final total:");
   });
 });
 
