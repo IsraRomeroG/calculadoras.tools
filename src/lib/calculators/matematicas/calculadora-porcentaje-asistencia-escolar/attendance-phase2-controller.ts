@@ -19,6 +19,7 @@ import {
   createAttendanceHistorySnapshot,
   createAttendanceSubject,
   createStableId,
+  deleteAttendanceHistoryForSubject,
   deleteAttendanceHistorySnapshot,
   downloadAttendanceCsv,
   normalizeAttendancePolicy,
@@ -57,10 +58,11 @@ const TEXT = {
     calendarEmpty: "Registra al menos una clase impartida antes de usar el calendario.",
     invalid: "Revisa los datos de esta materia.",
     sourceConfirm: "Cambiar el origen reemplazará los datos que alimentan el cálculo. ¿Deseas continuar?",
+    noSubject: "Sin materia seleccionada",
     subjectPrompt: "Escribe el nombre de la materia.",
     subjectLimit: "Alcanzaste el límite de 20 materias por sesión.",
     renamePrompt: "Escribe el nuevo nombre de la materia.",
-    deleteConfirm: "¿Eliminar esta materia y sus datos? Esta acción no se puede deshacer.",
+    deleteConfirm: "¿Eliminar esta materia, sus datos y sus resultados guardados? Esta acción no se puede deshacer.",
     deleted: "Materia eliminada.",
     cleared: "Formulario limpio.",
     saved: "Resultado guardado en esta sesión.",
@@ -79,6 +81,18 @@ const TEXT = {
     noExport: "No hay un resultado válido para exportar.",
     noClasses: "Sin clases computables",
     undefined: "Indefinido",
+    eventStatuses: {
+      attended: "Asistida",
+      absence: "Falta",
+      justified: "Justificada",
+      tardy: "Retardo",
+      scheduled: "Programada",
+      cancelled: "Cancelada",
+    },
+    actualPercent: "Real",
+    evaluatedPercent: "evaluado",
+    finalActualPercent: "Máximo final real",
+    effectiveAttendance: "Asistencia efectiva",
     meets: "Cumples actualmente",
     below: "Por debajo del mínimo actual",
     unknown: "Proyección pendiente",
@@ -122,10 +136,11 @@ const TEXT = {
     calendarEmpty: "Register at least one completed class before using the calendar.",
     invalid: "Check this subject's data.",
     sourceConfirm: "Changing the source replaces the data that feeds the calculation. Continue?",
+    noSubject: "No subject selected",
     subjectPrompt: "Enter the subject name.",
     subjectLimit: "You reached the 20-subject session limit.",
     renamePrompt: "Enter the new subject name.",
-    deleteConfirm: "Delete this subject and its data? This cannot be undone.",
+    deleteConfirm: "Delete this subject, its data, and its saved results? This cannot be undone.",
     deleted: "Subject deleted.",
     cleared: "Inputs cleared.",
     saved: "Result saved in this session.",
@@ -144,6 +159,18 @@ const TEXT = {
     noExport: "There is no valid result to export.",
     noClasses: "No computable classes",
     undefined: "Undefined",
+    eventStatuses: {
+      attended: "Attended",
+      absence: "Absence",
+      justified: "Justified",
+      tardy: "Tardy",
+      scheduled: "Scheduled",
+      cancelled: "Cancelled",
+    },
+    actualPercent: "Actual",
+    evaluatedPercent: "evaluated",
+    finalActualPercent: "Final maximum actual",
+    effectiveAttendance: "Effective attendance",
     meets: "Currently meets the minimum",
     below: "Below the current minimum",
     unknown: "Projection pending",
@@ -199,8 +226,9 @@ function initAttendancePhase2Calculator(root: HTMLElement): void {
   const adapter: Adapter = locale === "en" ? en : es;
   const text = TEXT[locale];
   let subjects = loadSubjects();
-  if (!subjects.length) subjects = [createAttendanceSubject(locale === "en" ? "Subject 1" : "Materia 1")];
-  let subject = subjects[0];
+  let emptyStart = subjects !== null && subjects.length === 0;
+  if (subjects === null) subjects = [createAttendanceSubject(locale === "en" ? "Subject 1" : "Materia 1")];
+  let subject = subjects[0] ?? createAttendanceSubject(locale === "en" ? "Subject 1" : "Materia 1");
   let source: AttendanceSource = subject.source;
   let events = [...subject.events];
   let syncing = false;
@@ -433,18 +461,22 @@ function initAttendancePhase2Calculator(root: HTMLElement): void {
   }
 
   function createPresentation(result: PolicyAttendanceResult): AttendanceContextPresentation {
-    const baseResult = source === "manual" && isDefaultPolicy(result.policy)
-      ? createBaseResult(result, getManualMode())
-      : null;
-    if (baseResult) return { kind: "base", result: baseResult };
-    return { kind: "policy", fields: createPolicyPresentation(result) };
+    const baseResult = createBaseResult(result, getManualMode());
+    if (source === "manual" && isDefaultPolicy(result.policy) && baseResult) {
+      return { kind: "base", result: baseResult };
+    }
+    return { kind: "policy", fields: createPolicyPresentation(result, baseResult) };
   }
 
   function createBaseResult(
     result: PolicyAttendanceResult,
     mode: "attended" | "absences",
   ): AttendanceResult | null {
-    if (result.currentPercent === null || result.currentStatus === "undefined" || result.projection.status === "undefined") {
+    if (
+      result.currentPercent === null ||
+      result.currentStatus === "undefined" ||
+      result.projection.status === "undefined"
+    ) {
       return null;
     }
     const projection: AttendanceProjection = result.projection.status === "unknown"
@@ -480,8 +512,12 @@ function initAttendancePhase2Calculator(root: HTMLElement): void {
     return { ...coreResult, presentation: adapter.presentAttendance(coreResult) };
   }
 
-  function createPolicyPresentation(result: PolicyAttendanceResult): Record<string, string> {
+  function createPolicyPresentation(
+    result: PolicyAttendanceResult,
+    baseResult: AttendanceResult | null,
+  ): Record<string, string> {
     const projection = result.projection;
+    const base = baseResult?.presentation;
     const labels: Record<string, string> = {
       unknown: text.unknown,
       undefined: text.noClasses,
@@ -493,31 +529,60 @@ function initAttendancePhase2Calculator(root: HTMLElement): void {
     };
     const rounding = result.policy.rounding === "exact" || result.currentPercent === null
       ? ""
-      : (locale === "en" ? "Actual: " : "Real: ") + formatPercent(result.currentPercent) + " · " +
-        (locale === "en" ? "evaluated: " : "evaluado: ") +
+      : `${text.actualPercent}: ${formatPercent(result.currentPercent)} · ${text.evaluatedPercent}: ` +
         formatPercent(result.currentEvaluatedPercent ?? result.currentPercent);
-    const condition = projection.status !== "unknown" && projection.status !== "undefined" && result.policy.rounding !== "exact"
-      ? (locale === "en" ? "Final maximum real: " : "Máximo final real: ") +
-        formatPercent(projection.maxPossiblePercent) + " · " +
-        (locale === "en" ? "evaluated: " : "evaluado: ") +
+    const finalRounding = projection.status !== "unknown" && projection.status !== "undefined" && result.policy.rounding !== "exact"
+      ? `${text.finalActualPercent}: ${formatPercent(projection.maxPossiblePercent)} · ${text.evaluatedPercent}: ` +
         formatPercent(projection.finalEvaluatedPercent)
       : "";
+    const condition = [
+      base?.conditionMessage,
+      base?.currentRoundingNotice,
+      base?.finalRoundingNotice,
+      finalRounding,
+    ].filter(Boolean).join(" ");
     const unknownProjection = projection.status === "unknown" || projection.status === "undefined";
+    const adapterSummary = baseResult ? adapter.buildAttendanceSummary(baseResult) : "";
+    const contextSummary = source === "calendar"
+      ? adapterSummary.split("\n").filter((_, index) => index !== 1).join("\n")
+      : adapterSummary;
+    const currentRoundingSummary = rounding && result.currentPercent !== null
+      ? `${text.actualPercent}: ${formatPercent(result.currentPercent)} · ${text.evaluatedPercent}: ` +
+        formatPercent(result.currentEvaluatedPercent ?? result.currentPercent)
+      : "";
+    const summary = baseResult
+      ? [
+          contextSummary,
+          `${text.effectiveAttendance}: ${result.effectiveTotalClasses === 0 ? text.noClasses : `${formatCount(result.effectiveAttendedClasses)}/${formatCount(result.effectiveTotalClasses)}`}`,
+          currentRoundingSummary,
+          finalRounding,
+        ].filter(Boolean).join("\n")
+      : "";
     return {
       percent: result.currentPercent === null ? text.undefined : formatPercent(result.currentPercent),
-      currentStatus: result.currentStatus === "meets" ? text.meets : result.currentStatus === "below" ? text.below : text.noClasses,
+      currentStatus: base?.currentStatusLabel ?? (
+        result.currentStatus === "meets"
+          ? text.meets
+          : result.currentStatus === "below"
+            ? text.below
+            : text.noClasses
+      ),
       rounding,
-      projection: labels[projection.status] ?? projection.status,
-      action: buildActionMessage(result),
+      projection: base?.projectionLabel ?? labels[projection.status] ?? text.noClasses,
+      action: base?.actionMessage ?? (projection.status === "unknown" ? text.unknown : text.noClasses),
       condition,
-      available: unknownProjection ? "—" : formatCount(projection.availableAbsences),
-      needed: unknownProjection ? "—" : formatCount(projection.requiredAttendancesFromRemaining),
+      available: base?.availabilityLabel ?? "—",
+      needed: base?.neededLabel ?? "—",
       total: formatCount(result.totalClasses),
       attended: formatCount(result.attendedClasses),
       absences: formatCount(result.originalAbsences),
-      minimum: formatPercent(result.requiredPercent),
-      margin: result.currentPercent === null ? "—" : formatSignedPercent(result.currentPercent - result.requiredPercent),
-      recovery: formatRecovery(result),
+      minimum: adapter.formatRequiredAttendancePercent(result.requiredPercent),
+      margin: base?.marginLabel ?? (
+        result.currentPercent === null
+          ? "—"
+          : formatSignedPercent(result.currentPercent - result.requiredPercent)
+      ),
+      recovery: base?.recoveryLabel ?? text.noClasses,
       remaining: projection.status === "unknown"
         ? (locale === "en" ? "Not provided" : "No indicadas")
         : formatCount(projection.remainingClasses),
@@ -525,6 +590,7 @@ function initAttendancePhase2Calculator(root: HTMLElement): void {
       maxAbsences: unknownProjection ? "" : formatCount(projection.maximumFinalAbsences),
       maxFinal: unknownProjection ? "" : formatPercent(projection.maxPossiblePercent),
       excess: unknownProjection ? "" : formatCount(projection.exceededAbsences),
+      summary,
       policy: text.policy + ": " + formatPolicy(result.policy),
       origin: (locale === "en" ? "Origin: " : "Origen: ") +
         (source === "manual" ? text.originManual : text.originCalendar),
@@ -556,30 +622,32 @@ function initAttendancePhase2Calculator(root: HTMLElement): void {
     }
     const fields = presentation.fields;
     return [
-      english ? "School attendance summary" : "Resumen de asistencia escolar",
       subject,
       origin,
-      (english ? "Input mode: " : "Modo de captura: ") +
-      (context.mode === "attended"
-          ? (english ? "Attendances" : "Asistencias")
-          : (english ? "Absences" : "Faltas")),
       policy,
       ...policyCounts,
-      (english ? "Minimum: " : "Mínimo: ") + fields.minimum,
-      (english ? "Classes held: " : "Clases impartidas: ") + fields.total,
-      (english ? "Attended: " : "Asistidas: ") + fields.attended,
-      (english ? "Accumulated absences: " : "Faltas acumuladas: ") + fields.absences,
-      (english ? "Effective attendance: " : "Asistencia efectiva: ") + fields.effective,
-      (english ? "Current attendance: " : "Asistencia actual: ") + fields.percent,
-      (english ? "Current status: " : "Estado actual: ") + fields.currentStatus,
-      (english ? "Margin: " : "Margen: ") + fields.margin,
-      (english ? "Remaining classes: " : "Clases restantes: ") + fields.remaining,
-      (english ? "Final projection: " : "Proyección final: ") + fields.projection,
-      (english ? "Future absences available: " : "Faltas futuras disponibles: ") + fields.available,
-      (english ? "Required attendances: " : "Asistencias necesarias: ") + fields.needed,
-      (english ? "Recovery: " : "Recuperación: ") + fields.recovery,
-      fields.action,
-      fields.condition,
+      fields.summary || [
+        english ? "School attendance summary" : "Resumen de asistencia escolar",
+        (english ? "Input mode: " : "Modo de captura: ") +
+        (context.mode === "attended"
+            ? (english ? "Attendances" : "Asistencias")
+            : (english ? "Absences" : "Faltas")),
+        (english ? "Minimum: " : "Mínimo: ") + fields.minimum,
+        (english ? "Classes held: " : "Clases impartidas: ") + fields.total,
+        (english ? "Attended: " : "Asistidas: ") + fields.attended,
+        (english ? "Accumulated absences: " : "Faltas acumuladas: ") + fields.absences,
+        (english ? "Effective attendance: " : "Asistencia efectiva: ") + fields.effective,
+        (english ? "Current attendance: " : "Asistencia actual: ") + fields.percent,
+        (english ? "Current status: " : "Estado actual: ") + fields.currentStatus,
+        (english ? "Margin: " : "Margen: ") + fields.margin,
+        (english ? "Remaining classes: " : "Clases restantes: ") + fields.remaining,
+        (english ? "Final projection: " : "Proyección final: ") + fields.projection,
+        (english ? "Future absences available: " : "Faltas futuras disponibles: ") + fields.available,
+        (english ? "Required attendances: " : "Asistencias necesarias: ") + fields.needed,
+        (english ? "Recovery: " : "Recuperación: ") + fields.recovery,
+        fields.action,
+        fields.condition,
+      ].filter(Boolean).join("\n"),
     ].filter(Boolean).join("\n");
   }
 
@@ -687,25 +755,6 @@ function initAttendancePhase2Calculator(root: HTMLElement): void {
     setColor(query("[data-result-action]"), fields.projectionColor);
   }
 
-  function buildActionMessage(result: PolicyAttendanceResult): string {
-    const projection = result.projection;
-    if (projection.status === "unknown") return text.unknown;
-    if (projection.status === "undefined") return text.noClasses;
-    if (projection.status === "finished_meets") return text.finishedMeets;
-    if (projection.status === "finished_below") return text.finishedBelow;
-    if (projection.status === "impossible") return `${text.impossible}: ${formatCount(projection.requiredAttendancesFromRemaining)} / ${formatCount(projection.remainingClasses)}`;
-    if (projection.status === "guaranteed") return text.guaranteed;
-    return `${text.possible}: ${formatCount(projection.requiredAttendancesFromRemaining)} / ${formatCount(projection.remainingClasses)}`;
-  }
-
-  function formatRecovery(result: PolicyAttendanceResult): string {
-    const recovery = calculatePolicyRecovery(result);
-    if (recovery.status === "undefined") return text.noClasses;
-    if (recovery.status === "impossible") return locale === "en" ? "100% cannot be recovered with recorded absences." : "El 100% no se puede recuperar con faltas registradas.";
-    if (recovery.classes === 0) return locale === "en" ? "Already meets the current minimum." : "Ya alcanzas el mínimo actual.";
-    return `${formatCount(recovery.classes)} ${locale === "en" ? "consecutive attendance(s)" : "clase(s) seguidas"}`;
-  }
-
   function saveSubjectDraft(): void {
     if (syncing) return;
     subject.source = source;
@@ -723,7 +772,25 @@ function initAttendancePhase2Calculator(root: HTMLElement): void {
       calendarMode: getCalendarMode(),
       courseTotalClasses: value("courseTotalClasses"),
     };
-    subjects = subjects.map((item) => item.id === subject.id ? subject : item);
+    if (emptyStart) {
+      const hasManualData = [
+        subject.manual.totalClasses,
+        subject.manual.attendedClasses,
+        subject.manual.absences,
+        subject.manual.remainingClasses,
+        subject.manual.courseTotalClasses,
+        subject.manual.justifiedAbsences,
+        subject.manual.tardyClasses,
+      ].some(Boolean) || (subject.manual.requiredPercent !== "" && subject.manual.requiredPercent !== "80");
+      if (!hasManualData && events.length === 0 && !subject.calendarComplete && isDefaultPolicy(subject.policy)) return;
+      emptyStart = false;
+      subjects = [subject];
+    } else {
+      const exists = subjects.some((item) => item.id === subject.id);
+      subjects = exists
+        ? subjects.map((item) => item.id === subject.id ? subject : item)
+        : [...subjects, subject];
+    }
     persistSubjects(subjects);
   }
 
@@ -734,14 +801,26 @@ function initAttendancePhase2Calculator(root: HTMLElement): void {
   function renderSubjectUi(): void {
     const select = query<HTMLSelectElement>("[data-subject-select]");
     if (select) {
-      select.replaceChildren(...subjects.map((item) => {
+      const options = subjects.map((item) => {
         const option = document.createElement("option");
         option.value = item.id;
         option.textContent = item.name;
         option.selected = item.id === subject.id;
         return option;
-      }));
+      });
+      if (!subjects.length) {
+        const option = document.createElement("option");
+        option.value = "";
+        option.textContent = text.noSubject;
+        option.selected = true;
+        option.disabled = true;
+        options.push(option);
+      }
+      select.replaceChildren(...options);
+      select.disabled = subjects.length === 0;
     }
+    query<HTMLButtonElement>("[data-rename-subject]")?.toggleAttribute("disabled", subjects.length === 0);
+    query<HTMLButtonElement>("[data-delete-subject]")?.toggleAttribute("disabled", subjects.length === 0);
     queryAll<HTMLButtonElement>("[data-source-button]").forEach((button) => {
       const active = button.dataset.sourceButton === source;
       button.setAttribute("aria-pressed", String(active));
@@ -762,7 +841,7 @@ function initAttendancePhase2Calculator(root: HTMLElement): void {
       item.className = "flex min-w-0 flex-wrap items-center justify-between gap-2 rounded-lg border border-gray-800 p-3";
       const label = document.createElement("span");
       label.className = "min-w-0 break-words";
-      label.textContent = `${event.date} · ${event.status}${event.label ? ` · ${event.label}` : ""}`;
+      label.textContent = `${event.date} · ${text.eventStatuses[event.status]}${event.label ? ` · ${event.label}` : ""}`;
       const actions = document.createElement("span");
       actions.className = "flex shrink-0 gap-2";
       const edit = document.createElement("button");
@@ -957,6 +1036,7 @@ function initAttendancePhase2Calculator(root: HTMLElement): void {
     }
 
     subjects = prepared.subjects;
+    emptyStart = false;
     subject = prepared.subject;
     source = subject.source;
     events = subject.events.map((event) => ({ ...event }));
@@ -1173,6 +1253,7 @@ function initAttendancePhase2Calculator(root: HTMLElement): void {
       saveSubjectDraft();
       subjects = addAttendanceSubject(subjects, name);
       subject = subjects[subjects.length - 1];
+      emptyStart = false;
       source = subject.source;
       events = [];
       syncSubjectToForm();
@@ -1187,12 +1268,22 @@ function initAttendancePhase2Calculator(root: HTMLElement): void {
     catch { setStatus(text.invalid, "error"); }
   });
   query<HTMLButtonElement>("[data-delete-subject]")?.addEventListener("click", () => {
-    if (subjects.length === 1) { subject = createAttendanceSubject(subject.name); subjects = [subject]; }
-    else if (window.confirm(text.deleteConfirm)) {
-      subjects = removeAttendanceSubject(subjects, subject.id);
-      subject = subjects[0];
-    } else return;
-    source = subject.source; events = [...subject.events]; persistSubjects(subjects); syncSubjectToForm(); showInitial(text.deleted); update(); setStatus(text.deleted, "success");
+    if (!subjects.some((item) => item.id === subject.id) || !window.confirm(text.deleteConfirm)) return;
+    if (history.snapshots.some((snapshot) => snapshot.subject.id === subject.id)) {
+      const remainingHistory = deleteAttendanceHistoryForSubject(getSessionStorage(), subject.id);
+      if (!remainingHistory.ok) { setStatus(text.historyUnavailable, "error"); return; }
+      history = remainingHistory;
+    }
+    subjects = removeAttendanceSubject(subjects, subject.id);
+    emptyStart = subjects.length === 0;
+    subject = subjects[0] ?? createAttendanceSubject(locale === "en" ? "Subject 1" : "Materia 1");
+    source = subject.source;
+    events = [...subject.events];
+    persistSubjects(subjects);
+    syncSubjectToForm();
+    showInitial(text.deleted);
+    update();
+    setStatus(text.deleted, "success");
   });
   queryAll<HTMLButtonElement>("[data-source-button]").forEach((button) => button.addEventListener("click", () => {
     const next = button.dataset.sourceButton === "calendar" ? "calendar" : "manual" as AttendanceSource;
@@ -1268,14 +1359,17 @@ function initAttendancePhase2Calculator(root: HTMLElement): void {
   update();
 }
 
-function loadSubjects(): AttendanceSubject[] {
-  if (typeof window === "undefined") return [];
+function loadSubjects(): AttendanceSubject[] | null {
+  if (typeof window === "undefined") return null;
   try {
     const raw = window.localStorage.getItem(ATTENDANCE_SUBJECTS_KEY);
-    if (!raw) return [];
+    if (raw === null) return null;
     const parsed: unknown = JSON.parse(raw);
-    if (!Array.isArray(parsed) || parsed.length === 0 || parsed.length > 20) return [];
-    return parsed.filter(isSubject).map((item) => ({
+    if (!Array.isArray(parsed) || parsed.length > 20) return null;
+    if (parsed.length === 0) return [];
+    const valid = parsed.filter(isSubject);
+    if (!valid.length) return null;
+    return valid.map((item) => ({
       ...item,
       manual: {
         ...item.manual,
@@ -1285,7 +1379,7 @@ function loadSubjects(): AttendanceSubject[] {
       policy: normalizeAttendancePolicy(item.policy),
       events: item.events.filter((event) => { try { validateCalendarEvent(event); return true; } catch { return false; } }),
     }));
-  } catch { return []; }
+  } catch { return null; }
 }
 
 function isSubject(value: unknown): value is AttendanceSubject {

@@ -802,6 +802,28 @@ export function clearAttendanceHistory(storage: StorageLike | null | undefined):
   }
 }
 
+export function deleteAttendanceHistoryForSubject(
+  storage: StorageLike | null | undefined,
+  subjectId: string,
+): HistoryReadResult {
+  const read = readAttendanceHistory(storage);
+  if (!read.ok) return read;
+  const snapshots = read.snapshots.filter((snapshot) => snapshot.subject.id !== subjectId);
+  if (snapshots.length === read.snapshots.length) return read;
+  try {
+    if (!storage) return { ok: false, snapshots: [], reason: "unavailable" };
+    if (snapshots.length) storage.setItem(ATTENDANCE_HISTORY_KEY, JSON.stringify(snapshots));
+    else storage.removeItem(ATTENDANCE_HISTORY_KEY);
+  } catch {
+    return { ok: false, snapshots: [], reason: "unavailable" };
+  }
+  return {
+    ok: true,
+    snapshots,
+    ...(read.ignoredCount ? { ignoredCount: read.ignoredCount } : {}),
+  };
+}
+
 export function createAttendanceHistorySnapshot(
   snapshot: Omit<AttendanceHistorySnapshot, "id" | "savedAt" | "schemaVersion" | "rulesVersion">,
 ): AttendanceHistorySnapshot {
