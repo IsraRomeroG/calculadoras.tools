@@ -47,7 +47,7 @@ const t = isEs
       remainingShort: "Restantes",
       finalTotal: "Total final",
       maxAbsences: "Faltas máximas totales",
-      excess: "Excedente de faltas",
+      excess: "Límite del curso",
       maxFinal: "Máximo final posible",
       recovery: "Clases seguidas para alcanzar el mínimo actual",
       manualCopy: "Selecciona y copia este resumen manualmente:",
@@ -88,7 +88,7 @@ const t = isEs
       remainingShort: "Remaining",
       finalTotal: "Final total",
       maxAbsences: "Maximum total absences",
-      excess: "Excess absences",
+      excess: "Course limit",
       maxFinal: "Maximum possible final",
       recovery: "Consecutive classes to reach the current minimum",
       manualCopy: "Select and copy this summary manually:",
@@ -107,26 +107,20 @@ const prefix = `attendance-${locale}`;
         <h2 id={`${prefix}-heading`} class="text-xl font-semibold">{t.heading}</h2>
         <p class="mt-2 text-sm leading-relaxed text-gray-400">{t.intro}</p>
 
-        <div class="mt-5 grid min-w-0 gap-5 sm:grid-cols-2">
+        <div class="mt-5 min-w-0">
           <div class="min-w-0">
             <label for={`${prefix}-total`} class="block text-sm font-medium text-gray-200">{t.total}</label>
             <input id={`${prefix}-total`} class="mt-2 min-h-12 w-full min-w-0 rounded-lg border border-gray-700 bg-gray-900 px-4 text-base text-white outline-none transition focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15" type="text" inputmode="numeric" autocomplete="off" data-field="totalClasses" aria-describedby={`${prefix}-total-help ${prefix}-total-error`} />
             <p id={`${prefix}-total-help`} class="mt-2 text-sm text-gray-400">{t.totalHelp}</p>
             <p id={`${prefix}-total-error`} class="mt-2 hidden text-sm text-red-300" data-error-for="totalClasses"></p>
           </div>
-          <div class="min-w-0">
-            <label for={`${prefix}-minimum`} class="block text-sm font-medium text-gray-200">{t.minimum}</label>
-            <input id={`${prefix}-minimum`} class="mt-2 min-h-12 w-full min-w-0 rounded-lg border border-gray-700 bg-gray-900 px-4 text-base text-white outline-none transition focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15" type="text" inputmode="decimal" autocomplete="off" value="80" data-field="requiredPercent" aria-describedby={`${prefix}-minimum-help ${prefix}-minimum-error`} />
-            <p id={`${prefix}-minimum-help`} class="mt-2 text-sm text-gray-400">{t.minimumHelp}</p>
-            <p id={`${prefix}-minimum-error`} class="mt-2 hidden text-sm text-red-300" data-error-for="requiredPercent"></p>
-          </div>
         </div>
 
         <div class="mt-5">
           <span class="block text-sm font-medium text-gray-200">{t.capture}</span>
           <div class="mt-2 inline-flex max-w-full rounded-lg border border-gray-700 bg-gray-900 p-1" role="group" aria-label={t.capture}>
-            <button class="min-h-11 rounded-md px-4 py-2 text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/40" type="button" data-mode-button="attended" aria-pressed="true">{t.attended}</button>
-            <button class="min-h-11 rounded-md px-4 py-2 text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/40" type="button" data-mode-button="absences" aria-pressed="false">{t.absences}</button>
+            <button class="min-h-11 rounded-md px-4 py-2 text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/40 disabled:cursor-not-allowed disabled:opacity-50" type="button" data-mode-button="attended" data-requires-js aria-pressed="true" disabled>{t.attended}</button>
+            <button class="min-h-11 rounded-md px-4 py-2 text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/40 disabled:cursor-not-allowed disabled:opacity-50" type="button" data-mode-button="absences" data-requires-js aria-pressed="false" disabled>{t.absences}</button>
           </div>
         </div>
 
@@ -142,6 +136,12 @@ const prefix = `attendance-${locale}`;
             <p id={`${prefix}-absences-error`} class="mt-2 hidden text-sm text-red-300" data-error-for="absences"></p>
           </div>
           <div class="min-w-0">
+            <label for={`${prefix}-minimum`} class="block text-sm font-medium text-gray-200">{t.minimum}</label>
+            <input id={`${prefix}-minimum`} class="mt-2 min-h-12 w-full min-w-0 rounded-lg border border-gray-700 bg-gray-900 px-4 text-base text-white outline-none transition focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15" type="text" inputmode="decimal" autocomplete="off" value="80" data-field="requiredPercent" aria-describedby={`${prefix}-minimum-help ${prefix}-minimum-error`} />
+            <p id={`${prefix}-minimum-help`} class="mt-2 text-sm text-gray-400">{t.minimumHelp}</p>
+            <p id={`${prefix}-minimum-error`} class="mt-2 hidden text-sm text-red-300" data-error-for="requiredPercent"></p>
+          </div>
+          <div class="min-w-0">
             <label for={`${prefix}-remaining`} class="block text-sm font-medium text-gray-200">{t.remaining}</label>
             <input id={`${prefix}-remaining`} class="mt-2 min-h-12 w-full min-w-0 rounded-lg border border-gray-700 bg-gray-900 px-4 text-base text-white outline-none transition focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15" type="text" inputmode="numeric" autocomplete="off" data-field="remainingClasses" aria-describedby={`${prefix}-remaining-help ${prefix}-remaining-error`} />
             <p id={`${prefix}-remaining-help`} class="mt-2 text-sm text-gray-400">{t.remainingHelp}</p>
@@ -152,7 +152,7 @@ const prefix = `attendance-${locale}`;
 
         <div class="mt-5 flex flex-wrap gap-3">
           <button class="inline-flex min-h-11 items-center justify-center rounded-lg bg-amber-400 px-4 py-2 text-sm font-semibold text-gray-950 transition hover:bg-amber-300 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/40 disabled:cursor-not-allowed disabled:opacity-50" type="button" data-copy-summary disabled>{t.copy}</button>
-          <button class="inline-flex min-h-11 items-center justify-center rounded-lg border border-gray-700 px-4 py-2 text-sm font-semibold text-gray-200 transition hover:border-amber-400 hover:text-white focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/40" type="button" data-clear>{t.clear}</button>
+          <button class="inline-flex min-h-11 items-center justify-center rounded-lg border border-gray-700 px-4 py-2 text-sm font-semibold text-gray-200 transition hover:border-amber-400 hover:text-white focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/40 disabled:cursor-not-allowed disabled:opacity-50" type="button" data-clear data-requires-js disabled>{t.clear}</button>
         </div>
         <div class="mt-3 min-h-6 text-sm" role="status" aria-live="polite" data-action-status></div>
         <div class="mt-3 hidden" data-manual-copy>
@@ -163,7 +163,7 @@ const prefix = `attendance-${locale}`;
         <div class="mt-5">
           <p class="text-sm font-medium text-gray-200">{t.examples}</p>
           <div class="mt-2 flex flex-wrap gap-2">
-            {examples.map((example) => <button class="min-h-11 rounded-lg border border-gray-700 px-3 py-2 text-sm font-semibold text-gray-200 transition hover:border-amber-400 hover:text-white focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/40" type="button" data-example-id={example.id}>{example.label}</button>)}
+            {examples.map((example) => <button class="min-h-11 rounded-lg border border-gray-700 px-3 py-2 text-sm font-semibold text-gray-200 transition hover:border-amber-400 hover:text-white focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/40 disabled:cursor-not-allowed disabled:opacity-50" type="button" data-example-id={example.id} data-requires-js disabled>{example.label}</button>)}
           </div>
         </div>
         <noscript><p class="mt-5 rounded-lg border border-amber-700 bg-amber-950/30 p-4 text-sm text-amber-100">{t.noJs}</p></noscript>
@@ -192,16 +192,16 @@ const prefix = `attendance-${locale}`;
           <details class="mt-3 rounded-lg border border-gray-800 bg-gray-950 p-4" open>
             <summary class="cursor-pointer font-semibold text-gray-200">{t.summary}</summary>
             <dl class="mt-4 grid min-w-0 grid-cols-2 gap-x-3 gap-y-2 text-sm text-gray-300">
-              <dt>{t.completed}</dt><dd class="break-words text-right" data-detail-total></dd>
-              <dt>{t.attendedShort}</dt><dd class="break-words text-right" data-detail-attended></dd>
-              <dt>{t.absencesShort}</dt><dd class="break-words text-right" data-detail-absences></dd>
-              <dt>{t.minimumShort}</dt><dd class="break-words text-right" data-detail-minimum></dd>
-              <dt>{t.margin}</dt><dd class="break-words text-right" data-detail-margin></dd>
-              <dt>{t.remainingShort}</dt><dd class="break-words text-right" data-detail-remaining></dd>
-              <dt data-known-detail>{t.finalTotal}</dt><dd class="break-words text-right" data-known-detail data-detail-final-total></dd>
-              <dt data-known-detail>{t.maxAbsences}</dt><dd class="break-words text-right" data-known-detail data-detail-max-absences></dd>
-              <dt data-known-detail>{t.excess}</dt><dd class="break-words text-right" data-known-detail data-detail-excess></dd>
-              <dt data-known-detail>{t.maxFinal}</dt><dd class="break-words text-right" data-known-detail data-detail-max-final></dd>
+              <dt class="min-w-0 break-words">{t.completed}</dt><dd class="min-w-0 break-words text-right" data-detail-total></dd>
+              <dt class="min-w-0 break-words">{t.attendedShort}</dt><dd class="min-w-0 break-words text-right" data-detail-attended></dd>
+              <dt class="min-w-0 break-words">{t.absencesShort}</dt><dd class="min-w-0 break-words text-right" data-detail-absences></dd>
+              <dt class="min-w-0 break-words">{t.minimumShort}</dt><dd class="min-w-0 break-words text-right" data-detail-minimum></dd>
+              <dt class="min-w-0 break-words">{t.margin}</dt><dd class="min-w-0 break-words text-right" data-detail-margin></dd>
+              <dt class="min-w-0 break-words">{t.remainingShort}</dt><dd class="min-w-0 break-words text-right" data-detail-remaining></dd>
+              <dt class="min-w-0 break-words" data-known-detail>{t.finalTotal}</dt><dd class="min-w-0 break-words text-right" data-known-detail data-detail-final-total></dd>
+              <dt class="min-w-0 break-words" data-known-detail>{t.maxAbsences}</dt><dd class="min-w-0 break-words text-right" data-known-detail data-detail-max-absences></dd>
+              <dt class="min-w-0 break-words" data-known-detail data-excess-detail>{t.excess}</dt><dd class="min-w-0 break-words text-right" data-known-detail data-excess-detail data-detail-excess></dd>
+              <dt class="min-w-0 break-words" data-known-detail>{t.maxFinal}</dt><dd class="min-w-0 break-words text-right" data-known-detail data-detail-max-final></dd>
               <dt class="col-span-2 mt-2">{t.recovery}</dt><dd class="col-span-2 break-words text-left text-gray-100" data-detail-recovery></dd>
             </dl>
           </details>

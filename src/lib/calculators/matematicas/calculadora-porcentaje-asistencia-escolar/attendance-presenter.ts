@@ -57,21 +57,25 @@ export interface AttendanceLocaleConfig {
     pendingProjection: string;
     finishedMeets: (minimum: string) => string;
     finishedBelow: (minimum: string) => string;
-    impossible: (remaining: string, maximum: string, needed: string) => string;
-    guaranteed: (minimum: string, total: string) => string;
-    possibleBelow: (needed: string, remaining: string, minimum: string) => string;
-    possibleAvailable: (
-      available: string,
-      remaining: string,
-      needed: string,
+    impossible: (remaining: LocalizedCount, maximum: string, needed: LocalizedCount) => string;
+    guaranteed: (minimum: string, total: LocalizedCount) => string;
+    possibleBelow: (
+      needed: LocalizedCount,
+      remaining: LocalizedCount,
       minimum: string,
     ) => string;
-    possibleAll: (remaining: string) => string;
-    impossibleNeeded: (remaining: string) => string;
+    possibleAvailable: (
+      available: LocalizedCount,
+      remaining: LocalizedCount,
+      minimum: string,
+    ) => string;
+    possibleAll: (remaining: LocalizedCount) => string;
+    impossibleNeeded: (remaining: LocalizedCount) => string;
+    exceededAbsences: (exceeded: LocalizedCount) => string;
     guaranteeCondition: string;
     temporaryMarginCondition: string;
     unknownRecovery: string;
-    theoreticalRecovery: (remaining: string) => string;
+    theoreticalRecovery: (remaining: LocalizedCount) => string;
     finishedRecovery: string;
     alreadyRecovered: string;
     impossibleRecovery: string;
@@ -89,10 +93,16 @@ export interface AttendancePresentation {
   projectionLabel: string;
   availabilityLabel: string;
   neededLabel: string;
+  exceededLabel: string;
   marginLabel: string;
   recoveryLabel: string;
   currentRoundingNotice: string;
   finalRoundingNotice: string;
+}
+
+export interface LocalizedCount {
+  value: number;
+  formatted: string;
 }
 
 export type AttendanceResult = CoreAttendanceResult & {
@@ -142,6 +152,10 @@ export function createAttendanceAdapter(config: AttendanceLocaleConfig) {
     return Math.abs(value) === 1 ? words[0] : words[1];
   }
 
+  function localizedCount(value: number): LocalizedCount {
+    return { value, formatted: formatCount(value) };
+  }
+
   function calculateAttendance(input: AttendanceInput): AttendanceResult {
     const core = calculateAttendanceCore(input);
     return { ...core, presentation: present(core) };
@@ -173,42 +187,48 @@ export function createAttendanceAdapter(config: AttendanceLocaleConfig) {
         break;
       case "impossible":
         actionMessage = config.messages.impossible(
-          formatCount(projection.remainingClasses),
+          localizedCount(projection.remainingClasses),
           formatPercent(projection.maxPossiblePercent),
-          formatCount(projection.requiredAttendancesFromRemaining),
+          localizedCount(projection.requiredAttendancesFromRemaining),
         );
         availabilityLabel = formatCount(0);
         neededLabel = config.messages.impossibleNeeded(
-          formatCount(projection.remainingClasses),
+          localizedCount(projection.remainingClasses),
         );
         break;
       case "guaranteed":
         actionMessage = config.messages.guaranteed(
           minimum,
-          formatCount(projection.finalTotalClasses),
+          localizedCount(projection.finalTotalClasses),
         );
-        conditionMessage = config.messages.guaranteeCondition;
+        conditionMessage = [
+          config.messages.guaranteeCondition,
+          projection.availableAbsences > 0
+            ? config.messages.temporaryMarginCondition
+            : "",
+        ]
+          .filter(Boolean)
+          .join(" ");
         availabilityLabel = formatCount(projection.availableAbsences);
         neededLabel = formatCount(0);
         break;
       case "possible":
         if (result.currentStatus === "below") {
           actionMessage = config.messages.possibleBelow(
-            formatCount(projection.requiredAttendancesFromRemaining),
-            formatCount(projection.remainingClasses),
+            localizedCount(projection.requiredAttendancesFromRemaining),
+            localizedCount(projection.remainingClasses),
             minimum,
           );
         } else if (projection.availableAbsences > 0) {
           actionMessage = config.messages.possibleAvailable(
-            formatCount(projection.availableAbsences),
-            formatCount(projection.remainingClasses),
-            formatCount(projection.requiredAttendancesFromRemaining),
+            localizedCount(projection.availableAbsences),
+            localizedCount(projection.remainingClasses),
             minimum,
           );
           conditionMessage = config.messages.temporaryMarginCondition;
         } else {
           actionMessage = config.messages.possibleAll(
-            formatCount(projection.remainingClasses),
+            localizedCount(projection.remainingClasses),
           );
         }
         availabilityLabel = formatCount(projection.availableAbsences);
@@ -226,6 +246,12 @@ export function createAttendanceAdapter(config: AttendanceLocaleConfig) {
       projectionLabel: config.projectionLabels[projection.status],
       availabilityLabel,
       neededLabel,
+      exceededLabel:
+        projection.status !== "unknown" && projection.exceededAbsences > 0
+          ? config.messages.exceededAbsences(
+              localizedCount(projection.exceededAbsences),
+            )
+          : "",
       marginLabel: formatMargin(result.marginPoints),
       recoveryLabel: formatRecovery(result),
       currentRoundingNotice: getRoundingNotice(
@@ -286,7 +312,7 @@ export function createAttendanceAdapter(config: AttendanceLocaleConfig) {
     }
     if (recovery > projection.remainingClasses) {
       return `${base}. ${config.messages.theoreticalRecovery(
-        formatCount(projection.remainingClasses),
+        localizedCount(projection.remainingClasses),
       )}`;
     }
     return base;

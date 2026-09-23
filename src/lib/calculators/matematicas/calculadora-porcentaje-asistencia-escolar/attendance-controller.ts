@@ -32,6 +32,7 @@ const TEXT = {
     tooManyAttended: (total: number) => `Las asistencias no pueden superar las ${total} clases realizadas.`,
     tooManyAbsences: (total: number) => `Las faltas no pueden superar las ${total} clases realizadas.`,
     incomplete: "Completa los campos obligatorios con valores válidos.",
+    initial: "Introduce las clases realizadas y las asistidas o faltas para calcular.",
     remainingInvalid: "Revisa las clases restantes.",
     updated: "Resultado actualizado.",
     example: "Ejemplo cargado.",
@@ -61,6 +62,7 @@ const TEXT = {
     tooManyAttended: (total: number) => `Attendances cannot exceed the ${total} completed classes.`,
     tooManyAbsences: (total: number) => `Absences cannot exceed the ${total} completed classes.`,
     incomplete: "Complete the required fields with valid values.",
+    initial: "Enter completed classes and either attendances or absences to calculate.",
     remainingInvalid: "Check the remaining classes.",
     updated: "Result updated.",
     example: "Example loaded.",
@@ -71,6 +73,38 @@ const TEXT = {
     unknown: "Not provided",
   },
 } as const;
+
+export type AttendanceCopyAttemptResult = "copied" | "failed" | "stale";
+
+export async function attemptAttendanceCopy({
+  writeText,
+  legacyCopy,
+  isCurrent,
+}: {
+  writeText?: () => Promise<void>;
+  legacyCopy: () => boolean;
+  isCurrent: () => boolean;
+}): Promise<AttendanceCopyAttemptResult> {
+  let copied = false;
+  if (writeText) {
+    try {
+      await writeText();
+      copied = true;
+    } catch {
+      copied = false;
+    }
+  }
+
+  if (!isCurrent()) return "stale";
+  if (!copied) {
+    try {
+      copied = legacyCopy();
+    } catch {
+      copied = false;
+    }
+  }
+  return copied ? "copied" : "failed";
+}
 
 export function initAttendanceCalculators(): void {
   document
@@ -111,6 +145,9 @@ function initAttendanceCalculator(root: HTMLElement): void {
   const results = query<HTMLElement>("[data-results]");
   const manualCopy = query<HTMLElement>("[data-manual-copy]");
   const manualCopyText = query<HTMLTextAreaElement>("[data-manual-copy-text]");
+  queryAll<HTMLButtonElement>("[data-requires-js]").forEach((button) =>
+    button.removeAttribute("disabled"),
+  );
 
   function updateCalculator(announce = false): void {
     resultVersion += 1;
@@ -271,9 +308,12 @@ function initAttendanceCalculator(root: HTMLElement): void {
     if (isKnown) {
       setText("[data-detail-final-total]", adapter.formatAttendanceCount(projection.finalTotalClasses));
       setText("[data-detail-max-absences]", adapter.formatAttendanceCount(projection.maximumFinalAbsences));
-      setText("[data-detail-excess]", adapter.formatAttendanceCount(projection.exceededAbsences));
+      setText("[data-detail-excess]", result.presentation.exceededLabel);
       setText("[data-detail-max-final]", adapter.formatAttendancePercent(projection.maxPossiblePercent));
     }
+    queryAll<HTMLElement>("[data-excess-detail]").forEach((element) =>
+      element.classList.toggle("hidden", !isKnown || !result.presentation.exceededLabel),
+    );
 
     const currentColor = result.currentStatus === "meets" ? "text-emerald-300" : "text-amber-300";
     const projectionColor =
@@ -305,8 +345,13 @@ function initAttendanceCalculator(root: HTMLElement): void {
     const source = total.ok
       ? adapter.parseAttendanceInteger(value(sourceName), { allowZero: true, max: total.value })
       : { ok: false as const };
-    setValue(targetName, total.ok && source.ok ? String(total.value - source.value) : "");
+    const canConvert = total.ok && source.ok;
+    setValue(targetName, canConvert ? String(total.value - source.value) : "");
     clearError(targetName);
+    if (!canConvert) {
+      const target = field(targetName);
+      if (target) target.dataset.touched = "true";
+    }
     mode = normalized;
     updateCalculator(true);
   }
@@ -357,7 +402,7 @@ function initAttendanceCalculator(root: HTMLElement): void {
     clearAllErrors();
     hideManualCopy();
     updateModeUi();
-    showInitial(text.incomplete);
+    showInitial(text.initial);
     copyButton?.setAttribute("disabled", "");
     field("totalClasses")?.focus();
     setStatus(text.cleared, "success");
@@ -371,18 +416,15 @@ function initAttendanceCalculator(root: HTMLElement): void {
     const summary = currentSummary;
     const version = resultVersion;
     const activeElement = document.activeElement instanceof HTMLElement ? document.activeElement : null;
-    let copied = false;
-    try {
-      if (navigator.clipboard?.writeText) {
-        await navigator.clipboard.writeText(summary);
-        copied = true;
-      }
-    } catch {
-      copied = false;
-    }
-    if (version !== resultVersion || summary !== currentSummary) return;
-    if (!copied) copied = tryLegacyCopy(summary, activeElement);
-    if (copied) {
+    const outcome = await attemptAttendanceCopy({
+      writeText: navigator.clipboard?.writeText
+        ? () => navigator.clipboard.writeText(summary)
+        : undefined,
+      legacyCopy: () => tryLegacyCopy(summary, activeElement),
+      isCurrent: () => version === resultVersion && summary === currentSummary,
+    });
+    if (outcome === "stale") return;
+    if (outcome === "copied") {
       setStatus(text.copied, "success");
       return;
     }
@@ -396,6 +438,7 @@ function initAttendanceCalculator(root: HTMLElement): void {
   }
 
   function tryLegacyCopy(summary: string, restoreFocus: HTMLElement | null): boolean {
+    if (typeof document.execCommand !== "function") return false;
     const textarea = document.createElement("textarea");
     textarea.value = summary;
     textarea.setAttribute("readonly", "");
@@ -492,5 +535,5 @@ function initAttendanceCalculator(root: HTMLElement): void {
   copyButton?.addEventListener("click", copySummary);
   clearButton?.addEventListener("click", clearCalculator);
   updateModeUi();
-  showInitial(text.incomplete);
+  showInitial(text.initial);
 }

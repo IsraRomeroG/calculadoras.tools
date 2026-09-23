@@ -1,6 +1,9 @@
 import { describe, expect, it } from "vitest";
 import * as en from "./attendance.en";
-import { initAttendanceCalculators } from "./attendance-controller";
+import {
+  attemptAttendanceCopy,
+  initAttendanceCalculators,
+} from "./attendance-controller";
 import {
   buildAttendanceSummary,
   calculateAttendance,
@@ -411,6 +414,62 @@ describe("presentation and language parity", () => {
     expect(summary).toContain("Excedente de faltas: 6");
   });
 
+  it("presents every projection without mixing it with current status", () => {
+    const unknown = calculate(40, 34, 80, null);
+    expect(unknown.presentation.availabilityLabel).toBe(
+      "Pendiente de clases restantes",
+    );
+
+    const finished = calculate(40, 40, 80, 0);
+    expect(finished.presentation.actionMessage).toContain("El curso terminó");
+    expect(finished.presentation.actionMessage).not.toContain("faltar");
+
+    const impossible = calculate(40, 25, 80, 5);
+    expect(impossible.presentation.neededLabel).toBe("No alcanzan las 5 restantes");
+    expect(impossible.presentation.exceededLabel).toBe(
+      "Excedes en 6 faltas el límite del curso",
+    );
+
+    const guaranteed = calculate(40, 40, 80, 5);
+    expect(guaranteed.presentation.conditionMessage).toContain(
+      "Siempre que no cambie",
+    );
+    expect(guaranteed.presentation.conditionMessage).toContain(
+      "puede bajar temporalmente",
+    );
+
+    const belowPossible = calculate(40, 30, 80, 10);
+    expect(belowPossible.currentStatus).toBe("below");
+    expect(belowPossible.presentation.actionMessage).toContain(
+      "Necesitas asistir al menos a 10 de las 10",
+    );
+
+    const oneAbsence = calculate(20, 16, 80, 5);
+    expect(oneAbsence.presentation.actionMessage).toContain("Puedes faltar hasta 1");
+    expect(oneAbsence.presentation.conditionMessage).toContain(
+      "puede bajar temporalmente",
+    );
+
+    const allRemaining = calculate(20, 16, 80, 4);
+    expect(allRemaining.presentation.actionMessage).toContain(
+      "Debes asistir a las 4 clases restantes",
+    );
+  });
+
+  it("pluralizes singular remaining and recovery messages", () => {
+    const impossible = calculate(2, 0, 80, 1);
+    expect(impossible.presentation.actionMessage).toContain("1 clase restante");
+    expect(impossible.presentation.neededLabel).toBe(
+      "La clase restante no alcanza",
+    );
+
+    const recovery = calculate(3, 2, 66.67, 0);
+    expect(recovery.presentation.recoveryLabel).toContain("1 clase");
+    expect(recovery.presentation.recoveryLabel).toContain(
+      "escenario hipotético",
+    );
+  });
+
   it("preserves four-decimal minimums and warns about a rounded final maximum", () => {
     const precise = parseAttendancePercent("99.9999");
     if (!precise.ok) throw new Error("Expected valid percent");
@@ -457,5 +516,73 @@ describe("presentation and language parity", () => {
     expect(en.buildAttendanceSummary(enResult)).not.toMatch(
       /Asistencias|Faltas|Viabilidad/,
     );
+  });
+});
+
+describe("attendance copy attempts", () => {
+  it("uses the Clipboard API without invoking the fallback", async () => {
+    let fallbackCalls = 0;
+    await expect(
+      attemptAttendanceCopy({
+        writeText: async () => undefined,
+        legacyCopy: () => {
+          fallbackCalls += 1;
+          return true;
+        },
+        isCurrent: () => true,
+      }),
+    ).resolves.toBe("copied");
+    expect(fallbackCalls).toBe(0);
+  });
+
+  it.each([
+    [undefined, true, "copied"],
+    [async () => Promise.reject(new Error("denied")), true, "copied"],
+    [undefined, false, "failed"],
+    [async () => Promise.reject(new Error("denied")), false, "failed"],
+  ] as const)(
+    "handles API/fallback copy branch %#",
+    async (writeText, fallbackResult, expected) => {
+      await expect(
+        attemptAttendanceCopy({
+          writeText,
+          legacyCopy: () => fallbackResult,
+          isCurrent: () => true,
+        }),
+      ).resolves.toBe(expected);
+    },
+  );
+
+  it("treats fallback exceptions as failure", async () => {
+    await expect(
+      attemptAttendanceCopy({
+        legacyCopy: () => {
+          throw new Error("unsupported");
+        },
+        isCurrent: () => true,
+      }),
+    ).resolves.toBe("failed");
+  });
+
+  it("does not run a fallback for a stale async result", async () => {
+    let finishWrite: (() => void) | undefined;
+    let current = true;
+    let fallbackCalls = 0;
+    const pending = attemptAttendanceCopy({
+      writeText: () =>
+        new Promise<void>((resolve) => {
+          finishWrite = resolve;
+        }),
+      legacyCopy: () => {
+        fallbackCalls += 1;
+        return true;
+      },
+      isCurrent: () => current,
+    });
+
+    current = false;
+    finishWrite?.();
+    await expect(pending).resolves.toBe("stale");
+    expect(fallbackCalls).toBe(0);
   });
 });

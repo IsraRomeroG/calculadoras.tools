@@ -27,14 +27,26 @@ describe("attendance calculator integration", () => {
   it("places the form before results and exposes accessible feedback", () => {
     const component = read("src/components/calculators/AttendanceCalculator.astro");
 
-    expect(component.indexOf("data-field=\"totalClasses\"")).toBeLessThan(
-      component.indexOf("<aside"),
-    );
+    const formOrder = [
+      'data-field="totalClasses"',
+      'data-mode-button="attended"',
+      'data-field="attendedClasses"',
+      'data-field="requiredPercent"',
+      'data-field="remainingClasses"',
+      "<aside",
+    ].map((token) => component.indexOf(token));
+    expect(formOrder.every((index) => index >= 0)).toBe(true);
+    expect(formOrder).toEqual([...formOrder].sort((a, b) => a - b));
     expect(component).toContain('role="status"');
     expect(component).toContain('aria-live="polite"');
     expect(component).toContain("aria-describedby");
     expect(component).toContain("<noscript>");
     expect(component).toContain("data-manual-copy-text");
+    expect(component).toContain("data-requires-js");
+    expect(component).toContain("data-excess-detail");
+    const noScriptButtons = component.match(/<button[^>]*data-requires-js[^>]*>/g) ?? [];
+    expect(noScriptButtons.length).toBeGreaterThan(0);
+    expect(noScriptButtons.every((button) => button.includes("disabled"))).toBe(true);
   });
 
   it("scopes selectors and checks the legacy clipboard result", () => {
@@ -44,7 +56,12 @@ describe("attendance calculator integration", () => {
 
     expect(controller).toContain("root.querySelector");
     expect(controller).toContain('copied = document.execCommand("copy")');
-    expect(controller).toContain("version !== resultVersion");
+    expect(controller).toContain(
+      "version === resultVersion && summary === currentSummary",
+    );
+    expect(controller).toContain('button.removeAttribute("disabled")');
     expect(controller).toContain('manualCopy.classList.remove("hidden")');
+    expect(controller).toContain("textarea.remove()");
+    expect(controller).toContain("restoreFocus?.focus()");
   });
 });
