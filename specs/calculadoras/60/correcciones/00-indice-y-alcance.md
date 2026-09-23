@@ -22,7 +22,7 @@ Este set cubre todos los hallazgos de la auditoría:
 | --- | --- | --- |
 | [01: fuente única e integración](01-fuente-unica-e-integracion.md) | Estado visible, copia y cambios de contexto | Controladores desincronizados |
 | [02: políticas y precisión](02-politicas-y-precision.md) | Redondeo, recuperación y parser | Recuperación incorrecta y precisión laxa |
-| [03: historial versionado](03-historial-versionado.md) | `sessionStorage` | Versiones antiguas rechazadas |
+| [03: historial versionado](03-historial-versionado.md) | `sessionStorage` | Consulta y comparación históricas; aislamiento de snapshots corruptas |
 | [04: restauración aislada](04-restauracion-aislada.md) | Materias y snapshots | Contaminación de eventos |
 | [05: captura de políticas](05-captura-de-politicas.md) | UI de fase 2 | Justificadas y retardos manuales inutilizables |
 | [06: presentación y localización](06-presentacion-y-localizacion.md) | Resultados ES/EN | Mensajes genéricos, precisión y estados sin traducir |

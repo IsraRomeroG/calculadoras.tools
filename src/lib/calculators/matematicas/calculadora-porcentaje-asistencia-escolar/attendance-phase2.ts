@@ -1,5 +1,8 @@
 import type { AttendancePercent } from "./attendance-core";
-import { ceilDiv } from "./attendance-core";
+import {
+  PERCENT_SCALE,
+  normalizeAttendancePercent,
+} from "./attendance-core";
 
 /** Versioned constants are intentionally independent from the page URL. */
 export const ATTENDANCE_PHASE2_SCHEMA_VERSION = 1;
@@ -127,24 +130,7 @@ export function normalizeAttendancePolicy(
 export function getRequiredPercentScaled(
   requiredPercent: AttendancePercent | number,
 ): number {
-  if (typeof requiredPercent !== "number") {
-    if (
-      !Number.isSafeInteger(requiredPercent.scaled) ||
-      requiredPercent.scaled < 0 ||
-      requiredPercent.scaled > 1_000_000
-    ) {
-      throw new RangeError("Required percentage is outside 0..100.");
-    }
-    return requiredPercent.scaled;
-  }
-  if (!Number.isFinite(requiredPercent) || requiredPercent < 0 || requiredPercent > 100) {
-    throw new RangeError("Required percentage must be finite and between 0 and 100.");
-  }
-  const scaled = Math.round((requiredPercent + Number.EPSILON) * 10_000);
-  if (scaled < 0 || scaled > 1_000_000 || !Number.isSafeInteger(scaled)) {
-    throw new RangeError("Required percentage has unsupported precision.");
-  }
-  return scaled;
+  return normalizeAttendancePercent(requiredPercent).scaled;
 }
 
 /** The exact shared predicate used by current, final, and recovery decisions. */
@@ -154,15 +140,22 @@ export function meetsPolicy(
   requiredPercent: AttendancePercent | number,
   policy: Partial<AttendancePolicy> = {},
 ): boolean {
-  assertCount(attended, 0, total, "Attended classes");
-  assertCount(total, 1, 2_000, "Total classes");
+  assertRatioCounts(attended, total);
   const normalizedPolicy = normalizeAttendancePolicy(policy);
   const requiredScaled = getRequiredPercentScaled(requiredPercent);
+  const a = BigInt(attended);
+  const t = BigInt(total);
+  const required = BigInt(requiredScaled);
   if (normalizedPolicy.rounding === "exact") {
-    return attended * 1_000_000 >= total * requiredScaled;
+    return a * BigInt(100 * PERCENT_SCALE) >= t * required;
   }
-  const units = roundedPercentUnits(attended, total, normalizedPolicy.rounding.decimals);
-  return units * 10_000 >= requiredScaled * 10 ** normalizedPolicy.rounding.decimals;
+  const factor = 10n ** BigInt(normalizedPolicy.rounding.decimals);
+  const roundedUnits = roundedPercentUnitsBigInt(
+    attended,
+    total,
+    normalizedPolicy.rounding.decimals,
+  );
+  return roundedUnits * BigInt(PERCENT_SCALE) >= required * factor;
 }
 
 export const meetsAttendancePolicy = meetsPolicy;
@@ -174,8 +167,28 @@ export function roundedPercentUnits(
 ): number {
   assertCount(attended, 0, total, "Attended classes");
   assertCount(total, 1, 2_000, "Total classes");
-  const factor = 10 ** decimals;
-  return Math.floor((2 * attended * 100 * factor + total) / (2 * total));
+  return Number(roundedPercentUnitsBigInt(attended, total, decimals));
+}
+
+function roundedPercentUnitsBigInt(
+  attended: number,
+  total: number,
+  decimals: 0 | 1 | 2,
+): bigint {
+  const numerator = 2n * BigInt(attended) * 100n * 10n ** BigInt(decimals) + BigInt(total);
+  return numerator / (2n * BigInt(total));
+}
+
+function assertRatioCounts(attended: number, total: number): void {
+  if (
+    !Number.isSafeInteger(attended) ||
+    !Number.isSafeInteger(total) ||
+    attended < 0 ||
+    total < 1 ||
+    attended > total
+  ) {
+    throw new RangeError("Attendance counts must be non-negative safe integers with attended no greater than total.");
+  }
 }
 
 export function minimumAttendancesForPolicy(
@@ -185,17 +198,13 @@ export function minimumAttendancesForPolicy(
 ): number {
   assertCount(total, 1, 2_000, "Total classes");
   const normalizedPolicy = normalizeAttendancePolicy(policy);
-  const requiredScaled = getRequiredPercentScaled(requiredPercent);
-  if (normalizedPolicy.rounding === "exact") {
-    return ceilDiv(total * requiredScaled, 1_000_000);
-  }
+  const normalizedRequiredPercent = normalizeAttendancePercent(requiredPercent);
 
   let low = 0;
   let high = total;
   while (low < high) {
     const middle = Math.floor((low + high) / 2);
-    const units = roundedPercentUnits(middle, total, normalizedPolicy.rounding.decimals);
-    if (units * 10_000 >= requiredScaled * 10 ** normalizedPolicy.rounding.decimals) {
+    if (meetsPolicy(middle, total, normalizedRequiredPercent, normalizedPolicy)) {
       high = middle;
     } else {
       low = middle + 1;
@@ -217,7 +226,8 @@ export function calculatePolicyAttendance(input: PolicyAttendanceInput): PolicyA
   }
 
   const policy = normalizeAttendancePolicy(input.policy);
-  const requiredPercentScaled = getRequiredPercentScaled(input.requiredPercent);
+  const requiredPercent = normalizeAttendancePercent(input.requiredPercent);
+  const requiredPercentScaled = requiredPercent.scaled;
   const effectiveTotalClasses =
     policy.justified === "exclude"
       ? input.totalClasses - justifiedAbsences
@@ -245,7 +255,7 @@ export function calculatePolicyAttendance(input: PolicyAttendanceInput): PolicyA
   const currentStatus: PolicyCurrentStatus =
     effectiveTotalClasses === 0
       ? "undefined"
-      : meetsPolicy(effectiveAttendedClasses, effectiveTotalClasses, requiredPercentScaled / 10_000, policy)
+      : meetsPolicy(effectiveAttendedClasses, effectiveTotalClasses, requiredPercent, policy)
         ? "meets"
         : "below";
 
@@ -270,7 +280,7 @@ export function calculatePolicyAttendance(input: PolicyAttendanceInput): PolicyA
     const finalTotalClasses = effectiveTotalClasses + remainingClasses;
     const minimumAttendancesFinal = minimumAttendancesForPolicy(
       finalTotalClasses,
-      requiredPercentScaled / 10_000,
+      requiredPercent,
       policy,
     );
     const maximumFinalAbsences = finalTotalClasses - minimumAttendancesFinal;
@@ -281,12 +291,18 @@ export function calculatePolicyAttendance(input: PolicyAttendanceInput): PolicyA
       0,
       minimumAttendancesFinal - effectiveAttendedClasses,
     );
+    const maximumFinalMeets = meetsPolicy(
+      effectiveAttendedClasses + remainingClasses,
+      finalTotalClasses,
+      requiredPercent,
+      policy,
+    );
     const maxPossiblePercent =
       (100 * (effectiveAttendedClasses + remainingClasses)) / finalTotalClasses;
     let status: Exclude<PolicyProjectionStatus, "unknown" | "undefined">;
     if (remainingClasses === 0) {
       status = currentStatus === "meets" ? "finished_meets" : "finished_below";
-    } else if (requiredAttendancesFromRemaining > remainingClasses) {
+    } else if (!maximumFinalMeets) {
       status = "impossible";
     } else if (requiredAttendancesFromRemaining === 0) {
       status = "guaranteed";
@@ -317,7 +333,7 @@ export function calculatePolicyAttendance(input: PolicyAttendanceInput): PolicyA
     originalAbsences,
     justifiedAbsences,
     tardyClasses,
-    requiredPercent: requiredPercentScaled / 10_000,
+    requiredPercent: requiredPercent.value,
     requiredPercentScaled,
     policy,
     effectiveTotalClasses,
@@ -856,16 +872,44 @@ export function calculatePolicyRecovery(result: PolicyAttendanceResult): {
   classes: number | null;
   status: "available" | "already_meets" | "impossible" | "undefined";
 } {
-  if (result.currentStatus === "undefined") return { classes: null, status: "undefined" };
-  if (result.currentStatus === "meets") return { classes: 0, status: "already_meets" };
-  if (result.requiredPercentScaled === 1_000_000) {
+  if (result.effectiveTotalClasses === 0) return { classes: null, status: "undefined" };
+  const requiredPercent = normalizeAttendancePercent(result.requiredPercent);
+  if (requiredPercent.scaled !== result.requiredPercentScaled) {
+    throw new RangeError("Attendance result has an inconsistent required percentage.");
+  }
+  const policy = normalizeAttendancePolicy(result.policy);
+  const meetsAt = (additionalClasses: number) =>
+    meetsPolicy(
+      result.effectiveAttendedClasses + additionalClasses,
+      result.effectiveTotalClasses + additionalClasses,
+      requiredPercent,
+      policy,
+    );
+
+  if (meetsAt(0)) return { classes: 0, status: "already_meets" };
+  if (policy.rounding === "exact" && requiredPercent.scaled === 100 * PERCENT_SCALE) {
     return { classes: null, status: "impossible" };
   }
-  const numerator =
-    result.effectiveTotalClasses * result.requiredPercentScaled -
-    result.effectiveAttendedClasses * 1_000_000;
-  const denominator = 1_000_000 - result.requiredPercentScaled;
-  return { classes: ceilDiv(numerator, denominator), status: "available" };
+
+  let low = 0;
+  let high = 1;
+  const maxAdditionalClasses = Number.MAX_SAFE_INTEGER - result.effectiveTotalClasses;
+  while (!meetsAt(high)) {
+    low = high;
+    if (high >= maxAdditionalClasses) {
+      throw new RangeError("Recovery exceeds the safe integer range.");
+    }
+    high = high > Math.floor(maxAdditionalClasses / 2)
+      ? maxAdditionalClasses
+      : high * 2;
+  }
+
+  while (low + 1 < high) {
+    const middle = low + Math.floor((high - low) / 2);
+    if (meetsAt(middle)) high = middle;
+    else low = middle;
+  }
+  return { classes: high, status: "available" };
 }
 
 export function downloadAttendanceCsv(

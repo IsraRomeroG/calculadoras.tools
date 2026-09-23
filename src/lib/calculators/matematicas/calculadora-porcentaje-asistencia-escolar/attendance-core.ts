@@ -113,7 +113,7 @@ export function calculateAttendanceCore(input: AttendanceInput): AttendanceResul
     throw new RangeError("Attendance mode must be attended or absences.");
   }
 
-  const percent = normalizePercent(input.requiredPercent);
+  const percent = normalizeAttendancePercent(input.requiredPercent);
   const remainingClasses = normalizeRemaining(input.remainingClasses);
   const attendedClasses =
     input.mode === "absences"
@@ -448,17 +448,27 @@ function calculateRecovery({
   );
 }
 
-function normalizePercent(value: AttendancePercent | number): AttendancePercent {
+export function normalizeAttendancePercent(
+  value: AttendancePercent | number,
+): AttendancePercent {
   if (typeof value !== "number") {
+    if (
+      typeof value !== "object" ||
+      value === null ||
+      typeof value.normalized !== "string"
+    ) {
+      throw new RangeError("Required percent must be between 0 and 100 with up to 4 decimals.");
+    }
     const parsed = parseAttendancePercent(value.normalized);
     if (
       !Number.isFinite(value.value) ||
       !Number.isSafeInteger(value.scaled) ||
       value.scaled < 0 ||
       value.scaled > ATTENDANCE_RATIO_SCALE ||
-      value.value !== value.scaled / PERCENT_SCALE ||
       !parsed.ok ||
-      parsed.scaled !== value.scaled
+      parsed.scaled !== value.scaled ||
+      parsed.value !== value.value ||
+      parsed.normalized !== value.normalized
     ) {
       throw new RangeError("Required percent must be between 0 and 100 with up to 4 decimals.");
     }
@@ -468,11 +478,15 @@ function normalizePercent(value: AttendancePercent | number): AttendancePercent 
   if (!Number.isFinite(value) || value < 0 || value > 100) {
     throw new RangeError("Required percent must be between 0 and 100 with up to 4 decimals.");
   }
-  const scaled = Math.round(value * PERCENT_SCALE);
-  if (Math.abs(value - scaled / PERCENT_SCALE) > Number.EPSILON * 100) {
+  const normalizedValue = Number(value.toFixed(MAX_PERCENT_DECIMALS));
+  if (normalizedValue !== value) {
     throw new RangeError("Required percent must have no more than 4 decimals.");
   }
-  const parsed = parseAttendancePercent((scaled / PERCENT_SCALE).toFixed(4));
+  const scaled = normalizedValue * PERCENT_SCALE;
+  if (!Number.isSafeInteger(scaled)) {
+    throw new RangeError("Required percent must have no more than 4 decimals.");
+  }
+  const parsed = parseAttendancePercent(normalizedValue.toFixed(MAX_PERCENT_DECIMALS));
   if (!parsed.ok) {
     throw new RangeError("Required percent must be valid.");
   }

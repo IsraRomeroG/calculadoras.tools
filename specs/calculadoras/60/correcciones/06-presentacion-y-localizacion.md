@@ -4,7 +4,10 @@
 
 Con calendario o política avanzada, la presentación cambia a mensajes genéricos,
 por ejemplo `posible: 6 / 10`. Se pierden las condiciones de la spec base, la
-precisión del mínimo, la pluralización y parte de la explicación de recuperación.
+pluralización y parte de la explicación de recuperación. El detalle avanzado
+redondea el mínimo a dos decimales aunque se haya introducido con más precisión.
+En la versión auditada, la copia podía describir otro contexto aunque conservara
+la precisión del mínimo introducido.
 Además, el listado de eventos muestra estados internos en inglés incluso en ES.
 
 ## Fuente de presentación
@@ -39,8 +42,10 @@ Todos los valores internos de eventos deben tener etiquetas localizadas:
 | `scheduled` | Programada | Scheduled |
 | `cancelled` | Cancelada | Cancelled |
 
-No mostrar claves internas en listas, mensajes, historial o CSV presentado al
-usuario. Los números y estados deben ser iguales entre ES y EN.
+No mostrar claves internas de eventos en listas, mensajes o historial visible.
+En el CSV, conservar las cabeceras y los códigos de estado estables del contrato
+de exportación; no traducirlos ni sustituirlos por etiquetas de interfaz. Los
+números y estados calculados deben ser iguales entre ES y EN.
 
 ## Aceptación
 
@@ -48,8 +53,11 @@ usuario. Los números y estados deben ser iguales entre ES y EN.
    no muestra solo `5` como necesidad.
 2. El caso `T=40,A=34,p=80,R=10` muestra que se necesitan 6 y permite 4 bajo la
    condición de asistir a las otras 6.
-3. El mínimo `80.125` aparece como `80.125%`, no como `80.13%`, en el resultado,
-   detalle y copia.
+3. Con política avanzada, el mínimo `80.125` aparece como `80.125%`, no como
+   `80.13%`, en la presentación visible. La copia conserva ese mínimo y describe
+   la misma política y el mismo resultado activo.
 4. Los mensajes de recuperación pluralizan correctamente en ES y EN.
 5. Un listado de eventos en ES no contiene `attended`, `absence`, `scheduled` ni
    las demás claves internas.
+6. El CSV de un mismo escenario mantiene cabeceras, códigos de estado y cifras
+   estables en ES y EN; las etiquetas visibles de eventos sí se localizan.

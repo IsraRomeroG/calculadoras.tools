@@ -377,6 +377,7 @@ export function createAttendanceAdapter(config: AttendanceLocaleConfig) {
     canonicalPath: config.canonicalPath,
     examples: config.examples,
     calculateAttendance,
+    presentAttendance: present,
     buildAttendanceSummary,
     formatAttendanceNumber: formatNumber,
     formatAttendancePercent: formatPercent,

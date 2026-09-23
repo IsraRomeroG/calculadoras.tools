@@ -122,16 +122,18 @@ describe("attendance calculator source contracts", () => {
     expect(noScriptButtons.every((button) => button.includes("disabled"))).toBe(true);
   });
 
-  it("scopes selectors and checks the legacy clipboard result", () => {
+  it("scopes selectors and binds asynchronous copy to the active context", () => {
     const controller = read(
       "src/lib/calculators/matematicas/calculadora-porcentaje-asistencia-escolar/attendance-controller.ts",
     );
 
     expect(controller).toContain("root.querySelector");
     expect(controller).toContain('copied = document.execCommand("copy")');
-    expect(controller).toContain(
-      "version === resultVersion && summary === currentSummary",
-    );
+    expect(controller).toContain("current.version === version && current.summary === summary");
+    expect(controller).toContain("getAttendanceContext(root)");
+    expect(controller).not.toContain("currentSummary");
+    expect(controller).not.toContain("currentResult");
+    expect(controller).not.toContain("calculateAttendance(");
     expect(controller).toContain('button.removeAttribute("disabled")');
     expect(controller).toContain('manualCopy.classList.remove("hidden")');
     expect(controller).toContain('manualCopyText.focus()');
@@ -142,6 +144,36 @@ describe("attendance calculator source contracts", () => {
     expect(controller).toContain('field("totalClasses")?.focus()');
     expect(controller).toContain('setStatus(text.cleared, "success")');
     expect(controller).toContain('if (root.dataset.initialized === "true") return');
+  });
+
+  it("shares one versioned result context across display, copy, history and CSV", () => {
+    const context = read(
+      "src/lib/calculators/matematicas/calculadora-porcentaje-asistencia-escolar/attendance-context.ts",
+    );
+    const base = read(
+      "src/lib/calculators/matematicas/calculadora-porcentaje-asistencia-escolar/attendance-controller.ts",
+    );
+    const phase2 = read(
+      "src/lib/calculators/matematicas/calculadora-porcentaje-asistencia-escolar/attendance-phase2-controller.ts",
+    );
+
+    expect(context).toContain("version: number");
+    expect(context).toContain("result: PolicyAttendanceResult | null");
+    expect(context).toContain("presentation: AttendanceContextPresentation | null");
+    expect(context).toContain("summary: string | null");
+    expect(context).toContain("invalidateAttendanceContext");
+    expect(base).toContain("invalidateAttendanceContext(root)");
+    expect(phase2).toContain("publishAttendanceContext(root");
+    expect(phase2).toContain("renderPhase2Result(context)");
+    expect(phase2).toContain("renderBaseResult(presentation.result, context)");
+    expect(phase2).toContain("getAttendanceContext(root)");
+    expect(phase2).not.toContain("let currentResult:");
+    expect(phase2).not.toContain("let currentSummary");
+    expect(phase2).toContain("policyAttendanceToCsvRow(context.subject.name, context.source, context.result)");
+    expect(phase2).toContain("result: context.result");
+    expect(phase2).toContain("draft.summary = presentation ? buildSummary(draft) : null");
+    expect(phase2).toContain("const baseResult = source === \"manual\" && isDefaultPolicy(result.policy)");
+    expect(phase2).toContain("if (syncing) return;");
   });
 
   it("keeps the acceptance paths and localization boundaries intact", () => {

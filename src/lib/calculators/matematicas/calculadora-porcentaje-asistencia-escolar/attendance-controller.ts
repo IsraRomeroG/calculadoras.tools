@@ -1,7 +1,11 @@
 import * as es from "./attendance";
 import * as en from "./attendance.en";
 import type { AttendanceCalendarMode, AttendanceInputMode, AttendancePercent } from "./attendance-core";
-import type { AttendanceResult } from "./attendance-presenter";
+import {
+  ATTENDANCE_CONTEXT_EVENT,
+  getAttendanceContext,
+  invalidateAttendanceContext,
+} from "./attendance-context";
 import { initAttendancePhase2Calculators } from "./attendance-phase2-controller";
 
 type Locale = "es" | "en";
@@ -121,14 +125,15 @@ export async function attemptAttendanceCopy({
 }
 
 export function initAttendanceCalculators(): void {
-  document
+  const roots = Array.from(document
     .querySelectorAll<HTMLElement>("[data-attendance-calculator]")
-    .forEach((root) => {
-      if (root.dataset.initialized === "true") return;
-      root.dataset.initialized = "true";
-      initAttendanceCalculator(root);
-      initAttendancePhase2Calculators();
-    });
+  );
+  roots.forEach((root) => {
+    if (root.dataset.initialized === "true") return;
+    root.dataset.initialized = "true";
+    initAttendanceCalculator(root);
+  });
+  initAttendancePhase2Calculators();
 }
 
 function initAttendanceCalculator(root: HTMLElement): void {
@@ -137,10 +142,6 @@ function initAttendanceCalculator(root: HTMLElement): void {
   const text = TEXT[locale];
   let mode: AttendanceInputMode = "attended";
   let calendarMode: AttendanceCalendarMode = "remaining";
-  let currentSummary = "";
-  let currentResult: AttendanceResult | null = null;
-  let calendarValid = false;
-  let resultVersion = 0;
   let statusTimer = 0;
 
   const query = <T extends Element>(selector: string) => root.querySelector<T>(selector);
@@ -163,46 +164,30 @@ function initAttendanceCalculator(root: HTMLElement): void {
   const results = query<HTMLElement>("[data-results]");
   const manualCopy = query<HTMLElement>("[data-manual-copy]");
   const manualCopyText = query<HTMLTextAreaElement>("[data-manual-copy-text]");
+  const syncCopyAvailability = () => {
+    copyButton?.toggleAttribute("disabled", !getAttendanceContext(root)?.summary);
+  };
+  root.addEventListener(ATTENDANCE_CONTEXT_EVENT, syncCopyAvailability);
+  syncCopyAvailability();
   queryAll<HTMLButtonElement>("[data-requires-js]").forEach((button) =>
     button.removeAttribute("disabled"),
   );
 
   function updateCalculator(announce = false): void {
-    resultVersion += 1;
+    invalidateAttendanceContext(root);
+    copyButton?.setAttribute("disabled", "");
     clearStatus();
     hideManualCopy();
     updateModeUi();
     const parsed = readInput();
 
     if (!parsed.ok) {
-      currentResult = null;
-      currentSummary = "";
-      calendarValid = false;
       showInitial(parsed.message);
       copyButton?.setAttribute("disabled", "");
       return;
     }
 
-    try {
-      const result = adapter.calculateAttendance(parsed.input);
-      currentResult = result;
-      currentSummary = adapter.buildAttendanceSummary(result);
-      calendarValid = parsed.calendarValid;
-      renderResult(result);
-      if (parsed.calendarValid) copyButton?.removeAttribute("disabled");
-      else {
-        copyButton?.setAttribute("disabled", "");
-        renderInvalidCalendarState();
-      }
-      syncAlternateField(result);
-      if (announce) setStatus(text.updated, "success");
-    } catch (error) {
-      currentResult = null;
-      currentSummary = "";
-      calendarValid = false;
-      showInitial(error instanceof Error ? error.message : text.incomplete);
-      copyButton?.setAttribute("disabled", "");
-    }
+    if (announce) setStatus(text.updated, "success");
   }
 
   function readInput():
@@ -216,7 +201,6 @@ function initAttendanceCalculator(root: HTMLElement): void {
           requiredPercent: AttendancePercent;
           remainingClasses: number | null;
         };
-        calendarValid: boolean;
       }
     | { ok: false; message: string } {
     clearCurrentErrors();
@@ -261,7 +245,6 @@ function initAttendanceCalculator(root: HTMLElement): void {
         requiredPercent: percent,
         remainingClasses: calendar.ok ? calendar.value : null,
       },
-      calendarValid: calendar.ok,
     };
   }
 
@@ -359,73 +342,6 @@ function initAttendanceCalculator(root: HTMLElement): void {
       );
     }
     return parsed;
-  }
-
-  function renderResult(result: AttendanceResult): void {
-    initialResult?.classList.add("hidden");
-    results?.classList.remove("hidden");
-    setText("[data-result-percent]", adapter.formatAttendancePercent(result.currentPercent));
-    setText("[data-result-current-status]", result.presentation.currentStatusLabel);
-    setText("[data-result-rounding]", result.presentation.currentRoundingNotice);
-    setText("[data-result-projection]", result.presentation.projectionLabel);
-    setText("[data-result-action]", result.presentation.actionMessage);
-    setText(
-      "[data-result-condition]",
-      [result.presentation.conditionMessage, result.presentation.finalRoundingNotice]
-        .filter(Boolean)
-        .join(" "),
-    );
-    setText("[data-result-available]", result.presentation.availabilityLabel);
-    setText("[data-result-needed]", result.presentation.neededLabel);
-    setText("[data-detail-total]", adapter.formatAttendanceCount(result.totalClasses));
-    setText("[data-detail-attended]", adapter.formatAttendanceCount(result.attendedClasses));
-    setText("[data-detail-absences]", adapter.formatAttendanceCount(result.currentAbsences));
-    setText("[data-detail-minimum]", adapter.formatRequiredAttendancePercent(result));
-    setText("[data-detail-margin]", result.presentation.marginLabel);
-    setText("[data-detail-recovery]", result.presentation.recoveryLabel);
-
-    const projection = result.projection;
-    const isKnown = projection.status !== "unknown";
-    queryAll<HTMLElement>("[data-known-detail]").forEach((element) =>
-      element.classList.toggle("hidden", !isKnown),
-    );
-    setText(
-      "[data-detail-remaining]",
-      isKnown ? adapter.formatAttendanceCount(projection.remainingClasses) : text.unknown,
-    );
-    if (isKnown) {
-      setText("[data-detail-final-total]", adapter.formatAttendanceCount(projection.finalTotalClasses));
-      setText("[data-detail-max-absences]", adapter.formatAttendanceCount(projection.maximumFinalAbsences));
-      setText("[data-detail-excess]", result.presentation.exceededLabel);
-      setText("[data-detail-max-final]", adapter.formatAttendancePercent(projection.maxPossiblePercent));
-    }
-    queryAll<HTMLElement>("[data-excess-detail]").forEach((element) =>
-      element.classList.toggle("hidden", !isKnown || !result.presentation.exceededLabel),
-    );
-
-    const currentColor = result.currentStatus === "meets" ? "text-emerald-300" : "text-amber-300";
-    const projectionColor =
-      projection.status === "impossible" || projection.status === "finished_below"
-        ? "text-red-300"
-        : projection.status === "unknown" || projection.status === "possible"
-          ? "text-amber-300"
-          : "text-emerald-300";
-    setColor(query("[data-result-current-status]"), currentColor);
-    setColor(query("[data-result-projection]"), projectionColor);
-    setColor(query("[data-result-action]"), projectionColor);
-  }
-
-  function renderInvalidCalendarState(): void {
-    setText("[data-result-projection]", text.calendarInvalid);
-    setText("[data-result-action]", text.calendarInvalid);
-    setText("[data-result-condition]", "");
-    setText("[data-result-available]", "—");
-    setText("[data-result-needed]", "—");
-    setText("[data-detail-remaining]", text.calendarInvalid);
-    queryAll<HTMLElement>("[data-known-detail]").forEach((element) => element.classList.add("hidden"));
-    queryAll<HTMLElement>("[data-excess-detail]").forEach((element) => element.classList.add("hidden"));
-    setColor(query("[data-result-projection]"), "text-red-300");
-    setColor(query("[data-result-action]"), "text-red-300");
   }
 
   function showInitial(message: string): void {
@@ -530,13 +446,6 @@ function initAttendanceCalculator(root: HTMLElement): void {
     if (calendarMode === "total") setText("[data-calendar-derived]", "");
   }
 
-  function syncAlternateField(result: AttendanceResult): void {
-    setValue(
-      mode === "attended" ? "absences" : "attendedClasses",
-      String(mode === "attended" ? result.currentAbsences : result.attendedClasses),
-    );
-  }
-
   function loadExample(id: string | undefined, trigger: HTMLButtonElement): void {
     const example = adapter.ATTENDANCE_EXAMPLES.find((item) => item.id === id);
     if (!example) return;
@@ -556,7 +465,7 @@ function initAttendanceCalculator(root: HTMLElement): void {
   }
 
   function clearCalculator(): void {
-    resultVersion += 1;
+    invalidateAttendanceContext(root);
     clearStatus();
     mode = "attended";
     calendarMode = "remaining";
@@ -566,8 +475,6 @@ function initAttendanceCalculator(root: HTMLElement): void {
     setValue("requiredPercent", "80");
     setValue("remainingClasses", "");
     setValue("courseTotalClasses", "");
-    currentResult = null;
-    currentSummary = "";
     clearAllErrors();
     hideManualCopy();
     updateModeUi();
@@ -578,19 +485,23 @@ function initAttendanceCalculator(root: HTMLElement): void {
   }
 
   async function copySummary(): Promise<void> {
-    if (!currentSummary || !currentResult || !calendarValid) {
+    const context = getAttendanceContext(root);
+    if (!context?.valid || !context.summary) {
       setStatus(text.noSummary, "error");
       return;
     }
-    const summary = currentSummary;
-    const version = resultVersion;
+    const summary = context.summary;
+    const version = context.version;
     const activeElement = document.activeElement instanceof HTMLElement ? document.activeElement : null;
     const outcome = await attemptAttendanceCopy({
       writeText: navigator.clipboard?.writeText
         ? () => navigator.clipboard.writeText(summary)
         : undefined,
       legacyCopy: () => tryLegacyCopy(summary, activeElement),
-      isCurrent: () => version === resultVersion && summary === currentSummary,
+      isCurrent: () => {
+        const current = getAttendanceContext(root);
+        return current?.valid === true && current.version === version && current.summary === summary;
+      },
     });
     if (outcome === "stale") return;
     if (outcome === "copied") {
@@ -664,11 +575,6 @@ function initAttendanceCalculator(root: HTMLElement): void {
   function setText(selector: string, content: string): void {
     const element = query<HTMLElement>(selector);
     if (element) element.textContent = content;
-  }
-
-  function setColor(element: Element | null, color: string): void {
-    element?.classList.remove("text-white", "text-emerald-300", "text-amber-300", "text-red-300");
-    element?.classList.add(color);
   }
 
   function setStatus(message: string, kind: "success" | "error", clear = true): void {
