@@ -156,6 +156,10 @@ describe("attendance calculator source contracts", () => {
     const phase2 = read(
       "src/lib/calculators/matematicas/calculadora-porcentaje-asistencia-escolar/attendance-phase2-controller.ts",
     );
+    const phase2Renderer = phase2.slice(
+      phase2.indexOf("function renderPhase2Result"),
+      phase2.indexOf("function saveSubjectDraft"),
+    );
 
     expect(context).toContain("version: number");
     expect(context).toContain("result: PolicyAttendanceResult | null");
@@ -166,14 +170,55 @@ describe("attendance calculator source contracts", () => {
     expect(phase2).toContain("publishAttendanceContext(root");
     expect(phase2).toContain("renderPhase2Result(context)");
     expect(phase2).toContain("renderBaseResult(presentation.result, context)");
+    expect(phase2Renderer).toContain('initial?.classList.add("hidden");\n    results?.classList.remove("hidden");');
     expect(phase2).toContain("getAttendanceContext(root)");
     expect(phase2).not.toContain("let currentResult:");
     expect(phase2).not.toContain("let currentSummary");
     expect(phase2).toContain("policyAttendanceToCsvRow(context.subject.name, context.source, context.result)");
     expect(phase2).toContain("result: context.result");
     expect(phase2).toContain("draft.summary = presentation ? buildSummary(draft) : null");
-    expect(phase2).toContain("const baseResult = source === \"manual\" && isDefaultPolicy(result.policy)");
+    expect(phase2).toContain("const baseResult = createBaseResult(result, getManualMode())");
+    expect(phase2).toContain("source === \"manual\" && isDefaultPolicy(result.policy) && baseResult");
     expect(phase2).toContain("if (syncing) return;");
+  });
+
+  it("keeps subject deletion confirmed and event states localized in the visible list", () => {
+    const component = read("src/components/calculators/AttendanceCalculator.astro");
+    const phase2 = read(
+      "src/lib/calculators/matematicas/calculadora-porcentaje-asistencia-escolar/attendance-phase2-controller.ts",
+    );
+    const deleteStart = phase2.indexOf('query<HTMLButtonElement>("[data-delete-subject]")?.addEventListener("click"');
+    const deleteHandler = phase2.slice(
+      deleteStart,
+      phase2.indexOf('queryAll<HTMLButtonElement>("[data-source-button]")', deleteStart),
+    );
+    const totalPosition = component.indexOf('data-field="totalClasses"');
+    const subjectPosition = component.indexOf("data-subject-select");
+    const sourcePosition = component.indexOf('data-source-button="manual"');
+    expect(totalPosition).toBeGreaterThanOrEqual(0);
+    expect(subjectPosition).toBeGreaterThan(totalPosition);
+    expect(sourcePosition).toBeGreaterThan(totalPosition);
+    expect(phase2).toContain("!window.confirm(text.deleteConfirm)");
+    expect(deleteHandler.indexOf("!window.confirm(text.deleteConfirm)")).toBeGreaterThanOrEqual(0);
+    expect(deleteHandler.indexOf("!window.confirm(text.deleteConfirm)")).toBeLessThan(deleteHandler.indexOf("removeAttendanceSubject"));
+    expect(phase2).toContain("text.eventStatuses[event.status]");
+    expect(phase2).toContain('attended: "Asistida"');
+    expect(phase2).toContain('attended: "Attended"');
+  });
+
+  it("keeps the required minimum editable while calendar mode hides manual-only inputs", () => {
+    const component = read("src/components/calculators/AttendanceCalculator.astro");
+    const phase2 = read(
+      "src/lib/calculators/matematicas/calculadora-porcentaje-asistencia-escolar/attendance-phase2-controller.ts",
+    );
+    const minimumPosition = component.indexOf('data-field="requiredPercent"');
+    const minimumWrapperPosition = component.lastIndexOf('<div class="min-w-0">', minimumPosition);
+    const minimumWrapper = component.slice(minimumWrapperPosition, minimumPosition);
+    expect(minimumPosition).toBeGreaterThanOrEqual(0);
+    expect(minimumWrapper).not.toContain("data-manual-source-fields");
+    expect(phase2).toContain('queryAll<HTMLElement>("[data-manual-source-fields], [data-manual-only]")');
+    expect(phase2).toContain('query<HTMLElement>("[data-calendar-panel]")?.classList.toggle("hidden", source !== "calendar")');
+    expect(phase2).toContain('{ kind: "calendar", events: [...events], calendarComplete: subject.calendarComplete }');
   });
 
   it("keeps the acceptance paths and localization boundaries intact", () => {

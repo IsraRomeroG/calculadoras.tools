@@ -3,7 +3,7 @@ import { INCOME_TAX_PAGE_DEFINITIONS, PAYROLL_PAGE_DEFINITIONS } from "./incomeT
 import { EMPLOYMENT_PAGE_DEFINITIONS } from "./employment/variants";
 import { MARKET_DEFINITIONS } from "./markets";
 
-export type LegalTaxTaskGroup = "indirect-tax" | "income-tax" | "take-home-pay" | "employment";
+export type LegalTaxTaskGroup = "indirect-tax" | "income-tax" | "take-home-pay" | "withholding" | "employment";
 
 export interface LegalTaxDirectoryEntry {
   id: string;

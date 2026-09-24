@@ -1,0 +1,478 @@
+---
+import BaseLayout from "@layouts/BaseLayout.astro";
+import Container from "@components/layout/Container.astro";
+import PageShell from "@components/layout/PageShell.astro";
+import FaqSection from "@components/shared/FaqSection.astro";
+import PageHero from "@components/shared/PageHero.astro";
+import { MEXICO_HONORARIOS_2026 } from "@lib/calculators/legal-impuestos/calculadora-retenciones-honorarios/rules/mexico/2026";
+import { buildRegionalAlternateLinks } from "@lib/i18n/routing";
+import { buildFaqJsonLd } from "@lib/seo";
+
+const title = "Calculadora de retenciones para honorarios en México";
+const description = "Estima impuestos trasladados, retenciones de ISR e IVA y el neto a recibir por honorarios con tasas editables y fuentes oficiales.";
+const canonical = "/legal-impuestos/calculadora-retenciones-honorarios";
+const englishCanonical = "/en/legal-tax/mexico-professional-fees-withholding-calculator";
+const alternates = buildRegionalAlternateLinks({ "es-MX": canonical, "en-MX": englishCanonical }, Astro.site ?? Astro.url, canonical);
+const faqs = [
+  {
+    question: "¿Qué retenciones contempla el preset de México 2026?",
+    answer: "Estima la retención de ISR para honorarios del régimen general o RESICO pagados por una persona moral. La retención de IVA solo se activa al indicar que la persona moral recibe un servicio personal independiente.",
+  },
+  {
+    question: "¿La retención de IVA siempre aplica a honorarios?",
+    answer: "No. Depende de que la persona moral reciba un servicio personal independiente de una persona física, de que se traslade IVA y de que la contraprestación haya sido efectivamente pagada. Confirma la clasificación de tu actividad.",
+  },
+  {
+    question: "¿El neto estimado es lo mismo que el dinero después de impuestos?",
+    answer: "Es el subtotal más el impuesto trasladado, menos las retenciones y otros conceptos que captures. No calcula el impuesto anual, acreditamientos, deducciones, pagos parciales ni todas las particularidades de una operación.",
+  },
+  {
+    question: "¿Esta calculadora genera una factura?",
+    answer: "No. Es una estimación informativa; no genera CFDI ni declaraciones y no sustituye la revisión de un profesional fiscal o de la autoridad competente.",
+  },
+];
+const faqJsonLd = buildFaqJsonLd(faqs);
+const fieldClass = "mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-900 px-4 text-base text-white outline-none transition placeholder:text-gray-600 focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15";
+---
+
+<BaseLayout title={title} description={description} canonical={canonical} alternates={alternates}>
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={JSON.stringify(faqJsonLd)} />
+  </Fragment>
+
+  <PageShell>
+    <PageHero
+      title="Calculadora de retenciones de honorarios"
+      description="Estima cuánto recibirías después de sumar el IVA trasladado y restar las retenciones de ISR e IVA que correspondan a tu escenario."
+      kicker="Legal e impuestos · México"
+      collapseBreadcrumbOnMobile
+      containerClass="py-6 md:py-8"
+      breadcrumbs={[
+        { label: "Inicio", href: "/", ariaLabel: "Inicio" },
+        { label: "Legal e impuestos", href: "/legal-impuestos", optional: true },
+        { label: "Retenciones de honorarios", truncate: true },
+      ]}
+    />
+
+    <Container as="section" class="py-5 md:py-8">
+      <div class="grid gap-6 lg:grid-cols-[minmax(0,1fr)_21rem]">
+        <section class="overflow-hidden rounded-lg border border-gray-700 bg-gray-950 shadow-xl shadow-gray-950/30" aria-labelledby="withholdings-heading">
+          <div class="border-b border-gray-700 p-4 sm:p-6">
+            <p class="text-sm font-semibold uppercase tracking-wide text-amber-400">México · Reglas revisadas {MEXICO_HONORARIOS_2026.reviewedAt}</p>
+            <h2 id="withholdings-heading" class="mt-2 text-xl font-semibold">Datos de la operación</h2>
+            <p class="mt-2 text-sm leading-relaxed text-gray-400">Confirma quién paga y el tipo de servicio para mostrar solo las retenciones cuyo supuesto seleccionaste.</p>
+          </div>
+
+          <form class="p-4 sm:p-6" data-withholdings-form novalidate>
+            <div class="grid gap-4 sm:grid-cols-2">
+              <div>
+                <label for="withholdings-country" class="block text-sm font-medium text-gray-200">País</label>
+                <select id="withholdings-country" class={fieldClass} disabled><option>México</option></select>
+              </div>
+              <div>
+                <label for="withholdings-period" class="block text-sm font-medium text-gray-200">Periodo fiscal / reglas</label>
+                <select id="withholdings-period" class={fieldClass} data-select="period">
+                  <option value="2026">2026 · Preset fiscal</option>
+                  <option value="manual">Otro periodo · Tasas manuales</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="mt-5 grid gap-4 sm:grid-cols-2">
+              <div>
+                <label for="withholdings-regime" class="block text-sm font-medium text-gray-200">Régimen de la persona que presta</label>
+                <select id="withholdings-regime" class={fieldClass} data-select="regime">
+                  <option value="undefined" selected>No definido · no activar ISR automático</option>
+                  <option value="professional-services">Servicios profesionales (honorarios)</option>
+                  <option value="resico">RESICO · persona física</option>
+                </select>
+                <p class="mt-2 text-xs leading-relaxed text-gray-500">Selecciona RESICO solo si tributas válidamente en ese régimen.</p>
+              </div>
+              <div>
+                <label for="withholdings-payer" class="block text-sm font-medium text-gray-200">Tipo de pagador</label>
+                <select id="withholdings-payer" class={fieldClass} data-select="payerType">
+                  <option value="undefined" selected>No definido</option>
+                  <option value="legal-entity">Persona moral</option>
+                  <option value="individual">Persona física / otro no retenedor</option>
+                </select>
+                <p class="mt-2 text-xs leading-relaxed text-gray-500">El preset de retenciones automáticas de ISR aplica a pagos de personas morales.</p>
+              </div>
+            </div>
+
+            <div class="mt-5">
+              <label for="withholdings-personal-service" class="block text-sm font-medium text-gray-200">¿El servicio es personal independiente para efectos del IVA?</label>
+              <select id="withholdings-personal-service" class={fieldClass} data-select="personalService">
+                <option value="unknown" selected>No estoy seguro · no activar retención de IVA</option>
+                <option value="yes">Sí</option>
+                <option value="no">No · tiene característica de actividad empresarial</option>
+              </select>
+              <p class="mt-2 text-xs leading-relaxed text-gray-500">El SAT indica que la retención por este supuesto depende de que el servicio sea personal, no de actividad empresarial.</p>
+            </div>
+
+            <div class="mt-5">
+              <label for="withholdings-subtotal" class="block text-sm font-medium text-gray-200">Subtotal de honorarios</label>
+              <div class="mt-2 flex rounded-lg border border-gray-700 bg-gray-900 focus-within:border-amber-400 focus-within:ring-3 focus-within:ring-amber-400/15">
+                <span class="flex items-center pl-4 text-gray-500">$</span>
+                <input id="withholdings-subtotal" class="min-h-12 w-full bg-transparent px-3 pr-4 text-base text-white outline-none placeholder:text-gray-600" type="text" inputmode="decimal" autocomplete="off" placeholder="10,000.00" data-input="subtotal" aria-describedby="withholdings-subtotal-help error-subtotal" />
+              </div>
+              <p id="withholdings-subtotal-help" class="mt-2 text-xs leading-relaxed text-gray-500">Importe antes de impuestos trasladados y retenciones.</p>
+              <p id="error-subtotal" class="mt-2 hidden text-sm text-red-300" data-error="subtotal"></p>
+            </div>
+
+            <div class="mt-6 rounded-lg border border-gray-800 bg-gray-900/40 p-4">
+              <h3 class="text-sm font-semibold text-white">Impuestos y tasas</h3>
+              <p class="mt-1 text-xs leading-relaxed text-gray-500">Las tasas del preset son editables. Cualquier edición se marcará como supuesto manual.</p>
+              <div class="mt-4 grid gap-4 sm:grid-cols-2">
+                <div>
+                  <label for="withholdings-iva-treatment" class="block text-sm font-medium text-gray-200">Tratamiento del IVA</label>
+                  <select id="withholdings-iva-treatment" class={fieldClass} data-select="ivaTreatment">
+                    <option value="unconfirmed" selected>No definido · no agregar IVA automático</option>
+                    <option value="standard">Tasa general 16% · confirmar que aplica</option>
+                    <option value="zero-or-exempt">Sin IVA trasladado · 0%</option>
+                    <option value="manual">Tasa manual</option>
+                  </select>
+                </div>
+                <div>
+                  <label for="withholdings-transferred-rate" class="block text-sm font-medium text-gray-200">Impuesto trasladado (%)</label>
+                  <input id="withholdings-transferred-rate" class={fieldClass} type="text" inputmode="decimal" value="0" data-rate="transferredTaxPercent" aria-describedby="error-transferredTaxPercent" />
+                  <p id="error-transferredTaxPercent" class="mt-2 hidden text-sm text-red-300" data-error="transferredTaxPercent"></p>
+                </div>
+                <div>
+                  <label for="withholdings-isr-rate" class="block text-sm font-medium text-gray-200">Retención de ISR (%) del subtotal</label>
+                  <input id="withholdings-isr-rate" class={fieldClass} type="text" inputmode="decimal" value="0" data-rate="incomeTaxWithholdingPercent" aria-describedby="error-incomeTaxWithholdingPercent" />
+                  <p id="error-incomeTaxWithholdingPercent" class="mt-2 hidden text-sm text-red-300" data-error="incomeTaxWithholdingPercent"></p>
+                </div>
+                <div>
+                  <label for="withholdings-iva-retention-rate" class="block text-sm font-medium text-gray-200">Retención de IVA (%) del IVA trasladado</label>
+                  <input id="withholdings-iva-retention-rate" class={fieldClass} type="text" inputmode="decimal" value="0" data-rate="ivaWithholdingPercentOfTransferredTax" aria-describedby="withholdings-iva-retention-help error-ivaWithholdingPercentOfTransferredTax" />
+                  <p id="withholdings-iva-retention-help" class="mt-2 text-xs leading-relaxed text-gray-500">Con el supuesto aplicable, el preset usa 66.6667% del IVA trasladado (dos terceras partes).</p>
+                  <p id="error-ivaWithholdingPercentOfTransferredTax" class="mt-2 hidden text-sm text-red-300" data-error="ivaWithholdingPercentOfTransferredTax"></p>
+                </div>
+              </div>
+            </div>
+
+            <div class="mt-6 rounded-lg border border-gray-800 p-4">
+              <div class="flex flex-wrap items-center justify-between gap-3">
+                <div>
+                  <h3 class="text-sm font-semibold text-white">Otros conceptos</h3>
+                  <p class="mt-1 text-xs leading-relaxed text-gray-500">Agrega descuentos o conceptos adicionales como importes manuales.</p>
+                </div>
+                <button class="min-h-10 rounded-lg border border-gray-700 px-3 py-2 text-sm font-semibold text-gray-200 hover:border-amber-400 hover:text-white" type="button" data-add-concept>Agregar concepto</button>
+              </div>
+              <div class="mt-3 space-y-3" data-other-concepts></div>
+            </div>
+
+            <div class="mt-6 flex flex-col gap-3 border-t border-gray-800 pt-5 sm:flex-row">
+              <button class="inline-flex min-h-11 items-center justify-center rounded-lg bg-amber-400 px-5 py-2 text-sm font-semibold text-gray-950 transition hover:bg-amber-300 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400/40" type="submit">Calcular neto estimado</button>
+              <button class="inline-flex min-h-11 items-center justify-center rounded-lg border border-gray-700 px-5 py-2 text-sm font-semibold text-gray-200 transition hover:border-amber-400 hover:text-white" type="button" data-clear>Limpiar</button>
+              <p class="sr-only" aria-live="polite" data-form-status></p>
+            </div>
+          </form>
+        </section>
+
+        <aside class="h-fit rounded-lg border border-gray-700 bg-gray-900/80 p-4 shadow-xl shadow-gray-950/20 sm:p-6 lg:sticky lg:top-6" aria-labelledby="withholdings-result-heading" aria-live="polite">
+          <p class="text-sm font-semibold uppercase tracking-wide text-amber-400" data-result-status>Resultado</p>
+          <h2 id="withholdings-result-heading" class="mt-2 text-xl font-semibold">Neto estimado a recibir</h2>
+          <p class="mt-3 break-words text-4xl font-bold tracking-tight text-white sm:text-5xl" data-net-result>—</p>
+          <p class="mt-3 text-sm leading-relaxed text-gray-400" data-result-context>Captura el subtotal para ver un desglose de tu escenario.</p>
+          <div class="mt-6 hidden grid-cols-2 gap-3" data-result-metrics>
+            <div class="rounded-lg border border-gray-800 bg-gray-950/70 p-3"><span class="block text-xs text-gray-500">Total facturado</span><strong class="mt-1 block break-words text-sm text-white" data-invoiced-result>—</strong></div>
+            <div class="rounded-lg border border-gray-800 bg-gray-950/70 p-3"><span class="block text-xs text-gray-500">Total retenido</span><strong class="mt-1 block break-words text-sm text-white" data-withheld-result>—</strong></div>
+            <div class="col-span-2 rounded-lg border border-gray-800 bg-gray-950/70 p-3"><span class="block text-xs text-gray-500">Tasa total retenida sobre subtotal</span><strong class="mt-1 block text-sm text-white" data-rate-result>—</strong></div>
+          </div>
+          <div class="mt-6 hidden space-y-2" data-breakdown></div>
+          <div class="mt-5 hidden rounded-lg border border-amber-400/25 bg-amber-400/10 p-3 text-sm leading-relaxed text-amber-100" data-warning></div>
+        </aside>
+      </div>
+    </Container>
+
+    <Container as="section" class="pb-8 md:pb-10">
+      <div class="grid gap-6 lg:grid-cols-2">
+        <section class="rounded-lg border border-gray-800 bg-gray-950 p-5 sm:p-6" aria-labelledby="rules-heading">
+          <h2 id="rules-heading" class="text-xl font-semibold text-white">Qué incluye el preset México 2026</h2>
+          <ul class="mt-4 space-y-3 text-sm leading-relaxed text-gray-300">
+            <li><strong class="text-white">ISR:</strong> 10% del subtotal para servicios profesionales pagados por una persona moral; 1.25% en RESICO cuando se cumplan sus condiciones. El preset no aplica retención automática si no se selecciona persona moral.</li>
+            <li><strong class="text-white">IVA:</strong> tasa general trasladada de 16% editable; no clasifica si el servicio es gravado, exento, tasa cero o sujeto a un tratamiento especial.</li>
+            <li><strong class="text-white">Retención de IVA:</strong> dos terceras partes del IVA trasladado, solo si la persona moral recibe de una persona física un servicio personal independiente. Si no se confirma esa condición, inicia en cero.</li>
+            <li><strong class="text-white">Fuera del alcance:</strong> deducciones, acreditamientos, retenciones locales, pagos parciales, actividad o residencia fiscal y cálculo de obligaciones mensuales o anuales.</li>
+          </ul>
+        </section>
+        <section class="rounded-lg border border-gray-800 bg-gray-950 p-5 sm:p-6" aria-labelledby="sources-heading">
+          <h2 id="sources-heading" class="text-xl font-semibold text-white">Fuentes y vigencia</h2>
+          <p class="mt-2 text-sm leading-relaxed text-gray-400">Reglas para el periodo {MEXICO_HONORARIOS_2026.period}; revisadas el {MEXICO_HONORARIOS_2026.reviewedAt}. Abre las disposiciones para verificar el supuesto aplicable:</p>
+          <ul class="mt-4 space-y-3 text-sm">
+            {MEXICO_HONORARIOS_2026.sources.map((source) => (
+              <li>
+                <a class="font-semibold text-amber-300 underline decoration-amber-400/40 underline-offset-4 hover:text-amber-200" href={source.url} target="_blank" rel="noopener noreferrer">{source.title} · SAT</a>
+                <p class="mt-1 leading-relaxed text-gray-500">{source.appliesTo}</p>
+              </li>
+            ))}
+          </ul>
+        </section>
+      </div>
+      <p class="mt-6 rounded-lg border border-gray-800 bg-gray-900/60 p-4 text-sm leading-relaxed text-gray-400">Esta herramienta no genera comprobantes ni declaraciones fiscales y no sustituye la revisión de un profesional fiscal o de la autoridad competente. Las tasas manuales son solo escenarios; el régimen, tipo de servicio, pagador y tratamiento de IVA pueden cambiar las obligaciones reales.</p>
+    </Container>
+
+    <FaqSection faqs={faqs} />
+  </PageShell>
+</BaseLayout>
+
+<script>
+  import {
+    calculateHonorariosWithholdings,
+    formatHonorariosMoney,
+    formatRate,
+    getDefaultWithholdingRates,
+    isMexicoHonorariosPresetCurrent,
+    parseNonNegativeNumber,
+    type HonorariosRegime,
+    type IvaTreatment,
+    type PayerType,
+    type PersonalServiceStatus,
+    type WithholdingRateInputs,
+  } from "@lib/calculators/legal-impuestos/calculadora-retenciones-honorarios/withholdings";
+
+  const form = document.querySelector<HTMLFormElement>("[data-withholdings-form]")!;
+  const periodSelect = document.querySelector<HTMLSelectElement>('[data-select="period"]')!;
+  const regimeSelect = document.querySelector<HTMLSelectElement>('[data-select="regime"]')!;
+  const payerSelect = document.querySelector<HTMLSelectElement>('[data-select="payerType"]')!;
+  const personalServiceSelect = document.querySelector<HTMLSelectElement>('[data-select="personalService"]')!;
+  const treatmentSelect = document.querySelector<HTMLSelectElement>('[data-select="ivaTreatment"]')!;
+  const subtotalInput = document.querySelector<HTMLInputElement>('[data-input="subtotal"]')!;
+  const netResult = document.querySelector<HTMLElement>("[data-net-result]")!;
+  const resultStatus = document.querySelector<HTMLElement>("[data-result-status]")!;
+  const resultContext = document.querySelector<HTMLElement>("[data-result-context]")!;
+  const resultMetrics = document.querySelector<HTMLElement>("[data-result-metrics]")!;
+  const invoicedResult = document.querySelector<HTMLElement>("[data-invoiced-result]")!;
+  const withheldResult = document.querySelector<HTMLElement>("[data-withheld-result]")!;
+  const rateResult = document.querySelector<HTMLElement>("[data-rate-result]")!;
+  const breakdown = document.querySelector<HTMLElement>("[data-breakdown]")!;
+  const warning = document.querySelector<HTMLElement>("[data-warning]")!;
+  const otherConceptsContainer = document.querySelector<HTMLElement>("[data-other-concepts]")!;
+  const formStatus = document.querySelector<HTMLElement>("[data-form-status]")!;
+  const rateInputs = Array.from(document.querySelectorAll<HTMLInputElement>("[data-rate]"));
+  let otherConceptIndex = 0;
+  let presetExpired = false;
+
+  const errorMessages = {
+    required: "Escribe un importe.",
+    invalid: "Usa números y separadores decimales válidos.",
+    negative: "El importe o tasa no puede ser negativo.",
+    too_many_decimals: "Usa como máximo cuatro decimales.",
+  };
+
+  function getError(name) {
+    return document.querySelector(`[data-error="${name}"]`);
+  }
+
+  function setError(name, message = "") {
+    const input = name === "subtotal" ? subtotalInput : document.querySelector<HTMLInputElement>(`[data-rate="${name}"]`);
+    const error = getError(name);
+    input?.setAttribute("aria-invalid", message ? "true" : "false");
+    if (error) {
+      error.textContent = message;
+      error.classList.toggle("hidden", !message);
+    }
+  }
+
+  function getSelections() {
+    return {
+      period: periodSelect.value,
+      regime: regimeSelect.value as HonorariosRegime,
+      payerType: payerSelect.value as PayerType,
+      ivaTreatment: treatmentSelect.value as IvaTreatment,
+      personalService: personalServiceSelect.value as PersonalServiceStatus,
+    };
+  }
+
+  function refreshDefaultRates() {
+    const defaults = getDefaultWithholdingRates(getSelections());
+    for (const input of rateInputs) {
+      if (input.dataset.dirty === "true") continue;
+      input.value = String(defaults[input.dataset.rate as keyof WithholdingRateInputs]);
+    }
+    document.querySelector("[data-manual-period]")?.remove();
+    if (periodSelect.value === "manual") {
+      const wrapper = document.createElement("div");
+      wrapper.dataset.manualPeriod = "true";
+      wrapper.className = "mt-4";
+      wrapper.innerHTML = '<label class="block text-sm font-medium text-gray-200" for="withholdings-manual-year">Año del periodo</label><input id="withholdings-manual-year" class="mt-2 min-h-12 w-full rounded-lg border border-gray-700 bg-gray-900 px-4 text-base text-white outline-none focus:border-amber-400 focus:ring-3 focus:ring-amber-400/15" type="text" inputmode="numeric" maxlength="4" placeholder="2025" data-manual-year /><p class="mt-2 text-xs leading-relaxed text-gray-500">Sin tasas automáticas. Captura cada tasa manualmente.</p>';
+      periodSelect.parentElement?.append(wrapper);
+      document.querySelector<HTMLInputElement>("[data-manual-year]")?.addEventListener("input", () => updateCalculator(false));
+    }
+  }
+
+  function resetResult() {
+    resultStatus.textContent = "Resultado";
+    netResult.textContent = "—";
+    resultContext.textContent = "Captura el subtotal para ver un desglose de tu escenario.";
+    resultMetrics.classList.add("hidden");
+    resultMetrics.classList.remove("grid");
+    breakdown.classList.add("hidden");
+    breakdown.innerHTML = "";
+    warning.classList.add("hidden");
+    warning.textContent = "";
+    formStatus.textContent = "";
+  }
+
+  function escapeHtml(value) {
+    return String(value)
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;")
+      .replaceAll("'", "&#039;");
+  }
+
+  function readValue(input, name, required = false) {
+    const parsed = parseNonNegativeNumber(input?.value ?? "", required);
+    if (!parsed.ok) {
+      setError(name, errorMessages[parsed.error]);
+      return null;
+    }
+    setError(name);
+    return parsed.value;
+  }
+
+  function renderBreakdown(result) {
+    breakdown.innerHTML = result.breakdown.map((row) => `
+      <div class="flex items-start justify-between gap-3 rounded-lg border border-gray-800 bg-gray-950/70 p-3">
+        <span class="text-sm text-gray-400">${escapeHtml(row.label)}${row.note ? `<span class="mt-1 block text-xs text-gray-600">${escapeHtml(row.note)}</span>` : ""}</span>
+        <strong class="shrink-0 text-right text-sm text-white">${escapeHtml(formatHonorariosMoney(row.amount))}</strong>
+      </div>`).join("");
+    breakdown.classList.remove("hidden");
+  }
+
+  function getOtherConcepts() {
+    return Array.from(otherConceptsContainer.querySelectorAll<HTMLElement>("[data-other-row]")).map((row) => ({
+      label: row.querySelector<HTMLInputElement>("[data-other-label]")?.value ?? "",
+      amount: readValue(row.querySelector<HTMLInputElement>("[data-other-amount]"), `other-${row.dataset.otherRow}`),
+    }));
+  }
+
+  function updateCalculator(showRequired = false) {
+    if (!subtotalInput.value.trim() && !showRequired) {
+      setError("subtotal");
+      resetResult();
+      return;
+    }
+    const subtotal = readValue(subtotalInput, "subtotal", showRequired || Boolean(subtotalInput.value.trim()));
+    const rates: Record<keyof WithholdingRateInputs, number | null> = {
+      transferredTaxPercent: null,
+      incomeTaxWithholdingPercent: null,
+      ivaWithholdingPercentOfTransferredTax: null,
+    };
+    let invalid = subtotal === null;
+
+    for (const input of rateInputs) {
+      const rateId = input.dataset.rate as keyof WithholdingRateInputs;
+      const value = readValue(input, rateId);
+      rates[rateId] = value;
+      invalid ||= value === null;
+    }
+    const otherConcepts = getOtherConcepts();
+    invalid ||= otherConcepts.some((concept) => concept.amount === null);
+
+    if (invalid) {
+      resetResult();
+      return;
+    }
+    if (subtotal === null) {
+      resetResult();
+      return;
+    }
+
+    const selections = getSelections();
+    const resolvedRates = {
+      transferredTaxPercent: rates.transferredTaxPercent ?? 0,
+      incomeTaxWithholdingPercent: rates.incomeTaxWithholdingPercent ?? 0,
+      ivaWithholdingPercentOfTransferredTax: rates.ivaWithholdingPercentOfTransferredTax ?? 0,
+    };
+    const result = calculateHonorariosWithholdings({
+      ...selections,
+      subtotal,
+      ...resolvedRates,
+      manuallyEditedRateIds: rateInputs
+        .filter((input) => input.dataset.dirty === "true")
+        .map((input) => input.dataset.rate)
+        .filter((rateId): rateId is string => Boolean(rateId)),
+      otherConcepts: otherConcepts.filter((concept): concept is { label: string; amount: number } => concept.amount !== null),
+    });
+    const manualPeriod = periodSelect.value === "manual";
+    const customYear = document.querySelector<HTMLInputElement>("[data-manual-year]")?.value.trim();
+    const yearLabel = manualPeriod ? customYear || "periodo manual" : "2026";
+    const regimeLabel = selections.regime === "resico" ? "RESICO" : selections.regime === "professional-services" ? "Servicios profesionales" : "régimen no definido";
+    resultStatus.textContent = manualPeriod || result.manualRateIds.length ? "Escenario con tasas manuales" : "Estimación con preset México";
+    netResult.textContent = formatHonorariosMoney(result.netToReceive);
+    resultContext.textContent = `${regimeLabel} · Pagador: ${selections.payerType === "legal-entity" ? "persona moral" : selections.payerType === "individual" ? "persona física / otro" : "no definido"} · ${yearLabel}`;
+    resultMetrics.classList.remove("hidden");
+    resultMetrics.classList.add("grid");
+    invoicedResult.textContent = formatHonorariosMoney(result.totalInvoiced);
+    withheldResult.textContent = formatHonorariosMoney(result.totalWithheld);
+    rateResult.textContent = formatRate(result.totalWithheldRate);
+    renderBreakdown(result);
+    warning.textContent = [
+      ...result.warnings,
+      ...(selections.personalService === "unknown" ? ["No se activa la retención automática de IVA porque no confirmaste que el servicio sea personal independiente."] : []),
+      ...(selections.payerType !== "legal-entity" ? ["No se activan retenciones automáticas de ISR o IVA para este tipo de pagador en el alcance de este MVP."] : []),
+      ...(manualPeriod ? ["Las tasas manuales no se verifican contra un periodo fiscal oficial."] : []),
+      ...(presetExpired ? ["El preset México 2026 está fuera de su vigencia; usa tasas manuales."] : []),
+    ].join(" ");
+    warning.classList.remove("hidden");
+    formStatus.textContent = `Neto estimado actualizado: ${formatHonorariosMoney(result.netToReceive)}.`;
+  }
+
+  function addOtherConcept() {
+    const index = otherConceptIndex++;
+    const row = document.createElement("div");
+    row.dataset.otherRow = String(index);
+    row.className = "grid gap-3 sm:grid-cols-[minmax(0,1fr)_10rem_auto] sm:items-end";
+    row.innerHTML = `<div><label class="block text-xs font-medium text-gray-400" for="other-label-${index}">Concepto</label><input id="other-label-${index}" class="mt-1 min-h-11 w-full rounded-lg border border-gray-700 bg-gray-900 px-3 text-sm text-white outline-none focus:border-amber-400" type="text" maxlength="60" placeholder="Descuento adicional" data-other-label /></div><div><label class="block text-xs font-medium text-gray-400" for="other-amount-${index}">Importe</label><input id="other-amount-${index}" class="mt-1 min-h-11 w-full rounded-lg border border-gray-700 bg-gray-900 px-3 text-sm text-white outline-none focus:border-amber-400" type="text" inputmode="decimal" placeholder="0.00" data-other-amount aria-describedby="error-other-${index}" /><p id="error-other-${index}" class="mt-1 hidden text-xs text-red-300" data-error="other-${index}"></p></div><button class="min-h-10 rounded-lg border border-gray-700 px-3 py-2 text-sm text-gray-300 hover:border-red-400 hover:text-white" type="button" data-remove-concept aria-label="Quitar concepto">Quitar</button>`;
+    otherConceptsContainer.append(row);
+    row.querySelector<HTMLInputElement>("[data-other-label]")?.addEventListener("input", () => updateCalculator(false));
+    row.querySelector<HTMLInputElement>("[data-other-amount]")?.addEventListener("input", () => updateCalculator(false));
+  }
+
+  form?.addEventListener("submit", (event) => {
+    event.preventDefault();
+    updateCalculator(true);
+  });
+
+  subtotalInput?.addEventListener("input", () => updateCalculator(false));
+  rateInputs.forEach((input) => input.addEventListener("input", () => {
+    input.dataset.dirty = "true";
+    if (input.dataset.rate === "transferredTaxPercent" && treatmentSelect.value !== "manual") {
+      treatmentSelect.value = "manual";
+    }
+    updateCalculator(false);
+  }));
+  [periodSelect, regimeSelect, payerSelect, personalServiceSelect, treatmentSelect].forEach((select) => select?.addEventListener("change", () => {
+    refreshDefaultRates();
+    updateCalculator(false);
+  }));
+  document.querySelector("[data-add-concept]")?.addEventListener("click", addOtherConcept);
+  otherConceptsContainer?.addEventListener("click", (event) => {
+    const button = (event.target as Element | null)?.closest("[data-remove-concept]");
+    if (!button) return;
+    button.closest("[data-other-row]")?.remove();
+    updateCalculator(false);
+  });
+  document.querySelector("[data-clear]")?.addEventListener("click", () => {
+    form?.reset();
+    rateInputs.forEach((input) => { delete input.dataset.dirty; });
+    otherConceptsContainer.innerHTML = "";
+    if (presetExpired) periodSelect.value = "manual";
+    refreshDefaultRates();
+    document.querySelectorAll("[data-error]").forEach((element) => { element.textContent = ""; element.classList.add("hidden"); });
+    resetResult();
+  });
+
+  if (!isMexicoHonorariosPresetCurrent()) {
+    presetExpired = true;
+    const presetOption = periodSelect.querySelector<HTMLOptionElement>('option[value="2026"]');
+    if (presetOption) presetOption.disabled = true;
+    periodSelect.value = "manual";
+  }
+  refreshDefaultRates();
+  resetResult();
+</script>

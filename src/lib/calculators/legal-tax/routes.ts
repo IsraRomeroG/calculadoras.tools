@@ -10,6 +10,7 @@ export const PUBLISHED_LEGAL_TAX_ROUTES = [
   "/en/legal-tax/indirect-tax-calculator",
   "/en/legal-tax/mexico-income-tax-calculator",
   "/en/legal-tax/mexico-net-salary-calculator",
+  "/en/legal-tax/mexico-professional-fees-withholding-calculator",
   "/en/legal-tax/mexico-proportional-vacation-calculator",
   "/en/legal-tax/mexico-termination-pay-calculator",
   "/en/legal-tax/us-sales-tax-calculator",

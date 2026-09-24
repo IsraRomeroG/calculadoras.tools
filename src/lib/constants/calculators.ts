@@ -124,6 +124,14 @@ export const CALCULATORS: LegacyCalculatorDirectoryItem[] = [
     order: 22,
   },
   {
+    id: "calculadora-retenciones-honorarios",
+    title: "Calculadora de retenciones para honorarios",
+    description: "Estima IVA trasladado, retenciones de ISR e IVA y el neto a recibir por honorarios en México.",
+    href: "/legal-impuestos/calculadora-retenciones-honorarios",
+    categorySlug: "legal-impuestos",
+    order: 22.5,
+  },
+  {
     id: "calculadora-vacaciones-proporcionales",
     title: "Calculadora de vacaciones proporcionales",
     description:
@@ -1092,6 +1100,13 @@ const ENGLISH_CALCULATOR_METADATA: Partial<
     description:
       "Estimate net salary in Mexico after income tax, subsidies and entered deductions with a clear breakdown.",
     slug: "mexico-net-salary-calculator",
+    published: true,
+  },
+  "calculadora-retenciones-honorarios": {
+    title: "Mexico professional fees withholding calculator",
+    description:
+      "Estimate IVA charged, ISR and IVA withholding, and net proceeds for professional services in Mexico.",
+    slug: "mexico-professional-fees-withholding-calculator",
     published: true,
   },
   "calculadora-vacaciones-proporcionales": {

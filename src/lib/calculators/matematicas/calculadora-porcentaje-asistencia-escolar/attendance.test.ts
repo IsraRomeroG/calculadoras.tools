@@ -8,6 +8,7 @@ import {
   ATTENDANCE_EXAMPLES,
   buildAttendanceSummary,
   calculateAttendance,
+  calculatePolicyAttendance,
   ceilDiv,
   parseAttendanceInteger,
   parseAttendancePercent,
@@ -734,6 +735,21 @@ describe("strict attendance parsing", () => {
     });
   });
 
+  it("rejects numeric percentages that need rounding but accepts the numeric value 80", () => {
+    for (const value of [80.12345, 80.0000000000001, Number.NaN, Number.POSITIVE_INFINITY]) {
+      expect(() => calculatePolicyAttendance({
+        totalClasses: 10,
+        attendedClasses: 8,
+        requiredPercent: value,
+      })).toThrow(RangeError);
+    }
+    expect(calculatePolicyAttendance({
+      totalClasses: 10,
+      attendedClasses: 8,
+      requiredPercent: 80,
+    }).requiredPercent).toBe(80);
+  });
+
   it.each(["100.0001", "-1", "NaN", "Infinity"])(
     "rejects an out-of-domain percentage %s",
     (text) => expect(parseAttendancePercent(text)).toMatchObject({ ok: false }),
@@ -1082,6 +1098,18 @@ describe("attendance copy attempts", () => {
     current = false;
     finishWrite?.();
     await expect(pending).resolves.toBe("stale");
+    expect(fallbackCalls).toBe(0);
+  });
+
+  it("does not start a clipboard write when the captured context is already stale", async () => {
+    let writeCalls = 0;
+    let fallbackCalls = 0;
+    await expect(attemptAttendanceCopy({
+      writeText: async () => { writeCalls += 1; },
+      legacyCopy: () => { fallbackCalls += 1; return true; },
+      isCurrent: () => false,
+    })).resolves.toBe("stale");
+    expect(writeCalls).toBe(0);
     expect(fallbackCalls).toBe(0);
   });
 });

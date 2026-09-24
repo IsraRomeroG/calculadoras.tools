@@ -122,14 +122,14 @@ describe("legal-tax release gate", () => {
     });
   });
 
-  it("groups all 36 directory entries by task and country", () => {
+  it("groups all 37 directory entries by task and country", () => {
     expect(LEGAL_TAX_MARKET_DIRECTORY_ITEMS.every((item) => item.taskGroup && item.countryLabel)).toBe(true);
     const categorySource = readFileSync(join(root, "src", "components", "pages", "LegalTaxCategoryPage.astro"), "utf8");
     expect(categorySource).toContain("VAT, GST and sales tax");
     expect(categorySource).toContain("Income tax");
     expect(categorySource).toContain("Take-home pay");
     expect(categorySource).toContain("Paid leave, final pay and redundancy");
-    expect(LEGAL_TAX_MARKET_DIRECTORY_ITEMS.length + LEGACY_MEXICO_ROUTE_RECORDS.length + 1).toBe(36);
+    expect(LEGAL_TAX_MARKET_DIRECTORY_ITEMS.length + LEGACY_MEXICO_ROUTE_RECORDS.length + 1).toBe(37);
   });
 
   it("keeps exact employment scope in metadata and JSON-LD", () => {

@@ -105,6 +105,7 @@ export async function attemptAttendanceCopy({
   legacyCopy: () => boolean;
   isCurrent: () => boolean;
 }): Promise<AttendanceCopyAttemptResult> {
+  if (!isCurrent()) return "stale";
   let copied = false;
   if (writeText) {
     try {

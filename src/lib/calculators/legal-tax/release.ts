@@ -53,6 +53,7 @@ export const SOURCE_AUDIT_RECORDS: SourceAuditRecord[] = (() => {
 export const LEGACY_MEXICO_ROUTE_RECORDS = [
   { path: "/en/legal-tax/mexico-income-tax-calculator", jurisdictionCode: "MX", implementation: "mexico-income-tax" },
   { path: "/en/legal-tax/mexico-net-salary-calculator", jurisdictionCode: "MX", implementation: "mexico-net-salary" },
+  { path: "/en/legal-tax/mexico-professional-fees-withholding-calculator", jurisdictionCode: "MX", implementation: "mexico-professional-fees-withholding" },
   { path: "/en/legal-tax/mexico-proportional-vacation-calculator", jurisdictionCode: "MX", implementation: "mexico-proportional-vacation" },
   { path: "/en/legal-tax/mexico-termination-pay-calculator", jurisdictionCode: "MX", implementation: "mexico-termination-pay" },
 ] as const;

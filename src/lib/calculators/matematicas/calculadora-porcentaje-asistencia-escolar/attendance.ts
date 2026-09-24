@@ -194,6 +194,7 @@ const adapter = createAttendanceAdapter({
 });
 
 export const calculateAttendance = adapter.calculateAttendance;
+export const presentAttendance = adapter.presentAttendance;
 export const buildAttendanceSummary = adapter.buildAttendanceSummary;
 export const formatAttendanceNumber = adapter.formatAttendanceNumber;
 export const formatAttendancePercent = adapter.formatAttendancePercent;

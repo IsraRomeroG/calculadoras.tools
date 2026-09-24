@@ -723,6 +723,8 @@ function initAttendancePhase2Calculator(root: HTMLElement): void {
 
   function renderPhase2Result(context: AttendanceCalculatorContext): void {
     if (!context.result || context.presentation?.kind !== "policy") return;
+    initial?.classList.add("hidden");
+    results?.classList.remove("hidden");
     const fields = context.presentation.fields;
     setText("[data-result-percent]", fields.percent);
     setText("[data-result-current-status]", fields.currentStatus);

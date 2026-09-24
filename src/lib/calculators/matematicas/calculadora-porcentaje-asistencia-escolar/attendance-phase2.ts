@@ -633,8 +633,9 @@ export interface PreparedAttendanceRestore {
  */
 export function prepareAttendanceRestore(
   subjects: readonly AttendanceSubject[],
-  snapshot: AttendanceHistorySnapshot,
+  value: AttendanceHistorySnapshot,
 ): PreparedAttendanceRestore {
+  const snapshot = validateAttendanceHistorySnapshot(value);
   const persistedSubject = subjects.find((item) => item.id === snapshot.subject.id);
   const subjectState = persistedSubject ?? createAttendanceSubject(
     snapshot.subject.name,
@@ -929,7 +930,7 @@ function parseHistorySnapshot(value: unknown): AttendanceHistorySnapshot {
       remainingClasses: counts.remainingClasses,
     };
   }
-  const result = validateHistoryResult(value.result, facts, policy);
+  const result = validateHistoryResult(value.result, facts, policy, value.rulesVersion);
   return {
     id: value.id.trim(),
     savedAt: value.savedAt,
@@ -1035,6 +1036,7 @@ function validateHistoryResult(
   value: unknown,
   facts: HistoryInputFacts,
   policy: AttendancePolicy,
+  rulesVersion: string,
 ): PolicyAttendanceResult {
   if (!isRecord(value) || !isRecord(value.policy) || !isRecord(value.projection)) {
     throw new TypeError("History result must contain calculation and projection data.");
@@ -1057,6 +1059,19 @@ function validateHistoryResult(
   ) {
     throw new TypeError("History result counts do not match the saved inputs.");
   }
+  const expectedEffectiveTotal = policy.justified === "exclude"
+    ? totalClasses - justifiedAbsences
+    : totalClasses;
+  const expectedTardyPenalty = policy.tardyConversion === null
+    ? 0
+    : Math.floor(tardyClasses / policy.tardyConversion);
+  const expectedEffectiveAttended = Math.max(
+    0,
+    attendedClasses + (policy.justified === "credit" ? justifiedAbsences : 0) - expectedTardyPenalty,
+  );
+  const expectedTardyRemainder = policy.tardyConversion === null
+    ? tardyClasses
+    : tardyClasses % policy.tardyConversion;
   if (typeof value.requiredPercent !== "number") {
     throw new TypeError("History result minimum is invalid.");
   }
@@ -1074,6 +1089,10 @@ function validateHistoryResult(
   const tardyPenalty = requireHistoryInteger(value.tardyPenalty, 0, tardyClasses, "tardy penalty");
   const tardyRemainder = requireHistoryInteger(value.tardyRemainder, 0, tardyClasses, "tardy remainder");
   if (
+    effectiveTotalClasses !== expectedEffectiveTotal ||
+    effectiveAttendedClasses !== expectedEffectiveAttended ||
+    tardyPenalty !== expectedTardyPenalty ||
+    tardyRemainder !== expectedTardyRemainder ||
     effectiveAbsences !== Math.max(0, effectiveTotalClasses - effectiveAttendedClasses)
   ) {
     throw new TypeError("History effective attendance counts are inconsistent.");
@@ -1093,11 +1112,32 @@ function validateHistoryResult(
   ) {
     throw new TypeError("History current status is invalid.");
   }
+  if (effectiveTotalClasses > 0) {
+    const expectedCurrentEvaluation = evaluatePercent(
+      effectiveAttendedClasses,
+      effectiveTotalClasses,
+      policy.rounding,
+    );
+    if (!historyNumbersEqual(currentEvaluatedPercent, expectedCurrentEvaluation)) {
+      throw new TypeError("History evaluated percentage does not match its effective attendance counts.");
+    }
+    const expectedCurrentStatus = policy.rounding === "exact"
+      ? BigInt(effectiveAttendedClasses) * BigInt(100 * PERCENT_SCALE) >=
+        BigInt(effectiveTotalClasses) * BigInt(requiredPercentScaled)
+      : currentEvaluatedPercent! >= requiredPercent.value;
+    if ((value.currentStatus === "meets") !== expectedCurrentStatus) {
+      throw new TypeError("History current status does not match its saved result.");
+    }
+  }
   const projection = validateHistoryProjection(value.projection, {
     effectiveTotalClasses,
     effectiveAttendedClasses,
     effectiveAbsences,
     remainingClasses: facts.remainingClasses,
+    requiredPercent: requiredPercent.value,
+    policy,
+    currentStatus: value.currentStatus,
+    rulesVersion,
   });
   return {
     totalClasses,
@@ -1153,6 +1193,10 @@ function validateHistoryProjection(
     effectiveTotalClasses: number;
     effectiveAttendedClasses: number;
     effectiveAbsences: number;
+    requiredPercent: number;
+    policy: AttendancePolicy;
+    currentStatus: PolicyAttendanceResult["currentStatus"];
+    rulesVersion: string;
   },
 ): PolicyAttendanceResult["projection"] {
   if (value.status === "unknown") {
@@ -1203,13 +1247,35 @@ function validateHistoryProjection(
   const maxPossiblePercent = requireHistoryPercent(value.maxPossiblePercent, "maximum possible percentage");
   const finalEvaluatedPercent = requireHistoryPercent(value.finalEvaluatedPercent, "evaluated final percentage");
   const rawAvailableAbsences = finalTotalClasses - minimumAttendancesFinal - facts.effectiveAbsences;
+  const expectedFinalStatus = remainingClasses === 0
+    ? facts.currentStatus === "meets" ? "finished_meets" : "finished_below"
+    : requiredAttendancesFromRemaining > remainingClasses
+      ? "impossible"
+      : requiredAttendancesFromRemaining === 0
+        ? "guaranteed"
+        : "possible";
+  const expectedMaxPossiblePercent =
+    (100 * (facts.effectiveAttendedClasses + remainingClasses)) / finalTotalClasses;
+  const expectedFinalEvaluation = evaluatePercent(
+    facts.effectiveAttendedClasses + remainingClasses,
+    finalTotalClasses,
+    facts.policy.rounding,
+  );
   if (
     finalTotalClasses !== facts.effectiveTotalClasses + remainingClasses ||
     maximumFinalAbsences !== finalTotalClasses - minimumAttendancesFinal ||
     requiredAttendancesFromRemaining !== Math.max(0, minimumAttendancesFinal - facts.effectiveAttendedClasses) ||
     availableAbsences !== Math.max(0, Math.min(remainingClasses, rawAvailableAbsences)) ||
     exceededAbsences !== Math.max(0, -rawAvailableAbsences) ||
-    Math.abs(maxPossiblePercent - (100 * (facts.effectiveAttendedClasses + remainingClasses)) / finalTotalClasses) > 1e-10
+    !historyNumbersEqual(maxPossiblePercent, expectedMaxPossiblePercent) ||
+    value.status !== expectedFinalStatus ||
+    (facts.rulesVersion === ATTENDANCE_PHASE2_RULES_VERSION &&
+      minimumAttendancesFinal !== minimumAttendancesForPolicy(
+        finalTotalClasses,
+        facts.requiredPercent,
+        facts.policy,
+      )) ||
+    !historyNumbersEqual(finalEvaluatedPercent, expectedFinalEvaluation)
   ) {
     throw new TypeError("History projection counts are inconsistent.");
   }
@@ -1225,6 +1291,10 @@ function validateHistoryProjection(
     maxPossiblePercent,
     finalEvaluatedPercent,
   };
+}
+
+function historyNumbersEqual(actual: number | null, expected: number): boolean {
+  return typeof actual === "number" && Math.abs(actual - expected) <= 1e-10;
 }
 
 function requireHistoryInteger(value: unknown, min: number, max: number, label: string): number {

@@ -542,7 +542,7 @@ describe("calculator category directory", () => {
           id: "legal-impuestos",
           slug: "legal-tax",
           label: "Legal & Taxes",
-          count: 36,
+          count: 37,
         }),
       ]),
     );
@@ -557,6 +557,7 @@ describe("calculator category directory", () => {
       "calculadora-de-iva",
       "calculadora-isr-irpf",
       "calculadora-salario-neto",
+      "calculadora-retenciones-honorarios",
       "calculadora-vacaciones-proporcionales",
       "calculadora-aguinaldo-proporcional",
       "calculadora-prima-vacacional",
